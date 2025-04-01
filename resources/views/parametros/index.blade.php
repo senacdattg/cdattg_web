@@ -114,54 +114,36 @@
     <div class="container-fluid">
         @can('CREAR PARAMETRO')
         <div class="card shadow-sm mb-4">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                <h5 class="card-title m-0 font-weight-bold text-primary">
-                    <i class="fas fa-plus-circle mr-2"></i>Crear Parámetro
+            <div class="card-header bg-white py-3 d-flex align-items-center">
+                <h5 class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1">
+                    <i class="fas fa-plus-circle mr-2"></i> Crear Parámetro
                 </h5>
                 <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="collapse" data-target="#createParameterForm" aria-expanded="true">
                     <i class="fas fa-chevron-down"></i>
                 </button>
             </div>
+
             <div class="collapse show" id="createParameterForm">
                 <div class="card-body">
-                    <form class="row g-3">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fw-bold">Nombre del Parámetro</label>
-                                <input type="text" class="form-control" placeholder="Ingrese el nombre">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label class="form-label fw-bold">Estado</label>
-                                <select class="form-control">
-                                    <option value="1">Activo</option>
-                                    <option value="0">Inactivo</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-12 text-right">
-                            <button type="button" class="btn btn-light mr-2">Cancelar</button>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save mr-1"></i>Guardar Parámetro
-                            </button>
-                        </div>
-                    </form>
+                    @include('parametros.create')
                 </div>
             </div>
         </div>
         @endcan
 
         <div class="card shadow-sm">
-            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
-                <h6 class="m-0 font-weight-bold text-primary">Lista de Parámetros</h6>
+            <div class="card-header bg-white py-3 d-flex align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary d-flex flex-grow-1">Lista de Parámetros</h6>
                 <div class="input-group w-25">
-                    <input type="text" class="form-control form-control-sm" placeholder="Buscar parámetro...">
-                    <div class="input-group-append">
-                        <button class="btn btn-primary btn-sm" type="button">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </div>
+                    <form action="{{ route('parametro.index') }}" method="GET" class="input-group">
+                        <input type="text" name="search" id="searchParameter" class="form-control form-control-sm" 
+                               placeholder="Buscar parámetro..." value="{{ request('search') }}" autocomplete="off">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary btn-sm" type="submit">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
             <div class="card-body p-0">
@@ -256,6 +238,22 @@
                 icon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
             }
         });
+
+        // Search functionality
+        $('#searchParameter').on('keyup', function() {
+            let value = $(this).val().toLowerCase();
+            $('table tbody tr').filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        });
+
+        // Search button click handler
+        $('#searchBtn').on('click', function() {
+            let value = $('#searchParameter').val().toLowerCase();
+            $('table tbody tr').filter(function() {
+                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+            });
+        });
     });
 </script>
 @endsection
@@ -331,19 +329,19 @@
         justify-content: center;
     }
 
-    .breadcrumb-item + .breadcrumb-item::before {
+    .breadcrumb-item+.breadcrumb-item::before {
         content: "›";
         font-size: 1.2rem;
         line-height: 1;
         color: #6c757d;
     }
-    
+
     .breadcrumb-item {
         font-size: 0.9rem;
         display: flex;
         align-items: center;
     }
-    
+
     .breadcrumb-item i {
         font-size: 0.8rem;
         margin-right: 0.4rem;
