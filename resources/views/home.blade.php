@@ -53,4 +53,5 @@ $(document).ready(function() {
             </p>
         @endauth
     </div>
+@include('layout.footer')
 @endsection

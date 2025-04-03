@@ -100,6 +100,7 @@
             </div>
         </section>
     </div>
+@include('layout.footer')
 @endsection
 
 @section('script')

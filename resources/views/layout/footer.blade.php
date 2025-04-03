@@ -1,5 +1,5 @@
 @section('css')
-@vite(['resou    /css/style.css'])
+@vite(['resources/css/style.css'])
 @endsection 
 <footer class="footer py-4">
         <div class="row align-items-center">
