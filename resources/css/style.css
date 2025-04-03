@@ -195,3 +195,27 @@
     font-size: 15px;
     color: #4299e1;
 }
+
+.footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid rgba(0, 0, 0, .05);
+}
+
+.footer-logo {
+    opacity: 0.8;
+    transition: opacity 0.3s;
+}
+
+.footer-logo:hover {
+    opacity: 1;
+}
+
+.social-links a {
+    color: #6c757d;
+    transition: color 0.3s;
+}
+
+.social-links a:hover {
+    color: #39b54a;
+    text-decoration: none;
+}
