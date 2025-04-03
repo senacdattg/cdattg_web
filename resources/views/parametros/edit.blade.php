@@ -1,48 +1,47 @@
 @extends('adminlte::page')
 
 @section('css')
-<style>
-    .form-control {
-        border-radius: 0.25rem;
-        border: 1px solid #e2e8f0;
-        padding: 0.5rem 1rem;
-    }
-
-    .form-control:focus {
-        border-color: #4299e1;
-        box-shadow: 0 0 0 0.2rem rgba(66, 153, 225, 0.25);
-    }
-
-    .form-label {
-        font-size: 0.875rem;
-        margin-bottom: 0.5rem;
-        color: #4a5568;
-    }
-</style>
+@vite(['resources/css/style.css'])
 @endsection
 
-@section('content')
-<section class="content-header bg-light py-3 shadow-sm">
+@section('content_header')
+<section class="content-header dashboard-header py-4">
     <div class="container-fluid">
         <div class="row align-items-center">
-            <div class="col-sm-6">
-                <h1 class="h3 mb-0 text-gray-800">{{ $parametro->name }}</h1>
+            <div class="col-12 col-md-6 d-flex align-items-center">
+                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3" style="width: 48px; height: 48px;">
+                    <i class="fas fa-cogs text-white fa-lg"></i>
+                </div>
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">Parámetro</h1>
+                    <p class="text-muted mb-0 font-weight-light">Edición del parámetro</p>
+                </div>
             </div>
             <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right bg-transparent mb-0">
-                    <li class="breadcrumb-item">
-                        <a href="{{ route('verificarLogin') }}" class="text-primary">Inicio</a>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a href="{{ route('parametro.index') }}" class="text-primary">Parámetros</a>
-                    </li>
-                    <li class="breadcrumb-item active">{{ $parametro->name }}</li>
-                </ol>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('verificarLogin') }}" class="link_right_header">
+                                <i class="fas fa-home"></i> Inicio
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('parametro.index') }}" class="link_right_header">
+                                <i class="fas fa-cog"></i> Parámetros
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            <i class="fas fa-edit"></i> Editar parámetro
+                        </li>
+                    </ol>
+                </nav>
             </div>
         </div>
     </div>
 </section>
+@endsection
 
+@section('content')
 <section class="content mt-4">
     <div class="container-fluid">
         <div class="row">
@@ -51,7 +50,7 @@
                     <i class="fas fa-arrow-left mr-1"></i> Volver
                 </a>
 
-                <div class="card shadow-sm">
+                <div class="card shadow-sm no-hover">
                     <div class="card-header bg-white py-3">
                         <h5 class="card-title m-0 font-weight-bold text-primary">
                             <i class="fas fa-edit mr-2"></i>Editar Parámetro

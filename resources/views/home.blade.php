@@ -1,5 +1,18 @@
 @extends('adminlte::page')
 
+@section('js')
+<script>
+$(document).ready(function() {
+    $('.logout-form').on('click', function(e) {
+        e.preventDefault();
+        var form = $('<form action="{{ route("logout") }}" method="POST">@csrf</form>');
+        $('body').append(form);
+        form.submit();
+    });
+});
+</script>
+@stop
+
 @section('content')
     <div class="jumbotron py-3">
         @auth

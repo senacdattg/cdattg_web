@@ -196,7 +196,7 @@ return [
     'classes_content_wrapper' => '',
     'classes_content_header' => '',
     'classes_content' => '',
-    'classes_sidebar' => 'sidebar-dark-primary elevation-4 text-sm',    
+    'classes_sidebar' => 'sidebar-dark-primary elevation-4 text-sm',
     'classes_sidebar_nav' => '',
     'classes_topnav' => 'navbar-white navbar-light',
     'classes_topnav_nav' => 'navbar-expand',
@@ -258,7 +258,7 @@ return [
 
     'use_route_url' => false,
     'dashboard_url' => 'home',
-    'logout_url' => 'logout',
+    'url' => 'logout',
     'login_url' => 'login',
     'register_url' => 'register',
     'password_reset_url' => 'password/reset',
@@ -309,6 +309,42 @@ return [
             'type'       => 'fullscreen-widget',
             'topnav_right' => true,
         ],
+        [
+            'type'         => 'navbar-notification',
+            'id'           => 'my-notification',
+            'icon'         => 'fas fa-user-circle',
+            'text'         => 'Usuario',
+            'topnav_right' => true,
+            'dropdown_mode'   => true,
+            'dropdown_flabel' => 'Mi Cuenta',
+            'submenu' => [
+                [
+                    'text' => 'Mi Perfil',
+                    'url'  => 'perfil',
+                    'icon' => 'fas fa-user-circle text-info',
+                ],
+                [
+                    'text' => 'Cambiar Contraseña',
+                    'url'  => 'cambiar-password',
+                    'icon' => 'fas fa-key text-warning',
+                ],
+                [
+                    'type' => 'divider'
+                ],
+                [
+                    'text' => 'Cerrar Sesión',
+                    'url'  => '#',
+                    'icon' => 'fas fa-sign-out-alt text-danger',
+                    'classes' => 'text-danger logout-form',
+                    'data' => [
+                        'form-action' => 'logout',
+                        'method' => 'post',
+                        'csrf' => true,
+                    ],
+                ],
+            ],
+        ],
+
 
         // Sidebar items:
         [

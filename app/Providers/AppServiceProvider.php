@@ -22,8 +22,11 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
+    public function boot()
     {
+        setlocale(LC_ALL, 'es_ES', 'es', 'ES', 'es_ES.utf8');
+        \Carbon\Carbon::setLocale('es');
+        date_default_timezone_set('America/Bogota');
         Schema::defaultStringLength(191);
         PaginationPaginator::useBootstrap();
 

@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\ProfileController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -14,6 +14,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+
 
 // Rutas públicas
 foreach (glob(routes_path('autenticacion/public') . '/*.php') as $routeFile) {
@@ -41,3 +43,7 @@ Route::middleware('auth')->group(function () {
         }
     }
 });
+
+// Route::get('/perfil', [ProfileController::class, 'index'])->name('profile.index');
+// Route::put('/perfil', [ProfileController::class, 'update'])->name('profile.update');
+// Route::post('/cambiar-password', [ProfileController::class, 'changePassword'])->name('password.change');

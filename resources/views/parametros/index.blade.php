@@ -1,85 +1,10 @@
 @extends('adminlte::page')
 
 @section('css')
-<style>
-    .bg-success-light {
-        background-color: rgba(40, 167, 69, 0.1);
-    }
-
-    .bg-danger-light {
-        background-color: rgba(220, 53, 69, 0.1);
-    }
-
-    .btn-light {
-        background-color: #f8f9fa;
-        border-color: #f8f9fa;
-        transition: all 0.2s ease;
-    }
-
-    .btn-light:hover {
-        background-color: #e2e6ea;
-        border-color: #dae0e5;
-        transform: translateY(-1px);
-    }
-
-    .table td,
-    .table th {
-        vertical-align: middle;
-    }
-
-    .btn-group .btn {
-        margin: 0 2px;
-    }
-
-    .rounded-pill {
-        font-size: 0.875rem;
-    }
-
-    .form-control {
-        border-radius: 0.25rem;
-        border: 1px solid #e2e8f0;
-        padding: 0.5rem 1rem;
-    }
-
-    .form-control:focus {
-        border-color: #4299e1;
-        box-shadow: 0 0 0 0.2rem rgba(66, 153, 225, 0.25);
-    }
-
-    .form-label {
-        font-size: 0.875rem;
-        margin-bottom: 0.5rem;
-        color: #4a5568;
-    }
-
-    .btn-outline-primary {
-        color: #4299e1;
-        border-color: #4299e1;
-    }
-
-    .btn-outline-primary:hover {
-        background-color: #4299e1;
-        color: white;
-    }
-
-    .card-header .btn-sm {
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .dashboard-header {
-        background: linear-gradient(to right, #fff, #f8f9fa);
-        border-bottom: 1px solid rgba(0, 0, 0, .05);
-        box-shadow: 0 2px 4px rgba(0, 0, 0, .03);
-    }
-</style>
+@vite(['resources/css/style.css'])
 @endsection
 
-@section('content')
+@section('content_header')
 <section class="content-header dashboard-header py-4">
     <div class="container-fluid">
         <div class="row align-items-center">
@@ -96,7 +21,7 @@
                 <nav aria-label="breadcrumb">
                     <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
                         <li class="breadcrumb-item">
-                            <a href="{{ route('verificarLogin') }}" class="text-primary">
+                            <a href="{{ route('verificarLogin') }}" class="link_right_header">
                                 <i class="fas fa-home"></i> Inicio
                             </a>
                         </li>
@@ -113,7 +38,7 @@
 <section class="content mt-4">
     <div class="container-fluid">
         @can('CREAR PARAMETRO')
-        <div class="card shadow-sm mb-4">
+        <div class="card shadow-sm mb-4 no-hover">
             <div class="card-header bg-white py-3 d-flex align-items-center">
                 <h5 class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1">
                     <i class="fas fa-plus-circle mr-2"></i> Crear Parámetro
@@ -131,13 +56,13 @@
         </div>
         @endcan
 
-        <div class="card shadow-sm">
+        <div class="card shadow-sm no-hover">
             <div class="card-header bg-white py-3 d-flex align-items-center">
                 <h6 class="m-0 font-weight-bold text-primary d-flex flex-grow-1">Lista de Parámetros</h6>
                 <div class="input-group w-25">
                     <form action="{{ route('parametro.index') }}" method="GET" class="input-group">
-                        <input type="text" name="search" id="searchParameter" class="form-control form-control-sm" 
-                               placeholder="Buscar parámetro..." value="{{ request('search') }}" autocomplete="off">
+                        <input type="text" name="search" id="searchParameter" class="form-control form-control-sm"
+                            placeholder="Buscar parámetro..." value="{{ request('search') }}" autocomplete="off">
                         <div class="input-group-append">
                             <button class="btn btn-primary btn-sm" type="submit">
                                 <i class="fas fa-search"></i>
@@ -224,127 +149,10 @@
 </section>
 @endsection
 
-@section('js')
-<script>
-    $(function() {
-        $('[data-toggle="tooltip"]').tooltip();
-
-        // Smooth collapse animation
-        $('.collapse').on('show.bs.collapse hide.bs.collapse', function(e) {
-            const icon = $(this).prev().find('i');
-            if (e.type === 'show') {
-                icon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
-            } else {
-                icon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
-            }
-        });
-
-        // Search functionality
-        $('#searchParameter').on('keyup', function() {
-            let value = $(this).val().toLowerCase();
-            $('table tbody tr').filter(function() {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-            });
-        });
-
-        // Search button click handler
-        $('#searchBtn').on('click', function() {
-            let value = $('#searchParameter').val().toLowerCase();
-            $('table tbody tr').filter(function() {
-                $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-            });
-        });
-    });
-</script>
+@section('footer')
+@include('layout.footer')
 @endsection
-
-@section('css')
-<style>
-    .bg-success-light {
-        background-color: rgba(40, 167, 69, 0.1);
-    }
-
-    .bg-danger-light {
-        background-color: rgba(220, 53, 69, 0.1);
-    }
-
-    .btn-light {
-        background-color: #f8f9fa;
-        border-color: #f8f9fa;
-        transition: all 0.2s ease;
-    }
-
-    .btn-light:hover {
-        background-color: #e2e6ea;
-        border-color: #dae0e5;
-        transform: translateY(-1px);
-    }
-
-    .table td,
-    .table th {
-        vertical-align: middle;
-    }
-
-    .btn-group .btn {
-        margin: 0 2px;
-    }
-
-    .rounded-pill {
-        font-size: 0.875rem;
-    }
-
-    .form-control {
-        border-radius: 0.25rem;
-        border: 1px solid #e2e8f0;
-        padding: 0.5rem 1rem;
-    }
-
-    .form-control:focus {
-        border-color: #4299e1;
-        box-shadow: 0 0 0 0.2rem rgba(66, 153, 225, 0.25);
-    }
-
-    .form-label {
-        font-size: 0.875rem;
-        margin-bottom: 0.5rem;
-        color: #4a5568;
-    }
-
-    .btn-outline-primary {
-        color: #4299e1;
-        border-color: #4299e1;
-    }
-
-    .btn-outline-primary:hover {
-        background-color: #4299e1;
-        color: white;
-    }
-
-    .card-header .btn-sm {
-        width: 32px;
-        height: 32px;
-        padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .breadcrumb-item+.breadcrumb-item::before {
-        content: "›";
-        font-size: 1.2rem;
-        line-height: 1;
-        color: #6c757d;
-    }
-
-    .breadcrumb-item {
-        font-size: 0.9rem;
-        display: flex;
-        align-items: center;
-    }
-
-    .breadcrumb-item i {
-        font-size: 0.8rem;
-        margin-right: 0.4rem;
-    }
-</style>
+@section('js')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+@vite(['resources/js/parametros.js'])
 @endsection
