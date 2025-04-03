@@ -3,7 +3,6 @@
 <script src="{{ asset('dist/js/adminlte.min.js') }}?v=3.2.0"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-@include('layout.alertas')
 </body>
 
 </html>
