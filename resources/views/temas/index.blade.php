@@ -77,8 +77,8 @@
                             <tr>
                                 <th class="px-4 py-3" style="width: 5%">#</th>
                                 <th class="px-4 py-3" style="width: 25%">Nombre</th>
-                                <th class="px-4 py-3" style="width: 15%">Estado</th>
-                                <th class="px-4 py-3" style="width: 40%">Parámetros</th>
+                                <th class="px-4 py-3 text-center" style="width: 15%">Estado</th>
+                                <th class="px-4 py-3 text-center" style="width: 40%">Parámetros</th>
                                 <th class="px-4 py-3 text-center" style="width: 25%">Acciones</th>
                             </tr>
                         </thead>
@@ -88,7 +88,7 @@
                                 <td class="px-4">{{ $loop->iteration }}</td>
                                 <td class="px-4 font-weight-medium">{{ $tema->name }}</td>
                                 <td class="px-4">
-                                    <div class="d-inline-block px-3 py-1 rounded-pill {{ $tema->status === 1 ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}">
+                                    <div class="ml-3 d-inline-block px-3 py-1 rounded-pill {{ $tema->status === 1 ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}">
                                         <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
                                         {{ $tema->status === 1 ? 'Activo' : 'Inactivo' }}
                                     </div>

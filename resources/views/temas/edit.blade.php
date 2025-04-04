@@ -2,47 +2,39 @@
 
 @section('css')
 @vite('resources/css/style.css')
-<style>
-    #parametros_disponibles option:checked,
-    #parametros_asignados option:checked {
-        background: #007bff !important;
-        color: #ffffff !important;
-        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
-    }
-
-    #parametros_disponibles option:hover,
-    #parametros_asignados option:hover {
-        background-color: #e8f5e9 !important;
-        cursor: pointer;
-    }
-
-    #parametros_disponibles,
-    #parametros_asignados {
-        border: 1px solid #e2e8f0;
-        border-radius: 4px;
-    }
-</style>
 @endsection
 
-@section('content')
-<!-- Encabezado de la página -->
-<section class="content-header">
+@section('content_header')
+<section class="content-header dashboard-header py-4">
     <div class="container-fluid">
-        <div class="row mb-2">
-            <div class="col-sm-6">
-                <h1>{{ $tema->name }}</h1>
+        <div class="row align-items-center">
+            <div class="col-12 col-md-6 d-flex align-items-center">
+                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3" style="width: 48px; height: 48px;">
+                    <i class="fas fa-cogs text-white fa-lg"></i>
+                </div>
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">Parámetro</h1>
+                    <p class="text-muted mb-0 font-weight-light">Edición del parámetro</p>
+                </div>
             </div>
             <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-right">
-                    <li class="breadcrumb-item">
-                        <a href="{{ route('verificarLogin') }}">Inicio</a>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a href="{{ route('tema.index') }}">Temas</a>
-                    </li>
-                    <li class="breadcrumb-item active">Editar</li>
-                    <li class="breadcrumb-item active">{{ $tema->name }}</li>
-                </ol>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('verificarLogin') }}" class="link_right_header">
+                                <i class="fas fa-home"></i> Inicio
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('parametro.index') }}" class="link_right_header">
+                                <i class="fas fa-fw fa-paint-brush"></i> Tema
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            <i class="fas fa-edit"></i> Editar tema
+                        </li>
+                    </ol>
+                </nav>
             </div>
         </div>
     </div>
@@ -51,7 +43,7 @@
 <!-- Contenido principal -->
 <section class="content">
     <div class="container-fluid">
-        <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ route('tema.index') }}">
+        <a class="btn btn-outline-secondary btn-sm mb-3 mt-4" href="{{ route('tema.index') }}">
             <i class="fas fa-arrow-left mr-1"></i> Volver
         </a>
 
@@ -189,62 +181,5 @@
 @endsection
 
 @section('js')
-<script>
-    // Double-click handlers for both select boxes
-    document.getElementById('parametros_disponibles').addEventListener('dblclick', function() {
-        moveSelectedOptions('parametros_disponibles', 'parametros_asignados');
-    });
-
-    document.getElementById('parametros_asignados').addEventListener('dblclick', function() {
-        moveSelectedOptions('parametros_asignados', 'parametros_disponibles');
-    });
-
-    // Button click handlers
-    document.getElementById('agregar_parametro').addEventListener('click', function() {
-        moveSelectedOptions('parametros_disponibles', 'parametros_asignados');
-    });
-
-    document.getElementById('quitar_parametro').addEventListener('click', function() {
-        moveSelectedOptions('parametros_asignados', 'parametros_disponibles');
-    });
-
-    // // Add click handler to deselect when clicking outside
-    // document.addEventListener('click', function(e) {
-    //     const parametrosDisponibles = document.getElementById('parametros_disponibles');
-    //     const parametrosAsignados = document.getElementById('parametros_asignados');
-        
-    //     if (!parametrosDisponibles.contains(e.target) && !parametrosAsignados.contains(e.target)) {
-    //         parametrosDisponibles.querySelectorAll('option:checked').forEach(option => {
-    //             option.selected = false;
-    //         });
-    //         parametrosAsignados.querySelectorAll('option:checked').forEach(option => {
-    //             option.selected = false;
-    //         });
-    //     }
-    // });
-
-    function moveSelectedOptions(fromSelectId, toSelectId) {
-        const fromSelect = document.getElementById(fromSelectId);
-        const toSelect = document.getElementById(toSelectId);
-        
-        // If nothing is selected, select the clicked item
-        if (fromSelect.selectedOptions.length === 0 && fromSelect.options.length > 0) {
-            fromSelect.options[fromSelect.options.length - 1].selected = true;
-        }
-
-        // Move all selected options
-        for(let option of [...fromSelect.selectedOptions]) {
-            toSelect.appendChild(option);
-        }
-
-        // Sort options alphabetically
-        sortSelect(toSelect);
-    }
-
-    function sortSelect(select) {
-        let options = [...select.options];
-        options.sort((a, b) => a.text.localeCompare(b.text));
-        options.forEach(option => select.appendChild(option));
-    }
-</script>
+@vite(['resources/js/tema.js'])
 @endsection

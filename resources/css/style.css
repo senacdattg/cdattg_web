@@ -210,4 +210,23 @@
 small {
     font-size: 16px;
     color: #6c757d;
-}	
+}
+
+#parametros_disponibles option:checked,
+#parametros_asignados option:checked {
+    background: #007bff !important;
+    color: #ffffff !important;
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.2);
+}
+
+#parametros_disponibles option:hover,
+#parametros_asignados option:hover {
+    background-color: #e8f5e9 !important;
+    cursor: pointer;
+}
+
+#parametros_disponibles,
+#parametros_asignados {
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+}
