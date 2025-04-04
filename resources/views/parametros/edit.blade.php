@@ -108,4 +108,5 @@
         </div>
     </div>
 </section>
+@include('layout.footer')
 @endsection
