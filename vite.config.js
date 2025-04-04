@@ -11,6 +11,9 @@ export default defineConfig({
                 'resources/js/parametros.js',
                 'resources/js/tema.js',
                 'resources/js/logout.js',
+                'resources/js/dashboards/superadmin/charts-scripts.js',
+                'resources/js/dashboards/superadmin/widgets.js',
+                'resources/css/dashboards/dashboard_superadmin.css'
             ],
             refresh: true,
         }),

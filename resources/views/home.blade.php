@@ -1,18 +1,5 @@
 @extends('adminlte::page')
-
-@section('js')
-<script>
-$(document).ready(function() {
-    $('.logout-form').on('click', function(e) {
-        e.preventDefault();
-        var form = $('<form action="{{ route("logout") }}" method="POST">@csrf</form>');
-        $('body').append(form);
-        form.submit();
-    });
-});
-</script>
-@stop
-
+@section('title', 'Inicio')
 @section('content')
     <div class="jumbotron py-3">
         @auth
@@ -21,16 +8,16 @@ $(document).ready(function() {
             @endphp
 
             @role('SUPER ADMINISTRADOR')
-                <h1 class="display-4">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+                <h1 class="display-4">
                     @include('dashboards.superadmin')
                 </h1>
                 <p class="lead">Tienes acceso completo a todas las herramientas del sistema.</p>
-            @elserole('ADMINISTRADOR')
+                @elserole('ADMINISTRADOR')
                 <h1 class="display-4">
                     Bienvenido <strong>{{ $nombreCompleto }}</strong>!
                 </h1>
                 <p class="lead">Tienes acceso a la administración del sistema. Revisa las configuraciones y reportes.</p>
-            @elserole('INSTRUCTOR')
+                @elserole('INSTRUCTOR')
                 <h1 class="display-4">
                     Hola Instructor <strong>{{ $nombreCompleto }}</strong>!
                 </h1>
@@ -53,5 +40,5 @@ $(document).ready(function() {
             </p>
         @endauth
     </div>
-@include('layout.footer')
+    @include('layout.footer')
 @endsection
