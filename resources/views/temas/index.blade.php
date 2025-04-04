@@ -89,7 +89,7 @@
                                 <td class="px-4 font-weight-medium">{{ $tema->name }}</td>
                                 <td class="px-4">
                                     <div class="ml-3 d-inline-block px-3 py-1 rounded-pill {{ $tema->status === 1 ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}">
-                                        <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
+                                        <i class="fas fa-circle" style="font-size: 8px;"></i>
                                         {{ $tema->status === 1 ? 'Activo' : 'Inactivo' }}
                                     </div>
                                 </td>
