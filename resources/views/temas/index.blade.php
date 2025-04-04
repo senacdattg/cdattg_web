@@ -10,7 +10,7 @@
         <div class="row align-items-center">
             <div class="col-12 col-md-6 d-flex align-items-center">
                 <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3" style="width: 48px; height: 48px;">
-                    <i class="fas fa-cogs text-white fa-paint-brush"></i>
+                    <i class="fas fa-fw fa-paint-brush text-white"></i>
                 </div>
                 <div>
                     <h1 class="h3 mb-0 text-gray-800">Temas</h1>
@@ -26,7 +26,7 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item active" aria-current="page">
-                            <i class="fas fa-cog"></i> Temas
+                            <i class="fas fa-fw fa-paint-brush"></i> Temas
                         </li>
                     </ol>
                 </nav>
@@ -97,7 +97,7 @@
                                     @forelse ($tema->parametros as $parametro)
                                     <span class="badge badge-info">{{ $parametro->name }}</span>
                                     @empty
-                                    <small>No hay parámetros asignados al tema {{ $parametro->name }}</small>
+                                    <small>No hay parámetros asignados</small>
                                     @endforelse
                                 </td>
                                 <td class="px-4 text-center">

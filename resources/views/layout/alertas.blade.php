@@ -20,7 +20,7 @@
             if (successMessage) {
                 Toastify({
                     text: `<i class="fas fa-check-circle"></i> ${successMessage}`,
-                    duration: 1800,
+                    duration: 3000,
                     gravity: "top",
                     position: "center",
                     escapeMarkup: false,
@@ -44,7 +44,7 @@
             if (errorMessage) { 
                 Toastify({
                     text: `<i class="fas fa-exclamation-circle"></i> ${errorMessage}`,
-                    duration: 1800,
+                    duration: 3000,
                     gravity: "top",
                     position: "center",
                     escapeMarkup: false,
@@ -94,6 +94,8 @@
             }
         }, 350);
 
+        // Keep the form submit listener outside the timeout
+        // Replace the simple confirm with SweetAlert2
         document.addEventListener('submit', function(e) {
             if (e.target.matches('.formulario-eliminar')) {
                 e.preventDefault();
@@ -118,8 +120,8 @@
                     buttonsStyling: false,
                     background: '#fff',
                     backdrop: `rgba(0,0,0,0.4)`,
-                    allowOutsideClick: true,
-                    allowEscapeKey: true,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
                     padding: '1.25em',
                     width: '360px'
                 }).then((result) => {
