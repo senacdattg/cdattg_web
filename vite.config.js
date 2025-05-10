@@ -7,8 +7,8 @@ export default defineConfig({
             input: {
                 // CSS files
                 'style': 'resources/css/style.css',
-                'temas': 'resources/css/temas.css',
-                'temas': 'resources/css/parametros.css',
+                'temas_css': 'resources/css/temas.css',
+                'parametros_css': 'resources/css/parametros.css',
                 'dashboard_superadmin': 'resources/css/dashboards/dashboard_superadmin.css',
                 
                 // JavaScript files
