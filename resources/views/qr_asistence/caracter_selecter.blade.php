@@ -1,6 +1,5 @@
 @extends('adminlte::page')
 @section('content')
-
     <section class="content-header mt-3">
         <div class="container-fluid mt-3">
             <div class="row mb-2">
@@ -37,33 +36,44 @@
         <div class="container-fluid">
 
             <div class="row">
-                @foreach($caracterizaciones as $caracterizacion)
+                @foreach ($caracterizaciones as $caracterizacion)
                     <div class="col-md-4">
                         <div class="card" style="height: 90%">
                             <div class="card-header">
                                 <h3 class="card-title"><b>N° ficha:</b> {{ $caracterizacion->ficha->ficha }}</h3>
                             </div>
                             <div class="card-body">
-                                <h6><b>N° Caracterización: </b>{{$caracterizacion->id}}</h6>
+                                <h6><b>N° Caracterización: </b>{{ $caracterizacion->id }}</h6>
                                 <h6><b>Programa:</b> {{ $caracterizacion->programaFormacion->nombre }}</h6>
-                                <h6><b>Instructor:</b> {{ $caracterizacion->persona->primer_nombre }}</h6>
+                                <h6><b>Instructor:</b> {{ $caracterizacion->instructor->persona->nombre_completo }}</h6>
                                 <h6><b>Jornada:</b> {{ $caracterizacion->jornada->jornada }}</h6>
                             </div>
                             <div class="card-footer">
                                 <div class="row">
                                     <div class="col-md-6">
-                                        <a href="{{ route('asistence.caracterSelected', ['id' => $caracterizacion->id]) }}" class="btn btn-primary">Asistencia</a>
-                                    </div>  
+                                        <a href="{{ route('asistence.caracterSelected', ['id' => $caracterizacion->id]) }}"
+                                            class="btn btn-primary">Asistencia</a>
+                                    </div>
                                     <div class="col-md-6">
-                                        <a href="{{ route('asistence.weblist', ['ficha' => $caracterizacion->ficha->ficha, 'jornada' => $caracterizacion->jornada->jornada]) }}" class="btn btn-success">Novedades</a>
+                                        <a href="{{ route('asistence.weblist', ['ficha' => $caracterizacion->ficha->ficha, 'jornada' => $caracterizacion->jornada->jornada]) }}"
+                                            class="btn btn-success">Novedades</a>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                     </div>
                 @endforeach
             </div>
         </div>
     </section>
-</div>
+    </div>
 @endsection

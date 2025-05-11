@@ -26,10 +26,11 @@ class AsistenciaAprendicesController extends Controller
      * @return \Illuminate\View\View La vista 'asistencias.index' con las fichas de caracterización.
      */
     public function index (){
-        $fichas = FichaCaracterizacion::select('id', 'ficha')->get();
-        return view('asistencias.index', compact('fichas')); 
+        // $fichas = FichaCaracterizacion::select('id', 'ficha')->get();
+        $fichas = FichaCaracterizacion::all();
+        return view('asistencias.index', compact('fichas'));
     }
-   
+
     /**
      * Obtiene las asistencias de los aprendices por ficha.
      *
@@ -39,13 +40,13 @@ class AsistenciaAprendicesController extends Controller
      * @throws \Exception Si ocurre un error al obtener las asistencias.
      */
     public function getAttendanceByFicha (Request $request){
-       
+
         try {
             $fichaId = $request->input('ficha');
             if (!$fichaId) {
                 return response()->json(['message' => 'ID de ficha no proporcionado'], 400);
             }
-            
+
             $asistencias = AsistenciaAprendiz::whereHas('caracterizacion', function ($query) use ($fichaId) {
                 $query->where('ficha_id', $fichaId);
             })->orderBy('id', 'desc')->get();
@@ -57,7 +58,7 @@ class AsistenciaAprendicesController extends Controller
         } catch (Exception $e) {
             return response()->json(['message' => 'Error obteniendo asistencias', 'error' => $e->getMessage()], 500);
         }
-    
+
     }
 
     /**
@@ -103,15 +104,15 @@ class AsistenciaAprendicesController extends Controller
      * Obtiene los documentos asociados a una ficha específica.
      *
      * @param \Illuminate\Http\Request $request La solicitud HTTP que contiene el ID de la ficha.
-     * @return \Illuminate\Http\JsonResponse|\Illuminate\View\View Una respuesta JSON con los documentos encontrados o un mensaje de error, 
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\View\View Una respuesta JSON con los documentos encontrados o un mensaje de error,
      *         o una vista con los documentos si se encuentran.
      *
      * @throws \Exception Si ocurre un error al obtener los documentos.
      */
     public function getDocumentsByFicha(Request $request)
     {
-        $ficha_id = $request->input('ficha'); 
-        
+        $ficha_id = $request->input('ficha');
+
         try {
             if (!$ficha_id) {
                 return response()->json(['message' => 'ID de ficha no proporcionado'], 400);
@@ -122,7 +123,7 @@ class AsistenciaAprendicesController extends Controller
                 $query->where('ficha_id', $ficha_id);
             })
             ->get();
-            
+
             if ($documentos->isEmpty()) {
                 return response()->json(['message' => 'No se encontraron documentos para la ficha proporcionada'], 404);
             }
@@ -143,14 +144,14 @@ class AsistenciaAprendicesController extends Controller
      * @return \Illuminate\Http\JsonResponse|\Illuminate\View\View Una respuesta JSON con un mensaje de error o una vista con las asistencias encontradas.
      */
     public function getAttendanceByDocument(Request $request){
-        $document = $request->input('documento'); 
-       
+        $document = $request->input('documento');
+
             if ( !$document) {
                 return response()->json(['message' => 'Datos incompletos'], 400);
             }
 
             $asistencias = AsistenciaAprendiz::where('numero_identificacion', $document)->get();
-           
+
             if ($asistencias->isEmpty()) {
                 return response()->json(['message' => 'No se encontraron asistencias para la ficha y documento proporcionados'], 404);
             }
@@ -158,7 +159,7 @@ class AsistenciaAprendicesController extends Controller
             return view('asistencias.asistencia_by_document', ['asistencias' => $asistencias]);
     }
 
-  
+
     /**
      * Almacena la asistencia de los aprendices.
      *
@@ -172,12 +173,12 @@ class AsistenciaAprendicesController extends Controller
     public function store(Request $request)
     {
             $data = $request->all();
-      
+
             if (isset($data['attendance']) ) {
-               
+
                 foreach ($data['attendance'] as $attendance) {
                     $horaIngreso = Carbon::parse($attendance['hora_ingreso'])->format('Y-m-d H:i:s');
-    
+
                     AsistenciaAprendiz::create([
                         'caracterizacion_id' => $data['caracterizacion_id'],
                         'nombres' => $attendance['nombres'],
@@ -206,21 +207,21 @@ class AsistenciaAprendicesController extends Controller
             return response()->json(['message' => 'Error saving attendance'], 500);
     }
 
-    
+
     /**
      * Actualiza la hora de salida de las asistencias de los aprendices.
      *
      * @param \Illuminate\Http\Request $request La solicitud HTTP que contiene los datos necesarios para la actualización.
-     * 
+     *
      * @return \Illuminate\Http\JsonResponse La respuesta JSON con un mensaje de éxito o error.
-     * 
+     *
      * @throws \Illuminate\Validation\ValidationException Si los datos proporcionados son incompletos.
-     * 
+     *
      * Datos esperados en la solicitud:
      * - caracterizacion_id: ID de la caracterización del aprendiz.
      * - hora_salida: Hora de salida a actualizar.
      * - fecha: Fecha de la asistencia a actualizar.
-     * 
+     *
      * Respuestas posibles:
      * - 200: Asistencias actualizadas con éxito.
      * - 400: Datos incompletos.
@@ -252,23 +253,23 @@ class AsistenciaAprendicesController extends Controller
             return response()->json(['message' => 'Asistencias actualizadas con éxito'], 200);
     }
 
-    
+
     /**
      * Maneja la solicitud de novedad de asistencia de aprendices.
      *
      * @param \Illuminate\Http\Request $request La solicitud HTTP que contiene los datos de la novedad.
-     * 
+     *
      * @return \Illuminate\Http\JsonResponse La respuesta JSON con el mensaje correspondiente y el código de estado HTTP.
-     * 
+     *
      * @throws \Illuminate\Validation\ValidationException Si los datos de la solicitud están incompletos.
-     * 
+     *
      * Este método verifica si la solicitud contiene los campos necesarios: 'caracterizacion_id', 'numero_identificacion', 'hora_entrada' y 'novedad'.
      * Si alguno de estos campos falta, devuelve una respuesta JSON con un mensaje de error y un código de estado 400.
-     * 
+     *
      * Luego, intenta encontrar un registro de asistencia que coincida con 'caracterizacion_id', 'numero_identificacion' y 'hora_ingreso'.
      * Si se encuentra un registro, actualiza la 'hora_salida' y 'novedad_salida' con los datos actuales y guarda los cambios.
      * Devuelve una respuesta JSON con un mensaje de éxito y un código de estado 200.
-     * 
+     *
      * Si no se encuentra un registro de asistencia, devuelve una respuesta JSON con un mensaje de error y un código de estado 404.
      */
     public function assistenceNovedad(Request $request)
@@ -276,16 +277,16 @@ class AsistenciaAprendicesController extends Controller
         if (!$request->has('caracterizacion_id') || !$request->has('numero_identificacion') || !$request->has('hora_entrada') || !$request->has('novedad')) {
             return response()->json(['message' => 'Datos incompletos'], 400);
         }
-   
+
         $caracterizacion_id = $request->input('caracterizacion_id');
         $numero_identificacion = $request->input('numero_identificacion');
         $hora_ingreso_peticion = $request->input('hora_entrada');
         $novedad_salida = $request->input('novedad');
 
-        
+
         $hora_ingreso = Carbon::parse($hora_ingreso_peticion)->format('H:i:s');
 
-      
+
         $asistencia = AsistenciaAprendiz::where('caracterizacion_id', $caracterizacion_id)
             ->where('numero_identificacion', $numero_identificacion)
             ->where('hora_ingreso', $hora_ingreso)
@@ -302,10 +303,10 @@ class AsistenciaAprendicesController extends Controller
         if (!$asistencia) {
             return response()->json(['message' => 'No se encontró asistencia'], 404);
         }
-        
+
     }
 
-   
+
     /**
      * Obtiene la lista de asistencias para una ficha y jornada específicas.
      *
@@ -316,16 +317,16 @@ class AsistenciaAprendicesController extends Controller
     public function getList(String $ficha, String $jornada)
     {
         // Obtiene la hora y fecha actual
-        $horaEjecucion = Carbon::now()->format('H:i:s'); 
+        $horaEjecucion = Carbon::now()->format('H:i:s');
         $fechaActual = Carbon::now()->format('Y-m-d');
 
         // Obtiene la jornada de formación correspondiente
         $obJornada = JornadaFormacion::where('jornada', $jornada)->first();
 
         Log::info('Jornada: '.json_encode($obJornada));
-        
+
         // Formatea las horas de inicio y fin de la jornada
-        $h1Ini = Carbon::parse($obJornada->hora_inicio)->format('H'); 
+        $h1Ini = Carbon::parse($obJornada->hora_inicio)->format('H');
         $m1Ini = Carbon::parse($obJornada->hora_inicio)->format('i');
         $h2Ini = Carbon::parse($obJornada->hora_fin)->format('H');
         $m2Fin = Carbon::parse($obJornada->hora_fin)->format('i');
@@ -342,7 +343,7 @@ class AsistenciaAprendicesController extends Controller
         // Recorre las asistencias y verifica si la hora de ingreso está dentro del rango de la jornada
         foreach ($asistencias as $asistencia){
             $hourEnter = Carbon::parse($asistencia->hora_ingreso)->format('H:i:s');
-            $dateEnter = Carbon::parse($asistencia->created_at)->format('Y-m-d'); 
+            $dateEnter = Carbon::parse($asistencia->created_at)->format('Y-m-d');
 
             if($this->validateHour($horaEjecucion, $jornada, $h1Ini , $m1Ini , $h2Ini , $m2Fin) == true && $dateEnter == $fechaActual){
                 return response()->json(['asistencias' => $asistencias], 200);
@@ -355,9 +356,9 @@ class AsistenciaAprendicesController extends Controller
 
     public function validateHour($ingreso, $jornada, $hora1, $min1, $hora2, $min2)
     {
-        $horaInicio = Carbon::createFromTime($hora1, $min1 , 0); 
-        $horaFin = Carbon::createFromTime($hora2, $min2, 0); 
-      
+        $horaInicio = Carbon::createFromTime($hora1, $min1 , 0);
+        $horaFin = Carbon::createFromTime($hora2, $min2, 0);
+
 
         $horaIngreso = Carbon::parse($ingreso);
 
@@ -383,9 +384,9 @@ class AsistenciaAprendicesController extends Controller
      */
     public function morning($ingreso, $jornada)
     {
-        $horaInicio = Carbon::createFromTime(06, 00, 0); 
-        $horaFin = Carbon::createFromTime(13, 10, 0); 
-        $morning = 'Mañana'; 
+        $horaInicio = Carbon::createFromTime(06, 00, 0);
+        $horaFin = Carbon::createFromTime(13, 10, 0);
+        $morning = 'Mañana';
 
         $horaIngreso = Carbon::parse($ingreso);
 
@@ -393,7 +394,7 @@ class AsistenciaAprendicesController extends Controller
             return true;
         }
 
-       
+
         return false;
     }
 
@@ -405,9 +406,9 @@ class AsistenciaAprendicesController extends Controller
      * @return bool Retorna true si la hora de ingreso está entre las 13:00 y las 18:10 y la jornada es 'Tarde', de lo contrario retorna false.
      */
     public function afternoon ($ingreso, $jornada){
-        $horaInicio = Carbon::createFromTime(13, 00, 0); 
-        $horaFin = Carbon::createFromTime(18, 10, 0); 
-        $morning = 'Tarde'; 
+        $horaInicio = Carbon::createFromTime(13, 00, 0);
+        $horaFin = Carbon::createFromTime(18, 10, 0);
+        $morning = 'Tarde';
 
         $horaIngreso = Carbon::parse($ingreso);
 
@@ -427,9 +428,9 @@ class AsistenciaAprendicesController extends Controller
      */
     public function night($ingreso, $jornada)
     {
-        $horaInicio = Carbon::createFromTime(17, 50, 0); 
+        $horaInicio = Carbon::createFromTime(17, 50, 0);
         $horaFin = Carbon::createFromTime(23, 10, 0);
-        $night = 'Noche'; 
+        $night = 'Noche';
 
         $horaIngreso = Carbon::parse($ingreso);
 
@@ -441,15 +442,15 @@ class AsistenciaAprendicesController extends Controller
     }
 
 
-    /***********Metodos para actulizar novedades de estrada y salida**************/ 
+    /***********Metodos para actulizar novedades de estrada y salida**************/
 
     /**
      * Actualiza la hora de salida y la novedad de salida de la asistencia de un aprendiz.
      *
      * @param \Illuminate\Http\Request $request La solicitud HTTP que contiene los datos necesarios para actualizar la asistencia.
-     * 
+     *
      * @return \Illuminate\Http\JsonResponse Una respuesta JSON con un mensaje indicando el resultado de la operación.
-     * 
+     *
      * Este método realiza las siguientes acciones:
      * - Obtiene la fecha y hora actual.
      * - Extrae los datos de la solicitud, incluyendo el número de identificación del aprendiz y la hora de ingreso.
@@ -457,7 +458,7 @@ class AsistenciaAprendicesController extends Controller
      * - Verifica si la asistencia corresponde a la fecha actual y si la hora de ingreso corresponde a los turnos de mañana, tarde o noche.
      * - Si se cumplen las condiciones, actualiza la novedad de salida y la hora de salida de la asistencia y guarda los cambios.
      * - Si no se encuentra la asistencia, devuelve una respuesta JSON con un mensaje de error.
-     * 
+     *
      * @throws \Exception Si ocurre un error al procesar la solicitud.
      */
     public function updateExitAsistence(Request $request){
@@ -483,33 +484,33 @@ class AsistenciaAprendicesController extends Controller
 
         if($this->morningAsistence($horaIngreso, $actualHourCarbon) == true && $dateAsistence == $actualDate){
             $asistencia->novedad_salida = $data['novedad_salida'];
-            $asistencia->hora_salida = $actualHour; 
+            $asistencia->hora_salida = $actualHour;
             $asistencia->save();
             return response()->json(['message' => 'Novedad de salidad Actualizada'], 200);
         }
 
         if($this->affternoonAsistence($horaIngreso, $actualHourCarbon) == true && $dateAsistence == $actualDate){
             $asistencia->novedad_salida = $data['novedad_salida'];
-            $asistencia->hora_salida = $actualHour; 
+            $asistencia->hora_salida = $actualHour;
             $asistencia->save();
             return response()->json(['message' => 'Novedad de salidad Actualizada'], 200);
         }
 
         if($this->nightAsistence($horaIngreso, $actualHourCarbon) == true && $dateAsistence == $actualDate){
             $asistencia->novedad_salida = $data['novedad_salida'];
-            $asistencia->hora_salida = $actualHour; 
+            $asistencia->hora_salida = $actualHour;
             $asistencia->save();
             return response()->json(['message' => 'Novedad de salidad Actualizada'], 200);
         }
-        
-       
+
+
 
         if (!$asistencia) {
             return response()->json(['message' => 'Asistencia no encontrada'], 404);
         }
 
-        
-  
+
+
     }
 
     /**
@@ -538,7 +539,7 @@ class AsistenciaAprendicesController extends Controller
 
         $data = $request->all();
 
-        log::info('data: '.json_encode($data)); 
+        log::info('data: '.json_encode($data));
 
         $numeroIdentificacion = $data['numero_identificacion'];
         $horaIngreso = Carbon::parse($data['hora_ingreso'])->format('H:i:s');
@@ -556,7 +557,7 @@ class AsistenciaAprendicesController extends Controller
 
         if($this->morningAsistence($horaIngreso, $actualHourCarbon) == true && $dateAsistence == $actualDate){
             $asistencia->novedad_entrada = $data['novedad_entrada'];
-            $asistencia->hora_ingreso = carbon::now()->format('H:i:s');  
+            $asistencia->hora_ingreso = carbon::now()->format('H:i:s');
             $asistencia->save();
             return response()->json(['message' => 'Novedad de entrada Actualizada'], 200);
         }
@@ -572,7 +573,7 @@ class AsistenciaAprendicesController extends Controller
             $asistencia->save();
             return response()->json(['message' => 'Novedad de entrada Actualizada'], 200);
         }
-        
+
         if (!$asistencia) {
             return response()->json(['message' => 'Asistencia no encontrada'], 404);
         }
@@ -588,11 +589,11 @@ class AsistenciaAprendicesController extends Controller
      * @param \Carbon\Carbon $actualHour La hora actual a verificar.
      * @return bool Devuelve true si ambas horas están dentro del período de asistencia matutina, de lo contrario false.
      */
-    
+
     private function morningAsistence($horaIngreso, $actualHour){
-        $horaInicio = Carbon::createFromTime(06, 00, 0); 
+        $horaInicio = Carbon::createFromTime(06, 00, 0);
         $horaFin = Carbon::createFromTime(13, 10, 0);
-    
+
         $horaIngreso = Carbon::parse($horaIngreso);
 
         if ($horaIngreso->between($horaInicio, $horaFin) && $actualHour->between($horaInicio, $horaFin)) {
@@ -610,9 +611,9 @@ class AsistenciaAprendicesController extends Controller
      * @return bool Retorna true si ambas horas están dentro del rango de 13:00 a 18:10, de lo contrario, retorna false.
      */
     private function affternoonAsistence($horaIngreso, $actualHour){
-        $horaInicio = Carbon::createFromTime(13, 00, 0); 
+        $horaInicio = Carbon::createFromTime(13, 00, 0);
         $horaFin = Carbon::createFromTime(18, 10, 0);
-    
+
         $horaIngreso = Carbon::parse($horaIngreso);
 
         if ($horaIngreso->between($horaInicio, $horaFin) && $actualHour->between($horaInicio, $horaFin)) {
@@ -631,7 +632,7 @@ class AsistenciaAprendicesController extends Controller
      * @return bool Retorna true si ambas horas están dentro del rango de asistencia nocturna, de lo contrario retorna false.
      */
     private function nightAsistence($horaIngreso, $actualHour){
-        $horaInicio = Carbon::createFromTime(17, 50, 0); 
+        $horaInicio = Carbon::createFromTime(17, 50, 0);
         $horaFin = Carbon::createFromTime(23, 10, 0);
         $horaIngreso = Carbon::parse($horaIngreso);
 
@@ -641,6 +642,6 @@ class AsistenciaAprendicesController extends Controller
 
         return false;
     }
-    
-   
+
+
 }
