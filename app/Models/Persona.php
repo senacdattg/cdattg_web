@@ -29,6 +29,10 @@ class Persona extends Model
         'telefono',
         'celular',
         'email',
+        'pais_id',
+        'departamento_id',
+        'municipio_id',
+        'direccion',
         'status',
         'user_create_id',
         'user_edit_id',
@@ -43,6 +47,7 @@ class Persona extends Model
             $persona->segundo_nombre = strtoupper($persona->segundo_nombre);
             $persona->primer_apellido = strtoupper($persona->primer_apellido);
             $persona->segundo_apellido = strtoupper($persona->segundo_apellido);
+            $persona->direccion = strtoupper($persona->direccion);
         });
     }
 
@@ -71,6 +76,21 @@ class Persona extends Model
         return $this->hasMany(CaracterizacionPrograma::class, 'instructor_id');
     }
 
+    public function pais()
+    {
+        return $this->belongsTo(Pais::class);
+    }
+
+    public function departamento()
+    {
+        return $this->belongsTo(Departamento::class);
+    }
+
+    public function municipio()
+    {
+        return $this->belongsTo(Municipio::class);
+    }
+
     /**
      * Accesor para obtener el nombre completo de la persona.
      *
@@ -81,7 +101,7 @@ class Persona extends Model
         // Usa array_filter para omitir valores vacíos y join para unirlos con espacios
         $nombres = [
             $this->primer_nombre,
-            $this->segundo_nombre, // Corregido: de sedundo_nombre a segundo_nombre
+            $this->segundo_nombre,
             $this->primer_apellido,
             $this->segundo_apellido
         ];

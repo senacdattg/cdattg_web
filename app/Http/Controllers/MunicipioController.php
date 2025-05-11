@@ -29,7 +29,7 @@ class MunicipioController extends Controller
     {
         // DB::enableQueryLog();
         $municipios = Municipio::where('departamento_id', $departamento_id)
-        ->where('status', 1)->get();
+            ->where('status', 1)->get();
         return response()->json(['success' => true, 'municipios' => $municipios]);
         // dd(DB::getQueryLog());
     }
@@ -47,7 +47,7 @@ class MunicipioController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreMunicipioRequest $request)
+    public function store(Request $request)
     {
         //
     }
@@ -71,7 +71,7 @@ class MunicipioController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateMunicipioRequest $request, Municipio $municipio)
+    public function update(Request $request, Municipio $municipio)
     {
         //
     }
@@ -82,5 +82,13 @@ class MunicipioController extends Controller
     public function destroy(Municipio $municipio)
     {
         //
+    }
+
+    public function getByDepartamento($departamentoId)
+    {
+        $municipios = Municipio::where('departamento_id', $departamentoId)
+            ->where('status', 1)
+            ->get();
+        return response()->json($municipios);
     }
 }
