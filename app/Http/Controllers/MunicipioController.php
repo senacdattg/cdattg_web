@@ -97,7 +97,7 @@ class MunicipioController extends Controller
             $municipio->update($data);
 
             DB::commit();
-            return redirect()->route('municipio.index')
+            return redirect()->route('municipio.show', $municipio)
                 ->with('success', 'Municipio actualizado exitosamente');
         } catch (QueryException $e) {
             DB::rollBack();
@@ -114,11 +114,34 @@ class MunicipioController extends Controller
      */
     public function destroy(Municipio $municipio)
     {
-        //
+        try {
+            DB::beginTransaction();
+            $municipio->delete();
+            DB::commit();
+            return redirect()->route('municipio.index')
+                ->with('success', 'Municipio eliminado exitosamente');
+        } catch (QueryException $e) {
+            DB::rollBack();
+            Log::error('Error al eliminar municipio: ' . $e->getMessage());
+            return redirect()->back()->withErrors(['error' => 'Ocurrió un error al eliminar el municipio.']);
+        }
     }
 
     public function cambiarEstado(Municipio $municipio)
     {
+        try {
+            DB::beginTransaction();
+            $municipio->update([
+                'status' => $municipio->status === 1 ? 0 : 1,
+            ]);
+            DB::commit();
+            return redirect()->route('municipio.show', $municipio)
+                ->with('success', 'Municipio actualizado exitosamente');
+        } catch (QueryException $e) {
+            DB::rollBack();
+            Log::error('Error al actualizar municipio: ' . $e->getMessage());
+            return redirect()->back()->withErrors(['error' => 'Ocurrió un error al actualizar el municipio.']);
+        }
 
     }
 
