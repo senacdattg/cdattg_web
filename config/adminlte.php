@@ -373,16 +373,32 @@ return [
                     'text' => 'Parámetros',
                     'url' => 'parametro',
                     'icon' => 'fas fa-fw fa-sliders-h',
+                    'can' => [
+                        'CREAR PARAMETRO',
+                        'EDITAR PARAMETRO',
+                        'VER PARAMETRO',
+                        'ELIMINAR PARAMETRO',
+                    ]
                 ],
                 [
                     'text' => 'Temas',
                     'url' => 'tema',
                     'icon' => 'fas fa-fw fa-paint-brush',
+                    'can' => [
+                        'CREAR TEMA',
+                        'EDITAR TEMA',
+                        'VER TEMA',
+                        'ELIMINAR TEMA',
+                        'ELIMINAR PARAMETRO DE TEMA',
+                    ]
                 ],
                 [
                     'text' => 'Asignar Permisos',
                     'url' => 'permiso',
                     'icon' => 'fas fa-fw fa-lock',
+                    'can' => [
+                        'ASIGNAR PERMISOS',
+                    ]
                 ],
             ],
         ],
@@ -395,74 +411,66 @@ return [
                     'text' => 'Regionales',
                     'url' => 'regional',
                     'icon' => 'fas fa-fw fa-map-marker-alt',
+                    'can' => [
+                        'CREAR REGIONAL',
+                        'EDITAR REGIONAL',
+                        'VER REGIONAL',
+                        'ELIMINAR REGIONAL',
+                    ]
                 ],
                 [
                     'text' => 'Centros de Formación',
-                    'url' => 'centros',
+                    'url' => 'centro',
                     'icon' => 'fas fa-fw fa-school',
+                    'can' => [
+                        'CREAR CENTRO DE FORMACION',
+                        'EDITAR CENTRO DE FORMACION',
+                        'VER CENTRO DE FORMACION',
+                        'ELIMINAR CENTRO DE FORMACION',
+                    ]
                 ],
                 [
                     'text' => 'Sedes',
+                    'url' => 'sede',
                     'icon' => 'fas fa-fw fa-hospital',
-                    'submenu' => [
-                        [
-                            'text' => 'Ver Sedes',
-                            'url' => 'sede',
-                            'icon' => 'fas fa-fw fa-eye',
-                        ],
-                        [
-                            'text' => 'Crear Sede',
-                            'url' => 'sede/create',
-                            'icon' => 'fas fa-fw fa-plus-circle',
-                        ],
-                    ],
+                    'can' => [
+                        'CREAR SEDE',
+                        'EDITAR SEDE',
+                        'VER SEDE',
+                        'ELIMINAR SEDE',
+                    ]
                 ],
                 [
                     'text' => 'Bloques',
+                    'url' => 'bloque',
                     'icon' => 'fas fa-fw fa-th-large',
-                    'submenu' => [
-                        [
-                            'text' => 'Ver Bloques',
-                            'url' => 'bloque',
-                            'icon' => 'fas fa-fw fa-eye',
-                        ],
-                        [
-                            'text' => 'Crear Bloque',
-                            'url' => 'bloque/create',
-                            'icon' => 'fas fa-fw fa-plus-circle',
-                        ],
+                    'can' => [
+                        'CREAR BLOQUE',
+                        'EDITAR BLOQUE',
+                        'VER BLOQUE',
+                        'ELIMINAR BLOQUE',
                     ],
                 ],
                 [
                     'text' => 'Pisos',
+                    'url' => 'piso',
                     'icon' => 'fas fa-fw fa-layer-group',
-                    'submenu' => [
-                        [
-                            'text' => 'Ver Pisos',
-                            'url' => 'piso',
-                            'icon' => 'fas fa-fw fa-eye',
-                        ],
-                        [
-                            'text' => 'Crear Piso',
-                            'url' => 'piso/create',
-                            'icon' => 'fas fa-fw fa-plus-circle',
-                        ],
+                    'can' => [
+                        'CREAR PISO',
+                        'EDITAR PISO',
+                        'VER PISO',
+                        'ELIMINAR PISO',
                     ],
                 ],
                 [
                     'text' => 'Ambientes',
+                    'url' => 'ambiente',
                     'icon' => 'fas fa-fw fa-door-open',
-                    'submenu' => [
-                        [
-                            'text' => 'Ver Ambientes',
-                            'url' => 'ambiente',
-                            'icon' => 'fas fa-fw fa-eye',
-                        ],
-                        [
-                            'text' => 'Crear Ambiente',
-                            'url' => 'ambiente/create',
-                            'icon' => 'fas fa-fw fa-plus-circle',
-                        ],
+                    'can' => [
+                        'CREAR AMBIENTE',
+                        'EDITAR AMBIENTE',
+                        'VER AMBIENTE',
+                        'ELIMINAR AMBIENTE',
                     ],
                 ],
             ],
@@ -474,34 +482,24 @@ return [
             'submenu' => [
                 [
                     'text' => 'Instructores',
+                    'url' => 'instructor',
                     'icon' => 'fas fa-fw fa-chalkboard-teacher',
-                    'submenu' => [
-                        [
-                            'text' => 'Ver Instructores',
-                            'url' => 'instructor',
-                            'icon' => 'fas fa-fw fa-eye',
-                        ],
-                        [
-                            'text' => 'Crear Instructor',
-                            'url' => 'instructor/create',
-                            'icon' => 'fas fa-fw fa-plus-circle',
-                        ],
+                    'can' => [
+                        'VER INSTRUCTOR',
+                        'CREAR INSTRUCTOR',
+                        'EDITAR INSTRUCTOR',
+                        'ELIMINAR INSTRUCTOR',
                     ],
                 ],
                 [
                     'text' => 'Vigilantes',
+                    'url' => 'vigilante',
                     'icon' => 'fas fa-fw fa-user-shield',
-                    'submenu' => [
-                        [
-                            'text' => 'Ver Vigilantes',
-                            'url' => 'vigilante',
-                            'icon' => 'fas fa-fw fa-eye',
-                        ],
-                        [
-                            'text' => 'Crear Vigilante',
-                            'url' => 'vigilante/create',
-                            'icon' => 'fas fa-fw fa-plus-circle',
-                        ],
+                    'can' => [
+                        'VER VIGILANTE',
+                        'CREAR VIGILANTE',
+                        'EDITAR VIGILANTE',
+                        'ELIMINAR VIGILANTE',
                     ],
                 ],
                 [
@@ -515,17 +513,11 @@ return [
         [
             'text' => 'Personas',
             'icon' => 'fas fa-fw fa-user',
-            'submenu' => [
-                [
-                    'text' => 'Ver Personas',
-                    'url' => 'personas',
-                    'icon' => 'fas fa-fw fa-eye',
-                ],
-                [
-                    'text' => 'Crear Persona',
-                    'url' => 'personas/create',
-                    'icon' => 'fas fa-fw fa-plus-circle',
-                ],
+            'can' => [
+                'VER PERSONA',
+                'CREAR PERSONA',
+                'EDITAR PERSONA',
+                'ELIMINAR PERSONA',
             ],
         ],
         // Operaciones Académicas y Administrativas
@@ -535,72 +527,39 @@ return [
             'submenu' => [
                 [
                     'text' => 'Jornadas',
+                    'url' => 'jornada',
                     'icon' => 'fas fa-fw fa-calendar',
-                    'submenu' => [
-                        [
-                            'text' => 'Ver Jornadas',
-                            'url' => 'jornada',
-                            'icon' => 'fas fa-fw fa-eye',
-                        ],
-                        [
-                            'text' => 'Crear Jornada',
-                            'url' => 'jornada/create',
-                            'icon' => 'fas fa-fw fa-plus-circle',
-                        ],
+                    'can' => [
+                        'VER JORNADA',
+                        'CREAR JORNADA',
+                        'EDITAR JORNADA',
+                        'ELIMINAR JORNADA',
                     ],
                 ],
                 [
                     'text' => 'Programas',
+                    'url' => 'programa',
                     'icon' => 'fas fa-fw fa-graduation-cap',
-                    'submenu' => [
-                        [
-                            'text' => 'Ver Programas',
-                            'url' => 'programa',
-                            'icon' => 'fas fa-fw fa-eye',
-                        ],
-                        [
-                            'text' => 'Crear Programa',
-                            'url' => 'programa/create',
-                            'icon' => 'fas fa-fw fa-plus-circle',
-                        ],
+                    'can' => [
+                        'VER PROGRAMA DE CARACTERIZACION',
+                        'CREAR PROGRAMA DE CARACTERIZACION',
+                        'EDITAR PROGRAMA DE CARACTERIZACION',
+                        'ELIMINAR PROGRAMA DE CARACTERIZACION',
                     ],
                 ],
                 [
                     'text' => 'Fichas',
-                    'icon' => 'fas fa-fw fa-address-book',
-                    'submenu' => [
-                        [
-                            'text' => 'Ver Fichas',
-                            'url' => 'ficha',
-                            'icon' => 'fas fa-fw fa-eye',
-                        ],
-                        [
-                            'text' => 'Crear Fichas',
-                            'url' => 'fichas.ficha',
-                            'icon' => 'fas fa-fw fa-plus-circle',
-                        ],
-                    ],
-                ],
-                [
-                    'text' => 'Caracterización',
-                    'icon' => 'fas fa-fw fa-info-circle',
-                    'submenu' => [
-                        [
-                            'text' => 'Ver Caracterización',
-                            'url' => 'caracterizacion',
-                            'icon' => 'fas fa-fw fa-eye',
-                        ],
-                        [
-                            'text' => 'Crear Caracterización',
-                            'url' => 'caracterizacion/create',
-                            'icon' => 'fas fa-fw fa-plus-circle',
-                        ],
+                    'url' => 'fichaCaracterizacion',
+                    'icon' => 'fas fa-fw fa-graduation-cap',
+                    'can' => [
+                        'VER PROGRAMA DE CARACTERIZACION'
                     ],
                 ],
                 [
                     'text' => 'Administrar Asistencias',
                     'url' => 'asistencia',
                     'icon' => 'fas fa-fw fa-check-square',
+                    
                 ],
             ],
         ],
