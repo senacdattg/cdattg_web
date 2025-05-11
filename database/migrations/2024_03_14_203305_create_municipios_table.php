@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('municipio');
             $table->foreignId('departamento_id')->constrained('departamentos');
-            $table->boolean('status')->default(0);
+            $table->boolean('status')->default(1);
             $table->timestamps();
 
             $table->unique(['municipio', 'departamento_id'], 'municipio_uk');
