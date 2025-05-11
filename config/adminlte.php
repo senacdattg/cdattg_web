@@ -419,6 +419,17 @@ return [
                     ]
                 ],
                 [
+                    'text' => 'Municipios',
+                    'url' => 'municipio',
+                    'icon' => 'fas fa-fw fa-map-marker-alt',
+                    // 'can' => [
+                    //     'CREAR MUNICIPIO',
+                    //     'EDITAR MUNICIPIO',
+                    //     'VER MUNICIPIO',
+                    //     'ELIMINAR MUNICIPIO',
+                    // ]
+                ],
+                [
                     'text' => 'Centros de Formación',
                     'url' => 'centro',
                     'icon' => 'fas fa-fw fa-school',

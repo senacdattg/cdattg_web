@@ -19,6 +19,7 @@ export default defineConfig({
                 'logout': 'resources/js/logout.js',
                 'charts-scripts': 'resources/js/dashboards/superadmin/charts-scripts.js',
                 'widgets': 'resources/js/dashboards/superadmin/widgets.js',
+                'municipios': 'resources/js/municipios.js',
             },
             refresh: true,
         }),

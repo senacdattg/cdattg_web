@@ -1,0 +1,158 @@
+@extends('adminlte::page')
+
+@section('css')
+    @vite(['resources/css/parametros.css'])
+@endsection
+
+@section('content_header')
+    <section class="content-header dashboard-header py-4">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-6 d-flex align-items-center">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
+                        style="width: 48px; height: 48px;">
+                        <i class="fas fa-cogs text-white fa-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800">Municipio</h1>
+                        <p class="text-muted mb-0 font-weight-light">Detalles del municipio</p>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
+                                    <i class="fas fa-home"></i> Inicio
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('municipio.index') }}" class="link_right_header">
+                                    <i class="fas fa-cog"></i> Municipios
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <i class="fas fa-info-circle"></i> Detalles del municipio
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+@endsection
+
+@section('content')
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ route('municipio.index') }}">
+                        <i class="fas fa-arrow-left mr-1"></i> Volver
+                    </a>
+
+                    <div class="card detail-card no-hover">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                                <i class="fas fa-info-circle mr-2"></i>Detalle del Municipio
+                            </h5>
+                        </div>
+
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table detail-table mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <th class="py-3">Nombre</th>
+                                            <td class="py-3">{{ $municipio->municipio }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Estado</th>
+                                            <td class="py-3">
+                                                <span class="status-badge {{ $municipio->status === 1 ? 'text-success' : 'text-danger' }}">
+                                                    <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
+                                                    {{ $municipio->status === 1 ? 'Activo' : 'Inactivo' }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Usuario que crea</th>
+                                            <td class="py-3 user-info">
+                                                @if ($municipio->userCreate)
+                                                    <i class="fas fa-user mr-1"></i>
+                                                    {{ $municipio->userCreate->persona->primer_nombre }}
+                                                    {{ $municipio->userCreate->persona->primer_apellido }}
+                                                @else
+                                                    <span class="text-muted">Usuario no disponible</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Fecha de creación</th>
+                                            <td class="py-3 timestamp">
+                                                <i class="far fa-calendar-alt mr-1"></i>
+                                                {{ $municipio->created_at->diffForHumans() }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Usuario que modifica</th>
+                                            <td class="py-3 user-info">
+                                                @if ($municipio->userUpdate)
+                                                    <i class="fas fa-user mr-1"></i>
+                                                    {{ $municipio->userUpdate->persona->primer_nombre }}
+                                                    {{ $municipio->userUpdate->persona->primer_apellido }}
+                                                @else
+                                                    <span class="text-muted">Usuario no disponible</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Fecha de modificación</th>
+                                            <td class="py-3 timestamp">
+                                                <i class="far fa-calendar-alt mr-1"></i>
+                                                {{ $municipio->updated_at->diffForHumans() }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white py-3">
+                            <div class="d-flex justify-content-center gap-2">
+                                @can('EDITAR PARAMETRO')
+                                    <form action="{{ route('municipio.cambiarEstado', ['municipio' => $municipio->id]) }}"
+                                        method="POST" class="d-inline mx-1">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="btn btn-outline-success btn-sm">
+                                            <i class="fas fa-sync mr-1"></i> Cambiar Estado
+                                        </button>
+                                    </form>
+                                    <a href="{{ route('municipio.edit', ['municipio' => $municipio->id]) }}"
+                                        class="btn btn-outline-info btn-sm mx-1">
+                                        <i class="fas fa-pencil-alt mr-1"></i> Editar
+                                    </a>
+                                @endcan
+                                @can('ELIMINAR PARAMETRO')
+                                    <form action="{{ route('municipio.destroy', ['municipio' => $municipio->id]) }}"
+                                        method="POST" class="d-inline mx-1 formulario-eliminar">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-trash mr-1"></i> Eliminar
+                                        </button>
+                                    </form>
+                                @endcan
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+@endsection
+
+@section('footer')
+    @include('layout.footer')
+@endsection
