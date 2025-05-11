@@ -135,7 +135,7 @@ class MunicipioController extends Controller
                 'status' => $municipio->status === 1 ? 0 : 1,
             ]);
             DB::commit();
-            return redirect()->route('municipio.show', $municipio)
+            return redirect()->route('municipio.index')
                 ->with('success', 'Municipio actualizado exitosamente');
         } catch (QueryException $e) {
             DB::rollBack();
