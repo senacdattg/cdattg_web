@@ -7,6 +7,7 @@ use App\Http\Requests\StoreMunicipioRequest;
 use App\Http\Requests\UpdateMunicipioRequest;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class MunicipioController extends Controller
 {
@@ -15,7 +16,10 @@ class MunicipioController extends Controller
      */
     public function index()
     {
-        //
+        $departamento_id = Auth::user()->persona->departamento_id;
+        
+        $municipios = Municipio::where('departamento_id', $departamento_id)->paginate(10);
+        return view('municipios.index', compact('municipios'));
     }
 
     /**
@@ -82,6 +86,11 @@ class MunicipioController extends Controller
     public function destroy(Municipio $municipio)
     {
         //
+    }
+
+    public function cambiarEstado(Municipio $municipio)
+    {
+
     }
 
     public function getByDepartamento($departamentoId)

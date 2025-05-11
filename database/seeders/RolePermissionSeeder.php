@@ -131,7 +131,6 @@ class RolePermissionSeeder extends Seeder
             'CREAR PROGRAMA DE CARACTERIZACION',
             'EDITAR PROGRAMA DE CARACTERIZACION',
             'ELIMINAR PROGRAMA DE CARACTERIZACION',
-            'MANIPULAR CARACTERIZACION',
             'CREAR PERSONA',
             'VER PERSONA',
             'EDITAR PERSONA',
