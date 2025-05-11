@@ -17,10 +17,10 @@
 <body class="hold-transition sidebar-mini">
     <div class="wrapper">
         @php
-            $user = Auth::user();
-            $persona = optional($user)->persona;
-            $userImage = $persona && $persona->foto ? asset('storage/' . $persona->foto) : asset('dist/img/LogoSena.png');
-            $rol = $user ? ucfirst(strtolower($user->getRoleNames()->first())) : '';
+        $user = Auth::user();
+        $persona = optional($user)->persona;
+        $userImage = $persona && $persona->foto ? asset('storage/' . $persona->foto) : asset('dist/img/LogoSena.png');
+        $rol = $user ? ucfirst(strtolower($user->getRoleNames()->first())) : '';
         @endphp
 
         <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -40,31 +40,32 @@
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item dropdown user-menu ml-auto">
                     @auth
-                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
-                            <img src="{{ $userImage }}" class="user-image img-circle elevation-2" alt="{{ $persona ? $persona->primer_nombre : 'User' }}">
-                            <span class="d-none d-md-inline">
+                    <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">
+                        <img src="{{ $userImage }}" class="user-image img-circle elevation-2" alt="{{ $persona ? $persona->primer_nombre : 'User' }}">
+                        <span class="d-none d-md-inline">
+                            {{ $persona->primer_nombre }} {{ $persona->primer_apellido }}
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+                        <li class="user-header bg-primary">
+                            <img src="{{ $userImage }}" class="img-circle elevation-2" alt="{{ $persona ? $persona->primer_nombre : 'User' }}">
+                            <p>
                                 {{ $persona->primer_nombre }} {{ $persona->primer_apellido }}
-                            </span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-                            <li class="user-header bg-primary">
-                                <img src="{{ $userImage }}" class="img-circle elevation-2" alt="{{ $persona ? $persona->primer_nombre : 'User' }}">
-                                <p>
-                                    {{ $persona->primer_nombre }} {{ $persona->primer_apellido }}
-                                </p>
-                                <p>
-                                    {{ $rol }}
-                                </p>
-                            </li>
-                            <li class="user-footer">
-                                <a href="{{ route('personas.show', ['persona' => $persona->id]) }}" class="btn btn-default btn-flat">Perfil</a>
-                                <a href="{{ route('logout') }}" class="btn btn-default btn-flat float-right">Cerrar sesión</a>
-                            </li>
-                        </ul>
+                            </p>
+                            <p>
+                                {{ $rol }}
+                            </p>
+                        </li>
+                        <li class="user-footer">
+                            <a href="{{ route('personas.show', ['persona' => $persona->id]) }}" class="btn btn-default btn-flat">Perfil</a>
+                            @include('logout')
+                        </li>
+                    </ul>
                     @else
-                        <a href="{{ route('iniciarSesion') }}" class="nav-link">Iniciar Sesión</a>
+                    <a href="{{ route('iniciarSesion') }}" class="nav-link">Iniciar Sesión</a>
                     @endauth
                 </li>
             </ul>
         </nav>
         <!-- Resto del contenido -->
+         

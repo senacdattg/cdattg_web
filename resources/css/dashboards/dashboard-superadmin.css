@@ -1,0 +1,68 @@
+.card {
+    transition: transform 0.2s;
+}
+
+.card:not(.no-hover):hover {
+    transform: translateY(-5px);
+}
+
+.dashboard-card {
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card:hover {
+    transform: translateY(-5px);
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, .125);
+}
+
+.card-title {
+    font-weight: 500;
+    color: #2d3748;
+}
+
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+}
+
+.dashboard-header {
+    background: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, .05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .03);
+}
+
+.welcome-title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 0.5rem;
+}
+
+.welcome-subtitle {
+    color: #718096;
+    font-size: 0.95rem;
+    margin-bottom: 0;
+}
+
+.breadcrumb-item {
+    font-size: 0.875rem;
+}
+
+.breadcrumb-item a {
+    color: #4a5568;
+    text-decoration: none;
+}
+
+.breadcrumb-item.active {
+    color: #718096;
+}
+
+small {
+    font-size: 16px;
+    color: #fff !important;
+}
