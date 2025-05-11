@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateMunicipioRequest;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class MunicipioController extends Controller
 {
@@ -17,7 +18,7 @@ class MunicipioController extends Controller
     public function index()
     {
         $departamento_id = Auth::user()->persona->departamento_id;
-        
+
         $municipios = Municipio::where('departamento_id', $departamento_id)->paginate(10);
         return view('municipios.index', compact('municipios'));
     }
@@ -39,7 +40,6 @@ class MunicipioController extends Controller
     }
     public function apiCargarMunicipios(Request $request)
     {
-
         // return response()->json(["message" => True]);
         $departamento_id = $request->departamento_id;
         // DB::enableQueryLog();
@@ -51,9 +51,19 @@ class MunicipioController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreMunicipioRequest $municipio)
     {
-        //
+        $data = $municipio->validated();
+        $data['user_create_id'] = Auth::id();
+        $data['user_edit_id'] = Auth::id();
+
+        try {
+            Municipio::create($data);
+            return redirect()->back()->with('success', '¡Municipio creado exitosamente!');
+        } catch (\Exception $e) {
+            Log::error('Error al crear municipio: ' . $e->getMessage());
+            return redirect()->back()->withInput()->withErrors(['error' => 'Ocurrió un error al crear el municipio.']);
+        }
     }
 
     /**
