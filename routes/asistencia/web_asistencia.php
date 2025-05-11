@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\AsignacionDeFormacionController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AsistenciaAprendicesController;
 use App\Http\Controllers\AsistenceQrController;
+use App\Models\AsignacionDeFormacion;
 
 // Rutas para AsistenciaAprendizController
 Route::resource('asistencia', AsistenciaAprendicesController::class);
@@ -38,7 +40,8 @@ route::middleware('can:TOMAR ASISTENCIA')->group(function () {
     Route::post('/asistence/setNewEntrance', [AsistenceQrController::class, 'setNewEntranceAsistenceWeb'])->name('asistence.setNewEntrance');
 });
 
-
+// Asignacion de formacion
+Route::resource('asignacionDeFormacion', AsignacionDeFormacionController::class);
 
 
 

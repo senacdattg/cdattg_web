@@ -13,7 +13,8 @@ class AsignacionDeFormacionController extends Controller
      */
     public function index()
     {
-        //
+        $asignaciones = AsignacionDeFormacion::all();
+        return view('asignacionFormacion.index', compact('asignaciones'));
     }
 
     /**

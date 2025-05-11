@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\JornadaFormacion;
+use Exception;
 use Illuminate\Http\Request;
+use App\Models\JornadaFormacion;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Events\TransactionBeginning;
 
 class JornadaController extends Controller
 {
     public function index()
     {
         $jornadas = JornadaFormacion::all();
-       return view('jornada.index', compact('jornadas')); 
+        return view('jornada.index', compact('jornadas'));
     }
 
     public function create()
@@ -25,24 +28,30 @@ class JornadaController extends Controller
             'hora_inicio' => 'required|date_format:H:i',
             'hora_fin' => 'required|date_format:H:i|after:hora_inicio',
         ]);
+        try{
+            DB::beginTransaction();
+            JornadaFormacion::create([
+                'jornada' => $request->jornada,
+                'hora_inicio' => $request->hora_inicio,
+                'hora_fin' => $request->hora_fin,
+            ]);
+            DB::commit();
+            return redirect()->route('jornada.index')->with('success', 'Jornada creada');
+        }catch(Exception $e){
+            DB::rollBack();
+            return redirect()->back()->withErrors('Error al momento de crear la jornada');
+        }
 
-        JornadaFormacion::create([
-            'jornada' => $request->jornada,
-            'hora_inicio' => $request->hora_inicio,
-            'hora_fin' => $request->hora_fin,
-        ]);
 
-     
 
-        return redirect()->route('jornada.index')->with('success', 'Jornada creada');
     }
 
 
-  
+
 
     public function update(Request $request, $id)
     {
-       
+
         $jornada = JornadaFormacion::find($id);
         $jornada->update([
             'jornada' => $request->jornada,

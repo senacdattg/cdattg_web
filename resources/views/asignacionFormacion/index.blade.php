@@ -4,7 +4,7 @@
         <div class="container-fluid">
             <div class="row mb-2">
                 <div class="col-sm-6">
-                    <h1>Lista de Jornadas</h1>
+                    <h1>Lista de Asignaciones de formacion</h1>
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
@@ -49,23 +49,28 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
+                            <th class="text-center">Instructor</th>
+                            <th class="text-center">Ficha</th>
+                            <th class="text-center">Ambiente</th>
                             <th class="text-center">Jornada</th>
-                            <th class="text-center">Hora Inicio</th>
-                            <th class="text-center">Hora Fin</th>
-                            <th class="text-center">Opciones</th>
+                            <th class="text-center">Fecha De Inicio</th>
+                            <th class="text-center">Fecha De Fin</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($jornadas as $jornada)
+                        @foreach($asignaciones as $asignacion)
                         <tr>
-                            <td>{{ $jornada->jornada }}</td>
-                            <td>{{ $jornada->hora_inicio }}</td>
-                            <td>{{ $jornada->hora_fin }}</td>
+                            <td>{{ $asignacion->instructor->persona->nombre_completo }}</td>
+                            <td>{{ $asignacion->ficha->ficha }}</td>
+                            <td>{{ $asignacion->ambiente->title }}</td>
+                            <td>{{ $asignacion->jornada->jornada }}</td>
+                            <td>{{ $asignacion->fecha_inicio }}</td>
+                            <td>{{ $asignacion->fecha_fin }}</td>
                             <td class="text-center">
-                                <a href="{{ route('jornada.edit', $jornada->id) }}" class="btn btn-success btn-sm">
+                                <a href="{{ route('asignacionDeFormacion.edit', $asignacion->id) }}" class="btn btn-success btn-sm">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="{{ route('jornada.destroy', $jornada->id) }}" class="btn btn-danger btn-sm">
+                                <a href="{{ route('asignacionDeFormacion.destroy', $asignacion->id) }}" class="btn btn-danger btn-sm">
                                     <i class="fas fa-trash"></i>
                                 </a>
                             </td>
