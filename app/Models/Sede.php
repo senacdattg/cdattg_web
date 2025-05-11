@@ -28,25 +28,9 @@ class Sede extends Model
     {
         return $this->belongsTo(User::class, 'user_edit_id');
     }
-    public function bloques()
-    {
-        return $this->hasMany(Bloque::class);
-    }
+
     public function municipio()
     {
         return $this->belongsTo(Municipio::class);
-    }
-    public function regional(){
-        return $this->belongsTo(Regional::class, 'regional_id');
-    }
-
-    public function programasFormacion()
-    {
-        return $this->hasMany(ProgramaFormacion::class, 'sede_id');
-    }
-
-    public function caracterizacionProgramas()
-    {
-        return $this->hasMany(CaracterizacionPrograma::class, 'sede_id');
     }
 }

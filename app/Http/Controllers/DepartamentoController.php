@@ -3,8 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Departamento;
-use App\Http\Requests\StoreDepartamentoRequest;
-use App\Http\Requests\UpdateDepartamentoRequest;
+use Illuminate\Http\Request;
 
 class DepartamentoController extends Controller
 {
@@ -22,7 +21,7 @@ class DepartamentoController extends Controller
     public function cargarDepartamentos()
     {
         // DB::enableQueryLog();
-        $departamentos = Departamento::where('status', 1)->get() ;
+        $departamentos = Departamento::where('status', 1)->get();
         return response()->json(['success' => true, 'departamentos' => $departamentos], 200);
         // dd(DB::getQueryLog());
     }
@@ -41,7 +40,7 @@ class DepartamentoController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreDepartamentoRequest $request)
+    public function store(Request $request)
     {
         //
     }
@@ -65,7 +64,7 @@ class DepartamentoController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateDepartamentoRequest $request, Departamento $departamento)
+    public function update(Request $request, Departamento $departamento)
     {
         //
     }
@@ -76,5 +75,13 @@ class DepartamentoController extends Controller
     public function destroy(Departamento $departamento)
     {
         //
+    }
+
+    public function getByPais($paisId)
+    {
+        $departamentos = Departamento::where('pais_id', $paisId)
+            ->where('status', 1)
+            ->get();
+        return response()->json($departamentos);
     }
 }

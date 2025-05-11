@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use PhpParser\Node\Expr\FuncCall;
 
 class Municipio extends Model
 {
@@ -24,18 +23,19 @@ class Municipio extends Model
         });
     }
 
-
-
-
-    public function fichaCaracterizacion()
+    /**
+     * Relación: Un municipio pertenece a una regional.
+     */
+    public function regional()
     {
-        return $this->hasMany(FichaCaracterizacion::class);
+        return $this->belongsTo(Regional::class);
     }
-    public function sedes()
+
+    /**
+     * Relación: Un municipio tiene muchos centros de formación.
+     */
+    public function centrosFormacion()
     {
-        return $this->hasMany(Sede::class);
-    }
-    public function departamentos(){
-        return $this->belongsTo(Departamento::class, 'departamento_id');
+        return $this->hasMany(CentroFormacion::class);
     }
 }

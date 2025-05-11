@@ -45,6 +45,10 @@ class UpdatePersonaRequest extends FormRequest
                 Rule::unique('personas', 'email')->ignore($personaId),
                 Rule::unique('users', 'email')->ignore($userId),
             ],
+            'pais_id'             => 'required|exists:pais,id',
+            'departamento_id'     => 'required|exists:departamentos,id',
+            'municipio_id'        => 'required|exists:municipios,id',
+            'direccion'           => 'required|string|max:255',
         ];
     }
 
@@ -68,6 +72,15 @@ class UpdatePersonaRequest extends FormRequest
             'email.unique'                 => 'El correo electrónico ya está en uso.',
             'telefono.unique'              => 'El número de teléfono ya está en uso.',
             'celular.unique'               => 'El número de celular ya está en uso.',
+            'pais_id.required'             => 'El país es obligatorio.',
+            'pais_id.exists'               => 'El país seleccionado no es válido.',
+            'departamento_id.required'     => 'El departamento es obligatorio.',
+            'departamento_id.exists'       => 'El departamento seleccionado no es válido.',
+            'municipio_id.required'        => 'El municipio es obligatorio.',
+            'municipio_id.exists'          => 'El municipio seleccionado no es válido.',
+            'direccion.required'           => 'La dirección es obligatoria.',
+            'direccion.string'             => 'La dirección debe ser una cadena de texto.',
+            'direccion.max'                => 'La dirección no puede tener más de 255 caracteres.',
         ];
     }
 }

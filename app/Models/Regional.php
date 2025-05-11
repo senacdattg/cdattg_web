@@ -35,11 +35,11 @@ class Regional extends Model
     }
 
     /**
-     * Relación: Una regional tiene muchas sedes.
+     * Relación: Regional tiene muchos municipios.
      */
-    public function sedes()
+    public function municipios()
     {
-        return $this->hasMany(Sede::class);
+        return $this->hasMany(Municipio::class);
     }
 
     /**
@@ -56,18 +56,5 @@ class Regional extends Model
     public function userEdited()
     {
         return $this->belongsTo(User::class, 'user_edit_id');
-    }
-
-    /**
-     * Relación: Una regional tiene muchas fichas de caracterización.
-     */
-    public function fichasCaracterizacion()
-    {
-        return $this->hasMany(FichaCaracterizacion::class, 'regional_id');
-    }
-
-    public function centroFormacion()
-    {
-        return $this->hasMany(CentroFormacion::class);
     }
 }

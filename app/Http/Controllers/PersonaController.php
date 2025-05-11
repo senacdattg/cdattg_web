@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Persona;
+use App\Models\Pais;
+use App\Models\Departamento;
+use App\Models\Municipio;
 
 use App\Http\Requests\StorePersonaRequest;
 use App\Http\Requests\UpdatePersonaRequest;
@@ -51,7 +54,11 @@ class PersonaController extends Controller
             $query->wherePivot('status', 1);
         }])->findOrFail(3);
 
-        return view('personas.create', compact('documentos', 'generos'));
+        $paises = Pais::where('status', 1)->get();
+        $departamentos = Departamento::where('status', 1)->get();
+        $municipios = Municipio::where('status', 1)->get();
+
+        return view('personas.create', compact('documentos', 'generos', 'paises', 'departamentos', 'municipios'));
     }
 
     /**
@@ -105,7 +112,18 @@ class PersonaController extends Controller
             $query->wherePivot('status', 1);
         }])->findOrFail(3);
 
-        return view('personas.edit', ['persona' => $persona, 'documentos' => $documentos, 'generos' => $generos]);
+        $paises = Pais::where('status', 1)->get();
+        $departamentos = Departamento::where('status', 1)->get();
+        $municipios = Municipio::where('status', 1)->get();
+
+        return view('personas.edit', [
+            'persona' => $persona,
+            'documentos' => $documentos,
+            'generos' => $generos,
+            'paises' => $paises,
+            'departamentos' => $departamentos,
+            'municipios' => $municipios
+        ]);
     }
 
     /**

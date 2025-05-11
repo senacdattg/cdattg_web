@@ -11,7 +11,7 @@ class FichaCaracterizacion extends Model
     protected $table = 'fichas_caracterizacion';
     protected $fillable = [
         'programa_formacion_id',
-        'ficha', 
+        'ficha',
     ];
 
     public function instructores()
@@ -28,8 +28,4 @@ class FichaCaracterizacion extends Model
     {
         return $this->hasMany(CaracterizacionPrograma::class, 'ficha_id');
     }
-
-  
-
-
 }
