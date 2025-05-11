@@ -9,10 +9,10 @@ class JornadaFormacion extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'jornada', 
-        'hora_inicio', 
+        'jornada',
+        'hora_inicio',
         'hora_fin'];
-    protected $table = 'jornadas_formacion'; 
+    protected $table = 'jornadas_formacion';
 
 
     public function caracterizaciones()
@@ -23,6 +23,10 @@ class JornadaFormacion extends Model
     public function caracterizacionProgramas()
     {
         return $this->hasMany(CaracterizacionPrograma::class, 'jornada_id');
+    }
+    public function asignacionDeFormacion()
+    {
+        return $this->hasMany(AsignacionDeFormacion::class, 'id_jornada');
     }
 
 }

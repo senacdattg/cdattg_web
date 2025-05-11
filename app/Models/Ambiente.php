@@ -37,4 +37,8 @@ class Ambiente extends Model
     {
         return $this->hasMany(FichaCaracterizacion::class, 'ambiente_id');
     }
+    public function asignacionDeFormacion()
+    {
+        return $this->hasMany(AsignacionDeFormacion::class, 'id_ambiente');
+    }
 }

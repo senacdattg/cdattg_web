@@ -43,4 +43,9 @@ class Instructor extends Model
     {
         return $this->hasOne(User::class, 'persona_id');
     }
+    // Relacion con asignacion de formacion
+    public function asignacionDeFormacion()
+    {
+        return $this->hasMany(AsignacionDeFormacion::class, 'id_instructor');
+    }
 }
