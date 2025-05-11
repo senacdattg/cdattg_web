@@ -34,21 +34,44 @@ class UserController extends Controller
 
     public function assignRoles(Request $request)
     {
-        $data = $request->validate([
-            'user_id' => 'required|integer|exists:users,id',
-            'roles'   => 'nullable|array',
-            'roles.*' => 'required|string|exists:roles,name',
-        ]);
-
         try {
+            Log::info('Datos recibidos en assignRoles:', $request->all());
+
+            $data = $request->validate([
+                'user_id' => 'required|integer|exists:users,id',
+                'roles' => 'nullable|array',
+                'roles.*' => 'required|string|exists:roles,name',
+                'available_roles' => 'nullable|array',
+                'available_roles.*' => 'required|string|exists:roles,name',
+            ]);
+
             $user = User::findOrFail($data['user_id']);
-            $roles = $data['roles'] ?? [];
-            $user->syncRoles($roles);
+
+            // Obtener roles existentes y nuevos roles
+            $existingRoles = $request->input('roles', []);
+            $newRoles = $request->input('available_roles', []);
+
+            // Combinar todos los roles
+            $allRoles = array_unique(array_merge($existingRoles, $newRoles));
+
+            Log::info('Roles a asignar:', [
+                'user_id' => $user->id,
+                'existing_roles' => $existingRoles,
+                'new_roles' => $newRoles,
+                'all_roles' => $allRoles
+            ]);
+
+            $user->syncRoles($allRoles);
 
             return redirect()->back()->with('success', 'Roles asignados correctamente');
         } catch (\Exception $e) {
-            Log::error('Error al asignar roles: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'No se pudieron asignar los roles');
+            Log::error('Error al asignar roles: ' . $e->getMessage(), [
+                'user_id' => $request->user_id,
+                'existing_roles' => $request->roles,
+                'new_roles' => $request->available_roles,
+                'exception' => $e
+            ]);
+            return redirect()->back()->with('error', 'No se pudieron asignar los roles: ' . $e->getMessage());
         }
     }
 }
