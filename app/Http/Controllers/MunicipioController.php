@@ -9,6 +9,8 @@ use App\Http\Requests\UpdateMunicipioRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\QueryException;
 
 class MunicipioController extends Controller
 {
@@ -79,15 +81,39 @@ class MunicipioController extends Controller
      */
     public function edit(Municipio $municipio)
     {
-        //
+        return view('municipios.edit', compact('municipio'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Municipio $municipio)
+    public function update(UpdateMunicipioRequest $request, Municipio $municipio)
     {
-        //
+        try {
+            DB::beginTransaction();
+
+            // Obtener los datos validados del request
+            $data = $request->validated();
+
+            // Si el usuario que actualizó anteriormente es distinto al usuario actual, actualiza el campo
+            if ($municipio->user_edit_id !== Auth::id()) {
+                $data['user_edit_id'] = Auth::id();
+            }
+
+            // Actualizar el parámetro con los nuevos datos
+            $municipio->update($data);
+
+            DB::commit();
+            return redirect()->route('municipio.index')
+                ->with('success', 'Municipio actualizado exitosamente');
+        } catch (QueryException $e) {
+            DB::rollBack();
+            Log::error('Error al actualizar municipio: ' . $e->getMessage());
+            if ($e->getCode() == 23000) {
+                return redirect()->back()->withErrors(['error' => 'El nombre asignado al municipio ya existe.']);
+            }
+            return redirect()->back()->withErrors(['error' => 'Ocurrió un error al actualizar el municipio.']);
+        }
     }
 
     /**

@@ -23,10 +23,10 @@ class UpdateMunicipioRequest extends FormRequest
     {
         // Obtener el ID del parámetro que se está actualizando.
         // Se asume que la ruta tiene un parámetro 'parametro'
-        $parametroId = $this->route('parametro')->id;
+        $municipioId = $this->route('municipio')->id;
 
         return [
-            'name'   => 'required|string|max:255|unique:parametros,name,' . $parametroId,
+            'municipio'   => 'required|string|max:255,' . $municipioId,
             'status' => 'required|boolean',
         ];
     }

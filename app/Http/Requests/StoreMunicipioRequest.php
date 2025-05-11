@@ -22,7 +22,7 @@ class StoreMunicipioRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'municipio' => 'required|string|max:255|unique:municipios,municipio',
+            'municipio' => 'required|string|max:255',
             'departamento_id' => 'required|exists:departamentos,id',
         ];
     }
