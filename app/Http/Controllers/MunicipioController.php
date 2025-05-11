@@ -25,13 +25,6 @@ class MunicipioController extends Controller
         return view('municipios.index', compact('municipios'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
     public function cargarMunicipios($departamento_id)
     {
         // DB::enableQueryLog();
@@ -73,7 +66,7 @@ class MunicipioController extends Controller
      */
     public function show(Municipio $municipio)
     {
-        //
+        return view('municipios.show', compact('municipio'));
     }
 
     /**
