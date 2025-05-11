@@ -13,8 +13,11 @@ class PaisSeeder extends Seeder
      */
     public function run(): void
     {
-
-        $colombia = Pais::create(['id' => 1, 'pais' => 'Colombia']);
-        
+        Pais::create(
+            [
+                'id' => 1,
+                'pais' => 'Colombia'
+            ]
+        );
     }
 }

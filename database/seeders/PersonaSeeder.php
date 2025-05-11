@@ -26,6 +26,10 @@ class PersonaSeeder extends Seeder
             'telefono' => NULL,
             'celular' => NULL,
             'email' => 'superAdmin@superAdmin.com',
+            'pais_id' => 1,
+            'departamento_id' => 95,
+            'municipio_id' => 824,
+            'direccion' => 'CALLE FALSA 123',
             'status' => 1,
         ]);
 
@@ -42,6 +46,10 @@ class PersonaSeeder extends Seeder
             'telefono' => NULL,
             'celular' => NULL,
             'email' => 'admin@admin.com',
+            'pais_id' => 1,
+            'departamento_id' => 95,
+            'municipio_id' => 824,
+            'direccion' => 'CALLE FALSA 123',
             'status' => 1,
         ]);
 
@@ -58,6 +66,10 @@ class PersonaSeeder extends Seeder
             'telefono' => NULL,
             'celular' => NULL,
             'email' => 'instructor@instructor.com',
+            'pais_id' => 1,
+            'departamento_id' => 95,
+            'municipio_id' => 824,
+            'direccion' => 'CALLE FALSA 123',
             'status' => 1,
         ]);
     }
