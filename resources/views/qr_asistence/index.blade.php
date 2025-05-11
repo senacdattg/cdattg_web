@@ -13,7 +13,7 @@
                         </div>
                         <div class="col-md-6">
                             <h3 class="text-center">N° Ficha: {{$caracterizacion->ficha->ficha}}</h3>
-                        </div> 
+                        </div>
                     </div>
                 </div>
             </div>
@@ -50,6 +50,7 @@
                 <form id="asistencia-form" action="{{route('asistence.store')}}" method="POST">
                     @csrf
                     <input type="hidden" name="caracterizacion_id" value="{{$caracterizacion->id}}">
+                    <input type="hidden" name="asignacion_de_formacion_id" value="{{$asignacionDeFormacion->id}}">
                     <div class="card">
                         <ul name="asistencia_web" id="asistencia-list"></ul>
                     </div>

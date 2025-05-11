@@ -61,7 +61,7 @@ class AsistenceQrController extends Controller
             ->first();
             if(!empty($asignacionDeFormacion)){
 
-                return view('qr_asistence.index', compact('caracterizacion'));
+                return view('qr_asistence.index', compact('caracterizacion', 'asignacionDeFormacion'));
             }else{
                 return back()->withErrors('No es posible tomar la asistencia de esta ficha');
             }
@@ -79,6 +79,7 @@ class AsistenceQrController extends Controller
      */
     public function store(Request $request)
     {
+        // @dd($request->asignacion_de_formacion_id);
         $data = $request->all();
 
         if (!$data) {
@@ -91,12 +92,11 @@ class AsistenceQrController extends Controller
             Log::info($asistenceData);
 
             $asistencia = AsistenciaAprendiz::create([
-                'caracterizacion_id' => $data['caracterizacion_id'],
-                'nombres' => $asistenceData['nombres'],
-                'apellidos' => $asistenceData['apellidos'],
-                'numero_identificacion' => $asistenceData['identificacion'],
                 'hora_ingreso' => $asistenceData['hora_ingreso'],
+                'aprendiz' => $asistenceData['identificacion'],
+                'id_asignacion_formacion' => $request->asignacion_de_formacion_id,
             ]);
+
         }
 
 
