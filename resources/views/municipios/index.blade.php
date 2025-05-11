@@ -171,6 +171,6 @@
 
 @section('js')
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    @vite(['resources/js/parametros.js'])
+    @vite(['resources/js/municipios.js'])
 @endsection
 
