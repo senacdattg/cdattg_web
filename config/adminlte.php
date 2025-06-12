@@ -333,7 +333,7 @@ return [
                 ],
                 [
                     'text' => 'Cerrar Sesión',
-                    'url' => '#',
+                    'url' => 'logout',
                     'icon' => 'fas fa-sign-out-alt text-danger',
                     'classes' => 'text-danger',
                     'route' => 'logout',
