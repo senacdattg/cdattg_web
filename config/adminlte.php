@@ -524,6 +524,7 @@ return [
         [
             'text' => 'Personas',
             'icon' => 'fas fa-fw fa-user',
+            'url' => 'personas',
             'can' => [
                 'VER PERSONA',
                 'CREAR PERSONA',
@@ -570,7 +571,12 @@ return [
                     'text' => 'Administrar Asistencias',
                     'url' => 'asistencia',
                     'icon' => 'fas fa-fw fa-check-square',
-                    
+                    'can' => [
+                        'VER ASISTENCIA',
+                        'CREAR ASISTENCIA',
+                        'EDITAR ASISTENCIA',
+                        'ELIMINAR ASISTENCIA',
+                    ],
                 ],
             ],
         ],
@@ -583,6 +589,12 @@ return [
                     'text' => 'Consultas',
                     'url' => 'consulta',
                     'icon' => 'fas fa-fw fa-search',
+                    'can' => [
+                        'VER CONSULTA',
+                        'CREAR CONSULTA',
+                        'EDITAR CONSULTA',
+                        'ELIMINAR CONSULTA',
+                    ],
                 ],
                 [
                     'text' => 'Carnet',
@@ -592,11 +604,23 @@ return [
                             'text' => 'Administrar Carnet',
                             'url' => 'administrar-carnet',
                             'icon' => 'fas fa-fw fa-tasks',
+                            'can' => [
+                                'VER ADMINISTRAR CARNET',
+                                'CREAR ADMINISTRAR CARNET',
+                                'EDITAR ADMINISTRAR CARNET',
+                                'ELIMINAR ADMINISTRAR CARNET',
+                            ],
                         ],
                         [
                             'text' => 'Crear Carnet',
                             'url' => 'carnet',
                             'icon' => 'fas fa-fw fa-plus-circle',
+                            'can' => [
+                                'VER CREAR CARNET',
+                                'CREAR CREAR CARNET',
+                                'EDITAR CREAR CARNET',
+                                'ELIMINAR CREAR CARNET',
+                            ],
                         ],
                     ],
                 ],
