@@ -422,12 +422,12 @@ return [
                     'text' => 'Municipios',
                     'url' => 'municipio',
                     'icon' => 'fas fa-fw fa-map-marker-alt',
-                    // 'can' => [
-                    //     'CREAR MUNICIPIO',
-                    //     'EDITAR MUNICIPIO',
-                    //     'VER MUNICIPIO',
-                    //     'ELIMINAR MUNICIPIO',
-                    // ]
+                    'can' => [
+                        'CREAR MUNICIPIO',
+                        'EDITAR MUNICIPIO',
+                        'VER MUNICIPIO',
+                        'ELIMINAR MUNICIPIO',
+                    ]
                 ],
                 [
                     'text' => 'Centros de Formación',
@@ -517,6 +517,9 @@ return [
                     'text' => 'Importar CSV',
                     'url' => 'createImportarCSV',
                     'icon' => 'fas fa-fw fa-file-upload',
+                    'can' => [
+                        'IMPORTAR CSV' //Este permiso no esta todavia en los seeders
+                    ],
                 ],
             ],
         ],
@@ -530,6 +533,15 @@ return [
                 'CREAR PERSONA',
                 'EDITAR PERSONA',
                 'ELIMINAR PERSONA',
+            ],
+        ],
+        //Tomat Asistencias
+        [
+            'text' => 'Tomar Asistencia',
+            'url' => 'asistencia',
+            'icon' => 'fas fa-fw fa-check-square',
+            'can' => [
+                'TOMAR ASISTENCIA',
             ],
         ],
         // Operaciones Académicas y Administrativas
@@ -576,7 +588,7 @@ return [
                         'CREAR ASISTENCIA',
                         'EDITAR ASISTENCIA',
                         'ELIMINAR ASISTENCIA',
-                    ],
+                    ]
                 ],
             ],
         ],

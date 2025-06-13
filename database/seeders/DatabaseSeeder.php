@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
             UpdatePersonaSeeder::class,
             InstructorSeeder::class,
             UpdatePersonasUserFieldsSeeder::class,
+            RedConocimientoSeeder::class,
         ]);
     }
 }

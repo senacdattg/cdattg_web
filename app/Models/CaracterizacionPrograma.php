@@ -17,7 +17,7 @@ class CaracterizacionPrograma extends Model
 
     public function instructor()
     {
-        return $this->belongsTo(Instructor::class, 'instructor_persona_id');
+        return $this->belongsTo(Instructor::class, 'persona_id');
     }
 
     public function programaFormacion()

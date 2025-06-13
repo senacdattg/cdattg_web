@@ -24,18 +24,16 @@ class AsistenceQrController extends Controller
      */
     public function index()
     {
-
         $user = Auth::user(); 
-        $id_person = $user->persona_id; 
+        $id_person = $user->persona_id;
       
-        $caracterizaciones = CaracterizacionPrograma::where('instructor_persona_id', $id_person)->get(); 
+        $caracterizaciones = CaracterizacionPrograma::where('instructor_id', $id_person)->get(); 
         
         if (!$caracterizaciones) {
             return response()->json(['message' => 'El instructor no tiene fichas de caracterización asignadas'], 404);
         }
 
         return view('qr_asistence.caracter_selecter', compact('caracterizaciones')); 
-       
     }
 
     /**
