@@ -11,13 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('programas_formacion', function (Blueprint $table) {
+        Schema::create('red_conocimientos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tipo_programa_id')->constrained('tipos_programas');
-            $table->foreignId('sede_id')->constrained('sedes');
-            $table->bigInteger('codigo');
-            $table->string('nombre');
-            $table->string('duracion');
+            $table->string('nombre', 255)->nullable()->unique();
             $table->timestamps();
         });
     }
@@ -27,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('programas_formacion');
+        Schema::dropIfExists('red_conocimientos');
     }
 };
