@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('instructor_fichas_caracterizacion', function (Blueprint $table) {
             $table->id();
             $table->integer('total_horas_instructor')->nullable();
-            $table->foreignId('instructor_id')->constrained('instructores');
+            $table->foreignId('instructor_id')->constrained('instructors');
             $table->foreignId('ficha_id')->constrained('fichas_caracterizacion');
             $table->timestamps();
         });
