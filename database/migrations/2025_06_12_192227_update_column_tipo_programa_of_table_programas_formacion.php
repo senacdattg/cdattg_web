@@ -15,7 +15,7 @@ return new class extends Migration
             $table->dropForeign(['tipo_programa_id']);
             $table->dropColumn('tipo_programa_id');
 
-            $table->foreignId('red_conocimiento_id')->constrained('red_conocimientos');
+            $table->foreignId('red_conocimiento_id')->after('nombre')->constrained('red_conocimientos');
         });
 
     }
