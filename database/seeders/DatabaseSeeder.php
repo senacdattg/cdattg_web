@@ -39,7 +39,7 @@ class DatabaseSeeder extends Seeder
             InstructorFichaDiasSeeder::class,
             PersonasEspecificasSeeder::class,
             AprendizSeeder::class,
-            
+            AprendizFichaSeeder::class
         ]);
     }
 }
