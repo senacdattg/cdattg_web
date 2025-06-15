@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('ficha_id')->constrained('fichas_caracterizacion');
             $table->foreignId('dia_id')->constrained('dias_formacion');
+            $table->time('hora_inicio')->nullable();
+            $table->time('hora_fin')->nullable();
             $table->timestamps();
         });
     }

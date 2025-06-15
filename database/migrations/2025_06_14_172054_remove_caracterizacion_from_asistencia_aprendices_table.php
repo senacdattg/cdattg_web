@@ -13,10 +13,7 @@ return new class extends Migration
     {
         Schema::table('asistencia_aprendices', function (Blueprint $table) {
             $table->dropForeign(['caracterizacion_id']);
-            $table->dropColumn('caracterizacion_id');
-            $table->dropColumn('nombres');
-            $table->dropColumn('apellidos');
-            $table->dropColumn('numero_identificacion');
+            $table->dropColumn(['caracterizacion_id', 'nombres', 'apellidos', 'numero_identificacion']);
         });
     }
 
@@ -26,10 +23,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('asistencia_aprendices', function (Blueprint $table) {
-            $table->foreignId('caracterizacion_id')->nullable()->constrained('caracterizaciones');
             $table->string('nombres')->nullable();
             $table->string('apellidos')->nullable();
-            $table->string('numero_identificacion')->nullable();
+            $table->bigInteger('numero_identificacion')->nullable();
         });
     }
 };

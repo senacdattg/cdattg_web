@@ -8,11 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 class JornadaFormacion extends Model
 {
     use HasFactory;
-    protected $fillable = [
-        'jornada', 
-        'hora_inicio', 
-        'hora_fin'];
     protected $table = 'jornadas_formacion'; 
+    protected $fillable = [
+        'jornada'
+    ];
 
 
     public function caracterizaciones()

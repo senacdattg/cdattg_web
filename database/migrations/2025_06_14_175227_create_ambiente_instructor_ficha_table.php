@@ -16,6 +16,7 @@ return new class extends Migration
             $table->date('fecha_asignacion')->nullable();
             $table->foreignId('ambiente_id')->constrained('ambientes');
             $table->foreignId('instructor_ficha_id')->constrained('instructor_fichas_caracterizacion');
+            $table->foreignId('vigilante_id')->nullable()->constrained('vigilantes');
             $table->foreignId('instructor_id')->constrained('instructors');
             $table->time('hora_entrada')->nullable();
             $table->time('hora_salida')->nullable();

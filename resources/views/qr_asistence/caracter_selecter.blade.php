@@ -1,13 +1,10 @@
 @extends('adminlte::page')
 @section('content')
-
     <section class="content-header mt-3">
         <div class="container-fluid mt-3">
             <div class="row mb-2">
                 <div class="col-sm-6">
                     <h1>Programas de formación
-
-
                     </h1>
                 </div>
                 <div class="col-sm-6">

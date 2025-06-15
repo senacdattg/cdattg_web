@@ -31,6 +31,13 @@ class DatabaseSeeder extends Seeder
             InstructorSeeder::class,
             UpdatePersonasUserFieldsSeeder::class,
             RedConocimientoSeeder::class,
+            NivelFormacionSeeder::class,
+            ProgramasFormacionSeeder::class,
+            ModalidadFormacionSeeder::class,
+            JornadaFormacionSeeder::class,
+            FichaCaracterizacionSeeder::class,
+            DiasFormacionSeeder::class,
+            FichaDiasFormacionSeeder::class,
         ]);
     }
 }

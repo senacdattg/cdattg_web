@@ -25,11 +25,23 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('programas_formacion', function (Blueprint $table) {
-            $table->dropForeign(['red_conocimiento_id']);
-            $table->dropColumn('red_conocimiento_id');
+        // Primero elimina la clave foránea de la tabla caracterizacion_programas
+        Schema::table('caracterizacion_programas', function (Blueprint $table) {
+            $table->dropForeign(['jornada_id']);
+        });
 
-            $table->foreignId('tipo_programa_id')->constrained('tipos_programas');
+        // Luego elimina la tabla jornadas_formacion
+        Schema::dropIfExists('jornadas_formacion');
+
+        Schema::table('programas_formacion', function (Blueprint $table) {
+            // Si la columna existe, elimínala primero (esto previene el error)
+            if (Schema::hasColumn('programas_formacion', 'red_conocimiento_id')) {
+                $table->dropColumn('red_conocimiento_id');
+            }
+            // Si la columna tipo_programa_id ya existe, no la agregues de nuevo
+            if (!Schema::hasColumn('programas_formacion', 'tipo_programa_id')) {
+                $table->foreignId('tipo_programa_id')->constrained('tipos_programas');
+            }
         });
     }
 };

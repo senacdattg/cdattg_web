@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class ProgramaFormacion extends Model
 {
     protected $table = 'programas_formacion';
+    protected $fillable = ['codigo', 'nombre', 'red_conocimiento_id', 'nivel_formacion_id'];
+    
     use HasFactory;
 
     public function ficha()

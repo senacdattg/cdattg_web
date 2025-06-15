@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('programas_formacion', function (Blueprint $table) {
-            $table->foreignId('nivel_formacion_id')->after('red_conocimiento_id')->constrained('niveles_formacion');
+        Schema::table('jornadas_formacion', function (Blueprint $table) {
+            $table->dropColumn('hora_inicio');
+            $table->dropColumn('hora_fin');
         });
     }
 
@@ -21,9 +22,9 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('programas_formacion', function (Blueprint $table) {
-            $table->dropForeign(['nivel_formacion_id']);
-            $table->dropColumn('nivel_formacion_id');
+        Schema::table('jornadas_formacion', function (Blueprint $table) {
+            $table->time('hora_inicio')->nullable();
+            $table->time('hora_fin')->nullable();
         });
     }
 };

@@ -11,20 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('instructor_ficha_dias', function (Blueprint $table) {
+        Schema::create('vigilantes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('instructor_ficha_id')->constrained('instructor_fichas_caracterizacion');
-            $table->foreignId('dia_id')->constrained('dias_formacion');
-            $table->time('hora_inicio')->nullable();
-            $table->time('hora_fin')->nullable();
+            $table->foreignId('persona_id')->constrained('personas')->onDelete('cascade');
             $table->timestamps();
         });
     }
+
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('instructor_ficha_dias');
+        Schema::dropIfExists('vigilantes');
     }
 };
