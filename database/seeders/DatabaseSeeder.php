@@ -36,7 +36,10 @@ class DatabaseSeeder extends Seeder
             FichaCaracterizacionSeeder::class,
             FichaDiasFormacionSeeder::class,
             InstructorFichaCaracterizacionSeeder::class,
-            InstructorFichaDiasSeeder::class
+            InstructorFichaDiasSeeder::class,
+            PersonasEspecificasSeeder::class,
+            AprendizSeeder::class,
+            
         ]);
     }
 }
