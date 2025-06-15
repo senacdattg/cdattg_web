@@ -42,9 +42,9 @@
                             </div>
                             <div class="card-body">
                                 <h6><b>N° Caracterización: </b>{{$caracterizacion->id}}</h6>
-                                <h6><b>Programa:</b> {{ $caracterizacion->programaFormacion->nombre }}</h6>
-                                <h6><b>Instructor:</b> {{ $caracterizacion->persona->primer_nombre }}</h6>
-                                <h6><b>Jornada:</b> {{ $caracterizacion->jornada->jornada }}</h6>
+                                <h6><b>Programa:</b> {{ $caracterizacion->ficha->programaFormacion->nombre }}</h6>
+                                <h6><b>Instructor:</b> {{ $persona->primer_nombre }} {{ $persona->primer_apellido}}</h6>
+                                <h6><b>Jornada:</b> {{ $caracterizacion->ficha->jornadaFormacion->jornada }}</h6>
                             </div>
                             <div class="card-footer">
                                 <div class="row">
@@ -52,7 +52,7 @@
                                         <a href="{{ route('asistence.caracterSelected', ['id' => $caracterizacion->id]) }}" class="btn btn-primary">Asistencia</a>
                                     </div>  
                                     <div class="col-md-6">
-                                        <a href="{{ route('asistence.weblist', ['ficha' => $caracterizacion->ficha->ficha, 'jornada' => $caracterizacion->jornada->jornada]) }}" class="btn btn-success">Novedades</a>
+                                        <a href="{{ route('asistence.weblist', ['ficha' => $caracterizacion->ficha->ficha, 'jornada' => $caracterizacion->ficha->jornadaFormacion->jornada]) }}" class="btn btn-success">Novedades</a>
                                     </div>
                                 </div>
                             </div>

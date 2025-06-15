@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CaracterizacionPrograma;
+use App\Models\InstructorFichaCaracterizacion;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -10,7 +10,9 @@ use App\Models\AsistenciaAprendiz;
 use App\Models\JornadaFormacion;
 use Herramientas;
 use Illuminate\Support\Facades\Log;
-
+use App\Models\Instructor;
+use App\Models\Persona;
+use App\Models\FichaCaracterizacion;
 
 class AsistenceQrController extends Controller
 {
@@ -23,17 +25,17 @@ class AsistenceQrController extends Controller
      * @return \Illuminate\View\View La vista que muestra la lista de fichas de caracterización.
      */
     public function index()
-    {
+    {   
         $user = Auth::user(); 
         $id_person = $user->persona_id;
-      
-        $caracterizaciones = CaracterizacionPrograma::where('instructor_id', $id_person)->get(); 
-        
+        $persona = Persona::where('id', $id_person)->first();
+        $instructor = Instructor::where('persona_id', $id_person)->first();
+        $caracterizaciones = InstructorFichaCaracterizacion::where('instructor_id', $instructor->id)->get();
         if (!$caracterizaciones) {
             return response()->json(['message' => 'El instructor no tiene fichas de caracterización asignadas'], 404);
         }
 
-        return view('qr_asistence.caracter_selecter', compact('caracterizaciones')); 
+        return view('qr_asistence.caracter_selecter', compact('caracterizaciones', 'persona')); 
     }
 
     /**
@@ -45,8 +47,7 @@ class AsistenceQrController extends Controller
     public function caracterSelected( $id )
     {
         $caracterizacion_id = $id; 
-        $caracterizacion = CaracterizacionPrograma::find($caracterizacion_id);
-        
+        $caracterizacion = FichaCaracterizacion::find($caracterizacion_id);
        
         return view('qr_asistence.index', compact('caracterizacion'));
         
