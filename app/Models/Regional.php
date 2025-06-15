@@ -16,6 +16,7 @@ class Regional extends Model
      */
     protected $fillable = [
         'nombre',
+        'departamento_id',
         'user_create_id',
         'user_edit_id',
         'status',

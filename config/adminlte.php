@@ -431,7 +431,7 @@ return [
                 ],
                 [
                     'text' => 'Centros de Formación',
-                    'url' => 'centro',
+                    'url' => 'centros',
                     'icon' => 'fas fa-fw fa-school',
                     'can' => [
                         'CREAR CENTRO DE FORMACION',

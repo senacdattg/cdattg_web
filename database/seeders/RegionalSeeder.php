@@ -15,6 +15,7 @@ class RegionalSeeder extends Seeder
     {
         Regional::create([
             'nombre' => 'GUAVIARE',
+            'departamento_id' => 95,
             'user_create_id' => '1',
             'user_edit_id' => '1',
             'status' => '1',
