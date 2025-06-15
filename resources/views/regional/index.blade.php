@@ -1,137 +1,161 @@
 @extends('adminlte::page')
 
-@section('content')
-        <!-- Encabezado de la página -->
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Regionales</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('verificarLogin') }}">Inicio</a>
-                            </li>
-                            <li class="breadcrumb-item active">Regionales</li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </section>
+@section('title', "Regionales")
 
-        <!-- Contenido principal -->
-        <section class="content">
-            @can('CREAR REGIONAL')
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title">Crear Regional</h5>
-                    </div>
-                    <div class="card-body">
-                        @include('regional.create')
-                    </div>
-                </div>
-            @endcan
-
-            <div class="card">
-                <div class="card-body p-0">
-                    <table class="table table-striped projects">
-                        <thead>
-                            <tr class="text-center">
-                                <th>#</th>
-                                <th>Regional</th>
-                                <th>Estado</th>
-                                <th>Opciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($regionales as $regional)
-                                <tr class="text-center">
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $regional->nombre }}</td>
-                                    <td class="project-state">
-                                        <span class="badge badge-{{ $regional->status === 1 ? 'success' : 'danger' }}">
-                                            {{ $regional->status === 1 ? 'ACTIVO' : 'INACTIVO' }}
-                                        </span>
-                                    </td>
-                                    <td class="project-actions">
-                                        @can('EDITAR REGIONAL')
-                                            <form class="d-inline" action="{{ route('regional.cambiarEstado', $regional->id) }}"
-                                                method="POST">
-                                                @csrf
-                                                @method('PUT')
-                                                <button type="submit" class="btn btn-success btn-sm" title="Cambiar Estado">
-                                                    <i class="fas fa-sync"></i>
-                                                </button>
-                                            </form>
-                                        @endcan
-                                        @can('VER REGIONAL')
-                                            <a class="btn btn-warning btn-sm" href="{{ route('regional.show', $regional->id) }}"
-                                                title="Ver">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
-                                        @endcan
-                                        @can('EDITAR REGIONAL')
-                                            <a class="btn btn-info btn-sm" href="{{ route('regional.edit', $regional->id) }}"
-                                                title="Editar">
-                                                <i class="fas fa-pencil-alt"></i>
-                                            </a>
-                                        @endcan
-                                        @can('ELIMINAR REGIONAL')
-                                            <form class="d-inline eliminar-regional-form"
-                                                action="{{ route('regional.destroy', $regional->id) }}" method="POST">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        @endcan
-
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr class="text-center">
-                                    <td colspan="4">No hay regionales registradas</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-
-                <!-- Paginación -->
-                <div class="card-footer">
-                    <div class="float-right">
-                        {{ $regionales->links() }}
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
+@section('css')
+    @vite(['resources/css/parametros.css'])
 @endsection
-@section('script')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const forms = document.querySelectorAll('.eliminar-regional-form');
-            forms.forEach(form => {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    Swal.fire({
-                        title: '¿Está seguro de eliminar la Reional?',
-                        text: "¡Esta acción no se podrá revertir!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Sí, eliminar',
-                        cancelButtonText: 'Cancelar'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            form.submit();
-                        }
-                    });
-                });
-            });
-        });
-    </script>
+
+@section('content_header')
+<section class="content-header dashboard-header py-4">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-12 col-md-6 d-flex align-items-center">
+                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
+                    style="width: 48px; height: 48px;">
+                    <i class="fas fa-cogs text-white fa-lg"></i>
+                </div>
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">Regionales</h1>
+                    <p class="text-muted mb-0 font-weight-light">Gestión de regionales</p>
+                </div>    
+            </div>
+            <div class="col-sm-6">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('verificarLogin') }}" class="link_right_header">
+                                <i class="fas fa-home"></i> Inicio
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            <i class="fas fa-cog"></i> Regionales
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+@endsection
+
+@section('content')
+<section class="content mt-4">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm mb-4 no-hover">
+                    <div class="card-header bg-white py-3 d-flex align-items-center">
+                        <h5 class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1">
+                            <i class="fas fa-plus-circle mr-2"></i> Crear Regional
+                        </h5>
+                        <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="collapse"
+                            data-target="#createParameterForm" aria-expanded="true">
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                    </div>
+
+                    <div class="collapse show" id="createParameterForm">
+                        <div class="card-body">
+                            @include('regional.create')
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4 no-hover">
+                    <div class="card-header bg-white py-3 d-flex align-items-center">
+                        <h6 class="m-0 font-weight-bold text-primary d-flex flex-grow-1">Lista de Regionales</h6>
+                        <div class="input-group w-25">
+                            <form action="{{ route('regional.index') }}" method="GET" class="input-group">
+                                <input type="text" name="search" id="searchRegional"
+                                    class="form-control form-control-sm" placeholder="Buscar regional..."
+                                    value="{{ request('search') }}" autocomplete="off">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary btn-sm" type="submit">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-borderless table-striped mb-0">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th class="px-4 py-3" style="width: 5%">#</th>
+                                        <th class="px-4 py-3" style="width: 40%">Regional</th>
+                                        <th class="px-4 py-3" style="width: 40%">Departamento</th>
+                                        <th class="px-4 py-3" style="width: 20%">Estado</th>
+                                        <th class="px-4 py-3 text-center" style="width: 35%">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($regionales as $regional)
+                                        <tr>
+                                            <td class="px-4">{{ $loop->iteration }}</td>
+                                            <td class="px-4 font-weight-medium">{{ $regional->nombre }}</td>
+                                            <td class="px-4 font-weight-medium">{{ $regional->departamento->departamento }}</td>
+                                            <td class="px-4">
+                                                <div
+                                                    class="d-inline-block px-3 py-1 rounded-pill {{ $regional->status === 1 ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}">
+                                                    <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
+                                                    {{ $regional->status === 1 ? 'Activo' : 'Inactivo' }}
+                                                </div>
+                                            </td>
+                                            <td class="px-4 text-center">
+                                                <div class="btn-group">
+                                                    <form action="{{ route('regional.cambiarEstado', ['regional' => $regional->id]) }}" method="POST" class="d-inline">
+                                                        @csrf
+                                                        @method('PUT')
+                                                        <button type="submit" class="btn btn-light btn-sm" data-toggle="tooltip" title="Cambiar estado">
+                                                            <i class="fas fa-sync text-success"></i>
+                                                        </button>
+                                                    </form>
+                                                    <a href="{{ route('regional.show', ['regional' => $regional->id]) }}" class="btn btn-light btn-sm" data-toggle="tooltip" title="Ver detalles">
+                                                        <i class="fas fa-eye text-warning"></i>
+                                                    </a>
+                                                    <a href="{{ route('regional.edit', ['regional' => $regional->id]) }}" class="btn btn-light btn-sm" data-toggle="tooltip" title="Editar">
+                                                        <i class="fas fa-pencil-alt text-info"></i>
+                                                    </a>
+                                                    <form action="{{ route('regional.destroy', ['regional' => $regional->id]) }}" method="POST" class="d-inline">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-light btn-sm" data-toggle="tooltip" title="Eliminar">
+                                                            <i class="fas fa-trash text-danger"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="5" class="text-center py-5">
+                                                <img src="{{ asset('img/no-data.svg') }}" alt="No data" class="img-fluid">
+                                                <p class="text-muted mt-3">No se encontraron resultados</p>
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <div class="float-right">
+                            {{ $regionales->links() }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@endsection
+
+@section('footer')
+    @include('layout.footer')
+@endsection
+
+@section('js')
+    @vite(['resources/js/regional.js'])
 @endsection

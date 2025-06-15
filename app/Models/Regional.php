@@ -36,6 +36,14 @@ class Regional extends Model
     }
 
     /**
+     * Relación: Regional pertenece a un departamento.
+     */
+    public function departamento()
+    {
+        return $this->belongsTo(Departamento::class);
+    }
+
+    /**
      * Relación: Regional tiene muchos municipios.
      */
     public function municipios()
