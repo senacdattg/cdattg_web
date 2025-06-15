@@ -16,7 +16,7 @@ return new class extends Migration
             $table->date('fecha_fin')->nullable()->after('fecha_inicio');
             $table->integer('total_horas')->nullable()->after('fecha_fin');
             $table->foreignId('ambiente_id')->nullable()->after('fecha_fin')->constrained('ambientes');
-            $table->foreignId('modalidad_formacion_id')->nullable()->after('ambiente_id')->constrained('modalidades_formacion');
+            $table->foreignId('modalidad_formacion_id')->nullable()->after('ambiente_id')->constrained('parametros_temas');
             $table->foreignId('sede_id')->nullable()->after('modalidad_formacion_id')->constrained('sedes');
             $table->foreignId('jornada_id')->nullable()->after('sede_id')->constrained('jornadas_formacion');
         });

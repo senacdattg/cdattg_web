@@ -13,6 +13,7 @@ class ParametroSeeder extends Seeder
     public function run(): void
     {
         $parametros = [
+            // Estados
             ['id' => 1, 'name' => 'ACTIVO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 2, 'name' => 'INACTIVO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
 
@@ -28,6 +29,25 @@ class ParametroSeeder extends Seeder
             ['id' => 9, 'name' => 'MASCULINO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 10, 'name' => 'FEMENINO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 11, 'name' => 'NO DEFINE', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+
+            // Dias
+            ['id' => 12, 'name' => 'LUNES', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 13, 'name' => 'MARTES', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 14, 'name' => 'MIERCOLES', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 15, 'name' => 'JUEVES', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 16, 'name' => 'VIERNES', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 17, 'name' => 'SABADO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+
+            // Modalidades
+            ['id' => 18, 'name' => 'PRESENCIAL', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 19, 'name' => 'VIRTUAL', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 20, 'name' => 'MIXTA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+
+            // Niveles de formación
+            ['id' => 21, 'name' => 'TÉCNICO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 22, 'name' => 'TECNÓLOGO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 23, 'name' => 'AUXILIAR', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 24, 'name' => 'OPERARIO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1]
         ];
 
         foreach ($parametros as $parametro) {

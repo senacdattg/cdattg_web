@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('instructor_ficha_dias', function (Blueprint $table) {
             $table->id();
             $table->foreignId('instructor_ficha_id')->constrained('instructor_fichas_caracterizacion');
-            $table->foreignId('dia_id')->constrained('dias_formacion');
+            $table->foreignId('dia_id')->constrained('parametros_temas');
             $table->time('hora_inicio')->nullable();
             $table->time('hora_fin')->nullable();
             $table->timestamps();

@@ -22,7 +22,7 @@ class FichaCaracterizacionSeeder extends Seeder
             'fecha_inicio' => Carbon::parse('2024-04-15'),
             'fecha_fin' => Carbon::parse('2026-07-14'),
             'ambiente_id' => 60,
-            'modalidad_formacion_id' => 1,
+            'modalidad_formacion_id' => 18,
             'sede_id' => 2,
             'jornada_id' => 1,
             'total_horas' => 3345,

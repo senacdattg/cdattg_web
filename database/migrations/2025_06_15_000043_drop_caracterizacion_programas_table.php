@@ -11,11 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('dias_formacion', function (Blueprint $table) {
-            $table->id();
-            $table->string('nombre')->nullable()->unique();
-            $table->timestamps();
-        });
+        Schema::dropIfExists('caracterizacion_programas');
     }
 
     /**
@@ -23,6 +19,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('dias_formacion');
+        Schema::create('caracterizacion_programas', function (Blueprint $table) {
+            //
+        });
     }
 };

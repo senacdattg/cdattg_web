@@ -52,5 +52,47 @@ class TemaSeeder extends Seeder
             $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
         }
         $tema->parametros()->sync($syncData);
+
+        // Tema 4: DIAS
+        $tema = Tema::create([
+            'id'             => 4,
+            'name'           => 'DIAS',
+            'status'         => 1,
+            'user_create_id' => 1,
+            'user_edit_id'   => 1,
+        ]);
+        $syncData = [];
+        foreach (range(12, 17) as $id) {
+            $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
+        }
+        $tema->parametros()->sync($syncData);
+
+        // Tema 5: MODALIDADES DE FORMACION
+        $tema = Tema::create([
+            'id'             => 5,
+            'name'           => 'MODALIDADES DE FORMACION',
+            'status'         => 1,
+            'user_create_id' => 1,
+            'user_edit_id'   => 1,
+        ]);
+        $syncData = [];
+        foreach ([18, 19, 20] as $id) {
+            $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
+        }
+        $tema->parametros()->sync($syncData);
+
+        // Tema 6: NIVELES DE FORMACION
+        $tema = Tema::create([
+            'id'             => 6,
+            'name'           => 'NIVELES DE FORMACION',
+            'status'         => 1,
+            'user_create_id' => 1,
+            'user_edit_id'   => 1,
+        ]);
+        $syncData = [];
+        foreach (range(21, 24) as $id) {
+            $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
+        }
+        $tema->parametros()->sync($syncData);
     }
 }
