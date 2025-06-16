@@ -6,13 +6,13 @@
             <div class="card-header bg-primary">
                 <div class="row">
                     <div class="col-md-6">
-                        <a class="btn btn-warning btn-sm" href="{{ route('asistence.') }}">
+                        <a class="btn btn-warning btn-sm" href="{{ route('asistence.web') }}">
                             <i class="fas fa-arrow-left"></i>
                             Volver
                         </a>
                     </div>
                     <div class="col-md-6">
-                        <h3 class="text-center text-white">Programa de Formación</h3>
+                        <h3 class="text-center text-white">{{$fichaCaracterizacion->programaFormacion->nombre}}</h3>
                     </div>
                 </div>
             </div>
@@ -79,18 +79,18 @@
 
                 <!-- Lector QR -->
                 <div class="qr-result" id="qr-result"></div>
-                <h3>Tomar asistencia</h3>
-                <div style="display: flex; justify-content: center;">
-                    <div id="qr-lector" style="width: 40%; margin-bottom: 3%;"></div>
+                <h4 class="mt-4 mb-3 text-primary"><i class="fas fa-qrcode"></i> Escanear QR para Asistencia</h4>
+                <div class="d-flex justify-content-center mb-4">
+                    <div id="qr-lector" style="width: 350px; border-radius: 10px; box-shadow: 0 2px 8px rgba(44,62,80,0.15);"></div>
                 </div>
 
                 <!-- Listado de aprendices -->
-                <div class="card mt-4">
-                    <div class="card-header bg-secondary">
-                        <h4 class="text-white mb-0">Listado de Aprendices</h4>
+                <div class="card mt-4 border-0 shadow-sm">
+                    <div class="card-header bg-gradient-secondary">
+                        <h5 class="text-white mb-0"><i class="fas fa-users"></i> Listado de Aprendices</h5>
                     </div>
                     <div class="card-body p-0">
-                        <table class="table table-striped table-hover mb-0">
+                        <table class="table table-hover table-striped mb-0">
                             <thead class="thead-dark">
                                 <tr>
                                     <th>#</th>
@@ -104,12 +104,13 @@
                                 @foreach($aprendizPersona as $index => $aprendiz)
                                     <tr>
                                         <td>{{ $index + 1 }}</td>
-                                        <td>{{ $aprendiz->numero_documento }}</td> 
+                                        <td>{{ $aprendiz->numero_identificacion }}</td>
                                         <td>{{ $aprendiz->primer_nombre }} {{ $aprendiz->segundo_nombre }}</td>
                                         <td>{{ $aprendiz->primer_apellido }} {{ $aprendiz->segundo_apellido }}</td>
                                         <td>
-                                            <!-- Aquí puedes mostrar un icono o texto según si ya registró asistencia -->
-                                            <span id="asistencia-{{ $aprendiz->numero_identificacion }}"></span>
+                                            <span id="asistencia-{{ $aprendiz->numero_identificacion }}">
+                                                <i class="fas fa-times text-danger"></i>
+                                            </span>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -119,17 +120,19 @@
                 </div>
 
                 <!-- Formulario de asistencia -->
-                <form id="asistencia-form" action="{{route('asistence.store')}}" method="POST">
+                <form id="asistencia-form" action="{{route('asistence.store')}}" method="POST" class="mt-4">
                     @csrf
                     <input type="hidden" name="caracterizacion_id" value="{{$fichaCaracterizacion->id}}">
                     <ul name="asistencia_web" id="asistencia-list"></ul>
                     <div class="row mt-3">
                         <div class="col-md-6">
-                            <button type="submit" class="btn btn-primary">Guardar Asistencia</button>
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-save"></i> Guardar Asistencia
+                            </button>
                         </div>
                         <div class="col-md-6 text-right">
-                            <a class="btn btn-danger" href="{{ route('asistence.exitFormation', ['caracterizacion_id' => $fichaCaracterizacion->id]) }}">
-                                Finalizar Formación
+                            <a class="btn btn-danger btn-block" href="{{ route('asistence.exitFormation', ['caracterizacion_id' => $fichaCaracterizacion->id]) }}">
+                                <i class="fas fa-door-open"></i> Finalizar Formación
                             </a>
                         </div>
                     </div>
@@ -149,7 +152,6 @@
     }
 
     cuandoElDocumentoEsteListo(() => {
-        let contenedorQR = document.getElementById('qr-result');
         let listaAsistencias = document.getElementById('asistencia-list');
         let ultimoCodigoEscaneado, contadorEscaneos = 0;
 
@@ -165,13 +167,11 @@
                     second: '2-digit' 
                 });
 
-                // Crear y mostrar la información en la lista
-                let elementoLista = document.createElement('li');
-                elementoLista.innerHTML = `
-                    <strong>Identificación:</strong> ${numeroIdentificacion}
-                    <br><strong>Hora de Ingreso:</strong> ${horaActual}
-                `;
-                listaAsistencias.appendChild(elementoLista);
+                // Marcar asistencia en la tabla
+                let celdaAsistencia = document.getElementById('asistencia-' + numeroIdentificacion);
+                if (celdaAsistencia) {
+                    celdaAsistencia.innerHTML = '<i class="fas fa-check text-success"></i>';
+                }
 
                 // Guardar los datos en un campo oculto del formulario
                 let campoOculto = document.createElement('input');
@@ -187,8 +187,8 @@
 
         // Inicializar el escáner de QR
         let escanerQR = new Html5QrcodeScanner("qr-lector", { 
-            fps: 10,  // Frames por segundo
-            qrbox: 250 // Tamaño del área de escaneo
+            fps: 10,
+            qrbox: 250
         });
         escanerQR.render(cuandoSeEscaneaQR);
     });

@@ -54,9 +54,4 @@ class FichaCaracterizacion extends Model
     {
         return $this->belongsTo(Sede::class, 'sede_id');
     }
-
-    public function jornadaFormacion()
-    {
-        return $this->belongsTo(JornadaFormacion::class, 'jornada_id');
-    }
 }
