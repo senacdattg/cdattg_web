@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Persona;
 use App\Models\User;
+use App\Models\Aprendiz;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -15,7 +16,6 @@ class UsersTableSeeder extends Seeder
      */
     public function run(): void
     {
-
         $superAdmin = User::create([
             'email' => 'superAdmin@superAdmin.com',
             'password' => Hash::make('123456'),
@@ -42,5 +42,16 @@ class UsersTableSeeder extends Seeder
         ]);
 
         $instructor->assignRole('INSTRUCTOR');
+
+        for($i = 4; $i < 32; $i++){
+            $aprendiz = User::create([
+                'email' => 'aprendiz'.$i.'@aprendiz.com',
+                'password' => Hash::make('123456'),
+                'status' => 1,
+                'persona_id' => $i
+            ]);
+
+            $aprendiz->assignRole('APRENDIZ');
+        }
     }
 }

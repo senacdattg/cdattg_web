@@ -18,6 +18,5 @@ class InstructorSeeder extends Seeder
             'persona_id' => 3,
             'regional_id' => 1,
         ]);
-
     }
 }

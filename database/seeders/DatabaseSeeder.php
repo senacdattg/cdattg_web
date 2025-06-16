@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             DepartamentoSeeder::class,
             MunicipioSeeder::class,
             PersonaSeeder::class,
+            PersonasEspecificasSeeder::class,
             UsersTableSeeder::class,
             RegionalSeeder::class,
             CentroFormacionSeeder::class,
@@ -37,7 +38,6 @@ class DatabaseSeeder extends Seeder
             FichaDiasFormacionSeeder::class,
             InstructorFichaCaracterizacionSeeder::class,
             InstructorFichaDiasSeeder::class,
-            PersonasEspecificasSeeder::class,
             AprendizSeeder::class,
             AprendizFichaSeeder::class
         ]);
