@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Departamento;
 
 class RegionalController extends Controller
 {
@@ -27,9 +28,10 @@ class RegionalController extends Controller
      */
     public function index()
     {
-        $regionales = Regional::paginate();
+        $departamentos = Departamento::all();
+        $regionales = Regional::with('departamento')->paginate(10);
 
-        return view('regional.index', compact('regionales'));
+        return view('regional.index', compact('regionales', 'departamentos'));
     }
 
     /**
@@ -56,12 +58,12 @@ class RegionalController extends Controller
             $regional = Regional::create($data);
 
             DB::commit();
-            return redirect()->route('regional.show', $regional->id)
+            return redirect()->route('regional.index')
                 ->with('success', 'Regional creada con éxito');
         } catch (QueryException $e) {
             DB::rollBack();
             Log::error('Error al crear regional: ' . $e->getMessage());
-            return redirect()->back()->withInput()->withErrors(['error' => 'Error al momento de crear la regional: ' . $e->getMessage()]);
+            return redirect()->back()->withInput()->withErrors(['error' => 'Error al momento de crear la regional']);
         }
     }
 

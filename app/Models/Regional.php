@@ -16,6 +16,7 @@ class Regional extends Model
      */
     protected $fillable = [
         'nombre',
+        'departamento_id',
         'user_create_id',
         'user_edit_id',
         'status',
@@ -32,6 +33,14 @@ class Regional extends Model
         static::saving(function ($regional) {
             $regional->nombre = strtoupper($regional->nombre);
         });
+    }
+
+    /**
+     * Relación: Regional pertenece a un departamento.
+     */
+    public function departamento()
+    {
+        return $this->belongsTo(Departamento::class);
     }
 
     /**

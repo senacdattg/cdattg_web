@@ -12,13 +12,13 @@ class FichaCaracterizacion extends Model
     protected $fillable = [
         'programa_formacion_id',
         'ficha',
+        'instructor_id',
         'fecha_inicio',
         'fecha_fin',
-        'jornada_id',
-        'instructor_id',
         'ambiente_id',
         'modalidad_formacion_id',
         'sede_id',
+        'jornada_id',
         'total_horas',
         'user_create_id',
         'user_edit_id',
@@ -33,6 +33,11 @@ class FichaCaracterizacion extends Model
     public function programaFormacion()
     {
         return $this->belongsTo(ProgramaFormacion::class);
+    }
+
+    public function jornadaFormacion()
+    {
+        return $this->belongsTo(JornadaFormacion::class, 'jornada_id');
     }
 
     public function ambiente()
