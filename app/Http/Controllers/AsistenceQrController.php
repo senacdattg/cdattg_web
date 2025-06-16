@@ -8,9 +8,12 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\AsistenciaAprendiz;
 use App\Models\JornadaFormacion;
+use App\Models\FichaCaracterizacion;
 use Herramientas;
 use Illuminate\Support\Facades\Log;
-
+use App\Models\AprendizFicha;
+use App\Models\Aprendiz;
+use App\Models\Persona;
 
 class AsistenceQrController extends Controller
 {
@@ -27,13 +30,13 @@ class AsistenceQrController extends Controller
         $user = Auth::user(); 
         $id_person = $user->persona_id;
       
-        $caracterizaciones = CaracterizacionPrograma::where('instructor_id', $id_person)->get(); 
+        $caracterizaciones = FichaCaracterizacion::where('instructor_id', $id_person)->get(); 
         
         if (!$caracterizaciones) {
             return response()->json(['message' => 'El instructor no tiene fichas de caracterización asignadas'], 404);
         }
 
-        return view('qr_asistence.caracter_selecter', compact('caracterizaciones')); 
+        return view('qr_asistence.caracter_selecter', compact('caracterizaciones', )); 
     }
 
     /**
@@ -44,11 +47,12 @@ class AsistenceQrController extends Controller
      */
     public function caracterSelected( $id )
     {
-        $caracterizacion_id = $id; 
-        $caracterizacion = CaracterizacionPrograma::find($caracterizacion_id);
-        
-       
-        return view('qr_asistence.index', compact('caracterizacion'));
+        $fichaCaracterizacion = FichaCaracterizacion::find($id);
+        $aprendicesFicha = AprendizFicha::where('ficha_id', $fichaCaracterizacion->id)->get();
+        $aprendices = Aprendiz::whereIn('id', $aprendicesFicha->pluck('aprendiz_id'))->get();
+        $aprendizPersona = Persona::whereIn('id', $aprendices->pluck('persona_id'))->get();
+        //dd($aprendizPersona);
+        return view('qr_asistence.index', compact('fichaCaracterizacion', 'aprendizPersona'));
         
     }
 
