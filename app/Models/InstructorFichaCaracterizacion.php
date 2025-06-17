@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InstructorFichaCaracterizacion extends Model
 {
@@ -16,12 +17,12 @@ class InstructorFichaCaracterizacion extends Model
         "total_horas_ficha"
     ];
 
-    public function instructor()
+    public function instructor(): BelongsTo
     {
         return $this->belongsTo(Instructor::class, 'instructor_id');
     }
 
-    public function ficha()
+    public function ficha(): BelongsTo
     {
         return $this->belongsTo(FichaCaracterizacion::class, 'ficha_id');
     }

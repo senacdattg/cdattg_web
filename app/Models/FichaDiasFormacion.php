@@ -22,6 +22,6 @@ class FichaDiasFormacion extends Model
 
     public function dia()
     {
-        return $this->belongsTo(DiaFormacion::class, 'dia_id');
+        return $this->belongsTo(Parametro::class, 'dia_id');
     }
 }

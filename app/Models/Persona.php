@@ -91,6 +91,11 @@ class Persona extends Model
         return $this->belongsTo(Municipio::class);
     }
 
+    public function aprendiz()
+    {
+        return $this->hasOne(Aprendiz::class, 'persona_id');
+    }
+
     /**
      * Accesor para obtener el nombre completo de la persona.
      *

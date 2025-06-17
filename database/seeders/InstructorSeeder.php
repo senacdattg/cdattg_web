@@ -19,4 +19,14 @@ class InstructorSeeder extends Seeder
             'regional_id' => 1,
         ]);
     }
+
+    /**
+     * Get the personaInstructor that owns the InstructorSeeder
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function personaInstructor(): BelongsTo
+    {
+        return $this->belongsTo(Persona::class, 'persona_id', 'id');
+    }
 }

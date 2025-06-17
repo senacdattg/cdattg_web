@@ -14,6 +14,7 @@ use App\Http\Controllers\MunicipioController;
 use App\Http\Controllers\ParametroController;
 use App\Http\Controllers\PisoController;
 use App\Http\Controllers\SedeController;
+use App\Http\Controllers\AsistenceQrController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -43,10 +44,12 @@ Route::middleware('auth:sanctum')->group(function(){
     Route::get('asistencia/getFicha/{ficha}/{jornada}', [AsistenciaAprendicesController::class, 'getList']);
     Route::post('asistencia/updateExitAsistence', [AsistenciaAprendicesController::class, 'updateExitAsistence']);
     Route::post('asistencia/updateEntraceAsistence', [AsistenciaAprendicesController::class, 'updateEntraceAsistence']);
-    
 });
 
 
 route::post('authenticate', [LoginController::class, 'authenticate']);
 route::post('logout', [LogoutController::class, 'logout']);
+
+// Nueva ruta para verificar el documento por QR
+Route::post('/verify-document', [AsistenceQrController::class, 'verifyDocument'])->name('api.verifyDocument');
 
