@@ -18,7 +18,7 @@ class PersonasAprendicesSeeder extends Seeder
             [
 
                 'tipo_documento' => NULL,
-                'numero_documento' => '10073NULL71NULL7',
+                'numero_documento' => '1007397197',
                 'primer_nombre' => 'JOHN',
                 'segundo_nombre' => 'EDUARD',
                 'primer_apellido' => 'VELEZ',
@@ -37,7 +37,7 @@ class PersonasAprendicesSeeder extends Seeder
             ],
             [
                 'tipo_documento' => NULL,
-                'numero_documento' => '102NULL142202',
+                'numero_documento' => '1029142202',
                 'primer_nombre' => 'SAMUEL',
                 'segundo_nombre' => 'RENE',
                 'primer_apellido' => 'YEPES',
@@ -56,7 +56,7 @@ class PersonasAprendicesSeeder extends Seeder
             ],
             [
                 'tipo_documento' => NULL,
-                'numero_documento' => '1041531NULL46',
+                'numero_documento' => '1041531946',
                 'primer_nombre' => 'DEYSON',
                 'segundo_nombre' => 'DE JESUS',
                 'primer_apellido' => 'URREGO',
@@ -75,7 +75,7 @@ class PersonasAprendicesSeeder extends Seeder
             ],
             [
                 'tipo_documento' => NULL,
-                'numero_documento' => '1041NULL76808',
+                'numero_documento' => '1041976808',
                 'primer_nombre' => 'JUAN',
                 'segundo_nombre' => 'DAVID',
                 'primer_apellido' => 'CASTRO',
@@ -94,7 +94,7 @@ class PersonasAprendicesSeeder extends Seeder
             ],
             [
                 'tipo_documento' => NULL,
-                'numero_documento' => '1045228NULL03',
+                'numero_documento' => '1045228903',
                 'primer_nombre' => 'CAMILO',
                 'segundo_nombre' => 'ANDRES',
                 'primer_apellido' => 'HERNANDEZ',
@@ -113,7 +113,7 @@ class PersonasAprendicesSeeder extends Seeder
             ],
             [
                 'tipo_documento' => NULL,
-                'numero_documento' => '10NULL2455166',
+                'numero_documento' => '1092455166',
                 'primer_nombre' => 'CARLOS',
                 'segundo_nombre' => 'HERNAN',
                 'primer_apellido' => 'MOLINA',
@@ -132,7 +132,7 @@ class PersonasAprendicesSeeder extends Seeder
             ],
             [
                 'tipo_documento' => NULL,
-                'numero_documento' => '10NULLNULL735735',
+                'numero_documento' => '1099735735',
                 'primer_nombre' => 'NICOLAS',
                 'segundo_nombre' => 'ANTONIO',
                 'primer_apellido' => 'ARRIETA',
@@ -189,7 +189,7 @@ class PersonasAprendicesSeeder extends Seeder
             ],
             [
                 'tipo_documento' => NULL,
-                'numero_documento' => '112055NULL248',
+                'numero_documento' => '1120559248',
                 'primer_nombre' => 'ALEX',
                 'segundo_nombre' => 'DAVID',
                 'primer_apellido' => 'VELANDIA',
@@ -227,7 +227,7 @@ class PersonasAprendicesSeeder extends Seeder
             ],
             [
                 'tipo_documento' => NULL,
-                'numero_documento' => '112056133NULL',
+                'numero_documento' => '1120561339',
                 'primer_nombre' => 'JHON',
                 'segundo_nombre' => 'DEIVID',
                 'primer_apellido' => 'ROJAS',
@@ -531,7 +531,7 @@ class PersonasAprendicesSeeder extends Seeder
             ],
             [
                 'tipo_documento' => NULL,
-                'numero_documento' => '1122NULL22NULL10',
+                'numero_documento' => '1122922910',
                 'primer_nombre' => 'MARIO',
                 'segundo_nombre' => 'ALEXANDER',
                 'primer_apellido' => 'CAÑOLA',
