@@ -14,7 +14,7 @@ class AprendizSeeder extends Seeder
      */
     public function run(): void
     {
-        $personas = Persona::where('status', 1)->where('id', '>=', 3)->get();
+        $personas = Persona::where('status', 1)->where('id', '>=', 4)->get();
 
         foreach ($personas as $persona) {
             Aprendiz::create([

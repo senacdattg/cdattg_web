@@ -42,16 +42,5 @@ class UsersTableSeeder extends Seeder
         ]);
 
         $instructor->assignRole('INSTRUCTOR');
-
-        for($i = 4; $i < 32; $i++){
-            $aprendiz = User::create([
-                'email' => 'aprendiz'.$i.'@aprendiz.com',
-                'password' => Hash::make('123456'),
-                'status' => 1,
-                'persona_id' => $i
-            ]);
-
-            $aprendiz->assignRole('APRENDIZ');
-        }
     }
 }
