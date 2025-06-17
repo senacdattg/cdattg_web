@@ -37,6 +37,16 @@ class FichaCaracterizacion extends Model
     }
 
     /**
+     * Get the instructorFicha that owns the FichaCaracterizacion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function instructorFicha(): BelongsTo
+    {
+        return $this->belongsTo(InstructorFichaCaracterizaion::class, 'ficha_id');
+    }
+
+    /**
      * Relación con los programas de formación.
      */
     public function programaFormacion(): BelongsTo

@@ -78,16 +78,52 @@ class AsistenceQrController extends Controller
         // Si fichaCaracterizacion es null, el resto de la ejecución dará un error.
         // Agrega una verificación para manejar el caso si no se encuentra la ficha.
         if (!$fichaCaracterizacion) {
-            // Puedes redirigir, abortar, o mostrar un mensaje de error.
-            // Por ejemplo:
             return redirect()->back()->with('error', 'Ficha de caracterización no encontrada.');
         }
 
-        $aprendicesFicha = AprendizFicha::where('ficha_id', $fichaCaracterizacion->id)->get();
-        $aprendices = Aprendiz::whereIn('id', $aprendicesFicha->pluck('aprendiz_id'))->get();
-        $aprendizPersona = Persona::whereIn('id', $aprendices->pluck('persona_id'))->get();
+        // Obtener el ID del instructor actual (logueado) y su ficha
+        $user = Auth::user();
+        $instructorFichaId = null;
+        if ($user && $user->persona && $user->persona->instructor) {
+            $instructor = $user->persona->instructor;
+            $instructorFicha = InstructorFichaCaracterizacion::where('instructor_id', $instructor->id)
+                ->where('ficha_id', $fichaCaracterizacion->id)
+                ->first();
+            if ($instructorFicha) {
+                $instructorFichaId = $instructorFicha->id;
+            }
+        }
 
-        return view('qr_asistence.index', compact('fichaCaracterizacion', 'aprendizPersona', 'horarioHoy'));
+        // Obtener los aprendices de la ficha y sus datos de asistencia para hoy
+        $aprendicesFicha = AprendizFicha::where('ficha_id', $fichaCaracterizacion->id)->get();
+        $aprendizPersonaConAsistencia = collect();
+        $fechaActual = Carbon::now()->format('Y-m-d');
+
+        foreach ($aprendicesFicha as $af) {
+            $aprendiz = Aprendiz::find($af->aprendiz_id);
+            if ($aprendiz && $aprendiz->persona) {
+                $persona = $aprendiz->persona;
+
+                $asistenciaHoy = null;
+                if ($instructorFichaId) {
+                    $asistenciaHoy = AsistenciaAprendiz::where('aprendiz_ficha_id', $af->id)
+                        ->where('instructor_ficha_id', $instructorFichaId)
+                        ->whereDate('created_at', $fechaActual)
+                        ->first();
+                }
+
+                $persona->asistenciaHoy = $asistenciaHoy;
+
+                if ($persona->asistenciaHoy) {
+                    $persona->asistenciaHoy->formatted_hora_ingreso = Carbon::parse($persona->asistenciaHoy->hora_ingreso)->format('h:i A');
+                    $persona->asistenciaHoy->formatted_hora_salida = $persona->asistenciaHoy->hora_salida ? Carbon::parse($persona->asistenciaHoy->hora_salida)->format('h:i A') : null;
+                }
+
+                $aprendizPersonaConAsistencia->push($persona);
+            }
+        }
+
+        return view('qr_asistence.index', compact('fichaCaracterizacion', 'aprendizPersonaConAsistencia', 'horarioHoy'));
     }
 
 
@@ -483,7 +519,7 @@ class AsistenceQrController extends Controller
             }
             $instructorId = $user->persona->instructor->id;
 
-            // 2. Encontrar el instructor_ficha_id para la ficha y el instructor actuales
+            // 2. Encontrar el instructor_ficha_id para la ficha y el instructor actual
             $instructorFicha = InstructorFichaCaracterizacion::where('instructor_id', $instructorId)
                 ->where('ficha_id', $fichaId)
                 ->first();
@@ -541,12 +577,35 @@ class AsistenceQrController extends Controller
                 ->first();
 
             if ($asistenciaExistente) {
-                DB::rollBack();
-                return response()->json([
-                    'status' => 'already_registered',
-                    'message' => 'El aprendiz ' . $persona->getNombreCompletoAttribute() . ' ya registró su entrada hoy.',
-                    'hora_ingreso' => Carbon::parse($asistenciaExistente->hora_ingreso)->format('h:i A')
-                ], 200);
+                // Si ya tiene asistencia de entrada, verificar si ya tiene hora de salida
+                if ($asistenciaExistente->hora_salida === null) {
+                    // Si no tiene hora de salida, registrarla
+                    $asistenciaExistente->update([
+                        'hora_salida' => $horaIngreso, // Usamos $horaIngreso para la hora actual
+                    ]);
+                    DB::commit();
+                    return response()->json([
+                        'status' => 'exit_registered',
+                        'message' => 'Asistencia de salida registrada para ' . $persona->getNombreCompletoAttribute() . '.',
+                        'hora_ingreso' => Carbon::parse($asistenciaExistente->hora_ingreso)->format('h:i A'),
+                        'hora_salida' => Carbon::parse($asistenciaExistente->hora_salida)->format('h:i A'), // Enviar la hora de salida
+                        'aprendiz_data' => [
+                            'numero_documento' => $persona->numero_documento,
+                        ]
+                    ], 200);
+                } else {
+                    // Si ya tiene entrada y salida, indicar que ya completó la asistencia
+                    DB::rollBack(); // Aunque no hay cambios, es buena práctica si la transacción está activa
+                    return response()->json([
+                        'status' => 'attendance_complete',
+                        'message' => 'El aprendiz ' . $persona->getNombreCompletoAttribute() . ' ya completó su asistencia hoy.',
+                        'hora_ingreso' => Carbon::parse($asistenciaExistente->hora_ingreso)->format('h:i A'),
+                        'hora_salida' => Carbon::parse($asistenciaExistente->hora_salida)->format('h:i A'),
+                        'aprendiz_data' => [
+                            'numero_documento' => $persona->numero_documento,
+                        ]
+                    ], 200);
+                }
             }
 
             // 7. Si no tiene asistencia de entrada, registrarla

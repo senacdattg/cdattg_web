@@ -22,6 +22,16 @@ class InstructorFichaCaracterizacion extends Model
         return $this->belongsTo(Instructor::class, 'instructor_id');
     }
 
+    /**
+     * Get the asistenciaAprendices that owns the InstructorFichaCaracterizacion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function asistenciaAprendices(): BelongsTo
+    {
+        return $this->belongsTo(asistenciaAprendices::class, 'instructor_ficha_id');
+    }
+
     public function ficha(): BelongsTo
     {
         return $this->belongsTo(FichaCaracterizacion::class, 'ficha_id');

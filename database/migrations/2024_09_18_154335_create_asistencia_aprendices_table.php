@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('asistencia_aprendices', function (Blueprint $table) {
             $table->id();
             $table->foreignId('caracterizacion_id')->constrained('caracterizacion_programas');
-            $table->string('nombres'); 
-            $table->string('apellidos'); 
+            $table->string('nombres');
+            $table->string('apellidos');
             $table->time('hora_ingreso');
-            $table->time('hora_salida');
-            $table->bigInteger('numero_identificacion'); 
+            $table->time('hora_salida')->nullable();
+            $table->bigInteger('numero_identificacion');
             $table->timestamps();
         });
     }
