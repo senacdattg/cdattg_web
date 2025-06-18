@@ -20,15 +20,15 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        $this->guia_aprendizaje_competencia();
+        $this->guia_aprendizaje_rap();
     }
 
-    public function guia_aprendizaje_competencia(): void
+    public function guia_aprendizaje_rap(): void
     {
-        Schema::create('guia_aprendizaje_competencia', function (Blueprint $table) {
+        Schema::create('guia_aprendizaje_rap', function (Blueprint $table) {
             $table->id();
             $table->foreignId('guia_aprendizaje_id')->nullable(false)->constrained('guia_aprendizajes');
-            $table->foreignId('competencia_id')->nullable(false)->constrained('competencias');
+            $table->foreignId('rap_id')->nullable(false)->constrained('resultados_aprendizajes');
             $table->foreignId('user_create_id')->nullable()->constrained('users');
             $table->foreignId('user_edit_id')->nullable()->constrained('users');
             $table->timestamps();
@@ -41,6 +41,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('guia_aprendizajes');
-        Schema::dropIfExists('guia_aprendizaje_competencia');
+        Schema::dropIfExists('guia_aprendizaje_rap');
     }
 };
