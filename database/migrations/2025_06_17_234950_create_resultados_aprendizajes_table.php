@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('codigo')->nullable(false);
             $table->string('nombre')->nullable(false);
-            $table->integer('duracion')->nullable(false);
+            $table->float('duracion', 8, 2)->nullable(false);
             $table->date('fecha_inicio')->nullable(false);
             $table->date('fecha_fin')->nullable(false);
             $table->foreignId('user_create_id')->nullable()->constrained('users');
