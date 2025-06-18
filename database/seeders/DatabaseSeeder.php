@@ -55,6 +55,7 @@ class DatabaseSeeder extends Seeder
             InstructorFichaCaracterizacionSeeder::class,//Depende de una ficha y un instructor
             InstructorFichaDiasSeeder::class,//Depende de una ficha y tema-parametro
             AprendizFichaSeeder::class,//Depende de aprendices y ficha
+            CompetenciaSeeder::class,
         ]);
     }
 }
