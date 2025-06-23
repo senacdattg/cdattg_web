@@ -61,7 +61,8 @@ class DatabaseSeeder extends Seeder
             ResultadosAprendizajeSeeder::class, 
             ResultadosCompetenciasSeeder::class,
             GuiasAprendizajeSeeder::class,
-            ResultadosGuiasSeeder::class
+            ResultadosGuiasSeeder::class,
+            CompetenciaProgramaSeeder::class
         ]);
     }
 }
