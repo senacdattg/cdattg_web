@@ -57,6 +57,7 @@ class DatabaseSeeder extends Seeder
             AprendizFichaSeeder::class,//Depende de aprendices y ficha
             CompetenciaSeeder::class,
             ResultadosAprendizajeSeeder::class,
+            ResultadosCompetenciasSeeder::class,
         ]);
     }
 }

@@ -24,16 +24,6 @@ class CompetenciaSeeder extends Seeder
                 'user_edit_id' => 1,
             ],
             [
-                'codigo' => '38368',
-                'nombre' => 'CONSTRUCCIÓN DEL SOFTWARE',
-                'descripcion' => 'Desarrollar la solución de software de acuerdo con el diseño y metodologías de desarrollo',
-                'fecha_inicio' => '2025-04-21',
-                'fecha_fin' => '2025-12-13',
-                'duracion' => 1008,
-                'user_create_id' => 1,
-                'user_edit_id' => 1,
-            ],
-            [
                 'codigo' => '38369',
                 'nombre' => 'ADOPCIÓN DE BUENAS PRÁCTICAS EN EL PROCESO DE DESARROLLO DE SOFTWARE',
                 'descripcion' => 'Controlar la calidad del servicio de software de acuerdo con los estándares técnicos',
@@ -93,6 +83,17 @@ class CompetenciaSeeder extends Seeder
                 'user_create_id' => 1,
                 'user_edit_id' => 1,
             ],
+
+            [
+                'codigo' => '38368',
+                'nombre' => 'CONSTRUCCIÓN DEL SOFTWARE',
+                'descripcion' => 'Desarrollar la solución de software de acuerdo con el diseño y metodologías de desarrollo',
+                'fecha_inicio' => '2025-04-21',
+                'fecha_fin' => '2025-12-13',
+                'duracion' => 1008,
+                'user_create_id' => 1,
+                'user_edit_id' => 1,
+            ]
         ];
 
         
