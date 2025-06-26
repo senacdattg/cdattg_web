@@ -6,22 +6,17 @@ use Illuminate\Database\Eloquent\Model;
 
 class InstructorFichaDias extends Model
 {
-    protected $table = "instructor_ficha_dias";
+    protected $table = 'instructor_ficha_dias';
 
-    protected $fillable = [
-        "instructor_ficha_id",
-        "dia_id",
-        "hora_inicio",
-        "hora_fin"
-    ];
+    protected $fillable = ['instructor_ficha_id', 'dia_id', 'hora_inicio', 'hora_fin'];
 
-    public function instructorFicha()
+    public function instructorFicha(): BelongsTo
     {
         return $this->belongsTo(InstructorFicha::class);
     }
 
-    public function dia()
+    public function parametrosTema(): BelongsToMany
     {
-        return $this->belongsTo(Dia::class);
+        return $this->belongsToMany(Parametro::class, 'dia_id');
     }
 }

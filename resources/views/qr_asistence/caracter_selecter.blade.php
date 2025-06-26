@@ -1,24 +1,43 @@
 @extends('adminlte::page')
-@section('content')
-    <section class="content-header mt-3">
-        <div class="container-fluid mt-3">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>Programas de formación
-                    </h1>
+
+@section('css')
+    @vite(['resources/css/temas.css'])
+@endsection
+
+@section('content_header')
+    <section class="content-header dashboard-header py-4">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-6 d-flex align-items-center">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
+                        style="width: 48px; height: 48px;">
+                        <i class="fas fa-fw fa-paint-brush text-white"></i>
+                    </div>
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800">Fichas de formación</h1>
+                        <p class="text-muted mb-0 font-weight-light">Gestión de fichas de formación</p>
+                    </div>
                 </div>
                 <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item">
-                            <a href="">Inicio</a>
-                        </li>
-                        <li class="breadcrumb-item active">Programas de formación
-                        </li>
-                    </ol>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
+                                    <i class="fas fa-home"></i> Inicio
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <i class="fas fa-fw fa-paint-brush"></i> Fichas de formación
+                            </li>
+                        </ol>
+                    </nav>
                 </div>
             </div>
         </div>
     </section>
+@endsection
+
+@section('content')
     @if (session('error'))
         <div class="alert alert-danger" id="error-message">
             {{ session('error') }}
@@ -32,27 +51,111 @@
 
     <section class="content">
         <div class="container-fluid">
-
             <div class="row">
-                @foreach($caracterizaciones as $caracterizacion)
-                    <div class="col-md-4">
-                        <div class="card" style="height: 90%">
-                            <div class="card-header">
-                                <h3 class="card-title"><b>N° ficha:</b> {{ $caracterizacion->ficha->ficha }}</h3>
+                @foreach ($caracterizaciones as $caracterizacion)
+                    <div class="col-md-4 mb-4">
+                        <div
+                            class="card h-100 shadow-sm border-0 rounded-lg overflow-hidden transition-all hover:shadow-lg">
+                            <div class="card-header bg-gradient-primary text-white py-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-clipboard-list fa-lg mr-2"></i>
+                                    <h3 class="card-title mb-0 font-weight-bold">FICHA {{ $caracterizacion->ficha->ficha }}
+                                    </h3>
+                                </div>
                             </div>
-                            <div class="card-body">
-                                <h6><b>N° Caracterización: </b>{{$caracterizacion->id}}</h6>
-                                <h6><b>Programa:</b> {{ $caracterizacion->ficha->programaFormacion->nombre }}</h6>
-                                <h6><b>Instructor:</b> {{ $persona->primer_nombre }} {{ $persona->primer_apellido}}</h6>
-                                <h6><b>Jornada:</b> {{ $caracterizacion->ficha->jornadaFormacion->jornada }}</h6>
+                            <div class="card-body py-3">
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-book text-primary mr-2"></i>
+                                        <h6 class="mb-0"><b>Programa:</b></h6>
+                                    </div>
+                                    <p class="ml-4 text-muted">{{ $caracterizacion->ficha->programaFormacion->nombre }}</p>
+                                </div>
+                                @php
+                                    $proximaClaseFormacion = $caracterizacion->obtenerProximaClase();
+                                @endphp
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="far fa-clock text-primary mr-2"></i>
+                                        <h6 class="mb-0"><b>Jornada:</b></h6>
+                                    </div>
+                                    <p class="ml-4 text-muted">{{ $caracterizacion->ficha->jornadaFormacion->jornada }}
+                                        ({{ Carbon\Carbon::parse($proximaClaseFormacion['hora_inicio'])->format('g:i A') }} -
+                                        {{ Carbon\Carbon::parse($proximaClaseFormacion['hora_fin'])->format('g:i A') }})
+                                    </p>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-tasks text-primary mr-2"></i>
+                                        <h6 class="mb-0"><b>Competencia:</b></h6>
+                                    </div>
+                                    <p class="ml-4 text-muted">{{ $caracterizacion->ficha->programaFormacion->competenciaActual()->nombre ?? 'No asignada' }}
+                                    </p>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-list-ol text-primary mr-2"></i>
+                                        <h6 class="mb-0"><b>RAP:</b></h6>
+                                    </div>
+                                    <p class="ml-4 text-muted">{{ $caracterizacion->rap->descripcion ?? 'No asignado' }}</p>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-map-marker-alt text-primary mr-2"></i>
+                                        <h6 class="mb-0"><b>Lugar de formación:</b></h6>
+                                    </div>
+                                    <div class="d-flex align-items-center ml-4 text-muted" style="gap: 0.5rem;">
+                                        <span>Centro: {{ $caracterizacion->centro->nombre ?? '' }}</span>
+                                        <i class="fas fa-arrow-right"></i>
+                                        <span>Sede: {{ $caracterizacion->sede->nombre ?? '' }}</span>
+                                        <i class="fas fa-arrow-right"></i>
+                                        <span>Bloque: {{ $caracterizacion->bloque->nombre ?? '' }}</span>
+                                        <i class="fas fa-arrow-right"></i>
+                                        <span>Piso: {{ $caracterizacion->piso->nombre ?? '' }}</span>
+                                        <i class="fas fa-arrow-right"></i>
+                                        <span>Ambiente: {{ $caracterizacion->ambiente->nombre ?? '' }}</span>
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="far fa-calendar-alt text-primary mr-2"></i>
+                                        <h6 class="mb-0"><b>Horario:</b></h6>
+                                    </div>
+                                    {{-- @foreach ($diasFormacion as $diaFormacion)
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="far fa-clock text-primary mr-2"></i>
+                                            <h6 class="mb-0"><b>Horario:</b></h6>
+                                        </div>
+                                        <p class="ml-4 text-muted">{{ \Carbon\Carbon::parse($diaFormacion->hora_inicio)->format('g:i A') }} - {{ \Carbon\Carbon::parse($diaFormacion->hora_fin)->format('g:i A') }}</p>
+                                    @endforeach
+                                    --}}
+                                    {{--
+                                    <div class="d-flex ml-4" style="gap: 0.5rem;">
+                                        @foreach ($dias as $dia)
+                                            <div
+                                                class="border rounded text-center px-2 py-1"
+                                                style="min-width: 40px; background: {{ in_array($dia, $diasFormacion) ? '#007bff' : '#f8f9fa' }}; color: {{ in_array($dia, $diasFormacion) ? '#fff' : '#6c757d' }};"
+                                            >
+                                                {{ substr($dia, 0, 3) }}
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                    --}}
+                                </div>
                             </div>
-                            <div class="card-footer">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <a href="{{ route('asistence.caracterSelected', ['id' => $caracterizacion->id]) }}" class="btn btn-primary">Asistencia</a>
-                                    </div>  
-                                    <div class="col-md-6">
-                                        <a href="{{ route('asistence.weblist', ['ficha' => $caracterizacion->ficha->ficha, 'jornada' => $caracterizacion->ficha->jornadaFormacion->jornada]) }}" class="btn btn-success">Novedades</a>
+                            <div class="card-footer bg-white border-top-0 pt-0 pb-3">
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <a href="{{ route('asistence.caracterSelected', ['id' => $caracterizacion->id]) }}"
+                                            class="btn btn-primary btn-block py-2 font-weight-bold">
+                                            <i class="fas fa-clipboard-check mr-1"></i> Asistencia
+                                        </a>
+                                    </div>
+                                    <div class="col-6">
+                                        <a href="{{ route('asistence.weblist', ['ficha' => $caracterizacion->ficha->ficha, 'jornada' => $caracterizacion->ficha->jornadaFormacion->jornada]) }}"
+                                            class="btn btn-success btn-block py-2 font-weight-bold">
+                                            <i class="fas fa-newspaper mr-1"></i> Novedades
+                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -60,7 +163,29 @@
                     </div>
                 @endforeach
             </div>
+
+            @push('css')
+                <style>
+                    .card {
+                        transition: transform 0.3s ease, box-shadow 0.3s ease;
+                        border: 1px solid rgba(0, 0, 0, 0.05);
+                    }
+
+                    .card:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, .15) !important;
+                    }
+
+                    .bg-gradient-primary {
+                        background: linear-gradient(45deg, #4e73df 0%, #224abe 100%) !important;
+                    }
+
+                    .rounded-lg {
+                        border-radius: 0.75rem !important;
+                    }
+                </style>
+            @endpush
         </div>
     </section>
-</div>
+    </div>
 @endsection

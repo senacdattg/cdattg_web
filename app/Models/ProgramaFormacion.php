@@ -9,13 +9,8 @@ class ProgramaFormacion extends Model
 {
     protected $table = 'programas_formacion';
     protected $fillable = ['codigo', 'nombre', 'red_conocimiento_id', 'nivel_formacion_id'];
-    
-    use HasFactory;
 
-    public function ficha()
-    {
-        return $this->belongsTo(FichaCaracterizacion::class);
-    }
+    use HasFactory;
 
     public function caracterizacionPrograma()
     {
@@ -37,4 +32,21 @@ class ProgramaFormacion extends Model
         return $this->hasMany(CaracterizacionPrograma::class, 'programa_formacion_id');
     }
 
+    public function competenciasProgramas()
+    {
+        return $this->hasMany(CompetenciaPrograma::class, 'programa_id');
+    }
+
+    public function competenciaActual()
+    {
+        foreach ($this->competenciasProgramas as $competenciaPrograma) {
+            if (
+                $competenciaPrograma->competencia->fecha_inicio <= now() &&
+                $competenciaPrograma->competencia->fecha_fin >= now()
+            ) {
+                return $competenciaPrograma->competencia;
+            }
+        }
+        return null;
+    }
 }

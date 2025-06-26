@@ -39,11 +39,11 @@ class FichaCaracterizacion extends Model
     /**
      * Get the instructorFicha that owns the FichaCaracterizacion
      *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     * @return \Illuminate\Database\Eloquent\Relations\hasMany
      */
-    public function instructorFicha(): BelongsTo
+    public function instructorFicha(): hasMany
     {
-        return $this->belongsTo(InstructorFichaCaracterizaion::class, 'ficha_id');
+        return $this->hasMany(InstructorFichaCaracterizaion::class, 'ficha_id');
     }
 
     /**

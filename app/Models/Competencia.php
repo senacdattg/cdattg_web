@@ -13,9 +13,21 @@ class Competencia extends Model
     protected $fillable = [
         'codigo',
         'nombre',
+        'fecha_inicio',
+        'fecha_fin',
         'descripcion',
         'duracion',
         'user_create_id',
         'user_edit_id',
     ];
+
+    public function competenciaActual()
+    {
+        foreach ($this->competencia() as $competencia) {
+            if ($competencia->fecha_inicio <= now() && $competencia->fecha_fin >= now()) {
+                return $competencia;
+            }
+        }
+        return null;
+    }
 }

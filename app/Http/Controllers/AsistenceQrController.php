@@ -39,6 +39,8 @@ class AsistenceQrController extends Controller
             return response()->json(['message' => 'El instructor no tiene fichas de caracterización asignadas'], 404);
         }
 
+
+
         return view('qr_asistence.caracter_selecter', compact('caracterizaciones', 'persona'));
     }
 
@@ -579,7 +581,6 @@ class AsistenceQrController extends Controller
             if ($asistenciaExistente) {
                 // Si ya tiene asistencia de entrada, verificar si ya tiene hora de salida
                 if ($asistenciaExistente->hora_salida === null) {
-                    // Si no tiene hora de salida, registrarla
                     $asistenciaExistente->update([
                         'hora_salida' => $horaIngreso, // Usamos $horaIngreso para la hora actual
                     ]);
@@ -637,6 +638,129 @@ class AsistenceQrController extends Controller
             return response()->json([
                 'status' => 'error',
                 'message' => 'Ocurrió un error en el servidor al procesar la asistencia.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtiene la próxima clase para una ficha específica
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getProximaClase(Request $request)
+    {
+        $request->validate([
+            'ficha_id' => 'required|integer|exists:fichas_caracterizacion,id',
+        ]);
+
+        try {
+            $fichaId = $request->input('ficha_id');
+
+            // Obtener el instructor actual
+            $user = Auth::user();
+            if (!$user || !$user->persona || !$user->persona->instructor) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No se pudo identificar al instructor actual.'
+                ], 403);
+            }
+
+            $instructorId = $user->persona->instructor->id;
+
+            // Buscar la relación instructor-ficha
+            $instructorFicha = InstructorFichaCaracterizacion::where('instructor_id', $instructorId)
+                ->where('ficha_id', $fichaId)
+                ->first();
+
+            if (!$instructorFicha) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'El instructor no está asignado a esta ficha.'
+                ], 404);
+            }
+
+            // Obtener la próxima clase
+            $proximaClase = $instructorFicha->obtenerProximaClase();
+            $claseActual = $instructorFicha->obtenerClaseActual();
+
+            if (!$proximaClase) {
+                return response()->json([
+                    'status' => 'no_classes',
+                    'message' => 'No hay clases programadas para esta ficha.',
+                    'data' => null
+                ], 404);
+            }
+
+            // Formatear las horas para mejor presentación
+            $proximaClase['hora_inicio_formatted'] = Carbon::parse($proximaClase['hora_inicio'])->format('h:i A');
+            $proximaClase['hora_fin_formatted'] = Carbon::parse($proximaClase['hora_fin'])->format('h:i A');
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Próxima clase obtenida exitosamente.',
+                'data' => [
+                    'proxima_clase' => $proximaClase,
+                    'clase_actual' => $claseActual
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Error al obtener próxima clase: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ocurrió un error al obtener la próxima clase.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtiene la próxima clase para una ficha específica (versión web)
+     *
+     * @param int $fichaId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getProximaClaseWeb($fichaId)
+    {
+        try {
+            // Obtener el instructor actual
+            $user = Auth::user();
+            if (!$user || !$user->persona || !$user->persona->instructor) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No se pudo identificar al instructor actual.'
+                ], 403);
+            }
+
+            $instructorId = $user->persona->instructor->id;
+
+            // Buscar la relación instructor-ficha
+            $instructorFicha = InstructorFichaCaracterizacion::where('instructor_id', $instructorId)
+                ->where('ficha_id', $fichaId)
+                ->first();
+
+            if (!$instructorFicha) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'El instructor no está asignado a esta ficha.'
+                ], 404);
+            }
+
+            // Obtener la próxima clase
+            $proximaClase = $instructorFicha->obtenerProximaClase();
+            $claseActual = $instructorFicha->obtenerClaseActual();
+
+            return response()->json([
+                'status' => 'success',
+                'proxima_clase' => $proximaClase,
+                'clase_actual' => $claseActual
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Error al obtener próxima clase web: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Ocurrió un error al obtener la próxima clase.'
             ], 500);
         }
     }
