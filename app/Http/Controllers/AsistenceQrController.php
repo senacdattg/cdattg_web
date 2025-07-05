@@ -17,9 +17,18 @@ use App\Models\Persona;
 use App\Models\Instructor;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
+use App\Services\AsistenceQrService;
 
 class AsistenceQrController extends Controller
 {
+
+    protected $asistenceQrService;
+
+    public function __construct(AsistenceQrService $asistenceQrService)
+    {
+        $this->asistenceQrService = $asistenceQrService;
+    }
+
     /**
      * Muestra una lista de todas las fichas de caracterización.
      *
@@ -31,25 +40,15 @@ class AsistenceQrController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $id_person = $user->persona_id;
-        $persona = Persona::where('id', $id_person)->first();
-        $instructor = Instructor::where('persona_id', $id_person)->first();
-        $caracterizaciones = InstructorFichaCaracterizacion::where('instructor_id', $instructor->id)->get();
-        if (!$caracterizaciones) {
+
+        $instructorFicha = $this->asistenceQrService->getInstructorFichaIndex($user);
+        $diasFormacion = $this->asistenceQrService->getDiasFormacion();
+
+        if (!$instructorFicha) {
             return response()->json(['message' => 'El instructor no tiene fichas de caracterización asignadas'], 404);
         }
 
-        $diasFormacion = [
-            12 => 'LUNES',
-            13 => 'MARTES',
-            14 => 'MIERCOLES',
-            15 => 'JUEVES',
-            16 => 'VIERNES',
-            17 => 'SÁBADO',
-            18 => 'DDOMINGO'
-        ];
-
-        return view('qr_asistence.caracter_selecter', compact('caracterizaciones', 'persona', 'diasFormacion'));
+        return view('qr_asistence.caracter_selecter', compact('instructorFicha', 'diasFormacion'));
     }
 
     /**

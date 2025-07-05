@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class FichaCaracterizacion extends Model
 {
@@ -71,11 +72,13 @@ class FichaCaracterizacion extends Model
     }
 
     /**
-     * Relación con la modalidad de formación.
+     * The modalidadFormacion that belong to the FichaCaracterizacion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function modalidadFormacion(): BelongsTo
+    public function modalidadFormacion()
     {
-        return $this->belongsTo(ModalidadFormacion::class, 'modalidad_formacion_id');
+        return $this->belongsTo(Parametro::class, 'modalidad_formacion_id');
     }
 
     /**

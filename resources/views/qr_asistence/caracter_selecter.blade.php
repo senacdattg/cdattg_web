@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('css')
-    @vite(['resources/css/temas.css'])
+    @vite(['resources/css/Asistencia/caracter_selecter.css'])
 @endsection
 
 @section('content_header')
@@ -38,21 +38,10 @@
 @endsection
 
 @section('content')
-    @if (session('error'))
-        <div class="alert alert-danger" id="error-message">
-            {{ session('error') }}
-        </div>
-        <script>
-            setTimeout(function() {
-                document.getElementById('error-message').style.display = 'none';
-            }, 3000);
-        </script>
-    @endif
-
     <section class="content">
         <div class="container-fluid">
             <div class="row">
-                @foreach ($caracterizaciones as $caracterizacion)
+                @foreach ($instructorFicha as $caracterizacion)
                     <div class="col-md-4 mb-4">
                         <div
                             class="card h-100 shadow-sm border-0 rounded-lg overflow-hidden transition-all hover:shadow-lg">
@@ -86,6 +75,16 @@
                                         {{ $caracterizacion->ficha->programaFormacion->competenciaActual()->rapActual()->nombre ?? 'No asignado' }}
                                     </p>
                                 </div>
+
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="fas fa-graduation-cap text-primary mr-2"></i>
+                                        <h6 class="mb-0"><b>Modalidad:</b></h6>
+                                    </div>
+                                    <div class="d-flex align-items-center ml-4 text-muted">
+                                        <span>{{ $caracterizacion->ficha->modalidadFormacion->name ?? 'No especificada' }}</span>
+                                    </div>
+                                </div>
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="d-flex align-items-center mb-2">
@@ -114,15 +113,14 @@
                                         <i class="far fa-calendar-alt text-primary mr-2"></i>
                                         <h6 class="mb-0"><b>Dias de formación:</b></h6>
                                     </div>
-                                    <?php
-                                    $dias = $caracterizacion->instructorFichaDias;
-                                    $proximoDiaFormacion = $caracterizacion->obtenerProximaClase();
-                                    ?>
+                                    @php
+                                        $dias = $caracterizacion->instructorFichaDias;
+                                    @endphp
                                     <div class="d-flex ml-4" style="gap: 0.5rem;">
                                         @foreach ($dias as $dia)
                                             <div class="border rounded text-center px-2 py-1"
-                                                style="min-width: 60px; background: {{ $dia->dia_id == $proximoDiaFormacion['dia_id'] ? '#007bff' : '#f8f9fa' }}; color: {{ $dia->dia_id == $proximoDiaFormacion['dia_id'] ? '#fff' : '#6c757d' }};">
-                                                {{ substr($diasFormacion[$dia->dia_id], 0, 3) }}
+                                                style="min-width: 60px; background: {{ $dia->dia_id == $proximaClaseFormacion['dia_id'] ? '#007bff' : '#f8f9fa' }}; color: {{ $dia->dia_id == $proximaClaseFormacion['dia_id'] ? '#fff' : '#6c757d' }};">
+                                                {{ substr($diasFormacion[$dia->dia_id - 12]['name'], 0, 3) }}
                                             </div>
                                         @endforeach
                                     </div>
@@ -163,31 +161,8 @@
                     </div>
                 @endforeach
             </div>
-
-            @push('css')
-                <style>
-                    .card {
-                        transition: transform 0.3s ease, box-shadow 0.3s ease;
-                        border: 1px solid rgba(0, 0, 0, 0.05);
-                    }
-
-                    .card:hover {
-                        transform: translateY(-5px);
-                        box-shadow: 0 0.5rem 1.5rem rgba(0, 0, 0, .15) !important;
-                    }
-
-                    .bg-gradient-primary {
-                        background: linear-gradient(45deg, #4e73df 0%, #224abe 100%) !important;
-                    }
-
-                    .rounded-lg {
-                        border-radius: 0.75rem !important;
-                    }
-                </style>
-            @endpush
         </div>
     </section>
-    </div>
 @endsection
 
 @section('footer')
