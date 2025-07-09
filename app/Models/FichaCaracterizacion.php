@@ -44,7 +44,7 @@ class FichaCaracterizacion extends Model
      */
     public function instructorFicha(): hasMany
     {
-        return $this->hasMany(InstructorFichaCaracterizaion::class, 'ficha_id');
+        return $this->hasMany(InstructorFichaCaracterizacion::class, 'ficha_id');
     }
 
     /**
@@ -104,5 +104,15 @@ class FichaCaracterizacion extends Model
     public function instructorAsignado(): belongsTo
     {
         return $this->belongsTo(InstructorFichaCaracterizacion::class, 'ficha_id');
+    }
+
+    /**
+     * Get all of the aprendices for the FichaCaracterizacion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function aprendices(): HasMany
+    {
+        return $this->hasMany(AprendizFicha::class, 'ficha_id', 'id');
     }
 }

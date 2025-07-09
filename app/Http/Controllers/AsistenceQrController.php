@@ -18,6 +18,7 @@ use App\Models\Instructor;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use App\Services\AsistenceQrService;
+use App\Events\QrScanned;
 
 class AsistenceQrController extends Controller
 {
@@ -623,6 +624,16 @@ class AsistenceQrController extends Controller
                 'hora_ingreso' => $horaIngreso,
                 'hora_salida' => null,
             ]);
+
+            // Disparar evento de WebSocket para notificar el escaneo de QR
+            event(new QrScanned([
+                'numero_documento' => $numeroDocumento,
+                'aprendiz_nombre' => $persona->getNombreCompletoAttribute(),
+                'ficha_id' => $fichaId,
+                'hora_ingreso' => $horaIngreso,
+                'tipo' => 'entrada',
+                'instructor_id' => $instructorId,
+            ]));
 
             DB::commit();
 

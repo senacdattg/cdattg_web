@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProgramaFormacion extends Model
 {
@@ -48,5 +49,15 @@ class ProgramaFormacion extends Model
             }
         }
         return null;
+    }
+
+    /**
+     * Get the nivelFormacion that owns the ProgramaFormacion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function nivelFormacion(): BelongsTo
+    {
+        return $this->belongsTo(Parametro::class, 'nivel_formacion_id');
     }
 }

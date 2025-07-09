@@ -16,3 +16,12 @@ use Illuminate\Support\Facades\Broadcast;
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
+
+// Canales públicos para WebSocket
+Broadcast::channel('qr-scans', function ($user) {
+    return true; // Canal público para escaneos de QR
+});
+
+Broadcast::channel('asistencias', function ($user) {
+    return true; // Canal público para asistencias
+});

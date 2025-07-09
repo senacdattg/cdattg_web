@@ -16,7 +16,8 @@ class AsistenceQrService
     protected $parametroRepository;
 
     public function __construct(InstructorFichaCaracterizacionRepository $instructorFichaCaracterizacionRepository,
-                                InstructorRepository $instructorRepository, PersonaRepository $personaRepository,
+                                InstructorRepository $instructorRepository,
+                                PersonaRepository $personaRepository,
                                 ParametroRepository $parametroRepository
     )
     {

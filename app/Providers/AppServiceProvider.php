@@ -7,6 +7,8 @@ use Illuminate\Pagination\Paginator as PaginationPaginator;
 use Illuminate\Support\Facades\Schema;
 // use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use App\Models\AsistenciaAprendiz;
+use App\Observers\AsistenciaAprendizObserver;
 // \Illuminate\Support\Facades\URL::forceScheme('https');
 
 class AppServiceProvider extends ServiceProvider
@@ -33,5 +35,8 @@ class AppServiceProvider extends ServiceProvider
         // if ($this->app->environment('production')) {
         //     URL::forceScheme('https');
         // }
+
+        // Registrar observadores
+        AsistenciaAprendiz::observe(AsistenciaAprendizObserver::class);
     }
 }

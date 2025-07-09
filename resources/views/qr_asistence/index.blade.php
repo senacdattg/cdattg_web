@@ -243,6 +243,7 @@
 
 @section('js')
     <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="{{ asset('js/websocket-handler.js') }}"></script>
     <script>
         window.csrfToken = '{{ csrf_token() }}';
         window.apiVerifyDocumentRoute = '{{ route('api.verifyDocument') }}';

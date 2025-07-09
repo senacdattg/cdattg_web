@@ -29,6 +29,30 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Rutas de prueba sin autenticación
+Route::get('/test', function () {
+    return response()->json([
+        'success' => true,
+        'message' => 'API funcionando correctamente',
+        'timestamp' => now()
+    ]);
+});
+
+// Ruta de prueba para fichas de caracterización sin autenticación
+Route::get('/fichas-caracterizacion/test', [FichaCaracterizacionController::class, 'getAllFichasCaracterizacion']);
+
+// Obtener todas las fichas de caracterización con información completa
+Route::get('fichas-caracterizacion/all', [FichaCaracterizacionController::class, 'getAllFichasCaracterizacion']);
+
+// Obtener una ficha de caracterización específica por ID
+Route::get('fichas-caracterizacion/{id}', [FichaCaracterizacionController::class, 'getFichaCaracterizacionById']);
+
+// Buscar fichas de caracterización por número de ficha
+Route::post('fichas-caracterizacion/search', [FichaCaracterizacionController::class, 'searchFichasByNumber']);
+
+// Obtener la cantidad de aprendices por ficha de caracterizacion
+Route::get('fichas-caracterizacion/aprendices/{id}', [FichaCaracterizacionController::class, 'getCantidadAprendicesPorFicha']);
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -36,6 +60,7 @@ Route::middleware('auth:sanctum')->group(function(){
 
     //http://127.0.0.1:8000/api/caracterizacion/byInstructor
     Route::get('caracterizacion/byInstructor/{id}', [CaracterizacionController::class, 'CaracterizacionByInstructor']);
+
 
     // Guardar asistencia de aprendices
     Route::post('asistencia/store', [AsistenciaAprendicesController::class, 'store']);
