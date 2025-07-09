@@ -35,9 +35,9 @@
             </div>
         </div>
     </section>
-@endsection
+    @endsection
 
-@section('content')
+    @section('content')
     <section class="content-mt4">
         <div class="container-fluid">
             <div class="row mb-4">
@@ -49,6 +49,20 @@
                             </h5>
                         </div>
                         <div class="card-body bg-light">
+                            <div class="card-body">
+                                    <label for="actividad" class="form-label ">Indique la actividad del día</label>
+                                    <div class="input-group mb-3">
+                                        <input type="text" class="form-control" name="actividad"
+                                            placeholder="Ej: Clase de Programación" aria-label="actividad"
+                                            autocomplete="off" required>
+                                    </div>
+                            </div>
+                            <hr>
+                            <div class="mb-3">
+                                <a href="{{ route('asistence.caracterSelected', ['id' => $fichaCaracterizacion->id]) }}" class="btn btn-primary">
+                                    Ir a la página de selección de caracterización
+                                </a>
+                            </div>
                             <div class="row g-4">
                                 <div class="col-md-4">
                                     <div class="info-box bg-white shadow-sm rounded">
@@ -213,6 +227,10 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Botón para finalizar asistencia, redirige a caracter_selected -->
+                    <a href="{{ route('asistence.web') }}" class="btn btn-success btn-block py-2 font-weight-bold mb-3">
+                        <i class="fas fa-check-circle mr-1"></i> Finalizar asistencia
+                    </a>
                 </div>
             </div>
         </div>

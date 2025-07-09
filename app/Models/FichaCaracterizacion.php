@@ -98,29 +98,6 @@ class FichaCaracterizacion extends Model
     }
 
     /**
-     * Obtiene el horario del día actual
-     */
-    public function getHorarioHoy()
-    {
-        $diaHoy = now()->dayOfWeek; // 0 = Domingo, 1 = Lunes, etc.
-        $diaId = $diaHoy == 0 ? 18 : $diaHoy + 11; // Domingo = 18, Lunes = 12, etc.
-
-        return $this->diasFormacion()
-            ->where('dia_id', $diaId)
-            ->first();
-    }
-
-    /**
-     * Obtiene el horario de un día específico
-     */
-    public function getHorarioDia($diaId)
-    {
-        return $this->diasFormacion()
-            ->where('dia_id', $diaId)
-            ->first();
-    }
-
-    /**
      * Relación Muchos a Muchos con instructores a través de la tabla intermedia.
      * Esta es la relación que describe la tabla 'instructor_fichas_caracterizacion'.
      */

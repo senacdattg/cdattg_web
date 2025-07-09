@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
         'personas',
         'tema_parametro',
         'ubicacion',
+        'actividades'
     ];
 
     foreach ($protectedFolders as $folder) {

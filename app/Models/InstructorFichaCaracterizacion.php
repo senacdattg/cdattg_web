@@ -88,7 +88,7 @@ class InstructorFichaCaracterizacion extends Model
                 'hora_inicio' => $claseHoy->hora_inicio,
                 'hora_fin' => $claseHoy->hora_fin,
                 'dia_nombre' => $this->obtenerNombreDia($claseHoy->dia_id),
-                'dia_id' => $clase->dia_id,
+                'dia_id' => $claseHoy->dia_id,
                 'fecha_proxima' => $horaActual->format('Y-m-d'),
                 'es_hoy' => true
             ];
@@ -148,38 +148,5 @@ class InstructorFichaCaracterizacion extends Model
         ];
 
         return $dias[$diaId] ?? 'Desconocido';
-    }
-
-    /**
-     * Obtiene el horario de la clase actual (si existe)
-     */
-    public function obtenerClaseActual()
-    {
-        $horaActual = now();
-        $diaActual = $horaActual->dayOfWeek;
-        $diaIdActual = ($diaActual == 0) ? 18 : $diaActual + 11;
-
-        $claseHoy = $this->instructorFichaDias()
-            ->where('dia_id', $diaIdActual)
-            ->first();
-
-        if (!$claseHoy) {
-            return null;
-        }
-
-        $horaInicio = \Carbon\Carbon::parse($claseHoy->hora_inicio);
-        $horaFin = \Carbon\Carbon::parse($claseHoy->hora_fin);
-
-        // Verificar si estamos en horario de clase
-        if ($horaActual->between($horaInicio, $horaFin)) {
-            return [
-                'hora_inicio' => $claseHoy->hora_inicio,
-                'hora_fin' => $claseHoy->hora_fin,
-                'dia_nombre' => $this->obtenerNombreDia($claseHoy->dia_id),
-                'estado' => 'en_curso'
-            ];
-        }
-
-        return null;
     }
 }

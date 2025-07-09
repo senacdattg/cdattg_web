@@ -146,7 +146,7 @@
                                     <div class="col-6">
                                         <a href="{{ route('asistence.caracterSelected', ['id' => $caracterizacion->id]) }}"
                                             class="btn btn-primary btn-block py-2 font-weight-bold">
-                                            <i class="fas fa-clipboard-check mr-1"></i> Asistencia
+                                            <i class="fas fa-clipboard-check mr-1"></i> Tomar Asistencia
                                         </a>
                                     </div>
                                     <div class="col-6">

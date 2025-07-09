@@ -772,4 +772,84 @@ class AsistenceQrController extends Controller
         }
     }
 
+        /**
+     * Agrega una nueva actividad a la ficha de caracterización.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function agregar_actividad(Request $request)
+    {
+        // Validar los datos recibidos
+        $request->validate([
+            'ficha_id' => 'required|exists:ficha_caracterizacions,id',
+            'titulo' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'fecha' => 'required|date',
+        ]);
+
+        try {
+            // Crear la actividad (suponiendo que existe el modelo Actividad y la relación)
+            $actividad = new \App\Models\Actividad();
+            $actividad->ficha_id = $request->input('ficha_id');
+            $actividad->titulo = $request->input('titulo');
+            $actividad->descripcion = $request->input('descripcion');
+            $actividad->fecha = $request->input('fecha');
+            $actividad->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Actividad agregada correctamente.',
+                'actividad' => $actividad
+            ], 201);
+
+        } catch (\Exception $e) {
+            Log::error('Error al agregar actividad: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No se pudo agregar la actividad.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Agrega una nueva actividad a la ficha de caracterización.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function finalizar_asistencia(Request $request)
+    {
+        // Validar los datos recibidos
+        $request->validate([
+            'ficha_id' => 'required|exists:ficha_caracterizacions,id',
+            'titulo' => 'required|string|max:255',
+            'descripcion' => 'nullable|string',
+            'fecha' => 'required|date',
+        ]);
+
+        try {
+            // Crear la actividad (suponiendo que existe el modelo Actividad y la relación)
+            $actividad = new \App\Models\Actividad();
+            $actividad->ficha_id = $request->input('ficha_id');
+            $actividad->titulo = $request->input('titulo');
+            $actividad->descripcion = $request->input('descripcion');
+            $actividad->fecha = $request->input('fecha');
+            $actividad->save();
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Actividad agregada correctamente.',
+                'actividad' => $actividad
+            ], 201);
+
+        } catch (\Exception $e) {
+            Log::error('Error al agregar actividad: ' . $e->getMessage());
+            return response()->json([
+                'status' => 'error',
+                'message' => 'No se pudo agregar la actividad.'
+            ], 500);
+        }
+    }
+
 }
