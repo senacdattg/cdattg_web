@@ -5,15 +5,17 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreRegistroActividadesRequest;
 use App\Http\Requests\UpdateRegistroActividadesRequest;
 use App\Models\RegistroActividades;
+use App\Models\Caracterizacion;
+use App\Models\InstructorFichaCaracterizacion;
 
 class RegistroActividadesController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(InstructorFichaCaracterizacion $caracterizacion)
     {
-        return view('registro_actividades.index');
+        return view('registro_actividades.index', compact('caracterizacion'));
     }
 
     /**
@@ -53,7 +55,20 @@ class RegistroActividadesController extends Controller
      */
     public function update(UpdateRegistroActividadesRequest $request, RegistroActividades $registroActividades)
     {
-        //
+        try {
+            // Obtener los datos validados del request
+            $data = $request->validated();
+
+            // Actualizar el registro con los nuevos datos
+            $registroActividades->update($data);
+
+            // Redirigir con mensaje de éxito
+            return redirect()->route('registro-actividades.index', ['caracterizacion' => $registroActividades->caracterizacion_id])
+                ->with('success', 'Registro de actividad actualizado exitosamente.');
+        } catch (\Exception $e) {
+            // Manejar errores y redirigir con mensaje de error
+            return redirect()->back()->withInput()->with('error', 'Ocurrió un error al actualizar el registro de actividad.');
+        }
     }
 
     /**

@@ -50,6 +50,9 @@ Route::get('fichas-caracterizacion/{id}', [FichaCaracterizacionController::class
 // Buscar fichas de caracterización por número de ficha
 Route::post('fichas-caracterizacion/search', [FichaCaracterizacionController::class, 'searchFichasByNumber']);
 
+// Obtener fichas de caracterización por jornada
+Route::get('fichas-caracterizacion/jornada/{id}', [FichaCaracterizacionController::class, 'getFichasCaracterizacionPorJornada']);
+
 // Obtener la cantidad de aprendices por ficha de caracterizacion
 Route::get('fichas-caracterizacion/aprendices/{id}', [FichaCaracterizacionController::class, 'getCantidadAprendicesPorFicha']);
 

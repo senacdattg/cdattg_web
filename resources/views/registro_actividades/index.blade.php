@@ -226,7 +226,7 @@
             <div class="col-12 mb-4">
                 <div class="card activity-card h-100">
                     <div
-                        class="card-header 
+                        class="card-header
                         @if ($actividad['estado'] == 'pendiente') bg-gradient-lightblue
                         @elseif($actividad['estado'] == 'en_curso') bg-gradient-info
                         @else bg-gradient-success @endif">
@@ -250,7 +250,7 @@
                             </div>
                             <div>
                                 <span
-                                    class="badge badge-pill 
+                                    class="badge badge-pill
                                     @if ($actividad['estado'] == 'pendiente') bg-dark
                                     @elseif($actividad['estado'] == 'en_curso') bg-primary
                                     @else bg-light text-dark @endif">
@@ -341,7 +341,7 @@
                                         <span class="font-weight-bold">{{ number_format($porcentaje, 0) }}%</span>
                                     </div>
                                     <div class="progress" style="height: 8px;">
-                                        <div class="progress-bar 
+                                        <div class="progress-bar
                                             @if ($porcentaje < 60) bg-danger
                                             @elseif($porcentaje < 80) bg-warning
                                             @else bg-success @endif"
@@ -358,9 +358,7 @@
                             <div class="col-lg-4 mt-4 mt-lg-0">
                                 <div class="d-flex flex-column h-100">
                                     @if ($actividad['estado'] == 'pendiente' || $actividad['estado'] == 'en_curso')
-                                        <button class="btn btn-primary btn-block mb-3" data-toggle="modal"
-                                            data-target="#tomarAsistenciaModal"
-                                            data-actividad-id="{{ $actividad['id'] }}">
+                                        <button class="btn btn-primary btn-block mb-3" href="{{ route('asistence.caracterSelected', ['id' => $caracterizacion->id]) }}">
                                             <i class="fas fa-clipboard-check"></i> Tomar Asistencia
                                         </button>
 
@@ -407,7 +405,7 @@
                                                 {{ \Carbon\Carbon::parse($actividad['fecha'])->format('d/m/Y') }}
                                             </small>
                                             <span
-                                                class="badge 
+                                                class="badge
                                                 @if ($porcentaje < 60) badge-danger
                                                 @elseif($porcentaje < 80) badge-warning
                                                 @else badge-success @endif">
@@ -425,224 +423,70 @@
     </div>
 
     <!-- Modal para Tomar Asistencia -->
-    <div class="modal fade" id="tomarAsistenciaModal" tabindex="-1" role="dialog"
-        aria-labelledby="tomarAsistenciaModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl" role="document">
+    <div class="modal fade" id="editarActividadModal" tabindex="-1" role="dialog"
+        aria-labelledby="editarActividadModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-gradient-primary text-white">
+                <div class="modal-header bg-gradient-info text-white">
                     <h5 class="modal-title d-flex align-items-center">
-                        <i class="fas fa-clipboard-check mr-2"></i>
-                        <span>Registrar Asistencia</span>
+                        <i class="fas fa-edit mr-2"></i>
+                        <span>Editar Actividad</span>
                     </h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Cerrar">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body p-0">
-                    <div class="container-fluid p-0">
-                        <!-- Encabezado de la actividad -->
-                        <div class="bg-light p-3 border-bottom">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <h5 class="mb-1" id="modalActividadTitulo">Sesión de Programación Web Avanzada</h5>
-                                    <div class="d-flex flex-wrap text-muted small">
-                                        <span class="mr-3">
-                                            <i class="far fa-calendar-alt mr-1"></i>
-                                            <span id="modalActividadFecha">05/07/2025</span>
-                                        </span>
-                                        <span class="mr-3">
-                                            <i class="far fa-clock mr-1"></i>
-                                            <span id="modalActividadHorario">08:00 - 12:00</span>
-                                        </span>
-                                        <span class="mr-3">
-                                            <i class="fas fa-user-tie mr-1"></i>
-                                            <span id="modalActividadInstructor">Juan Pérez</span>
-                                        </span>
-                                        <span>
-                                            <i class="fas fa-users mr-1"></i>
-                                            <span id="modalActividadAsistencia">15/20 asistentes</span>
-                                        </span>
-                                    </div>
+                <form id="formEditarActividad" method="POST" action="{{ route('registro-actividades.update', ['registro_actividade' => $caracterizacion->id]) }}">
+                    @csrf
+                    @method('PUT')
+                    <div class="modal-body p-0">
+                        <div class="container-fluid p-4">
+                            <div class="form-group">
+                                <label for="tituloActividad"><b>Título de la Actividad</b></label>
+                                <input type="text" class="form-control" id="tituloActividad" name="titulo" value="Sesión de Programación Web Avanzada" required>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    <label for="fechaActividad"><b>Fecha</b></label>
+                                    <input type="date" class="form-control" id="fechaActividad" name="fecha" value="2025-07-05" required>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="input-group input-group-sm">
-                                        <div class="input-group-prepend">
-                                            <span class="input-group-text bg-white border-right-0">
-                                                <i class="fas fa-search text-muted"></i>
-                                            </span>
-                                        </div>
-                                        <input type="text" class="form-control border-left-0"
-                                            placeholder="Buscar aprendiz..." id="buscarAprendiz">
-                                        <div class="input-group-append">
-                                            <button class="btn btn-outline-secondary dropdown-toggle" type="button"
-                                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                Filtros
-                                            </button>
-                                            <div class="dropdown-menu dropdown-menu-right">
-                                                <a class="dropdown-item" href="#">
-                                                    <div class="custom-control custom-checkbox">
-                                                        <input type="checkbox" class="custom-control-input"
-                                                            id="filtroAsistencia" checked>
-                                                        <label class="custom-control-label"
-                                                            for="filtroAsistencia">Asistencia Pendiente</label>
-                                                    </div>
-                                                </a>
-                                                <a class="dropdown-item" href="#">
-                                                    <div class="custom-control custom-checkbox">
-                                                        <input type="checkbox" class="custom-control-input"
-                                                            id="filtroInasistencia" checked>
-                                                        <label class="custom-control-label"
-                                                            for="filtroInasistencia">Inasistencias</label>
-                                                    </div>
-                                                </a>
-                                                <div class="dropdown-divider"></div>
-                                                <a class="dropdown-item" href="#">
-                                                    <i class="fas fa-check-double text-success mr-2"></i> Marcar todos como
-                                                    presentes
-                                                </a>
-                                                <a class="dropdown-item" href="#">
-                                                    <i class="fas fa-times-circle text-danger mr-2"></i> Marcar todos como
-                                                    ausentes
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="form-group col-md-4">
+                                    <label for="horaInicio"><b>Hora de Inicio</b></label>
+                                    <input type="time" class="form-control" id="horaInicio" name="hora_inicio" value="08:00" required>
+                                </div>
+                                <div class="form-group col-md-4">
+                                    <label for="horaFin"><b>Hora de Fin</b></label>
+                                    <input type="time" class="form-control" id="horaFin" name="hora_fin" value="12:00" required>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Tabla de asistentes -->
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead class="bg-light">
-                                    <tr>
-                                        <th width="50" class="text-center">#</th>
-                                        <th width="120">Documento</th>
-                                        <th>Nombre Completo</th>
-                                        <th width="150" class="text-center">Estado</th>
-                                        <th width="200">Observaciones</th>
-                                        <th width="100" class="text-center">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="tablaAsistencia">
-                                    @php
-                                        $nombres = [
-                                            'Ana María',
-                                            'Carlos Andrés',
-                                            'Diana Carolina',
-                                            'Jorge Luis',
-                                            'Laura Valentina',
-                                            'Miguel Ángel',
-                                            'Sofía Alejandra',
-                                            'Juan David',
-                                        ];
-                                        $apellidos = [
-                                            'González',
-                                            'Rodríguez',
-                                            'Martínez',
-                                            'López',
-                                            'Pérez',
-                                            'García',
-                                            'Sánchez',
-                                            'Ramírez',
-                                        ];
-                                    @endphp
-
-                                    @for ($i = 1; $i <= 8; $i++)
-                                        @php
-                                            $nombre = $nombres[array_rand($nombres)];
-                                            $apellido = $apellidos[array_rand($apellidos)];
-                                            $asistio = rand(0, 1);
-                                            $llegadaTarde = $asistio ? rand(0, 1) : 0;
-                                            $justificada = $llegadaTarde ? rand(0, 1) : 0;
-                                        @endphp
-                                        <tr class="align-middle">
-                                            <td class="text-center text-muted">{{ $i }}</td>
-                                            <td>100{{ str_pad($i, 4, '0', STR_PAD_LEFT) }}</td>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <div class="avatar-sm mr-3">
-                                                        <span
-                                                            class="avatar-title rounded-circle bg-soft-primary text-primary">
-                                                            {{ substr($nombre, 0, 1) }}{{ substr($apellido, 0, 1) }}
-                                                        </span>
-                                                    </div>
-                                                    <div>
-                                                        <h6 class="mb-0">{{ $nombre }} {{ $apellido }}</h6>
-                                                        <small class="text-muted">Aprendiz</small>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="text-center">
-                                                <div class="btn-group btn-group-toggle w-100" data-toggle="buttons">
-                                                    <label
-                                                        class="btn btn-sm btn-outline-success mb-0 {{ $asistio && !$llegadaTarde ? 'active' : '' }}">
-                                                        <input type="radio" name="asistencia{{ $i }}"
-                                                            autocomplete="off"
-                                                            {{ $asistio && !$llegadaTarde ? 'checked' : '' }}>
-                                                        <i class="fas fa-check"></i> Presente
-                                                    </label>
-                                                    <label
-                                                        class="btn btn-sm btn-outline-warning mb-0 {{ $llegadaTarde ? 'active' : '' }}">
-                                                        <input type="radio" name="asistencia{{ $i }}"
-                                                            autocomplete="off" {{ $llegadaTarde ? 'checked' : '' }}>
-                                                        <i class="fas fa-clock"></i> Tarde
-                                                    </label>
-                                                    <label
-                                                        class="btn btn-sm btn-outline-danger mb-0 {{ !$asistio ? 'active' : '' }}">
-                                                        <input type="radio" name="asistencia{{ $i }}"
-                                                            autocomplete="off" {{ !$asistio ? 'checked' : '' }}>
-                                                        <i class="fas fa-times"></i> Ausente
-                                                    </label>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <input type="text" class="form-control form-control-sm observacion"
-                                                    placeholder="Motivo (opcional)"
-                                                    value="{{ $llegadaTarde ? 'Llegó 15 minutos tarde' : '' }}">
-                                            </td>
-                                            <td class="text-center">
-                                                <div class="dropdown">
-                                                    <button class="btn btn-sm btn-link text-muted" type="button"
-                                                        data-toggle="dropdown" aria-haspopup="true"
-                                                        aria-expanded="false">
-                                                        <i class="fas fa-ellipsis-v"></i>
-                                                    </button>
-                                                    <div class="dropdown-menu dropdown-menu-right">
-                                                        <a class="dropdown-item" href="#">
-                                                            <i class="fas fa-paperclip text-muted mr-2"></i> Adjuntar
-                                                            justificación
-                                                        </a>
-                                                        <a class="dropdown-item" href="#">
-                                                            <i class="fas fa-envelope text-muted mr-2"></i> Enviar
-                                                            recordatorio
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endfor
-                                </tbody>
-                            </table>
+                            <div class="form-group">
+                                <label for="instructorActividad"><b>Instructor</b></label>
+                                <input type="text" class="form-control" id="instructorActividad" name="instructor" value="Juan Pérez" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="descripcionActividad"><b>Descripción</b></label>
+                                <textarea class="form-control" id="descripcionActividad" name="descripcion" rows="3">Clase avanzada de programación web con Laravel y Vue.js</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="estadoActividad"><b>Estado</b></label>
+                                <select class="form-control" id="estadoActividad" name="estado">
+                                    <option value="programada" selected>Programada</option>
+                                    <option value="en_progreso">En progreso</option>
+                                    <option value="finalizada">Finalizada</option>
+                                    <option value="cancelada">Cancelada</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="modal-footer bg-light">
-                    <div class="d-flex justify-content-between align-items-center w-100">
-                        <div class="text-muted small">
-                            <i class="fas fa-info-circle text-primary"></i>
-                            <span id="contadorAsistencia">5 de 8 aprendices marcados como presentes</span>
-                        </div>
-                        <div>
-                            <button type="button" class="btn btn-outline-secondary mr-2" data-dismiss="modal">
-                                <i class="fas fa-times mr-1"></i> Cancelar
-                            </button>
-                            <button type="button" class="btn btn-primary">
-                                <i class="fas fa-save mr-1"></i> Guardar Asistencia
-                            </button>
-                        </div>
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-outline-secondary mr-2" data-dismiss="modal">
+                            <i class="fas fa-times mr-1"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-info">
+                            <i class="fas fa-save mr-1"></i> Guardar Cambios
+                        </button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>

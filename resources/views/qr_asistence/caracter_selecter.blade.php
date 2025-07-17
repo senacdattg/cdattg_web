@@ -144,7 +144,7 @@
                             <div class="card-footer bg-white border-top-0 pt-0 pb-3">
                                 <div class="row g-2">
                                     <div class="col-6">
-                                        <a href="{{ route('asistence.caracterSelected', ['id' => $caracterizacion->id]) }}"
+                                        <a href="{{ route('registro-actividades.index', ['caracterizacion' => $caracterizacion]) }}"
                                             class="btn btn-primary btn-block py-2 font-weight-bold">
                                             <i class="fas fa-clipboard-check mr-1"></i> Tomar Asistencia
                                         </a>

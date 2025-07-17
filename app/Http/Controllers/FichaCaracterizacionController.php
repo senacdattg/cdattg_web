@@ -592,4 +592,150 @@ class FichaCaracterizacionController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Obtiene las fichas de caracterización filtradas por jornada de formación.
+     *
+     * Este método permite obtener todas las fichas de caracterización que pertenecen
+     * a una jornada específica y devuelve una respuesta JSON con la información completa
+     * de cada ficha.
+     *
+     * @param \Illuminate\Http\Request $request La solicitud HTTP que contiene el ID de la jornada.
+     * @return \Illuminate\Http\JsonResponse Una respuesta JSON con las fichas encontradas.
+     */
+    public function getFichasCaracterizacionPorJornada(Request $request)
+    {
+        try {
+            $jornadaId = $request->id;
+
+            $fichas = FichaCaracterizacion::with([
+                'programaFormacion',
+                'instructor.persona',
+                'jornadaFormacion',
+                'ambiente.piso.bloque',
+                'modalidadFormacion',
+                'sede',
+                'diasFormacion.dia',
+                'instructorFicha.instructor.persona'
+            ])->where('status', true)
+              ->where('id', $jornadaId)
+              ->orderBy('id', 'desc')
+              ->get();
+
+            if ($fichas->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se encontraron fichas de caracterización para la jornada especificada',
+                    'data' => [],
+                    'id' => $jornadaId
+                ], 404);
+            }
+
+            $fichasFormateadas = $fichas->map(function ($ficha) {
+                return [
+                    'id' => $ficha->id,
+                    'numero_ficha' => $ficha->ficha,
+                    'fecha_inicio' => $ficha->fecha_inicio,
+                    'fecha_fin' => $ficha->fecha_fin,
+                    'total_horas' => $ficha->total_horas,
+                    'status' => $ficha->status,
+                    'programa_formacion' => [
+                        'id' => $ficha->programaFormacion->id ?? null,
+                        'nombre' => $ficha->programaFormacion->nombre ?? 'N/A',
+                        'codigo' => $ficha->programaFormacion->codigo ?? 'N/A',
+                        'nivel_formacion' => $ficha->programaFormacion->nivelFormacion->name ?? 'N/A',
+                    ],
+                    'instructor_principal' => [
+                        'id' => $ficha->instructor->id ?? null,
+                        'persona' => [
+                            'id' => $ficha->instructor->persona->id ?? null,
+                            'primer_nombre' => $ficha->instructor->persona->primer_nombre ?? 'N/A',
+                            'segundo_nombre' => $ficha->instructor->persona->segundo_nombre ?? '',
+                            'primer_apellido' => $ficha->instructor->persona->primer_apellido ?? 'N/A',
+                            'segundo_apellido' => $ficha->instructor->persona->segundo_apellido ?? '',
+                            'tipo_documento' => $ficha->instructor->persona->tipo_documento ?? 'N/A',
+                            'numero_documento' => $ficha->instructor->persona->numero_documento ?? 'N/A',
+                            'email' => $ficha->instructor->persona->email ?? 'N/A',
+                            'telefono' => $ficha->instructor->persona->telefono ?? 'N/A',
+                        ]
+                    ],
+                    'jornada_formacion' => [
+                        'id' => $ficha->jornadaFormacion->id ?? null,
+                        'jornada' => $ficha->jornadaFormacion->jornada ?? 'N/A',
+                    ],
+                    'ambiente' => [
+                        'id' => $ficha->ambiente->id ?? null,
+                        'nombre' => $ficha->ambiente->title ?? 'N/A',
+                        'piso' => [
+                            'id' => $ficha->ambiente->piso->id ?? null,
+                            'piso' => $ficha->ambiente->piso->piso ?? 'N/A',
+                            'bloque' => [
+                                'id' => $ficha->ambiente->piso->bloque->id ?? null,
+                                'nombre' => $ficha->ambiente->piso->bloque->bloque ?? 'N/A',
+                            ] ?? null,
+                        ] ?? null,
+                    ] ?? null,
+                    'modalidad_formacion' => [
+                        'id' => $ficha->modalidadFormacion->id ?? null,
+                        'nombre' => $ficha->modalidadFormacion->name ?? 'N/A',
+                    ] ?? null,
+                    'sede' => [
+                        'id' => $ficha->sede->id ?? null,
+                        'sede' => $ficha->sede->sede ?? 'N/A',
+                        'direccion' => $ficha->sede->direccion ?? 'N/A',
+                    ] ?? null,
+                    'dias_formacion' => $ficha->diasFormacion->map(function ($dia) {
+                        return [
+                            'id' => $dia->id,
+                            'hora_inicio' => $dia->hora_inicio,
+                            'hora_fin' => $dia->hora_fin,
+                            'dia' => [
+                                'id' => $dia->dia->id ?? null,
+                                'nombre' => $dia->dia->name ?? 'N/A',
+                            ] ?? null,
+                        ];
+                    }),
+                    'instructores_asignados' => $ficha->instructorFicha->map(function ($instructorFicha) {
+                        return [
+                            'id' => $instructorFicha->id,
+                            'fecha_inicio' => $instructorFicha->fecha_inicio,
+                            'fecha_fin' => $instructorFicha->fecha_fin,
+                            'total_horas' => $instructorFicha->total_horas_instructor,
+                            'instructor' => [
+                                'id' => $instructorFicha->instructor->id ?? null,
+                                'persona' => [
+                                    'id' => $instructorFicha->instructor->persona->id ?? null,
+                                    'primer_nombre' => $instructorFicha->instructor->persona->primer_nombre ?? 'N/A',
+                                    'segundo_nombre' => $instructorFicha->instructor->persona->segundo_nombre ?? '',
+                                    'primer_apellido' => $instructorFicha->instructor->persona->primer_apellido ?? 'N/A',
+                                    'segundo_apellido' => $instructorFicha->instructor->persona->segundo_apellido ?? '',
+                                    'tipo_documento' => $instructorFicha->instructor->persona->tipo_documento ?? 'N/A',
+                                    'numero_documento' => $instructorFicha->instructor->persona->numero_documento ?? 'N/A',
+                                    'email' => $instructorFicha->instructor->persona->email ?? 'N/A',
+                                    'telefono' => $instructorFicha->instructor->persona->telefono ?? 'N/A',
+                                ] ?? null,
+                            ] ?? null,
+                        ];
+                    }),
+                    'created_at' => $ficha->created_at,
+                    'updated_at' => $ficha->updated_at,
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Fichas de caracterización obtenidas exitosamente por jornada',
+                'data' => $fichasFormateadas,
+                'total' => $fichasFormateadas->count(),
+                'jornada_id' => $jornadaId
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener las fichas de caracterización por jornada',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

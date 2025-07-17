@@ -17,8 +17,6 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-
-
 // Rutas públicas
 foreach (glob(routes_path('autenticacion/public') . '/*.php') as $routeFile) {
     include_once $routeFile;
@@ -28,6 +26,7 @@ foreach (glob(routes_path('autenticacion/public') . '/*.php') as $routeFile) {
 Route::middleware('auth')->group(function () {
     $protectedFolders = [
         'autenticacion/private',
+        'actividades',
         'usuario',
         'asistencia',
         'caracterizacion',
