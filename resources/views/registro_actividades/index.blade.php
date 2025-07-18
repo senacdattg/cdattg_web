@@ -160,10 +160,21 @@
 
     <!-- Lista de Actividades -->
     <div class="row">
-        @foreach ($actividades as $actividad)
+        @if (count($actividades) == 0)
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <p>No hay actividades disponibles.</p>
+                    </div>
+                </div>
+            </div>
+        @else
+            @foreach ($actividades as $actividad)
             @php
-                $porcentaje = ($actividad['asistentes'] / $actividad['total_aprendices']) * 100;
-                $diasRestantes = \Carbon\Carbon::parse($actividad['fecha'])->diffInDays(now(), false) * -1;
+                //$porcentaje = ($actividad['asistentes'] / $actividad['total_aprendices']) * 100;
+                $porcentaje = 0;
+                //$diasRestantes = \Carbon\Carbon::parse($actividad['fecha'])->diffInDays(now(), false) * -1;
+                $diasRestantes = 0;
             @endphp
 
             <div class="col-12 mb-4">
@@ -329,6 +340,7 @@
                 </div>
             </div>
         @endforeach
+        @endif
     </div>
 @endsection
 
