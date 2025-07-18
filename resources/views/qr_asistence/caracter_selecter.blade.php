@@ -146,7 +146,7 @@
                                     <div class="col-6">
                                         <a href="{{ route('registro-actividades.index', ['caracterizacion' => $caracterizacion]) }}"
                                             class="btn btn-primary btn-block py-2 font-weight-bold">
-                                            <i class="fas fa-clipboard-check mr-1"></i> Tomar Asistencia
+                                            <i class="fas fa-clipboard-check mr-1"></i> Actividades
                                         </a>
                                     </div>
                                     <div class="col-6">

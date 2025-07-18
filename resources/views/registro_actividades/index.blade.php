@@ -160,63 +160,6 @@
 
     <!-- Lista de Actividades -->
     <div class="row">
-        @php
-            // Datos de prueba mejorados
-            $actividades = [
-                [
-                    'id' => 1,
-                    'codigo' => 'ACT-' . str_pad(1, 4, '0', STR_PAD_LEFT),
-                    'titulo' => 'Sesión de Programación Web Avanzada',
-                    'fecha' => '2025-07-05',
-                    'hora_inicio' => '08:00',
-                    'hora_fin' => '12:00',
-                    'descripcion' =>
-                        'Desarrollo de aplicaciones web modernas utilizando Laravel y Vue.js, implementando buenas prácticas y patrones de diseño.',
-                    'instructor' => 'Juan Pérez',
-                    'estado' => 'pendiente',
-                    'asistentes' => 15,
-                    'total_aprendices' => 20,
-                    'tipo' => 'Teórico-Práctica',
-                    'sala' => 'Sala 305 - Laboratorio de Computación',
-                    'temas' => ['Introducción a Laravel', 'Componentes Vue.js', 'API REST', 'Autenticación JWT'],
-                ],
-                [
-                    'id' => 2,
-                    'codigo' => 'ACT-' . str_pad(2, 4, '0', STR_PAD_LEFT),
-                    'titulo' => 'Taller de Base de Datos Relacionales',
-                    'fecha' => '2025-07-04',
-                    'hora_inicio' => '13:00',
-                    'hora_fin' => '17:00',
-                    'descripcion' =>
-                        'Modelado avanzado de bases de datos relacionales y optimización de consultas SQL complejas.',
-                    'instructor' => 'María García',
-                    'estado' => 'completada',
-                    'asistentes' => 18,
-                    'total_aprendices' => 18,
-                    'tipo' => 'Práctica',
-                    'sala' => 'Sala 201 - Laboratorio de BD',
-                    'temas' => ['Modelo Relacional', 'Normalización', 'Índices', 'Vistas'],
-                ],
-                [
-                    'id' => 3,
-                    'codigo' => 'ACT-' . str_pad(3, 4, '0', STR_PAD_LEFT),
-                    'titulo' => 'Control de Versiones con Git',
-                    'fecha' => '2025-07-03',
-                    'hora_inicio' => '09:00',
-                    'hora_fin' => '11:00',
-                    'descripcion' =>
-                        'Gestión de código fuente utilizando Git y GitHub, incluyendo flujos de trabajo colaborativos.',
-                    'instructor' => 'Carlos López',
-                    'estado' => 'en_curso',
-                    'asistentes' => 22,
-                    'total_aprendices' => 25,
-                    'tipo' => 'Taller',
-                    'sala' => 'Sala 102 - Aula de Capacitación',
-                    'temas' => ['Ramas', 'Fusión', 'Pull Requests', 'CI/CD'],
-                ],
-            ];
-        @endphp
-
         @foreach ($actividades as $actividad)
             @php
                 $porcentaje = ($actividad['asistentes'] / $actividad['total_aprendices']) * 100;
@@ -291,15 +234,6 @@
                                     </div>
                                     <div class="col-md-6 mt-3">
                                         <div class="info-item">
-                                            <i class="fas fa-user-tie text-primary"></i>
-                                            <div>
-                                                <small class="text-muted d-block">Instructor</small>
-                                                <strong>{{ $actividad['instructor'] }}</strong>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6 mt-3">
-                                        <div class="info-item">
                                             <i class="fas fa-door-open text-primary"></i>
                                             <div>
                                                 <small class="text-muted d-block">Ubicación</small>
@@ -308,31 +242,6 @@
                                         </div>
                                     </div>
                                 </div>
-
-                                <!-- Descripción -->
-                                <div class="mb-3">
-                                    <h6 class="text-muted mb-2">
-                                        <i class="fas fa-align-left"></i> Descripción
-                                    </h6>
-                                    <p class="mb-0">{{ $actividad['descripcion'] }}</p>
-                                </div>
-
-                                <!-- Temas -->
-                                @if (!empty($actividad['temas']))
-                                    <div class="mb-3">
-                                        <h6 class="text-muted mb-2">
-                                            <i class="fas fa-list-ul"></i> Temas a tratar
-                                        </h6>
-                                        <div class="d-flex flex-wrap gap-2">
-                                            @foreach ($actividad['temas'] as $tema)
-                                                <span class="badge badge-pill badge-light border">
-                                                    <i class="fas fa-circle text-primary" style="font-size: 6px;"></i>
-                                                    {{ $tema }}
-                                                </span>
-                                            @endforeach
-                                        </div>
-                                    </div>
-                                @endif
 
                                 <!-- Progreso de asistencia -->
                                 <div class="mt-4">
@@ -358,9 +267,9 @@
                             <div class="col-lg-4 mt-4 mt-lg-0">
                                 <div class="d-flex flex-column h-100">
                                     @if ($actividad['estado'] == 'pendiente' || $actividad['estado'] == 'en_curso')
-                                        <button class="btn btn-primary btn-block mb-3" href="{{ route('asistence.caracterSelected', ['id' => $caracterizacion->id]) }}">
+                                        <a class="btn btn-primary btn-block mb-3" href="{{ route('asistence.caracterSelected', ['id' => $caracterizacion->id]) }}">
                                             <i class="fas fa-clipboard-check"></i> Tomar Asistencia
-                                        </button>
+                                        </a>
 
                                         <div class="dropdown mb-3">
                                             <button class="btn btn-outline-secondary btn-block dropdown-toggle"
@@ -421,135 +330,6 @@
             </div>
         @endforeach
     </div>
-
-    <!-- Modal para Tomar Asistencia -->
-    <div class="modal fade" id="editarActividadModal" tabindex="-1" role="dialog"
-        aria-labelledby="editarActividadModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content border-0 shadow">
-                <div class="modal-header bg-gradient-info text-white">
-                    <h5 class="modal-title d-flex align-items-center">
-                        <i class="fas fa-edit mr-2"></i>
-                        <span>Editar Actividad</span>
-                    </h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Cerrar">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <form id="formEditarActividad" method="POST" action="{{ route('registro-actividades.update', ['registro_actividade' => $caracterizacion->id]) }}">
-                    @csrf
-                    @method('PUT')
-                    <div class="modal-body p-0">
-                        <div class="container-fluid p-4">
-                            <div class="form-group">
-                                <label for="tituloActividad"><b>Título de la Actividad</b></label>
-                                <input type="text" class="form-control" id="tituloActividad" name="titulo" value="Sesión de Programación Web Avanzada" required>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group col-md-4">
-                                    <label for="fechaActividad"><b>Fecha</b></label>
-                                    <input type="date" class="form-control" id="fechaActividad" name="fecha" value="2025-07-05" required>
-                                </div>
-                                <div class="form-group col-md-4">
-                                    <label for="horaInicio"><b>Hora de Inicio</b></label>
-                                    <input type="time" class="form-control" id="horaInicio" name="hora_inicio" value="08:00" required>
-                                </div>
-                                <div class="form-group col-md-4">
-                                    <label for="horaFin"><b>Hora de Fin</b></label>
-                                    <input type="time" class="form-control" id="horaFin" name="hora_fin" value="12:00" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="instructorActividad"><b>Instructor</b></label>
-                                <input type="text" class="form-control" id="instructorActividad" name="instructor" value="Juan Pérez" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="descripcionActividad"><b>Descripción</b></label>
-                                <textarea class="form-control" id="descripcionActividad" name="descripcion" rows="3">Clase avanzada de programación web con Laravel y Vue.js</textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="estadoActividad"><b>Estado</b></label>
-                                <select class="form-control" id="estadoActividad" name="estado">
-                                    <option value="programada" selected>Programada</option>
-                                    <option value="en_progreso">En progreso</option>
-                                    <option value="finalizada">Finalizada</option>
-                                    <option value="cancelada">Cancelada</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer bg-light">
-                        <button type="button" class="btn btn-outline-secondary mr-2" data-dismiss="modal">
-                            <i class="fas fa-times mr-1"></i> Cancelar
-                        </button>
-                        <button type="submit" class="btn btn-info">
-                            <i class="fas fa-save mr-1"></i> Guardar Cambios
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    @push('js')
-        <script>
-            // Actualizar datos del modal al mostrarlo
-            $('#tomarAsistenciaModal').on('show.bs.modal', function(event) {
-                var button = $(event.relatedTarget);
-                var actividadId = button.data('actividad-id');
-                var modal = $(this);
-
-                // Aquí iría la lógica para cargar los datos de la actividad
-                // Por ahora usamos datos de ejemplo
-                var actividad = {
-                    titulo: 'Sesión de Programación Web Avanzada',
-                    fecha: '05/07/2025',
-                    horario: '08:00 - 12:00',
-                    instructor: 'Juan Pérez',
-                    asistentes: 5,
-                    totalAprendices: 8
-                };
-
-                modal.find('#modalActividadTitulo').text(actividad.titulo);
-                modal.find('#modalActividadFecha').text(actividad.fecha);
-                modal.find('#modalActividadHorario').text(actividad.horario);
-                modal.find('#modalActividadInstructor').text(actividad.instructor);
-                modal.find('#modalActividadAsistencia').text(actividad.asistentes + '/' + actividad.totalAprendices +
-                    ' asistentes');
-
-                // Actualizar contador de asistentes
-                actualizarContadorAsistencia();
-
-                // Manejar cambios en los radio buttons
-                $('input[type="radio"]').change(function() {
-                    actualizarContadorAsistencia();
-                });
-
-                // Función para actualizar el contador de asistentes
-                function actualizarContadorAsistencia() {
-                    var total = $('input[type="radio"]').length / 3; // 3 opciones por aprendiz
-                    var presentes = $('input[type="radio"]:checked').filter(function() {
-                        return $(this).val() === 'presente' || $(this).val() === 'tarde';
-                    }).length;
-
-                    $('#contadorAsistencia').text(presentes + ' de ' + total + ' aprendices marcados como presentes');
-                }
-
-                // Búsqueda de aprendices
-                $('#buscarAprendiz').on('keyup', function() {
-                    var value = $(this).val().toLowerCase();
-                    $('#tablaAsistencia tr').filter(function() {
-                        $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
-                    });
-                });
-            });
-
-            // Inicializar tooltips
-            $(function() {
-                $('[data-toggle="tooltip"]').tooltip();
-            });
-        </script>
-    @endpush
 @endsection
 
 @section('footer')

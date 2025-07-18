@@ -5,8 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class evidencias extends Model
+class Evidencias extends Model
 {
-    /** @use HasFactory<\Database\Factories\EvidenciasFactory> */
-    use HasFactory;
+    protected $table = 'evidencias';
+    protected $fillable = [
+        'id',
+        'codigo',
+        'nombre',
+        'user_create_id',
+        'user_edit_id',
+    ];
 }

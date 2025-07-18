@@ -4,18 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRegistroActividadesRequest;
 use App\Http\Requests\UpdateRegistroActividadesRequest;
-use App\Models\RegistroActividades;
-use App\Models\Caracterizacion;
+use App\Services\RegistroActividadesServices;
 use App\Models\InstructorFichaCaracterizacion;
 
 class RegistroActividadesController extends Controller
 {
+
+    protected $registroActividadesServices;
+
+    public function __construct(RegistroActividadesServices $registroActividadesServices)
+    {
+        $this->registroActividadesServices = $registroActividadesServices;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index(InstructorFichaCaracterizacion $caracterizacion)
     {
-        return view('registro_actividades.index', compact('caracterizacion'));
+        $actividades = $this->registroActividadesServices->getActividades($caracterizacion);
+        return view('registro_actividades.index', compact('caracterizacion', 'actividades'));
     }
 
     /**
