@@ -21,7 +21,7 @@ class EvidenciasController extends Controller
      */
     public function create()
     {
-        //
+        return view('registro_actividades.create');
     }
 
     /**

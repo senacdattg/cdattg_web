@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Tema;
 use App\Http\Requests\StoreTemaRequest;
 use App\Http\Requests\UpdateTemaRequest;
-use App\Models\parametro;
+use App\Models\Parametro;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
