@@ -164,11 +164,12 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-body">
-                        <p>No hay actividades disponibles.</p>
+                        <p class="text-muted mb-0 font-weight-light">No hay actividades disponibles.</p>
                     </div>
                 </div>
             </div>
         @else
+
             @foreach ($actividades as $actividad)
             @php
                 //$porcentaje = ($actividad['asistentes'] / $actividad['total_aprendices']) * 100;
@@ -196,7 +197,7 @@
                                     @endif
                                 </div>
                                 <div>
-                                    <h4 class="mb-0 text-white">{{ $actividad['titulo'] }}</h4>
+                                    <h5 class="mb-0 text-white">{{ $actividad['nombre'] }}</h5>
                                     <div class="text-white-50">
                                         <i class="far fa-hashtag"></i> {{ $actividad['codigo'] }}
                                     </div>
