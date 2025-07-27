@@ -94,5 +94,19 @@ class TemaSeeder extends Seeder
             $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
         }
         $tema->parametros()->sync($syncData);
+
+        // Tema 7: ESTADOS DE EVIDENCIAS
+        $tema = Tema::create([
+            'id'             => 7,
+            'name'           => 'ESTADOS DE EVIDENCIAS',
+            'status'         => 1,
+            'user_create_id' => 1,
+            'user_edit_id'   => 1,
+        ]);
+        $syncData = [];
+        foreach ([25, 26, 27] as $id) {
+            $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
+        }
+        $tema->parametros()->sync($syncData);
     }
 }

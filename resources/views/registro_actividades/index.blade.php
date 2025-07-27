@@ -163,18 +163,18 @@
                 <div class="col-12 mb-4">
                     <div class="card activity-card h-100">
                         <div class="card-header text-white
-                        @if ($actividad['estado'] == 'pendiente') bg-gradient-primary
-                        @elseif($actividad['estado'] == 'en_curso') bg-gradient-info
+                        @if ($actividad['id_estado'] == 'PENDIENTE') bg-gradient-primary
+                        @elseif($actividad['id_estado'] == 'EN CURSO') bg-gradient-info
                         @else bg-gradient-success @endif"
-                            style="@if ($actividad['estado'] == 'pendiente') background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
-                        @elseif($actividad['estado'] == 'en_curso') background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
+                            style="@if ($actividad['id_estado'] == 'PENDIENTE') background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+                        @elseif($actividad['id_estado'] == 'EN CURSO') background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
                         @else background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%); @endif">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="d-flex align-items-center">
                                     <div class="mr-3">
-                                        @if ($actividad['estado'] == 'pendiente')
+                                        @if ($actividad['id_estado'] == 'PENDIENTE')
                                             <i class="far fa-clock fa-2x text-white"></i>
-                                        @elseif($actividad['estado'] == 'en_curso')
+                                        @elseif($actividad['id_estado'] == 'EN CURSO')
                                             <i class="fas fa-spinner fa-spin fa-2x text-white"></i>
                                         @else
                                             <i class="fas fa-check-circle fa-2x text-white"></i>
@@ -190,15 +190,15 @@
                                 <div>
                                     <span
                                         class="badge badge-pill text-white
-                                    @if ($actividad['estado'] == 'pendiente') bg-primary
-                                    @elseif($actividad['estado'] == 'en_curso') bg-info
+                                    @if ($actividad['id_estado'] == 'PENDIENTE') bg-primary
+                                    @elseif($actividad['id_estado'] == 'EN CURSO') bg-info
                                     @else bg-success @endif"
-                                        style="@if ($actividad['estado'] == 'pendiente') background-color: #3a56a8 !important;
-                                    @elseif($actividad['estado'] == 'en_curso') background-color: #00a8d8 !important;
+                                        style="@if ($actividad['id_estado'] == 'PENDIENTE') background-color: #3a56a8 !important;
+                                    @elseif($actividad['id_estado'] == 'EN CURSO') background-color: #00a8d8 !important;
                                     @else background-color: #28a745 !important; @endif">
                                         {{ ucfirst(str_replace('_', ' ', $actividad['estado'])) }}
                                     </span>
-                                    @if ($actividad['estado'] == 'pendiente' && $diasRestantes > 0)
+                                    @if ($actividad['id_estado'] == 'PENDIENTE' && $diasRestantes > 0)
                                         <span class="badge badge-pill bg-warning text-dark ml-1">
                                             <i class="far fa-calendar-alt"></i> En {{ $diasRestantes }} días
                                         </span>

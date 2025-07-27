@@ -9,6 +9,7 @@ use App\Repositories\CompetenciaRepository;
 use App\Repositories\EvidenciasRepository;
 use App\Models\Evidencias;
 use App\Models\EvidenciaGuiaAprendizaje;
+use App\Models\Parametro;
 
 class RegistroActividadesServices
 {
@@ -36,6 +37,11 @@ class RegistroActividadesServices
         $rapActual = $competenciaActual->rapActual();
         $guiaAprendizaje = $rapActual->guiasAprendizaje->first();
         $actividades = $guiaAprendizaje->actividades;
+
+        foreach ($actividades as $actividad) {
+            $actividad->id_estado = $this->formatearEstadoActividad($actividad);
+        }
+        
         return $actividades;
     }
 
@@ -66,7 +72,7 @@ class RegistroActividadesServices
             $numeroCodigoGuiaAprendizaje = obtener_numero_evidencia($ultimaEvidenciaGuia->codigo) + 1;
             $codigo = 'EV-'.$numeroCodigoGuiaAprendizaje;
         } else {
-            $codigo = 'EV-0';
+            $codigo = 'EV-1';
         }
 
         return $codigo;
@@ -90,5 +96,14 @@ class RegistroActividadesServices
         ];
 
         EvidenciaGuiaAprendizaje::create($dataEvidenciaGuia);
+    }
+
+    public function formatearEstadoActividad(Evidencias $evidencia)
+    {
+        $estados = Parametro::whereHas('parametrosTemas', function ($query) use ($evidencia) {
+            $query->where('parametros_temas.id', $evidencia->id_estado);
+        })->first()->name;
+        
+        return $estados;
     }
 }

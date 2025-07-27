@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\ParametroTema;
 
 class Parametro extends Model
 {
@@ -40,5 +41,10 @@ class Parametro extends Model
     public function temas()
     {
         return $this->belongsToMany(Tema::class, 'parametros_temas')->withPivot('status');
+    }
+
+    public function parametrosTemas()
+    {
+        return $this->hasMany(ParametroTema::class, 'parametro_id');
     }
 }

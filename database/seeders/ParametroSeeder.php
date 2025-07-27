@@ -47,7 +47,12 @@ class ParametroSeeder extends Seeder
             ['id' => 21, 'name' => 'TÉCNICO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 22, 'name' => 'TECNÓLOGO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 23, 'name' => 'AUXILIAR', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-            ['id' => 24, 'name' => 'OPERARIO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1]
+            ['id' => 24, 'name' => 'OPERARIO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+
+            // Estados de evidencias
+            ['id' => 25, 'name' => 'PENDIENTE', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 26, 'name' => 'EN CURSO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 27, 'name' => 'COMPLETADO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
         ];
 
         foreach ($parametros as $parametro) {
