@@ -50,7 +50,7 @@ class RegistroActividadesController extends Controller
                 'codigo' => $codigo,
                 'nombre' => $request->nombre,
                 'fecha_evidencia' => $request->fecha_evidencia,
-                'id_estado' => 1,
+                'id_estado' => 25,
             ];
 
             $data['user_create_id'] = Auth::id();
