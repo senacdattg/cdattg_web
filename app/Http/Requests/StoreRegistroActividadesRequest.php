@@ -23,7 +23,7 @@ class StoreRegistroActividadesRequest extends FormRequest
     {
         return [
             'nombre' => 'required|string|max:255',
-            'fecha_actividad' => 'required|date|after_or_equal:today',
+            'fecha_evidencia' => 'required|date|after_or_equal:today',
         ];
     }
 
@@ -38,9 +38,9 @@ class StoreRegistroActividadesRequest extends FormRequest
             'nombre.required' => 'El nombre de la actividad es obligatorio.',
             'nombre.string' => 'El nombre de la actividad debe ser una cadena de texto.',
             'nombre.max' => 'El nombre de la actividad debe tener un máximo de 255 caracteres.',
-            'fecha_actividad.required' => 'La fecha de la actividad es obligatoria.',
-            'fecha_actividad.date' => 'La fecha de la actividad debe ser una fecha válida.',
-            'fecha_actividad.after_or_equal' => 'La fecha de la actividad debe ser una fecha válida.',
+            'fecha_evidencia.required' => 'La fecha de la actividad es obligatoria.',
+            'fecha_evidencia.date' => 'La fecha de la actividad debe ser una fecha válida.',
+            'fecha_evidencia.after_or_equal' => 'La fecha de la actividad debe ser una fecha válida.',
         ];
     }
 }

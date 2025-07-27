@@ -12,6 +12,7 @@ class Evidencias extends Model
         'codigo',
         'nombre',
         'id_estado',
+        'fecha_evidencia',
         'user_create_id',
         'user_edit_id',
     ];

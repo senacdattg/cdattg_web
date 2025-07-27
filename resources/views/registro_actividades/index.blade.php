@@ -217,7 +217,7 @@
                                                 <i class="far fa-calendar-alt text-primary"></i>
                                                 <div>
                                                     <small class="text-muted d-block">Fecha</small>
-                                                    <strong>{{ \Carbon\Carbon::parse($actividad['fecha'])->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</strong>
+                                                    <strong>{{ \Carbon\Carbon::parse($actividad['fecha_evidencia'])->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</strong>
                                                 </div>
                                             </div>
                                         </div>

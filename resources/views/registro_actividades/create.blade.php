@@ -9,7 +9,7 @@
     <div class="col-md-12">
         <div class="form-group">
             <label class="form-label fw-bold">Fecha de la actividad</label>
-            <input type="date" name="fecha_actividad" value="{{ old('fecha_actividad') }}" class="form-control" placeholder="Seleccione la fecha" min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
+            <input type="date" name="fecha_evidencia" value="{{ old('fecha_evidencia') }}" class="form-control" placeholder="Seleccione la fecha" min="{{ \Carbon\Carbon::now()->format('Y-m-d') }}">
         </div>
     </div>
 
