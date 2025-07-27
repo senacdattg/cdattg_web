@@ -34,6 +34,43 @@
                         </ol>
                     </nav>
                 </div>
+                <div class="col-12 mt-3">
+                    <div class="row row-cols-1 row-cols-md-2 g-3">
+                        <div class="col">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body d-flex align-items-center">
+                                    <i class="fas fa-fw fa-book text-primary me-2 d-none d-sm-inline-block" style="font-size: 1.25rem;"></i>
+                                    <div class="d-flex flex-column">
+                                        <span class="text-dark d-block">Ficha de formación:</span>
+                                        <span class="badge bg-primary text-wrap text-start w-100" style="white-space: normal !important;">{{ $caracterizacion->ficha->ficha }} - {{ $caracterizacion->ficha->programaFormacion->nombre }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body d-flex align-items-center">
+                                    <i class="fas fa-fw fa-crown text-primary me-2 d-none d-sm-inline-block" style="font-size: 1.25rem;"></i>
+                                    <div class="d-flex flex-column">
+                                        <span class="text-dark d-block">Competencia:</span>
+                                        <span class="badge bg-primary text-wrap text-start w-100" style="white-space: normal !important;">{{ $caracterizacion->ficha->programaFormacion->competenciaActual()->nombre }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="card border-0 shadow-sm">
+                                <div class="card-body d-flex align-items-center">
+                                    <i class="fas fa-fw fa-graduation-cap text-primary me-2 d-none d-sm-inline-block" style="font-size: 1.25rem;"></i>
+                                    <div class="d-flex flex-column">
+                                        <span class="text-dark d-block">Resultado de aprendizaje:</span>
+                                        <span class="badge bg-primary text-wrap text-start w-100" style="white-space: normal !important;">{{ $caracterizacion->ficha->programaFormacion->competenciaActual()->rapActual()->nombre }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
