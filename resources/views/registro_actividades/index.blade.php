@@ -46,23 +46,14 @@
             <div class="card border-0 shadow-sm h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-start">
-                        <div class="bg-soft-info rounded-circle p-2 p-sm-3 me-3">
-                            <i class="fas fa-calendar-check text-info" style="font-size: 1.5rem;"></i>
+                        <div class="bg-soft-primary rounded-circle p-2 p-sm-3 me-3">
+                            <i class="fas fa-tasks text-primary" style="font-size: 1.5rem;"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <h6 class="text-uppercase text-muted small mb-1">Total de Actividades</h6>
+                            <h6 class="text-uppercase text-muted small mb-1">Total de actividades</h6>
                             <div class="d-flex align-items-end">
-                                <h3 class="mb-0 fw-bold me-2">3</h3>
-                                <span class="text-success small mb-1">
-                                    <i class="fas fa-arrow-up"></i> 12%
-                                </span>
+                                <h3 class="mb-0 fw-bold me-2">{{ $actividades->count() }}</h3>
                             </div>
-                            <div class="progress mt-2" style="height: 4px;">
-                                <div class="progress-bar bg-info" style="width: 85%"></div>
-                            </div>
-                            <p class="small text-muted mt-2 mb-0">
-                                <i class="far fa-calendar me-1"></i> 3 este mes
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -76,18 +67,27 @@
                             <i class="fas fa-user-clock text-warning" style="font-size: 1.5rem;"></i>
                         </div>
                         <div class="flex-grow-1">
-                            <h6 class="text-uppercase text-muted small mb-1">En Curso</h6>
+                            @php
+                                $totalActividades = $actividades->count();
+                                $totalPendientes = $actividades->where('id_estado', 'PENDIENTE')->count();
+                                $porcentajePendiente = ($totalPendientes / $totalActividades) * 100;
+                                $porcentajePendiente = number_format($porcentajePendiente, 2);
+                                $totalEnCurso = $actividades->where('id_estado', 'EN CURSO')->count();
+                                $porcentajeEnCurso = ($totalEnCurso / $totalActividades) * 100;
+                                $porcentajeEnCurso = number_format($porcentajeEnCurso, 2);
+                            @endphp
+                            <h6 class="text-uppercase text-muted small mb-1">PENDIENTES</h6>
                             <div class="d-flex align-items-end">
-                                <h3 class="mb-0 fw-bold me-2">1</h3>
+                                <h3 class="mb-0 fw-bold me-2">{{ $totalPendientes }}</h3>
                                 <span class="text-warning small mb-1">
-                                    <i class="fas fa-pause"></i> 33%
+                                    <i class="fas fa-pause"></i> {{ $porcentajePendiente }}%
                                 </span>
                             </div>
                             <div class="progress mt-2" style="height: 4px;">
-                                <div class="progress-bar bg-warning" style="width: 33%"></div>
+                                <div class="progress-bar bg-warning" style="width: {{ $porcentajePendiente }}%"></div>
                             </div>
                             <p class="small text-muted mt-2 mb-0">
-                                <i class="far fa-clock me-1"></i> 1 en progreso
+                                <i class="far fa-clock me-1"></i> {{ $porcentajeEnCurso }}% en curso
                             </p>
                         </div>
                     </div>
@@ -102,18 +102,24 @@
                             <i class="fas fa-check-circle text-success" style="font-size: 1.5rem;"></i>
                         </div>
                         <div class="flex-grow-1">
+                            @php
+                                $totalActividades = $actividades->count();
+                                $totalCompletadas = $actividades->where('id_estado', 'COMPLETADO')->count();
+                                $porcentajeCompletado = ($totalCompletadas / $totalActividades) * 100;
+                                $porcentajeCompletado = number_format($porcentajeCompletado, 2);
+                            @endphp
                             <h6 class="text-uppercase text-muted small mb-1">Completadas</h6>
                             <div class="d-flex align-items-end">
-                                <h3 class="mb-0 fw-bold me-2">1</h3>
+                                <h3 class="mb-0 fw-bold me-2">{{ $totalCompletadas }}</h3>
                                 <span class="text-success small mb-1">
-                                    <i class="fas fa-check"></i> 100%
+                                    <i class="fas fa-check"></i> {{ $porcentajeCompletado }}%
                                 </span>
                             </div>
                             <div class="progress mt-2" style="height: 4px;">
-                                <div class="progress-bar bg-success" style="width: 100%"></div>
+                                <div class="progress-bar bg-success" style="width: {{ $porcentajeCompletado }}%"></div>
                             </div>
                             <p class="small text-muted mt-2 mb-0">
-                                <i class="far fa-calendar-check me-1"></i> 1 esta semana
+                                <i class="far fa-calendar-check me-1"></i> {{ $porcentajeCompletado }}% completadas esta semana
                             </p>
                         </div>
                     </div>
@@ -217,27 +223,8 @@
                                             <div class="info-item">
                                                 <i class="far fa-calendar-alt text-primary"></i>
                                                 <div>
-                                                    <small class="text-muted d-block">Fecha</small>
+                                                    <small class="text-muted d-block">Fecha de la actividad</small>
                                                     <strong>{{ \Carbon\Carbon::parse($actividad['fecha_evidencia'])->isoFormat('dddd, D [de] MMMM [de] YYYY') }}</strong>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="info-item">
-                                                <i class="far fa-clock text-primary"></i>
-                                                <div>
-                                                    <small class="text-muted d-block">Horario</small>
-                                                    <strong>{{ $actividad['hora_inicio'] }} -
-                                                        {{ $actividad['hora_fin'] }}</strong>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6 mt-3">
-                                            <div class="info-item">
-                                                <i class="fas fa-door-open text-primary"></i>
-                                                <div>
-                                                    <small class="text-muted d-block">Ubicación</small>
-                                                    <strong>{{ $actividad['sala'] }}</strong>
                                                 </div>
                                             </div>
                                         </div>
@@ -251,16 +238,18 @@
                                         </div>
                                         <div class="progress" style="height: 8px;">
                                             <div class="progress-bar
-                                            @if ($porcentaje < 60) bg-danger
-                                            @elseif($porcentaje < 80) bg-warning
-                                            @else bg-success @endif"
+                                                @if ($porcentaje < 60) bg-danger
+                                                @elseif($porcentaje < 80) bg-warning
+                                                @else bg-success @endif"
                                                 role="progressbar" style="width: {{ $porcentaje }}%"
                                                 aria-valuenow="{{ $porcentaje }}" aria-valuemin="0"
                                                 aria-valuemax="100">
                                             </div>
                                         </div>
-                                        <small class="text-muted">{{ $actividad['asistentes'] }} de
-                                            {{ $actividad['total_aprendices'] }} aprendices</small>
+                                        @if ($actividad['id_estado'] != 'PENDIENTE' && $actividad['id_estado'] != 'EN CURSO')
+                                            <small class="text-muted">{{ $actividad['asistentes'] }} de
+                                                {{ $actividad['total_aprendices'] }} aprendices</small>
+                                        @endif
                                     </div>
                                 </div>
 
@@ -309,22 +298,23 @@
                                                 </button>
                                             </div>
                                         @endif
-
-                                        <div class="mt-auto pt-3 border-top">
-                                            <div class="d-flex justify-content-between align-items-center">
-                                                <small class="text-muted">
-                                                    <i class="far fa-calendar-alt"></i>
-                                                    {{ \Carbon\Carbon::parse($actividad['fecha'])->format('d/m/Y') }}
-                                                </small>
-                                                <span
-                                                    class="badge
+                                        @if ($actividad['id_estado'] != 'PENDIENTE' && $actividad['id_estado'] != 'EN CURSO')
+                                            <div class="mt-auto pt-3 border-top">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <small class="text-muted">
+                                                        <i class="far fa-calendar-alt"></i>
+                                                        {{ \Carbon\Carbon::parse($actividad['fecha'])->format('d/m/Y') }}
+                                                    </small>
+                                                    <span
+                                                        class="badge
                                                 @if ($porcentaje < 60) badge-danger
                                                 @elseif($porcentaje < 80) badge-warning
                                                 @else badge-success @endif">
-                                                    {{ number_format($porcentaje, 0) }}% de asistencia
-                                                </span>
+                                                        {{ number_format($porcentaje, 0) }}% de asistencia
+                                                    </span>
+                                                </div>
                                             </div>
-                                        </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>
