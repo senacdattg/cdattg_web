@@ -17,9 +17,10 @@
         "phpoffice/phpspreadsheet": "^2.1",
         "pusher/pusher-php-server": "^7.2",
         "spatie/laravel-permission": "^6.4",
-        "beyondcode/laravel-websockets": "^2.0@beta"
+        "symfony/var-dumper": "^7.3"
     },
     "require-dev": {
+        "barryvdh/laravel-debugbar": "^3.16",
         "fakerphp/faker": "^1.9.1",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",

@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('evidencias', function (Blueprint $table) {
-            $table->foreignId('id_estado')->nullable()->constrained('parametros_temas')->nullOnDelete();
+            $table->foreignId('id_estado')->nullable()->constrained('parametros_temas')->nullOnDelete()->after('nombre');
+            $table->date('fecha_evidencia')->nullable()->after('id_estado');
         });
     }
 
@@ -24,6 +25,7 @@ return new class extends Migration
         Schema::table('evidencias', function (Blueprint $table) {
             $table->dropForeign(['id_estado']);
             $table->dropColumn('id_estado');
+            $table->dropColumn('fecha_evidencia');
         });
     }
 };

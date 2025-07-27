@@ -6,6 +6,10 @@ use App\Http\Requests\StoreRegistroActividadesRequest;
 use App\Http\Requests\UpdateRegistroActividadesRequest;
 use App\Services\RegistroActividadesServices;
 use App\Models\InstructorFichaCaracterizacion;
+use App\Models\ResultadosAprendizaje;
+use App\Models\Evidencias;
+use Appa\Models\EvidenciaGuiaAprendizaje;
+use Illuminate\Support\Facades\Auth;
 
 class RegistroActividadesController extends Controller
 {
@@ -22,8 +26,9 @@ class RegistroActividadesController extends Controller
      */
     public function index(InstructorFichaCaracterizacion $caracterizacion)
     {
+        $resultadosAprendizaje = $this->registroActividadesServices->getRaps($caracterizacion);
         $actividades = $this->registroActividadesServices->getActividades($caracterizacion);
-        return view('registro_actividades.index', compact('caracterizacion', 'actividades'));
+        return view('registro_actividades.index', compact('caracterizacion', 'actividades', 'resultadosAprendizaje'));
     }
 
     /**
@@ -37,9 +42,26 @@ class RegistroActividadesController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRegistroActividadesRequest $request)
+    public function store(StoreRegistroActividadesRequest $request, InstructorFichaCaracterizacion $caracterizacion)
     {
-        //
+            $codigo = $this->registroActividadesServices->generateCodigo($caracterizacion);
+            $fecha_evidencia = $request->fecha_evidencia;
+            $data = [
+                'codigo' => $codigo,
+                'nombre' => $request->nombre,
+                'fecha_evidencia' => $request->fecha_evidencia,
+                'id_estado' => 1,
+            ];
+
+            $data['user_create_id'] = Auth::id();
+            $data['user_edit_id'] = Auth::id();
+
+            $this->registroActividadesServices->crearEvidencia($data, $caracterizacion);
+
+            // Redirigir con mensaje de éxito
+            return redirect()->route('registro-actividades.index', ['caracterizacion' => $caracterizacion])
+                ->with('success', 'Registro de actividad creado exitosamente.');
+
     }
 
     /**

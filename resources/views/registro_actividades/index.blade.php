@@ -40,37 +40,6 @@
 @endsection
 
 @section('content')
-    <!-- Filtros de Búsqueda -->
-    <div class="card card-outline card-primary">
-        <div class="card-header">
-            <h3 class="card-title">Filtros de Búsqueda</h3>
-        </div>
-        <div class="card-body">
-            <form method="GET" action="#" class="form-inline">
-                <div class="input-group input-group-sm">
-                    <select class="form-control mr-2" name="estado" id="filtroEstado">
-                        <option value="">Todos los estados</option>
-                        <option value="pendiente" {{ request('estado') == 'pendiente' ? 'selected' : '' }}>Pendientes
-                        </option>
-                        <option value="en_curso" {{ request('estado') == 'en_curso' ? 'selected' : '' }}>En Curso</option>
-                        <option value="completada" {{ request('estado') == 'completada' ? 'selected' : '' }}>Completadas
-                        </option>
-                    </select>
-                    <div class="input-group-append">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-filter"></i> Filtrar
-                        </button>
-                    </div>
-                </div>
-                <div class="ml-auto d-flex align-items-center">
-                    <a href="#" class="btn btn-success btn-flat" data-toggle="modal" data-target="#modalNuevaActividad">
-                        <i class="fas fa-plus-circle mr-1"></i> Nueva Actividad
-                    </a>
-                </div>
-            </form>
-        </div>
-    </div>
-
     <!-- Estadísticas Rápidas -->
     <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 gx-3 gy-4 mb-4">
         <div class="col">
@@ -152,6 +121,25 @@
             </div>
         </div>
     </div>
+    <!-- Filtros de Búsqueda -->
+    <div class="card shadow-sm mb-4 no-hover">
+        <div class="card-header bg-white py-3 d-flex align-items-center">
+            <h5 class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1">
+                <i class="fas fa-plus-circle mr-2"></i> Crear Nueva Actividad
+            </h5>
+            <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="collapse"
+                data-target="#createParameterForm" aria-expanded="true">
+                <i class="fas fa-chevron-down"></i>
+            </button>
+        </div>
+
+        <div class="collapse show" id="createParameterForm">
+            <div class="card-body">
+                @include('registro_actividades.create', compact('caracterizacion'))
+            </div>
+        </div>
+    </div>
+
 
     <!-- Lista de Actividades -->
     <div class="row">
@@ -174,12 +162,11 @@
 
                 <div class="col-12 mb-4">
                     <div class="card activity-card h-100">
-                        <div
-                            class="card-header text-white
+                        <div class="card-header text-white
                         @if ($actividad['estado'] == 'pendiente') bg-gradient-primary
                         @elseif($actividad['estado'] == 'en_curso') bg-gradient-info
-                        @else bg-gradient-success @endif" 
-                        style="@if($actividad['estado'] == 'pendiente') background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+                        @else bg-gradient-success @endif"
+                            style="@if ($actividad['estado'] == 'pendiente') background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
                         @elseif($actividad['estado'] == 'en_curso') background: linear-gradient(135deg, #00b4db 0%, #0083b0 100%);
                         @else background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%); @endif">
                             <div class="d-flex justify-content-between align-items-center">
@@ -206,7 +193,7 @@
                                     @if ($actividad['estado'] == 'pendiente') bg-primary
                                     @elseif($actividad['estado'] == 'en_curso') bg-info
                                     @else bg-success @endif"
-                                    style="@if($actividad['estado'] == 'pendiente') background-color: #3a56a8 !important;
+                                        style="@if ($actividad['estado'] == 'pendiente') background-color: #3a56a8 !important;
                                     @elseif($actividad['estado'] == 'en_curso') background-color: #00a8d8 !important;
                                     @else background-color: #28a745 !important; @endif">
                                         {{ ucfirst(str_replace('_', ' ', $actividad['estado'])) }}
