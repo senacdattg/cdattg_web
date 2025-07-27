@@ -3,6 +3,9 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
+use Carbon\Carbon;
+use App\Models\InstructorFichaCaracterizacion;
 
 class StoreRegistroActividadesRequest extends FormRequest
 {
@@ -23,7 +26,11 @@ class StoreRegistroActividadesRequest extends FormRequest
     {
         return [
             'nombre' => 'required|string|max:255',
-            'fecha_evidencia' => 'required|date|after_or_equal:today',
+            'fecha_evidencia' => [
+                'required',
+                'date',
+                'after_or_equal:today'
+            ],
         ];
     }
 
@@ -40,7 +47,7 @@ class StoreRegistroActividadesRequest extends FormRequest
             'nombre.max' => 'El nombre de la actividad debe tener un máximo de 255 caracteres.',
             'fecha_evidencia.required' => 'La fecha de la actividad es obligatoria.',
             'fecha_evidencia.date' => 'La fecha de la actividad debe ser una fecha válida.',
-            'fecha_evidencia.after_or_equal' => 'La fecha de la actividad debe ser una fecha válida.',
+            'fecha_evidencia.after_or_equal' => 'La fecha de la actividad debe ser hoy o una fecha futura.',
         ];
     }
 }
