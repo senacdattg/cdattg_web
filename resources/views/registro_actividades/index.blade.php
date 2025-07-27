@@ -156,8 +156,9 @@
                 @php
                     //$porcentaje = ($actividad['asistentes'] / $actividad['total_aprendices']) * 100;
                     $porcentaje = 0;
-                    //$diasRestantes = \Carbon\Carbon::parse($actividad['fecha'])->diffInDays(now(), false) * -1;
-                    $diasRestantes = 0;
+                    $fechaActividad = \Carbon\Carbon::parse($actividad['fecha_evidencia']);
+                    $hoy = \Carbon\Carbon::today();
+                    $diasRestantes = $fechaActividad->isFuture() ? $hoy->diffInDays($fechaActividad) : 0;
                 @endphp
 
                 <div class="col-12 mb-4">
@@ -194,9 +195,9 @@
                                     @elseif($actividad['id_estado'] == 'EN CURSO') bg-info
                                     @else bg-success @endif"
                                         style="@if ($actividad['id_estado'] == 'PENDIENTE') background-color: #3a56a8 !important;
-                                    @elseif($actividad['id_estado'] == 'EN CURSO') background-color: #00a8d8 !important;
-                                    @else background-color: #28a745 !important; @endif">
-                                        {{ ucfirst(str_replace('_', ' ', $actividad['estado'])) }}
+                                    @elseif($actividad['id_estado'] == 'EN CURSO') background-color: #00a8d8 !important; font-size: 12px !important;
+                                    @else background-color: #28a745 !important; font-size: 12px !important; @endif">
+                                        {{ ucfirst(str_replace('_', ' ', $actividad['id_estado'])) }}
                                     </span>
                                     @if ($actividad['id_estado'] == 'PENDIENTE' && $diasRestantes > 0)
                                         <span class="badge badge-pill bg-warning text-dark ml-1">
@@ -266,7 +267,7 @@
                                 <!-- Columna de acciones -->
                                 <div class="col-lg-4 mt-4 mt-lg-0">
                                     <div class="d-flex flex-column h-100">
-                                        @if ($actividad['estado'] == 'pendiente' || $actividad['estado'] == 'en_curso')
+                                        @if ($actividad['id_estado'] == 'PENDIENTE' || $actividad['id_estado'] == 'EN CURSO')
                                             <a class="btn btn-primary btn-block mb-3"
                                                 href="{{ route('asistence.caracterSelected', ['id' => $caracterizacion->id]) }}">
                                                 <i class="fas fa-clipboard-check"></i> Tomar Asistencia
