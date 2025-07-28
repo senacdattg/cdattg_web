@@ -258,300 +258,177 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Obtener los días de formación del instructor desde la caracterización
-    @php
-        $diasFormacion = $caracterizacion->instructorFichaDias;
-        $diasIds = $diasFormacion->pluck('dia_id')->toArray();
-
-        // Obtener la fecha de fin del RAP actual
-        $rapActual = $caracterizacion->ficha->programaFormacion->competenciaActual()->rapActual();
-        $fechaFinRap = $rapActual ? $rapActual->fecha_fin : null;
-    @endphp
-
-    const diasFormacion = @json($diasIds);
-    const fechaFinRap = @json($fechaFinRap);
-    const inputFecha = document.getElementById('fecha_evidencia');
-    const abrirCalendarioBtn = document.getElementById('abrir-calendario');
-    const calendarioModal = document.getElementById('calendario-modal');
-    const cerrarCalendarioBtn = document.getElementById('cerrar-calendario');
-    const confirmarFechaBtn = document.getElementById('confirmar-fecha');
-    const mesActual = document.getElementById('mes-actual');
-    const mesAnteriorBtn = document.getElementById('mes-anterior');
-    const mesSiguienteBtn = document.getElementById('mes-siguiente');
-    const calendarioDias = document.getElementById('calendario-dias');
-
-    console.log('Días de formación configurados:', diasFormacion);
-    console.log('Fecha fin del RAP actual:', fechaFinRap);
-    console.log('Tipo de fechaFinRap:', typeof fechaFinRap);
-    console.log('Fecha fin RAP como Date:', fechaFinRap ? new Date(fechaFinRap) : 'null');
-    console.log('Fecha fin RAP como string:', fechaFinRap ? new Date(fechaFinRap).toISOString().split('T')[0] : 'null');
-
-    // Función para verificar si una fecha es un día de formación
-    function esDiaFormacion(fecha) {
-        const diaSemana = fecha.getDay(); // 0 = Domingo, 1 = Lunes, etc.
-        // Mapeo: 0=Domingo->18, 1=Lunes->12, 2=Martes->13, etc.
-        const diaId = (diaSemana === 0) ? 18 : diaSemana + 11;
-
-        console.log('Fecha:', fecha.toDateString(), 'Día semana:', diaSemana, 'Día ID:', diaId, 'Es día formación:', diasFormacion.includes(diaId));
-
-        return diasFormacion.includes(diaId);
-    }
-
-    // Función para obtener la próxima fecha válida desde una fecha inicial
-    function obtenerProximaFechaValida(fechaInicial) {
-        let fechaActual = new Date(fechaInicial);
-        let intentos = 0;
-        const maxIntentos = 365; // Buscar hasta un año adelante
-
-        console.log('Buscando próxima fecha válida desde:', fechaActual.toISOString().split('T')[0]);
-        console.log('Fecha fin del RAP:', fechaFinRap);
-
-        while (intentos < maxIntentos) {
-            fechaActual.setDate(fechaActual.getDate() + 1);
-            intentos++;
-
-            // Verificar si la fecha actual supera la fecha de fin del RAP
-            if (fechaFinRap) {
-                const fechaFinRapDate = new Date(fechaFinRap);
-                // Comparar usando strings de fecha (YYYY-MM-DD) para mayor precisión
-                const fechaActualString = fechaActual.toISOString().split('T')[0];
-                const fechaFinRapString = fechaFinRapDate.toISOString().split('T')[0];
-
-                if (fechaActualString > fechaFinRapString) {
-                    console.log('Fecha supera el límite del RAP:', fechaActualString);
-                    return null;
-                }
-            }
-
-            if (esDiaFormacion(fechaActual)) {
-                console.log('Fecha válida encontrada:', fechaActual.toISOString().split('T')[0]);
-                return fechaActual;
-            }
-        }
-
-        console.log('No se encontró fecha válida después de', maxIntentos, 'intentos');
-        return null;
-    }
-
-    // Función para obtener la primera fecha válida desde hoy
-    function obtenerPrimeraFechaValida() {
-        const hoy = new Date();
-        const primeraFecha = obtenerProximaFechaValida(hoy);
-
-        if (!primeraFecha) {
-            console.log('No se encontró primera fecha válida');
-            return null;
-        }
-
-        // Verificar que la primera fecha no supere el límite del RAP
-        if (fechaFinRap) {
-            const fechaFinRapDate = new Date(fechaFinRap);
-            // Comparar usando strings de fecha (YYYY-MM-DD) para mayor precisión
-            const primeraFechaString = primeraFecha.toISOString().split('T')[0];
-            const fechaFinRapString = fechaFinRapDate.toISOString().split('T')[0];
-
-            if (primeraFechaString > fechaFinRapString) {
-                console.log('Primera fecha válida supera el límite del RAP');
-                return null;
-            }
-        }
-
-        return primeraFecha;
-    }
-
-    // Función para validar y corregir la fecha seleccionada
-    function validarFecha() {
-        if (!inputFecha.value) {
-            // Si no hay fecha seleccionada, sugerir la primera fecha válida
-            const primeraFecha = obtenerPrimeraFechaValida();
-            if (primeraFecha) {
-                const confirmacion = confirm(
-                    '¿Desea seleccionar la primera fecha disponible (' +
-                    primeraFecha.toLocaleDateString('es-ES', {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    }) + ')?'
-                );
-
-                if (confirmacion) {
-                    inputFecha.value = primeraFecha.toISOString().split('T')[0];
-                }
-            }
-            return true;
-        }
-
-        const fechaSeleccionada = new Date(inputFecha.value);
-        const fechaMinima = new Date('{{ \Carbon\Carbon::now()->format('Y-m-d') }}');
-        const fechaMaxima = fechaFinRap ? new Date(fechaFinRap) : null;
-
-        // Verificar que la fecha no sea anterior a hoy
-        if (fechaSeleccionada < fechaMinima) {
-            alert('La fecha no puede ser anterior a hoy.');
-            inputFecha.value = '';
-            return false;
-        }
-
-        // Verificar que la fecha no sea posterior a la fecha de fin del RAP
-        if (fechaMaxima) {
-            // Comparar usando strings de fecha (YYYY-MM-DD) para mayor precisión
-            const fechaSeleccionadaString = fechaSeleccionada.toISOString().split('T')[0];
-            const fechaMaximaString = fechaMaxima.toISOString().split('T')[0];
-
-            if (fechaSeleccionadaString > fechaMaximaString) {
-                alert('La fecha no puede ser posterior al ' + fechaMaxima.toLocaleDateString('es-ES', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                }) + ' (fecha de fin del RAP actual).');
-                inputFecha.value = '';
-                return false;
-            }
-        }
-
-        // Verificar que sea un día de formación
-        if (!esDiaFormacion(fechaSeleccionada)) {
-            const proximaFecha = obtenerProximaFechaValida(fechaSeleccionada);
-            if (proximaFecha) {
-                // Corregir automáticamente sin mostrar confirmación
-                inputFecha.value = proximaFecha.toISOString().split('T')[0];
-            } else {
-                // Si no se encuentra fecha válida, mostrar información de debugging
-                const diasNombres = {
-                    12: 'Lunes',
-                    13: 'Martes',
-                    14: 'Miércoles',
-                    15: 'Jueves',
-                    16: 'Viernes',
-                    17: 'Sábado',
-                    18: 'Domingo'
-                };
-
-                const diasDisponibles = diasFormacion.map(id => diasNombres[id]).join(', ');
-
-                alert(
-                    'No se encontró una fecha válida en el próximo año. ' +
-                    'Días de formación configurados: ' + diasDisponibles + '\n\n' +
-                    'Por favor, verifique la configuración de días de formación del instructor.'
-                );
-                inputFecha.value = '';
-            }
-            return false;
-        }
-
-        return true;
-    }
-
-    // Event listeners
-    inputFecha.addEventListener('change', function() {
-        validarFecha();
-    });
-    inputFecha.addEventListener('blur', validarFecha);
-
-    // Validar el formulario antes de enviar
-    document.querySelector('form').addEventListener('submit', function(e) {
-        if (!validarFecha()) {
-            e.preventDefault();
-            return false;
-        }
-    });
-
-    // Mostrar información sobre los días de formación disponibles
-    const diasNombres = {
-        12: 'Lunes',
-        13: 'Martes',
-        14: 'Miércoles',
-        15: 'Jueves',
-        16: 'Viernes',
-        17: 'Sábado',
-        18: 'Domingo'
+    // Configuración inicial
+    const CONFIG = {
+        diasFormacion: @json($caracterizacion->instructorFichaDias->pluck('dia_id')->toArray()),
+        fechaFinRap: @json($caracterizacion->ficha->programaFormacion->competenciaActual()->rapActual()?->fecha_fin),
+        fechaHoy: '{{ \Carbon\Carbon::now()->format('Y-m-d') }}',
+        maxIntentosBusqueda: 365
     };
 
-    const diasDisponibles = diasFormacion.map(id => diasNombres[id]).join(', ');
-    console.log('Días de formación disponibles:', diasDisponibles);
+    // Elementos del DOM
+    const DOM = {
+        inputFecha: document.getElementById('fecha_evidencia'),
+        calendarioModal: document.getElementById('calendario-modal'),
+        calendarioDias: document.getElementById('calendario-dias'),
+        mesActual: document.getElementById('mes-actual'),
+        selectedDate: null,
+        currentMonth: new Date().getMonth(),
+        currentYear: new Date().getFullYear()
+    };
 
-    // Verificar si hay días de formación configurados
-    if (diasFormacion.length === 0) {
-        console.warn('ADVERTENCIA: No hay días de formación configurados para este instructor');
-        alert('ADVERTENCIA: No hay días de formación configurados para este instructor. Por favor, configure los días de formación antes de crear actividades.');
-    }
+    // Mapeo de días de la semana
+    const DIAS_SEMANA = {
+        DOMINGO: 18,
+        LUNES: 12,
+        MARTES: 13,
+        MIERCOLES: 14,
+        JUEVES: 15,
+        VIERNES: 16,
+        SABADO: 17
+    };
 
-    // Manejo del calendario personalizado
-    let currentMonth = new Date().getMonth();
-    let currentYear = new Date().getFullYear();
-    let selectedDate = null;
+    const NOMBRES_DIAS = {
+        12: 'Lunes', 13: 'Martes', 14: 'Miércoles', 15: 'Jueves',
+        16: 'Viernes', 17: 'Sábado', 18: 'Domingo'
+    };
 
-    function renderCalendar(month, year) {
-        const firstDayOfMonth = new Date(year, month, 1);
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const startingDayOfWeek = firstDayOfMonth.getDay();
+    const NOMBRES_MESES = [
+        'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+        'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+    ];
 
-        // Actualizar el título del mes
-        const monthNames = [
-            'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-            'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
-        ];
-        mesActual.textContent = `${monthNames[month]} ${year}`;
+    // Utilidades de fecha
+    const DateUtils = {
+        toDateString: (date) => date.toISOString().split('T')[0],
 
-        // Limpiar días anteriores
-        calendarioDias.innerHTML = '';
+        getDiaId: (fecha) => {
+            const diaSemana = fecha.getDay();
+            return diaSemana === 0 ? DIAS_SEMANA.DOMINGO : diaSemana + 11;
+        },
 
-        // Agregar días vacíos al inicio
-        for (let i = 0; i < startingDayOfWeek; i++) {
-            calendarioDias.innerHTML += '<div class="calendario-dia empty"></div>';
-        }
+        esDiaFormacion: (fecha) => {
+            const diaId = DateUtils.getDiaId(fecha);
+            return CONFIG.diasFormacion.includes(diaId);
+        },
 
-        // Agregar días del mes
-        for (let day = 1; day <= daysInMonth; day++) {
-            const date = new Date(year, month, day);
-            const dateString = date.toISOString().split('T')[0];
-            const today = new Date();
-            const isToday = date.toDateString() === today.toDateString();
-            const isPast = date < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        esFechaValida: (fecha) => {
+            const fechaHoy = new Date(CONFIG.fechaHoy);
+            const fechaFinRap = CONFIG.fechaFinRap ? new Date(CONFIG.fechaFinRap) : null;
 
-            // Verificar si la fecha es posterior al fin del RAP
-            let isAfterRapEnd = false;
-            if (fechaFinRap) {
-                const fechaFinRapDate = new Date(fechaFinRap);
-                // Comparar usando strings de fecha (YYYY-MM-DD) para mayor precisión
-                const dateStringOnly = date.toISOString().split('T')[0];
-                const fechaFinRapString = fechaFinRapDate.toISOString().split('T')[0];
-                isAfterRapEnd = dateStringOnly > fechaFinRapString;
+            const esPasada = fecha < fechaHoy;
+            const esDespuesRap = fechaFinRap && DateUtils.toDateString(fecha) > DateUtils.toDateString(fechaFinRap);
+            const esDiaFormacion = DateUtils.esDiaFormacion(fecha);
 
-                // Debug log para el 30 de agosto y fechas cercanas al fin del RAP
-                if (dateStringOnly === fechaFinRapString || dateStringOnly === '2024-08-30') {
-                    console.log('Debug fecha fin RAP:', {
-                        dateStringOnly: dateStringOnly,
-                        fechaFinRapString: fechaFinRapString,
-                        isAfterRapEnd: isAfterRapEnd,
-                        fechaFinRap: fechaFinRap,
-                        day: day,
-                        month: month,
-                        year: year
-                    });
+            return !esPasada && !esDespuesRap && esDiaFormacion;
+        },
+
+        obtenerProximaFechaValida: (fechaInicial) => {
+            let fechaActual = new Date(fechaInicial);
+            let intentos = 0;
+
+            while (intentos < CONFIG.maxIntentosBusqueda) {
+                fechaActual.setDate(fechaActual.getDate() + 1);
+                intentos++;
+
+                if (DateUtils.esFechaValida(fechaActual)) {
+                    return fechaActual;
                 }
             }
+            return null;
+        },
 
-            const isFormationDay = esDiaFormacion(date);
-            const isDisabled = isPast || isAfterRapEnd || !isFormationDay;
+        obtenerPrimeraFechaValida: () => {
+            const hoy = new Date();
+            return DateUtils.obtenerProximaFechaValida(hoy);
+        }
+    };
 
-            // Debug log para el último día del RAP
-            if (fechaFinRap && dateString === fechaFinRap) {
-                console.log('Debug último día RAP:', {
-                    dateString: dateString,
-                    isPast: isPast,
-                    isAfterRapEnd: isAfterRapEnd,
-                    isFormationDay: isFormationDay,
-                    isDisabled: isDisabled,
-                    diasFormacion: diasFormacion
-                });
+    // Validación de fechas
+    const Validator = {
+        validarFecha: () => {
+            if (!DOM.inputFecha.value) {
+                return Validator.sugerirPrimeraFecha();
             }
 
-            let className = 'calendario-dia';
-            if (isToday) className += ' today';
-            if (isDisabled) className += ' disabled';
-            if (selectedDate === dateString) className += ' fecha-seleccionada';
+            const fechaSeleccionada = new Date(DOM.inputFecha.value);
+
+            if (!DateUtils.esFechaValida(fechaSeleccionada)) {
+                return Validator.corregirFecha(fechaSeleccionada);
+            }
+
+            return true;
+        },
+
+        sugerirPrimeraFecha: () => {
+            const primeraFecha = DateUtils.obtenerPrimeraFechaValida();
+            if (!primeraFecha) return false;
+
+            const confirmacion = confirm(
+                `¿Desea seleccionar la primera fecha disponible (${primeraFecha.toLocaleDateString('es-ES', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                })})?`
+            );
+
+            if (confirmacion) {
+                DOM.inputFecha.value = DateUtils.toDateString(primeraFecha);
+            }
+            return true;
+        },
+
+        corregirFecha: (fechaInvalida) => {
+            const proximaFecha = DateUtils.obtenerProximaFechaValida(fechaInvalida);
+
+            if (proximaFecha) {
+                DOM.inputFecha.value = DateUtils.toDateString(proximaFecha);
+                return false;
+            }
+
+            const diasDisponibles = CONFIG.diasFormacion.map(id => NOMBRES_DIAS[id]).join(', ');
+            alert(`No se encontró una fecha válida. Días disponibles: ${diasDisponibles}`);
+            DOM.inputFecha.value = '';
+            return false;
+        }
+    };
+
+    // Calendario personalizado
+    const Calendar = {
+        render: (month, year) => {
+            const firstDay = new Date(year, month, 1);
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const startingDay = firstDay.getDay();
+
+            Calendar.updateHeader(month, year);
+            Calendar.renderDays(startingDay, daysInMonth, month, year);
+        },
+
+        updateHeader: (month, year) => {
+            DOM.mesActual.textContent = `${NOMBRES_MESES[month]} ${year}`;
+        },
+
+        renderDays: (startingDay, daysInMonth, month, year) => {
+            DOM.calendarioDias.innerHTML = '';
+
+            // Días vacíos al inicio
+            for (let i = 0; i < startingDay; i++) {
+                DOM.calendarioDias.innerHTML += '<div class="calendario-dia empty"></div>';
+            }
+
+            // Días del mes
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(year, month, day);
+                const dateString = DateUtils.toDateString(date);
+                const dayElement = Calendar.createDayElement(date, day, dateString);
+                DOM.calendarioDias.appendChild(dayElement);
+            }
+        },
+
+        createDayElement: (date, day, dateString) => {
+            const isToday = DateUtils.toDateString(date) === CONFIG.fechaHoy;
+            const isDisabled = !DateUtils.esFechaValida(date);
+            const isSelected = DOM.selectedDate === dateString;
+
+            const className = Calendar.getDayClassName(isToday, isDisabled, isSelected);
 
             const dayElement = document.createElement('div');
             dayElement.className = className;
@@ -559,70 +436,116 @@ document.addEventListener('DOMContentLoaded', function() {
             dayElement.innerHTML = `<span>${day}</span>`;
 
             if (!isDisabled) {
-                dayElement.addEventListener('click', function() {
-                    // Remover selección previa
-                    document.querySelectorAll('.calendario-dia').forEach(d => d.classList.remove('fecha-seleccionada'));
-                    // Seleccionar nueva fecha
-                    this.classList.add('fecha-seleccionada');
-                    selectedDate = this.getAttribute('data-date');
-                });
+                dayElement.addEventListener('click', () => Calendar.selectDate(dateString));
             }
 
-            calendarioDias.appendChild(dayElement);
+            return dayElement;
+        },
+
+        getDayClassName: (isToday, isDisabled, isSelected) => {
+            let className = 'calendario-dia';
+            if (isToday) className += ' today';
+            if (isDisabled) className += ' disabled';
+            if (isSelected) className += ' fecha-seleccionada';
+            return className;
+        },
+
+        selectDate: (dateString) => {
+            document.querySelectorAll('.calendario-dia').forEach(d =>
+                d.classList.remove('fecha-seleccionada')
+            );
+            document.querySelector(`[data-date="${dateString}"]`).classList.add('fecha-seleccionada');
+            DOM.selectedDate = dateString;
+        },
+
+        open: () => {
+            DOM.calendarioModal.style.display = 'flex';
+            Calendar.render(DOM.currentMonth, DOM.currentYear);
+        },
+
+        close: () => {
+            DOM.calendarioModal.style.display = 'none';
+            DOM.selectedDate = null;
+        },
+
+        confirm: () => {
+            if (DOM.selectedDate) {
+                DOM.inputFecha.value = DOM.selectedDate;
+                Calendar.close();
+            } else {
+                alert('Por favor, selecciona una fecha válida');
+            }
+        },
+
+        prevMonth: () => {
+            DOM.currentMonth--;
+            if (DOM.currentMonth < 0) {
+                DOM.currentMonth = 11;
+                DOM.currentYear--;
+            }
+            Calendar.render(DOM.currentMonth, DOM.currentYear);
+        },
+
+        nextMonth: () => {
+            DOM.currentMonth++;
+            if (DOM.currentMonth > 11) {
+                DOM.currentMonth = 0;
+                DOM.currentYear++;
+            }
+            Calendar.render(DOM.currentMonth, DOM.currentYear);
         }
-    }
+    };
 
-    function prevMonth() {
-        currentMonth--;
-        if (currentMonth < 0) {
-            currentMonth = 11;
-            currentYear--;
+    // Event listeners
+    const EventHandlers = {
+        init: () => {
+            DOM.inputFecha.addEventListener('change', Validator.validarFecha);
+            DOM.inputFecha.addEventListener('blur', Validator.validarFecha);
+
+            document.querySelector('form').addEventListener('submit', (e) => {
+                if (!Validator.validarFecha()) {
+                    e.preventDefault();
+                }
+            });
+
+            // Calendario
+            document.getElementById('abrir-calendario').addEventListener('click', Calendar.open);
+            document.getElementById('cerrar-calendario').addEventListener('click', Calendar.close);
+            document.getElementById('confirmar-fecha').addEventListener('click', Calendar.confirm);
+            document.getElementById('mes-anterior').addEventListener('click', Calendar.prevMonth);
+            document.getElementById('mes-siguiente').addEventListener('click', Calendar.nextMonth);
+
+            // Cerrar al hacer clic fuera
+            window.addEventListener('click', (event) => {
+                if (event.target === DOM.calendarioModal) {
+                    Calendar.close();
+                }
+            });
         }
-        renderCalendar(currentMonth, currentYear);
-    }
+    };
 
-    function nextMonth() {
-        currentMonth++;
-        if (currentMonth > 11) {
-            currentMonth = 0;
-            currentYear++;
+    // Inicialización y validaciones
+    const App = {
+        init: () => {
+            App.validarConfiguracion();
+            EventHandlers.init();
+            Calendar.render(DOM.currentMonth, DOM.currentYear);
+        },
+
+        validarConfiguracion: () => {
+            if (CONFIG.diasFormacion.length === 0) {
+                alert('ADVERTENCIA: No hay días de formación configurados para este instructor.');
+            }
+
+            console.log('Configuración cargada:', {
+                diasFormacion: CONFIG.diasFormacion,
+                fechaFinRap: CONFIG.fechaFinRap,
+                diasDisponibles: CONFIG.diasFormacion.map(id => NOMBRES_DIAS[id]).join(', ')
+            });
         }
-        renderCalendar(currentMonth, currentYear);
-    }
+    };
 
-    function openCalendar() {
-        calendarioModal.style.display = 'flex';
-        renderCalendar(currentMonth, currentYear);
-    }
-
-    function closeCalendar() {
-        calendarioModal.style.display = 'none';
-        selectedDate = null;
-    }
-
-    function confirmDate() {
-        if (selectedDate) {
-            inputFecha.value = selectedDate;
-            closeCalendar();
-        } else {
-            alert('Por favor, selecciona una fecha válida');
-        }
-    }
-
-    abrirCalendarioBtn.addEventListener('click', openCalendar);
-    cerrarCalendarioBtn.addEventListener('click', closeCalendar);
-    confirmarFechaBtn.addEventListener('click', confirmDate);
-    mesAnteriorBtn.addEventListener('click', prevMonth);
-    mesSiguienteBtn.addEventListener('click', nextMonth);
-
-    // Close calendar when clicking outside
-    window.addEventListener('click', function(event) {
-        if (event.target == calendarioModal) {
-            closeCalendar();
-        }
-    });
-
-    // Initial render
-    renderCalendar(currentMonth, currentYear);
+    // Iniciar aplicación
+    App.init();
 });
 </script>
