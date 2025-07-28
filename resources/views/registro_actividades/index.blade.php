@@ -107,10 +107,10 @@
                             @php
                                 $totalActividades = $actividades->count();
                                 $totalPendientes = $actividades->where('id_estado', 'PENDIENTE')->count();
-                                $porcentajePendiente = ($totalPendientes / $totalActividades) * 100;
+                                $porcentajePendiente = $totalActividades > 0 ? ($totalPendientes / $totalActividades) * 100 : 0;
                                 $porcentajePendiente = number_format($porcentajePendiente, 2);
                                 $totalEnCurso = $actividades->where('id_estado', 'EN CURSO')->count();
-                                $porcentajeEnCurso = ($totalEnCurso / $totalActividades) * 100;
+                                $porcentajeEnCurso = $totalActividades > 0 ? ($totalEnCurso / $totalActividades) * 100 : 0;
                                 $porcentajeEnCurso = number_format($porcentajeEnCurso, 2);
                             @endphp
                             <h6 class="text-uppercase text-muted small mb-1">PENDIENTES</h6>
@@ -142,7 +142,7 @@
                             @php
                                 $totalActividades = $actividades->count();
                                 $totalCompletadas = $actividades->where('id_estado', 'COMPLETADO')->count();
-                                $porcentajeCompletado = ($totalCompletadas / $totalActividades) * 100;
+                                $porcentajeCompletado = $totalActividades > 0 ? ($totalCompletadas / $totalActividades) * 100 : 0;
                                 $porcentajeCompletado = number_format($porcentajeCompletado, 2);
                             @endphp
                             <h6 class="text-uppercase text-muted small mb-1">Completadas</h6>
