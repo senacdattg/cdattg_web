@@ -86,32 +86,42 @@
                                         {{ $caracterizacion->ficha->programaFormacion->competenciaActual()->rapActual()->nombre ?? 'No asignado' }}
                                     </p>
                                 </div>
-                                <div class="mb-3">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="far fa-clock text-primary mr-2"></i>
-                                        <h6 class="mb-0"><b>Jornada:</b></h6>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="far fa-sun text-primary mr-2"></i>
+                                            <h6 class="mb-0"><b>Jornada:</b></h6>
+                                        </div>
+                                        <p class="ml-4 text-muted">{{ $caracterizacion->ficha->jornadaFormacion->jornada }}
+                                        </p>
                                     </div>
-                                    <p class="ml-4 text-muted">{{ $caracterizacion->ficha->jornadaFormacion->jornada }}
-                                    </p>
+                                    <div class="col-6">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <i class="far fa-clock text-primary mr-2"></i>
+                                            <h6 class="mb-0"><b>Horario de formación:</b></h6>
+                                        </div>
+                                        <div class="d-flex align-items-center mb-2">
+                                            <p class="ml-4 mb-0 text-muted">
+                                                {{ Carbon\Carbon::parse($proximaClaseFormacion['hora_inicio'])->format('g:i A') }}
+                                                -
+                                                {{ Carbon\Carbon::parse($proximaClaseFormacion['hora_fin'])->format('g:i A') }}
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="mb-3">
                                     <div class="d-flex align-items-center mb-2">
                                         <i class="far fa-calendar-alt text-primary mr-2"></i>
-                                        <h6 class="mb-0"><b>Horario de formación:</b></h6>
-                                        <p class="ml-1 mb-0 text-muted">
-                                            {{ Carbon\Carbon::parse($proximaClaseFormacion['hora_inicio'])->format('g:i A') }}
-                                            -
-                                            {{ Carbon\Carbon::parse($proximaClaseFormacion['hora_fin'])->format('g:i A') }}
-                                        </p>
+                                        <h6 class="mb-0"><b>Dias de formación:</b></h6>
                                     </div>
                                     <?php
-                                        $dias = $caracterizacion->instructorFichaDias;
-                                        $proximoDiaFormacion = $caracterizacion->obtenerProximaClase();
+                                    $dias = $caracterizacion->instructorFichaDias;
+                                    $proximoDiaFormacion = $caracterizacion->obtenerProximaClase();
                                     ?>
                                     <div class="d-flex ml-4" style="gap: 0.5rem;">
                                         @foreach ($dias as $dia)
                                             <div class="border rounded text-center px-2 py-1"
-                                                style="min-width: 60px; background: {{ ($dia->dia_id == $proximoDiaFormacion['dia_id']) ? '#007bff' : '#f8f9fa' }}; color: {{ ($dia->dia_id == $proximoDiaFormacion['dia_id']) ? '#fff' : '#6c757d' }};">
+                                                style="min-width: 60px; background: {{ $dia->dia_id == $proximoDiaFormacion['dia_id'] ? '#007bff' : '#f8f9fa' }}; color: {{ $dia->dia_id == $proximoDiaFormacion['dia_id'] ? '#fff' : '#6c757d' }};">
                                                 {{ substr($diasFormacion[$dia->dia_id], 0, 3) }}
                                             </div>
                                         @endforeach
@@ -123,15 +133,13 @@
                                         <h6 class="mb-0"><b>Lugar de formación:</b></h6>
                                     </div>
                                     <div class="d-flex align-items-center ml-4 text-muted" style="gap: 0.5rem;">
-                                        <span>Centro: {{ $caracterizacion->ficha->nombre ?? '' }}</span>
+                                        <span>{{ $caracterizacion->ficha->ambiente->piso->bloque->sede->sede ?? '' }}</span>
                                         <i class="fas fa-arrow-right"></i>
-                                        <span>Sede: {{ $caracterizacion->sede->nombre ?? '' }}</span>
+                                        <span>{{ $caracterizacion->ficha->ambiente->piso->bloque->bloque ?? '' }}</span>
                                         <i class="fas fa-arrow-right"></i>
-                                        <span>Bloque: {{ $caracterizacion->bloque->nombre ?? '' }}</span>
+                                        <span>{{ $caracterizacion->ficha->ambiente->piso->piso ?? '' }}</span>
                                         <i class="fas fa-arrow-right"></i>
-                                        <span>Piso: {{ $caracterizacion->piso->nombre ?? '' }}</span>
-                                        <i class="fas fa-arrow-right"></i>
-                                        <span>Ambiente: {{ $caracterizacion->ambiente->nombre ?? '' }}</span>
+                                        <span>{{ $caracterizacion->ficha->ambiente->title ?? '' }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -180,4 +188,8 @@
         </div>
     </section>
     </div>
+@endsection
+
+@section('footer')
+    @include('layout.footer')
 @endsection
