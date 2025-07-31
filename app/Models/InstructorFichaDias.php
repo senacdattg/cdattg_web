@@ -14,9 +14,4 @@ class InstructorFichaDias extends Model
     {
         return $this->belongsTo(InstructorFicha::class);
     }
-
-    public function parametrosTema(): BelongsToMany
-    {
-        return $this->belongsToMany(Parametro::class, 'dia_id');
-    }
 }

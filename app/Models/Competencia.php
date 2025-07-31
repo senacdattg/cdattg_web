@@ -21,11 +21,16 @@ class Competencia extends Model
         'user_edit_id',
     ];
 
-    public function competenciaActual()
+    public function resultadosCompetencia()
     {
-        foreach ($this->competencia() as $competencia) {
-            if ($competencia->fecha_inicio <= now() && $competencia->fecha_fin >= now()) {
-                return $competencia;
+        return $this->hasMany(ResultadosCompetencia::class);
+    }
+
+    public function rapActual()
+    {
+        foreach ($this->resultadosCompetencia as $rap) {
+            if ($rap->rap->fecha_inicio <= now() && $rap->rap->fecha_fin >= now()) {
+                return $rap->rap;
             }
         }
         return null;

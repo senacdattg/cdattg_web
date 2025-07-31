@@ -58,38 +58,23 @@
                             class="card h-100 shadow-sm border-0 rounded-lg overflow-hidden transition-all hover:shadow-lg">
                             <div class="card-header bg-gradient-primary text-white py-3">
                                 <div class="d-flex align-items-center">
-                                    <i class="fas fa-clipboard-list fa-lg mr-2"></i>
-                                    <h3 class="card-title mb-0 font-weight-bold">FICHA {{ $caracterizacion->ficha->ficha }}
+                                    <i class="fas fa-book fa-lg mr-2"></i>
+                                    <h3 class="card-title mb-0 font-weight-bold">{{ $caracterizacion->ficha->ficha }} -
+                                        {{ $caracterizacion->ficha->programaFormacion->nombre }}
                                     </h3>
                                 </div>
                             </div>
                             <div class="card-body py-3">
-                                <div class="mb-3">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="fas fa-book text-primary mr-2"></i>
-                                        <h6 class="mb-0"><b>Programa:</b></h6>
-                                    </div>
-                                    <p class="ml-4 text-muted">{{ $caracterizacion->ficha->programaFormacion->nombre }}</p>
-                                </div>
                                 @php
                                     $proximaClaseFormacion = $caracterizacion->obtenerProximaClase();
                                 @endphp
                                 <div class="mb-3">
                                     <div class="d-flex align-items-center mb-2">
-                                        <i class="far fa-clock text-primary mr-2"></i>
-                                        <h6 class="mb-0"><b>Jornada:</b></h6>
-                                    </div>
-                                    <p class="ml-4 text-muted">{{ $caracterizacion->ficha->jornadaFormacion->jornada }}
-                                        ({{ Carbon\Carbon::parse($proximaClaseFormacion['hora_inicio'])->format('g:i A') }} -
-                                        {{ Carbon\Carbon::parse($proximaClaseFormacion['hora_fin'])->format('g:i A') }})
-                                    </p>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="d-flex align-items-center mb-2">
                                         <i class="fas fa-tasks text-primary mr-2"></i>
                                         <h6 class="mb-0"><b>Competencia:</b></h6>
                                     </div>
-                                    <p class="ml-4 text-muted">{{ $caracterizacion->ficha->programaFormacion->competenciaActual()->nombre ?? 'No asignada' }}
+                                    <p class="ml-4 text-muted">
+                                        {{ $caracterizacion->ficha->programaFormacion->competenciaActual()->nombre ?? 'No asignada' }}
                                     </p>
                                 </div>
                                 <div class="mb-3">
@@ -97,7 +82,40 @@
                                         <i class="fas fa-list-ol text-primary mr-2"></i>
                                         <h6 class="mb-0"><b>RAP:</b></h6>
                                     </div>
-                                    <p class="ml-4 text-muted">{{ $caracterizacion->rap->descripcion ?? 'No asignado' }}</p>
+                                    <p class="ml-4 text-muted">
+                                        {{ $caracterizacion->ficha->programaFormacion->competenciaActual()->rapActual()->nombre ?? 'No asignado' }}
+                                    </p>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="far fa-clock text-primary mr-2"></i>
+                                        <h6 class="mb-0"><b>Jornada:</b></h6>
+                                    </div>
+                                    <p class="ml-4 text-muted">{{ $caracterizacion->ficha->jornadaFormacion->jornada }}
+                                    </p>
+                                </div>
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <i class="far fa-calendar-alt text-primary mr-2"></i>
+                                        <h6 class="mb-0"><b>Horario de formación:</b></h6>
+                                        <p class="ml-1 mb-0 text-muted">
+                                            {{ Carbon\Carbon::parse($proximaClaseFormacion['hora_inicio'])->format('g:i A') }}
+                                            -
+                                            {{ Carbon\Carbon::parse($proximaClaseFormacion['hora_fin'])->format('g:i A') }}
+                                        </p>
+                                    </div>
+                                    <?php
+                                        $dias = $caracterizacion->instructorFichaDias;
+                                        $proximoDiaFormacion = $caracterizacion->obtenerProximaClase();
+                                    ?>
+                                    <div class="d-flex ml-4" style="gap: 0.5rem;">
+                                        @foreach ($dias as $dia)
+                                            <div class="border rounded text-center px-2 py-1"
+                                                style="min-width: 60px; background: {{ ($dia->dia_id == $proximoDiaFormacion['dia_id']) ? '#007bff' : '#f8f9fa' }}; color: {{ ($dia->dia_id == $proximoDiaFormacion['dia_id']) ? '#fff' : '#6c757d' }};">
+                                                {{ substr($diasFormacion[$dia->dia_id], 0, 3) }}
+                                            </div>
+                                        @endforeach
+                                    </div>
                                 </div>
                                 <div class="mb-3">
                                     <div class="d-flex align-items-center mb-2">
@@ -105,7 +123,7 @@
                                         <h6 class="mb-0"><b>Lugar de formación:</b></h6>
                                     </div>
                                     <div class="d-flex align-items-center ml-4 text-muted" style="gap: 0.5rem;">
-                                        <span>Centro: {{ $caracterizacion->centro->nombre ?? '' }}</span>
+                                        <span>Centro: {{ $caracterizacion->ficha->nombre ?? '' }}</span>
                                         <i class="fas fa-arrow-right"></i>
                                         <span>Sede: {{ $caracterizacion->sede->nombre ?? '' }}</span>
                                         <i class="fas fa-arrow-right"></i>
@@ -115,32 +133,6 @@
                                         <i class="fas fa-arrow-right"></i>
                                         <span>Ambiente: {{ $caracterizacion->ambiente->nombre ?? '' }}</span>
                                     </div>
-                                </div>
-                                <div class="mb-3">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <i class="far fa-calendar-alt text-primary mr-2"></i>
-                                        <h6 class="mb-0"><b>Horario:</b></h6>
-                                    </div>
-                                    {{-- @foreach ($diasFormacion as $diaFormacion)
-                                        <div class="d-flex align-items-center mb-2">
-                                            <i class="far fa-clock text-primary mr-2"></i>
-                                            <h6 class="mb-0"><b>Horario:</b></h6>
-                                        </div>
-                                        <p class="ml-4 text-muted">{{ \Carbon\Carbon::parse($diaFormacion->hora_inicio)->format('g:i A') }} - {{ \Carbon\Carbon::parse($diaFormacion->hora_fin)->format('g:i A') }}</p>
-                                    @endforeach
-                                    --}}
-                                    {{--
-                                    <div class="d-flex ml-4" style="gap: 0.5rem;">
-                                        @foreach ($dias as $dia)
-                                            <div
-                                                class="border rounded text-center px-2 py-1"
-                                                style="min-width: 40px; background: {{ in_array($dia, $diasFormacion) ? '#007bff' : '#f8f9fa' }}; color: {{ in_array($dia, $diasFormacion) ? '#fff' : '#6c757d' }};"
-                                            >
-                                                {{ substr($dia, 0, 3) }}
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                    --}}
                                 </div>
                             </div>
                             <div class="card-footer bg-white border-top-0 pt-0 pb-3">

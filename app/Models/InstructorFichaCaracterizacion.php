@@ -88,6 +88,7 @@ class InstructorFichaCaracterizacion extends Model
                 'hora_inicio' => $claseHoy->hora_inicio,
                 'hora_fin' => $claseHoy->hora_fin,
                 'dia_nombre' => $this->obtenerNombreDia($claseHoy->dia_id),
+                'dia_id' => $clase->dia_id,
                 'fecha_proxima' => $horaActual->format('Y-m-d'),
                 'es_hoy' => true
             ];
@@ -120,6 +121,7 @@ class InstructorFichaCaracterizacion extends Model
                     'hora_inicio' => $clase->hora_inicio,
                     'hora_fin' => $clase->hora_fin,
                     'dia_nombre' => $this->obtenerNombreDia($clase->dia_id),
+                    'dia_id' => $clase->dia_id,
                     'fecha_proxima' => $fechaProxima->format('Y-m-d'),
                     'es_hoy' => false,
                     'dias_restantes' => $i
@@ -136,13 +138,13 @@ class InstructorFichaCaracterizacion extends Model
     private function obtenerNombreDia($diaId)
     {
         $dias = [
-            12 => 'Lunes',
-            13 => 'Martes',
-            14 => 'Miércoles',
-            15 => 'Jueves',
-            16 => 'Viernes',
-            17 => 'Sábado',
-            18 => 'Domingo'
+            12 => 'LUNES',
+            13 => 'MARTES',
+            14 => 'MIERCOLES',
+            15 => 'JUEVES',
+            16 => 'VIERNES',
+            17 => 'SÁBADO',
+            18 => 'DDOMINGO'
         ];
 
         return $dias[$diaId] ?? 'Desconocido';

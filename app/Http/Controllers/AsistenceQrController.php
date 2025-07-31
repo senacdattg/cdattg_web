@@ -39,9 +39,17 @@ class AsistenceQrController extends Controller
             return response()->json(['message' => 'El instructor no tiene fichas de caracterización asignadas'], 404);
         }
 
+        $diasFormacion = [
+            12 => 'LUNES',
+            13 => 'MARTES',
+            14 => 'MIERCOLES',
+            15 => 'JUEVES',
+            16 => 'VIERNES',
+            17 => 'SÁBADO',
+            18 => 'DDOMINGO'
+        ];
 
-
-        return view('qr_asistence.caracter_selecter', compact('caracterizaciones', 'persona'));
+        return view('qr_asistence.caracter_selecter', compact('caracterizaciones', 'persona', 'diasFormacion'));
     }
 
     /**
