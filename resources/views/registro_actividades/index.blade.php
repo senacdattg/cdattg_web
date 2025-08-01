@@ -39,10 +39,13 @@
                         <div class="col">
                             <div class="card border-0 shadow-sm">
                                 <div class="card-body d-flex align-items-center">
-                                    <i class="fas fa-fw fa-book text-primary me-2 d-none d-sm-inline-block" style="font-size: 1.25rem;"></i>
+                                    <i class="fas fa-fw fa-book text-primary me-2 d-none d-sm-inline-block"
+                                        style="font-size: 1.25rem;"></i>
                                     <div class="d-flex flex-column">
                                         <span class="text-dark d-block">Ficha de formación:</span>
-                                        <span class="badge bg-primary text-wrap text-start w-100" style="white-space: normal !important;">{{ $caracterizacion->ficha->ficha }} - {{ $caracterizacion->ficha->programaFormacion->nombre }}</span>
+                                        <span class="badge bg-primary text-wrap text-start w-100"
+                                            style="white-space: normal !important;">{{ $caracterizacion->ficha->ficha }} -
+                                            {{ $caracterizacion->ficha->programaFormacion->nombre }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -50,10 +53,12 @@
                         <div class="col">
                             <div class="card border-0 shadow-sm">
                                 <div class="card-body d-flex align-items-center">
-                                    <i class="fas fa-fw fa-crown text-primary me-2 d-none d-sm-inline-block" style="font-size: 1.25rem;"></i>
+                                    <i class="fas fa-fw fa-crown text-primary me-2 d-none d-sm-inline-block"
+                                        style="font-size: 1.25rem;"></i>
                                     <div class="d-flex flex-column">
                                         <span class="text-dark d-block">Competencia:</span>
-                                        <span class="badge bg-primary text-wrap text-start w-100" style="white-space: normal !important;">{{ $caracterizacion->ficha->programaFormacion->competenciaActual()->nombre }}</span>
+                                        <span class="badge bg-primary text-wrap text-start w-100"
+                                            style="white-space: normal !important;">{{ $caracterizacion->ficha->programaFormacion->competenciaActual()->nombre }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -61,10 +66,12 @@
                         <div class="col">
                             <div class="card border-0 shadow-sm">
                                 <div class="card-body d-flex align-items-center">
-                                    <i class="fas fa-fw fa-graduation-cap text-primary me-2 d-none d-sm-inline-block" style="font-size: 1.25rem;"></i>
+                                    <i class="fas fa-fw fa-graduation-cap text-primary me-2 d-none d-sm-inline-block"
+                                        style="font-size: 1.25rem;"></i>
                                     <div class="d-flex flex-column">
                                         <span class="text-dark d-block">Resultado de aprendizaje:</span>
-                                        <span class="badge bg-primary text-wrap text-start w-100" style="white-space: normal !important;">{{ $caracterizacion->ficha->programaFormacion->competenciaActual()->rapActual()->nombre }}</span>
+                                        <span class="badge bg-primary text-wrap text-start w-100"
+                                            style="white-space: normal !important;">{{ $caracterizacion->ficha->programaFormacion->competenciaActual()->rapActual()->nombre }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -107,10 +114,12 @@
                             @php
                                 $totalActividades = $actividades->count();
                                 $totalPendientes = $actividades->where('id_estado', 'PENDIENTE')->count();
-                                $porcentajePendiente = $totalActividades > 0 ? ($totalPendientes / $totalActividades) * 100 : 0;
+                                $porcentajePendiente =
+                                    $totalActividades > 0 ? ($totalPendientes / $totalActividades) * 100 : 0;
                                 $porcentajePendiente = number_format($porcentajePendiente, 2);
                                 $totalEnCurso = $actividades->where('id_estado', 'EN CURSO')->count();
-                                $porcentajeEnCurso = $totalActividades > 0 ? ($totalEnCurso / $totalActividades) * 100 : 0;
+                                $porcentajeEnCurso =
+                                    $totalActividades > 0 ? ($totalEnCurso / $totalActividades) * 100 : 0;
                                 $porcentajeEnCurso = number_format($porcentajeEnCurso, 2);
                             @endphp
                             <h6 class="text-uppercase text-muted small mb-1">PENDIENTES</h6>
@@ -142,7 +151,8 @@
                             @php
                                 $totalActividades = $actividades->count();
                                 $totalCompletadas = $actividades->where('id_estado', 'COMPLETADO')->count();
-                                $porcentajeCompletado = $totalActividades > 0 ? ($totalCompletadas / $totalActividades) * 100 : 0;
+                                $porcentajeCompletado =
+                                    $totalActividades > 0 ? ($totalCompletadas / $totalActividades) * 100 : 0;
                                 $porcentajeCompletado = number_format($porcentajeCompletado, 2);
                             @endphp
                             <h6 class="text-uppercase text-muted small mb-1">Completadas</h6>
@@ -156,7 +166,8 @@
                                 <div class="progress-bar bg-success" style="width: {{ $porcentajeCompletado }}%"></div>
                             </div>
                             <p class="small text-muted mt-2 mb-0">
-                                <i class="far fa-calendar-check me-1"></i> {{ $porcentajeCompletado }}% completadas esta semana
+                                <i class="far fa-calendar-check me-1"></i> {{ $porcentajeCompletado }}% completadas esta
+                                semana
                             </p>
                         </div>
                     </div>
@@ -391,6 +402,61 @@
         .badge {
             font-size: 0.9em;
             padding: 0.5em 0.8em;
+        }
+
+        /* Ensure dropdown menus appear above other elements */
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            z-index: 9999 !important;
+            position: fixed !important;
+            /* Changed from absolute to fixed */
+            margin: 0;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+            max-height: none !important;
+            overflow: visible !important;
+        }
+
+        /* Reset any transform on the dropdown */
+        .dropdown-menu.show {
+            transform: none !important;
+            top: auto !important;
+            left: auto !important;
+            right: auto !important;
+            bottom: auto !important;
+        }
+
+        /* Make sure dropdown is not constrained by parent overflow */
+        .activity-card,
+        .card,
+        .card-body,
+        .col-12,
+        .row,
+        [class*="col-"],
+        .content-wrapper,
+        .content {
+            overflow: visible !important;
+            position: static !important;
+        }
+
+        /* Ensure dropdown items are properly displayed */
+        .dropdown-item {
+            white-space: normal;
+            word-wrap: break-word;
+            padding: 0.5rem 1.5rem;
+        }
+
+        /* Fix for Bootstrap's default dropdown behavior */
+        .btn-group {
+            position: static;
+        }
+
+        /* Ensure the dropdown menu is positioned correctly */
+        .dropdown-toggle::after {
+            vertical-align: middle;
         }
     </style>
 @stop
