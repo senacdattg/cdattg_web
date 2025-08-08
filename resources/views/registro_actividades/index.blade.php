@@ -305,34 +305,20 @@
                                 <div class="col-lg-4 mt-4 mt-lg-0">
                                     <div class="d-flex flex-column h-100">
                                         @if ($actividad['id_estado'] == 'PENDIENTE' || $actividad['id_estado'] == 'EN CURSO')
-                                            <a class="btn btn-primary btn-block mb-3"
+                                            <a class="btn btn-success btn-block mb-1"
                                                 href="{{ route('asistence.caracterSelected', ['id' => $caracterizacion->id]) }}">
                                                 <i class="fas fa-clipboard-check"></i> Tomar Asistencia
                                             </a>
 
-                                            <div class="dropdown mb-3">
-                                                <button class="btn btn-outline-secondary btn-block dropdown-toggle"
-                                                    type="button" id="dropdownMenuButton" data-toggle="dropdown"
-                                                    aria-haspopup="true" aria-expanded="false">
-                                                    <i class="fas fa-ellipsis-h"></i> Más opciones
-                                                </button>
-                                                <div class="dropdown-menu w-100" aria-labelledby="dropdownMenuButton">
-                                                    <a class="dropdown-item" href="#">
-                                                        <i class="fas fa-edit text-primary mr-2"></i> Editar Actividad
-                                                    </a>
-                                                    <a class="dropdown-item" href="#">
-                                                        <i class="fas fa-file-export text-info mr-2"></i> Exportar Lista
-                                                    </a>
-                                                    <a class="dropdown-item" href="#">
-                                                        <i class="fas fa-envelope text-success mr-2"></i> Enviar
-                                                        Recordatorio
-                                                    </a>
-                                                    <div class="dropdown-divider"></div>
-                                                    <a class="dropdown-item text-danger" href="#">
-                                                        <i class="fas fa-trash-alt mr-2"></i> Cancelar Actividad
-                                                    </a>
-                                                </div>
-                                            </div>
+                                            <a class="btn btn-primary btn-block mb-1"
+                                                href="{{ route('asistence.caracterSelected', ['id' => $caracterizacion->id]) }}">
+                                                <i class="fas fa-edit"></i> Editar Actividad
+                                            </a>
+
+                                            <a class="btn btn-danger btn-block mb-1"
+                                                href="{{ route('asistence.caracterSelected', ['id' => $caracterizacion->id]) }}">
+                                                <i class="fas fa-trash-alt"></i> Cancelar Actividad
+                                            </a>
                                         @else
                                             <button class="btn btn-outline-secondary btn-block mb-3" disabled>
                                                 <i class="fas fa-check-circle"></i> Asistencia Registrada

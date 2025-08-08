@@ -43,6 +43,6 @@ class GuiasAprendizaje extends Model
     {
         return $this->belongsToMany(Evidencias::class, 'evidencia_guia_aprendizaje', 'guia_aprendizaje_id', 'evidencia_id')
                     ->withPivot('user_create_id', 'user_edit_id')
-                    ->withTimestamps();
+                    ->withTimestamps()->orderBy('fecha_evidencia', 'asc');
     }
 }

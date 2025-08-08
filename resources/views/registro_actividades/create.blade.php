@@ -1,12 +1,5 @@
 <form method="POST" action="{{ route('registro-actividades.store', $caracterizacion) }}" class="row g-2">
     @csrf
-    <div class="col-md-12">
-        <div class="form-group">
-            <label class="form-label fw-bold">Nombre de la actividad</label>
-            <input type="text" name="nombre" value="{{ old('nombre') }}" class="form-control" placeholder="Ingrese el nombre">
-        </div>
-    </div>
-
     <!-- Información del RAP actual -->
     <div class="col-md-12 mb-3">
         <div class="card border-warning shadow-sm">
@@ -39,6 +32,13 @@
                     </div>
                 @endif
             </div>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="form-group">
+            <label class="form-label fw-bold">Nombre de la actividad</label>
+            <input type="text" name="nombre" value="{{ old('nombre') }}" class="form-control" placeholder="Ingrese el nombre">
         </div>
     </div>
 
