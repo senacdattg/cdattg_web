@@ -25,7 +25,7 @@ class StoreRegistroActividadesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nombre' => 'required|string|max:255',
+            'nombre' => 'required|string|unique:evidencias|max:255',
             'fecha_evidencia' => [
                 'required',
                 'date',
@@ -44,6 +44,7 @@ class StoreRegistroActividadesRequest extends FormRequest
         return [
             'nombre.required' => 'El nombre de la actividad es obligatorio.',
             'nombre.string' => 'El nombre de la actividad debe ser una cadena de texto.',
+            'nombre.unique' => 'El nombre de la actividad ya existe. Por favor, elige otro nombre.',
             'nombre.max' => 'El nombre de la actividad debe tener un máximo de 255 caracteres.',
             'fecha_evidencia.required' => 'La fecha de la actividad es obligatoria.',
             'fecha_evidencia.date' => 'La fecha de la actividad debe ser una fecha válida.',

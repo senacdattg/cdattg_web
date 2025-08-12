@@ -238,7 +238,7 @@
                                     <div>
                                         <h5 class="mb-0 text-white">{{ $actividad['nombre'] }}</h5>
                                         <div class="text-white-50">
-                                            <i class="far fa-hashtag"></i> {{ $actividad['codigo'] }}
+                                            <i class="far fa-hashtag"></i> EV-{{ $loop->iteration}}
                                         </div>
                                     </div>
                                 </div>

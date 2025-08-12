@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('evidencias', function (Blueprint $table) {
             $table->id();
-            $table->string('codigo', 50)->unique()->nullable(false);
-            $table->string('nombre', 255)->nullable(false);
+            $table->string('nombre', 255)->unique()->nullable(false);
             $table->foreignId('user_create_id')->nullable()->constrained('users');
             $table->foreignId('user_edit_id')->nullable()->constrained('users');
             $table->timestamps();

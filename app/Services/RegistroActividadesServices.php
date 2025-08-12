@@ -57,27 +57,6 @@ class RegistroActividadesServices
         $competenciaActual = $programaFormacion->competenciaActual();
     }
 
-    public function generateCodigo(InstructorFichaCaracterizacion $instructorFichaCaracterizacion)
-    {
-
-        $codigo = '';
-
-        $caracterizacion = $this->fichaCaracterizacionRepository->getFichaCaracterizacion($instructorFichaCaracterizacion->ficha_id);
-        $programaFormacion = $caracterizacion->programaFormacion;
-        $competenciaActual = $programaFormacion->competenciaActual();
-        $rapActual = $competenciaActual->rapActual();
-        $guiaAprendizaje = $rapActual->guiasAprendizaje->first();
-        $ultimaEvidenciaGuia = $this->evidenciaRepository->getUltimaEvidencia($guiaAprendizaje->id);
-        if ($ultimaEvidenciaGuia){
-            $numeroCodigoGuiaAprendizaje = obtener_numero_evidencia($ultimaEvidenciaGuia->codigo) + 1;
-            $codigo = 'EV-'.$numeroCodigoGuiaAprendizaje;
-        } else {
-            $codigo = 'EV-1';
-        }
-
-        return $codigo;
-    }
-
     public function crearEvidencia($data, InstructorFichaCaracterizacion $caracterizacion)
     {
         $caracterizacion = $this->fichaCaracterizacionRepository->getFichaCaracterizacion($caracterizacion->ficha_id);

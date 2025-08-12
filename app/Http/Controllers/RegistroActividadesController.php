@@ -44,10 +44,8 @@ class RegistroActividadesController extends Controller
      */
     public function store(StoreRegistroActividadesRequest $request, InstructorFichaCaracterizacion $caracterizacion)
     {
-            $codigo = $this->registroActividadesServices->generateCodigo($caracterizacion);
             $fecha_evidencia = $request->fecha_evidencia;
             $data = [
-                'codigo' => $codigo,
                 'nombre' => $request->nombre,
                 'fecha_evidencia' => $request->fecha_evidencia,
                 'id_estado' => 25,
