@@ -263,6 +263,7 @@ document.addEventListener('DOMContentLoaded', function() {
         diasFormacion: @json($caracterizacion->instructorFichaDias->pluck('dia_id')->toArray()),
         fechaFinRap: @json($caracterizacion->ficha->programaFormacion->competenciaActual()->rapActual()?->fecha_fin),
         fechaHoy: '{{ \Carbon\Carbon::now()->format('Y-m-d') }}',
+        actividades: @json($actividades),
         maxIntentosBusqueda: 365
     };
 
@@ -274,7 +275,8 @@ document.addEventListener('DOMContentLoaded', function() {
         mesActual: document.getElementById('mes-actual'),
         selectedDate: null,
         currentMonth: new Date().getMonth(),
-        currentYear: new Date().getFullYear()
+        currentYear: new Date().getFullYear(),
+        fechasInvalidadas: []
     };
 
     // Mapeo de días de la semana
@@ -319,8 +321,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const esPasada = fecha < fechaHoy;
             const esDespuesRap = fechaFinRap && DateUtils.toDateString(fecha) > DateUtils.toDateString(fechaFinRap);
             const esDiaFormacion = DateUtils.esDiaFormacion(fecha);
+            const esFechaOcupada = CONFIG.actividades.some(actividad => 
+                DateUtils.toDateString(fecha) === DateUtils.toDateString(new Date(actividad.fecha_evidencia))
+            );
 
-            return !esPasada && !esDespuesRap && esDiaFormacion;
+            return !esPasada && !esDespuesRap && esDiaFormacion && !esFechaOcupada;
         },
 
         obtenerProximaFechaValida: (fechaInicial) => {
