@@ -15,7 +15,7 @@
         </div>
     @endif
 
-    <form action="{{ route('productos.store') }}" method="POST">
+    <form action="{{ route('productos.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
 
         <div class="mb-3">
@@ -53,6 +53,16 @@
         </div>
 
         <div class="mb-3">
+            <label for="cantidad" class="form-label">Cantidad</label>
+            <input type="number" name="cantidad" id="cantidad" class="form-control" value="{{ old('cantidad') }}" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="codigo_barras" class="form-label">Codigo de barras</label>
+            <input type="text" name="codigo_barras" id="codigo_barras" class="form-control" value="{{ old('codigo_barras') }}" required>
+        </div>
+
+        <div class="mb-3">
             <label for="estado_id" class="form-label">Estado</label>
             <select name="estado_id" id="estado_id" class="form-control" required>
                 <option value="">Seleccione...</option>
@@ -62,6 +72,11 @@
                     </option>
                 @endforeach
             </select>
+        </div>
+
+        <div class="mb-3">
+            <label for="imagen" class="form-label">Imágen</label>
+            <input type="file" name="imagen" id="imagen" class="form-control" required>
         </div>
 
         <button type="submit" class="btn btn-primary">Guardar</button>

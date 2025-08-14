@@ -18,7 +18,10 @@ class Producto extends Model
         'tipo_producto_id',
         'descripcion',
         'unidad_medida_id',
+        'cantidad',
+        'codigo_barras',
         'estado_id',
+        'imagen',
         'user_create_id',
         'user_update_id'
     ];

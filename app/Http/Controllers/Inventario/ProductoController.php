@@ -60,8 +60,17 @@ class ProductoController extends Controller
             'tipo_producto_id' => 'required|exists:parametros_temas,id',
             'descripcion' => 'required|string',
             'unidad_medida_id' => 'required|exists:parametros_temas,id',
+            'cantidad' => 'required|int',
+            'codigo_barras' => 'required|string',
             'estado_id' => 'required|exists:parametros_temas,id',
+            'imagen' => 'nullable|image|mimes:jpg,jpeg,png'
         ]);
+
+        if ($request->hasFile('imagen')){
+            $nombreArchivo = time() . '.' . $request->imagen->extension();
+            $request->imagen->move(public_path('img/inventario'), $nombreArchivo);
+            $validated['imagen'] = 'img/inventario' . $nombreArchivo;
+        }   
 
         $validated['user_create_id'] = Auth::id();
         $validated['user_update_id'] = Auth::id();
