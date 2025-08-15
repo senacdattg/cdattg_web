@@ -735,6 +735,57 @@ return [
                 ],
             ],
         ],
+        // Gestion de complementarios
+        [
+            'text' => 'Complementarios',
+            'icon' => 'fa-solid fa-folder-open',
+            'submenu' => [
+                [
+                    'text' => 'Gestion complementarios',
+                    'url' => 'programa',
+                    'icon' => 'fas fa-tasks',
+                    'can' => [
+                        'VER PROGRAMA DE CARACTERIZACION',
+                        'CREAR PROGRAMA DE CARACTERIZACION',
+                        'EDITAR PROGRAMA DE CARACTERIZACION',
+                        'ELIMINAR PROGRAMA DE CARACTERIZACION',
+                    ],
+                ],
+                [
+                    'text' => 'Gestion de aspirantes',
+                    'url' => 'programa',
+                    'icon' => 'fas fa-users',
+                    'can' => [
+                        'VER PROGRAMA DE CARACTERIZACION',
+                        'CREAR PROGRAMA DE CARACTERIZACION',
+                        'EDITAR PROGRAMA DE CARACTERIZACION',
+                        'ELIMINAR PROGRAMA DE CARACTERIZACION',
+                    ],
+                ],
+                [
+                    'text' => 'Estadisticas',
+                    'url' => 'fichaCaracterizacion',
+                    'icon' => 'fas fa-chart-line',
+                    'can' => [
+                        'VER PROGRAMA DE CARACTERIZACION',
+                        'CREAR PROGRAMA DE CARACTERIZACION',
+                        'EDITAR PROGRAMA DE CARACTERIZACION',
+                        'ELIMINAR PROGRAMA DE CARACTERIZACION',
+                    ],
+                ],
+                [
+                    'text' => 'Procesar documentos',
+                    'url' => 'programa',
+                    'icon' => 'fas fa-file-signature',
+                    'can' => [
+                        'VER PROGRAMA DE CARACTERIZACION',
+                        'CREAR PROGRAMA DE CARACTERIZACION',
+                        'EDITAR PROGRAMA DE CARACTERIZACION',
+                        'ELIMINAR PROGRAMA DE CARACTERIZACION',
+                    ]
+                ],
+            ],
+        ],
     ],
 
     /*
