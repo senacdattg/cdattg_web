@@ -1,5 +1,3 @@
-import Swal from 'sweetalert2';
-
 document.getElementById('imagen').addEventListener('change', function(e) {
     let reader = new FileReader();
     reader.onload = function(e) {
@@ -8,27 +6,24 @@ document.getElementById('imagen').addEventListener('change', function(e) {
     reader.readAsDataURL(this.files[0]);
 });
 
-if (document.querySelector('.alert-success')) {
-    Swal.fire({
-        icon: 'success',
-        title: '¡Éxito!',
-        text: document.querySelector('.alert-success').innerText,
-        timer: 2500,
-        showConfirmButton: false
-    });
-}
+// Validar cantidad máxima en el input del carrito
+document.addEventListener('DOMContentLoaded', function() {
+    const cantidadInput = document.getElementById('cantidad_carrito');
+    if (cantidadInput) {
+        cantidadInput.addEventListener('input', function() {
+            const max = parseInt(cantidadInput.max);
+            if (parseInt(cantidadInput.value) > max) {
+                cantidadInput.value = max;
+            }
+            if (parseInt(cantidadInput.value) < 1) {
+                cantidadInput.value = 1;
+            }
+        });
+    }
 
-document.querySelectorAll('.btn_carrito').forEach(btn => {
-    btn.addEventListener('mouseenter', () => btn.classList.add('animate__pulse'));
-    btn.addEventListener('mouseleave', () => btn.classList.remove('animate__pulse'));
+    // Animación en botones del carrito
+    document.querySelectorAll('.btn_carrito').forEach(btn => {
+        btn.addEventListener('mouseenter', () => btn.style.transform = 'scale(1.05)');
+        btn.addEventListener('mouseleave', () => btn.style.transform = 'scale(1)');
+    });
 });
-
-const cantidadInput = document.getElementById('cantidad_carrito');
-if (cantidadInput) {
-    cantidadInput.addEventListener('input', function() {
-        const max = parseInt(cantidadInput.max);
-        if (parseInt(cantidadInput.value) > max) {
-            cantidadInput.value = max;
-        }
-    });
-}
