@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DepartamentoController;
 use App\Http\Controllers\MunicipioController;
+use App\Http\Controllers\AsistenceQrController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -44,6 +45,8 @@ Route::middleware('auth')->group(function () {
             include_once $routeFile;
         }
     }
+
+    Route::post('/verify-document', [AsistenceQrController::class, 'verifyDocument'])->name('api.verifyDocument');
 });
 
 // Route::get('/perfil', [ProfileController::class, 'index'])->name('profile.index');
