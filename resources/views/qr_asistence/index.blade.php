@@ -129,6 +129,8 @@
                                     @csrf
                                     <input type="hidden" name="caracterizacion_id" id="ficha_caracterizacion_id"
                                         value="{{ $fichaCaracterizacion->id }}">
+                                    <input type="hidden" name="evidencia_id" id="evidencia_id"
+                                        value="{{ $evidencia->id }}">
                                 </form>
                                 <div class="qr-scanner-container rounded-lg border border-primary shadow-sm p-3"
                                     style="width: 100%; max-width: 350px;">

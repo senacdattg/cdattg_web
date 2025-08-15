@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use App\Services\AsistenceQrService;
 use App\Events\QrScanned;
+use App\Models\Evidencias;
 
 class AsistenceQrController extends Controller
 {
@@ -59,7 +60,7 @@ class AsistenceQrController extends Controller
      * @param int $id El ID de la caracterización.
      * @return \Illuminate\View\View La vista de selección de caracterización.
      */
-    public function caracterSelected(InstructorFichaCaracterizacion $caracterizacion)
+    public function caracterSelected(InstructorFichaCaracterizacion $caracterizacion,Evidencias $evidencia)
     {
         $fichaCaracterizacion = FichaCaracterizacion::with([
             'diasFormacion.dia',
@@ -67,6 +68,8 @@ class AsistenceQrController extends Controller
             'instructor.persona',
             'jornadaFormacion'
         ])->find($caracterizacion->id);
+
+        
 
         // Obtener el día de hoy (1 = Lunes, 7 = Domingo)
         $diaHoy = now()->dayOfWeek; // 0 = Domingo, 1 = Lunes, etc.
@@ -134,7 +137,7 @@ class AsistenceQrController extends Controller
             }
         }
 
-        return view('qr_asistence.index', compact('caracterizacion', 'fichaCaracterizacion', 'aprendizPersonaConAsistencia', 'horarioHoy'));
+        return view('qr_asistence.index', compact('caracterizacion', 'fichaCaracterizacion', 'aprendizPersonaConAsistencia', 'horarioHoy', 'evidencia'));
     }
 
 
@@ -506,13 +509,16 @@ class AsistenceQrController extends Controller
      */
     public function verifyDocument(Request $request)
     {
+        
         $request->validate([
             'numero_documento' => 'required|string',
-            'ficha_id' => 'required|integer|exists:fichas_caracterizacion,id', // ID de FichaCaracterizacion
+            'ficha_id' => 'required|integer|exists:fichas_caracterizacion,id',
+            'evidencia_id' => 'required|integer|exists:evidencias,id', // Asegúrate de que la evidencia_id sea requerida y válida
         ]);
 
         $numeroDocumento = $request->input('numero_documento');
         $fichaId = $request->input('ficha_id');
+        $evidenciaId = $request->input('evidencia_id'); // Obtener el ID de la evidencia del request
         $fechaActual = Carbon::now()->format('Y-m-d');
         $horaIngreso = Carbon::now()->format('H:i:s');
 
@@ -622,6 +628,7 @@ class AsistenceQrController extends Controller
             $asistencia = AsistenciaAprendiz::create([
                 'instructor_ficha_id' => $instructorFichaId,
                 'aprendiz_ficha_id' => $aprendizFichaId,
+                'evidencia_id' => $evidenciaId, // Asignar el ID de la evidencia
                 'hora_ingreso' => $horaIngreso,
                 'hora_salida' => null,
             ]);

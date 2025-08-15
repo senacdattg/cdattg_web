@@ -306,7 +306,7 @@
                                     <div class="d-flex flex-column h-100">
                                         @if ($actividad['id_estado'] == 'PENDIENTE' || $actividad['id_estado'] == 'EN CURSO')
                                             <a class="btn btn-success btn-block mb-1"
-                                                href="{{ route('asistence.caracterSelected', ['caracterizacion' => $caracterizacion]) }}">
+                                                href="{{ route('asistence.caracterSelected', [$caracterizacion, $actividad]); }}">
                                                 <i class="fas fa-clipboard-check"></i> Tomar Asistencia
                                             </a>
 
