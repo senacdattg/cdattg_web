@@ -108,5 +108,47 @@ class TemaSeeder extends Seeder
             $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
         }
         $tema->parametros()->sync($syncData);
+
+        // Tema 8: TIPOS DE PRODUCTO
+        $tema = Tema::create([
+            'id'             => 8,
+            'name'           => 'TIPOS DE PRODUCTO',
+            'status'         => 1,
+            'user_create_id' => 1,
+            'user_edit_id'   => 1,
+        ]);
+        $syncData = [];
+        foreach ([28, 29] as $id) {
+            $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
+        }
+        $tema->parametros()->sync($syncData);
+
+        // Tema 9: UNIDADES DE MEDIDA
+        $tema = Tema::create([
+            'id'             => 9,
+            'name'           => 'UNIDADES DE MEDIDA',
+            'status'         => 1,
+            'user_create_id' => 1,
+            'user_edit_id'   => 1,
+        ]);
+        $syncData = [];
+        foreach ([30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40] as $id) {
+            $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
+        }
+        $tema->parametros()->sync($syncData);
+
+        // Tema 10: ESTADOS DE PRODUCTO
+        $tema = Tema::create([
+            'id'             => 10,
+            'name'           => 'ESTADOS DE PRODUCTO',
+            'status'         => 1,
+            'user_create_id' => 1,
+            'user_edit_id'   => 1,
+        ]);
+        $syncData = [];
+        foreach ([41, 42] as $id) {
+            $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
+        }
+        $tema->parametros()->sync($syncData);
     }
 }
