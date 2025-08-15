@@ -85,7 +85,8 @@ class ProductoController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $producto = Producto::with(['tipoProducto', 'unidadMedida', 'estado'])->findOrFail($id);
+        return view('inventario.productos.show', compact('producto'));
     }
 
     /**
