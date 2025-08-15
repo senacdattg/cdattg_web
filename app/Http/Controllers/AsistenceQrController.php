@@ -28,6 +28,7 @@ class AsistenceQrController extends Controller
     public function __construct(AsistenceQrService $asistenceQrService)
     {
         $this->asistenceQrService = $asistenceQrService;
+        $this->middleware('auth');
     }
 
     /**
