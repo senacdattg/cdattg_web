@@ -49,15 +49,6 @@
                             </h5>
                         </div>
                         <div class="card-body bg-light">
-                            <div class="card-body">
-                                    <label for="actividad" class="form-label ">Indique la actividad del día</label>
-                                    <div class="input-group mb-3">
-                                        <input type="text" class="form-control" name="actividad"
-                                            placeholder="Ej: Clase de Programación" aria-label="actividad"
-                                            autocomplete="off" required>
-                                    </div>
-                            </div>
-                            <hr>
                             <div class="mb-3">
                                 <a href="{{ route('asistence.caracterSelected', ['id' => $fichaCaracterizacion->id]) }}" class="btn btn-primary">
                                     Ir a la página de selección de caracterización
