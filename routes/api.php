@@ -78,6 +78,4 @@ Route::middleware('auth:sanctum')->group(function(){
 route::post('authenticate', [LoginController::class, 'authenticate']);
 route::post('logout', [LogoutController::class, 'logout']);
 
-// Nueva ruta para verificar el documento por QR
-Route::post('/verify-document', [AsistenceQrController::class, 'verifyDocument'])->name('api.verifyDocument');
 

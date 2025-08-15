@@ -48,9 +48,14 @@
                         </select>
                     </div>
 
+                    
+
                     <div class="col-md-6 mb-3">
-                        <label for="descripcion" class="form-label">Descripción</label>
-                        <input name="descripcion" id="descripcion" class="form-control form-control-sm" value="{{ old('descripcion') }}" required>
+                        <label for="peso" class="form-label">Peso</label>
+                        <input type="number" name="peso" id="peso" 
+                            class="form-control form-control-sm" 
+                            value="{{ old('peso') }}" 
+                            step="0.01" min="0" required>
                     </div>
 
                     <div class="col-md-6 mb-3">
@@ -90,6 +95,13 @@
                     <div class="col-md-6 mb-3">
                         <label for="imagen" class="form-label">Imagen</label>
                         <input type="file" name="imagen" id="imagen" class="form-control form-control-sm">
+                    </div>
+
+                    <div class="col-md-6 mb-3 descripcion-container">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea name="descripcion" id="descripcion" 
+                                class="form-control form-control-sm" 
+                                rows="4" required>{{ old('descripcion') }}</textarea>
                     </div>
 
                     <div class="col-12 btn-container">

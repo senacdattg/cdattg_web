@@ -17,10 +17,11 @@ class Producto extends Model
         'producto',
         'tipo_producto_id',
         'descripcion',
+        'peso',
         'unidad_medida_id',
         'cantidad',
         'codigo_barras',
-        'estado_id',
+        'estado_producto_id',
         'imagen',
         'user_create_id',
         'user_update_id'
@@ -38,7 +39,7 @@ class Producto extends Model
 
     public function estado()
     {
-        return $this->belongsTo(ParametroTema::class, 'estado_id');
+        return $this->belongsTo(ParametroTema::class, 'estado_producto_id');
     }
     
     public function creador()

@@ -33,17 +33,17 @@ class ProductoController extends Controller
     public function create()
     {
         $tiposProductos = ParametroTema::with(['parametro','tema'])
-            ->whereHas('tema', fn($q) => $q->where('name', 'TIPO DE PRODUCTO'))
+            ->whereHas('tema', fn($q) => $q->where('name', 'TIPOS DE PRODUCTO'))
             ->where('status', 1)
             ->get();
 
         $unidadesMedida = ParametroTema::with(['parametro','tema'])
-            ->whereHas('tema', fn($q) => $q->where('name', 'UNIDAD DE MEDIDA'))
+            ->whereHas('tema', fn($q) => $q->where('name', 'UNIDADES DE MEDIDA'))
             ->where('status', 1)
             ->get();
 
         $estados = ParametroTema::with(['parametro','tema'])
-            ->whereHas('tema', fn($q) => $q->where('name', 'ESTADOS'))
+            ->whereHas('tema', fn($q) => $q->where('name', 'ESTADOS DE PRODUCTO'))
             ->where('status', 1)
             ->get();
 
@@ -59,10 +59,11 @@ class ProductoController extends Controller
             'producto' => 'required|unique:productos',
             'tipo_producto_id' => 'required|exists:parametros_temas,id',
             'descripcion' => 'required|string',
+            'peso' => 'required|numeric|min:0',
             'unidad_medida_id' => 'required|exists:parametros_temas,id',
-            'cantidad' => 'required|int',
+            'cantidad' => 'required|integer|min:0',
             'codigo_barras' => 'required|string',
-            'estado_id' => 'required|exists:parametros_temas,id',
+            'estado_producto_id' => 'required|exists:parametros_temas,id',
             'imagen' => 'nullable|image|mimes:jpg,jpeg,png'
         ]);
 
