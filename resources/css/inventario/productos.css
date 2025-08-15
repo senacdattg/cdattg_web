@@ -1,0 +1,50 @@
+.inventario-img-box {
+    width: 150px !important;
+    height: 150px !important;
+    border: 2px dashed #ccc;
+    background-color: #fafafa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.inventario-img-box img {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain;
+}
+/* Cambiar el color del navbar */
+.productos-page .main-header.navbar {
+    background-color: #00041D !important;
+}
+
+.productos-page .main-header.navbar .nav-link {
+    color: white !important;
+}
+
+.productos-page .main-header.navbar .nav-link:hover {
+    color: #FFD700 !important;
+}
+/* Bajar la imagen */
+.inventario-container .inventario-img-box {
+    margin-top: 180px; 
+}
+
+/* Bajar los campos del formulario */
+.inventario-container form {
+    margin-top: 100px; 
+}
+
+.productos-page .form-control {
+    border-radius: 50px; 
+}
+
+.productos-page .btn-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.productos-page .btn-container .btn {
+    margin: 0 20px;
+}
