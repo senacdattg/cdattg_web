@@ -30,7 +30,7 @@
             </div>
             <div class="show_img">
                 <img 
-                    src="{{ $producto->imagen ? asset('storage/'.$producto->imagen) : asset('img/inventario/1755214914.png') }}" 
+                    src="{{ $producto->imagen ? asset($producto->imagen) : asset('img/inventario/default.png') }}" 
                     alt="Imagen del producto" 
                     class="img-fluid rounded shadow"
                 >
