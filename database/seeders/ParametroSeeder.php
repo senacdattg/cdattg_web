@@ -62,19 +62,20 @@ class ParametroSeeder extends Seeder
             // Unidades de medida
             ['id' => 30, 'name' => 'GRAMOS', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 31, 'name' => 'LIBRAS', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-            ['id' => 32, 'name' => 'ARROBA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-            ['id' => 33, 'name' => 'QUINTAL', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-            ['id' => 34, 'name' => 'ONZA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-            ['id' => 35, 'name' => 'MILILITRO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-            ['id' => 36, 'name' => 'LITRO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-            ['id' => 37, 'name' => 'GALÓN', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-            ['id' => 38, 'name' => 'ONZA LÍQUIDA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-            ['id' => 39, 'name' => 'BARRIL', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-            ['id' => 40, 'name' => 'UNIDADES', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 32, 'name' => 'KILOGRAMOS', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 33, 'name' => 'ARROBA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 34, 'name' => 'QUINTAL', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 35, 'name' => 'ONZA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 36, 'name' => 'MILILITRO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 37, 'name' => 'LITRO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 38, 'name' => 'GALÓN', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 39, 'name' => 'ONZA LÍQUIDA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 40, 'name' => 'BARRIL', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 41, 'name' => 'UNIDADES', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             
             // Estados de producto
-            ['id' => 41, 'name' => 'DISPONIBLE', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-            ['id' => 42, 'name' => 'AGOTADO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 42, 'name' => 'DISPONIBLE', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 43, 'name' => 'AGOTADO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             
         ];
 
