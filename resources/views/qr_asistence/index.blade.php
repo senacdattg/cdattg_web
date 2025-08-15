@@ -50,7 +50,7 @@
                         </div>
                         <div class="card-body bg-light">
                             <div class="mb-3">
-                                <a href="{{ route('asistence.caracterSelected', ['id' => $fichaCaracterizacion->id]) }}" class="btn btn-primary">
+                                <a href="{{ route('registro-actividades.index', ['caracterizacion' => $caracterizacion]) }}" class="btn btn-primary">
                                     Ir a la página de selección de caracterización
                                 </a>
                             </div>

@@ -59,14 +59,14 @@ class AsistenceQrController extends Controller
      * @param int $id El ID de la caracterización.
      * @return \Illuminate\View\View La vista de selección de caracterización.
      */
-    public function caracterSelected($id)
+    public function caracterSelected(InstructorFichaCaracterizacion $caracterizacion)
     {
         $fichaCaracterizacion = FichaCaracterizacion::with([
             'diasFormacion.dia',
             'programaFormacion',
             'instructor.persona',
             'jornadaFormacion'
-        ])->find($id);
+        ])->find($caracterizacion->id);
 
         // Obtener el día de hoy (1 = Lunes, 7 = Domingo)
         $diaHoy = now()->dayOfWeek; // 0 = Domingo, 1 = Lunes, etc.
@@ -134,7 +134,7 @@ class AsistenceQrController extends Controller
             }
         }
 
-        return view('qr_asistence.index', compact('fichaCaracterizacion', 'aprendizPersonaConAsistencia', 'horarioHoy'));
+        return view('qr_asistence.index', compact('caracterizacion', 'fichaCaracterizacion', 'aprendizPersonaConAsistencia', 'horarioHoy'));
     }
 
 

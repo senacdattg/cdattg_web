@@ -306,17 +306,17 @@
                                     <div class="d-flex flex-column h-100">
                                         @if ($actividad['id_estado'] == 'PENDIENTE' || $actividad['id_estado'] == 'EN CURSO')
                                             <a class="btn btn-success btn-block mb-1"
-                                                href="{{ route('asistence.caracterSelected', ['id' => $caracterizacion->id]) }}">
+                                                href="{{ route('asistence.caracterSelected', ['caracterizacion' => $caracterizacion]) }}">
                                                 <i class="fas fa-clipboard-check"></i> Tomar Asistencia
                                             </a>
 
                                             <a class="btn btn-primary btn-block mb-1"
-                                                href="{{ route('asistence.caracterSelected', ['id' => $caracterizacion->id]) }}">
+                                                href="#">
                                                 <i class="fas fa-edit"></i> Editar Actividad
                                             </a>
 
                                             <a class="btn btn-danger btn-block mb-1"
-                                                href="{{ route('asistence.caracterSelected', ['id' => $caracterizacion->id]) }}">
+                                                href="#">
                                                 <i class="fas fa-trash-alt"></i> Cancelar Actividad
                                             </a>
                                         @else
