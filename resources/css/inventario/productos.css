@@ -29,6 +29,7 @@
 /* Bajar la imagen */
 .inventario-container .inventario-img-box {
     margin-top: 180px; 
+    border-radius: 15px;
 }
 
 /* Bajar los campos del formulario */
@@ -47,4 +48,276 @@
 
 .productos-page .btn-container .btn {
     margin: 0 20px;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/* Estilos para la sección de mostrar producto */
+.flex_show {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 1200px;
+    margin: 40px auto 0 auto;
+    padding: 20px;
+    background-color: #f3f3f7;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para la sección de acciones del carrito */
+.acciones_carrito {
+    flex: 1 1 30%;
+    max-width: 350px;
+    background-color: #f3f3f7;
+    border-radius: 15px;
+    margin: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Contenedor principal */
+.container_show {
+    flex: 1 1 60%;
+    max-width: 700px;
+    min-height: 350px;
+    background-color: #f3f3f7;
+    border-radius: 15px;
+    margin: 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 40px auto;
+    padding: 30px 50px;
+    width: 100%;
+    transition: box-shadow 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Efecto hover para el contenedor principal */
+.container_show:hover {
+    box-shadow: 0 8px 16px rgb(52 127 103 / 48%);
+}
+
+/* Contenedor para la información del producto */
+.div_show {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Información del producto */
+.show_info {
+    flex: 1;
+    margin-right: 20px;
+}
+
+/* Contenedor para la imagen del producto */
+.show_img {
+    flex: 0 0 160px;
+    height: 160px;
+    border: 2px solid  #4caf509e;
+    border-radius: 15px;
+    background-color: #e8f5e9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    margin-left: 10px;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.15);
+}
+
+/* Imagen del producto */
+.show_img img {
+    max-width: 95%;
+    max-height: 95%;
+    object-fit: cover;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(52, 127, 103, 0.18);
+    background: #fff;
+    border: 1px solid #c8e6c9;
+}
+
+/* Estilos para la lista de información del producto */
+.list-show {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Estilos para los elementos de la lista de información del producto */
+.list-show .list-group-item {
+    background: #f8f9fa;
+    border: none;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.07);
+    padding: 14px 22px;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    transition: box-shadow 0.2s;
+}
+
+/* Efecto para el hover en los elementos de la lista de información del producto */
+.list-show .list-group-item strong {
+    color: #388e3c;
+    min-width: 160px;
+    display: inline-block;
+    font-weight: 600;
+
+}
+
+/* Icono para los elementos de la lista de información del producto */
+.list-show .list-group-item i {
+    margin-right: 10px;
+    color: #4caf50;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.div_btn {
+    margin: 20px auto;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 200px;
+    border-radius: 9px;
+    background-color: #f9f9f900;
+    padding: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para los botones del contenedor */
+.div_btn .btn_show {
+    padding: 12px 16px;
+    border: none;
+    width: 100%;
+    max-width: 139px;
+    border-radius: 9px;
+    background-color: #4caf509e;
+    color: white !important;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    display: inline-block;
+    text-decoration: none;
+}
+
+/* Efecto hover para el botón de mostrar */
+.div_btn .btn_show:hover {
+    background-color: #4caf50bd
+}
+
+/* Contenedor para las acciones del carrito */
+.acciones_carrito {
+    margin: 40px auto;
+    padding: 30px 50px;
+    border: 1px solid #eee;
+    width: 100%;
+    max-width: 500px;
+    min-height: 400px;
+    border-radius: 15px;
+    background-color:  #f3f3f7;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Efecto hover para el contenedor de acciones del carrito */
+.acciones_carrito:hover {
+    box-shadow: 0 8px 16px rgb(52 127 103 / 48%);
+}
+
+/* Contenedor para el carrito */
+.carrito_box {
+    text-align: center;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Título del carrito */
+.carrito_box h5 {
+    margin-bottom: 15px;
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Estilos para el formulario del carrito */
+.carrito_box .form-group {
+    margin-bottom: 15px;
+    padding: 12px 16px;
+    border: 1px solid #eee;
+    border-radius: 9px;
+    background-color: #f9f9f9;
+}
+
+/* Estilos para el botón del carrito */
+.carrito_box .btn_carrito {
+    padding: 12px 16px;
+    border: none;
+    border-radius: 9px;
+    background-color: #4caf509e;
+    color: white !important;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    display: inline-block;
+    text-decoration: none;
+}
+
+/* Efecto hover para el botón del carrito */
+.carrito_box .btn_carrito:hover {
+    background-color: #4caf50bd;
+}
+
+/* Estilos para el contenedor de botones del carrito */
+.div_btn_carrito {
+    padding: 12px 16px;
+    border: none;
+    border-radius: 9px;
+    margin-bottom: 16px;
+    background-color: #f7f7f7f7;
+    color: white !important;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+    display: inline-block;
+    text-decoration: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Efecto hover para el contenedor de botones del carrito */
+.div_btn_carrito:hover {
+    background-color: #f7f7f7bd;
+}
+
+/* Estilos para el último botón del carrito */
+.div_btn_carrito:last-child {
+    margin-bottom: 0;
 }
