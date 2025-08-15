@@ -17,6 +17,7 @@ class Producto extends Model
         'producto',
         'tipo_producto_id',
         'descripcion',
+        'peso',
         'unidad_medida_id',
         'cantidad',
         'codigo_barras',

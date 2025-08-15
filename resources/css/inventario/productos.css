@@ -48,3 +48,12 @@
 .productos-page .btn-container .btn {
     margin: 0 20px;
 }
+
+.productos-page textarea.form-control {
+    border-radius: 6px !important;
+}
+
+.productos-page .descripcion-container{
+    margin-top: 20px;
+    margin-left: 100px;
+}

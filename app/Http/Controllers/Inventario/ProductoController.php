@@ -59,8 +59,9 @@ class ProductoController extends Controller
             'producto' => 'required|unique:productos',
             'tipo_producto_id' => 'required|exists:parametros_temas,id',
             'descripcion' => 'required|string',
+            'peso' => 'required|numeric|min:0',
             'unidad_medida_id' => 'required|exists:parametros_temas,id',
-            'cantidad' => 'required|int',
+            'cantidad' => 'required|integer|min:0',
             'codigo_barras' => 'required|string',
             'estado_id' => 'required|exists:parametros_temas,id',
             'imagen' => 'nullable|image|mimes:jpg,jpeg,png'
