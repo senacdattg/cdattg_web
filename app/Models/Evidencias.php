@@ -31,4 +31,11 @@ class Evidencias extends Model
                     ->withPivot('user_create_id', 'user_edit_id')
                     ->withTimestamps();
     }
+
+    static function terminarActividad($id)
+    {
+        $actividad = Evidencias::find($id);
+        $actividad->id_estado = 27;
+        $actividad->save();
+    }
 }

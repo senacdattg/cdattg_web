@@ -252,9 +252,14 @@
                         </div>
                     </div>
                     <!-- Botón para finalizar asistencia, redirige a caracter_selected -->
-                    <a href="{{ route('asistence.web') }}" class="btn btn-success btn-block py-2 font-weight-bold mb-3">
-                        <i class="fas fa-check-circle mr-1"></i> Finalizar asistencia
-                    </a>
+                    <form action="{{ route('asistence.terminarActividad') }} " method="POST">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="evidencia_id" value="{{ $evidencia->id }}">
+                        <button type="submit" class="btn btn-success btn-block py-2 font-weight-bold mb-3">
+                            <i class="fas fa-check-circle mr-1"></i> Finalizar asistencia
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

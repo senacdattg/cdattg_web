@@ -51,8 +51,7 @@ class ParametroSeeder extends Seeder
 
             // Estados de evidencias
             ['id' => 25, 'name' => 'PENDIENTE', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-            ['id' => 26, 'name' => 'EN CURSO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-            ['id' => 27, 'name' => 'COMPLETADO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 26, 'name' => 'COMPLETADO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
         ];
 
         foreach ($parametros as $parametro) {

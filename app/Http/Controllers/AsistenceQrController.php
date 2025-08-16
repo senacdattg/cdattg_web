@@ -878,4 +878,16 @@ class AsistenceQrController extends Controller
         }
     }
 
+    public function terminar_actividad(Request $request)
+    {
+        try {
+            
+            $evindencia = Evidencias::terminarActividad($request->input('evidencia_id'));
+            return redirect()->back()->with('success', 'Actividad terminada correctamente.');
+
+        } catch (\Exception $e) {
+            Log::error('Error al terminar actividad: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'No se pudo terminar la actividad.');
+        }
+    }
 }

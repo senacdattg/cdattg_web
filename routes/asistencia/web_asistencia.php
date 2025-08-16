@@ -39,6 +39,7 @@ route::middleware('can:TOMAR ASISTENCIA')->group(function () {
     // Ruta para agregar una nueva actividad a la ficha de caracterización
     Route::post('/asistence/finalizar-asistencia', [AsistenceQrController::class, 'finalizar_asistencia'])->name('asistence.finalizarAsistencia');
     Route::post('/asistence/agregar-actividad', [AsistenceQrController::class, 'agregar_actividad'])->name('asistence.agregarActividad');
+    Route::put('/asistence/terminar-actividad', [AsistenceQrController::class, 'terminar_actividad'])->name('asistence.terminarActividad');
 });
 
 
