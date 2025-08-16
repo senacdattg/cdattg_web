@@ -1,0 +1,226 @@
+.div_flex {
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 1200px;
+    margin: 40px auto 0 auto;
+    padding: 20px;
+    background-color: #f3f3f7;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 900px) {
+    .div_flex {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .div_carrito, .div_pedido {
+        max-width: 100%;
+    }
+}
+
+
+.div_pedido {
+    flex: 1 1 30%;
+    max-width: 350px;
+    margin: 40px auto;
+    padding: 30px 50px;
+    background-color: #f3f3f7;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: box-shadow 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.div_pedido:hover {
+    box-shadow: 0 8px 16px rgb(52 127 103 / 48%);
+}
+
+.div_pedido h2 {
+    color: #388e3c;
+    margin-bottom: 10px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 25px;
+}
+
+
+.div_pedido p {
+    color: #555;
+    font-size: 16px;
+    margin-bottom: 20px;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.div_carrito {
+    max-width: 700px;
+    min-height: 350px;
+    margin: 40px auto;
+    padding: 30px 50px;
+    background-color: #f3f3f7;
+    border-radius: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    width: 100%;
+    transition: box-shadow 0.4s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.div_carrito:hover {
+    box-shadow: 0 8px 16px rgb(52 127 103 / 48%);
+}
+
+.div_carrito h2 {
+    color: #388e3c;
+    margin-bottom: 25px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 35px;
+}
+
+.carrito-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 18px;
+    text-align: center;
+    margin-top: 20px !important;
+    font-size: 16px;
+    color: #333;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(76, 175, 80, 0.07);
+}
+
+.carrito-table th, .carrito-table td {
+    background: #f8f9fa;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.07);
+    padding: 18px 28px;
+    font-size: 16px;
+    text-align: left;
+    transition: background-color 0.3s ease;
+    vertical-align: middle;
+}
+
+.carrito-table th {
+    color: #388e3c;
+    font-weight: 600;
+    background: #e8f5e9;
+    border-bottom: 2px solid #388e3c;
+}
+
+.carrito-table td .btn {
+    padding: 8px 14px;
+    border-radius: 9px;
+    background-color: #c2171791;
+    color: white !important;
+    font-size: 15px;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.3s;
+    vertical-align: middle;
+
+}
+
+.carrito-table td .btn:hover {
+    background-color: #b82034d5;
+    vertical-align: middle;
+}
+
+.carrito-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+}
+
+.carrito-table tbody tr:hover td {
+    background-color: #f1f8f1;
+}
+
+
+.div_titulo {
+    padding: 10px;
+    border-radius: 5px;
+    background-color: #e8f5e9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 20px;
+    color: #388e3c;
+}
+
+.list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    text-transform: uppercase;
+    font-size: 14px;
+    color: #555;
+    text-align: left;
+    font-weight: normal;
+    margin-top: 10px;
+    margin-bottom: 20px;
+}
+
+.div_producto_titulo {
+    padding: 10px 0;
+    border-radius: 5px;
+    background-color: #e8f5e9;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 20px;
+    color: #388e3c;
+}
+
+.div_producto_titulo strong {
+    color: #388e3c;
+    font-weight: bold;
+    letter-spacing: 1px;
+    font-size: 16px;
+}
+
+.div_btn {
+    margin-top: 20px;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 13px 0;
+    background-color: #f9f9f900;
+    border-radius: 9px;
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+.div_btn:hover {
+    background-color: #f9f9f900;
+}
+
+.btn-pedido {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    background-color: #388e3c;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    position: sticky;
+    bottom: 10px;
+}
+
+.btn-pedido:hover {
+    background-color: #2e7d32;
+}
