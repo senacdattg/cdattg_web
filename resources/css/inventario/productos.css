@@ -1,6 +1,6 @@
 .inventario-img-box {
-    width: 150px !important;
-    height: 150px !important;
+    width: 250px !important;
+    height: 250px !important;
     border: 2px dashed #ccc;
     background-color: #fafafa;
     display: flex;
@@ -30,6 +30,8 @@
 .inventario-container .inventario-img-box {
     margin-top: 180px; 
     border-radius: 15px;
+    width: 300px;   
+    height: 200px;  
 }
 
 /* Bajar los campos del formulario */
@@ -319,3 +321,4 @@
 .div_btn_carrito:last-child {
     margin-bottom: 0;
 }
+

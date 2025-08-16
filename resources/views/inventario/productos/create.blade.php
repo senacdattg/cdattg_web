@@ -26,7 +26,7 @@
             </div>
         </div>
 
-        <div class="col-md-8">
+        <div class="acciones_carrito">
             <form action="{{ route('productos.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
