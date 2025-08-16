@@ -8,7 +8,7 @@ use App\Services\RegistroActividadesServices;
 use App\Models\InstructorFichaCaracterizacion;
 use App\Models\ResultadosAprendizaje;
 use App\Models\Evidencias;
-use Appa\Models\EvidenciaGuiaAprendizaje;
+use App\Models\EvidenciaGuiaAprendizaje;
 use Illuminate\Support\Facades\Auth;
 
 class RegistroActividadesController extends Controller
@@ -26,9 +26,10 @@ class RegistroActividadesController extends Controller
      */
     public function index(InstructorFichaCaracterizacion $caracterizacion)
     {
-        $resultadosAprendizaje = $this->registroActividadesServices->getRaps($caracterizacion);
         $actividades = $this->registroActividadesServices->getActividades($caracterizacion);
-        return view('registro_actividades.index', compact('caracterizacion', 'actividades', 'resultadosAprendizaje'));
+        $guiaAprendizajeActual = $this->registroActividadesServices->getGuiasAprendizaje($caracterizacion);
+        $rapActual = $caracterizacion->ficha->programaFormacion->competenciaActual()->rapActual();
+        return view('registro_actividades.index', compact('caracterizacion', 'actividades', 'rapActual', 'guiaAprendizajeActual'));
     }
 
     /**
