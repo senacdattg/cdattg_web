@@ -15,6 +15,7 @@ class AsistenciaAprendiz extends Model
     protected $fillable = [
         'instructor_ficha_id',
         'aprendiz_ficha_id',
+        'evidencia_id',
         'hora_ingreso',
         'hora_salida',
     ];

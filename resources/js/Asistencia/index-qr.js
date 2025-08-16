@@ -27,6 +27,7 @@ cuandoElDocumentoEsteListo(function() {
         const qrFeedbackMessages = document.querySelector('.qr-feedback-messages');
         // Obtener el id de la ficha desde un data-attribute para JS puro
         const fichaId = document.querySelector('input[name="caracterizacion_id"]').value;
+        const evidenciaId = document.querySelector('input[name="evidencia_id"]').value;
 
         function showFeedback(message, type = 'info') {
             const alertHtml = `
@@ -85,7 +86,8 @@ cuandoElDocumentoEsteListo(function() {
                     },
                     body: JSON.stringify({
                         numero_documento: numeroIdentificacion,
-                        ficha_id: fichaId
+                        ficha_id: fichaId,
+                        evidencia_id: evidenciaId
                     })
                 })
                 .then(response => response.json())

@@ -5,12 +5,9 @@
         <div class="card border-warning shadow-sm">
             <div class="card-header bg-warning text-dark">
                 <i class="fas fa-calendar-times mr-2"></i>
-                <strong>Período del RAP actual</strong>
+                <strong>Resultado de Aprendizaje actual</strong>
             </div>
             <div class="card-body">
-                @php
-                    $rapActual = $caracterizacion->ficha->programaFormacion->competenciaActual()->rapActual();
-                @endphp
                 @if($rapActual)
                     <div class="row">
                         <div class="col-md-6">
@@ -321,7 +318,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const esPasada = fecha < fechaHoy;
             const esDespuesRap = fechaFinRap && DateUtils.toDateString(fecha) > DateUtils.toDateString(fechaFinRap);
             const esDiaFormacion = DateUtils.esDiaFormacion(fecha);
-            const esFechaOcupada = CONFIG.actividades.some(actividad => 
+            const esFechaOcupada = CONFIG.actividades.some(actividad =>
                 DateUtils.toDateString(fecha) === DateUtils.toDateString(new Date(actividad.fecha_evidencia))
             );
 

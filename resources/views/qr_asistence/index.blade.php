@@ -7,7 +7,15 @@
     <section class="content-header dashboard-header py-4">
         <div class="container-fluid">
             <div class="row align-items-center">
-                <div class="col-12 col-md-6 d-flex align-items-center">
+                <div class="col-sm-6">
+                    <div class="d-flex justify-content-start mt-1 mb">
+                        <a href="{{ route('registro-actividades.index', ['caracterizacion' => $caracterizacion]) }}"
+                            class="btn btn-outline-primary rounded-pill px-4">
+                            <i class="fas fa-arrow-left me-2"></i>Volver a las actividades
+                        </a>
+                    </div>
+                </div>
+                <div class="col-12 col-md-6 d-flex align-items-center justify-content-end">
                     <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
                         style="width: 48px; height: 48px;">
                         <i class="fas fa-fw fa-qrcode text-white"></i>
@@ -15,29 +23,15 @@
                     <div>
                         <h1 class="h3 mb-0 text-gray-800">Asistencia QR</h1>
                         <p class="text-muted mb-0 font-weight-light">
-                            {{ $fichaCaracterizacion->programaFormacion->nombre ?? 'Programa no disponible' }}</p>
+                            REGISTRO DE ASISTENCIA</p>
                     </div>
-                </div>
-                <div class="col-sm-6">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
-                                    <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-fw fa-qrcode"></i> Asistencia QR
-                            </li>
-                        </ol>
-                    </nav>
                 </div>
             </div>
         </div>
     </section>
-    @endsection
+@endsection
 
-    @section('content')
+@section('content')
     <section class="content-mt4">
         <div class="container-fluid">
             <div class="row mb-4">
@@ -49,33 +43,7 @@
                             </h5>
                         </div>
                         <div class="card-body bg-light">
-                            <div class="card-body">
-                                    <label for="actividad" class="form-label ">Indique la actividad del día</label>
-                                    <div class="input-group mb-3">
-                                        <input type="text" class="form-control" name="actividad"
-                                            placeholder="Ej: Clase de Programación" aria-label="actividad"
-                                            autocomplete="off" required>
-                                    </div>
-                            </div>
-                            <hr>
-                            <div class="mb-3">
-                                <a href="{{ route('asistence.caracterSelected', ['id' => $fichaCaracterizacion->id]) }}" class="btn btn-primary">
-                                    Ir a la página de selección de caracterización
-                                </a>
-                            </div>
                             <div class="row g-4">
-                                <div class="col-md-4">
-                                    <div class="info-box bg-white shadow-sm rounded">
-                                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                                            style="width: 48px; height: 48px;">
-                                            <i class="fas fa-fw fa-book text-white"></i>
-                                        </div>
-                                        <div class="info-box-content">
-                                            <span class="info-box-text text-secondary">N° Ficha</span>
-                                            <span class="info-box-number fw-bold">{{ $fichaCaracterizacion->ficha }}</span>
-                                        </div>
-                                    </div>
-                                </div>
                                 <div class="col-md-4">
                                     <div class="info-box bg-white shadow-sm rounded">
                                         <div class="bg-success rounded-circle d-flex align-items-center justify-content-center mr-3"
@@ -83,20 +51,22 @@
                                             <i class="fas fa-clock text-white"></i>
                                         </div>
                                         <div class="info-box-content">
-                                            <span class="info-box-text text-secondary">Jornada</span>
+                                            <span class="info-box-text text-secondary">Programa de formación</span>
                                             <span class="info-box-number fw-bold">
-                                                {{ $fichaCaracterizacion->jornadaFormacion->jornada }}
+                                                {{ $fichaCaracterizacion->programaFormacion->nombre ?? 'Programa no disponible' }}
                                             </span>
-                                            @if ($horarioHoy)
-                                                <span class="text-muted">
-                                                    ({{ \Carbon\Carbon::parse($horarioHoy->hora_inicio)->format('h:i A') }}
-                                                    - {{ \Carbon\Carbon::parse($horarioHoy->hora_fin)->format('h:i A') }})
-                                                </span>
-                                            @else
-                                                <span class="text-danger">
-                                                    (No hay clases hoy)
-                                                </span>
-                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="info-box bg-white shadow-sm rounded">
+                                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
+                                            style="width: 48px; height: 48px;">
+                                            <i class="fa-solid fa-hashtag text-white"></i>
+                                        </div>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text text-secondary">N° Ficha</span>
+                                            <span class="info-box-number fw-bold">{{ $fichaCaracterizacion->ficha }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -114,6 +84,59 @@
                                                 @else
                                                     No asignado
                                                 @endif
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @php
+                                $numeroActividad = 1;
+                            @endphp
+                            @foreach ($actividades as $actividad)
+                                @if ($actividad->id == $evidencia->id)
+                                    @break
+                                @endif
+                                @php
+                                    $numeroActividad++;
+                                @endphp
+                            @endforeach
+                            <div class="row g-4">
+                                <div class="col-md-4">
+                                    <div class="info-box bg-white shadow-sm rounded">
+                                        <div class="bg-success rounded-circle d-flex align-items-center justify-content-center mr-3"
+                                            style="width: 48px; height: 48px;">
+                                            <i class="fas fa-file-alt text-white"></i>
+                                        </div>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text text-secondary">Evidencia de aprendizaje</span>
+                                            <span class="info-box-number fw-bold">
+                                                EV-{{ $numeroActividad }}: {{ $evidencia->nombre ?? 'Evidencia no disponible' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="info-box bg-white shadow-sm rounded">
+                                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
+                                            style="width: 48px; height: 48px;">
+                                            <i class="fas fa-check-circle text-white"></i>
+                                        </div>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text text-secondary">Guia de aprendizaje</span>
+                                            <span class="info-box-number fw-bold">{{ $guiaAprendizajeActual->codigo}}: {{ $guiaAprendizajeActual->nombre }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="info-box bg-white shadow-sm rounded">
+                                        <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center mr-3"
+                                            style="width: 48px; height: 48px;">
+                                            <i class="fas fa-book text-white"></i>
+                                        </div>
+                                        <div class="info-box-content">
+                                            <span class="info-box-text text-secondary">Resultado de aprendizaje</span>
+                                            <span class="info-box-number fw-bold">
+                                                {{ $rapActual->nombre }}
                                             </span>
                                         </div>
                                     </div>
@@ -138,6 +161,8 @@
                                     @csrf
                                     <input type="hidden" name="caracterizacion_id" id="ficha_caracterizacion_id"
                                         value="{{ $fichaCaracterizacion->id }}">
+                                    <input type="hidden" name="evidencia_id" id="evidencia_id"
+                                        value="{{ $evidencia->id }}">
                                 </form>
                                 <div class="qr-scanner-container rounded-lg border border-primary shadow-sm p-3"
                                     style="width: 100%; max-width: 350px;">
@@ -147,7 +172,6 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="qr-scanner-footer mt-3">
                                 <div class="text-center text-secondary mb-3">
                                     <p class="mb-0">Posicione el código QR en el recuadro</p>
@@ -228,9 +252,14 @@
                         </div>
                     </div>
                     <!-- Botón para finalizar asistencia, redirige a caracter_selected -->
-                    <a href="{{ route('asistence.web') }}" class="btn btn-success btn-block py-2 font-weight-bold mb-3">
-                        <i class="fas fa-check-circle mr-1"></i> Finalizar asistencia
-                    </a>
+                    <form action="{{ route('asistence.terminarActividad') }} " method="POST">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="evidencia_id" value="{{ $evidencia->id }}">
+                        <button type="submit" class="btn btn-success btn-block py-2 font-weight-bold mb-3">
+                            <i class="fas fa-check-circle mr-1"></i> Finalizar asistencia
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
