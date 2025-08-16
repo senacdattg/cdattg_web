@@ -64,8 +64,9 @@ class DatabaseSeeder extends Seeder
             ResultadosGuiasSeeder::class,
             CompetenciaProgramaSeeder::class,
 
-            // Crear productos para agregar al módulo de inventario
-            ProductoSeeder::class
+            //Inventario:
+            ProductoSeeder::class, // Crear productos para agregar al módulo de inventario
+            OrdenSeeder::class //Crear ordenes
         ]);
     }
 }

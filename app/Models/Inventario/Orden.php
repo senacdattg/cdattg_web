@@ -16,6 +16,7 @@ class Orden extends Model
     protected $fillable = [
         'descripcion_orden',
         'tipo_orden_id',
+        'fecha_devolucion',
         'user_create_id',
         'user_update_id'
     ];

@@ -44,7 +44,8 @@ class OrdenController extends Controller
     {
         $validated = $request->validate([
             'descripcion_orden' => 'required|string',
-            'tipo_orden_id' => 'required|exists:parametros_temas_id'
+            'tipo_orden_id' => 'required|exists:parametros_temas,id',
+            'fecha_devolucion' => 'nullable|date'
         ]);
 
         $validated['user_create_id'] = Auth::id();

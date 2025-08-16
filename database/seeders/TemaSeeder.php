@@ -154,7 +154,7 @@ class TemaSeeder extends Seeder
         // Tema 11: TIPOS DE ORDEN
         $tema = Tema::create([
             'id'             => 11,
-            'name'           => 'TIPOS DE ORDENñ',
+            'name'           => 'TIPOS DE ORDEN',
             'status'         => 1,
             'user_create_id' => 1,
             'user_edit_id'   => 1,
