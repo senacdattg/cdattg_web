@@ -150,5 +150,19 @@ class TemaSeeder extends Seeder
             $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
         }
         $tema->parametros()->sync($syncData);
+
+        // Tema 11: TIPOS DE ORDEN
+        $tema = Tema::create([
+            'id'             => 11,
+            'name'           => 'TIPOS DE ORDENñ',
+            'status'         => 1,
+            'user_create_id' => 1,
+            'user_edit_id'   => 1,
+        ]);
+        $syncData = [];
+        foreach ([44, 45] as $id) {
+            $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
+        }
+        $tema->parametros()->sync($syncData);
     }
 }

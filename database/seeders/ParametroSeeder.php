@@ -76,7 +76,11 @@ class ParametroSeeder extends Seeder
             // Estados de producto
             ['id' => 42, 'name' => 'DISPONIBLE', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 43, 'name' => 'AGOTADO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-            
+
+            // Tipos de orden
+            ['id' => 44, 'name' => 'PRÉSTAMO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 45, 'name' => 'SALIDA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+        
         ];
 
         foreach ($parametros as $parametro) {

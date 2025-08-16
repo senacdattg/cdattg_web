@@ -42,7 +42,17 @@ class OrdenController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'descripcion_orden' => 'required|string',
+            'tipo_orden_id' => 'required|exists:parametros_temas_id'
+        ]);
+
+        $validated['user_create_id'] = Auth::id();
+        $validated['user_update_id'] = Auth::id();
+
+        Orden::create($validated);
+
+        return redirect()->route('ordenes.create')->with('success', 'Orden creada correctamente');
     }
 
     /**
@@ -50,7 +60,8 @@ class OrdenController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $orden = Orden::with(['tipoOrden'])->findOrFail($id);
+        return view('inventario.ordenes.show', compact('orden'));
     }
 
     /**
@@ -58,7 +69,8 @@ class OrdenController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $orden = Orden::findOrFail($id);
+        return view('invetario.ordenes.edit', compact('orden'));
     }
 
     /**
