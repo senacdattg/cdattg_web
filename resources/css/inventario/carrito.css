@@ -1,5 +1,6 @@
 .div_flex {
-    display: flex;
+    display: flex; /* Contenedor flexible para alinear elementos */
+    transition: all 0.3s ease; /* Añadir transición a la flexbox */
     gap: 30px;
     justify-content: center;
     flex-wrap: wrap;
@@ -13,7 +14,7 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 900px) { /* Estilos para pantallas pequeñas */
     .div_flex {
         flex-direction: column;
         align-items: stretch;
@@ -24,15 +25,14 @@
 }
 
 .div_pedido,
-.resumen {
-    width: 100%;
+.resumen { /* Estilos para el contenedor de pedido y resumen */
     max-width: 400px;   /* ambos tendrán el mismo límite */
     margin: 0 auto;     /* para que se centren */
     box-sizing: border-box;
 }
 
-.div_pedido {
-    margin: 40px auto;
+.div_pedido { /* Estilos para el contenedor del pedido */
+    transition: box-shadow 0.4s ease, transform 0.3s ease; /* Añadir transición de transformación */
     padding: 30px 110px;
     background-color: #f3f3f7;
     border-radius: 15px;
@@ -44,7 +44,7 @@
     justify-content: center;
 }
 
-.div_pedido:hover {
+.div_pedido:hover { /* Efecto de sombra al pasar el mouse sobre el pedido */
     box-shadow: 0 8px 16px rgb(52 127 103 / 48%);
 }
 
@@ -74,8 +74,8 @@
     line-height: 1.5;
 }
 
-.div_carrito {
-    max-width: 700px;
+.div_carrito { /* Estilos para el contenedor del carrito */
+    transition: box-shadow 0.4s ease, transform 0.3s ease; /* Añadir transición de transformación */
     min-height: 350px;
     margin: 40px auto;
     padding: 30px 50px;
@@ -94,8 +94,7 @@
     box-shadow: 0 8px 16px rgb(52 127 103 / 48%);
 }
 
-.carrito-table {
-    width: 100%;
+.carrito-table { /* Estilos para la tabla del carrito */
     border-collapse: separate;
     border-spacing: 0 18px;
     text-align: center;
@@ -105,8 +104,7 @@
     justify-content: space-between;
 }
 
-.carrito-table th, .carrito-table td {
-    background: #f8f9fa;
+.carrito-table th, .carrito-table td { /* Estilos para celdas de la tabla */
     border: none;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(76, 175, 80, 0.07);
@@ -117,8 +115,8 @@
     vertical-align: middle;
 }
 
-.carrito-table th {
-    color: #388e3c;
+.carrito-table th { /* Estilos para el encabezado de la tabla */
+    transition: background-color 0.3s ease; /* Añadir transición al color de fondo */
     font-weight: 600;
     background: #e8f5e9;
     border-bottom: 2px solid #388e3c;
@@ -153,8 +151,7 @@
 }
 
 
-.div_titulo {
-    border-radius: 5px;
+.div_titulo { /* Estilos para el contenedor del título */
     background-color: #e8f5e9;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: center;
@@ -200,8 +197,7 @@
     font-size: 16px;
 }
 
-.div_btn {
-    margin-top: 20px;
+.div_btn { /* Estilos para el contenedor de botones */
     text-align: center;
     display: flex;
     justify-content: center;
@@ -217,8 +213,7 @@
     background-color: #f9f9f900;
 }
 
-.btn-pedido {
-    padding: 12px 20px;
+.btn-pedido { /* Estilos para el botón de pedido */
     border: none;
     border-radius: 8px;
     background-color: #388e3c;
@@ -235,8 +230,7 @@
     background-color: #2e7d32;
 }
 
-.div_lateral {
-    flex: 1 1 30%;
+.div_lateral { /* Estilos para el contenedor lateral */
     max-width: 350px;
     display: flex;
     flex-direction: column;
@@ -245,8 +239,7 @@
     gap: 20px;
 }
 
-.resumen {
-    padding: 15px;
+.resumen { /* Estilos para el contenedor del resumen */
     background-color: #f3f3f7;
     border-radius: 15px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -278,6 +271,7 @@
     width: 50px;
     height: 50px;
     border-radius: 8px;
+    border: 2px dashed #4caf50;
     transition: transform 0.3s ease;
     transform: scale(1);
 }

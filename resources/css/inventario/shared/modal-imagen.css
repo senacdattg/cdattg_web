@@ -1,4 +1,4 @@
-.img-expandable {
+.img-expandable { /* Estilo para imágenes que se pueden expandir al hacer clic */
     cursor: pointer;
     transition: transform 0.3s ease;
 }
@@ -7,9 +7,9 @@
     transform: scale(1.1);
 }
 
-/* Modal oculto por defecto */
-.modal-imagen {
+.modal-imagen { /* Modal que se oculta por defecto */
     display: none; 
+    transition: opacity 0.3s ease; /* Añadir transición de opacidad */
     position: fixed; 
     z-index: 9999; 
     padding-top: 80px; 
@@ -21,8 +21,7 @@
     background-color: rgba(0,0,0,0.8); 
 }
 
-/* Imagen dentro del modal */
-.modal-contenido {
+.modal-contenido { /* Estilo para la imagen dentro del modal */
     margin: auto;
     display: block;
     max-width: 80%;
@@ -32,14 +31,12 @@
     animation: zoom 0.3s ease-in-out;
 }
 
-/* Animación de zoom */
-@keyframes zoom {
+@keyframes zoom { /* Animación de zoom para el modal */
     from {transform: scale(0.7); opacity:0;}
     to {transform: scale(1); opacity:1;}
 }
 
-/* Botón cerrar */
-.cerrar {
+.cerrar { /* Estilo para el botón de cerrar el modal */
     position: absolute;
     top: 20px;
     right: 35px;

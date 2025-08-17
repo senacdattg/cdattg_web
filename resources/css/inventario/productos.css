@@ -1,4 +1,4 @@
-.inventario-img-box {
+.inventario-img-box { /* Estilo para la caja de imagen del inventario */
     width: 250px !important;
     height: 250px !important;
     border: 2px dashed #4caf50;
@@ -13,13 +13,13 @@
     position: relative;
 }
 
-.inventario-img-box:hover {
+.inventario-img-box:hover { /* Efecto de escala al pasar el mouse sobre la caja de imagen */
     transform: scale(1.05);
     box-shadow: 0 8px 20px rgba(76, 175, 80, 0.2);
     border-color: #45a049;
 }
 
-.inventario-img-box::before {
+.inventario-img-box::before { /* Pseudo-elemento que muestra un símbolo '+' cuando no hay imagen */
     content: '+';
     font-size: 80px;
     font-weight: 300;
@@ -44,18 +44,18 @@
     object-fit: contain;
 }
 /* Cambiar el color del navbar */
-.productos-page .main-header.navbar {
+.productos-page .main-header.navbar { /* Estilo para el navbar de la página de productos */
     background-color: #00041D !important;
 }
 
-.productos-page .main-header.navbar .nav-link {
+.productos-page .main-header.navbar .nav-link { /* Estilo para los enlaces del navbar */
     color: white !important;
 }
 
 .productos-page .main-header.navbar .nav-link:hover {
     color: #FFD700 !important;
 }
-.flex_form {
+.flex_form { /* Estilo para el formulario flexible */
     display: flex;
     gap: 30px;
     justify-content: center;
@@ -66,7 +66,7 @@
     padding: 20px;
 }
 
-.form_img_container {
+.form_img_container { /* Contenedor para la imagen en el formulario */
     flex: 1 1 30%;
     max-width: 350px;
     display: flex;
@@ -78,7 +78,7 @@
     animation: fadeInUp 0.8s ease-out 0.2s forwards;
 }
 
-.container_form {
+.container_form { /* Estilo para el contenedor del formulario */
     flex: 1 1 60%;
     max-width: 800px;
     background-color: #ffffff;
@@ -97,7 +97,7 @@
     box-shadow: 0 8px 16px rgb(52 127 103 / 48%);
 }
 
-.form_header {
+.form_header { /* Estilo para el encabezado del formulario */
     padding: 20px 50px;
     border-bottom: 1px solid #e9ecef;
     margin-bottom: 30px;
@@ -117,7 +117,7 @@
     padding: 0 50px 40px 50px;
 }
 
-.productos-page .form-floating {
+.productos-page .form-floating { /* Estilo para el contenedor de formulario flotante */
     position: relative;
 }
 
@@ -149,7 +149,7 @@
     color: transparent;
 }
 
-.productos-page .form-control {
+.productos-page .form-control { /* Estilo para el control del formulario */
     border-radius: 8px;
     border: 1px solid #ced4da;
     transition: all 0.3s ease-in-out;
@@ -160,7 +160,7 @@
     box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
 }
 
-.productos-page .btn-container {
+.productos-page .btn-container { /* Estilo para el contenedor de botones */
     text-align: center;
     margin-top: 20px;
 }
@@ -198,7 +198,7 @@
     width: 100%;
 }
 
-.custom-file-input-wrapper {
+.custom-file-input-wrapper { /* Estilo para el contenedor del input de archivo personalizado */
     position: relative;
     overflow: hidden;
     display: inline-block;
@@ -215,7 +215,7 @@
     cursor: pointer;
 }
 
-.custom-file-input-label {
+.custom-file-input-label { /* Estilo para la etiqueta del input de archivo personalizado */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -245,7 +245,7 @@
     color: #495057;
 }
 
-#file-chosen {
+#file-chosen { /* Estilo para mostrar el archivo elegido */
     display: block;
     margin-top: 10px;
     font-style: italic;
@@ -330,7 +330,7 @@
 .show_img {
     flex: 0 0 160px;
     height: 135px;
-    border: 2px solid  #eff5f09e;
+    border: 2px dashed #4caf50;
     border-radius: 15px;
     background-color: #e8f5e9;
     display: flex;

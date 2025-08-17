@@ -1,0 +1,39 @@
+.aprobar-salida-container {
+    max-width: 500px;
+    margin: 40px auto;
+    padding: 30px 40px;
+    background: #f3f3f7;
+    border-radius: 15px;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.07);
+}
+
+.aprobar-salida-container h2 {
+    color: #388e3c;
+    margin-bottom: 25px;
+    font-weight: bold;
+}
+
+.btn_aprobar {
+    padding: 12px 24px;
+    border: none;
+    border-radius: 9px;
+    background-color: #4caf509e;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 15px;
+    transition: background-color 0.3s;
+}
+
+.btn_aprobar:hover {
+    background-color: #388e3c;
+}
+
+.msg-success {
+    margin-top: 20px;
+    color: #388e3c;
+    font-weight: bold;
+    background: #e8f5e9;
+    padding: 10px 20px;
+    border-radius: 8px;
+}
