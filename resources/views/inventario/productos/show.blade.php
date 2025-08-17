@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@vite(['resources/css/inventario/productos.css', 'resources/js/inventario/productos.js'])
+@vite(['resources/css/inventario/productos.css', 'resources/js/inventario/productos.js', 'resources/css/inventario/shared/modal-imagen.css', 'resources/js/inventario/shared/modal-imagen.js'])
 
 @section('content')
 <div class="flex_show">
@@ -21,7 +21,7 @@
                     <li class="list-group-item"><i class="fas fa-tag"></i> <strong>Producto:</strong> {{ $producto->producto ?? 'N/A' }}</li>
                     <li class="list-group-item"><i class="fas fa-cubes"></i> <strong>Tipo de producto:</strong> {{ $producto->tipoProducto->parametro->name ?? 'N/A' }}</li>
                     <li class="list-group-item"><i class="fas fa-align-left"></i> <strong>Descripción:</strong> {{ $producto->descripcion }}</li>
-                    <li class="list-group-item"><i class="fas fa-balance-scale"></i> <strong>Unidad de medida:</strong> {{ $producto->unidadMedida->parametro->name ?? 'N/A' }}</li>
+                    <li class="list-group-item"><i class="fas fa-balance-scale"></i> <strong>Peso:</strong> {{ $producto->unidadMedida->parametro->name ?? 'N/A' }}</li>
                     <li class="list-group-item"><i class="fas fa-sort-numeric-up"></i> <strong>Cantidad:</strong> {{ $producto->cantidad }}</li>
                     <li class="list-group-item"><i class="fas fa-barcode"></i> <strong>Código de barras:</strong> {{ $producto->codigo_barras }}</li>
                     <li class="list-group-item"><i class="fas fa-check-circle"></i> <strong>Estado:</strong> {{ $producto->estado->parametro->name ?? 'N/A' }}</li>
@@ -30,9 +30,9 @@
             </div>
             <div class="show_img">
                 <img 
-                    src="{{ $producto->imagen ? asset($producto->imagen) : asset('img/inventario/default.png') }}" 
+                    src="{{ $producto->imagen ? asset($producto->imagen) : asset('img/inventario/imagen_default.png') }}" 
                     alt="Imagen del producto" 
-                    class="img-fluid rounded shadow"
+                    class="clickable-img img-expandable"
                 >
             </div>
         </div>
@@ -62,5 +62,10 @@
             </form>
         </div>
     </div>
+</div>
+<!-- Modal para imagen expandida -->
+<div id="modalImagen" class="modal-imagen">
+    <span class="cerrar">&times;</span>
+    <img class="modal-contenido" id="imgExpandida">
 </div>
 @endsection

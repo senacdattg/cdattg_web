@@ -1,13 +1,40 @@
-.inventario-img-box {
+
+.inventario-img-box { /* Estilo para la caja de imagen del inventario */
     width: 250px !important;
     height: 250px !important;
-    border: 2px dashed #ccc;
-    background-color: #fafafa;
+    border: 2px dashed #4caf50;
+    background-color: #f3f7f3;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
 }
+
+.inventario-img-box:hover { /* Efecto de escala al pasar el mouse sobre la caja de imagen */
+    transform: scale(1.05);
+    box-shadow: 0 8px 20px rgba(76, 175, 80, 0.2);
+    border-color: #45a049;
+}
+
+.inventario-img-box::before { /* Pseudo-elemento que muestra un símbolo '+' cuando no hay imagen */
+    content: '+';
+    font-size: 80px;
+    font-weight: 300;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #4caf50;
+    opacity: 0.7;
+    pointer-events: none;
+    z-index: 1;
+    transition: opacity 0.3s ease;
+}
+
 
 .inventario-img-box img {
     max-width: 100% !important;
@@ -15,50 +42,224 @@
     object-fit: contain;
 }
 /* Cambiar el color del navbar */
-.productos-page .main-header.navbar {
+.productos-page .main-header.navbar { /* Estilo para el navbar de la página de productos */
     background-color: #00041D !important;
 }
 
-.productos-page .main-header.navbar .nav-link {
+.productos-page .main-header.navbar .nav-link { /* Estilo para los enlaces del navbar */
     color: white !important;
 }
 
 .productos-page .main-header.navbar .nav-link:hover {
     color: #FFD700 !important;
 }
-/* Bajar la imagen */
-.inventario-container .inventario-img-box {
-    margin-top: 180px; 
+.flex_form { /* Estilo para el formulario flexible */
+    display: flex;
+    gap: 30px;
+    justify-content: center;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 1200px;
+    margin: 40px auto 0 auto;
+    padding: 20px;
+    
+}
+
+.form_img_container { /* Contenedor para la imagen en el formulario */
+    flex: 1 1 30%;
+    max-width: 350px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 50px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s ease-out 0.2s forwards;
+}
+
+.container_form { /* Estilo para el contenedor del formulario */
+    flex: 1 1 60%;
+    max-width: 800px;
+    background-color: #ffffff;
     border-radius: 15px;
     width: 300px;   
     height: 200px;  
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    padding: 0;
+    transition: all 0.4s ease-in-out;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.8s ease-out forwards;
+    overflow: hidden;
+    border-top: 5px solid #4caf50;
 }
 
-/* Bajar los campos del formulario */
-.inventario-container form {
-    margin-top: 100px; 
+.container_form:hover {
+    box-shadow: 0 8px 16px rgb(52 127 103 / 48%);
 }
 
-.productos-page .form-control {
-    border-radius: 50px; 
+.form_header { /* Estilo para el encabezado del formulario */
+    padding: 20px 50px;
+    border-bottom: 1px solid #e9ecef;
+    margin-bottom: 30px;
 }
 
-.productos-page .btn-container {
+.form_header h3 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #4caf50;
+    text-align: center;
+}
+
+.form_flex {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 0 50px 40px 50px;
+}
+
+.productos-page .form-floating { /* Estilo para el contenedor de formulario flotante */
+    position: relative;
+}
+
+.productos-page .form-floating .form-control {
+    height: calc(3.5rem + 2px);
+    padding: 1rem 0.75rem;
+}
+
+.productos-page .form-floating label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    padding: 1rem 0.75rem;
+    pointer-events: none;
+    border: 1px solid transparent;
+    transform-origin: 0 0;
+    transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
+    color: #6c757d;
+}
+
+.productos-page .form-floating .form-control:focus~label,
+.productos-page .form-floating .form-control:not(:placeholder-shown)~label {
+    opacity: 0.65;
+    transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+}
+
+.productos-page .form-floating .form-control::placeholder {
+    color: transparent;
+}
+
+.productos-page .form-control { /* Estilo para el control del formulario */
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    transition: all 0.3s ease-in-out;
+}
+
+.productos-page .form-control:focus {
+    border-color: #4caf50;
+    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+.productos-page .btn-container { /* Estilo para el contenedor de botones */
     text-align: center;
     margin-top: 20px;
 }
 
 .productos-page .btn-container .btn {
-    margin: 0 20px;
+    margin: 0 10px;
+    border-radius: 50px;
+    padding: 10px 30px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.productos-page .btn-success {
+    background-color: #4caf50;
+    border-color: #4caf50;
+}
+
+.productos-page .btn-success:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.productos-page .btn-secondary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .productos-page textarea.form-control {
-    border-radius: 6px !important;
+    min-height: 120px;
+    border-radius: 8px !important;
 }
 
-.productos-page .descripcion-container{
-    margin-top: 20px;
-    margin-left: 100px;
+.productos-page .descripcion-container {
+    width: 100%;
+}
+
+.custom-file-input-wrapper { /* Estilo para el contenedor del input de archivo personalizado */
+    position: relative;
+    overflow: hidden;
+    display: inline-block;
+    width: 100%;
+}
+
+.custom-file-input { /* Estilo para el input de archivo personalizado */
+    position: absolute;
+    left: 0;
+    top: 0;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.custom-file-input-label { /* Estilo para la etiqueta del input de archivo personalizado */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f9fa;
+    border: 2px dashed #ced4da;
+    border-radius: 8px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+    width: 100%;
+}
+
+.custom-file-input-label:hover {
+    background-color: #e9ecef;
+    border-color: #4caf50;
+}
+
+.custom-file-input-label i {
+    margin-right: 10px;
+    color: #4caf50;
+    font-size: 24px;
+}
+
+.custom-file-input-label span {
+    font-weight: 600;
+    color: #495057;
+}
+
+#file-chosen { /* Estilo para mostrar el archivo elegido */
+    display: block;
+    margin-top: 10px;
+    font-style: italic;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Estilos para la sección de mostrar producto */
@@ -76,15 +277,6 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilos para la sección de acciones del carrito */
-.acciones_carrito {
-    flex: 1 1 30%;
-    max-width: 350px;
-    background-color: #f3f3f7;
-    border-radius: 15px;
-    margin: 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
 
 /* Contenedor principal */
 .container_show {
@@ -130,27 +322,34 @@
 /* Contenedor para la imagen del producto */
 .show_img {
     flex: 0 0 160px;
-    height: 160px;
-    border: 2px solid  #4caf509e;
+    height: 135px;
+    border: 2px dashed #4caf50;
     border-radius: 15px;
     background-color: #e8f5e9;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    margin-left: 10px;
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.15);
+    margin-left: 25px;
+    box-shadow: 0 4px 12px rgba(224, 220, 230, 0.15);
 }
 
 /* Imagen del producto */
 .show_img img {
-    max-width: 95%;
-    max-height: 95%;
+    max-width: 82%;
+    max-height: 90%;
     object-fit: cover;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(52, 127, 103, 0.18);
+    box-shadow: 0 2px 8px rgba(27, 224, 162, 0.18);
     background: #fff;
     border: 1px solid #c8e6c9;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+    transform: scale(1);
+}
+
+.show_img img:hover {
+    transform: scale(1.1);
 }
 
 /* Estilos para la lista de información del producto */
@@ -228,25 +427,20 @@
 }
 
 /* Contenedor para las acciones del carrito */
-.acciones_carrito {
-    margin: 40px auto;
-    padding: 30px 50px;
-    border: 1px solid #eee;
-    width: 100%;
-    max-width: 500px;
-    min-height: 400px;
+.container_form {
+    flex: 1 1 60%;
+    max-width: 800px;
+    background-color: #ffffff;
     border-radius: 15px;
-    background-color:  #f3f3f7;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.4s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-/* Efecto hover para el contenedor de acciones del carrito */
-.acciones_carrito:hover {
-    box-shadow: 0 8px 16px rgb(52 127 103 / 48%);
+    width: 100%;   
+    min-height: 750px;  /* más espacio */
+    padding: 20px 30px; /* que se vea el contenido */
+    transition: all 0.4s ease-in-out;
+    opacity: 1; 
+    transform: translateY(0); /* evita que quede fuera de la vista */
+    animation: fadeInUp 0.8s ease-out forwards;
+    overflow: hidden;
+    border-top: 5px solid #4caf50;
 }
 
 /* Contenedor para el carrito */
@@ -263,7 +457,7 @@
     margin-bottom: 15px;
     font-size: 20px;
     font-weight: bold;
-    color: #333;
+    color: #4caf509e;
 }
 
 /* Estilos para el formulario del carrito */
