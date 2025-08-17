@@ -54,29 +54,14 @@
             ],
             'cantidad' => 1
         ],
-        (object)[
-            'id' => 3,
-            'producto' => (object)[
-                'producto' => 'Teclado',
-                'imagen' => 'img/inventario/imagen_default.png'
-            ],
-            'cantidad' => 1
-        ],
-        (object)[
-            'id' => 4,
-            'producto' => (object)[
-                'producto' => 'Teclado',
-                'imagen' => 'img/inventario/imagen_default.png'
-            ],
-            'cantidad' => 1
-        ],
-
     ];
 @endphp
 
 <div class="div_flex">
     <div class="div_carrito">
-        <h2><i class="fas fa-shopping-cart"></i> Carrito </h2>
+        <div class="div_titulo_carrito">
+            <h2><i class="fas fa-shopping-cart"></i> Carrito </h2>
+        </div>
         <table class="carrito-table mt-3">
             <thead>
                 <tr>
@@ -91,8 +76,8 @@
                 <tr>
                     <td>
                         <img src="{{ asset($item->producto->imagen ?? 'img/inventario/default.png') }}"
-                             alt="Foto"
-                             class="img img-expandable">
+                            alt="Foto"
+                            class="img img-expandable">
                     <td>{{ $item->producto->producto }}</td>
                     <td>{{ $item->cantidad }}</td>
                     <td>
@@ -112,7 +97,7 @@
     <div class="div_lateral">
         <div class="div_pedido">
             <div class="div_titulo">
-                <h2><i class="fas fa-receipt"></i> Pedido </h2>
+                <h2 class="h2_titulo"><i class="fas fa-receipt"></i> Pedido </h2>
             </div>
             <div class="div_titulo">
                 <p><strong>Productos:</strong> {{ count($carrito) }}</p>
@@ -127,8 +112,8 @@
             </form>
         </div>
 
-        <div class="resumen">
-            <div class="div_titulo">
+        <div class="div_resumen">
+            <div class="div_titulo_resumen">
                 <h2><i class="fas fa-list-alt"></i> Resumen </h2>
             </div>
             <ul>

@@ -107,7 +107,8 @@
     margin: 0;
     font-size: 24px;
     font-weight: 600;
-    color: #343a40;
+    color: #4caf50;
+    text-align: center;
 }
 
 .form_flex {
@@ -205,7 +206,7 @@
     width: 100%;
 }
 
-.custom-file-input {
+.custom-file-input { /* Estilo para el input de archivo personalizado */
     position: absolute;
     left: 0;
     top: 0;

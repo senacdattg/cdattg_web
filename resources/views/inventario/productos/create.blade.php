@@ -27,7 +27,7 @@
 
         <div class="container_form">
             <div class="form_header">
-                <h3>Registrar Nuevo Producto</h3>
+                <h3>Registrar Producto</h3>
             </div>
             <form action="{{ route('productos.store') }}" method="POST" enctype="multipart/form-data" class="form_flex">
                 @csrf
