@@ -201,7 +201,6 @@
                     $hoy = \Carbon\Carbon::today();
                     $diasRestantes = $fechaActividad->isFuture() ? $hoy->diffInDays($fechaActividad) : 0;
                 @endphp
-
                 <div class="col-12 mb-4">
                     <div class="card activity-card h-100">
                         <div class="card-header text-white
@@ -292,11 +291,16 @@
                                 <div class="col-lg-4 mt-4 mt-lg-0">
                                     <div class="d-flex flex-column h-100">
                                         @if ($actividad['id_estado'] == 'PENDIENTE' || $actividad['id_estado'] == 'EN CURSO')
-                                            <a class="btn btn-success btn-block mb-1"
-                                                href="{{ route('asistence.caracterSelected', [$caracterizacion, $actividad]); }}">
-                                                <i class="fas fa-clipboard-check"></i> Tomar Asistencia
-                                            </a>
-
+                                            @if ($fechaActividad == $hoy)
+                                                <a class="btn btn-success btn-block mb-1"
+                                                    href="{{ route('asistence.caracterSelected', [$caracterizacion, $actividad]); }}">
+                                                    <i class="fas fa-clipboard-check"></i> Tomar Asistencia
+                                                </a>
+                                            @else
+                                                <button class="btn btn-outline-secondary btn-block mb-1" disabled>
+                                                    <i class="fas fa-clipboard-check"></i> Tomar Asistencia
+                                                </button>
+                                            @endif
                                             <a class="btn btn-primary btn-block mb-1"
                                                 href="#">
                                                 <i class="fas fa-edit"></i> Editar Actividad
