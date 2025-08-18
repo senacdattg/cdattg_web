@@ -1,0 +1,158 @@
+/* Estilos para modal de información reutilizable */
+.modal-aprobar-salida {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-aprobar-salida.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-info-force {
+    z-index: 99999 !important;
+}
+
+.modal-aprobar-salida .modal-content {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
+    padding: 0;
+    width: 520px;
+    max-width: 97vw;
+    position: relative;
+    border: 2px solid #3a7e627a;
+    transform: scale(0.85);
+    opacity: 0;
+    transition: transform 0.35s cubic-bezier(.4,2,.3,1), opacity 0.35s;
+}
+
+.modal-aprobar-salida.show .modal-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.modal-aprobar-salida .modal-header {
+    padding: 28px 32px 18px 32px;
+    border-bottom: 1.5px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #e9ecef;
+}
+
+.modal-aprobar-salida .modal-header h4 {
+    color: #33ab65;
+    font-weight: 700;
+    margin: 0;
+    font-size: 1.35rem;
+    display: flex;
+    align-items: center;
+    text-align: center;
+}
+
+.modal-aprobar-salida .modal-header i {
+    margin-right: 16px;
+    font-size: 2.2rem;
+    color: #28a745;
+}
+
+.modal-aprobar-salida .modal-body {
+    padding: 32px 32px 24px 32px;
+}
+
+.modal-aprobar-salida .modal-content ul {
+    text-align: left;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: none;
+    margin-right: 12px;
+    font-weight: 600;
+    font-size: 1.08rem;
+}
+
+.modal-aprobar-salida .modal-content ul li {
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #fff;
+    border: none;
+    margin-right: 12px;
+    font-weight: 600;
+    font-size: 1.08rem;
+}
+
+.modal-aprobar-salida .div_motivo_rechazo textarea {
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+    margin-top: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+    box-shadow: 0 1px 6px rgba(220,53,69,0.08);
+}
+.modal-aprobar-salida .div_motivo_rechazo textarea.rechazo-activo {
+    border-color: #dc3545;
+    box-shadow: 0 2px 12px rgba(220,53,69,0.18);
+}
+
+.modal-aprobar-salida .modal-content ul li:last-child {
+    border-bottom: none;
+}
+
+.modal-aprobar-salida .modal-content ul li strong {
+    color: #555;
+    margin-right: 10px;
+    display: inline-flex;
+    align-items: center;
+    font-weight: 600;
+}
+
+.modal-aprobar-salida .modal-content ul li strong i {
+    margin-right: 8px;
+    color: #007bff;
+    width: 20px;
+    text-align: center;
+}
+
+.modal-aprobar-salida .modal-content ul li span {
+    color: #333;
+    text-align: right;
+}
+
+.modal-aprobar-salida .close-modal {
+    font-size: 1.2rem;
+    color: #888;
+    background-color: #f0f0f0;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 0;
+    line-height: 1;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-aprobar-salida .close-modal:hover {
+    color: #fff;
+    background-color: #dc3545;
+    transform: rotate(90deg) scale(1.1);
+}

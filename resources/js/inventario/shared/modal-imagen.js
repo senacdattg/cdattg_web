@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
 
+        /* Cerrar modal */
         cerrar.addEventListener("click", function () {
             modal.style.display = "none";
         });
