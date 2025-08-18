@@ -90,6 +90,27 @@ class RolePermissionSeeder extends Seeder
             'EDITAR PERSONA',
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+            // Permisos para inventario
+            // Productos
+            'CREAR PRODUCTO',
+            'VER PRODUCTO',
+            'EDITAR PRODUCTO',
+            'ELIMINAR PRODUCTO',
+            // Ordenes
+            'VER ORDEN',
+            'CREAR ORDEN',
+            'EDITAR ORDEN',
+            // Préstamos
+            'VER PRESTAMO',
+            'CREAR PRESTAMO',
+            'EDITAR PRESTAMO',
+            'DEVOLVER PRESTAMO',
+            // Entradas
+            'VER ENTRADA',
+            'CREAR ENTRADA',
+            // Salidas
+            'VER SALIDA',
+            'CREAR SALIDA',
         ];
 
         // Crear cada permiso si no existe
@@ -146,6 +167,21 @@ class RolePermissionSeeder extends Seeder
             'EDITAR PERSONA',
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+            'CREAR PRODUCTO',
+            'VER PRODUCTO',
+            'EDITAR PRODUCTO',
+            'ELIMINAR PRODUCTO',
+            'VER ORDEN',
+            'CREAR ORDEN',
+            'EDITAR ORDEN',
+            'VER PRESTAMO',
+            'CREAR PRESTAMO',
+            'EDITAR PRESTAMO',
+            'DEVOLVER PRESTAMO',
+            'VER ENTRADA',
+            'CREAR ENTRADA',
+            'VER SALIDA',
+            'CREAR SALIDA',
         ]);
 
         // Asignar permisos al rol ADMINISTRADOR
