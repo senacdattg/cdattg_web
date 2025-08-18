@@ -689,6 +689,50 @@ return [
                 ],
             ],
         ],
+        // Inventario
+        [
+            'text' => 'Inventario',
+            'icon' => 'fa-solid fa-boxes-stacked',
+            'submenu' => [
+                [
+                    'text' => 'Productos',
+                    'url'  => 'productos',
+                    'icon' => 'fa-solid fa-box',
+                    'can'  => ['VER PRODUCTO', 'CREAR PRODUCTO', 'EDITAR PRODUCTO', 'ELIMINAR PRODUCTO'],
+                ],
+                [
+                    'text' => 'Carrito',
+                    'url'  => 'carrito',
+                    'icon' => 'fa-solid fa-cart-plus',
+                    'can'  => ['AGREGAR CARRITO', 'VER CARRITO', 'ELIMINAR CARRITO'],
+                ],
+                [
+                    'text' => 'Órdenes',
+                    'url'  => 'ordenes',
+                    'icon' => 'fa-solid fa-file-invoice',
+                    'can'  => ['VER ORDEN', 'CREAR ORDEN', 'EDITAR ORDEN'],
+                ],
+                [
+                    'text' => 'Préstamos',
+                    'url'  => 'prestamos',
+                    'icon' => 'fa-solid fa-handshake',
+                    'can'  => ['VER PRESTAMO', 'CREAR PRESTAMO', 'EDITAR PRESTAMO', 'DEVOLVER PRESTAMO'],
+                ],
+                [
+                    'text' => 'Entradas',
+                    'url'  => 'entradas',
+                    'icon' => 'fa-solid fa-arrow-down',
+                    'can'  => ['VER ENTRADA', 'CREAR ENTRADA'],
+                ],
+                [
+                    'text' => 'Salidas',
+                    'url'  => 'salidas',
+                    'icon' => 'fa-solid fa-arrow-up',
+                    'can'  => ['VER SALIDA', 'CREAR SALIDA'],
+                ],
+            ],
+        ],
+
     ],
 
     /*
