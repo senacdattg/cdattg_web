@@ -21,7 +21,7 @@ class OrdenController extends Controller
     public function index()
     {
         $ordenes = Orden::with(['tipoOrden'])->get();
-        return view('inventario.ordenes,index', compact('ordenes'));
+        return view('inventario.ordenes.index', compact('ordenes'));
     }
 
     /**
