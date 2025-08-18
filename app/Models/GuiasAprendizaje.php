@@ -42,7 +42,9 @@ class GuiasAprendizaje extends Model
     public function actividades()
     {
         return $this->belongsToMany(Evidencias::class, 'evidencia_guia_aprendizaje', 'guia_aprendizaje_id', 'evidencia_id')
-                    ->withPivot('user_create_id', 'user_edit_id')
-                    ->withTimestamps()->orderBy('fecha_evidencia', 'asc');
+                ->withPivot('user_create_id', 'user_edit_id')
+                ->withTimestamps()
+                ->orderByRaw("FIELD(id_estado, '25', '27')")
+                ->orderBy('fecha_evidencia', 'asc');
     }
 }
