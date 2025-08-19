@@ -753,7 +753,7 @@ return [
                 ],
                 [
                     'text' => 'Gestion de aspirantes',
-                    'url' => 'programa',
+                    'url' => 'gestion-aspirantes',
                     'icon' => 'fas fa-users',
                     'can' => [
                         'VER PROGRAMA DE CARACTERIZACION',
