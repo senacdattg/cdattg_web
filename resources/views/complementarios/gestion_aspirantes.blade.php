@@ -122,10 +122,9 @@
             <div class="row align-items-center">
                 <div class="col">
                     <div class="d-flex align-items-center">
-                        <i class="fas fa-users fs-2 text-dark me-3"></i>
+                        
                         <div>
-                            <h1 class="h2 mb-1 text-dark">Gestión de Aspirantes</h1>
-                            <p class="text-muted mb-0 small">Administre los aspirantes a programas de formación complementaria</p>
+                            <p class="text-muted mb-0">Administre los aspirantes a programas de formación complementaria</p>
                         </div>
                     </div>
                 </div>
