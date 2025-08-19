@@ -1,5 +1,7 @@
 @extends('adminlte::page')
 
+@section('classes_body', 'productos-page')
+
 @vite(['resources/css/inventario/productos.css', 'resources/js/inventario/productos.js', 'resources/css/inventario/shared/modal-imagen.css', 'resources/js/inventario/shared/modal-imagen.js'])
 
 @section('content')

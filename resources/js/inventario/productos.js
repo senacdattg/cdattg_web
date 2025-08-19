@@ -45,3 +45,41 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, 500); // Retraso para que la animación del contenedor principal termine
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const productCards = document.querySelectorAll('.product-card');
+    
+    productCards.forEach(card => {
+        // Efecto al pasar el mouse
+        card.addEventListener('mouseenter', function() {
+            const img = this.querySelector('.product-image');
+            if (img) {
+                img.style.transition = 'transform 0.3s ease';
+            }
+        });
+        
+        card.addEventListener('click', function(e) {
+            if (!e.target.closest('.action-btn')) {
+                const productId = this.getAttribute('data-product-id');
+                console.log(`Producto seleccionado ID: ${productId}`);
+            }
+        });
+    });
+
+    // Animación para el mensaje de éxito
+    const successAlert = document.querySelector('.alert-success');
+    if (successAlert) {
+        setTimeout(() => {
+            successAlert.style.transition = 'opacity 0.5s ease';
+            successAlert.style.opacity = '0';
+            setTimeout(() => {
+                successAlert.remove();
+            }, 500);
+        }, 3000);
+    }
+
+    // Filtros y búsqueda (puedes implementar esto luego)
+    console.log('Sistema de productos cargado correctamente');
+    
+    // Aquí puedes agregar más funcionalidad según sea necesario
+});

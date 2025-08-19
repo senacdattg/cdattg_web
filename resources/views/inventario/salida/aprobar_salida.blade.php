@@ -1,6 +1,8 @@
 {{-- resources/views/inventario/salida/aprobar_salida.blade.php --}}
 @extends('adminlte::page')
 
+@section('classes_body', 'salidas-page')
+
 @vite(['resources/css/inventario/aprobar_salida.css', 'resources/css/inventario/shared/modal-info.css', 'resources/js/inventario/aprobar_salida.js'])
 
 @section('content')

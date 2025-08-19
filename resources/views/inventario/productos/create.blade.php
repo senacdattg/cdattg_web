@@ -56,7 +56,7 @@
                         <div class="col-md-6 mb-4 form-floating">
                             <input type="number" name="peso" id="peso" class="form-control form-control-sm"
                                 value="{{ old('peso') }}" step="0.01" min="0" required placeholder="Peso">
-                            <label for="peso">Peso</label>
+                            <label for="peso">Magnitud</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
                             <select name="unidad_medida_id" id="unidad_medida_id" class="form-control form-control-sm" required>
