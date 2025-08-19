@@ -3,46 +3,46 @@
 @section('title', 'Gestión de Aspirantes')
 
 @section('content_header')
-    <h1>Gestión de Aspirantes</h1>
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1>Gestión de Aspirantes</h1>
+            <p class="text-muted">Administre los aspirantes a programas de formación complementaria</p>
+        </div>
+        <button class="btn btn-primary">
+            <i class="fas fa-plus"></i> Nuevo Aspirante
+        </button>
+    </div>
 @stop
 
 @section('content')
     <style>
-        .header-section {
+        .course-card {
             background-color: white;
-            border-bottom: 1px solid #e9ecef;
-            padding: 1.5rem 0;
-        }
-        
-        .status-tabs {
-            border-bottom: 1px solid #dee2e6;
+            border: 1px solid #e9ecef;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            text-align: center;
             margin-bottom: 1.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
-        
-        .status-tab {
-            background: none;
-            border: none;
-            padding: 0.75rem 1rem;
+        .course-card .card-icon {
+            font-size: 2rem;
             color: #6c757d;
-            text-decoration: none;
-            border-bottom: 2px solid transparent;
+            margin-bottom: 1rem;
+        }
+        .course-card .card-title {
+            font-size: 1.25rem;
             font-weight: 500;
+            margin-bottom: 0.5rem;
         }
-        
-        .status-tab.active {
-            color: #0d6efd;
-            border-bottom-color: #0d6efd;
-        }
-        
-        .status-tab:hover {
-            color: #495057;
-        }
-        
-        .badge-en-proceso {
-            background-color: #ffc107 !important;
-            color: white !important;
-        }
-        
+        .course-card .card-status {
+            display: inline-block;
+            padding: 0.25em 0.6em;
+            font-size: 75%;
+            font
         .badge-aceptado {
             background-color: #198754 !important;
             color: white !important;
@@ -116,199 +116,98 @@
         }
     </style>
 
-    <!-- Header -->
-    <div class="header-section">
-        <div class="container-fluid px-4">
-            <div class="row align-items-center">
-                <div class="col">
-                    <div class="d-flex align-items-center">
-                        
-                        <div>
-                            <p class="text-muted mb-0">Administre los aspirantes a programas de formación complementaria</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <button class="btn btn-primary">
-                        <i class="fas fa-plus me-2"></i>
-                        Nuevo Aspirante
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Main Content -->
     <div class="container-fluid px-4 py-4">
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-4">
-                <!-- Search and Filters -->
-                <div class="row mb-4">
-                    <div class="col-lg-6 mb-3 mb-lg-0">
-                        <div class="search-input">
-                            <i class="fas fa-search"></i>
-                            <input type="text" class="form-control" placeholder="Buscar por nombre o número de identidad">
-                        </div>
+        <div class="row">
+            <!-- Ejemplo de tarjeta -->
+            <div class="col-md-4 mb-4">
+                <div class="course-card">
+                    <div class="card-icon">
+                        <i class="fas fa-utensils"></i>
                     </div>
-                    <div class="col-lg-3 mb-3 mb-lg-0">
-                        <select class="form-select">
-                            <option selected>Todos los programas</option>
-                            <option>Desarrollo de Software</option>
-                            <option>Análisis de Datos</option>
-                            <option>Diseño Gráfico</option>
-                        </select>
+                    <div class="card-title">Auxiliar de Cocina</div>
+                    <span class="badge badge-aceptado mb-2">Activo</span>
+                    <p>Fundamentos de cocina, manipulación de alimentos y técnicas básicas de preparación.</p>
+                    <p><strong>Aspirantes:</strong> 15</p>
+                    <a href="#" class="btn btn-primary w-100">
+                        <i class="fas fa-users"></i> Ver Aspirantes
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="course-card">
+                    <div class="card-icon">
+                        <i class="fas fa-hammer"></i>
                     </div>
-                    <div class="col-lg-3">
-                        <select class="form-select">
-                            <option selected>Todos los años</option>
-                            <option>2025</option>
-                            <option>2024</option>
-                        </select>
+                    <div class="card-title">Acabados en Madera</div>
+                    <span class="badge badge-aceptado mb-2">Activo</span>
+                    <p>Técnicas de acabado, barnizado y restauración de muebles de madera.</p>
+                    <p><strong>Aspirantes:</strong> 8</p>
+                    <a href="#" class="btn btn-primary w-100">
+                        <i class="fas fa-users"></i> Ver Aspirantes
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="course-card">
+                    <div class="card-icon">
+                        <i class="fas fa-cut"></i>
                     </div>
+                    <div class="card-title">Confección de Prendas</div>
+                    <span class="badge badge-aceptado mb-2">Activo</span>
+                    <p>Técnicas básicas de corte, confección y terminado de prendas de vestir.</p>
+                    <p><strong>Aspirantes:</strong> 12</p>
+                    <a href="#" class="btn btn-primary w-100">
+                        <i class="fas fa-users"></i> Ver Aspirantes
+                    </a>
                 </div>
+            </div>
 
-                <!-- Status Tabs -->
-                <div class="status-tabs">
-                    <button class="status-tab active" data-status="todos">Todos</button>
-                    <button class="status-tab" data-status="en-proceso">En Proceso</button>
-                    <button class="status-tab" data-status="aceptados">Aceptados</button>
-                    <button class="status-tab" data-status="rechazados">Rechazados</button>
+            <div class="col-md-4 mb-4">
+                <div class="course-card">
+                    <div class="card-icon">
+                        <i class="fas fa-car"></i>
+                    </div>
+                    <div class="card-title">Mecánica Básica Automotriz</div>
+                    <span class="badge badge-aceptado mb-2">Activo</span>
+                    <p>Mantenimiento preventivo y diagnóstico básico de vehículos.</p>
+                    <p><strong>Aspirantes:</strong> 20</p>
+                    <a href="#" class="btn btn-primary w-100">
+                        <i class="fas fa-users"></i> Ver Aspirantes
+                    </a>
                 </div>
+            </div>
 
-                <!-- Table -->
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre Completo</th>
-                                <th>Número de Identidad</th>
-                                <th>Programa de Formación</th>
-                                <th>Fecha Solicitud</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>Carlos Andrés Martínez</td>
-                                <td>1098765432</td>
-                                <td>Desarrollo de Software</td>
-                                <td>15/03/2025</td>
-                                <td><span class="badge badge-en-proceso">EN PROCESO</span></td>
-                                <td>
-                                    <button class="action-btn action-btn-view" title="Ver">
-                                        <i class="fas fa-eye text-white"></i>
-                                    </button>
-                                    <button class="action-btn action-btn-edit" title="Editar">
-                                        <i class="fas fa-edit text-white"></i>
-                                    </button>
-                                    <button class="action-btn action-btn-delete" title="Eliminar">
-                                        <i class="fas fa-trash text-white"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>Ana María López</td>
-                                <td>1087654321</td>
-                                <td>Análisis de Datos</td>
-                                <td>10/02/2025</td>
-                                <td><span class="badge badge-aceptado">ACEPTADO</span></td>
-                                <td>
-                                    <button class="action-btn action-btn-view" title="Ver">
-                                        <i class="fas fa-eye text-white"></i>
-                                    </button>
-                                    <button class="action-btn action-btn-edit" title="Editar">
-                                        <i class="fas fa-edit text-white"></i>
-                                    </button>
-                                    <button class="action-btn action-btn-delete" title="Eliminar">
-                                        <i class="fas fa-trash text-white"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>Juan Pablo Rodríguez</td>
-                                <td>1076543210</td>
-                                <td>Diseño Gráfico</td>
-                                <td>05/04/2025</td>
-                                <td><span class="badge badge-rechazado">RECHAZADO</span></td>
-                                <td>
-                                    <button class="action-btn action-btn-view" title="Ver">
-                                        <i class="fas fa-eye text-white"></i>
-                                    </button>
-                                    <button class="action-btn action-btn-edit" title="Editar">
-                                        <i class="fas fa-edit text-white"></i>
-                                    </button>
-                                    <button class="action-btn action-btn-delete" title="Eliminar">
-                                        <i class="fas fa-trash text-white"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>4</td>
-                                <td>Luisa Fernanda Gómez</td>
-                                <td>1065432109</td>
-                                <td>Gestión de Redes</td>
-                                <td>20/01/2025</td>
-                                <td><span class="badge badge-aceptado">ACEPTADO</span></td>
-                                <td>
-                                    <button class="action-btn action-btn-view" title="Ver">
-                                        <i class="fas fa-eye text-white"></i>
-                                    </button>
-                                    <button class="action-btn action-btn-edit" title="Editar">
-                                        <i class="fas fa-edit text-white"></i>
-                                    </button>
-                                    <button class="action-btn action-btn-delete" title="Eliminar">
-                                        <i class="fas fa-trash text-white"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>5</td>
-                                <td>Pedro José Ramírez</td>
-                                <td>1054321098</td>
-                                <td>Administración de Empresas</td>
-                                <td>12/03/2025</td>
-                                <td><span class="badge badge-en-proceso">EN PROCESO</span></td>
-                                <td>
-                                    <button class="action-btn action-btn-view" title="Ver">
-                                        <i class="fas fa-eye text-white"></i>
-                                    </button>
-                                    <button class="action-btn action-btn-edit" title="Editar">
-                                        <i class="fas fa-edit text-white"></i>
-                                    </button>
-                                    <button class="action-btn action-btn-delete" title="Eliminar">
-                                        <i class="fas fa-trash text-white"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div class="col-md-4 mb-4">
+                <div class="course-card">
+                    <div class="card-icon">
+                        <i class="fas fa-leaf"></i>
+                    </div>
+                    <div class="card-title">Cultivo de Huertas Urbanas</div>
+                    <span class="badge badge-aceptado mb-2">Activo</span>
+                    <p>Técnicas de cultivo y mantenimiento de huertas en espacios urbanos.</p>
+                    <p><strong>Aspirantes:</strong> 10</p>
+                    <a href="#" class="btn btn-primary w-100">
+                        <i class="fas fa-users"></i> Ver Aspirantes
+                    </a>
                 </div>
+            </div>
 
-                <!-- Pagination -->
-                <nav aria-label="Paginación" class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Anterior">Anterior</a>
-                        </li>
-                        <li class="page-item active">
-                            <a class="page-link" href="#">1</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">2</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#">3</a>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link" href="#" aria-label="Siguiente">Siguiente</a>
-                        </li>
-                    </ul>
-                </nav>
+            <div class="col-md-4 mb-4">
+                <div class="course-card">
+                    <div class="card-icon">
+                        <i class="fas fa-gavel"></i>
+                    </div>
+                    <div class="card-title">Normatividad Laboral</div>
+                    <span class="badge badge-aceptado mb-2">Activo</span>
+                    <p>Actualización en normatividad laboral y seguridad social.</p>
+                    <p><strong>Aspirantes:</strong> 5</p>
+                    <a href="#" class="btn btn-primary w-100">
+                        <i class="fas fa-users"></i> Ver Aspirantes
+                    </a>
+                </div>
             </div>
         </div>
     </div>
