@@ -15,4 +15,9 @@ class ComplementarioController extends Controller
     {
         return view('complementarios.gestion_aspirantes');
     }
+
+    public function procesarDcoumentos() 
+    {
+        
+    }
 }
