@@ -37,7 +37,8 @@ Route::middleware('auth')->group(function () {
         'personas',
         'tema_parametro',
         'ubicacion',
-        'actividades'
+        'actividades',
+        'complementarios'
     ];
 
     // Incluir rutas de guías de aprendizaje
