@@ -18,6 +18,6 @@ class ComplementarioController extends Controller
 
     public function procesarDcoumentos() 
     {
-        
+        return view('complementarios.procesamiento_documentos');
     }
 }
