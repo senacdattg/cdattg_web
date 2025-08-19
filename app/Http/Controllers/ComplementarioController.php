@@ -13,6 +13,6 @@ class ComplementarioController extends Controller
      */
     public function gestionAspirantes()
     {
-        return view('complementarios.gestion_aspirantes_blade');
+        return view('complementarios.gestion_aspirantes');
     }
 }
