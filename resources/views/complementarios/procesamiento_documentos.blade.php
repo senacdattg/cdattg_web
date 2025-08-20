@@ -10,88 +10,12 @@
         </div>
     </div>
 @stop
+@section('css')
+    {{-- Usando Vite --}}
+    @vite('resources/css/complementario/procesar_documentos.css')
+@stop
 
 @section('content')
-    <style>
-        body {
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-        }
-        .main-content {
-            margin-left: 20%;
-            width: 75%;
-            background-color: #e7e7eb;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        .content-header {
-            margin-bottom: 20px;
-        }
-        .card {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .upload-area {
-            border: 2px dashed #094577;
-            border-radius: 10px;
-            padding: 40px;
-            text-align: center;
-            background-color: #f8f9fa;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        .upload-area:hover {
-            background-color: #e2e6ea;
-        }
-        .upload-icon {
-            font-size: 50px;
-            color: #094577;
-            margin-bottom: 15px;
-        }
-        .btn-primary {
-            background-color: #094577;
-            border-color: #094577;
-        }
-        .btn-primary:hover {
-            background-color: #073a62;
-            border-color: #073a62;
-        }
-        .validation-section {
-            margin-top: 20px;
-        }
-        .validation-icon {
-            font-size: 24px;
-            margin-right: 10px;
-        }
-        .stat-card {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            margin-bottom: 20px;
-            transition: transform 0.3s;
-        }
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-        .stat-icon {
-            font-size: 30px;
-            color: #094577;
-            margin-bottom: 10px;
-        }
-        .stat-number {
-            font-size: 28px;
-            font-weight: bold;
-            color: #2f2f30;
-        }
-        .stat-title {
-            color: #6c757d;
-            font-size: 14px;
-        }
-    </style>
      <!-- Main Content -->
     <div class="main-content">
 
@@ -243,46 +167,11 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Status tab functionality
-        document.querySelectorAll('.status-tab').forEach(tab => {
-            tab.addEventListener('click', function() {
-                // Remove active class from all tabs
-                document.querySelectorAll('.status-tab').forEach(t => t.classList.remove('active'));
-                // Add active class to clicked tab
-                this.classList.add('active');
-                
-                // Here you would typically filter the table based on the selected status
-                const status = this.getAttribute('data-status');
-                console.log('Selected status:', status);
-            });
-        });
-
-        // Search functionality
-        document.querySelector('.search-input input').addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase();
-            console.log('Search term:', searchTerm);
-            // Here you would implement the search logic
-        });
-
-        // Action button functionality
-        document.querySelectorAll('.action-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                const action = this.classList.contains('action-btn-view') ? 'view' : 
-                              this.classList.contains('action-btn-edit') ? 'edit' : 'delete';
-                const row = this.closest('tr');
-                const id = row.cells[0].textContent;
-                console.log(`${action} action for ID: ${id}`);
-            });
-        });
-    </script>
 @stop
 
-@section('css')
-@stop
 
 @section('js')
     <script>
-        console.log('Módulo de gestión de aspirantes cargado');
+        console.log('Módulo de Procesamiento de documentos');
     </script>
 @stop
