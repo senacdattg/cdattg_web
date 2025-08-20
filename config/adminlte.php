@@ -801,7 +801,7 @@ return [
                 ],
                 [
                     'text' => 'Procesar documentos',
-                    'url' => 'procesar_documentos',
+                    'url' => 'procesar-documentos',
                     'icon' => 'fas fa-file-signature',
                     'can' => [
                         'VER PROGRAMA DE CARACTERIZACION',
