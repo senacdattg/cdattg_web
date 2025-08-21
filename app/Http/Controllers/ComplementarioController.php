@@ -35,4 +35,9 @@ class ComplementarioController extends Controller
     {
         return view('complementarios.gestion_programas_complementarios');
     }
+    public function estadisticas()
+    {
+        return view('complementarios.estadisticas');
+
+    }
 }
