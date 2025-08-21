@@ -790,7 +790,7 @@ return [
                 ],
                 [
                     'text' => 'Estadisticas',
-                    'url' => 'fichaCaracterizacion',
+                    'url' => 'estadisticas',
                     'icon' => 'fas fa-chart-line',
                     'can' => [
                         'VER PROGRAMA DE CARACTERIZACION',
