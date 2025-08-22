@@ -32,7 +32,6 @@
     width: 520px;
     max-width: 97vw;
     position: relative;
-    border: 2px solid #3a7e627a;
     transform: scale(0.85);
     opacity: 0;
     transition: transform 0.35s cubic-bezier(.4,2,.3,1), opacity 0.35s;
@@ -45,11 +44,11 @@
 
 .modal-aprobar-salida .modal-header {
     padding: 28px 32px 18px 32px;
-    border-bottom: 1.5px solid #e9ecef;
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: #e9ecef;
+    border-radius: 16px 16px 0 0;
 }
 
 .modal-aprobar-salida .modal-header h4 {
@@ -85,7 +84,6 @@
 
 .modal-aprobar-salida .modal-content ul li {
     padding: 12px 0;
-    border-bottom: 1px solid #f0f0f0;
     font-size: 0.95rem;
     display: flex;
     align-items: center;
@@ -155,4 +153,81 @@
     color: #fff;
     background-color: #dc3545;
     transform: rotate(90deg) scale(1.1);
+}
+
+/* User Tooltip Styles */
+.user-field {
+    position: relative !important;
+    display: inline-block !important;
+}
+
+.user-info-icon {
+    color: #007bff !important;
+    cursor: pointer !important;
+    margin-right: 5px !important;
+    font-size: 1.1em !important;
+    transition: color 0.2s ease !important;
+    position: relative !important;
+}
+
+.user-info-icon:hover {
+    color: #0056b3 !important;
+    transform: scale(1.1) !important;
+}
+
+.user-tooltip {
+    position: absolute !important;
+    top: 25px !important;
+    left: 0px !important;
+    background: #fff !important;
+    border: 2px solid #007bff !important;
+    border-radius: 8px !important;
+    padding: 15px !important;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15) !important;
+    z-index: 999999 !important;
+    min-width: 280px !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: all 0.3s ease !important;
+    font-size: 0.9em !important;
+    pointer-events: none !important;
+}
+
+/* Mostrar tooltip cuando tenga la clase 'show' */
+.user-tooltip.show {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+.tooltip-content {
+    text-align: left !important;
+}
+
+.tooltip-content h5 {
+    margin: 0 0 10px 0 !important;
+    color: #007bff !important;
+    font-size: 1.1em !important;
+    border-bottom: 1px solid #e9ecef !important;
+    padding-bottom: 5px !important;
+}
+
+.tooltip-content p {
+    margin: 5px 0 !important;
+    line-height: 1.4 !important;
+    color: #333 !important;
+}
+
+.tooltip-content strong {
+    color: #495057 !important;
+    font-weight: 600 !important;
+}
+
+/* Test button styles */
+.test-tooltip-section {
+    text-align: center !important;
+    padding: 10px !important;
+    background: #f8f9fa !important;
+    border-radius: 5px !important;
+    margin-bottom: 15px !important;
 }

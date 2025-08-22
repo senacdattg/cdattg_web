@@ -1,29 +1,35 @@
 @extends('adminlte::page')
 
-@vite(['resources/css/inventario/ordenes.css', 'resources/js/inventario/ordenes.js'])
+@vite([
+    'resources/css/inventario/shared/base.css',
+    'resources/css/inventario/ordenes.css',
+    'resources/js/inventario/ordenes.js'
+])
 
 @section('content')
-    <div class="card card-ordenes">
-        <div class="card-header">
-            <h3><i class="fas fa-clipboard-list"></i> Listado de Órdenes</h3>
-            {{--<a href="{{ route('inventario.ordenes.create') }}" class="btn btn-success btn-sm">
-                <i class="fas fa-plus"></i> Nueva Orden
-            </a> --}}
-        </div>
-        <div class="card-body">
-            <table id="orders-table" class="table-ordenes">
-                <thead>
-                    <tr>
-                        <th><i class="fas fa-hashtag"></i> ID</th>
-                        <th><i class="fas fa-align-left"></i> Descripción</th>
-                        <th><i class="fas fa-tags"></i> Tipo</th>
-                        <th><i class="fas fa-calendar-alt"></i> Fecha devolución</th>
-                        <th><i class="fas fa-user"></i> Usuario</th>
-                        <th><i class="fas fa-info-circle"></i> Estado</th>
-                        <th><i class="fas fa-calendar-alt"></i> Creación</th>
-                        <th><i class="fas fa-cogs"></i> Acciones</th>
-                    </tr>
-                </thead>
+    <div class="container-fluid">
+        <div class="card card-ordenes">
+            <div class="card-header">
+                <h3><i class="fas fa-clipboard-list"></i> Listado de Órdenes</h3>
+                {{--<a href="{{ route('inventario.ordenes.create') }}" class="btn btn-success btn-sm">
+                    <i class="fas fa-plus"></i> Nueva Orden
+                </a> --}}
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="orders-table" class="table-ordenes">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-hashtag"></i> ID</th>
+                                <th><i class="fas fa-align-left"></i> Descripción</th>
+                                <th><i class="fas fa-tags"></i> Tipo</th>
+                                <th><i class="fas fa-calendar-alt"></i> Fecha devolución</th>
+                                <th><i class="fas fa-user"></i> Usuario</th>
+                                <th><i class="fas fa-info-circle"></i> Estado</th>
+                                <th><i class="fas fa-calendar-alt"></i> Creación</th>
+                                <th><i class="fas fa-cogs"></i> Acciones</th>
+                            </tr>
+                        </thead>
                 <tbody>
                     {{-- Ejemplo visual, reemplaza por tu foreach real --}}
                     <tr>
@@ -55,7 +61,7 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>2</td>
+                        <td>3</td>
                         <td>Llevarme un pc pa la casa pa jugar</td>
                         <td><span class="badge badge-secondary">Salida</span></td>
                         <td>2026-08-30</td>
@@ -88,7 +94,9 @@
                         </tr>
                     @endforeach --}}
                 </tbody>
-            </table>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 @endsection

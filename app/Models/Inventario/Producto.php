@@ -23,6 +23,11 @@ class Producto extends Model
         'codigo_barras',
         'estado_producto_id',
         'imagen',
+        'contrato_convenio',
+        'fecha_vencimiento',
+        'categoria_id',
+        'marca_id',
+        'ubicacion',
         'user_create_id',
         'user_update_id'
     ];

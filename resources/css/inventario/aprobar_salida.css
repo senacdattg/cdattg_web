@@ -6,7 +6,7 @@
     min-height: 350px;
     background-color: #f3f3f7;
     border-radius: 15px;
-    margin: 40px auto;
+    margin: 0 auto;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     padding: 30px 50px;
     width: 100%;
@@ -250,44 +250,10 @@ div.div_titulo_cerrar h2 {
     opacity: 1;
     top: -40px;
 }
-body {
-    background: linear-gradient(to bottom, #CACCCE, #CACCCE);
-    margin: 0;
-    min-height: 100vh;
-}
 
+/* Estilos específicos para centrado en aprobar salida */
 .content-wrapper {
-  background: linear-gradient(to bottom, 
-    #000627 0%, 
-    #5E6771 50%, 
-    #CACCCE 100%
-  );
-}
-/* Cambiar el color del navbar */
-.salidas-page .main-header.navbar { 
-    background-color: #00041D !important;
-}
-
-/* Estilos para el texto del navbar */
-.salidas-page .main-header.navbar .nav-link {
-    color: #ffffff !important; /* Color del texto de los links */
-}
-
-.salidas-page .main-header.navbar .nav-link:hover {
-    color: #30d668 !important; 
-}
-
-/* Color del texto del título/marca en el navbar */
-.salidas-page .main-header.navbar .navbar-brand {
-    color: #ffffff !important;
-}
-
-/* Color del texto del nombre de usuario y rol */
-.salidas-page .main-header.navbar .user-menu .nav-link {
-    color: #ffffff !important;
-}
-
-/* Color de los iconos en el navbar */
-.salidas-page .main-header.navbar .nav-item i {
-    color: #ffffff !important;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
 }
