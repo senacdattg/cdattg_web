@@ -1,6 +1,10 @@
 @extends('adminlte::page')
 
-@vite(['resources/css/inventario/shared/base.css', 'resources/css/inventario/ordenes.css', 'resources/js/inventario/ordenes.js'])
+@vite([
+    'resources/css/inventario/shared/base.css',
+    'resources/css/inventario/ordenes.css',
+    'resources/js/inventario/ordenes.js'
+])
 
 @section('content')
     <div class="container-fluid">

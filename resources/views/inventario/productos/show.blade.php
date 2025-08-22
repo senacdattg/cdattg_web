@@ -2,7 +2,14 @@
 
 @section('classes_body', 'productos-page')
 
-@vite(['resources/css/inventario/shared/base.css', 'resources/css/inventario/productos.css', 'resources/css/inventario/carrito.css', 'resources/js/inventario/productos.js', 'resources/css/inventario/shared/modal-imagen.css', 'resources/js/inventario/shared/modal-imagen.js'])
+@vite([
+    'resources/css/inventario/shared/base.css',
+    'resources/css/inventario/productos.css',
+    'resources/css/inventario/carrito.css',
+    'resources/js/inventario/productos.js',
+    'resources/css/inventario/shared/modal-imagen.css',
+    'resources/js/inventario/shared/modal-imagen.js'
+])
 
 @section('content')
 <div class="flex_show">

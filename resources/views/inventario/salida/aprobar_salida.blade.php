@@ -3,7 +3,12 @@
 
 @section('classes_body', 'salidas-page')
 
-@vite(['resources/css/inventario/shared/base.css', 'resources/css/inventario/aprobar_salida.css', 'resources/css/inventario/shared/modal-info.css', 'resources/js/inventario/aprobar_salida.js'])
+@vite([
+    'resources/css/inventario/shared/base.css',
+    'resources/css/inventario/aprobar_salida.css',
+    'resources/css/inventario/shared/modal-info.css',
+    'resources/js/inventario/aprobar_salida.js'
+])
 
 @section('content')
 <div class="container_show">
