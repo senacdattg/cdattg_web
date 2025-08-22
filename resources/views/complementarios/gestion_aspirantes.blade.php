@@ -129,7 +129,7 @@
                     <span class="badge badge-aceptado mb-2">Activo</span>
                     <p>Fundamentos de cocina, manipulación de alimentos y técnicas básicas de preparación.</p>
                     <p><strong>Aspirantes:</strong> 15</p>
-                    <a href="#" class="btn btn-primary w-100">
+                    <a href="{{ route('aspirantes.ver', ['curso' => 'auxiliar-cocina']) }}" class="btn btn-primary w-100">
                         <i class="fas fa-users"></i> Ver Aspirantes
                     </a>
                 </div>
@@ -144,7 +144,7 @@
                     <span class="badge badge-aceptado mb-2">Activo</span>
                     <p>Técnicas de acabado, barnizado y restauración de muebles de madera.</p>
                     <p><strong>Aspirantes:</strong> 8</p>
-                    <a href="#" class="btn btn-primary w-100">
+                    <a href="{{ route('aspirantes.ver', ['curso' => 'acabados-madera']) }}" class="btn btn-primary w-100">
                         <i class="fas fa-users"></i> Ver Aspirantes
                     </a>
                 </div>
@@ -159,7 +159,7 @@
                     <span class="badge badge-aceptado mb-2">Activo</span>
                     <p>Técnicas básicas de corte, confección y terminado de prendas de vestir.</p>
                     <p><strong>Aspirantes:</strong> 12</p>
-                    <a href="#" class="btn btn-primary w-100">
+                    <a href="{{ route('aspirantes.ver', ['curso' => 'confeccion-prendas']) }}" class="btn btn-primary w-100">
                         <i class="fas fa-users"></i> Ver Aspirantes
                     </a>
                 </div>
@@ -174,7 +174,7 @@
                     <span class="badge badge-aceptado mb-2">Activo</span>
                     <p>Mantenimiento preventivo y diagnóstico básico de vehículos.</p>
                     <p><strong>Aspirantes:</strong> 20</p>
-                    <a href="#" class="btn btn-primary w-100">
+                    <a href="{{ route('aspirantes.ver', ['curso' => 'mecanica-basica-automotriz']) }}" class="btn btn-primary w-100">
                         <i class="fas fa-users"></i> Ver Aspirantes
                     </a>
                 </div>
@@ -189,7 +189,7 @@
                     <span class="badge badge-aceptado mb-2">Activo</span>
                     <p>Técnicas de cultivo y mantenimiento de huertas en espacios urbanos.</p>
                     <p><strong>Aspirantes:</strong> 10</p>
-                    <a href="#" class="btn btn-primary w-100">
+                    <a href="{{ route('aspirantes.ver', ['curso' => 'cultivo-huertas-urbanas']) }}" class="btn btn-primary w-100">
                         <i class="fas fa-users"></i> Ver Aspirantes
                     </a>
                 </div>
@@ -204,7 +204,7 @@
                     <span class="badge badge-aceptado mb-2">Activo</span>
                     <p>Actualización en normatividad laboral y seguridad social.</p>
                     <p><strong>Aspirantes:</strong> 5</p>
-                    <a href="#" class="btn btn-primary w-100">
+                    <a href="{{ route('aspirantes.ver', ['curso' => 'normatividad-laboral']) }}" class="btn btn-primary w-100">
                         <i class="fas fa-users"></i> Ver Aspirantes
                     </a>
                 </div>
