@@ -567,6 +567,63 @@
     color: white;
 }
 
+.header-buttons {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.header-buttons .btn {
+    transition: all 0.3s ease;
+}
+
+.header-buttons .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Estilos específicos para el botón del carrito */
+.carrito-icon-btn {
+    width: 50px !important;
+    height: 50px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    color: white !important;
+}
+
+.carrito-icon-btn i {
+    font-size: 1.2em !important;
+}
+
+/* Tooltip personalizado para el carrito */
+.carrito-icon-btn::after {
+    content: 'Ver Carrito';
+    position: absolute;
+    bottom: -35px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #000627;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 1000;
+}
+
+.carrito-icon-btn:hover::after {
+    opacity: 1;
+    visibility: visible;
+    bottom: -45px;
+}
+
 .product-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));

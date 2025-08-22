@@ -3,7 +3,7 @@
 @section('classes_body', 'productos-page')
 
 @vite([
-    'resources/css/inventario/shared/navbar.css',
+    'resources/css/inventario/shared/base.css',
     'resources/css/inventario/productos.css',
     'resources/js/inventario/productos.js',
     'resources/css/inventario/shared/modal-imagen.css',
