@@ -23,7 +23,7 @@ class ProductoSeeder extends Seeder
                 'cantidad' => 4,
                 'codigo_barras' => 1234567890123,
                 'estado_producto_id' => 42,
-                'imagen' => NULL,
+                'imagen' => 'img/inventario/imagen_default.png',
                 'user_create_id' => 1, 
                 'user_update_id' => 1,
             ],
