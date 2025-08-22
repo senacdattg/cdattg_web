@@ -3,10 +3,34 @@ document.addEventListener('DOMContentLoaded', function() {
     const imgBox = document.querySelector('.inventario-img-box');
     const previewImg = document.getElementById('preview');
 
-    if (imgBox) {
-        imgBox.addEventListener('click', function() {
-            imagenInput.click();
+    if (imgBox && imagenInput) {
+        // Manejar el clic en la caja de imagen del formulario
+        imgBox.addEventListener('click', function(e) {
+            const isDefaultImage = previewImg.src.includes('default.png') || previewImg.src.includes('imagen_default.png');
+            
+            if (isDefaultImage) {
+                // Si es imagen por defecto, solo abrir selector de archivo
+                e.stopPropagation();
+                e.preventDefault();
+                imagenInput.click();
+            }
+            // Si hay imagen real, permitir que el modal se abra (no hacer nada aquí)
         });
+
+        // Interceptar específicamente el evento de la imagen del preview para el modal
+        if (previewImg) {
+            previewImg.addEventListener('click', function(e) {
+                const isDefaultImage = this.src.includes('default.png') || this.src.includes('imagen_default.png');
+                
+                if (isDefaultImage) {
+                    // Si es imagen por defecto, evitar que se abra el modal
+                    e.stopPropagation();
+                    e.preventDefault();
+                    imagenInput.click();
+                }
+                // Si hay imagen real, permitir que el modal se abra normalmente
+            });
+        }
     }
 
     if (imagenInput) {
@@ -16,10 +40,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 reader.onload = function(e) {
                     previewImg.setAttribute('src', e.target.result);
                     imgBox.classList.add('has-image');
+                    imgBox.style.cursor = 'pointer';
                 }
                 reader.readAsDataURL(this.files[0]);
             }
         });
+    }
+
+    // Verificar al cargar la página si ya hay una imagen
+    if (previewImg) {
+        const isDefaultImage = previewImg.src.includes('default.png') || previewImg.src.includes('imagen_default.png');
+        if (!isDefaultImage) {
+            imgBox.classList.add('has-image');
+            imgBox.style.cursor = 'pointer';
+        } else {
+            imgBox.style.cursor = 'copy';
+        }
     }
 
     // Forzar la activación de etiquetas flotantes para selects con valor

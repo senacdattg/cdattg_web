@@ -1,7 +1,12 @@
 {{-- filepath: resources/views/inventario/carrito/index.blade.php --}}
 @extends('adminlte::page')
 
-@vite(['resources/css/inventario/carrito.css', 'resources/css/inventario/shared/modal-imagen.css', 'resources/js/inventario/shared/modal-imagen.js'])
+@vite([
+    'resources/css/inventario/shared/base.css',
+    'resources/css/inventario/carrito.css',
+    'resources/css/inventario/shared/modal-imagen.css',
+    'resources/js/inventario/shared/modal-imagen.js'
+])
 
 @section('content')
 @php

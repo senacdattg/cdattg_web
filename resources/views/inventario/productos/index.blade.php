@@ -3,6 +3,7 @@
 @section('classes_body', 'productos-page')
 
 @vite([
+    'resources/css/inventario/shared/base.css',
     'resources/css/inventario/productos.css',
     'resources/js/inventario/productos.js',
     'resources/css/inventario/shared/modal-imagen.css',
@@ -13,9 +14,14 @@
 @section('content_header')
     <div class="header-container">
         <h1>Catálogo de Productos</h1>
-        <a href="{{ route('productos.create') }}" class="btn btn-primary btn-lg">
-            <i class="fas fa-plus"></i> Nuevo Producto
-        </a>
+        <div class="header-buttons">
+            <a href="{{ route('carrito.index') }}" class="btn-lg carrito-icon-btn" title="Ver Carrito">
+                <i class="fas fa-shopping-cart"></i>
+            </a>
+            <a href="{{ route('productos.create') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus"></i> Nuevo Producto
+            </a>
+        </div>
     </div>
 @stop
 

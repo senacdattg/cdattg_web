@@ -29,7 +29,7 @@
     border-radius: 14px;
     box-shadow: 0 6px 24px rgba(0,0,0,0.13);
     background: #fff;
-    margin-top: 32px;
+    margin: 0 auto;
     border: 1.5px solid #4caf50;
 }
 .card-ordenes .card-header {
@@ -59,10 +59,11 @@
     border-collapse: separate;
     border-spacing: 0 18px;
     text-align: center;
-    margin-top: 20px !important;
+    margin: 20px auto !important;
     font-size: 16px;
     color: #333;
-    justify-content: space-between;
+    width: 100%;
+    max-width: 100%;
 }
 
 .table-ordenes th, .table-ordenes td {
@@ -156,4 +157,239 @@
 
 .card-body {
     padding: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow-x: auto;
+}
+
+/* Estilos para la sección de filtros */
+.filtros-container {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.07);
+    border: 1px solid #e9ecef;
+}
+
+.filtros-container .form-control {
+    border-radius: 8px;
+    border: 1.5px solid #ced4da;
+    font-size: 14px;
+    padding: 8px 12px;
+    transition: all 0.3s ease;
+    background-color: #fff;
+}
+
+.filtros-container .form-control:focus {
+    border-color: #4caf50;
+    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+.filtros-container .form-control::placeholder {
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Wrapper para centrar la tabla */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Responsive Design - Centrado en todas las pantallas */
+@media (max-width: 1200px) {
+    .table-ordenes {
+        margin: 15px auto !important;
+    }
+    
+    .table-ordenes th, .table-ordenes td {
+        padding: 12px 16px;
+        font-size: 14px;
+    }
+    
+    .card-ordenes .card-header {
+        padding: 14px 20px;
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 992px) {
+    .card-ordenes {
+        margin: 15px auto;
+        max-width: 95%;
+    }
+    
+    .table-ordenes {
+        font-size: 14px;
+        margin: 10px auto !important;
+    }
+    
+    .table-ordenes th, .table-ordenes td {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    
+    .badge-primary, .badge-success, .badge-warning, .badge-secondary, .badge-danger {
+        font-size: 0.85rem;
+        padding: 4px 8px;
+    }
+    
+    .btn-info, .btn-warning, .btn-danger {
+        font-size: 0.875rem !important;
+        padding: 4px 8px;
+        margin: 0 1px;
+    }
+}
+
+@media (max-width: 768px) {
+    .card-ordenes {
+        border-radius: 8px;
+        margin: 10px auto;
+        max-width: calc(100% - 20px);
+    }
+    
+    .card-body {
+        padding: 8px;
+    }
+    
+    .filtros-container {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+    
+    .filtros-container .col-md-3 {
+        margin-bottom: 10px;
+    }
+    
+    .filtros-container .form-control {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
+    
+    .card-ordenes .card-header {
+        padding: 12px 16px;
+        font-size: 1rem;
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+    }
+    
+    .table-ordenes {
+        border-spacing: 0 8px;
+        font-size: 12px;
+        margin: 5px auto !important;
+    }
+    
+    .table-ordenes th, .table-ordenes td {
+        padding: 8px 6px;
+        font-size: 12px;
+        border-radius: 6px;
+    }
+    
+    /* Ocultar algunas columnas en móvil */
+    .table-ordenes th:nth-child(3),
+    .table-ordenes td:nth-child(3),
+    .table-ordenes th:nth-child(4),
+    .table-ordenes td:nth-child(4),
+    .table-ordenes th:nth-child(7),
+    .table-ordenes td:nth-child(7) {
+        display: none;
+    }
+    
+    .badge-primary, .badge-success, .badge-warning, .badge-secondary, .badge-danger {
+        font-size: 0.75rem;
+        padding: 3px 6px;
+    }
+    
+    .btn-info, .btn-warning, .btn-danger {
+        font-size: 0.75rem !important;
+        padding: 3px 6px;
+        margin: 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .card-ordenes {
+        margin: 5px auto;
+        border-radius: 6px;
+        max-width: calc(100% - 10px);
+    }
+    
+    .card-body {
+        padding: 4px;
+    }
+    
+    .filtros-container {
+        padding: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .filtros-container .form-control {
+        font-size: 12px;
+        padding: 5px 8px;
+        margin-bottom: 8px;
+    }
+    
+    .filtros-container .row {
+        margin: 0;
+    }
+    
+    .filtros-container .col-md-3 {
+        padding: 0 5px;
+        margin-bottom: 8px;
+    }
+    
+    .card-ordenes .card-header {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+    
+    .table-ordenes {
+        border-spacing: 0 6px;
+        font-size: 11px;
+        margin: 2px auto !important;
+    }
+    
+    .table-ordenes th, .table-ordenes td {
+        padding: 6px 4px;
+        font-size: 11px;
+        border-radius: 4px;
+    }
+    
+    /* En móvil muy pequeño, mostrar solo columnas esenciales */
+    .table-ordenes th:nth-child(2),
+    .table-ordenes td:nth-child(2) {
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .badge-primary, .badge-success, .badge-warning, .badge-secondary, .badge-danger {
+        font-size: 0.7rem;
+        padding: 2px 4px;
+    }
+    
+    .btn-info, .btn-warning, .btn-danger {
+        font-size: 0.7rem !important;
+        padding: 2px 4px;
+        margin: 0;
+    }
+}
+
+/* Estilos para mejorar la legibilidad en pantallas pequeñas */
+@media (max-width: 768px) {
+    .table-ordenes tbody tr {
+        border-bottom: 1px solid #eee;
+    }
+    
+    .table-ordenes tbody tr:last-child {
+        border-bottom: none;
+    }
+}
+
+.container-fluid {
+    margin: 0 auto;
 }

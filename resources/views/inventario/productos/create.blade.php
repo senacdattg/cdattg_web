@@ -3,6 +3,7 @@
 @section('classes_body', 'productos-page')
 
 @vite([
+    'resources/css/inventario/shared/base.css',
     'resources/css/inventario/productos.css',
     'resources/js/inventario/productos.js',
     'resources/css/inventario/shared/modal-imagen.css',
@@ -44,7 +45,7 @@
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
                             <select name="tipo_producto_id" id="tipo_producto_id" class="form-control form-control-sm" required>
-                                <option value=""></option>
+                                <option value="">Tipo de producto</option>
                                 @foreach ($tiposProductos as $tipo)
                                     <option value="{{ $tipo->id }}" {{ old('tipo_producto_id') == $tipo->id ? 'selected' : '' }}>
                                         {{ $tipo->parametro->name }}
@@ -55,12 +56,12 @@
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
                             <input type="number" name="peso" id="peso" class="form-control form-control-sm"
-                                value="{{ old('peso') }}" step="0.01" min="0" required placeholder="Peso">
+                                value="{{ old('peso') }}" step="0.01" min="0" required placeholder="">
                             <label for="peso">Magnitud</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
                             <select name="unidad_medida_id" id="unidad_medida_id" class="form-control form-control-sm" required>
-                                <option value=""></option>
+                                <option value="">Unidad de medida</option>
                                 @foreach ($unidadesMedida as $unidad)
                                     <option value="{{ $unidad->id }}" {{ old('unidad_medida_id') == $unidad->id ? 'selected' : '' }}>
                                         {{ $unidad->parametro->name }}
@@ -71,17 +72,17 @@
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
                             <input type="number" name="cantidad" id="cantidad" class="form-control form-control-sm"
-                                value="{{ old('cantidad') }}" required placeholder="Cantidad">
+                                value="{{ old('cantidad') }}" required placeholder="">
                             <label for="cantidad">Cantidad</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
                             <input type="text" name="codigo_barras" id="codigo_barras" class="form-control form-control-sm"
-                                value="{{ old('codigo_barras') }}" required placeholder="Código de barras">
+                                value="{{ old('codigo_barras') }}" required placeholder="">
                             <label for="codigo_barras">Código de barras</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
                             <select name="estado_id" id="estado_id" class="form-control form-control-sm" required>
-                                <option value=""></option>
+                                <option value="">Estado</option>
                                 @foreach ($estados as $estado)
                                     <option value="{{ $estado->id }}" {{ old('estado_id') == $estado->id ? 'selected' : '' }}>
                                         {{ $estado->parametro->name }}
@@ -90,7 +91,50 @@
                             </select>
                             <label for="estado_id">Estado</label>
                         </div>
-                        <div class="col-md-6 mb-4">
+                        <div class="col-md-6 mb-4 form-floating">
+                            <input type="text" name="contrato_convenio" id="contrato_convenio" class="form-control form-control-sm"
+                                value="{{ old('contrato_convenio') }}" placeholder="">
+                            <label for="contrato_convenio">Contrato convenio</label>
+                        </div>
+                        <div class="col-md-6 mb-4 form-floating">
+                            <input type="date" name="fecha_vencimiento" id="fecha_vencimiento" class="form-control form-control-sm"
+                                value="{{ old('fecha_vencimiento') }}" placeholder="">
+                            <label for="fecha_vencimiento">Fecha de vencimiento</label>
+                        </div>
+                        <div class="col-md-6 mb-4 form-floating">
+                            <select name="categoria_id" id="categoria_id" class="form-control form-control-sm">
+                                <option value="">Categoría</option>
+                                {{-- Asumiendo que $categorias se pasa desde el controlador --}}
+                                @if(isset($categorias))
+                                    @foreach ($categorias as $categoria)
+                                        <option value="{{ $categoria->id }}" {{ old('categoria_id') == $categoria->id ? 'selected' : '' }}>
+                                            {{ $categoria->name }}
+                                        </option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            <label for="categoria_id">Categoría</label>
+                        </div>
+                        <div class="col-md-6 mb-4 form-floating">
+                            <select name="marca_id" id="marca_id" class="form-control form-control-sm">
+                                <option value="">Marca</option>
+                                {{-- Asumiendo que $marcas se pasa desde el controlador --}}
+                                @if(isset($marcas))
+                                    @foreach ($marcas as $marca)
+                                        <option value="{{ $marca->id }}" {{ old('marca_id') == $marca->id ? 'selected' : '' }}>
+                                            {{ $marca->name }}
+                                        </option>
+                                    @endforeach
+                                @endif
+                            </select>
+                            <label for="marca_id">Marca</label>
+                        </div>
+                        <div class="col-md-6 mb-4 form-floating">
+                            <input type="text" name="ubicacion" id="ubicacion" class="form-control form-control-sm"
+                                value="{{ old('ubicacion') }}" placeholder="">
+                            <label for="ubicacion">Ubicación</label>
+                        </div>
+                        <div class="col-md-12 mb-4">
                             <div class="custom-file-input-wrapper">
                                 <label for="imagen" class="custom-file-input-label">
                                     <i class="fas fa-cloud-upload-alt"></i>
@@ -99,14 +143,14 @@
                                 <input type="file" name="imagen" id="imagen" class="custom-file-input">
                             </div>
                         </div>
-                        <div class="col-md-12 mb-4 form-floating descripcion-container">
-                            <textarea name="descripcion" id="descripcion" class="form-control form-control-sm" rows="4" required placeholder="Descripción">{{ old('descripcion') }}</textarea>
+                        <div class="col-md-12 mb-4 form-floating">
+                            <textarea name="descripcion" id="descripcion" class="form-control form-control-sm" style="height: 120px;" placeholder="">{{ old('descripcion') }}</textarea>
                             <label for="descripcion">Descripción</label>
                         </div>
-                        <div class="col-12 btn-container">
-                            <button type="submit" class="btn btn-success btn-sm">Registrar Producto</button>
-                            <a href="{{ route('productos.index') }}" class="btn btn-secondary btn-sm">Cancelar</a>
-                        </div>
+                    </div>
+                    <div class="form_footer">
+                        <button type="submit" class="btn btn-success">Guardar</button>
+                        <a href="{{ route('productos.index') }}" class="btn btn-secondary">Cancelar</a>
                     </div>
                 </div>
             </form>
