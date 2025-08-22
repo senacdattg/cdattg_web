@@ -114,7 +114,109 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
 
-    // Filtros y búsqueda (puedes implementar esto luego)
+    // Funcionalidad de búsqueda de productos
+    const searchInput = document.getElementById('searchProducts');
+    const clearButton = document.getElementById('clearSearch');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+            
+            // Mostrar/ocultar botón de limpiar
+            if (searchTerm.length > 0) {
+                clearButton.style.display = 'block';
+            } else {
+                clearButton.style.display = 'none';
+            }
+
+            // Filtrar productos
+            filterProducts(searchTerm);
+        });
+
+        // Limpiar búsqueda
+        if (clearButton) {
+            clearButton.addEventListener('click', function() {
+                searchInput.value = '';
+                clearButton.style.display = 'none';
+                filterProducts('');
+                searchInput.focus();
+            });
+        }
+    }
+
+    function filterProducts(searchTerm) {
+        let visibleCount = 0;
+        
+        productCards.forEach(card => {
+            const productName = card.querySelector('.product-title')?.textContent.toLowerCase() || '';
+            const productInfo = card.querySelector('.product-info')?.textContent.toLowerCase() || '';
+            
+            const isVisible = productName.includes(searchTerm) || 
+                            productInfo.includes(searchTerm);
+            
+            if (isVisible) {
+                card.style.display = 'block';
+                card.style.animation = 'fadeIn 0.3s ease';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+
+        // Mostrar mensaje si no hay resultados
+        showNoResultsMessage(visibleCount === 0 && searchTerm.length > 0);
+    }
+
+    function showNoResultsMessage(show) {
+        let noResultsMsg = document.getElementById('no-results-message');
+        
+        if (show && !noResultsMsg) {
+            noResultsMsg = document.createElement('div');
+            noResultsMsg.id = 'no-results-message';
+            noResultsMsg.className = 'no-results-message';
+            noResultsMsg.innerHTML = `
+                <div class="no-results-content">
+                    <i class="fas fa-search fa-3x"></i>
+                    <h3>No se encontraron productos</h3>
+                    <p>Intenta con otros términos de búsqueda</p>
+                </div>
+            `;
+            
+            const productGrid = document.querySelector('.product-grid');
+            if (productGrid) {
+                productGrid.parentNode.insertBefore(noResultsMsg, productGrid.nextSibling);
+            }
+        } else if (!show && noResultsMsg) {
+            noResultsMsg.remove();
+        }
+    }
+
+    // Animación CSS para fade in
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .no-results-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+        
+        .no-results-content i {
+            color: #dee2e6;
+            margin-bottom: 20px;
+        }
+        
+        .no-results-content h3 {
+            margin-bottom: 10px;
+            color: #495057;
+        }
+    `;
+    document.head.appendChild(style);
+
     console.log('Sistema de productos cargado correctamente');
     
     // Aquí puedes agregar más funcionalidad según sea necesario
