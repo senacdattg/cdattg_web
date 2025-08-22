@@ -158,7 +158,9 @@
 /* User Tooltip Styles */
 .user-field {
     position: relative !important;
-    display: inline-block !important;
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 8px !important;
 }
 
 .user-info-icon {
@@ -202,6 +204,21 @@
 
 .tooltip-content {
     text-align: left !important;
+}
+
+.tooltip-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin-bottom: 12px !important;
+    padding-bottom: 8px !important;
+    border-bottom: 1px solid #e9ecef !important;
+    color: #007bff !important;
+    font-size: 1.1em !important;
+}
+
+.tooltip-header i {
+    color: #007bff !important;
 }
 
 .tooltip-content h5 {

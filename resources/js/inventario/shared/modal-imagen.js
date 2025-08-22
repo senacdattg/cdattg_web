@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         document.querySelectorAll(".img-expandable").forEach(img => {
             img.addEventListener("click", function () {
-                modal.style.display = "block";
+                modal.style.display = "flex";
                 modalImg.src = this.src;
             });
         });

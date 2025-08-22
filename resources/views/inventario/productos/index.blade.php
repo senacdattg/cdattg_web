@@ -54,12 +54,12 @@
                     @if($producto->imagen)
                         <img src="{{ asset($producto->imagen) }}" 
                             alt="{{ $producto->producto }}" 
-                            class="product-image">
+                            class="product-image img-expandable">
                     @else
                         <div class="placeholder-image">
                             <img src="https://placehold.co/300x300?text={{ urlencode($producto->producto) }}" 
                                 alt="Vista previa de {{ $producto->producto }}" 
-                                class="product-image">
+                                class="product-image img-expandable">
                         </div>
                     @endif
                 </div>
@@ -103,6 +103,13 @@
             </div>
         @endforelse
     </div>
+
+    
+<!-- Modal para imagen expandida -->
+<div id="modalImagen" class="modal-imagen">
+    <span class="cerrar">&times;</span>
+    <img class="modal-contenido" id="imgExpandida">
+</div>
 @stop
 
 

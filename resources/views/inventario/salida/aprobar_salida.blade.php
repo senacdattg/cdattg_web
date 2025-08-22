@@ -100,8 +100,42 @@
                 <li><strong><i class="fas fa-comment-alt"></i>Descripción:</strong> <span>{{ $detalleOrden->descripcion_orden ?? 'N/A' }}</span></li>
                 <li><strong><i class="fas fa-box-open"></i>Tipo de orden:</strong> <span>{{ $detalleOrden->tipo_orden_id ?? 'N/A' }}</span></li>
                 <li><strong><i class="fas fa-calendar-alt"></i>Fecha devolución:</strong> <span>{{ $detalleOrden->fecha_devolucion ?? 'N/A' }}</span></li>
-                <li><strong><i class="fas fa-user-plus"></i>Usuario crea:</strong> <span>{{ $detalleOrden->user_create_id ?? 'N/A' }}</span></li>
-                <li><strong><i class="fas fa-user-edit"></i>Usuario actualiza:</strong> <span>{{ $detalleOrden->user_update_id ?? 'N/A' }}</span></li>
+                <li class="user-field">
+                    <strong><i class="fas fa-user-plus user-info-icon" data-usuario-id="{{ $detalleOrden->user_create_id ?? '1' }}" title="Ver información del usuario"></i>Usuario crea:</strong> 
+                    <span>{{ $detalleOrden->user_create_id ?? 'N/A' }}</span>
+                    <div class="user-tooltip">
+                        <div class="tooltip-header">
+                            <i class="fas fa-user"></i>
+                            <strong>Información del Usuario</strong>
+                        </div>
+                        <div class="tooltip-content">
+                            <p><strong>ID:</strong> <span class="user-id">-</span></p>
+                            <p><strong>Nombre:</strong> <span class="user-name">Cargando...</span></p>
+                            <p><strong>Email:</strong> <span class="user-email">-</span></p>
+                            <p><strong>Rol:</strong> <span class="user-role">-</span></p>
+                            <p><strong>Estado:</strong> <span class="user-status">-</span></p>
+                            <p><strong>Último acceso:</strong> <span class="user-last-login">-</span></p>
+                        </div>
+                    </div>
+                </li>
+                <li class="user-field">
+                    <strong><i class="fas fa-user-edit user-info-icon" data-usuario-id="{{ $detalleOrden->user_update_id ?? '2' }}" title="Ver información del usuario"></i>Usuario actualiza:</strong> 
+                    <span>{{ $detalleOrden->user_update_id ?? 'N/A' }}</span>
+                    <div class="user-tooltip">
+                        <div class="tooltip-header">
+                            <i class="fas fa-user"></i>
+                            <strong>Información del Usuario</strong>
+                        </div>
+                        <div class="tooltip-content">
+                            <p><strong>ID:</strong> <span class="user-id">-</span></p>
+                            <p><strong>Nombre:</strong> <span class="user-name">Cargando...</span></p>
+                            <p><strong>Email:</strong> <span class="user-email">-</span></p>
+                            <p><strong>Rol:</strong> <span class="user-role">-</span></p>
+                            <p><strong>Estado:</strong> <span class="user-status">-</span></p>
+                            <p><strong>Último acceso:</strong> <span class="user-last-login">-</span></p>
+                        </div>
+                    </div>
+                </li>
                 <li><strong><i class="fas fa-clock"></i>Creado en:</strong> <span>{{ $detalleOrden->create_at ?? 'N/A' }}</span></li>
                 <li><strong><i class="fas fa-sync-alt"></i>Actualizado en:</strong> <span>{{ $detalleOrden->update_at ?? 'N/A' }}</span></li>
             </ul>
