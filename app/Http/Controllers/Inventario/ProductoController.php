@@ -114,4 +114,43 @@ class ProductoController extends Controller
     {
         //
     }
+    public function to_search(Request $request)
+    {
+        // Si la petición es AJAX, retorna los resultados en JSON
+        if ($request->ajax()) {
+            $query = $request->input('query');
+            $categoria = $request->input('categoria');
+            $estado = $request->input('estado');
+            $ubicacion = $request->input('ubicacion');
+
+            $productos = Producto::query();
+
+            if ($query) {
+                $productos->where(function($q) use ($query) {
+                    $q->where('producto', 'like', "%$query%")
+                      ->orWhere('codigo_barras', 'like', "%$query%")
+                      ->orWhere('descripcion', 'like', "%$query%");
+                });
+            }
+            if ($categoria) {
+                $productos->where('categoria', $categoria); // Ajusta el campo si es necesario
+            }
+            if ($estado) {
+                $productos->where('estado', $estado); // Ajusta el campo si es necesario
+            }
+            if ($ubicacion) {
+                $productos->where('ubicacion', $ubicacion); // Ajusta el campo si es necesario
+            }
+
+            $resultados = $productos->get();
+
+            $data = [
+                'productos' => $resultados,
+                'total' => $resultados->count()
+            ];
+            return response()->json($data);
+        }
+        // Si no es AJAX, retorna la vista normal
+        return view('inventario.productos.buscar_producto');
+    }
 }
