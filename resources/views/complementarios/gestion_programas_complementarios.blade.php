@@ -26,7 +26,7 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <select class="form-select mb-3" aria-label="Estado">
+                    <select class="custom-select mb-3" aria-label="Estado">
                         <option selected value="">Todos los estados</option>
                         <option value="activo">Activo</option>
                         <option value="inactivo">Inactivo</option>
@@ -55,8 +55,10 @@
                     <div class="h1 text-primary mb-3">
                         <i class="fas fa-utensils"></i>
                     </div>
-                    <h5 class="card-title">Auxiliar de Cocina</h5>
-                    <span class="badge bg-success mb-2">Activo</span>
+                    <div class="d-flex justify-content-center">
+                        <h5 class="card-title font-weight-bold">Auxiliar de Cocina</h5>
+                    </div>
+                    <span class="badge bg-success mb-2 w-20 text-center">Activo</span>
                     <p class="card-text">Fundamentos de cocina, manipulación de alimentos y técnicas básicas de preparación.</p>
                     <div class="d-flex justify-content-center mt-3 pt-3 border-top">
                         <div>
@@ -67,10 +69,10 @@
                 </div>
                 <div class="card-footer bg-transparent border-0">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <button class="btn btn-sm btn-outline-primary me-md-2" data-bs-toggle="modal" data-bs-target="#viewProgramModal">
+                        <button class="btn btn-sm btn-outline-primary me-md-2 mr-2" data-bs-toggle="modal" data-bs-target="#viewProgramModal">
                             <i class="fas fa-eye"></i> Ver
                         </button>
-                        <button class="btn btn-sm btn-outline-warning me-md-2">
+                        <button class="btn btn-sm btn-outline-warning me-md-2 mr-2">
                             <i class="fas fa-edit"></i> Editar
                         </button>
                         <button class="btn btn-sm btn-outline-danger">
@@ -87,8 +89,10 @@
                     <div class="h1 text-primary mb-3">
                         <i class="fas fa-hammer"></i>
                     </div>
-                    <h5 class="card-title">Acabados en Madera</h5>
-                    <span class="badge bg-success mb-2">Activo</span>
+                    <div class="d-flex justify-content-center">
+                        <h5 class="card-title font-weight-bold">Acabados en Madera</h5>
+                    </div>
+                    <span class="badge bg-success mb-2 w-20 text-center">Activo</span>
                     <p class="card-text">Técnicas de acabado, barnizado y restauración de muebles de madera.</p>
                     <div class="d-flex justify-content-center mt-3 pt-3 border-top">
                         <div>
@@ -99,10 +103,10 @@
                 </div>
                 <div class="card-footer bg-transparent border-0">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <button class="btn btn-sm btn-outline-primary me-md-2">
+                        <button class="btn btn-sm btn-outline-primary me-md-2 mr-2">
                             <i class="fas fa-eye"></i> Ver
                         </button>
-                        <button class="btn btn-sm btn-outline-warning me-md-2">
+                        <button class="btn btn-sm btn-outline-warning me-md-2 mr-2">
                             <i class="fas fa-edit"></i> Editar
                         </button>
                         <button class="btn btn-sm btn-outline-danger">
@@ -119,8 +123,10 @@
                     <div class="h1 text-primary mb-3">
                         <i class="fas fa-cut"></i>
                     </div>
-                    <h5 class="card-title">Confección de Prendas</h5>
-                    <span class="badge bg-success mb-2">Activo</span>
+                    <div class="d-flex justify-content-center">
+                        <h5 class="card-title font-weight-bold">Confección de Prendas</h5>
+                    </div>
+                    <span class="badge bg-success mb-2 w-20 text-center">Activo</span>
                     <p class="card-text">Técnicas básicas de corte, confección y terminado de prendas de vestir.</p>
                     <div class="d-flex justify-content-center mt-3 pt-3 border-top">
                         <div>
@@ -131,10 +137,10 @@
                 </div>
                 <div class="card-footer bg-transparent border-0">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <button class="btn btn-sm btn-outline-primary me-md-2">
+                        <button class="btn btn-sm btn-outline-primary me-md-2 mr-2">
                             <i class="fas fa-eye"></i> Ver
                         </button>
-                        <button class="btn btn-sm btn-outline-warning me-md-2">
+                        <button class="btn btn-sm btn-outline-warning me-md-2 mr-2">
                             <i class="fas fa-edit"></i> Editar
                         </button>
                         <button class="btn btn-sm btn-outline-danger">
@@ -151,8 +157,10 @@
                     <div class="h1 text-primary mb-3">
                         <i class="fas fa-car"></i>
                     </div>
-                    <h5 class="card-title">Mecánica Básica Automotriz</h5>
-                    <span class="badge bg-success mb-2">Activo</span>
+                    <div class="d-flex justify-content-center">
+                        <h5 class="card-title font-weight-bold">Mecánica Básica Automotriz</h5>
+                    </div>
+                    <span class="badge bg-success mb-2 w-20 text-center">Activo</span>
                     <p class="card-text">Mantenimiento preventivo y diagnóstico básico de vehículos.</p>
                     <div class="d-flex justify-content-center mt-3 pt-3 border-top">
                         <div>
@@ -163,10 +171,10 @@
                 </div>
                 <div class="card-footer bg-transparent border-0">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <button class="btn btn-sm btn-outline-primary me-md-2">
+                        <button class="btn btn-sm btn-outline-primary me-md-2 mr-2">
                             <i class="fas fa-eye"></i> Ver
                         </button>
-                        <button class="btn btn-sm btn-outline-warning me-md-2">
+                        <button class="btn btn-sm btn-outline-warning me-md-2 mr-2">
                             <i class="fas fa-edit"></i> Editar
                         </button>
                         <button class="btn btn-sm btn-outline-danger">
@@ -183,8 +191,10 @@
                     <div class="h1 text-primary mb-3">
                         <i class="fas fa-spa"></i>
                     </div>
-                    <h5 class="card-title">Cultivo de Huertas Urbanas</h5>
-                    <span class="badge bg-success mb-2">Activo</span>
+                    <div class="d-flex justify-content-center">
+                        <h5 class="card-title font-weight-bold">Cultivos de Huertas Urbanas</h5>
+                    </div>
+                    <span class="badge bg-success mb-2 w-20 text-center">Activo</span>
                     <p class="card-text">Técnicas de cultivo y mantenimiento de huertas en espacios urbanos.</p>
                     <div class="d-flex justify-content-center mt-3 pt-3 border-top">
                         <div>
@@ -195,10 +205,10 @@
                 </div>
                 <div class="card-footer bg-transparent border-0">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <button class="btn btn-sm btn-outline-primary me-md-2">
+                        <button class="btn btn-sm btn-outline-primary me-md-2 mr-2">
                             <i class="fas fa-eye"></i> Ver
                         </button>
-                        <button class="btn btn-sm btn-outline-warning me-md-2">
+                        <button class="btn btn-sm btn-outline-warning me-md-2 mr-2">
                             <i class="fas fa-edit"></i> Editar
                         </button>
                         <button class="btn btn-sm btn-outline-danger">
@@ -215,8 +225,10 @@
                     <div class="h1 text-primary mb-3">
                         <i class="fas fa-gavel"></i>
                     </div>
-                    <h5 class="card-title">Normatividad Laboral</h5>
-                    <span class="badge bg-success mb-2">Activo</span>
+                    <div class="d-flex justify-content-center">
+                        <h5 class="card-title font-weight-bold">Normatividad Laboral</h5>
+                    </div>
+                    <span class="badge bg-success mb-2 w-20 text-center">Activo</span>
                     <p class="card-text">Actualización en normatividad laboral y seguridad social.</p>
                     <div class="d-flex justify-content-center mt-3 pt-3 border-top">
                         <div>
@@ -227,10 +239,10 @@
                 </div>
                 <div class="card-footer bg-transparent border-0">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <button class="btn btn-sm btn-outline-primary me-md-2">
+                        <button class="btn btn-sm btn-outline-primary me-md-2 mr-2">
                             <i class="fas fa-eye"></i> Ver
                         </button>
-                        <button class="btn btn-sm btn-outline-warning me-md-2">
+                        <button class="btn btn-sm btn-outline-warning me-md-2 mr-2">
                             <i class="fas fa-edit"></i> Editar
                         </button>
                         <button class="btn btn-sm btn-outline-danger">
