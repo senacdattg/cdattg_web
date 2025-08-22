@@ -3,7 +3,7 @@
 
 @section('classes_body', 'salidas-page')
 
-@vite(['resources/css/inventario/aprobar_salida.css', 'resources/css/inventario/shared/modal-info.css', 'resources/js/inventario/aprobar_salida.js'])
+@vite(['resources/css/inventario/shared/base.css', 'resources/css/inventario/aprobar_salida.css', 'resources/css/inventario/shared/modal-info.css', 'resources/js/inventario/aprobar_salida.js'])
 
 @section('content')
 <div class="container_show">
@@ -49,6 +49,7 @@
                 <i class="fas fa-check"></i> Acciones
             </button>
         </div>
+    </div>
 </div>
 
 <!-- Modal Aprobar/Rechazar Orden (fuera del div principal para evitar conflictos de estilos) -->
@@ -94,8 +95,46 @@
                 <li><strong><i class="fas fa-comment-alt"></i>Descripción:</strong> <span>{{ $detalleOrden->descripcion_orden ?? 'N/A' }}</span></li>
                 <li><strong><i class="fas fa-box-open"></i>Tipo de orden:</strong> <span>{{ $detalleOrden->tipo_orden_id ?? 'N/A' }}</span></li>
                 <li><strong><i class="fas fa-calendar-alt"></i>Fecha devolución:</strong> <span>{{ $detalleOrden->fecha_devolucion ?? 'N/A' }}</span></li>
-                <li><strong><i class="fas fa-user-plus"></i>Usuario crea:</strong> <span>{{ $detalleOrden->user_create_id ?? 'N/A' }}</span></li>
-                <li><strong><i class="fas fa-user-edit"></i>Usuario actualiza:</strong> <span>{{ $detalleOrden->user_update_id ?? 'N/A' }}</span></li>
+                <li class="user-field">
+                    <strong>
+                        <i class="fas fa-user-plus user-info-icon" data-usuario-id="{{ $detalleOrden->user_create_id ?? '1' }}"></i>
+                        Usuario crea:
+                    </strong> 
+                    <span>{{ $detalleOrden->user_create_id ?? 'Usuario #1' }}</span>
+                    <div class="user-tooltip" id="tooltip-user-create">
+                        <div class="tooltip-content">
+                            <div class="user-info">
+                                <h5><i class="fas fa-user-circle"></i> Información del Usuario</h5>
+                                <p><strong>ID:</strong> <span class="user-id">{{ $detalleOrden->user_create_id ?? '1' }}</span></p>
+                                <p><strong>Nombre:</strong> <span class="user-name">Cargando...</span></p>
+                                <p><strong>Email:</strong> <span class="user-email">Cargando...</span></p>
+                                <p><strong>Rol:</strong> <span class="user-role">Cargando...</span></p>
+                                <p><strong>Estado:</strong> <span class="user-status">Cargando...</span></p>
+                                <p><strong>Último acceso:</strong> <span class="user-last-login">Cargando...</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li class="user-field">
+                    <strong>
+                        <i class="fas fa-user-edit user-info-icon" data-usuario-id="{{ $detalleOrden->user_update_id ?? '1' }}"></i>
+                        Usuario actualiza:
+                    </strong> 
+                    <span>{{ $detalleOrden->user_update_id ?? 'Usuario #2' }}</span>
+                    <div class="user-tooltip" id="tooltip-user-update">
+                        <div class="tooltip-content">
+                            <div class="user-info">
+                                <h5><i class="fas fa-user-circle"></i> Información del Usuario</h5>
+                                <p><strong>ID:</strong> <span class="user-id">{{ $detalleOrden->user_update_id ?? '2' }}</span></p>
+                                <p><strong>Nombre:</strong> <span class="user-name">Cargando...</span></p>
+                                <p><strong>Email:</strong> <span class="user-email">Cargando...</span></p>
+                                <p><strong>Rol:</strong> <span class="user-role">Cargando...</span></p>
+                                <p><strong>Estado:</strong> <span class="user-status">Cargando...</span></p>
+                                <p><strong>Último acceso:</strong> <span class="user-last-login">Cargando...</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </li>
                 <li><strong><i class="fas fa-clock"></i>Creado en:</strong> <span>{{ $detalleOrden->create_at ?? 'N/A' }}</span></li>
                 <li><strong><i class="fas fa-sync-alt"></i>Actualizado en:</strong> <span>{{ $detalleOrden->update_at ?? 'N/A' }}</span></li>
             </ul>

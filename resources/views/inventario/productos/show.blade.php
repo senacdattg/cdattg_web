@@ -2,7 +2,7 @@
 
 @section('classes_body', 'productos-page')
 
-@vite(['resources/css/inventario/productos.css', 'resources/js/inventario/productos.js', 'resources/css/inventario/shared/modal-imagen.css', 'resources/js/inventario/shared/modal-imagen.js'])
+@vite(['resources/css/inventario/shared/base.css', 'resources/css/inventario/productos.css', 'resources/css/inventario/carrito.css', 'resources/js/inventario/productos.js', 'resources/css/inventario/shared/modal-imagen.css', 'resources/js/inventario/shared/modal-imagen.js'])
 
 @section('content')
 <div class="flex_show">
@@ -23,10 +23,25 @@
                     <li class="list-group-item"><i class="fas fa-tag"></i> <strong>Producto:</strong> {{ $producto->producto ?? 'N/A' }}</li>
                     <li class="list-group-item"><i class="fas fa-cubes"></i> <strong>Tipo de producto:</strong> {{ $producto->tipoProducto->parametro->name ?? 'N/A' }}</li>
                     <li class="list-group-item"><i class="fas fa-align-left"></i> <strong>Descripción:</strong> {{ $producto->descripcion }}</li>
-                    <li class="list-group-item"><i class="fas fa-balance-scale"></i> <strong>Peso:</strong> {{ $producto->unidadMedida->parametro->name ?? 'N/A' }}</li>
+                    <li class="list-group-item"><i class="fas fa-balance-scale"></i> <strong>Magnitud:</strong> {{$producto->peso}} {{ $producto->unidadMedida->parametro->name ?? 'N/A' }}</li>
                     <li class="list-group-item"><i class="fas fa-sort-numeric-up"></i> <strong>Cantidad:</strong> {{ $producto->cantidad }}</li>
                     <li class="list-group-item"><i class="fas fa-barcode"></i> <strong>Código de barras:</strong> {{ $producto->codigo_barras }}</li>
                     <li class="list-group-item"><i class="fas fa-check-circle"></i> <strong>Estado:</strong> {{ $producto->estado->parametro->name ?? 'N/A' }}</li>
+                    @if($producto->contrato_convenio)
+                        <li class="list-group-item"><i class="fas fa-file-contract"></i> <strong>Contrato convenio:</strong> {{ $producto->contrato_convenio }}</li>
+                    @endif
+                    @if($producto->fecha_vencimiento)
+                        <li class="list-group-item"><i class="fas fa-calendar-times"></i> <strong>Fecha de vencimiento:</strong> {{ \Carbon\Carbon::parse($producto->fecha_vencimiento)->format('d/m/Y') }}</li>
+                    @endif
+                    @if($producto->categoria)
+                        <li class="list-group-item"><i class="fas fa-layer-group"></i> <strong>Categoría:</strong> {{ $producto->categoria->parametro->name ?? 'N/A' }}</li>
+                    @endif
+                    @if($producto->marca)
+                        <li class="list-group-item"><i class="fas fa-trademark"></i> <strong>Marca:</strong> {{ $producto->marca->parametro->name ?? 'N/A' }}</li>
+                    @endif
+                    @if($producto->ubicacion)
+                        <li class="list-group-item"><i class="fas fa-map-marker-alt"></i> <strong>Ubicación:</strong> {{ $producto->ubicacion }}</li>
+                    @endif
                     <li class="list-group-item"><i class="fas fa-calendar-alt"></i> <strong>Fecha de Ingreso:</strong> {{ $producto->created_at ? $producto->created_at->format('d/m/Y H:i') : 'N/A' }}</li>
                 </ul>
             </div>
