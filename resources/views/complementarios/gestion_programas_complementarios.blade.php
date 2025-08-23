@@ -72,7 +72,7 @@
                 <div class="card-footer bg-transparent border-0">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                         <button class="btn btn-sm btn-outline-primary me-md-2 mr-2">
-                            <a href="{{ route('programa_complementario.ver', ['programa' => 'fundamentos-cocina']) }}"
+                            <a href="{{ route('programa_complementario.ver', ['programa' => 'auxiliar-cocina']) }}"
                                 class="btn btn-primary w-100">
                                 <i class="fas fa-eye"></i> Ver
                             </a>
