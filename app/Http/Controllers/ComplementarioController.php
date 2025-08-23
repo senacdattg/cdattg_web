@@ -46,4 +46,8 @@ class ComplementarioController extends Controller
 
         return view('complementarios.ver_aspirantes', compact('curso'));
     }
+    public function verPrograma($programa)
+    { 
+        return view('complementarios.ver_programa_complementario', compact('programa'));
+    }
 }
