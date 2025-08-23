@@ -22,7 +22,8 @@
                 <div class="col-md-8">
                     <div class="input-group mb-3">
                         <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
-                        <input type="text" class="form-control" placeholder="Buscar programa por nombre o código" aria-label="Search">
+                        <input type="text" class="form-control" placeholder="Buscar programa por nombre o código"
+                            aria-label="Search">
                     </div>
                 </div>
                 <div class="col-md-4">
@@ -59,7 +60,8 @@
                         <h5 class="card-title font-weight-bold">Auxiliar de Cocina</h5>
                     </div>
                     <span class="badge bg-success mb-2 w-20 text-center">Con Oferta</span>
-                    <p class="card-text">Fundamentos de cocina, manipulación de alimentos y técnicas básicas de preparación.</p>
+                    <p class="card-text">Fundamentos de cocina, manipulación de alimentos y técnicas básicas de preparación.
+                    </p>
                     <div class="d-flex justify-content-center mt-3 pt-3 border-top">
                         <div>
                             <small class="text-muted">Duración</small>
@@ -69,8 +71,9 @@
                 </div>
                 <div class="card-footer bg-transparent border-0">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <button class="btn btn-sm btn-outline-primary me-md-2 mr-2" data-bs-toggle="modal" data-bs-target="#viewProgramModal">
-                            <i class="fas fa-eye"></i> Ver
+                        <button class="btn btn-sm btn-outline-primary me-md-2 mr-2" data-bs-toggle="modal"
+                            data-bs-target="#viewProgramModal">
+                            <i class="fas fa-users"></i> Ver Programa
                         </button>
                         <button class="btn btn-sm btn-outline-warning me-md-2 mr-2">
                             <i class="fas fa-edit"></i> Editar
@@ -172,7 +175,7 @@
                 <div class="card-footer bg-transparent border-0">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                         <button class="btn btn-sm btn-outline-primary me-md-2 mr-2">
-                            <i class="fas fa-eye"></i> Ver
+                                <i class="fas fa-eye me-1"></i> Ver programa
                         </button>
                         <button class="btn btn-sm btn-outline-warning me-md-2 mr-2">
                             <i class="fas fa-edit"></i> Editar
@@ -255,7 +258,8 @@
     </div>
 
     <!-- New Program Modal -->
-    <div class="modal fade" id="newProgramModal" tabindex="-1" aria-labelledby="newProgramModalLabel" aria-hidden="true">
+    <div class="modal fade" id="newProgramModal" tabindex="-1" aria-labelledby="newProgramModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -283,13 +287,15 @@
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="programDuration" class="form-label">Duración (horas)</label>
-                                    <input type="number" class="form-control" id="programDuration" name="programDuration" required min="1">
+                                    <input type="number" class="form-control" id="programDuration"
+                                        name="programDuration" required min="1">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="programCapacity" class="form-label">Cupos</label>
-                                    <input type="number" class="form-control" id="programCapacity" name="programCapacity" required min="1">
+                                    <input type="number" class="form-control" id="programCapacity"
+                                        name="programCapacity" required min="1">
                                 </div>
                             </div>
                         </div>
@@ -316,7 +322,8 @@
     </div>
 
     <!-- View Program Modal -->
-    <div class="modal fade" id="viewProgramModal" tabindex="-1" aria-labelledby="viewProgramModalLabel" aria-hidden="true">
+    <div class="modal fade" id="viewProgramModal" tabindex="-1" aria-labelledby="viewProgramModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -327,7 +334,8 @@
                     <!-- Modal content goes here -->
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#editProgramModal">
+                    <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal"
+                        data-bs-target="#editProgramModal">
                         <i class="fas fa-edit"></i> Editar Programa
                     </button>
                     <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cerrar</button>
@@ -346,6 +354,17 @@
     <script>
         console.log("AdminLTE programs: bootstrapping");
         document.addEventListener('DOMContentLoaded', function() {
+<<<<<<< HEAD
+            console.log("DOM loaded for programs view");
+            
+            // Ensure bootstrap JS is loaded (Bootstrap 5)
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                console.log("Bootstrap modal available");
+            } else {@section('js')
+    <script>
+        console.log("AdminLTE programs: bootstrapping");
+        document.addEventListener('DOMContentLoaded', function() {
+<<<<<<< HEAD
             console.log("DOM loaded for programs view");
             
             // Ensure bootstrap JS is loaded (Bootstrap 5)
@@ -417,6 +436,94 @@
                         }
                     }
                     newProgramForm.reset();
+=======
+            const newProgramForm = document.getElementById('newProgramForm');
+
+            if (newProgramForm) {
+                newProgramForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    // Aquí iría la lógica para guardar el programa
+                    // Por ahora, mostramos un mensaje de éxito y cerramos la modal
+                    alert('Programa guardado exitosamente');
+
+                    // Cerrar la modal
+                    const modal = bootstrap.Modal.getInstance(document.getElementById('newProgramModal'));
+                    modal.hide();
+
+                    // Limpiar el formulario
+                    newProgramForm.reset();
+
+                    // Aquí podrías recargar la página o actualizar la lista de programas
+                    // window.location.reload();
+                });
+            }
+                console.warn("Bootstrap modal not available. Bootstrap 5 JS may not be loaded.");
+            }
+
+            // Store reference to the button that opens the modal
+            let newProgramButton = null;
+
+            // Log button click for debugging and store reference
+            const newProgramButtons = document.querySelectorAll('[data-bs-target="#newProgramModal"]');
+            if (newProgramButtons.length > 0) {
+                newProgramButton = newProgramButtons[0];
+                newProgramButton.addEventListener('click', function() {
+                    console.log('Nuevo Programa button clicked');
+                });
+            }
+
+            // Handle modal focus management
+            const newProgramModalEl = document.getElementById('newProgramModal');
+            if (newProgramModalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                // Store the element that had focus before opening the modal
+                let previousActiveElement = null;
+                
+                newProgramModalEl.addEventListener('show.bs.modal', function() {
+                    previousActiveElement = document.activeElement;
+                });
+
+                newProgramModalEl.addEventListener('hidden.bs.modal', function() {
+                    // Restore focus to the element that opened the modal
+                    if (newProgramButton && typeof newProgramButton.focus === 'function') {
+                        newProgramButton.focus();
+                    } else if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
+                        previousActiveElement.focus();
+                    }
+                    
+                    // Ensure no element inside the hidden modal retains focus
+                    const focusedElement = document.activeElement;
+                    if (focusedElement && newProgramModalEl.contains(focusedElement)) {
+                        focusedElement.blur();
+                    }
+                });
+
+                // Prevent focus from being trapped in hidden modal
+                newProgramModalEl.addEventListener('keydown', function(e) {
+                    if (e.key === 'Tab' && !newProgramModalEl.classList.contains('show')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            // Handle form submission
+            const newProgramForm = document.getElementById('newProgramForm');
+            if (newProgramForm) {
+                newProgramForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    alert('Programa guardado exitosamente');
+                    
+                    // Close modal and handle focus properly
+                    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('newProgramModal'));
+                        if (modal) {
+                            modal.hide();
+                            // Focus will be handled by the hidden.bs.modal event
+                        }
+                    }
+                    newProgramForm.reset();
+
                 });
             }
         });
