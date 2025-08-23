@@ -67,9 +67,9 @@
                     <input type="number" name="cantidad" id="cantidad_carrito" class="form-control" min="1" max="{{ $producto->cantidad }}" value="1">
                 </div>
                 <div class="div_btn_carrito">
-                    <button type="submit" class="btn_carrito">
+                    <a href="{{ route('carrito.index') }}" class="btn_carrito">
                         <i class="fas fa-cart-plus"></i> Agregar al carrito
-                    </button>
+                    </a>
                 </div>
                 <div class="div_btn_carrito">
                     <button type="submit" class="btn_carrito">

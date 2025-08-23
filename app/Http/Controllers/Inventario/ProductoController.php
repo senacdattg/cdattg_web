@@ -115,15 +115,5 @@ class ProductoController extends Controller
         //
     }
   
-    public function buscarProducto()
-{
-    $categorias = Categoria::all();
-    return view('inventario.buscar-producto', compact('categorias'));
-}
 
-public function prestamosSalidas()
-{
-    $prestamos = Prestamo::with(['usuario', 'producto'])->get();
-    return view('inventario.prestamos-salidas', compact('prestamos'));
-}
 }
