@@ -109,7 +109,10 @@
                 <div class="card-footer bg-transparent border-0">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                         <button class="btn btn-sm btn-outline-primary me-md-2 mr-2">
-                            <i class="fas fa-eye"></i> Ver
+                            <a href="{{ route('programa_complementario.ver', ['programa' => 'Acabados-en-Madera']) }}"
+                                class="btn btn-primary w-100">
+                                <i class="fas fa-eye"></i> Ver
+                            </a>
                         </button>
                         <button class="btn btn-sm btn-outline-warning me-md-2 mr-2">
                             <i class="fas fa-edit"></i> Editar
@@ -144,6 +147,7 @@
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                         <button class="btn btn-sm btn-outline-primary me-md-2 mr-2" data-bs-toggle="modal" data-bs-target="#viewProgramModal">
                             <i class="fas fa-eye"></i> Ver
+
                         </button>
                         <button class="btn btn-sm btn-outline-warning me-md-2 mr-2">
                             <i class="fas fa-edit"></i> Editar
@@ -177,7 +181,10 @@
                 <div class="card-footer bg-transparent border-0">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                         <button class="btn btn-sm btn-outline-primary me-md-2 mr-2">
-                            <i class="fas fa-eye me-1"></i> Ver programa
+                            <a href="{{ route('programa_complementario.ver', ['programa' => 'Mecánica-Básica-Automotriz']) }}"
+                                class="btn btn-primary w-100">
+                                <i class="fas fa-eye"></i> Ver
+                            </a>
                         </button>
                         <button class="btn btn-sm btn-outline-warning me-md-2 mr-2">
                             <i class="fas fa-edit"></i> Editar
@@ -211,7 +218,10 @@
                 <div class="card-footer bg-transparent border-0">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                         <button class="btn btn-sm btn-outline-primary me-md-2 mr-2">
-                            <i class="fas fa-eye"></i> Ver
+                            <a href="{{ route('programa_complementario.ver', ['programa' => 'Cultivos-de-Huertas-Urbanas']) }}"
+                                class="btn btn-primary w-100">
+                                <i class="fas fa-eye"></i> Ver
+                            </a>
                         </button>
                         <button class="btn btn-sm btn-outline-warning me-md-2 mr-2">
                             <i class="fas fa-edit"></i> Editar
@@ -245,7 +255,10 @@
                 <div class="card-footer bg-transparent border-0">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                         <button class="btn btn-sm btn-outline-primary me-md-2 mr-2">
-                            <i class="fas fa-eye"></i> Ver
+                            <a href="{{ route('programa_complementario.ver', ['programa' => 'Normatividad-Laboral']) }}"
+                                class="btn btn-primary w-100">
+                                <i class="fas fa-eye"></i> Ver
+                            </a>
                         </button>
                         <button class="btn btn-sm btn-outline-warning me-md-2 mr-2">
                             <i class="fas fa-edit"></i> Editar
