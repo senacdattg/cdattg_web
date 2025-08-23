@@ -37,11 +37,13 @@ class ComplementarioController extends Controller
     }
     public function estadisticas()
     {
+        
         return view('complementarios.estadisticas');
 
     }
     public function verAspirantes($curso)
     {
+
         return view('complementarios.ver_aspirantes', compact('curso'));
     }
 }
