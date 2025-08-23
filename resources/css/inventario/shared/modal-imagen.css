@@ -18,7 +18,9 @@
     width: 100%; 
     height: 100%; 
     overflow: auto;
-    background-color: rgba(0,0,0,0.8); 
+    background-color: rgba(0,0,0,0.8);
+    align-items: center;
+    justify-content: center;
 }
 
 .modal-contenido { /* Estilo para la imagen dentro del modal */
