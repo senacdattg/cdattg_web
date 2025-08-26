@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Departamento;
+use App\Models\Municipio;
 
 class ComplementarioController extends Controller
 {
@@ -37,9 +39,10 @@ class ComplementarioController extends Controller
     }
     public function estadisticas()
     {
-        
-        return view('complementarios.estadisticas');
+        $departamentos = Departamento::select('id', 'departamento')->get();
+        $municipios = Municipio::select('id', 'municipio')->get();
 
+        return view('complementarios.estadisticas', compact('departamentos', 'municipios'));
     }
     public function verAspirantes($curso)
     {
