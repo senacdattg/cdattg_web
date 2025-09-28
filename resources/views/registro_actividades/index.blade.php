@@ -302,7 +302,7 @@
                                                 </button>
                                             @endif
                                             <a class="btn btn-primary btn-block mb-1"
-                                                href="#">
+                                                href="{{ route('registro-actividades.edit', ['caracterizacion' => $caracterizacion, 'actividad' => $actividad]) }}">
                                                 <i class="fas fa-edit"></i> Editar Actividad
                                             </a>
 

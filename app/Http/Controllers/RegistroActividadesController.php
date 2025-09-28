@@ -74,29 +74,32 @@ class RegistroActividadesController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(RegistroActividades $registroActividades)
+    public function edit(InstructorFichaCaracterizacion $caracterizacion, Evidencias $actividad)
     {
-        //
+        $actividades = $this->registroActividadesServices->getActividades($caracterizacion);
+        $rapActual = $caracterizacion->ficha->programaFormacion->competenciaActual()->rapActual();
+        return view('registro_actividades.edit', compact('actividad', 'caracterizacion', 'actividades', 'rapActual'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRegistroActividadesRequest $request, RegistroActividades $registroActividades)
+    public function update(UpdateRegistroActividadesRequest $request, InstructorFichaCaracterizacion $caracterizacion, Evidencias $actividad)
     {
         try {
-            // Obtener los datos validados del request
-            $data = $request->validated();
-
-            // Actualizar el registro con los nuevos datos
-            $registroActividades->update($data);
+            // Actualizar directamente la evidencia
+            $actividad->update([
+                'nombre' => $request->nombre,
+                'fecha_evidencia' => $request->fecha_evidencia,
+                'user_edit_id' => Auth::id(),
+            ]);
 
             // Redirigir con mensaje de éxito
-            return redirect()->route('registro-actividades.index', ['caracterizacion' => $registroActividades->caracterizacion_id])
+            return redirect()->route('registro-actividades.index', ['caracterizacion' => $caracterizacion])
                 ->with('success', 'Registro de actividad actualizado exitosamente.');
         } catch (\Exception $e) {
             // Manejar errores y redirigir con mensaje de error
-            return redirect()->back()->withInput()->with('error', 'Ocurrió un error al actualizar el registro de actividad.');
+            return redirect()->back()->withInput()->with('error', 'Ocurrió un error al actualizar el registro de actividad: ' . $e->getMessage());
         }
     }
 
