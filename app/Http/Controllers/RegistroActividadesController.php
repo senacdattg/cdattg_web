@@ -10,6 +10,7 @@ use App\Models\ResultadosAprendizaje;
 use App\Models\Evidencias;
 use App\Models\EvidenciaGuiaAprendizaje;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class RegistroActividadesController extends Controller
 {
@@ -106,8 +107,24 @@ class RegistroActividadesController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(RegistroActividades $registroActividades)
+    public function destroy(InstructorFichaCaracterizacion $caracterizacion, Evidencias $actividad)
     {
-        //
+        try {
+            // Usar transacción para asegurar consistencia de datos
+            DB::transaction(function () use ($actividad) {
+                // Eliminar primero los registros relacionados en evidencia_guia_aprendizaje
+                EvidenciaGuiaAprendizaje::where('evidencia_id', $actividad->id)->delete();
+                
+                // Luego eliminar la actividad (evidencia)
+                $actividad->delete();
+            });
+
+            // Redirigir con mensaje de éxito
+            return redirect()->route('registro-actividades.index', ['caracterizacion' => $caracterizacion])
+                ->with('success', 'Actividad cancelada exitosamente.');
+        } catch (\Exception $e) {
+            // Manejar errores y redirigir con mensaje de error
+            return redirect()->back()->with('error', 'Ocurrió un error al cancelar la actividad: ' . $e->getMessage());
+        }
     }
 }

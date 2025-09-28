@@ -306,10 +306,15 @@
                                                 <i class="fas fa-edit"></i> Editar Actividad
                                             </a>
 
-                                            <a class="btn btn-danger btn-block mb-1"
-                                                href="#">
-                                                <i class="fas fa-trash-alt"></i> Cancelar Actividad
-                                            </a>
+                                            <form method="POST" action="{{ route('registro-actividades.destroy', ['caracterizacion' => $caracterizacion, 'actividad' => $actividad]) }}" 
+                                                  style="display: inline-block;" 
+                                                  onsubmit="return confirmarCancelacion('{{ $actividad->nombre }}')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-danger btn-block mb-1">
+                                                    <i class="fas fa-trash-alt"></i> Cancelar Actividad
+                                                </button>
+                                            </form>
                                         @else
                                             <button class="btn btn-outline-secondary btn-block mb-3" disabled>
                                                 <i class="fas fa-check-circle"></i> Asistencia Registrada
@@ -436,4 +441,12 @@
             vertical-align: middle;
         }
     </style>
-@stop
+@endsection
+
+@section('js')
+<script>
+    function confirmarCancelacion(nombreActividad) {
+        return confirm(`¿Estás seguro de que deseas cancelar la actividad "${nombreActividad}"?\n\nEsta acción no se puede deshacer.`);
+    }
+</script>
+@endsection
