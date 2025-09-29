@@ -617,7 +617,8 @@ class FichaCaracterizacionController extends Controller
                 'sede',
                 'diasFormacion.dia',
                 'instructorFicha.instructor.persona'
-            ])->where('status', true)
+            ])->withCount('aprendices')
+              ->where('status', true)
               ->where('id', $jornadaId)
               ->orderBy('id', 'desc')
               ->get();
@@ -639,6 +640,7 @@ class FichaCaracterizacionController extends Controller
                     'fecha_fin' => $ficha->fecha_fin,
                     'total_horas' => $ficha->total_horas,
                     'status' => $ficha->status,
+                    'cantidad_aprendices' => $ficha->aprendices_count,
                     'programa_formacion' => [
                         'id' => $ficha->programaFormacion->id ?? null,
                         'nombre' => $ficha->programaFormacion->nombre ?? 'N/A',

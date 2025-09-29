@@ -61,7 +61,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 Route::middleware('auth:sanctum')->group(function(){
 
-    //http://127.0.0.1:8000/api/caracterizacion/byInstructor
+    //http://127.0.0.1:8000/api/caracterizacion/byInstructorz
     Route::get('caracterizacion/byInstructor/{id}', [CaracterizacionController::class, 'CaracterizacionByInstructor']);
 
 
