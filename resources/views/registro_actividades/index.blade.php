@@ -267,7 +267,7 @@
                                     <!-- Progreso de asistencia -->
                                     <div class="mt-4">
                                         <div class="d-flex justify-content-between mb-1">
-                                            <span class="text-muted">Asistencia registrada</span>
+                                            <span class="text-muted">Asistencia registrada</spqan>
                                             <span class="font-weight-bold">{{ number_format($porcentaje, 0) }}%</span>
                                         </div>
                                         <div class="progress" style="height: 8px;">
