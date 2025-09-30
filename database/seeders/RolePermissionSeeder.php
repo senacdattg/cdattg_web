@@ -90,6 +90,11 @@ class RolePermissionSeeder extends Seeder
             'EDITAR PERSONA',
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+            // Permisos para redes de conocimiento
+            'CREAR RED CONOCIMIENTO',
+            'EDITAR RED CONOCIMIENTO',
+            'VER RED CONOCIMIENTO',
+            'ELIMINAR RED CONOCIMIENTO',
         ];
 
         // Crear cada permiso si no existe
@@ -146,6 +151,10 @@ class RolePermissionSeeder extends Seeder
             'EDITAR PERSONA',
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+            'CREAR RED CONOCIMIENTO',
+            'EDITAR RED CONOCIMIENTO',
+            'VER RED CONOCIMIENTO',
+            'ELIMINAR RED CONOCIMIENTO',
         ]);
 
         // Asignar permisos al rol ADMINISTRADOR
@@ -162,6 +171,10 @@ class RolePermissionSeeder extends Seeder
             'VER PERSONA',
             'EDITAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+            'CREAR RED CONOCIMIENTO',
+            'EDITAR RED CONOCIMIENTO',
+            'VER RED CONOCIMIENTO',
+            'ELIMINAR RED CONOCIMIENTO',
         ]);
 
         // Asignar permisos al rol INSTRUCTOR
