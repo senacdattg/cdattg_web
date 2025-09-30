@@ -58,4 +58,12 @@ class RedConocimiento extends Model
     {
         return $this->belongsTo(User::class, 'user_edit_id');
     }
+
+    /**
+     * Relación: Red de conocimiento tiene muchos programas de formación.
+     */
+    public function programasFormacion()
+    {
+        return $this->hasMany(ProgramaFormacion::class, 'red_conocimiento_id');
+    }
 }

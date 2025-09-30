@@ -60,4 +60,14 @@ class ProgramaFormacion extends Model
     {
         return $this->belongsTo(Parametro::class, 'nivel_formacion_id');
     }
+
+    /**
+     * Get the redConocimiento that owns the ProgramaFormacion
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function redConocimiento(): BelongsTo
+    {
+        return $this->belongsTo(RedConocimiento::class, 'red_conocimiento_id');
+    }
 }
