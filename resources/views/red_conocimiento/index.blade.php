@@ -107,19 +107,32 @@
                                             </td>
                                             <td class="px-4 text-center">
                                                 <div class="btn-group">
+                                                    @can('EDITAR RED CONOCIMIENTO')
+                                                        <form action="{{ route('red-conocimiento.cambiarEstado', ['red_conocimiento' => $redConocimiento->id]) }}" method="POST" class="d-inline">
+                                                            @csrf
+                                                            @method('PUT')
+                                                            <button type="submit" class="btn btn-light btn-sm" data-toggle="tooltip" title="Cambiar estado">
+                                                                <i class="fas fa-sync text-success"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endcan
                                                     <a href="{{ route('red-conocimiento.show', ['red_conocimiento' => $redConocimiento->id]) }}" class="btn btn-light btn-sm" data-toggle="tooltip" title="Ver detalles">
                                                         <i class="fas fa-eye text-warning"></i>
                                                     </a>
-                                                    <a href="{{ route('red-conocimiento.edit', ['red_conocimiento' => $redConocimiento->id]) }}" class="btn btn-light btn-sm" data-toggle="tooltip" title="Editar">
-                                                        <i class="fas fa-pencil-alt text-info"></i>
-                                                    </a>
-                                                    <form action="{{ route('red-conocimiento.destroy', ['red_conocimiento' => $redConocimiento->id]) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar esta red de conocimiento?');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-light btn-sm" data-toggle="tooltip" title="Eliminar">
-                                                            <i class="fas fa-trash text-danger"></i>
-                                                        </button>
-                                                    </form>
+                                                    @can('EDITAR RED CONOCIMIENTO')
+                                                        <a href="{{ route('red-conocimiento.edit', ['red_conocimiento' => $redConocimiento->id]) }}" class="btn btn-light btn-sm" data-toggle="tooltip" title="Editar">
+                                                            <i class="fas fa-pencil-alt text-info"></i>
+                                                        </a>
+                                                    @endcan
+                                                    @can('ELIMINAR RED CONOCIMIENTO')
+                                                        <form action="{{ route('red-conocimiento.destroy', ['red_conocimiento' => $redConocimiento->id]) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar esta red de conocimiento?');">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-light btn-sm" data-toggle="tooltip" title="Eliminar">
+                                                                <i class="fas fa-trash text-danger"></i>
+                                                            </button>
+                                                        </form>
+                                                    @endcan
                                                 </div>
                                             </td>
                                         </tr>

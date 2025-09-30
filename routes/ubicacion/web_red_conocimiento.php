@@ -21,3 +21,7 @@ Route::resource('red-conocimiento', RedConocimientoController::class)->names([
     'update' => 'red-conocimiento.update',
     'destroy' => 'red-conocimiento.destroy',
 ]);
+
+// Ruta para cambiar estado
+Route::put('red-conocimiento/{red_conocimiento}/cambiar-estado', [RedConocimientoController::class, 'cambiarEstado'])
+    ->name('red-conocimiento.cambiarEstado');

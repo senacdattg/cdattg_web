@@ -202,4 +202,44 @@ class RedConocimientoController extends Controller
                 ->withErrors(['error' => 'Ocurrió un error inesperado al eliminar la red de conocimiento.']);
         }
     }
+
+    /**
+     * Cambiar el estado de una red de conocimiento.
+     */
+    public function cambiarEstado(RedConocimiento $redConocimiento)
+    {
+        try {
+            DB::beginTransaction();
+            
+            // Cambiar el estado (1 -> 0 o 0 -> 1)
+            $nuevoEstado = $redConocimiento->status === 1 ? 0 : 1;
+            
+            $redConocimiento->update([
+                'status' => $nuevoEstado,
+                'user_edit_id' => Auth::id(),
+            ]);
+            
+            DB::commit();
+            
+            $mensaje = $nuevoEstado === 1 
+                ? 'Red de conocimiento activada exitosamente.' 
+                : 'Red de conocimiento desactivada exitosamente.';
+                
+            return redirect()->back()
+                ->with('success', $mensaje);
+                
+        } catch (QueryException $e) {
+            DB::rollBack();
+            Log::error('Error al cambiar estado de red de conocimiento: ' . $e->getMessage());
+            
+            return redirect()->back()
+                ->withErrors(['error' => 'Ocurrió un error al cambiar el estado de la red de conocimiento.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error inesperado al cambiar estado de red de conocimiento: ' . $e->getMessage());
+            
+            return redirect()->back()
+                ->withErrors(['error' => 'Ocurrió un error inesperado al cambiar el estado.']);
+        }
+    }
 }

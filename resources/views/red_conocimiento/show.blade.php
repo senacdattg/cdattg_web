@@ -113,6 +113,14 @@
                     <!-- Bloque de Acciones -->
                     <div class="card-footer text-center">
                         @can('EDITAR RED CONOCIMIENTO')
+                            <form class="d-inline" action="{{ route('red-conocimiento.cambiarEstado', $redConocimiento->id) }}"
+                                method="POST">
+                                @csrf
+                                @method('PUT')
+                                <button type="submit" class="btn btn-success btn-sm" title="Cambiar Estado">
+                                    <i class="fas fa-sync"></i> Cambiar Estado
+                                </button>
+                            </form>
                             <a class="btn btn-info btn-sm" href="{{ route('red-conocimiento.edit', $redConocimiento->id) }}" title="Editar">
                                 <i class="fas fa-pencil-alt"></i> Editar
                             </a>
