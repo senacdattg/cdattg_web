@@ -52,7 +52,7 @@
                                         </div>
                                         <div class="info-box-content">
                                             <span class="info-box-text text-secondary">Programa de formación</span>
-                                            <span class="info-box-number fw-bold">
+                                            <span class="info-box-number fw-bold">                                                               
                                                 {{ $fichaCaracterizacion->programaFormacion->nombre ?? 'Programa no disponible' }}
                                             </span>
                                         </div>
@@ -110,7 +110,8 @@
                                         <div class="info-box-content">
                                             <span class="info-box-text text-secondary">Evidencia de aprendizaje</span>
                                             <span class="info-box-number fw-bold">
-                                                EV-{{ $numeroActividad }}: {{ $evidencia->nombre ?? 'Evidencia no disponible' }}
+                                                EV-{{ $numeroActividad }}:
+                                                {{ $evidencia->nombre ?? 'Evidencia no disponible' }}
                                             </span>
                                         </div>
                                     </div>
@@ -123,7 +124,8 @@
                                         </div>
                                         <div class="info-box-content">
                                             <span class="info-box-text text-secondary">Guia de aprendizaje</span>
-                                            <span class="info-box-number fw-bold">{{ $guiaAprendizajeActual->codigo}}: {{ $guiaAprendizajeActual->nombre }}</span>
+                                            <span class="info-box-number fw-bold">{{ $guiaAprendizajeActual->codigo }}:
+                                                {{ $guiaAprendizajeActual->nombre }}</span>
                                         </div>
                                     </div>
                                 </div>
@@ -256,6 +258,7 @@
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="evidencia_id" value="{{ $evidencia->id }}">
+                        <input type="hidden" name="caracterizacion" value="{{ $caracterizacion->id }}">
                         <button type="submit" class="btn btn-success btn-block py-2 font-weight-bold mb-3">
                             <i class="fas fa-check-circle mr-1"></i> Finalizar asistencia
                         </button>

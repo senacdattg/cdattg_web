@@ -30,8 +30,8 @@ class WebSocketHandler {
 
         // Canal para asistencias
         this.echo.channel('asistencias')
-            .listen('AsistenciaCreated', (event) => {
-                this.handleAsistenciaCreated(event);
+            .listen('NuevaAsistenciaRegistrada', (event) => {
+                this.handleNuevaAsistenciaRegistrada(event);
             });
 
         console.log('WebSocket channels configurados correctamente');
@@ -54,20 +54,18 @@ class WebSocketHandler {
         this.updateQrInterface(data);
     }
 
-    handleAsistenciaCreated(event) {
-        console.log('Asistencia creada:', event);
+    handleNuevaAsistenciaRegistrada(event) {
+        console.log('Nueva asistencia registrada:', event);
 
-        const data = event.data;
-        const aprendizNombre = data.aprendiz ? data.aprendiz.persona.nombre_completo : 'Aprendiz';
-        const fichaNumero = data.ficha ? data.ficha.numero_ficha : 'N/A';
+        const data = event;
+        const aprendizNombre = data.aprendiz || 'Aprendiz';
+        const message = `Nueva asistencia: ${aprendizNombre}`;
 
-        const message = `Nueva asistencia: ${aprendizNombre} - Ficha ${fichaNumero}`;
-
-        this.showNotification(message, 'info', {
+        this.showNotification(message, 'success', {
             icon: 'fas fa-user-check',
             title: 'Nueva Asistencia',
-            subtitle: `Ficha: ${fichaNumero}`,
-            body: `${aprendizNombre} registró asistencia a las ${this.formatTime(data.hora_ingreso)}`
+            subtitle: `Estado: ${data.estado}`,
+            body: `${aprendizNombre} registró asistencia a las ${this.formatTime(data.timestamp)}`
         });
 
         // Actualizar la interfaz si estamos en la página de asistencias
@@ -146,7 +144,7 @@ class WebSocketHandler {
 
         // Actualizar tabla de asistencias si existe
         const asistenciaTable = document.getElementById('asistencia-table');
-        if (asistenciaTable && data.aprendiz) {
+        if (asistenciaTable) {
             this.addRowToAsistenciaTable(data);
         }
     }
@@ -157,11 +155,11 @@ class WebSocketHandler {
 
         const newRow = document.createElement('tr');
         newRow.innerHTML = `
-            <td>${data.aprendiz.persona.nombre_completo}</td>
-            <td>${data.aprendiz.persona.numero_documento}</td>
-            <td>${this.formatTime(data.hora_ingreso)}</td>
-            <td>${data.hora_salida ? this.formatTime(data.hora_salida) : '-'}</td>
-            <td><span class="badge badge-success">Registrado</span></td>
+            <td>${data.aprendiz || 'Aprendiz'}</td>
+            <td>${data.id || 'N/A'}</td>
+            <td>${this.formatTime(data.timestamp)}</td>
+            <td>-</td>
+            <td><span class="badge badge-success">${data.estado || 'Registrado'}</span></td>
         `;
 
         // Agregar efecto de entrada

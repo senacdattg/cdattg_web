@@ -17,6 +17,7 @@ use App\Http\Controllers\SedeController;
 use App\Http\Controllers\AsistenceQrController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RegistroAsistenciaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -61,7 +62,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 Route::middleware('auth:sanctum')->group(function(){
 
-    //http://127.0.0.1:8000/api/caracterizacion/byInstructor
+    //http://127.0.0.1:8000/api/caracterizacion/byInstructorz
     Route::get('caracterizacion/byInstructor/{id}', [CaracterizacionController::class, 'CaracterizacionByInstructor']);
 
 
@@ -77,5 +78,11 @@ Route::middleware('auth:sanctum')->group(function(){
 
 route::post('authenticate', [LoginController::class, 'authenticate']);
 route::post('logout', [LogoutController::class, 'logout']);
+
+// Rutas para registro de asistencias con jornadas y WebSocket en tiempo real
+Route::post('/asistencia/entrada', [RegistroAsistenciaController::class, 'registrarEntrada']);
+Route::post('/asistencia/salida', [RegistroAsistenciaController::class, 'registrarSalida']);
+Route::get('/asistencia/jornada', [RegistroAsistenciaController::class, 'obtenerAsistenciasPorJornada']);
+Route::get('/asistencia/fichas', [RegistroAsistenciaController::class, 'obtenerFichasConJornadas']);
 
 

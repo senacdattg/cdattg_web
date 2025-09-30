@@ -201,7 +201,6 @@
                     $hoy = \Carbon\Carbon::today();
                     $diasRestantes = $fechaActividad->isFuture() ? $hoy->diffInDays($fechaActividad) : 0;
                 @endphp
-
                 <div class="col-12 mb-4">
                     <div class="card activity-card h-100">
                         <div class="card-header text-white
@@ -264,7 +263,6 @@
                                             </div>
                                         </div>
                                     </div>
-
                                     <!-- Progreso de asistencia -->
                                     <div class="mt-4">
                                         <div class="d-flex justify-content-between mb-1">
@@ -292,20 +290,29 @@
                                 <div class="col-lg-4 mt-4 mt-lg-0">
                                     <div class="d-flex flex-column h-100">
                                         @if ($actividad['id_estado'] == 'PENDIENTE' || $actividad['id_estado'] == 'EN CURSO')
-                                            <a class="btn btn-success btn-block mb-1"
-                                                href="{{ route('asistence.caracterSelected', [$caracterizacion, $actividad]); }}">
-                                                <i class="fas fa-clipboard-check"></i> Tomar Asistencia
-                                            </a>
-
+                                            @if ($fechaActividad == $hoy)
+                                                <a class="btn btn-success btn-block mb-1"
+                                                    href="{{ route('asistence.caracterSelected', [$caracterizacion, $actividad]); }}">
+                                                    <i class="fas fa-clipboard-check"></i> Tomar Asistencia
+                                                </a>
+                                            @else
+                                                <button class="btn btn-outline-secondary btn-block mb-1" disabled>
+                                                    <i class="fas fa-clipboard-check"></i> Tomar Asistencia
+                                                </button>
+                                            @endif
                                             <a class="btn btn-primary btn-block mb-1"
-                                                href="#">
+                                                href="{{ route('registro-actividades.edit', ['caracterizacion' => $caracterizacion, 'actividad' => $actividad]) }}">
                                                 <i class="fas fa-edit"></i> Editar Actividad
                                             </a>
 
-                                            <a class="btn btn-danger btn-block mb-1"
-                                                href="#">
-                                                <i class="fas fa-trash-alt"></i> Cancelar Actividad
-                                            </a>
+                                            <button type="button" class="btn btn-danger btn-block mb-1" 
+                                                    data-toggle="modal" 
+                                                    data-target="#cancelarActividadModal"
+                                                    data-actividad-id="{{ $actividad->id }}"
+                                                    data-actividad-nombre="{{ $actividad->nombre }}"
+                                                    data-caracterizacion-id="{{ $caracterizacion->id }}">
+                                                <i class="fas fa-times-circle"></i> Cancelar Actividad
+                                            </button>
                                         @else
                                             <button class="btn btn-outline-secondary btn-block mb-3" disabled>
                                                 <i class="fas fa-check-circle"></i> Asistencia Registrada
@@ -344,6 +351,54 @@
                 </div>
             @endforeach
         @endif
+    </div>
+
+    <!-- Modal de Confirmación para Cancelar Actividad -->
+    <div class="modal fade" id="cancelarActividadModal" tabindex="-1" role="dialog" aria-labelledby="cancelarActividadModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-header bg-danger text-white border-0">
+                    <h5 class="modal-title d-flex align-items-center" id="cancelarActividadModalLabel">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        Confirmar Cancelación
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="text-center mb-4">
+                        <div class="bg-danger-light rounded-circle d-inline-flex align-items-center justify-content-center mb-3" 
+                             style="width: 80px; height: 80px; background-color: rgba(220, 53, 69, 0.1);">
+                            <i class="fas fa-times-circle text-danger" style="font-size: 2.5rem;"></i>
+                        </div>
+                        <h4 class="text-gray-800 mb-3">¿Estás seguro de cancelar esta actividad?</h4>
+                        <div class="alert alert-warning border-0 mb-3" style="background-color: rgba(255, 193, 7, 0.1);">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-info-circle text-warning mr-2"></i>
+                                <span class="text-warning font-weight-bold" id="actividad-nombre-modal"></span>
+                            </div>
+                        </div>
+                        <p class="text-muted mb-0">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            Esta acción <strong>no se puede deshacer</strong> y eliminará permanentemente la actividad del sistema.
+                        </p>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 bg-light p-4">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">
+                        <i class="fas fa-arrow-left mr-1"></i> Cancelar
+                    </button>
+                    <form id="form-cancelar-actividad" method="POST" style="display: inline;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-lg px-4">
+                            <i class="fas fa-times-circle mr-2"></i> Sí, Cancelar Actividad
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 
@@ -431,5 +486,122 @@
         .dropdown-toggle::after {
             vertical-align: middle;
         }
+
+        /* Estilos para el modal de cancelación */
+        .modal-content {
+            border-radius: 15px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-footer {
+            border-radius: 0 0 15px 15px;
+        }
+
+        .bg-danger-light {
+            background-color: rgba(220, 53, 69, 0.1) !important;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-secondary:hover {
+            transform: translateY(-1px);
+            transition: all 0.3s ease;
+        }
+
+        /* Animaciones */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translate3d(0, -30px, 0);
+            }
+            to {
+                opacity: 1;
+                transform: translate3d(0, 0, 0);
+            }
+        }
+
+        .animate__fadeInDown {
+            animation: fadeInDown 0.5s ease-out;
+        }
+
+        /* Efecto de pulso para el ícono de advertencia */
+        .fa-times-circle {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Mejorar la apariencia del botón de cancelar actividad */
+        .btn[data-target="#cancelarActividadModal"] {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .btn[data-target="#cancelarActividadModal"]:hover {
+            background-color: #c82333;
+            border-color: #bd2130;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
     </style>
-@stop
+@endsection
+
+@section('js')
+<script>
+    $(document).ready(function() {
+        // Manejar el click en el botón de cancelar actividad
+        $('button[data-target="#cancelarActividadModal"]').on('click', function() {
+            var actividadId = $(this).data('actividad-id');
+            var actividadNombre = $(this).data('actividad-nombre');
+            var caracterizacionId = $(this).data('caracterizacion-id');
+            
+            // Actualizar el nombre de la actividad en el modal
+            $('#actividad-nombre-modal').text(actividadNombre);
+            
+            // Actualizar la acción del formulario
+            var actionUrl = '{{ route("registro-actividades.destroy", [":caracterizacion", ":actividad"]) }}';
+            actionUrl = actionUrl.replace(':caracterizacion', caracterizacionId);
+            actionUrl = actionUrl.replace(':actividad', actividadId);
+            
+            $('#form-cancelar-actividad').attr('action', actionUrl);
+            
+            // Mostrar el modal con animación
+            $('#cancelarActividadModal').modal('show');
+        });
+        
+        // Animación de entrada para el modal
+        $('#cancelarActividadModal').on('show.bs.modal', function () {
+            $(this).find('.modal-content').addClass('animate__animated animate__fadeInDown');
+        });
+        
+        // Limpiar animación al cerrar
+        $('#cancelarActividadModal').on('hidden.bs.modal', function () {
+            $(this).find('.modal-content').removeClass('animate__animated animate__fadeInDown');
+        });
+        
+        // Mostrar loading al enviar el formulario
+        $('#form-cancelar-actividad').on('submit', function(e) {
+            // Mostrar loading en el botón
+            $(this).find('button[type="submit"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i> Cancelando...');
+        });
+    });
+</script>
+@endsection

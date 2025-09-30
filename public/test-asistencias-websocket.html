@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Asistencias WebSocket - Tiempo Real</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .status.conectado {
+            background: #10b981;
+            color: white;
+        }
+
+        .status.desconectado {
+            background: #ef4444;
+            color: white;
+        }
+
+        .panels {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .panel h2 {
+            color: #333;
+            margin-bottom: 15px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #555;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .asistencias-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .asistencia-item {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .asistencia-item.entrada {
+            border-left-color: #10b981;
+        }
+
+        .asistencia-item.salida {
+            border-left-color: #ef4444;
+        }
+
+        .asistencia-item strong {
+            color: #333;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .badge.entrada {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .badge.salida {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .asistencia-item small {
+            color: #6b7280;
+            font-size: 12px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+
+        .stat-card p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 350px;
+            animation: slideInRight 0.3s ease-out;
+            z-index: 1000;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Test Asistencias en Tiempo Real</h1>
+            <p>Sistema de asistencias con WebSocket</p>
+            <div style="margin-top: 15px;">
+                <span id="connection-status" class="status desconectado">⚠️ Desconectado</span>
+            </div>
+        </div>
+
+        <div class="panels">
+            <!-- Panel de Registro -->
+            <div class="panel">
+                <h2>📝 Registrar Asistencia</h2>
+                <div class="form-group">
+                    <label for="instructor_ficha_id">ID Instructor Ficha:</label>
+                    <input type="number" id="instructor_ficha_id" value="1" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="aprendiz_ficha_id">ID Aprendiz Ficha:</label>
+                    <input type="number" id="aprendiz_ficha_id" value="1" min="1">
+                </div>
+                <button class="btn btn-primary" onclick="registrarEntrada()">
+                    🚪 Registrar Entrada
+                </button>
+                <button class="btn btn-success" onclick="registrarSalida()" style="margin-top: 10px;">
+                    👋 Registrar Salida
+                </button>
+            </div>
+
+            <!-- Panel de Estadísticas -->
+            <div class="panel">
+                <h2>📊 Estadísticas en Tiempo Real</h2>
+                <div class="stats">
+                    <div class="stat-card">
+                        <h3 id="total-entradas">0</h3>
+                        <p>Entradas</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3 id="total-salidas">0</h3>
+                        <p>Salidas</p>
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <button class="btn btn-primary" onclick="obtenerAsistenciasHoy()">
+                        🔄 Recargar Datos
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel de Asistencias en Tiempo Real -->
+        <div class="panel">
+            <h2>📋 Asistencias del Día (Actualizaciones en Tiempo Real)</h2>
+            <div id="asistencias-list" class="asistencias-list">
+                <p style="color: #6b7280; text-align: center; padding: 20px;">
+                    Esperando asistencias...
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pusher JS -->
+    <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
+    
+    <script>
+        // Configuración
+        const API_URL = 'http://localhost:8000/api';
+        const WEBSOCKET_CONFIG = {
+            key: 'local', // Cambia esto por tu REVERB_APP_KEY
+            cluster: 'mt1',
+            wsHost: '127.0.0.1',
+            wsPort: 8080,
+            forceTLS: false,
+            enabledTransports: ['ws', 'wss']
+        };
+
+        // Estadísticas
+        let totalEntradas = 0;
+        let totalSalidas = 0;
+
+        // Conectar a WebSocket con Pusher/Reverb
+        const pusher = new Pusher(WEBSOCKET_CONFIG.key, {
+            wsHost: WEBSOCKET_CONFIG.wsHost,
+            wsPort: WEBSOCKET_CONFIG.wsPort,
+            forceTLS: WEBSOCKET_CONFIG.forceTLS,
+            enabledTransports: WEBSOCKET_CONFIG.enabledTransports,
+            disableStats: true,
+            cluster: WEBSOCKET_CONFIG.cluster
+        });
+
+        // Suscribirse al canal de asistencias
+        const channel = pusher.subscribe('asistencias');
+
+        // Estado de conexión
+        pusher.connection.bind('connected', function() {
+            document.getElementById('connection-status').textContent = '✅ Conectado';
+            document.getElementById('connection-status').className = 'status conectado';
+            console.log('✅ Conectado a WebSocket');
+        });
+
+        pusher.connection.bind('disconnected', function() {
+            document.getElementById('connection-status').textContent = '⚠️ Desconectado';
+            document.getElementById('connection-status').className = 'status desconectado';
+            console.log('⚠️ Desconectado de WebSocket');
+        });
+
+        // Escuchar eventos de asistencia
+        channel.bind('NuevaAsistenciaRegistrada', function(data) {
+            console.log('📡 Nueva asistencia recibida:', data);
+            agregarAsistenciaALista(data);
+            actualizarEstadisticas(data.estado);
+            mostrarNotificacion(data);
+        });
+
+        // Funciones para registrar asistencias
+        async function registrarEntrada() {
+            const instructorFichaId = document.getElementById('instructor_ficha_id').value;
+            const aprendizFichaId = document.getElementById('aprendiz_ficha_id').value;
+
+            try {
+                const response = await fetch(`${API_URL}/asistencia/entrada`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        instructor_ficha_id: parseInt(instructorFichaId),
+                        aprendiz_ficha_id: parseInt(aprendizFichaId),
+                        evidencia_id: null
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('✅ ' + data.message);
+                } else {
+                    alert('❌ Error: ' + data.message);
+                }
+            } catch (error) {
+                alert('❌ Error de conexión: ' + error.message);
+                console.error('Error:', error);
+            }
+        }
+
+        async function registrarSalida() {
+            const aprendizFichaId = document.getElementById('aprendiz_ficha_id').value;
+
+            try {
+                const response = await fetch(`${API_URL}/asistencia/salida`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        aprendiz_ficha_id: parseInt(aprendizFichaId)
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('✅ ' + data.message);
+                } else {
+                    alert('❌ Error: ' + data.message);
+                }
+            } catch (error) {
+                alert('❌ Error de conexión: ' + error.message);
+                console.error('Error:', error);
+            }
+        }
+
+        async function obtenerAsistenciasHoy() {
+            try {
+                const response = await fetch(`${API_URL}/asistencia/jornada`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    // Limpiar lista
+                    document.getElementById('asistencias-list').innerHTML = '';
+                    
+                    // Reiniciar estadísticas
+                    totalEntradas = 0;
+                    totalSalidas = 0;
+                    
+                    // Agregar cada asistencia
+                    data.asistencias.forEach(asistencia => {
+                        agregarAsistenciaAListaSinAnimacion(asistencia);
+                        if (asistencia.estado === 'completa') {
+                            totalEntradas++;
+                            totalSalidas++;
+                        } else {
+                            totalEntradas++;
+                        }
+                    });
+                    
+                    actualizarVisualizacionEstadisticas();
+                } else {
+                    alert('❌ Error: ' + data.message);
+                }
+            } catch (error) {
+                alert('❌ Error de conexión: ' + error.message);
+                console.error('Error:', error);
+            }
+        }
+
+        function agregarAsistenciaALista(data) {
+            const lista = document.getElementById('asistencias-list');
+            
+            // Limpiar mensaje de "Esperando"
+            if (lista.querySelector('p')) {
+                lista.innerHTML = '';
+            }
+            
+            const item = document.createElement('div');
+            item.className = `asistencia-item ${data.estado}`;
+            item.innerHTML = `
+                <strong>${data.aprendiz}</strong>
+                <span class="badge ${data.estado}">${data.estado.toUpperCase()}</span>
+                <small>Jornada: ${data.jornada} | Ficha: ${data.ficha}</small>
+                <br>
+                <small>${new Date(data.timestamp).toLocaleString('es-ES')}</small>
+            `;
+            
+            lista.insertBefore(item, lista.firstChild);
+        }
+
+        function agregarAsistenciaAListaSinAnimacion(asistencia) {
+            const lista = document.getElementById('asistencias-list');
+            
+            const item = document.createElement('div');
+            item.className = `asistencia-item ${asistencia.estado === 'completa' ? 'salida' : 'entrada'}`;
+            item.innerHTML = `
+                <strong>${asistencia.aprendiz}</strong>
+                <span class="badge ${asistencia.estado === 'completa' ? 'salida' : 'entrada'}">
+                    ${asistencia.estado === 'completa' ? 'COMPLETA' : 'EN CURSO'}
+                </span>
+                <small>Jornada: ${asistencia.jornada} | Ficha: ${asistencia.ficha}</small>
+                <br>
+                <small>Entrada: ${asistencia.hora_ingreso} ${asistencia.hora_salida ? '| Salida: ' + asistencia.hora_salida : ''}</small>
+            `;
+            
+            lista.appendChild(item);
+        }
+
+        function actualizarEstadisticas(estado) {
+            if (estado === 'entrada') {
+                totalEntradas++;
+            } else if (estado === 'salida') {
+                totalSalidas++;
+            }
+            actualizarVisualizacionEstadisticas();
+        }
+
+        function actualizarVisualizacionEstadisticas() {
+            document.getElementById('total-entradas').textContent = totalEntradas;
+            document.getElementById('total-salidas').textContent = totalSalidas;
+        }
+
+        function mostrarNotificacion(data) {
+            // Crear notificación
+            const notif = document.createElement('div');
+            notif.className = 'notification';
+            notif.innerHTML = `
+                <strong style="color: ${data.estado === 'entrada' ? '#10b981' : '#ef4444'}">
+                    ${data.estado === 'entrada' ? '🚪 Entrada' : '👋 Salida'}
+                </strong>
+                <p style="margin: 10px 0; color: #333;">${data.aprendiz}</p>
+                <small style="color: #6b7280;">
+                    ${data.jornada} - Ficha ${data.ficha}
+                </small>
+            `;
+            
+            document.body.appendChild(notif);
+            
+            // Remover después de 3 segundos
+            setTimeout(() => {
+                notif.remove();
+            }, 3000);
+        }
+
+        // Cargar asistencias al iniciar
+        window.addEventListener('load', function() {
+            obtenerAsistenciasHoy();
+        });
+    </script>
+</body>
+</html>
