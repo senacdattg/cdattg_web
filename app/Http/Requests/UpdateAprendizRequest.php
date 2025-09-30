@@ -25,6 +25,8 @@ class UpdateAprendizRequest extends FormRequest
 
         return [
             'persona_id' => "required|exists:personas,id|unique:aprendices,persona_id,{$aprendizId}",
+            'ficha_caracterizacion_id' => 'required|exists:fichas_caracterizacion,id',
+            'estado' => 'required|boolean',
         ];
     }
 
@@ -39,6 +41,10 @@ class UpdateAprendizRequest extends FormRequest
             'persona_id.required' => 'La persona es obligatoria.',
             'persona_id.exists' => 'La persona seleccionada no existe.',
             'persona_id.unique' => 'Esta persona ya está registrada como aprendiz.',
+            'ficha_caracterizacion_id.required' => 'La ficha de caracterización es obligatoria.',
+            'ficha_caracterizacion_id.exists' => 'La ficha de caracterización seleccionada no existe.',
+            'estado.required' => 'El estado es obligatorio.',
+            'estado.boolean' => 'El estado debe ser verdadero o falso.',
         ];
     }
 }

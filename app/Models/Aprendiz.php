@@ -22,6 +22,17 @@ class Aprendiz extends Model
      */
     protected $fillable = [
         'persona_id',
+        'ficha_caracterizacion_id',
+        'estado',
+    ];
+
+    /**
+     * Los atributos que deben ser casteados.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'estado' => 'boolean',
     ];
 
     /**
@@ -33,6 +44,17 @@ class Aprendiz extends Model
     public function persona(): BelongsTo
     {
         return $this->belongsTo(Persona::class, 'persona_id');
+    }
+
+    /**
+     * Relación directa con FichaCaracterizacion (Many-to-One).
+     * Un aprendiz puede tener una ficha principal asignada.
+     *
+     * @return BelongsTo
+     */
+    public function fichaCaracterizacion(): BelongsTo
+    {
+        return $this->belongsTo(FichaCaracterizacion::class, 'ficha_caracterizacion_id');
     }
 
     /**
