@@ -112,6 +112,17 @@
                                         </span>
                                     </td>
                                     <td class="project-actions">
+                                        @can('EDITAR APRENDIZ')
+                                            <form class="d-inline"
+                                                action="{{ route('aprendices.cambiarEstado', $aprendiz->id) }}"
+                                                method="POST" title="Cambiar Estado">
+                                                @csrf
+                                                @method('PUT')
+                                                <button type="submit" class="btn btn-success btn-sm">
+                                                    <i class="fas fa-sync"></i>
+                                                </button>
+                                            </form>
+                                        @endcan
                                         @can('VER APRENDIZ')
                                             <a href="{{ route('aprendices.show', $aprendiz->id) }}"
                                                 class="btn btn-warning btn-sm" title="Ver">

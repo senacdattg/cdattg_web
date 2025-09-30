@@ -21,7 +21,7 @@ class AprendizController extends Controller
 
         $this->middleware('can:VER APRENDIZ')->only(['index', 'show']);
         $this->middleware('can:CREAR APRENDIZ')->only(['create', 'store']);
-        $this->middleware('can:EDITAR APRENDIZ')->only(['edit', 'update']);
+        $this->middleware('can:EDITAR APRENDIZ')->only(['edit', 'update', 'cambiarEstado']);
         $this->middleware('can:ELIMINAR APRENDIZ')->only('destroy');
     }
 
@@ -377,6 +377,34 @@ class AprendizController extends Controller
                 'success' => false,
                 'message' => 'Error al buscar aprendices.'
             ], 500);
+        }
+    }
+
+    /**
+     * Cambia el estado de un aprendiz (activo/inactivo).
+     *
+     * @param Aprendiz $aprendiz
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function cambiarEstado(Aprendiz $aprendiz)
+    {
+        try {
+            $nuevoEstado = !$aprendiz->estado;
+            $aprendiz->update(['estado' => $nuevoEstado]);
+
+            Log::info('Estado de aprendiz cambiado', [
+                'aprendiz_id' => $aprendiz->id,
+                'nuevo_estado' => $nuevoEstado,
+                'user_id' => Auth::id()
+            ]);
+
+            return redirect()->back()->with('success', 'Estado cambiado exitosamente.');
+        } catch (\Exception $e) {
+            Log::error('Error al cambiar estado del aprendiz: ' . $e->getMessage(), [
+                'aprendiz_id' => $aprendiz->id
+            ]);
+
+            return redirect()->back()->with('error', 'Error al cambiar el estado del aprendiz.');
         }
     }
 }
