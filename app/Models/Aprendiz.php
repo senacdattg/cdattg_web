@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Aprendiz extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $table = 'aprendices';
 
@@ -24,6 +25,8 @@ class Aprendiz extends Model
         'persona_id',
         'ficha_caracterizacion_id',
         'estado',
+        'user_create_id',
+        'user_edit_id',
     ];
 
     /**
@@ -100,5 +103,25 @@ class Aprendiz extends Model
             'id',                 // PK en aprendices
             'id'                  // PK en aprendiz_fichas_caracterizacion
         );
+    }
+
+    /**
+     * Relación con el usuario que creó el registro.
+     *
+     * @return BelongsTo
+     */
+    public function userCreatedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_create_id');
+    }
+
+    /**
+     * Relación con el usuario que editó el registro por última vez.
+     *
+     * @return BelongsTo
+     */
+    public function userUpdatedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_edit_id');
     }
 }
