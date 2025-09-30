@@ -13,7 +13,7 @@ class RedConocimientoPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->can('VER RED CONOCIMIENTO');
     }
 
     /**
@@ -21,7 +21,7 @@ class RedConocimientoPolicy
      */
     public function view(User $user, RedConocimiento $redConocimiento): bool
     {
-        return false;
+        return $user->can('VER RED CONOCIMIENTO');
     }
 
     /**
@@ -29,7 +29,7 @@ class RedConocimientoPolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->can('CREAR RED CONOCIMIENTO');
     }
 
     /**
@@ -37,7 +37,7 @@ class RedConocimientoPolicy
      */
     public function update(User $user, RedConocimiento $redConocimiento): bool
     {
-        return false;
+        return $user->can('EDITAR RED CONOCIMIENTO');
     }
 
     /**
@@ -45,7 +45,7 @@ class RedConocimientoPolicy
      */
     public function delete(User $user, RedConocimiento $redConocimiento): bool
     {
-        return false;
+        return $user->can('ELIMINAR RED CONOCIMIENTO');
     }
 
     /**
@@ -53,7 +53,7 @@ class RedConocimientoPolicy
      */
     public function restore(User $user, RedConocimiento $redConocimiento): bool
     {
-        return false;
+        return $user->can('EDITAR RED CONOCIMIENTO');
     }
 
     /**
@@ -61,6 +61,6 @@ class RedConocimientoPolicy
      */
     public function forceDelete(User $user, RedConocimiento $redConocimiento): bool
     {
-        return false;
+        return $user->can('ELIMINAR RED CONOCIMIENTO');
     }
 }
