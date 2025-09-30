@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\RedConocimiento;
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -13,7 +14,11 @@ class RedConocimientoSeeder extends Seeder
      */
     public function run(): void
     {
-        //Redes de conocimiento de la regional Guaviare
+        // Obtener el primer usuario administrador para auditoría
+        $adminUser = User::first();
+        $userId = $adminUser ? $adminUser->id : null;
+
+        // Redes de conocimiento de la regional Guaviare
         $redes_conocimientos = [
             'ACTIVIDAD FÍSICA, RECREACIÓN Y DEPORTE',
             'ACUÍCOLA Y DE PESCA',
@@ -44,7 +49,10 @@ class RedConocimientoSeeder extends Seeder
 
         foreach ($redes_conocimientos as $nombre) {
             RedConocimiento::create([
-                'nombre' => $nombre
+                'nombre' => $nombre,
+                'user_create_id' => $userId,
+                'user_edit_id' => $userId,
+                'status' => 1, // Activo por defecto
             ]);
         }
     }
