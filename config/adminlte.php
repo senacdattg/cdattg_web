@@ -591,6 +591,39 @@ return [
                     ],
                 ],
                 [
+                    'text' => 'Aprendices',
+                    'icon' => 'fas fa-fw fa-user-graduate',
+                    'can' => [
+                        'VER APRENDIZ',
+                    ],
+                    'submenu' => [
+                        [
+                            'text' => 'Todos los Aprendices',
+                            'url' => 'aprendices',
+                            'icon' => 'fas fa-fw fa-users',
+                            'can' => [
+                                'VER APRENDIZ',
+                            ],
+                        ],
+                        [
+                            'text' => 'Crear Aprendiz',
+                            'url' => 'aprendices/create',
+                            'icon' => 'fas fa-fw fa-user-plus',
+                            'can' => [
+                                'CREAR APRENDIZ',
+                            ],
+                        ],
+                        [
+                            'text' => 'Aprendices por Ficha',
+                            'url' => 'aprendices?ficha_filter=true',
+                            'icon' => 'fas fa-fw fa-filter',
+                            'can' => [
+                                'VER APRENDICES POR FICHA',
+                            ],
+                        ],
+                    ],
+                ],
+                [
                     'text' => 'Administrar Asistencias',
                     'url' => 'asistencia',
                     'icon' => 'fas fa-fw fa-check-square',
