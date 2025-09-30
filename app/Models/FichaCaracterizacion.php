@@ -107,12 +107,80 @@ class FichaCaracterizacion extends Model
     }
 
     /**
-     * Get all of the aprendices for the FichaCaracterizacion
+     * Relación con la tabla pivot AprendizFicha.
+     * Obtiene todos los registros de la tabla intermedia.
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function aprendices(): HasMany
+    public function aprendicesFicha(): HasMany
     {
         return $this->hasMany(AprendizFicha::class, 'ficha_id', 'id');
+    }
+
+    /**
+     * Relación Many-to-Many con Aprendiz.
+     * Obtiene directamente los aprendices asignados a esta ficha.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function aprendices(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Aprendiz::class,
+            'aprendiz_fichas_caracterizacion',
+            'ficha_id',
+            'aprendiz_id'
+        )->withTimestamps();
+    }
+
+    /**
+     * Obtiene solo los aprendices activos de esta ficha.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function aprendicesActivos(): BelongsToMany
+    {
+        return $this->aprendices()->where('aprendices.estado', 1);
+    }
+
+    /**
+     * Obtiene el conteo total de aprendices en esta ficha.
+     *
+     * @return int
+     */
+    public function contarAprendices(): int
+    {
+        return $this->aprendices()->count();
+    }
+
+    /**
+     * Obtiene el conteo de aprendices activos en esta ficha.
+     *
+     * @return int
+     */
+    public function contarAprendicesActivos(): int
+    {
+        return $this->aprendicesActivos()->count();
+    }
+
+    /**
+     * Verifica si la ficha tiene aprendices asignados.
+     *
+     * @return bool
+     */
+    public function tieneAprendices(): bool
+    {
+        return $this->aprendices()->exists();
+    }
+
+    /**
+     * Verifica si un aprendiz específico pertenece a esta ficha.
+     *
+     * @param int $aprendizId
+     * @return bool
+     */
+    public function tieneAprendiz(int $aprendizId): bool
+    {
+        return $this->aprendices()->where('aprendices.id', $aprendizId)->exists();
     }
 }
