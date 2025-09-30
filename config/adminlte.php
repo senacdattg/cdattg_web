@@ -419,6 +419,17 @@ return [
                     ]
                 ],
                 [
+                    'text' => 'Redes de Conocimiento',
+                    'url' => 'red-conocimiento',
+                    'icon' => 'fas fa-fw fa-network-wired',
+                    'can' => [
+                        'CREAR RED CONOCIMIENTO',
+                        'EDITAR RED CONOCIMIENTO',
+                        'VER RED CONOCIMIENTO',
+                        'ELIMINAR RED CONOCIMIENTO',
+                    ]
+                ],
+                [
                     'text' => 'Municipios',
                     'url' => 'municipio',
                     'icon' => 'fas fa-fw fa-map-marker-alt',
