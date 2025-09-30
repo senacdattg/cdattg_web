@@ -9,6 +9,10 @@ use App\Models\InstructorFichaCaracterizacion;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
+/**
+ * Comando para registrar asistencias de prueba
+ * Facilita el testing del sistema de asistencias y WebSocket
+ */
 class RegistrarAsistenciaPrueba extends Command
 {
     /**
@@ -23,7 +27,7 @@ class RegistrarAsistenciaPrueba extends Command
      *
      * @var string
      */
-    protected $description = 'Registra una asistencia de prueba en la base de datos';
+    protected $description = 'Registra una asistencia de prueba en la base de datos y dispara WebSocket';
 
     /**
      * Ejecuta el comando de consola.
@@ -33,17 +37,20 @@ class RegistrarAsistenciaPrueba extends Command
         $tipo = $this->argument('tipo');
 
         if (!in_array($tipo, ['entrada', 'salida'])) {
-            $this->error('Tipo no válido. Use "entrada" o "salida"');
+            $this->error('❌ Tipo no válido. Use "entrada" o "salida"');
             return 1;
         }
 
         try {
             // Obtener el primer aprendiz_ficha disponible
-            $aprendizFicha = AprendizFicha::with(['aprendiz.persona'])->first();
+            $aprendizFicha = AprendizFicha::with([
+                'aprendiz.persona',
+                'ficha.jornadaFormacion'
+            ])->first();
             
             if (!$aprendizFicha) {
-                $this->error('No se encontró ningún aprendiz en la base de datos.');
-                $this->info('Por favor, crea al menos un aprendiz primero.');
+                $this->error('❌ No se encontró ningún aprendiz en la base de datos.');
+                $this->info('💡 Por favor, crea al menos un aprendiz primero.');
                 return 1;
             }
 
@@ -51,8 +58,8 @@ class RegistrarAsistenciaPrueba extends Command
             $instructorFicha = InstructorFichaCaracterizacion::first();
             
             if (!$instructorFicha) {
-                $this->error('No se encontró ningún instructor asignado a una ficha.');
-                $this->info('Por favor, crea al menos una asignación de instructor a ficha primero.');
+                $this->error('❌ No se encontró ningún instructor asignado a una ficha.');
+                $this->info('💡 Por favor, crea al menos una asignación de instructor a ficha primero.');
                 return 1;
             }
 
@@ -66,7 +73,7 @@ class RegistrarAsistenciaPrueba extends Command
                     'hora_salida' => null,
                 ]);
 
-                $this->info('✓ Asistencia de ENTRADA registrada con éxito!');
+                $this->info('✅ Asistencia de ENTRADA registrada con éxito!');
             } else {
                 // Buscar última asistencia sin salida
                 $asistencia = AsistenciaAprendiz::where('aprendiz_ficha_id', $aprendizFicha->id)
@@ -76,8 +83,8 @@ class RegistrarAsistenciaPrueba extends Command
                     ->first();
 
                 if (!$asistencia) {
-                    $this->error('No se encontró una asistencia de entrada para registrar la salida.');
-                    $this->info('Primero registra una entrada con: php artisan asistencia:registrar entrada');
+                    $this->error('❌ No se encontró una asistencia de entrada para registrar la salida.');
+                    $this->info('💡 Primero registra una entrada con: php artisan asistencia:registrar entrada');
                     return 1;
                 }
 
@@ -85,18 +92,29 @@ class RegistrarAsistenciaPrueba extends Command
                 $asistencia->hora_salida = Carbon::now()->format('H:i:s');
                 $asistencia->save();
 
-                $this->info('✓ Asistencia de SALIDA registrada con éxito!');
+                $this->info('✅ Asistencia de SALIDA registrada con éxito!');
             }
 
-            // Obtener nombre del aprendiz
-            $nombreAprendiz = $aprendizFicha->aprendiz->persona->getNombreCompletoAttribute();
+            // Cargar relaciones
+            $asistencia->load([
+                'aprendizFicha.aprendiz.persona',
+                'aprendizFicha.ficha.jornadaFormacion'
+            ]);
 
-            // Mostrar información
+            // Obtener información
+            $nombreAprendiz = $asistencia->aprendizFicha->aprendiz->persona->getNombreCompletoAttribute();
+            $ficha = $asistencia->aprendizFicha->ficha;
+            $jornada = $ficha->jornadaFormacion->jornada ?? 'No especificada';
+
+            // Mostrar información en tabla
+            $this->newLine();
             $this->table(
                 ['Campo', 'Valor'],
                 [
-                    ['ID', $asistencia->id],
+                    ['ID Asistencia', $asistencia->id],
                     ['Aprendiz', $nombreAprendiz],
+                    ['Ficha', $ficha->ficha],
+                    ['Jornada', $jornada],
                     ['Tipo', strtoupper($tipo)],
                     ['Hora Ingreso', $asistencia->hora_ingreso],
                     ['Hora Salida', $asistencia->hora_salida ?? 'Pendiente'],
@@ -110,15 +128,19 @@ class RegistrarAsistenciaPrueba extends Command
                 'aprendiz' => $nombreAprendiz,
                 'estado' => $tipo,
                 'timestamp' => now()->toISOString(),
+                'jornada' => $jornada,
+                'ficha' => $ficha->ficha,
             ]));
 
-            $this->info('✓ Evento de WebSocket disparado correctamente');
+            $this->newLine();
+            $this->info('🚀 Evento de WebSocket disparado correctamente');
+            $this->info('📡 Los clientes conectados recibirán la notificación en tiempo real');
 
             return 0;
 
         } catch (\Exception $e) {
-            $this->error('Error al registrar la asistencia: ' . $e->getMessage());
-            $this->error('Trace: ' . $e->getTraceAsString());
+            $this->error('❌ Error al registrar la asistencia: ' . $e->getMessage());
+            $this->error('📍 Trace: ' . $e->getTraceAsString());
             return 1;
         }
     }

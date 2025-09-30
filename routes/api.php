@@ -79,8 +79,10 @@ Route::middleware('auth:sanctum')->group(function(){
 route::post('authenticate', [LoginController::class, 'authenticate']);
 route::post('logout', [LogoutController::class, 'logout']);
 
-// Rutas para registro de asistencias
+// Rutas para registro de asistencias con jornadas y WebSocket en tiempo real
 Route::post('/asistencia/entrada', [RegistroAsistenciaController::class, 'registrarEntrada']);
 Route::post('/asistencia/salida', [RegistroAsistenciaController::class, 'registrarSalida']);
+Route::get('/asistencia/jornada', [RegistroAsistenciaController::class, 'obtenerAsistenciasPorJornada']);
+Route::get('/asistencia/fichas', [RegistroAsistenciaController::class, 'obtenerFichasConJornadas']);
 
 
