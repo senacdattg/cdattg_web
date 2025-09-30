@@ -5,62 +5,201 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreRedConocimientoRequest;
 use App\Http\Requests\UpdateRedConocimientoRequest;
 use App\Models\RedConocimiento;
+use App\Models\Regional;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Database\QueryException;
 
 class RedConocimientoController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Constructor: aplica middleware de autenticación y permisos.
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+
+        $this->middleware('can:VER RED CONOCIMIENTO')->only(['index', 'show']);
+        $this->middleware('can:CREAR RED CONOCIMIENTO')->only(['create', 'store']);
+        $this->middleware('can:EDITAR RED CONOCIMIENTO')->only(['edit', 'update']);
+        $this->middleware('can:ELIMINAR RED CONOCIMIENTO')->only('destroy');
+    }
+
+    /**
+     * Muestra el listado de redes de conocimiento.
      */
     public function index()
     {
-        //
+        try {
+            $redesConocimiento = RedConocimiento::with('regional')->paginate(10);
+            return view('red_conocimiento.index', compact('redesConocimiento'));
+        } catch (\Exception $e) {
+            Log::error('Error al listar redes de conocimiento: ' . $e->getMessage());
+            return redirect()->back()->withErrors(['error' => 'Ocurrió un error al cargar las redes de conocimiento.']);
+        }
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Muestra el formulario para crear una nueva red de conocimiento.
      */
     public function create()
     {
-        //
+        try {
+            $regionales = Regional::where('status', 1)->get();
+            return view('red_conocimiento.create', compact('regionales'));
+        } catch (\Exception $e) {
+            Log::error('Error al cargar formulario de creación: ' . $e->getMessage());
+            return redirect()->route('red-conocimiento.index')
+                ->withErrors(['error' => 'Ocurrió un error al cargar el formulario.']);
+        }
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Almacena una nueva red de conocimiento.
      */
     public function store(StoreRedConocimientoRequest $request)
     {
-        //
+        try {
+            DB::beginTransaction();
+
+            $data = $request->validated();
+            $data['user_create_id'] = Auth::id();
+            $data['user_edit_id'] = Auth::id();
+
+            RedConocimiento::create($data);
+
+            DB::commit();
+            
+            return redirect()->route('red-conocimiento.index')
+                ->with('success', '¡Red de conocimiento creada exitosamente!');
+        } catch (QueryException $e) {
+            DB::rollBack();
+            Log::error('Error al crear red de conocimiento: ' . $e->getMessage());
+            
+            if ($e->getCode() == 23000) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['error' => 'Ya existe una red de conocimiento con este nombre.']);
+            }
+            
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Ocurrió un error al crear la red de conocimiento.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error inesperado al crear red de conocimiento: ' . $e->getMessage());
+            
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Ocurrió un error inesperado al crear la red de conocimiento.']);
+        }
     }
 
     /**
-     * Display the specified resource.
+     * Muestra los detalles de una red de conocimiento específica.
      */
     public function show(RedConocimiento $redConocimiento)
     {
-        //
+        try {
+            $redConocimiento->load('regional');
+            return view('red_conocimiento.show', compact('redConocimiento'));
+        } catch (\Exception $e) {
+            Log::error('Error al mostrar red de conocimiento: ' . $e->getMessage());
+            return redirect()->route('red-conocimiento.index')
+                ->withErrors(['error' => 'Ocurrió un error al cargar los detalles.']);
+        }
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Muestra el formulario para editar una red de conocimiento.
      */
     public function edit(RedConocimiento $redConocimiento)
     {
-        //
+        try {
+            $regionales = Regional::where('status', 1)->get();
+            return view('red_conocimiento.edit', compact('redConocimiento', 'regionales'));
+        } catch (\Exception $e) {
+            Log::error('Error al cargar formulario de edición: ' . $e->getMessage());
+            return redirect()->route('red-conocimiento.index')
+                ->withErrors(['error' => 'Ocurrió un error al cargar el formulario de edición.']);
+        }
     }
 
     /**
-     * Update the specified resource in storage.
+     * Actualiza una red de conocimiento existente.
      */
     public function update(UpdateRedConocimientoRequest $request, RedConocimiento $redConocimiento)
     {
-        //
+        try {
+            DB::beginTransaction();
+
+            $data = $request->validated();
+
+            if ($redConocimiento->user_edit_id !== Auth::id()) {
+                $data['user_edit_id'] = Auth::id();
+            }
+
+            $redConocimiento->update($data);
+
+            DB::commit();
+            
+            return redirect()->route('red-conocimiento.show', $redConocimiento->id)
+                ->with('success', 'Red de conocimiento actualizada exitosamente.');
+        } catch (QueryException $e) {
+            DB::rollBack();
+            Log::error('Error al actualizar red de conocimiento: ' . $e->getMessage());
+            
+            if ($e->getCode() == 23000) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['error' => 'Ya existe una red de conocimiento con este nombre.']);
+            }
+            
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Ocurrió un error al actualizar la red de conocimiento.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error inesperado al actualizar red de conocimiento: ' . $e->getMessage());
+            
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Ocurrió un error inesperado al actualizar la red de conocimiento.']);
+        }
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Elimina una red de conocimiento.
      */
     public function destroy(RedConocimiento $redConocimiento)
     {
-        //
+        try {
+            DB::beginTransaction();
+            
+            $redConocimiento->delete();
+            
+            DB::commit();
+            
+            return redirect()->route('red-conocimiento.index')
+                ->with('success', 'Red de conocimiento eliminada exitosamente.');
+        } catch (QueryException $e) {
+            DB::rollBack();
+            Log::error('Error al eliminar red de conocimiento: ' . $e->getMessage());
+            
+            if ($e->getCode() == 23000) {
+                return redirect()->back()
+                    ->withErrors(['error' => 'La red de conocimiento está siendo usada y no es posible eliminarla.']);
+            }
+            
+            return redirect()->back()
+                ->withErrors(['error' => 'Ocurrió un error al eliminar la red de conocimiento.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error inesperado al eliminar red de conocimiento: ' . $e->getMessage());
+            
+            return redirect()->back()
+                ->withErrors(['error' => 'Ocurrió un error inesperado al eliminar la red de conocimiento.']);
+        }
     }
 }
