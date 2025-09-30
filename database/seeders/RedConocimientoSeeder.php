@@ -48,12 +48,15 @@ class RedConocimientoSeeder extends Seeder
         ];
 
         foreach ($redes_conocimientos as $nombre) {
-            RedConocimiento::create([
-                'nombre' => $nombre,
-                'user_create_id' => $userId,
-                'user_edit_id' => $userId,
-                'status' => 1, // Activo por defecto
-            ]);
+            RedConocimiento::updateOrCreate(
+                ['nombre' => $nombre], // Condición de búsqueda
+                [  
+                    'regionals_id' => 1,
+                    'user_create_id' => $userId,
+                    'user_edit_id' => $userId,
+                    'status' => 1, // Activo por defecto
+                ]
+            );
         }
     }
 }

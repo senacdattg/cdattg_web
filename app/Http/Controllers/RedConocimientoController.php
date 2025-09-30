@@ -33,7 +33,8 @@ class RedConocimientoController extends Controller
     {
         try {
             $redesConocimiento = RedConocimiento::with('regional')->paginate(10);
-            return view('red_conocimiento.index', compact('redesConocimiento'));
+            $regionales = Regional::where('status', 1)->get();
+            return view('red_conocimiento.index', compact('redesConocimiento', 'regionales'));
         } catch (\Exception $e) {
             Log::error('Error al listar redes de conocimiento: ' . $e->getMessage());
             return redirect()->back()->withErrors(['error' => 'Ocurrió un error al cargar las redes de conocimiento.']);
