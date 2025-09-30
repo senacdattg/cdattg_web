@@ -213,4 +213,5 @@
 
 @section('footer')
     @include('layout.footer')
+    @include('layout.alertas')
 @endsection

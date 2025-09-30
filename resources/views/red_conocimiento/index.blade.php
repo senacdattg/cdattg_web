@@ -125,13 +125,13 @@
                                                         </a>
                                                     @endcan
                                                     @can('ELIMINAR RED CONOCIMIENTO')
-                                                        <form action="{{ route('red-conocimiento.destroy', ['red_conocimiento' => $redConocimiento->id]) }}" method="POST" class="d-inline" onsubmit="return confirm('¿Está seguro de eliminar esta red de conocimiento?');">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-light btn-sm" data-toggle="tooltip" title="Eliminar">
-                                                                <i class="fas fa-trash text-danger"></i>
-                                                            </button>
-                                                        </form>
+                                                    <form action="{{ route('red-conocimiento.destroy', ['red_conocimiento' => $redConocimiento->id]) }}" method="POST" class="d-inline formulario-eliminar">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-light btn-sm" data-toggle="tooltip" title="Eliminar">
+                                                            <i class="fas fa-trash text-danger"></i>
+                                                        </button>
+                                                    </form>
                                                     @endcan
                                                 </div>
                                             </td>
@@ -162,6 +162,7 @@
 
 @section('footer')
     @include('layout.footer')
+    @include('layout.alertas')
 @endsection
 
 @section('js')
