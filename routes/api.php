@@ -17,6 +17,7 @@ use App\Http\Controllers\SedeController;
 use App\Http\Controllers\AsistenceQrController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\RegistroAsistenciaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -77,5 +78,9 @@ Route::middleware('auth:sanctum')->group(function(){
 
 route::post('authenticate', [LoginController::class, 'authenticate']);
 route::post('logout', [LogoutController::class, 'logout']);
+
+// Rutas para registro de asistencias
+Route::post('/asistencia/entrada', [RegistroAsistenciaController::class, 'registrarEntrada']);
+Route::post('/asistencia/salida', [RegistroAsistenciaController::class, 'registrarSalida']);
 
 

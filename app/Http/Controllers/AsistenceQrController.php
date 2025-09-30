@@ -18,6 +18,7 @@ use App\Models\Instructor;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 use App\Services\AsistenceQrService;
+use App\Events\NuevaAsistenciaRegistrada;
 use App\Events\QrScanned;
 use App\Models\Evidencias;
 use App\Services\RegistroActividadesServices;
@@ -606,6 +607,15 @@ class AsistenceQrController extends Controller
                     $asistenciaExistente->update([
                         'hora_salida' => $horaIngreso, // Usamos $horaIngreso para la hora actual
                     ]);
+
+                    // Disparar evento de nueva asistencia registrada (salida)
+                    event(new NuevaAsistenciaRegistrada([
+                        'id' => $asistenciaExistente->id,
+                        'aprendiz' => $persona->getNombreCompletoAttribute(),
+                        'estado' => 'salida',
+                        'timestamp' => now()->toISOString(),
+                    ]));
+
                     DB::commit();
                     return response()->json([
                         'status' => 'exit_registered',
@@ -648,6 +658,14 @@ class AsistenceQrController extends Controller
                 'hora_ingreso' => $horaIngreso,
                 'tipo' => 'entrada',
                 'instructor_id' => $instructorId,
+            ]));
+
+            // Disparar evento de nueva asistencia registrada
+            event(new NuevaAsistenciaRegistrada([
+                'id' => $asistencia->id,
+                'aprendiz' => $persona->getNombreCompletoAttribute(),
+                'estado' => 'entrada',
+                'timestamp' => now()->toISOString(),
             ]));
 
             DB::commit();

@@ -485,6 +485,15 @@ class AsistenciaAprendicesController extends Controller
             $asistencia->novedad_salida = $data['novedad_salida'];
             $asistencia->hora_salida = $actualHour; 
             $asistencia->save();
+
+            // Disparar evento de nueva asistencia registrada (salida)
+            event(new \App\Events\NuevaAsistenciaRegistrada([
+                'id' => $asistencia->id,
+                'aprendiz' => $asistencia->nombres . ' ' . $asistencia->apellidos,
+                'estado' => 'salida',
+                'timestamp' => now()->toISOString(),
+            ]));
+
             return response()->json(['message' => 'Novedad de salidad Actualizada'], 200);
         }
 
@@ -492,6 +501,15 @@ class AsistenciaAprendicesController extends Controller
             $asistencia->novedad_salida = $data['novedad_salida'];
             $asistencia->hora_salida = $actualHour; 
             $asistencia->save();
+
+            // Disparar evento de nueva asistencia registrada (salida)
+            event(new \App\Events\NuevaAsistenciaRegistrada([
+                'id' => $asistencia->id,
+                'aprendiz' => $asistencia->nombres . ' ' . $asistencia->apellidos,
+                'estado' => 'salida',
+                'timestamp' => now()->toISOString(),
+            ]));
+
             return response()->json(['message' => 'Novedad de salidad Actualizada'], 200);
         }
 
@@ -499,6 +517,15 @@ class AsistenciaAprendicesController extends Controller
             $asistencia->novedad_salida = $data['novedad_salida'];
             $asistencia->hora_salida = $actualHour; 
             $asistencia->save();
+
+            // Disparar evento de nueva asistencia registrada (salida)
+            event(new \App\Events\NuevaAsistenciaRegistrada([
+                'id' => $asistencia->id,
+                'aprendiz' => $asistencia->nombres . ' ' . $asistencia->apellidos,
+                'estado' => 'salida',
+                'timestamp' => now()->toISOString(),
+            ]));
+
             return response()->json(['message' => 'Novedad de salidad Actualizada'], 200);
         }
         

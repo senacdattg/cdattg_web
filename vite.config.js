@@ -9,7 +9,7 @@ export default defineConfig({
                 'style': 'resources/css/style.css',
                 'temas_css': 'resources/css/temas.css',
                 'parametros_css': 'resources/css/parametros.css',
-                'dashboard_superadmin': 'resources/css/dashboards/dashboard_superadmin.css',
+                'dashboard_superadmin': 'resources/css/dashboards/dashboard-superadmin.css',
                 'caracter_selecter': 'resources/css/Asistencia/caracter_selecter.css',
                 
                 // JavaScript files
