@@ -199,5 +199,12 @@ class RolePermissionSeeder extends Seeder
             'VER APRENDIZ',
             'VER APRENDICES POR FICHA',
         ]);
+
+        // Asignar permisos al rol APRENDIZ
+        // Los aprendices tienen acceso limitado solo a consultar su propia información
+        $aprendiz->givePermissionTo([
+            // Por ahora, el rol aprendiz no tiene permisos específicos
+            // Se controla el acceso mediante políticas y middleware
+        ]);
     }
 }
