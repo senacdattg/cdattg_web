@@ -22,12 +22,14 @@ class UpdateRedConocimientoRequest extends FormRequest
      */
     public function rules(): array
     {
+        $redConocimientoId = $this->route('red_conocimiento');
+        
         return [
             'nombre' => [
                 'required', 
                 'string', 
                 'max:255',
-                Rule::unique('red_conocimientos', 'nombre')->ignore($this->redConocimiento->id)
+                Rule::unique('red_conocimientos', 'nombre')->ignore($redConocimientoId)
             ],
             'regionals_id' => ['nullable', 'integer', 'exists:regionals,id'],
         ];
