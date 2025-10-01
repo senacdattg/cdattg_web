@@ -102,7 +102,9 @@
                         <div class="d-flex align-items-center justify-content-between">
                             <h6 class="m-0 font-weight-bold text-primary">Lista de Aprendices</h6>
                             @can('CREAR APRENDIZ')
-                                <a href="{{ route('aprendices.create') }}" class="btn btn-primary btn-sm"><i class="fas fa-plus mr-1"></i>Crear Aprendiz</a>
+                                <a href="{{ route('aprendices.create') }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus"></i> Crear Aprendiz
+                                </a>
                             @endcan
                         </div>
                     </div>
