@@ -50,8 +50,8 @@ class Aprendiz extends Model
     }
 
     /**
-     * Relación directa con FichaCaracterizacion (Many-to-One).
-     * Un aprendiz puede tener una ficha principal asignada.
+     * Relación con FichaCaracterizacion (Many-to-One).
+     * Un aprendiz pertenece a una única ficha de caracterización.
      *
      * @return BelongsTo
      */
@@ -62,7 +62,7 @@ class Aprendiz extends Model
 
     /**
      * Relación con AprendizFicha (One-to-Many).
-     * Un aprendiz puede estar asignado a múltiples fichas.
+     * Un aprendiz tiene un registro en la tabla intermedia para asistencias.
      *
      * @return HasMany
      */
@@ -72,24 +72,8 @@ class Aprendiz extends Model
     }
 
     /**
-     * Relación Many-to-Many con FichaCaracterizacion a través de tabla pivot.
-     * Un aprendiz puede pertenecer a múltiples fichas de caracterización.
-     *
-     * @return BelongsToMany
-     */
-    public function fichasCaracterizacion(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            FichaCaracterizacion::class,
-            'aprendiz_fichas_caracterizacion',
-            'aprendiz_id',
-            'ficha_id'
-        )->withTimestamps();
-    }
-
-    /**
-     * Relación HasManyThrough con AsistenciaAprendiz.
-     * Un aprendiz tiene múltiples asistencias a través de AprendizFicha.
+     * Relación con AsistenciaAprendiz a través de AprendizFicha.
+     * Un aprendiz tiene múltiples asistencias.
      *
      * @return HasManyThrough
      */

@@ -34,7 +34,7 @@ class AprendizController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Aprendiz::with(['persona', 'fichaCaracterizacion', 'aprendizFichas.ficha']);
+            $query = Aprendiz::with(['persona', 'fichaCaracterizacion']);
 
             // Filtro por búsqueda de nombre o documento
             if ($request->filled('search')) {
@@ -48,9 +48,7 @@ class AprendizController extends Controller
 
             // Filtro por ficha
             if ($request->filled('ficha_id')) {
-                $query->whereHas('fichasCaracterizacion', function ($q) use ($request) {
-                    $q->where('fichas_caracterizacion.id', $request->ficha_id);
-                });
+                $query->where('ficha_caracterizacion_id', $request->ficha_id);
             }
 
             $aprendices = $query->paginate(10)->withQueryString();
@@ -108,11 +106,6 @@ class AprendizController extends Controller
                 // Crear el aprendiz
                 $aprendiz = Aprendiz::create($data);
 
-                // Asignar a fichas si se proporcionaron
-                if ($request->filled('fichas')) {
-                    $aprendiz->fichasCaracterizacion()->attach($request->fichas);
-                }
-
                 // Asignar rol de aprendiz al usuario asociado a la persona
                 $persona = Persona::find($data['persona_id']);
                 if ($persona->user) {
@@ -122,6 +115,7 @@ class AprendizController extends Controller
                 Log::info('Aprendiz creado exitosamente', [
                     'aprendiz_id' => $aprendiz->id,
                     'persona_id' => $data['persona_id'],
+                    'ficha_id' => $data['ficha_caracterizacion_id'],
                     'user_id' => Auth::id()
                 ]);
             });
@@ -199,7 +193,7 @@ class AprendizController extends Controller
     {
         try {
             // Cargar el aprendiz con sus relaciones
-            $aprendiz = Aprendiz::with('fichasCaracterizacion')->findOrFail($id);
+            $aprendiz = Aprendiz::with('fichaCaracterizacion')->findOrFail($id);
             
             // Obtener personas que no son aprendices, o que son este aprendiz
             $personas = Persona::where(function ($query) use ($aprendiz) {
@@ -208,9 +202,8 @@ class AprendizController extends Controller
             })->where('status', 1)->get();
 
             $fichas = FichaCaracterizacion::where('status', 1)->get();
-            $fichasSeleccionadas = $aprendiz->fichasCaracterizacion->pluck('id')->toArray();
 
-            return view('aprendices.edit', compact('aprendiz', 'personas', 'fichas', 'fichasSeleccionadas'));
+            return view('aprendices.edit', compact('aprendiz', 'personas', 'fichas'));
         } catch (\Exception $e) {
             Log::error('Error al cargar formulario de edición de aprendiz: ' . $e->getMessage(), [
                 'id_recibido' => $id
@@ -238,15 +231,9 @@ class AprendizController extends Controller
                 // Actualizar el aprendiz
                 $aprendiz->update($data);
 
-                // Sincronizar fichas
-                if ($request->filled('fichas')) {
-                    $aprendiz->fichasCaracterizacion()->sync($request->fichas);
-                } else {
-                    $aprendiz->fichasCaracterizacion()->detach();
-                }
-
                 Log::info('Aprendiz actualizado exitosamente', [
                     'aprendiz_id' => $aprendiz->id,
+                    'ficha_id' => $data['ficha_caracterizacion_id'],
                     'user_id' => Auth::id()
                 ]);
             });
@@ -278,10 +265,7 @@ class AprendizController extends Controller
             $aprendiz = Aprendiz::findOrFail($id);
             
             DB::transaction(function () use ($aprendiz) {
-                // Eliminar relaciones con fichas
-                $aprendiz->fichasCaracterizacion()->detach();
-
-                // Eliminar el aprendiz
+                // Eliminar el aprendiz (soft delete)
                 $aprendiz->delete();
 
                 Log::info('Aprendiz eliminado exitosamente', [

@@ -1,7 +1,5 @@
 @extends('adminlte::page')
 
-@section('title', 'Editar Aprendiz')
-
 @section('css')
     @vite(['resources/css/parametros.css'])
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -9,184 +7,165 @@
 @endsection
 
 @section('content_header')
-<section class="content-header dashboard-header py-4">
-    <div class="container-fluid">
-        <div class="row align-items-center">
-            <div class="col-12 col-md-6 d-flex align-items-center">
-                <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center mr-3"
-                    style="width: 48px; height: 48px;">
-                    <i class="fas fa-user-edit text-white fa-lg"></i>
+    <section class="content-header dashboard-header py-4">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-6 d-flex align-items-center">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
+                        style="width: 48px; height: 48px;">
+                        <i class="fas fa-user-graduate text-white fa-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800">Aprendiz</h1>
+                        <p class="text-muted mb-0 font-weight-light">Edición del aprendiz</p>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="h3 mb-0 text-gray-800">Editar Aprendiz</h1>
-                    <p class="text-muted mb-0 font-weight-light">Actualizar información del aprendiz</p>
-                </div>    
-            </div>
-            <div class="col-sm-6">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                        <li class="breadcrumb-item">
-                            <a href="{{ route('verificarLogin') }}" class="link_right_header">
-                                <i class="fas fa-home"></i> Inicio
-                            </a>
-                        </li>
-                        <li class="breadcrumb-item">
-                            <a href="{{ route('aprendices.index') }}" class="link_right_header">
-                                <i class="fas fa-user-graduate"></i> Aprendices
-                            </a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                            Editar
-                        </li>
-                    </ol>
-                </nav>
+                <div class="col-sm-6">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
+                                    <i class="fas fa-home"></i> Inicio
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('aprendices.index') }}" class="link_right_header">
+                                    <i class="fas fa-user-graduate"></i> Aprendices
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <i class="fas fa-edit"></i> Editar aprendiz
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 @endsection
 
 @section('content')
-<section class="content mt-4">
-    <div class="container-fluid">
-        <div class="row justify-content-center">
-            <div class="col-lg-10">
-                <div class="card shadow-sm card-warning">
-                        <div class="card-header">
-                            <h3 class="card-title">Editar Información del Aprendiz</h3>
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ route('aprendices.index') }}">
+                        <i class="fas fa-arrow-left mr-1"></i> Volver
+                    </a>
+
+                    <div class="card shadow-sm no-hover">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                                <i class="fas fa-edit mr-2"></i>Editar Aprendiz
+                            </h5>
                         </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ route('aprendices.update', $aprendiz->id) }}" class="row">
+                                @csrf
+                                @method('PUT')
 
-                        <form method="POST" action="{{ route('aprendices.update', $aprendiz->id) }}">
-                            @csrf
-                            @method('PUT')
-                            
-                            <div class="card-body">
                                 <!-- Selector de Persona -->
-                                <div class="form-group">
-                                    <label for="persona_id">Persona <span class="text-danger">*</span></label>
-                                    <select name="persona_id" id="persona_id" 
-                                        class="form-control select2 @error('persona_id') is-invalid @enderror">
-                                        <option value="" selected disabled>Seleccione una persona</option>
-                                        @foreach ($personas as $persona)
-                                            <option value="{{ $persona->id }}" 
-                                                {{ (old('persona_id', $aprendiz->persona_id) == $persona->id) ? 'selected' : '' }}>
-                                                {{ $persona->nombre_completo }} - {{ $persona->numero_documento }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('persona_id')
-                                        <span class="invalid-feedback d-block">{{ $message }}</span>
-                                    @enderror
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="persona_id" class="form-label font-weight-bold">
+                                            Persona <span class="text-danger">*</span>
+                                        </label>
+                                        <select name="persona_id" id="persona_id" 
+                                            class="form-control select2 @error('persona_id') is-invalid @enderror" required>
+                                            <option value="">Seleccione una persona</option>
+                                            @foreach ($personas as $persona)
+                                                <option value="{{ $persona->id }}" 
+                                                    {{ (old('persona_id', $aprendiz->persona_id) == $persona->id) ? 'selected' : '' }}>
+                                                    {{ $persona->nombre_completo }} - {{ $persona->numero_documento }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('persona_id')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        <small class="form-text text-muted">
+                                            Seleccione la persona asociada al aprendiz
+                                        </small>
+                                    </div>
                                 </div>
 
-                                <!-- Ficha de Caracterización Principal -->
-                                <div class="form-group">
-                                    <label for="ficha_caracterizacion_id">Ficha de Caracterización Principal <span class="text-danger">*</span></label>
-                                    <select name="ficha_caracterizacion_id" id="ficha_caracterizacion_id" 
-                                        class="form-control select2 @error('ficha_caracterizacion_id') is-invalid @enderror">
-                                        <option value="" selected disabled>Seleccione una ficha</option>
-                                        @foreach ($fichas as $ficha)
-                                            <option value="{{ $ficha->id }}" 
-                                                {{ (old('ficha_caracterizacion_id', $aprendiz->ficha_caracterizacion_id) == $ficha->id) ? 'selected' : '' }}>
-                                                {{ $ficha->ficha }} - {{ $ficha->programaFormacion->nombre ?? 'N/A' }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('ficha_caracterizacion_id')
-                                        <span class="invalid-feedback d-block">{{ $message }}</span>
-                                    @enderror
-                                </div>
-
-                                <!-- Fichas Adicionales (Many-to-Many) -->
-                                <div class="form-group">
-                                    <label for="fichas">Fichas Adicionales (Opcional)</label>
-                                    <select name="fichas[]" id="fichas" 
-                                        class="form-control select2" multiple="multiple">
-                                        @foreach ($fichas as $ficha)
-                                            <option value="{{ $ficha->id }}"
-                                                {{ in_array($ficha->id, $fichasSeleccionadas) ? 'selected' : '' }}>
-                                                {{ $ficha->ficha }} - {{ $ficha->programaFormacion->nombre ?? 'N/A' }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <small class="form-text text-muted">
-                                        <i class="fas fa-info-circle"></i> Puede seleccionar múltiples fichas si el aprendiz pertenece a varios programas
-                                    </small>
+                                <!-- Ficha de Caracterización -->
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="ficha_caracterizacion_id" class="form-label font-weight-bold">
+                                            Ficha de Caracterización <span class="text-danger">*</span>
+                                        </label>
+                                        <select name="ficha_caracterizacion_id" id="ficha_caracterizacion_id" 
+                                            class="form-control select2 @error('ficha_caracterizacion_id') is-invalid @enderror" required>
+                                            <option value="">Seleccione una ficha</option>
+                                            @foreach ($fichas as $ficha)
+                                                <option value="{{ $ficha->id }}" 
+                                                    {{ (old('ficha_caracterizacion_id', $aprendiz->ficha_caracterizacion_id) == $ficha->id) ? 'selected' : '' }}>
+                                                    {{ $ficha->ficha }} - {{ $ficha->programaFormacion->nombre ?? 'N/A' }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('ficha_caracterizacion_id')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        <small class="form-text text-muted">
+                                            Ficha de caracterización a la que pertenece el aprendiz
+                                        </small>
+                                    </div>
                                 </div>
 
                                 <!-- Estado -->
-                                <div class="form-group">
-                                    <label for="estado">Estado <span class="text-danger">*</span></label>
-                                    <div class="form-check">
-                                        <input type="radio" class="form-check-input" id="estado_activo" 
-                                            name="estado" value="1" 
-                                            {{ old('estado', $aprendiz->estado ? 1 : 0) == 1 ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="estado_activo">
-                                            <span class="badge badge-success">ACTIVO</span>
-                                        </label>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="estado" class="form-label font-weight-bold">Estado</label>
+                                        <select name="estado" id="estado" 
+                                            class="form-control @error('estado') is-invalid @enderror" required>
+                                            <option value="1" {{ old('estado', $aprendiz->estado) == 1 ? 'selected' : '' }}>
+                                                Activo
+                                            </option>
+                                            <option value="0" {{ old('estado', $aprendiz->estado) == 0 ? 'selected' : '' }}>
+                                                Inactivo
+                                            </option>
+                                        </select>
+                                        @error('estado')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
                                     </div>
-                                    <div class="form-check">
-                                        <input type="radio" class="form-check-input" id="estado_inactivo" 
-                                            name="estado" value="0" 
-                                            {{ old('estado', $aprendiz->estado ? 1 : 0) == 0 ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="estado_inactivo">
-                                            <span class="badge badge-danger">INACTIVO</span>
-                                        </label>
-                                    </div>
-                                    @error('estado')
-                                        <span class="text-danger d-block">{{ $message }}</span>
-                                    @enderror
                                 </div>
 
-                                <hr>
-                                
-                                <!-- Información adicional -->
-                                <div class="alert alert-info">
-                                    <h5><i class="icon fas fa-info"></i> Información</h5>
-                                    <ul class="mb-0">
-                                        <li><strong>Creado:</strong> {{ $aprendiz->created_at->format('d/m/Y H:i') }}</li>
-                                        <li><strong>Última actualización:</strong> {{ $aprendiz->updated_at->format('d/m/Y H:i') }}</li>
-                                    </ul>
-                                </div>
-
-                                <p class="text-muted">
-                                    <small><span class="text-danger">*</span> Campos obligatorios</small>
-                                </p>
-                            </div>
-
-                            <div class="card-footer">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <a href="{{ route('aprendices.show', $aprendiz->id) }}" class="btn btn-secondary">
-                                            <i class="fas fa-arrow-left"></i> Cancelar
+                                <!-- Botones -->
+                                <div class="col-12">
+                                    <hr class="mt-4">
+                                    <div class="d-flex justify-content-end">
+                                        <a href="{{ route('aprendices.index') }}" class="btn btn-light mr-2">
+                                            <i class="fas fa-times mr-1"></i>Cancelar
                                         </a>
-                                    </div>
-                                    <div class="col-md-6 text-right">
-                                        <button type="submit" class="btn btn-warning">
-                                            <i class="fas fa-save"></i> Actualizar Aprendiz
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save mr-1"></i>Guardar Cambios
                                         </button>
                                     </div>
                                 </div>
-                            </div>
-                        </form>
+                            </form>
+                        </div>
                     </div>
+                </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 @endsection
 
 @section('footer')
     @include('layout.footer')
+    @include('layout.alertas')
 @endsection
 
 @section('js')
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Inicializar Select2
+            // Inicializar Select2 para todos los select
             $('.select2').select2({
-                theme: 'bootstrap4',
+                theme: 'bootstrap-5',
                 width: '100%',
                 placeholder: 'Seleccione una opción',
                 allowClear: true
@@ -194,4 +173,3 @@
         });
     </script>
 @endsection
-
