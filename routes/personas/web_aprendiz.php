@@ -13,6 +13,9 @@ use App\Http\Controllers\AprendizController;
 |
 */
 
+// Ruta de test temporal - ELIMINAR DESPUÉS
+Route::get('/aprendices-test-data', [AprendizController::class, 'testData'])->name('aprendices.test');
+
 // Rutas CRUD de recurso para Aprendiz
 Route::resource('aprendices', AprendizController::class);
 

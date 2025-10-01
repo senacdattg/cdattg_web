@@ -29,7 +29,7 @@
                 </div>
                 <div>
                     <h1 class="h3 mb-0 text-gray-800">Información del Aprendiz</h1>
-                    <p class="text-muted mb-0 font-weight-light">{{ $aprendiz->persona->nombre_completo }}</p>
+                    <p class="text-muted mb-0 font-weight-light">{{ $aprendiz->persona?->nombre_completo ?? 'Sin información' }}</p>
                 </div>    
             </div>
             <div class="col-sm-6">
@@ -46,7 +46,7 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item active" aria-current="page">
-                            {{ $aprendiz->persona->nombre_completo }}
+                            {{ $aprendiz->persona?->nombre_completo ?? 'Sin información' }}
                         </li>
                     </ol>
                 </nav>
@@ -66,9 +66,11 @@
                 <i class="fas fa-arrow-left"></i> Volver
             </a>
             @can('EDITAR APRENDIZ')
-                <a class="btn btn-warning btn-sm" href="{{ route('aprendices.edit', $aprendiz->id) }}" title="Editar">
-                    <i class="fas fa-edit"></i> Editar
-                </a>
+                @if(isset($aprendiz) && $aprendiz->id)
+                    <a class="btn btn-warning btn-sm" href="{{ route('aprendices.edit', $aprendiz->id) }}" title="Editar">
+                        <i class="fas fa-edit"></i> Editar
+                    </a>
+                @endif
             @endcan
         </div>
 
@@ -80,12 +82,12 @@
                         <div class="card-body box-profile">
                             <div class="text-center">
                                 <img class="profile-user-img img-fluid img-circle" 
-                                     src="https://ui-avatars.com/api/?name={{ urlencode($aprendiz->persona->nombre_completo) }}&size=128&background=007bff&color=fff"
+                                     src="https://ui-avatars.com/api/?name={{ urlencode($aprendiz->persona?->nombre_completo ?? 'Sin nombre') }}&size=128&background=007bff&color=fff"
                                      alt="Foto de perfil">
                             </div>
-                            <h3 class="profile-username text-center">{{ $aprendiz->persona->nombre_completo }}</h3>
+                            <h3 class="profile-username text-center">{{ $aprendiz->persona?->nombre_completo ?? 'Sin información' }}</h3>
                             <p class="text-muted text-center">
-                                @if($aprendiz->persona->user)
+                                @if($aprendiz->persona?->user)
                                     {{ $aprendiz->persona->user->getRoleNames()->implode(', ') }}
                                 @else
                                     Sin rol asignado
@@ -95,16 +97,16 @@
                             <ul class="list-group list-group-unbordered mb-3">
                                 <li class="list-group-item">
                                     <b><i class="fas fa-id-card"></i> Documento</b>
-                                    <span class="float-right">{{ $aprendiz->persona->numero_documento }}</span>
+                                    <span class="float-right">{{ $aprendiz->persona?->numero_documento ?? 'N/A' }}</span>
                                 </li>
                                 <li class="list-group-item">
                                     <b><i class="fas fa-envelope"></i> Email</b>
-                                    <span class="float-right">{{ $aprendiz->persona->email }}</span>
+                                    <span class="float-right">{{ $aprendiz->persona?->email ?? 'N/A' }}</span>
                                 </li>
                                 <li class="list-group-item">
                                     <b><i class="fas fa-mobile-alt"></i> Celular</b>
                                     <span class="float-right">
-                                        @if ($aprendiz->persona->celular)
+                                        @if ($aprendiz->persona?->celular)
                                             <a href="https://wa.me/{{ $aprendiz->persona->celular }}" target="_blank">
                                                 {{ $aprendiz->persona->celular }} <i class="fab fa-whatsapp text-success"></i>
                                             </a>

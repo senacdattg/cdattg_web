@@ -6,6 +6,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Tooltip para botones de acción
     $('[data-toggle="tooltip"]').tooltip();
 
+    // Debug: Verificar enlaces de visualización
+    const viewLinks = document.querySelectorAll('a[href*="aprendices"][href*="/"]');
+    console.log('Enlaces de aprendices encontrados:', viewLinks.length);
+    
+    // Agregar evento de clic para debug
+    viewLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            console.log('Click en enlace:', this.href);
+        });
+    });
+
     // Confirmación para eliminar aprendiz
     const formsEliminar = document.querySelectorAll('.formulario-eliminar');
     formsEliminar.forEach(form => {
