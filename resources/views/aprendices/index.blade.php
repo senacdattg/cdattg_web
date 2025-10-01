@@ -98,13 +98,15 @@
 
                 <!-- Card de Lista -->
                 <div class="card shadow-sm mb-4 no-hover">
-                    <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
-                        <h6 class="m-0 font-weight-bold text-primary">Lista de Aprendices</h6>
-                        @can('CREAR APRENDIZ')
-                            <a href="{{ route('aprendices.create') }}" class="btn btn-primary">
-                                <i class="fas fa-plus mr-1"></i> Crear Aprendiz
-                            </a>
-                        @endcan
+                    <div class="card-header bg-white py-3">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h6 class="m-0 font-weight-bold text-primary">Lista de Aprendices</h6>
+                            @can('CREAR APRENDIZ')
+                                <a href="{{ route('aprendices.create') }}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus mr-1"></i> Crear Aprendiz
+                                </a>
+                            @endcan
+                        </div>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
@@ -142,11 +144,10 @@
                                             </td>
                                             <td class="px-3">{{ $aprendiz->persona->email }}</td>
                                             <td class="px-3">
-                                                <div
-                                                    class="d-inline-block px-2 py-1 rounded-pill {{ $aprendiz->estado ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}" style="font-size: 0.8rem;">
-                                                    <i class="fas fa-circle mr-1" style="font-size: 6px;"></i>
+                                                <span class="badge badge-{{ $aprendiz->estado ? 'success' : 'danger' }} px-3 py-2">
+                                                    <i class="fas fa-circle mr-1" style="font-size: 6px; vertical-align: middle;"></i>
                                                     {{ $aprendiz->estado ? 'Activo' : 'Inactivo' }}
-                                                </div>
+                                                </span>
                                             </td>
                                             <td class="px-3 text-center" style="white-space: nowrap;">
                                                 <div class="btn-group btn-group-sm" role="group">
