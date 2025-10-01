@@ -120,7 +120,7 @@
                                     <div class="form-check">
                                         <input type="radio" class="form-check-input" id="estado_activo" 
                                             name="estado" value="1" 
-                                            {{ old('estado', $aprendiz->estado) == '1' ? 'checked' : '' }}>
+                                            {{ old('estado', $aprendiz->estado ? 1 : 0) == 1 ? 'checked' : '' }}>
                                         <label class="form-check-label" for="estado_activo">
                                             <span class="badge badge-success">ACTIVO</span>
                                         </label>
@@ -128,7 +128,7 @@
                                     <div class="form-check">
                                         <input type="radio" class="form-check-input" id="estado_inactivo" 
                                             name="estado" value="0" 
-                                            {{ old('estado', $aprendiz->estado) == '0' ? 'checked' : '' }}>
+                                            {{ old('estado', $aprendiz->estado ? 1 : 0) == 0 ? 'checked' : '' }}>
                                         <label class="form-check-label" for="estado_inactivo">
                                             <span class="badge badge-danger">INACTIVO</span>
                                         </label>

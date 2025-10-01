@@ -98,11 +98,11 @@
 
                 <!-- Card de Lista -->
                 <div class="card shadow-sm mb-4 no-hover">
-                    <div class="card-header bg-white py-3 d-flex align-items-center">
-                        <h6 class="m-0 font-weight-bold text-primary d-flex flex-grow-1">Lista de Aprendices</h6>
+                    <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Lista de Aprendices</h6>
                         @can('CREAR APRENDIZ')
-                            <a href="{{ route('aprendices.create') }}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-plus"></i> Crear Aprendiz
+                            <a href="{{ route('aprendices.create') }}" class="btn btn-primary">
+                                <i class="fas fa-plus mr-1"></i> Crear Aprendiz
                             </a>
                         @endcan
                     </div>
@@ -111,56 +111,61 @@
                             <table class="table table-borderless table-striped mb-0">
                                 <thead class="thead-light">
                                     <tr>
-                                        <th class="px-4 py-3" style="width: 5%">#</th>
-                                        <th class="px-4 py-3" style="width: 20%">Nombre y Apellido</th>
-                                        <th class="px-4 py-3" style="width: 12%">Documento</th>
-                                        <th class="px-4 py-3" style="width: 12%">Ficha Principal</th>
-                                        <th class="px-4 py-3" style="width: 20%">Correo Electrónico</th>
-                                        <th class="px-4 py-3" style="width: 10%">Estado</th>
-                                        <th class="px-4 py-3 text-center" style="width: 21%">Acciones</th>
+                                        <th class="px-3 py-3" style="width: 3%">#</th>
+                                        <th class="px-3 py-3" style="width: 18%">Nombre y Apellido</th>
+                                        <th class="px-3 py-3" style="width: 10%">Documento</th>
+                                        <th class="px-3 py-3" style="width: 10%">Ficha Principal</th>
+                                        <th class="px-3 py-3" style="width: 20%">Correo Electrónico</th>
+                                        <th class="px-3 py-3" style="width: 10%">Estado</th>
+                                        <th class="px-3 py-3 text-center" style="width: 29%; min-width: 200px;">Acciones</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse ($aprendices as $aprendiz)
                                         <tr>
-                                            <td class="px-4">{{ $loop->iteration + ($aprendices->currentPage() - 1) * $aprendices->perPage() }}</td>
-                                            <td class="px-4 font-weight-medium">{{ $aprendiz->persona->nombre_completo }}</td>
-                                            <td class="px-4">{{ $aprendiz->persona->numero_documento }}</td>
-                                            <td class="px-4">
+                                            <td class="px-3">{{ $loop->iteration + ($aprendices->currentPage() - 1) * $aprendices->perPage() }}</td>
+                                            <td class="px-3 font-weight-medium">{{ $aprendiz->persona->nombre_completo }}</td>
+                                            <td class="px-3">{{ $aprendiz->persona->numero_documento }}</td>
+                                            <td class="px-3">
+                                                {{-- Debug: ID en BD: {{ $aprendiz->ficha_caracterizacion_id ?? 'NULL' }} --}}
                                                 @if($aprendiz->fichaCaracterizacion)
                                                     <span class="badge badge-info">
                                                         {{ $aprendiz->fichaCaracterizacion->ficha }}
                                                     </span>
+                                                @elseif($aprendiz->ficha_caracterizacion_id)
+                                                    <span class="badge badge-warning">
+                                                        ID: {{ $aprendiz->ficha_caracterizacion_id }} (No cargada)
+                                                    </span>
                                                 @else
-                                                    <span class="text-muted">Sin asignar</span>
+                                                    <span class="text-muted small">Sin asignar</span>
                                                 @endif
                                             </td>
-                                            <td class="px-4">{{ $aprendiz->persona->email }}</td>
-                                            <td class="px-4">
+                                            <td class="px-3">{{ $aprendiz->persona->email }}</td>
+                                            <td class="px-3">
                                                 <div
-                                                    class="d-inline-block px-3 py-1 rounded-pill {{ $aprendiz->estado === 1 ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}">
-                                                    <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
-                                                    {{ $aprendiz->estado === 1 ? 'Activo' : 'Inactivo' }}
+                                                    class="d-inline-block px-2 py-1 rounded-pill {{ $aprendiz->estado ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}" style="font-size: 0.8rem;">
+                                                    <i class="fas fa-circle mr-1" style="font-size: 6px;"></i>
+                                                    {{ $aprendiz->estado ? 'Activo' : 'Inactivo' }}
                                                 </div>
                                             </td>
-                                            <td class="px-4 text-center">
-                                                <div class="btn-group">
+                                            <td class="px-3 text-center" style="white-space: nowrap;">
+                                                <div class="btn-group btn-group-sm" role="group">
                                                     @can('EDITAR APRENDIZ')
                                                         <form action="{{ route('aprendices.cambiarEstado', $aprendiz->id) }}" method="POST" class="d-inline">
                                                             @csrf
                                                             @method('PUT')
-                                                            <button type="submit" class="btn btn-light btn-sm" data-toggle="tooltip" title="Cambiar estado">
+                                                            <button type="submit" class="btn btn-light" data-toggle="tooltip" title="Cambiar estado">
                                                                 <i class="fas fa-sync text-success"></i>
                                                             </button>
                                                         </form>
                                                     @endcan
                                                     @can('VER APRENDIZ')
-                                                        <a href="{{ route('aprendices.show', $aprendiz->id) }}" class="btn btn-light btn-sm" data-toggle="tooltip" title="Ver detalles">
+                                                        <a href="{{ route('aprendices.show', $aprendiz->id) }}" class="btn btn-light" data-toggle="tooltip" title="Ver detalles">
                                                             <i class="fas fa-eye text-warning"></i>
                                                         </a>
                                                     @endcan
                                                     @can('EDITAR APRENDIZ')
-                                                        <a href="{{ route('aprendices.edit', $aprendiz->id) }}" class="btn btn-light btn-sm" data-toggle="tooltip" title="Editar">
+                                                        <a href="{{ route('aprendices.edit', $aprendiz->id) }}" class="btn btn-light" data-toggle="tooltip" title="Editar">
                                                             <i class="fas fa-pencil-alt text-info"></i>
                                                         </a>
                                                     @endcan
@@ -168,7 +173,7 @@
                                                         <form action="{{ route('aprendices.destroy', $aprendiz->id) }}" method="POST" class="d-inline formulario-eliminar">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="btn btn-light btn-sm" data-toggle="tooltip" title="Eliminar">
+                                                            <button type="submit" class="btn btn-light" data-toggle="tooltip" title="Eliminar">
                                                                 <i class="fas fa-trash text-danger"></i>
                                                             </button>
                                                         </form>
