@@ -98,15 +98,13 @@
 
                 <!-- Card de Lista -->
                 <div class="card shadow-sm mb-4 no-hover">
-                    <div class="card-header bg-white py-3">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <h6 class="m-0 font-weight-bold text-primary">Lista de Aprendices</h6>
-                            @can('CREAR APRENDIZ')
-                                <a href="{{ route('aprendices.create') }}" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-plus"></i> Crear Aprendiz
-                                </a>
-                            @endcan
-                        </div>
+                    <div class="card-header bg-white py-3 d-flex align-items-center justify-content-between">
+                        <h6 class="m-0 font-weight-bold text-primary">Lista de Aprendices</h6>
+                        @can('CREAR APRENDIZ')
+                            <a href="{{ route('aprendices.create') }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus"></i> Crear Aprendiz
+                            </a>
+                        @endcan
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
