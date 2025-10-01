@@ -2,6 +2,8 @@
 
 @section('classes_body', 'productos-page')
 
+@section('plugins.Sweetalert2', true)
+
 @vite([
     'resources/css/inventario/shared/base.css',
     'resources/css/inventario/productos.css',
@@ -54,7 +56,21 @@
             </div>
         </div>
         <div class="div_btn">
-            <a href="{{ route('productos.index') }}" class="btn_show">Volver</a>
+            <a href="{{ route('productos.index') }}" class="btn_show">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+            <a href="{{ route('productos.edit', $producto->id) }}" class="btn_show btn_warning">
+                <i class="fas fa-edit"></i> Editar
+            </a>
+            <button type="button" class="btn_show btn_danger" onclick="confirmarEliminacion()">
+                <i class="fas fa-trash"></i> Eliminar
+            </button>
+            
+            <!-- Formulario oculto para eliminar -->
+            <form id="form-eliminar" action="{{ route('productos.destroy', $producto->id) }}" method="POST" style="display: none;">
+                @csrf
+                @method('DELETE')
+            </form>
         </div>
     </div>
     <div class="acciones_carrito">
@@ -85,4 +101,25 @@
     <span class="cerrar">&times;</span>
     <img class="modal-contenido" id="imgExpandida">
 </div>
+
+@push('js')
+<script>
+    function confirmarEliminacion() {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "Esta acción no se puede deshacer",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('form-eliminar').submit();
+            }
+        });
+    }
+</script>
+@endpush
 @endsection
