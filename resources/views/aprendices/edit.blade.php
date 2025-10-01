@@ -2,16 +2,56 @@
 
 @section('title', 'Editar Aprendiz')
 
+@section('css')
+    @vite(['resources/css/parametros.css'])
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+@endsection
+
 @section('content_header')
-    <h1>Editar Aprendiz</h1>
-@stop
+<section class="content-header dashboard-header py-4">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-12 col-md-6 d-flex align-items-center">
+                <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center mr-3"
+                    style="width: 48px; height: 48px;">
+                    <i class="fas fa-user-edit text-white fa-lg"></i>
+                </div>
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">Editar Aprendiz</h1>
+                    <p class="text-muted mb-0 font-weight-light">Actualizar información del aprendiz</p>
+                </div>    
+            </div>
+            <div class="col-sm-6">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('verificarLogin') }}" class="link_right_header">
+                                <i class="fas fa-home"></i> Inicio
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('aprendices.index') }}" class="link_right_header">
+                                <i class="fas fa-user-graduate"></i> Aprendices
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            Editar
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</section>
+@endsection
 
 @section('content')
+<section class="content mt-4">
     <div class="container-fluid">
-        <section class="content">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="card card-warning">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card shadow-sm card-warning">
                         <div class="card-header">
                             <h3 class="card-title">Editar Información del Aprendiz</h3>
                         </div>
@@ -130,16 +170,15 @@
                             </div>
                         </form>
                     </div>
-                </div>
             </div>
-        </section>
+        </div>
     </div>
-@stop
+</section>
+@endsection
 
-@section('css')
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
-@stop
+@section('footer')
+    @include('layout.footer')
+@endsection
 
 @section('js')
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -154,5 +193,5 @@
             });
         });
     </script>
-@stop
+@endsection
 

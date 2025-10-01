@@ -2,45 +2,81 @@
 
 @section('title', 'Detalle Aprendiz')
 
-@section('content')
-    <!-- Encabezado de la Página -->
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>Información del Aprendiz</h1>
+@section('css')
+    @vite(['resources/css/parametros.css'])
+    <style>
+        .info-box {
+            min-height: 80px;
+        }
+        .info-box-text {
+            font-size: 0.875rem;
+        }
+        .info-box-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+    </style>
+@endsection
+
+@section('content_header')
+<section class="content-header dashboard-header py-4">
+    <div class="container-fluid">
+        <div class="row align-items-center">
+            <div class="col-12 col-md-6 d-flex align-items-center">
+                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
+                    style="width: 48px; height: 48px;">
+                    <i class="fas fa-user-graduate text-white fa-lg"></i>
                 </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="{{ route('verificarLogin') }}">Inicio</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('aprendices.index') }}">Aprendices</a></li>
-                        <li class="breadcrumb-item active">{{ $aprendiz->persona->nombre_completo }}</li>
+                <div>
+                    <h1 class="h3 mb-0 text-gray-800">Información del Aprendiz</h1>
+                    <p class="text-muted mb-0 font-weight-light">{{ $aprendiz->persona->nombre_completo }}</p>
+                </div>    
+            </div>
+            <div class="col-sm-6">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('verificarLogin') }}" class="link_right_header">
+                                <i class="fas fa-home"></i> Inicio
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
+                            <a href="{{ route('aprendices.index') }}" class="link_right_header">
+                                <i class="fas fa-user-graduate"></i> Aprendices
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item active" aria-current="page">
+                            {{ $aprendiz->persona->nombre_completo }}
+                        </li>
                     </ol>
-                </div>
+                </nav>
             </div>
         </div>
-    </section>
+    </div>
+</section>
+@endsection
 
-    <!-- Contenido Principal -->
-    <section class="content">
-        <div class="container-fluid">
-            <!-- Botón Volver y Editar -->
-            <div class="mb-3">
-                <a class="btn btn-outline-secondary btn-sm" href="{{ route('aprendices.index') }}" title="Volver">
-                    <i class="fas fa-arrow-left"></i> Volver
+@section('content')
+
+<section class="content mt-4">
+    <div class="container-fluid">
+        <!-- Botón Volver y Editar -->
+        <div class="mb-3">
+            <a class="btn btn-secondary btn-sm" href="{{ route('aprendices.index') }}" title="Volver">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+            @can('EDITAR APRENDIZ')
+                <a class="btn btn-warning btn-sm" href="{{ route('aprendices.edit', $aprendiz->id) }}" title="Editar">
+                    <i class="fas fa-edit"></i> Editar
                 </a>
-                @can('EDITAR APRENDIZ')
-                    <a class="btn btn-outline-warning btn-sm" href="{{ route('aprendices.edit', $aprendiz->id) }}" title="Editar">
-                        <i class="fas fa-edit"></i> Editar
-                    </a>
-                @endcan
-            </div>
+            @endcan
+        </div>
 
-            <div class="row">
-                <!-- Columna izquierda: Información del Aprendiz -->
-                <div class="col-md-4">
-                    <!-- Perfil del Aprendiz -->
-                    <div class="card card-primary card-outline">
+        <div class="row">
+            <!-- Columna izquierda: Información del Aprendiz -->
+            <div class="col-md-4">
+                <!-- Perfil del Aprendiz -->
+                <div class="card shadow-sm card-primary card-outline">
                         <div class="card-body box-profile">
                             <div class="text-center">
                                 <img class="profile-user-img img-fluid img-circle" 
@@ -89,8 +125,8 @@
                         </div>
                     </div>
 
-                    <!-- Estadísticas -->
-                    <div class="card card-info">
+                <!-- Estadísticas -->
+                <div class="card shadow-sm card-info">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-chart-bar"></i> Estadísticas</h3>
                         </div>
@@ -117,10 +153,10 @@
                     </div>
                 </div>
 
-                <!-- Columna derecha: Detalles y fichas -->
-                <div class="col-md-8">
-                    <!-- Ficha Principal -->
-                    <div class="card card-primary">
+            <!-- Columna derecha: Detalles y fichas -->
+            <div class="col-md-8">
+                <!-- Ficha Principal -->
+                <div class="card shadow-sm card-primary">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-graduation-cap"></i> Ficha Principal</h3>
                         </div>
@@ -152,8 +188,8 @@
                         </div>
                     </div>
 
-                    <!-- Fichas Asociadas -->
-                    <div class="card card-success">
+                <!-- Fichas Asociadas -->
+                <div class="card shadow-sm card-success">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-list"></i> Todas las Fichas Asociadas</h3>
                         </div>
@@ -195,8 +231,8 @@
                         </div>
                     </div>
 
-                    <!-- Últimas Asistencias -->
-                    <div class="card card-warning">
+                <!-- Últimas Asistencias -->
+                <div class="card shadow-sm card-warning">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-clock"></i> Últimas Asistencias</h3>
                         </div>
@@ -251,8 +287,8 @@
                         </div>
                     </div>
 
-                    <!-- Información de Auditoría -->
-                    <div class="card card-secondary">
+                <!-- Información de Auditoría -->
+                <div class="card shadow-sm card-secondary">
                         <div class="card-header">
                             <h3 class="card-title"><i class="fas fa-history"></i> Información de Registro</h3>
                         </div>
@@ -269,24 +305,13 @@
                             </dl>
                         </div>
                     </div>
-                </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 @endsection
 
-@section('css')
-    <style>
-        .info-box {
-            min-height: 80px;
-        }
-        .info-box-text {
-            font-size: 0.875rem;
-        }
-        .info-box-number {
-            font-size: 1.5rem;
-            font-weight: bold;
-        }
-    </style>
+@section('footer')
+    @include('layout.footer')
 @endsection
 
