@@ -34,7 +34,7 @@ class AprendizController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Aprendiz::with(['persona', 'aprendizFichas.ficha']);
+            $query = Aprendiz::with(['persona', 'fichaCaracterizacion', 'aprendizFichas.ficha']);
 
             // Filtro por búsqueda de nombre o documento
             if ($request->filled('search')) {

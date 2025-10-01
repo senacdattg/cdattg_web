@@ -25,4 +25,13 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: {
+        host: '0.0.0.0',  // Escucha en todas las interfaces de red
+        port: 5173,
+        strictPort: true,
+        hmr: {
+            host: '192.168.100.79',  // Tu IP de red local
+        },
+        cors: true,  // Habilita CORS para permitir peticiones cross-origin
+    },
 });
