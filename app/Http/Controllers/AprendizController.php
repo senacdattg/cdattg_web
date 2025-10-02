@@ -203,17 +203,11 @@ class AprendizController extends Controller
     {
         try {
             // Cargar el aprendiz con sus relaciones
-            $aprendiz = Aprendiz::with('fichaCaracterizacion')->findOrFail($id);
+            $aprendiz = Aprendiz::with(['persona', 'fichaCaracterizacion'])->findOrFail($id);
             
-            // Obtener personas que no son aprendices, o que son este aprendiz
-            $personas = Persona::where(function ($query) use ($aprendiz) {
-                $query->whereDoesntHave('aprendiz')
-                    ->orWhere('id', $aprendiz->persona_id);
-            })->where('status', 1)->get();
-
             $fichas = FichaCaracterizacion::where('status', 1)->get();
 
-            return view('aprendices.edit', compact('aprendiz', 'personas', 'fichas'));
+            return view('aprendices.edit', compact('aprendiz', 'fichas'));
         } catch (\Exception $e) {
             Log::error('Error al cargar formulario de edición de aprendiz: ' . $e->getMessage(), [
                 'id_recibido' => $id

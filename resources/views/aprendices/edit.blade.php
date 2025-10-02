@@ -64,27 +64,19 @@
                                 @csrf
                                 @method('PUT')
 
-                                <!-- Selector de Persona -->
+                                <!-- Información de la Persona (Solo lectura) -->
                                 <div class="col-md-6">
                                     <div class="form-group">
-                                        <label for="persona_id" class="form-label font-weight-bold">
-                                            Persona <span class="text-danger">*</span>
+                                        <label for="persona_info" class="form-label font-weight-bold">
+                                            Persona Asociada
                                         </label>
-                                        <select name="persona_id" id="persona_id" 
-                                            class="form-control select2 @error('persona_id') is-invalid @enderror" required>
-                                            <option value="">Seleccione una persona</option>
-                                            @foreach ($personas as $persona)
-                                                <option value="{{ $persona->id }}" 
-                                                    {{ (old('persona_id', $aprendiz->persona_id) == $persona->id) ? 'selected' : '' }}>
-                                                    {{ $persona->nombre_completo }} - {{ $persona->numero_documento }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @error('persona_id')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
+                                        <input type="text" id="persona_info" 
+                                            class="form-control bg-light" 
+                                            value="{{ $aprendiz->persona->nombre_completo }} - {{ $aprendiz->persona->numero_documento }}"
+                                            readonly>
+                                        <input type="hidden" name="persona_id" value="{{ $aprendiz->persona_id }}">
                                         <small class="form-text text-muted">
-                                            Seleccione la persona asociada al aprendiz
+                                            La persona no se puede cambiar en la edición
                                         </small>
                                     </div>
                                 </div>

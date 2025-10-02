@@ -21,10 +21,8 @@ class UpdateAprendizRequest extends FormRequest
      */
     public function rules(): array
     {
-        $aprendizId = $this->route('aprendiz');
-
         return [
-            'persona_id' => "required|exists:personas,id|unique:aprendices,persona_id,{$aprendizId}",
+            'persona_id' => "required|exists:personas,id",
             'ficha_caracterizacion_id' => 'required|exists:fichas_caracterizacion,id',
             'estado' => 'required|boolean',
         ];
@@ -40,7 +38,6 @@ class UpdateAprendizRequest extends FormRequest
         return [
             'persona_id.required' => 'La persona es obligatoria.',
             'persona_id.exists' => 'La persona seleccionada no existe.',
-            'persona_id.unique' => 'Esta persona ya está registrada como aprendiz.',
             'ficha_caracterizacion_id.required' => 'La ficha de caracterización es obligatoria.',
             'ficha_caracterizacion_id.exists' => 'La ficha de caracterización seleccionada no existe.',
             'estado.required' => 'El estado es obligatorio.',

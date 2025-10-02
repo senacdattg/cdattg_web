@@ -613,14 +613,6 @@ return [
                                 'CREAR APRENDIZ',
                             ],
                         ],
-                        [
-                            'text' => 'Aprendices por Ficha',
-                            'url' => 'aprendices?ficha_filter=true',
-                            'icon' => 'fas fa-fw fa-filter',
-                            'can' => [
-                                'VER APRENDICES POR FICHA',
-                            ],
-                        ],
                     ],
                 ],
                 [
