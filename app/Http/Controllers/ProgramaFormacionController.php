@@ -5,13 +5,21 @@ namespace App\Http\Controllers;
 use App\Models\ProgramaFormacion;
 use App\Models\Sede;
 use App\Models\TipoPrograma;
-use Database\Seeders\TiposProgramas;
-use Hamcrest\Type\IsNumeric;
 use Illuminate\Http\Request;
-use PHPUnit\Framework\Constraint\IsFalse;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class ProgramaFormacionController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('permission:programa.index')->only('index');
+        $this->middleware('permission:programa.create')->only('create', 'store');
+        $this->middleware('permission:programa.edit')->only('edit', 'update');
+        $this->middleware('permission:programa.delete')->only('destroy');
+        $this->middleware('permission:programa.search')->only('search');
+    }
 
     /**
      * Muestra una lista paginada de programas de formación.
@@ -58,24 +66,39 @@ class ProgramaFormacionController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'nombre_programa' => 'required|string|max:255|unique:programas_formacion,nombre',
-            'sede_id' => 'required|exists:sedes,id',
-            'tipo_programa_id' => 'required|exists:tipos_programas,id',
-        ]);
+        try {
+            $request->validate([
+                'nombre_programa' => 'required|string|max:255|unique:programas_formacion,nombre',
+                'sede_id' => 'required|exists:sedes,id',
+                'tipo_programa_id' => 'required|exists:tipos_programas,id',
+            ]);
 
-        $programaFormacion = new ProgramaFormacion();
-        $programaFormacion->nombre = $request->input('nombre_programa');
-        $programaFormacion->sede_id = $request->input('sede_id');
-        $programaFormacion->tipo_programa_id = $request->input('tipo_programa_id');
+            $programaFormacion = new ProgramaFormacion();
+            $programaFormacion->nombre = $request->input('nombre_programa');
+            $programaFormacion->sede_id = $request->input('sede_id');
+            $programaFormacion->tipo_programa_id = $request->input('tipo_programa_id');
 
-        if (is_numeric($programaFormacion->nombre)) return back()->with('error', 'Error al crear el programa de formación.');
+            if (is_numeric($programaFormacion->nombre)) {
+                return back()->with('error', 'El nombre del programa no puede ser numérico.');
+            }
 
-
-        if ($programaFormacion->save()) {
-            return redirect()->route('programa.index')->with('success', 'Programa de formación creado exitosamente.');
-        } else {
-            return redirect()->back()->with('error', 'Error al crear el programa de formación.');
+            if ($programaFormacion->save()) {
+                Log::info('Programa de formación creado exitosamente', [
+                    'programa_id' => $programaFormacion->id,
+                    'nombre' => $programaFormacion->nombre,
+                    'usuario_id' => Auth::id()
+                ]);
+                return redirect()->route('programa.index')->with('success', 'Programa de formación creado exitosamente.');
+            } else {
+                return redirect()->back()->with('error', 'Error al crear el programa de formación.');
+            }
+        } catch (\Exception $e) {
+            Log::error('Error al crear programa de formación', [
+                'error' => $e->getMessage(),
+                'usuario_id' => Auth::id(),
+                'request_data' => $request->all()
+            ]);
+            return redirect()->back()->with('error', 'Error interno al crear el programa de formación.');
         }
     }
 
@@ -113,20 +136,37 @@ class ProgramaFormacionController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        try {
+            $request->validate([
+                'nombre_programa' => 'required|string|max:255|unique:programas_formacion,nombre,' . $id,
+                'sede_id' => 'required|exists:sedes,id',
+                'tipo_programa_id' => 'required|exists:tipos_programas,id',
+            ]);
 
-        $request->validate([
-            'nombre_programa' => 'required|string|max:255|unique:programas_formacion,nombre,' . $id,
-            'sede_id' => 'required|exists:sedes,id',
-            'tipo_programa_id' => 'required|exists:tipos_programas,id',
-        ]);
-
-        $programaFormacion = ProgramaFormacion::findOrFail($id);
-        $programaFormacion->nombre = $request->input('nombre_programa');
-        $programaFormacion->sede_id = $request->input('sede_id');
-        $programaFormacion->tipo_programa_id = $request->input('tipo_programa_id');
-        $programaFormacion->save();
-
-        return redirect('programa/index')->with('success', 'Programa de formación actualizado exitosamente.');
+            $programaFormacion = ProgramaFormacion::findOrFail($id);
+            $programaFormacion->nombre = $request->input('nombre_programa');
+            $programaFormacion->sede_id = $request->input('sede_id');
+            $programaFormacion->tipo_programa_id = $request->input('tipo_programa_id');
+            
+            if ($programaFormacion->save()) {
+                Log::info('Programa de formación actualizado exitosamente', [
+                    'programa_id' => $programaFormacion->id,
+                    'nombre' => $programaFormacion->nombre,
+                    'usuario_id' => Auth::id()
+                ]);
+                return redirect()->route('programa.index')->with('success', 'Programa de formación actualizado exitosamente.');
+            } else {
+                return redirect()->back()->with('error', 'Error al actualizar el programa de formación.');
+            }
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar programa de formación', [
+                'programa_id' => $id,
+                'error' => $e->getMessage(),
+                'usuario_id' => Auth::id(),
+                'request_data' => $request->all()
+            ]);
+            return redirect()->back()->with('error', 'Error interno al actualizar el programa de formación.');
+        }
     }
 
 
@@ -138,11 +178,28 @@ class ProgramaFormacionController extends Controller
      */
     public function destroy(string $id)
     {
-
-        $programaFormacion = ProgramaFormacion::findOrFail($id);
-        $programaFormacion->delete();
-
-        return redirect('programa/index')->with('success', 'Programa de formación eliminado exitosamente.');
+        try {
+            $programaFormacion = ProgramaFormacion::findOrFail($id);
+            $nombrePrograma = $programaFormacion->nombre;
+            
+            if ($programaFormacion->delete()) {
+                Log::info('Programa de formación eliminado exitosamente', [
+                    'programa_id' => $id,
+                    'nombre' => $nombrePrograma,
+                    'usuario_id' => Auth::id()
+                ]);
+                return redirect()->route('programa.index')->with('success', 'Programa de formación eliminado exitosamente.');
+            } else {
+                return redirect()->back()->with('error', 'Error al eliminar el programa de formación.');
+            }
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar programa de formación', [
+                'programa_id' => $id,
+                'error' => $e->getMessage(),
+                'usuario_id' => Auth::id()
+            ]);
+            return redirect()->back()->with('error', 'Error interno al eliminar el programa de formación.');
+        }
     }
 
 
@@ -159,21 +216,46 @@ class ProgramaFormacionController extends Controller
      */
     public function search(Request $request)
     {
+        try {
+            $query = $request->input('search');
+            
+            if (empty($query)) {
+                return redirect()->route('programa.index')->with('error', 'El término de búsqueda no puede estar vacío.');
+            }
 
-        $query = $request->input('search');
-        $programas = ProgramaFormacion::where('nombre', 'LIKE', "%{$query}%")
-            ->orWhereHas('sede', function ($q) use ($query) {
-                $q->where('nombre', 'LIKE', "%{$query}%");
-            })
-            ->orWhereHas('tipoPrograma', function ($q) use ($query) {
-                $q->where('nombre', 'LIKE', "%{$query}%");
-            })
-            ->paginate(7);
+            $programas = ProgramaFormacion::with(['sede', 'tipoPrograma'])
+                ->where('nombre', 'LIKE', "%{$query}%")
+                ->orWhereHas('sede', function ($q) use ($query) {
+                    $q->where('nombre', 'LIKE', "%{$query}%");
+                })
+                ->orWhereHas('tipoPrograma', function ($q) use ($query) {
+                    $q->where('nombre', 'LIKE', "%{$query}%");
+                })
+                ->orderBy('id', 'desc')
+                ->paginate(6);
 
-        if (count($programas) == 0) {
-            return redirect()->route('programa.index')->with('error', 'No se encontraron programas de formación.');
+            if ($programas->count() == 0) {
+                Log::info('Búsqueda de programas sin resultados', [
+                    'query' => $query,
+                    'usuario_id' => Auth::id()
+                ]);
+                return redirect()->route('programa.index')->with('error', 'No se encontraron programas de formación.');
+            }
+
+            Log::info('Búsqueda de programas realizada', [
+                'query' => $query,
+                'resultados' => $programas->count(),
+                'usuario_id' => Auth::id()
+            ]);
+
+            return view('programas.index', compact('programas'));
+        } catch (\Exception $e) {
+            Log::error('Error en búsqueda de programas', [
+                'query' => $request->input('search'),
+                'error' => $e->getMessage(),
+                'usuario_id' => Auth::id()
+            ]);
+            return redirect()->route('programa.index')->with('error', 'Error interno en la búsqueda.');
         }
-
-        return view('programas.index', compact('programas'));
     }
 }
