@@ -117,7 +117,7 @@
                                         </tr>
                                         <tr>
                                             <th class="py-3">Jornada</th>
-                                            <td class="py-3">{{ $aprendiz->fichaCaracterizacion?->jornadaFormacion?->nombre ?? 'N/A' }}</td>
+                                            <td class="py-3">{{ $aprendiz->fichaCaracterizacion?->jornadaFormacion?->jornada ?? 'N/A' }}</td>
                                         </tr>
                                         <tr>
                                             <th class="py-3">Fecha Inicio de Formación</th>

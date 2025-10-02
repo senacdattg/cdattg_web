@@ -9,10 +9,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Permission\Traits\HasRoles;
 
 class Aprendiz extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasRoles;
 
     protected $table = 'aprendices';
 
@@ -107,5 +108,98 @@ class Aprendiz extends Model
     public function userUpdatedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_edit_id');
+    }
+
+    /**
+     * Obtiene el usuario asociado a través de la persona.
+     *
+     * @return BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'persona_id', 'persona_id')
+            ->through('persona');
+    }
+
+    /**
+     * Verifica si el aprendiz tiene un rol específico.
+     *
+     * @param string $role
+     * @return bool
+     */
+    public function hasRole(string $role): bool
+    {
+        // Primero verifica si tiene el rol directamente asignado
+        if (parent::hasRole($role)) {
+            return true;
+        }
+
+        // Si no, verifica a través del usuario asociado
+        if ($this->persona && $this->persona->user) {
+            return $this->persona->user->hasRole($role);
+        }
+
+        return false;
+    }
+
+    /**
+     * Verifica si el aprendiz tiene un permiso específico.
+     *
+     * @param string $permission
+     * @return bool
+     */
+    public function hasPermissionTo(string $permission): bool
+    {
+        // Primero verifica si tiene el permiso directamente asignado
+        if (parent::hasPermissionTo($permission)) {
+            return true;
+        }
+
+        // Si no, verifica a través del usuario asociado
+        if ($this->persona && $this->persona->user) {
+            return $this->persona->user->hasPermissionTo($permission);
+        }
+
+        return false;
+    }
+
+    /**
+     * Obtiene todos los roles del aprendiz (directos y a través del usuario).
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getAllRoles()
+    {
+        $roles = collect();
+
+        // Roles directos del aprendiz
+        $roles = $roles->merge($this->roles);
+
+        // Roles a través del usuario asociado
+        if ($this->persona && $this->persona->user) {
+            $roles = $roles->merge($this->persona->user->roles);
+        }
+
+        return $roles->unique('id');
+    }
+
+    /**
+     * Obtiene todos los permisos del aprendiz (directos y a través del usuario).
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function getAllPermissions()
+    {
+        $permissions = collect();
+
+        // Permisos directos del aprendiz
+        $permissions = $permissions->merge($this->permissions);
+
+        // Permisos a través del usuario asociado
+        if ($this->persona && $this->persona->user) {
+            $permissions = $permissions->merge($this->persona->user->permissions);
+        }
+
+        return $permissions->unique('id');
     }
 }

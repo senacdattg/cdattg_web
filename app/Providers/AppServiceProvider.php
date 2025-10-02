@@ -8,7 +8,9 @@ use Illuminate\Support\Facades\Schema;
 // use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
 use App\Models\AsistenciaAprendiz;
+use App\Models\Aprendiz;
 use App\Observers\AsistenciaAprendizObserver;
+use App\Observers\AprendizObserver;
 // \Illuminate\Support\Facades\URL::forceScheme('https');
 
 class AppServiceProvider extends ServiceProvider
@@ -38,5 +40,6 @@ class AppServiceProvider extends ServiceProvider
 
         // Registrar observadores
         AsistenciaAprendiz::observe(AsistenciaAprendizObserver::class);
+        Aprendiz::observe(AprendizObserver::class);
     }
 }

@@ -25,6 +25,7 @@ Route::middleware('can:EDITAR APRENDIZ')->group(function () {
         ->name('aprendices.cambiarEstado');
 });
 
+
 // Rutas API para aprendices
 Route::middleware('can:VER APRENDIZ')->group(function () {
     // API: Listar todos los aprendices

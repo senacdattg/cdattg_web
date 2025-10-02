@@ -7,11 +7,14 @@ use App\Http\Requests\UpdateAprendizRequest;
 use App\Models\Aprendiz;
 use App\Models\FichaCaracterizacion;
 use App\Models\Persona;
+use App\Events\AprendizAsignadoAFicha;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class AprendizController extends Controller
 {
@@ -110,12 +113,12 @@ class AprendizController extends Controller
                 $data = $request->validated();
 
                 // Crear el aprendiz
+                // El observer se encargará de asignar el rol automáticamente
                 $aprendiz = Aprendiz::create($data);
 
-                // Asignar rol de aprendiz al usuario asociado a la persona
-                $persona = Persona::find($data['persona_id']);
-                if ($persona->user) {
-                    $persona->user->assignRole('APRENDIZ');
+                // Disparar evento de asignación a ficha
+                if ($data['ficha_caracterizacion_id']) {
+                    event(new AprendizAsignadoAFicha($aprendiz, $data['ficha_caracterizacion_id']));
                 }
 
                 Log::info('Aprendiz creado exitosamente', [
@@ -151,8 +154,9 @@ class AprendizController extends Controller
         try {
             // Cargar el aprendiz con sus relaciones
             $aprendiz = Aprendiz::with([
-                'persona',
+                'persona.tipoDocumento',
                 'fichaCaracterizacion.programaFormacion',
+                'fichaCaracterizacion.jornadaFormacion',
                 'asistencias' => function ($query) {
                     $query->latest()->take(10);
                 }
@@ -233,13 +237,20 @@ class AprendizController extends Controller
             
             DB::transaction(function () use ($request, $aprendiz) {
                 $data = $request->validated();
+                $fichaAnterior = $aprendiz->ficha_caracterizacion_id;
 
                 // Actualizar el aprendiz
                 $aprendiz->update($data);
 
+                // Disparar evento si cambió la ficha
+                if ($data['ficha_caracterizacion_id'] && $data['ficha_caracterizacion_id'] != $fichaAnterior) {
+                    event(new AprendizAsignadoAFicha($aprendiz, $data['ficha_caracterizacion_id']));
+                }
+
                 Log::info('Aprendiz actualizado exitosamente', [
                     'aprendiz_id' => $aprendiz->id,
-                    'ficha_id' => $data['ficha_caracterizacion_id'],
+                    'ficha_anterior' => $fichaAnterior,
+                    'ficha_nueva' => $data['ficha_caracterizacion_id'],
                     'user_id' => Auth::id()
                 ]);
             });
@@ -435,6 +446,7 @@ class AprendizController extends Controller
             return redirect()->back()->with('error', 'Error al cambiar el estado del aprendiz.');
         }
     }
+
 
     /**
      * Método de test para verificar la carga de datos
