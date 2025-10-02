@@ -245,4 +245,142 @@ class ProgramaFormacionController extends Controller
             return redirect()->route('programa.index')->with('error', 'Error interno en la búsqueda.');
         }
     }
+
+    /**
+     * Cambiar el estado de un programa de formación.
+     *
+     * @param string $id El ID del programa de formación.
+     * @return \Illuminate\Http\JsonResponse Respuesta JSON con el resultado.
+     */
+    public function cambiarEstado(string $id)
+    {
+        try {
+            $programa = ProgramaFormacion::findOrFail($id);
+            $programa->status = !$programa->status;
+            
+            if ($programa->save()) {
+                Log::info('Estado del programa cambiado', [
+                    'programa_id' => $id,
+                    'nuevo_estado' => $programa->status ? 'activo' : 'inactivo',
+                    'usuario_id' => Auth::id()
+                ]);
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Estado del programa actualizado exitosamente.',
+                    'status' => $programa->status
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al cambiar el estado del programa.'
+                ], 500);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error al cambiar estado del programa', [
+                'programa_id' => $id,
+                'error' => $e->getMessage(),
+                'usuario_id' => Auth::id()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error interno al cambiar el estado del programa.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtener programas por red de conocimiento.
+     *
+     * @param string $redConocimientoId ID de la red de conocimiento.
+     * @return \Illuminate\Http\JsonResponse Lista de programas.
+     */
+    public function getByRedConocimiento(string $redConocimientoId)
+    {
+        try {
+            $programas = ProgramaFormacion::where('red_conocimiento_id', $redConocimientoId)
+                ->where('status', true)
+                ->orderBy('nombre')
+                ->get(['id', 'codigo', 'nombre']);
+
+            return response()->json([
+                'success' => true,
+                'data' => $programas
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener programas por red de conocimiento', [
+                'red_conocimiento_id' => $redConocimientoId,
+                'error' => $e->getMessage(),
+                'usuario_id' => Auth::id()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener los programas.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtener programas por nivel de formación.
+     *
+     * @param string $nivelFormacionId ID del nivel de formación.
+     * @return \Illuminate\Http\JsonResponse Lista de programas.
+     */
+    public function getByNivelFormacion(string $nivelFormacionId)
+    {
+        try {
+            $programas = ProgramaFormacion::where('nivel_formacion_id', $nivelFormacionId)
+                ->where('status', true)
+                ->orderBy('nombre')
+                ->get(['id', 'codigo', 'nombre']);
+
+            return response()->json([
+                'success' => true,
+                'data' => $programas
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener programas por nivel de formación', [
+                'nivel_formacion_id' => $nivelFormacionId,
+                'error' => $e->getMessage(),
+                'usuario_id' => Auth::id()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener los programas.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtener todos los programas activos.
+     *
+     * @return \Illuminate\Http\JsonResponse Lista de programas activos.
+     */
+    public function getActivos()
+    {
+        try {
+            $programas = ProgramaFormacion::where('status', true)
+                ->with(['redConocimiento', 'nivelFormacion'])
+                ->orderBy('nombre')
+                ->get(['id', 'codigo', 'nombre', 'red_conocimiento_id', 'nivel_formacion_id']);
+
+            return response()->json([
+                'success' => true,
+                'data' => $programas
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al obtener programas activos', [
+                'error' => $e->getMessage(),
+                'usuario_id' => Auth::id()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener los programas activos.'
+            ], 500);
+        }
+    }
 }
