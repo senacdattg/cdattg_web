@@ -95,6 +95,11 @@ class RolePermissionSeeder extends Seeder
             'EDITAR RED CONOCIMIENTO',
             'VER RED CONOCIMIENTO',
             'ELIMINAR RED CONOCIMIENTO',
+            // Permisos para aprendices
+            'VER APRENDIZ',
+            'CREAR APRENDIZ',
+            'EDITAR APRENDIZ',
+            'ELIMINAR APRENDIZ',
         ];
 
         // Crear cada permiso si no existe
@@ -155,6 +160,10 @@ class RolePermissionSeeder extends Seeder
             'EDITAR RED CONOCIMIENTO',
             'VER RED CONOCIMIENTO',
             'ELIMINAR RED CONOCIMIENTO',
+            'VER APRENDIZ',
+            'CREAR APRENDIZ',
+            'EDITAR APRENDIZ',
+            'ELIMINAR APRENDIZ',
         ]);
 
         // Asignar permisos al rol ADMINISTRADOR
@@ -175,11 +184,23 @@ class RolePermissionSeeder extends Seeder
             'EDITAR RED CONOCIMIENTO',
             'VER RED CONOCIMIENTO',
             'ELIMINAR RED CONOCIMIENTO',
+            'VER APRENDIZ',
+            'CREAR APRENDIZ',
+            'EDITAR APRENDIZ',
+            'ELIMINAR APRENDIZ',
         ]);
 
         // Asignar permisos al rol INSTRUCTOR
         $instructor->givePermissionTo([
             'TOMAR ASISTENCIA',
+            'VER APRENDIZ',
+        ]);
+
+        // Asignar permisos al rol APRENDIZ
+        // Los aprendices tienen acceso limitado solo a consultar su propia información
+        $aprendiz->givePermissionTo([
+            // Por ahora, el rol aprendiz no tiene permisos específicos
+            // Se controla el acceso mediante políticas y middleware
         ]);
     }
 }
