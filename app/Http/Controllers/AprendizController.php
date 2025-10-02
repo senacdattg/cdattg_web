@@ -34,7 +34,13 @@ class AprendizController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Aprendiz::with(['persona', 'fichaCaracterizacion']);
+            // Consulta para obtener solo el aprendiz más reciente por persona
+            $query = Aprendiz::with(['persona', 'fichaCaracterizacion'])
+                ->whereIn('id', function($subquery) {
+                    $subquery->select(DB::raw('MAX(id)'))
+                        ->from('aprendices')
+                        ->groupBy('persona_id');
+                });
 
             // Filtro por búsqueda de nombre o documento
             if ($request->filled('search')) {
@@ -51,7 +57,7 @@ class AprendizController extends Controller
                 $query->where('ficha_caracterizacion_id', $request->ficha_id);
             }
 
-            $aprendices = $query->paginate(10)->withQueryString();
+            $aprendices = $query->orderBy('id', 'desc')->paginate(10)->withQueryString();
             
             // Debug: Verificar que las personas estén cargadas
             Log::info('Aprendices cargados en index', [
