@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\ProgramaFormacion;
-use App\Models\Sede;
-use App\Models\TipoPrograma;
+use App\Models\RedConocimiento;
+use App\Models\Parametro;
+use App\Http\Requests\StoreProgramaFormacionRequest;
+use App\Http\Requests\UpdateProgramaFormacionRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -32,7 +34,7 @@ class ProgramaFormacionController extends Controller
      */
     public function index()
     {
-        $programas = ProgramaFormacion::with(['sede', 'tipoPrograma'])->orderBy('id', 'desc')->paginate(6);
+        $programas = ProgramaFormacion::with(['redConocimiento', 'nivelFormacion'])->orderBy('id', 'desc')->paginate(6);
 
         return view('programas.index', compact('programas'));
     }
@@ -48,10 +50,10 @@ class ProgramaFormacionController extends Controller
      */
     public function create()
     {
-        $sedes = Sede::all();
-        $tipos = TipoPrograma::all();
+        $redesConocimiento = RedConocimiento::all();
+        $nivelesFormacion = Parametro::where('tema_id', 1)->get(); // Asumiendo que tema_id 1 corresponde a niveles de formación
 
-        return view('programas.create', compact('sedes', 'tipos'));
+        return view('programas.create', compact('redesConocimiento', 'nivelesFormacion'));
     }
 
 
@@ -64,27 +66,19 @@ class ProgramaFormacionController extends Controller
      * @param \Illuminate\Http\Request $request La solicitud HTTP que contiene los datos del formulario.
      * @return \Illuminate\Http\RedirectResponse Redirige a la página de índice de programas con un mensaje de éxito.
      */
-    public function store(Request $request)
+    public function store(StoreProgramaFormacionRequest $request)
     {
         try {
-            $request->validate([
-                'nombre_programa' => 'required|string|max:255|unique:programas_formacion,nombre',
-                'sede_id' => 'required|exists:sedes,id',
-                'tipo_programa_id' => 'required|exists:tipos_programas,id',
-            ]);
-
             $programaFormacion = new ProgramaFormacion();
-            $programaFormacion->nombre = $request->input('nombre_programa');
-            $programaFormacion->sede_id = $request->input('sede_id');
-            $programaFormacion->tipo_programa_id = $request->input('tipo_programa_id');
-
-            if (is_numeric($programaFormacion->nombre)) {
-                return back()->with('error', 'El nombre del programa no puede ser numérico.');
-            }
+            $programaFormacion->codigo = $request->input('codigo');
+            $programaFormacion->nombre = $request->input('nombre');
+            $programaFormacion->red_conocimiento_id = $request->input('red_conocimiento_id');
+            $programaFormacion->nivel_formacion_id = $request->input('nivel_formacion_id');
 
             if ($programaFormacion->save()) {
                 Log::info('Programa de formación creado exitosamente', [
                     'programa_id' => $programaFormacion->id,
+                    'codigo' => $programaFormacion->codigo,
                     'nombre' => $programaFormacion->nombre,
                     'usuario_id' => Auth::id()
                 ]);
@@ -113,14 +107,10 @@ class ProgramaFormacionController extends Controller
     public function edit(string $id)
     {
         $programa = ProgramaFormacion::findOrFail($id);
-        $sedes = Sede::all();
-        $tipos = TipoPrograma::all();
+        $redesConocimiento = RedConocimiento::all();
+        $nivelesFormacion = Parametro::where('tema_id', 1)->get(); // Asumiendo que tema_id 1 corresponde a niveles de formación
 
-        if ($programa == null) {
-            $programa = null;
-        }
-
-        return view('programas.edit', compact('programa', 'sedes', 'tipos'));
+        return view('programas.edit', compact('programa', 'redesConocimiento', 'nivelesFormacion'));
     }
 
 
@@ -134,23 +124,19 @@ class ProgramaFormacionController extends Controller
      * @throws \Illuminate\Validation\ValidationException Si la validación de los datos falla.
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException Si no se encuentra el programa de formación con el ID proporcionado.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateProgramaFormacionRequest $request, string $id)
     {
         try {
-            $request->validate([
-                'nombre_programa' => 'required|string|max:255|unique:programas_formacion,nombre,' . $id,
-                'sede_id' => 'required|exists:sedes,id',
-                'tipo_programa_id' => 'required|exists:tipos_programas,id',
-            ]);
-
             $programaFormacion = ProgramaFormacion::findOrFail($id);
-            $programaFormacion->nombre = $request->input('nombre_programa');
-            $programaFormacion->sede_id = $request->input('sede_id');
-            $programaFormacion->tipo_programa_id = $request->input('tipo_programa_id');
+            $programaFormacion->codigo = $request->input('codigo');
+            $programaFormacion->nombre = $request->input('nombre');
+            $programaFormacion->red_conocimiento_id = $request->input('red_conocimiento_id');
+            $programaFormacion->nivel_formacion_id = $request->input('nivel_formacion_id');
             
             if ($programaFormacion->save()) {
                 Log::info('Programa de formación actualizado exitosamente', [
                     'programa_id' => $programaFormacion->id,
+                    'codigo' => $programaFormacion->codigo,
                     'nombre' => $programaFormacion->nombre,
                     'usuario_id' => Auth::id()
                 ]);
@@ -223,12 +209,13 @@ class ProgramaFormacionController extends Controller
                 return redirect()->route('programa.index')->with('error', 'El término de búsqueda no puede estar vacío.');
             }
 
-            $programas = ProgramaFormacion::with(['sede', 'tipoPrograma'])
+            $programas = ProgramaFormacion::with(['redConocimiento', 'nivelFormacion'])
                 ->where('nombre', 'LIKE', "%{$query}%")
-                ->orWhereHas('sede', function ($q) use ($query) {
+                ->orWhere('codigo', 'LIKE', "%{$query}%")
+                ->orWhereHas('redConocimiento', function ($q) use ($query) {
                     $q->where('nombre', 'LIKE', "%{$query}%");
                 })
-                ->orWhereHas('tipoPrograma', function ($q) use ($query) {
+                ->orWhereHas('nivelFormacion', function ($q) use ($query) {
                     $q->where('nombre', 'LIKE', "%{$query}%");
                 })
                 ->orderBy('id', 'desc')
