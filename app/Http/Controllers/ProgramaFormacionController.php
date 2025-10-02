@@ -204,33 +204,79 @@ class ProgramaFormacionController extends Controller
     {
         try {
             $query = $request->input('search');
+            $redConocimientoId = $request->input('red_conocimiento_id');
+            $nivelFormacionId = $request->input('nivel_formacion_id');
+            $status = $request->input('status');
+            $perPage = $request->input('per_page', 6);
             
-            if (empty($query)) {
-                return redirect()->route('programa.index')->with('error', 'El término de búsqueda no puede estar vacío.');
+            // Construir consulta base
+            $programasQuery = ProgramaFormacion::with(['redConocimiento', 'nivelFormacion', 'userCreated', 'userEdited']);
+
+            // Aplicar filtros
+            if (!empty($query)) {
+                $programasQuery->where(function ($q) use ($query) {
+                    $q->where('codigo', 'LIKE', "%{$query}%")
+                      ->orWhere('nombre', 'LIKE', "%{$query}%")
+                      ->orWhereHas('redConocimiento', function ($subQuery) use ($query) {
+                          $subQuery->where('nombre', 'LIKE', "%{$query}%");
+                      })
+                      ->orWhereHas('nivelFormacion', function ($subQuery) use ($query) {
+                          $subQuery->where('name', 'LIKE', "%{$query}%");
+                      });
+                });
             }
 
-            $programas = ProgramaFormacion::with(['redConocimiento', 'nivelFormacion'])
-                ->where('nombre', 'LIKE', "%{$query}%")
-                ->orWhere('codigo', 'LIKE', "%{$query}%")
-                ->orWhereHas('redConocimiento', function ($q) use ($query) {
-                    $q->where('nombre', 'LIKE', "%{$query}%");
-                })
-                ->orWhereHas('nivelFormacion', function ($q) use ($query) {
-                    $q->where('nombre', 'LIKE', "%{$query}%");
-                })
-                ->orderBy('id', 'desc')
-                ->paginate(6);
+            if (!empty($redConocimientoId)) {
+                $programasQuery->where('red_conocimiento_id', $redConocimientoId);
+            }
 
-            if ($programas->count() == 0) {
+            if (!empty($nivelFormacionId)) {
+                $programasQuery->where('nivel_formacion_id', $nivelFormacionId);
+            }
+
+            if ($status !== null && $status !== '') {
+                $programasQuery->where('status', $status);
+            }
+
+            // Ordenar y paginar
+            $programas = $programasQuery->orderBy('nombre', 'asc')->paginate($perPage);
+
+            // Si es una petición AJAX, devolver JSON
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'data' => [
+                        'programas' => $programas->items(),
+                        'pagination' => [
+                            'current_page' => $programas->currentPage(),
+                            'last_page' => $programas->lastPage(),
+                            'per_page' => $programas->perPage(),
+                            'total' => $programas->total(),
+                            'has_more_pages' => $programas->hasMorePages(),
+                        ],
+                        'filters' => [
+                            'search' => $query,
+                            'red_conocimiento_id' => $redConocimientoId,
+                            'nivel_formacion_id' => $nivelFormacionId,
+                            'status' => $status,
+                        ]
+                    ]
+                ]);
+            }
+
+            // Si no hay resultados y hay búsqueda, mostrar mensaje
+            if ($programas->count() == 0 && !empty($query)) {
                 Log::info('Búsqueda de programas sin resultados', [
                     'query' => $query,
+                    'filters' => $request->all(),
                     'usuario_id' => Auth::id()
                 ]);
-                return redirect()->route('programa.index')->with('error', 'No se encontraron programas de formación.');
+                return redirect()->route('programa.index')->with('error', 'No se encontraron programas de formación con los criterios especificados.');
             }
 
             Log::info('Búsqueda de programas realizada', [
                 'query' => $query,
+                'filters' => $request->all(),
                 'resultados' => $programas->count(),
                 'usuario_id' => Auth::id()
             ]);
@@ -238,10 +284,18 @@ class ProgramaFormacionController extends Controller
             return view('programas.index', compact('programas'));
         } catch (\Exception $e) {
             Log::error('Error en búsqueda de programas', [
-                'query' => $request->input('search'),
+                'filters' => $request->all(),
                 'error' => $e->getMessage(),
                 'usuario_id' => Auth::id()
             ]);
+            
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error interno en la búsqueda.'
+                ], 500);
+            }
+            
             return redirect()->route('programa.index')->with('error', 'Error interno en la búsqueda.');
         }
     }
