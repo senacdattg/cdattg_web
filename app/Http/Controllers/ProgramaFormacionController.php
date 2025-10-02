@@ -69,22 +69,31 @@ class ProgramaFormacionController extends Controller
     public function store(StoreProgramaFormacionRequest $request)
     {
         try {
-            $programaFormacion = new ProgramaFormacion();
+            // Validaciones de negocio adicionales
+            $validationErrors = $this->validateBusinessRules($request);
+            if (!empty($validationErrors)) {
+                return redirect()->back()->withInput()->withErrors($validationErrors);
+            }
+
+        $programaFormacion = new ProgramaFormacion();
             $programaFormacion->codigo = $request->input('codigo');
             $programaFormacion->nombre = $request->input('nombre');
             $programaFormacion->red_conocimiento_id = $request->input('red_conocimiento_id');
             $programaFormacion->nivel_formacion_id = $request->input('nivel_formacion_id');
+            $programaFormacion->user_create_id = Auth::id();
+            $programaFormacion->user_edit_id = Auth::id();
+            $programaFormacion->status = true;
 
-            if ($programaFormacion->save()) {
+        if ($programaFormacion->save()) {
                 Log::info('Programa de formación creado exitosamente', [
                     'programa_id' => $programaFormacion->id,
                     'codigo' => $programaFormacion->codigo,
                     'nombre' => $programaFormacion->nombre,
                     'usuario_id' => Auth::id()
                 ]);
-                return redirect()->route('programa.index')->with('success', 'Programa de formación creado exitosamente.');
-            } else {
-                return redirect()->back()->with('error', 'Error al crear el programa de formación.');
+            return redirect()->route('programa.index')->with('success', 'Programa de formación creado exitosamente.');
+        } else {
+            return redirect()->back()->with('error', 'Error al crear el programa de formación.');
             }
         } catch (\Exception $e) {
             Log::error('Error al crear programa de formación', [
@@ -128,10 +137,22 @@ class ProgramaFormacionController extends Controller
     {
         try {
             $programaFormacion = ProgramaFormacion::findOrFail($id);
+            
+            // Validaciones de negocio adicionales para actualización
+            $validationErrors = $this->validateBusinessRules($request, $programaFormacion);
+            if (!empty($validationErrors)) {
+                return redirect()->back()->withInput()->withErrors($validationErrors);
+            }
+
             $programaFormacion->codigo = $request->input('codigo');
             $programaFormacion->nombre = $request->input('nombre');
             $programaFormacion->red_conocimiento_id = $request->input('red_conocimiento_id');
             $programaFormacion->nivel_formacion_id = $request->input('nivel_formacion_id');
+            $programaFormacion->user_edit_id = Auth::id();
+            
+            if ($request->has('status')) {
+                $programaFormacion->status = $request->input('status');
+            }
             
             if ($programaFormacion->save()) {
                 Log::info('Programa de formación actualizado exitosamente', [
@@ -167,6 +188,12 @@ class ProgramaFormacionController extends Controller
         try {
             $programaFormacion = ProgramaFormacion::findOrFail($id);
             $nombrePrograma = $programaFormacion->nombre;
+            
+            // Validar que no tenga fichas activas
+            $validationErrors = $this->validateDeletionRules($programaFormacion);
+            if (!empty($validationErrors)) {
+                return redirect()->back()->withErrors($validationErrors);
+            }
             
             if ($programaFormacion->delete()) {
                 Log::info('Programa de formación eliminado exitosamente', [
@@ -436,5 +463,223 @@ class ProgramaFormacionController extends Controller
                 'message' => 'Error al obtener los programas activos.'
             ], 500);
         }
+    }
+
+    /**
+     * Validar reglas de negocio para creación y actualización de programas.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Models\ProgramaFormacion|null $programa
+     * @return array
+     */
+    private function validateBusinessRules($request, $programa = null)
+    {
+        $errors = [];
+
+        // 1. Validar código único por regional
+        $codigo = $request->input('codigo');
+        $redConocimientoId = $request->input('red_conocimiento_id');
+        
+        if ($codigo && $redConocimientoId) {
+            $query = ProgramaFormacion::where('codigo', $codigo)
+                ->whereHas('redConocimiento', function ($q) use ($redConocimientoId) {
+                    $q->where('id', $redConocimientoId);
+                });
+
+            // Excluir el programa actual en caso de actualización
+            if ($programa) {
+                $query->where('id', '!=', $programa->id);
+            }
+
+            if ($query->exists()) {
+                $redConocimiento = \App\Models\RedConocimiento::find($redConocimientoId);
+                $errors['codigo'] = "El código '{$codigo}' ya existe para la red de conocimiento '{$redConocimiento->nombre}'.";
+            }
+        }
+
+        // 2. Validar formato del código SENA
+        if ($codigo && !$this->validateSenaCodeFormat($codigo)) {
+            $errors['codigo'] = 'El código debe tener el formato válido del SENA (6 dígitos numéricos).';
+        }
+
+        // 3. Validar nombre único por regional
+        $nombre = $request->input('nombre');
+        if ($nombre && $redConocimientoId) {
+            $query = ProgramaFormacion::where('nombre', $nombre)
+                ->whereHas('redConocimiento', function ($q) use ($redConocimientoId) {
+                    $q->where('id', $redConocimientoId);
+                });
+
+            if ($programa) {
+                $query->where('id', '!=', $programa->id);
+            }
+
+            if ($query->exists()) {
+                $redConocimiento = \App\Models\RedConocimiento::find($redConocimientoId);
+                $errors['nombre'] = "El nombre '{$nombre}' ya existe para la red de conocimiento '{$redConocimiento->nombre}'.";
+            }
+        }
+
+        // 4. Validar compatibilidad entre red de conocimiento y nivel de formación
+        $nivelFormacionId = $request->input('nivel_formacion_id');
+        if ($redConocimientoId && $nivelFormacionId) {
+            if (!$this->validateRedNivelCompatibility($redConocimientoId, $nivelFormacionId)) {
+                $errors['nivel_formacion_id'] = 'El nivel de formación seleccionado no es compatible con la red de conocimiento.';
+            }
+        }
+
+        // 5. Validar reglas específicas del SENA
+        if ($nombre) {
+            $senaValidation = $this->validateSenaProgramRules($nombre, $nivelFormacionId);
+            if (!empty($senaValidation)) {
+                $errors = array_merge($errors, $senaValidation);
+            }
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Validar reglas de eliminación de programas.
+     *
+     * @param \App\Models\ProgramaFormacion $programa
+     * @return array
+     */
+    private function validateDeletionRules($programa)
+    {
+        $errors = [];
+
+        // 1. Validar que no tenga fichas activas
+        $fichasActivas = $programa->fichasCaracterizacion()
+            ->where('status', true)
+            ->count();
+
+        if ($fichasActivas > 0) {
+            $errors['programa'] = "No se puede eliminar el programa '{$programa->nombre}' porque tiene {$fichasActivas} ficha(s) de caracterización activa(s).";
+        }
+
+        // 2. Validar que no tenga competencias asociadas
+        $competenciasCount = $programa->competenciasProgramas()->count();
+        if ($competenciasCount > 0) {
+            $errors['programa'] = "No se puede eliminar el programa '{$programa->nombre}' porque tiene {$competenciasCount} competencia(s) asociada(s).";
+        }
+
+        // 3. Validar que no tenga aprendices asociados
+        $aprendicesCount = $programa->fichasCaracterizacion()
+            ->join('aprendices', 'fichas_caracterizacion.id', '=', 'aprendices.ficha_caracterizacion_id')
+            ->count();
+
+        if ($aprendicesCount > 0) {
+            $errors['programa'] = "No se puede eliminar el programa '{$programa->nombre}' porque tiene {$aprendicesCount} aprendiz(es) asociado(s).";
+        }
+
+        return $errors;
+    }
+
+    /**
+     * Validar formato del código SENA.
+     *
+     * @param string $codigo
+     * @return bool
+     */
+    private function validateSenaCodeFormat($codigo)
+    {
+        // Código SENA: 6 dígitos numéricos
+        return preg_match('/^\d{6}$/', $codigo);
+    }
+
+    /**
+     * Validar compatibilidad entre red de conocimiento y nivel de formación.
+     *
+     * @param int $redConocimientoId
+     * @param int $nivelFormacionId
+     * @return bool
+     */
+    private function validateRedNivelCompatibility($redConocimientoId, $nivelFormacionId)
+    {
+        // Obtener la red de conocimiento
+        $redConocimiento = \App\Models\RedConocimiento::find($redConocimientoId);
+        $nivelFormacion = \App\Models\Parametro::find($nivelFormacionId);
+
+        if (!$redConocimiento || !$nivelFormacion) {
+            return false;
+        }
+
+        // Reglas de compatibilidad específicas del SENA
+        $compatibilidades = [
+            'INFORMÁTICA, DISEÑO Y DESARROLLO DE SOFTWARE' => ['TÉCNICO', 'TECNÓLOGO', 'AUXILIAR'],
+            'COMERCIO Y VENTAS' => ['TÉCNICO', 'TECNÓLOGO', 'AUXILIAR', 'OPERARIO'],
+            'GESTIÓN ADMINISTRATIVA Y FINANCIERA' => ['TÉCNICO', 'TECNÓLOGO', 'AUXILIAR'],
+            'HOTELERÍA Y TURISMO' => ['TÉCNICO', 'TECNÓLOGO', 'AUXILIAR'],
+            'CONSTRUCCIÓN' => ['TÉCNICO', 'TECNÓLOGO', 'AUXILIAR', 'OPERARIO'],
+            'MECÁNICA INDUSTRIAL' => ['TÉCNICO', 'TECNÓLOGO', 'AUXILIAR', 'OPERARIO'],
+        ];
+
+        $nivelesPermitidos = $compatibilidades[$redConocimiento->nombre] ?? ['TÉCNICO', 'TECNÓLOGO', 'AUXILIAR', 'OPERARIO'];
+        
+        return in_array($nivelFormacion->name, $nivelesPermitidos);
+    }
+
+    /**
+     * Validar reglas específicas del SENA para programas.
+     *
+     * @param string $nombre
+     * @param int $nivelFormacionId
+     * @return array
+     */
+    private function validateSenaProgramRules($nombre, $nivelFormacionId)
+    {
+        $errors = [];
+        $nivelFormacion = \App\Models\Parametro::find($nivelFormacionId);
+
+        if (!$nivelFormacion) {
+            return $errors;
+        }
+
+        // 1. Validar que el nombre contenga el nivel de formación
+        $nivelEnNombre = false;
+        $niveles = ['TÉCNICO', 'TECNÓLOGO', 'AUXILIAR', 'OPERARIO'];
+        
+        foreach ($niveles as $nivel) {
+            if (stripos($nombre, $nivel) !== false) {
+                $nivelEnNombre = true;
+                break;
+            }
+        }
+
+        if (!$nivelEnNombre) {
+            $errors['nombre'] = 'El nombre del programa debe contener el nivel de formación (Técnico, Tecnólogo, Auxiliar u Operario).';
+        }
+
+        // 2. Validar longitud mínima del nombre
+        if (strlen($nombre) < 10) {
+            $errors['nombre'] = 'El nombre del programa debe tener al menos 10 caracteres.';
+        }
+
+        // 3. Validar que no contenga caracteres especiales no permitidos
+        if (preg_match('/[<>{}[\]\\|`~!@#$%^&*()+=]/', $nombre)) {
+            $errors['nombre'] = 'El nombre del programa no puede contener caracteres especiales.';
+        }
+
+        // 4. Validar formato específico por nivel
+        switch ($nivelFormacion->name) {
+            case 'TÉCNICO':
+                if (!preg_match('/TÉCNICO\s+EN/i', $nombre)) {
+                    $errors['nombre'] = 'Los programas técnicos deben comenzar con "TÉCNICO EN".';
+                }
+                break;
+            case 'TECNÓLOGO':
+                if (!preg_match('/TECNÓLOGO\s+EN/i', $nombre)) {
+                    $errors['nombre'] = 'Los programas tecnólogos deben comenzar con "TECNÓLOGO EN".';
+                }
+                break;
+            case 'AUXILIAR':
+                if (!preg_match('/AUXILIAR\s+EN/i', $nombre)) {
+                    $errors['nombre'] = 'Los programas auxiliares deben comenzar con "AUXILIAR EN".';
+                }
+                break;
+        }
+
+        return $errors;
     }
 }
