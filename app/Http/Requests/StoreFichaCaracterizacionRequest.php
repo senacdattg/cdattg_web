@@ -4,9 +4,11 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Traits\ValidacionesSena;
 
 class StoreFichaCaracterizacionRequest extends FormRequest
 {
+    use ValidacionesSena;
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -197,22 +199,50 @@ class StoreFichaCaracterizacionRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            // Validación adicional: verificar que las fechas no excedan un año
-            if ($this->fecha_inicio && $this->fecha_fin) {
-                $fechaInicio = \Carbon\Carbon::parse($this->fecha_inicio);
-                $fechaFin = \Carbon\Carbon::parse($this->fecha_fin);
+            // 1. Validar disponibilidad del ambiente
+            if ($this->ambiente_id && $this->fecha_inicio && $this->fecha_fin) {
+                $validacionAmbiente = $this->validarDisponibilidadAmbiente(
+                    $this->ambiente_id,
+                    $this->fecha_inicio,
+                    $this->fecha_fin
+                );
                 
-                if ($fechaFin->diffInMonths($fechaInicio) > 12) {
-                    $validator->errors()->add('fecha_fin', 'La duración del programa no puede exceder 12 meses.');
+                if (!$validacionAmbiente['valido']) {
+                    $validator->errors()->add('ambiente_id', $validacionAmbiente['mensaje']);
                 }
             }
 
-            // Validación adicional: verificar que el ambiente pertenezca a la sede
-            if ($this->sede_id && $this->ambiente_id) {
-                $ambiente = \App\Models\Ambiente::find($this->ambiente_id);
-                if ($ambiente && $ambiente->sede_id !== (int) $this->sede_id) {
-                    $validator->errors()->add('ambiente_id', 'El ambiente seleccionado no pertenece a la sede especificada.');
+            // 2. Validar disponibilidad del instructor
+            if ($this->instructor_id && $this->fecha_inicio && $this->fecha_fin) {
+                $validacionInstructor = $this->validarDisponibilidadInstructor(
+                    $this->instructor_id,
+                    $this->fecha_inicio,
+                    $this->fecha_fin
+                );
+                
+                if (!$validacionInstructor['valido']) {
+                    $validator->errors()->add('instructor_id', $validacionInstructor['mensaje']);
                 }
+            }
+
+            // 3. Validar que el número de ficha sea único por programa
+            if ($this->ficha && $this->programa_formacion_id) {
+                $validacionFicha = $this->validarFichaUnicaPorPrograma(
+                    $this->ficha,
+                    $this->programa_formacion_id
+                );
+                
+                if (!$validacionFicha['valido']) {
+                    $validator->errors()->add('ficha', $validacionFicha['mensaje']);
+                }
+            }
+
+            // 4. Validar reglas de negocio específicas del SENA
+            $datos = $this->all();
+            $validacionReglas = $this->validarReglasNegocioSena($datos);
+            
+            if (!$validacionReglas['valido']) {
+                $validator->errors()->add('reglas_negocio', $validacionReglas['mensaje']);
             }
         });
     }

@@ -4,9 +4,11 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Traits\ValidacionesSena;
 
 class UpdateFichaCaracterizacionRequest extends FormRequest
 {
+    use ValidacionesSena;
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -200,26 +202,58 @@ class UpdateFichaCaracterizacionRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            // Validación adicional: verificar que las fechas no excedan un año
-            if ($this->fecha_inicio && $this->fecha_fin) {
-                $fechaInicio = \Carbon\Carbon::parse($this->fecha_inicio);
-                $fechaFin = \Carbon\Carbon::parse($this->fecha_fin);
-                
-                if ($fechaFin->diffInMonths($fechaInicio) > 12) {
-                    $validator->errors()->add('fecha_fin', 'La duración del programa no puede exceder 12 meses.');
-                }
-            }
-
-            // Validación adicional: verificar que el ambiente pertenezca a la sede
-            if ($this->sede_id && $this->ambiente_id) {
-                $ambiente = \App\Models\Ambiente::find($this->ambiente_id);
-                if ($ambiente && $ambiente->sede_id !== (int) $this->sede_id) {
-                    $validator->errors()->add('ambiente_id', 'El ambiente seleccionado no pertenece a la sede especificada.');
-                }
-            }
-
-            // Validación adicional: verificar que no se cambien fechas si ya hay aprendices asignados
             $fichaId = $this->route('fichaCaracterizacion') ?? $this->route('id');
+
+            // 1. Validar disponibilidad del ambiente (excluyendo la ficha actual)
+            if ($this->ambiente_id && $this->fecha_inicio && $this->fecha_fin) {
+                $validacionAmbiente = $this->validarDisponibilidadAmbiente(
+                    $this->ambiente_id,
+                    $this->fecha_inicio,
+                    $this->fecha_fin,
+                    $fichaId
+                );
+                
+                if (!$validacionAmbiente['valido']) {
+                    $validator->errors()->add('ambiente_id', $validacionAmbiente['mensaje']);
+                }
+            }
+
+            // 2. Validar disponibilidad del instructor (excluyendo la ficha actual)
+            if ($this->instructor_id && $this->fecha_inicio && $this->fecha_fin) {
+                $validacionInstructor = $this->validarDisponibilidadInstructor(
+                    $this->instructor_id,
+                    $this->fecha_inicio,
+                    $this->fecha_fin,
+                    $fichaId
+                );
+                
+                if (!$validacionInstructor['valido']) {
+                    $validator->errors()->add('instructor_id', $validacionInstructor['mensaje']);
+                }
+            }
+
+            // 3. Validar que el número de ficha sea único por programa (excluyendo la ficha actual)
+            if ($this->ficha && $this->programa_formacion_id) {
+                $validacionFicha = $this->validarFichaUnicaPorPrograma(
+                    $this->ficha,
+                    $this->programa_formacion_id,
+                    $fichaId
+                );
+                
+                if (!$validacionFicha['valido']) {
+                    $validator->errors()->add('ficha', $validacionFicha['mensaje']);
+                }
+            }
+
+            // 4. Validar reglas de negocio específicas del SENA (excluyendo la ficha actual)
+            $datos = $this->all();
+            $validacionReglas = $this->validarReglasNegocioSena($datos, $fichaId);
+            
+            if (!$validacionReglas['valido']) {
+                $validator->errors()->add('reglas_negocio', $validacionReglas['mensaje']);
+            }
+
+            // 5. Validación adicional: verificar que no se cambien fechas si ya hay aprendices asignados
             if ($fichaId) {
                 $ficha = \App\Models\FichaCaracterizacion::find($fichaId);
                 if ($ficha && $ficha->tieneAprendices()) {
@@ -231,4 +265,5 @@ class UpdateFichaCaracterizacionRequest extends FormRequest
             }
         });
     }
+}
 }

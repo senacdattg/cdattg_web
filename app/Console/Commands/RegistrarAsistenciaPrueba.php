@@ -42,11 +42,11 @@ class RegistrarAsistenciaPrueba extends Command
         }
 
         try {
-            // Obtener el primer aprendiz_ficha disponible
+            // Obtener cualquier aprendiz_ficha disponible
             $aprendizFicha = AprendizFicha::with([
                 'aprendiz.persona',
                 'ficha.jornadaFormacion'
-            ])->first();
+            ])->inRandomOrder()->first();
             
             if (!$aprendizFicha) {
                 $this->error('❌ No se encontró ningún aprendiz en la base de datos.');
@@ -54,8 +54,8 @@ class RegistrarAsistenciaPrueba extends Command
                 return 1;
             }
 
-            // Obtener el primer instructor_ficha disponible
-            $instructorFicha = InstructorFichaCaracterizacion::first();
+            // Obtener cualquier instructor_ficha disponible
+            $instructorFicha = InstructorFichaCaracterizacion::inRandomOrder()->first();
             
             if (!$instructorFicha) {
                 $this->error('❌ No se encontró ningún instructor asignado a una ficha.');
