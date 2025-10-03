@@ -450,6 +450,7 @@ class FichaCaracterizacionController extends Controller
                 'ambiente',
                 'modalidadFormacion',
                 'sede',
+                'diasFormacion.dia',
                 'aprendices'
             ])->findOrFail($id);
 
@@ -1624,5 +1625,375 @@ class FichaCaracterizacionController extends Controller
         }
 
         return $disponibilidad;
+    }
+
+    /**
+     * Muestra la vista para gestionar días de formación de una ficha.
+     *
+     * @param int $id El ID de la ficha.
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
+    public function gestionarDiasFormacion(string $id)
+    {
+        try {
+            Log::info('Acceso a gestión de días de formación', [
+                'user_id' => Auth::id(),
+                'ficha_id' => $id,
+                'timestamp' => now()
+            ]);
+
+            // Buscar la ficha con sus relaciones
+            $ficha = FichaCaracterizacion::with([
+                'programaFormacion',
+                'jornadaFormacion',
+                'diasFormacion.dia',
+                'sede'
+            ])->findOrFail($id);
+
+            // Obtener días de la semana disponibles
+            $diasSemana = \App\Models\Parametro::whereIn('id', [12, 13, 14, 15, 16, 17]) // LUNES a SÁBADO
+                ->orderBy('id')
+                ->get();
+
+            // Obtener días ya asignados a esta ficha
+            $diasAsignados = $ficha->diasFormacion()
+                ->with('dia')
+                ->get();
+
+            // Configuración de jornadas y días permitidos
+            $configuracionJornadas = $this->obtenerConfiguracionJornadas();
+
+            // Calcular horas totales actuales
+            $horasTotalesActuales = $this->calcularHorasTotales($diasAsignados, $ficha);
+
+            Log::info('Datos de gestión de días cargados', [
+                'ficha_id' => $id,
+                'total_dias_disponibles' => $diasSemana->count(),
+                'dias_asignados' => $diasAsignados->count(),
+                'horas_totales_actuales' => $horasTotalesActuales
+            ]);
+
+            return view('fichas.gestionar-dias-formacion', compact(
+                'ficha',
+                'diasSemana',
+                'diasAsignados',
+                'configuracionJornadas',
+                'horasTotalesActuales'
+            ));
+
+        } catch (\Exception $e) {
+            Log::error('Error al cargar gestión de días de formación', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'line' => $e->getLine()
+            ]);
+
+            return redirect()->route('fichaCaracterizacion.index')
+                ->with('error', 'Error al cargar la gestión de días de formación: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Guarda los días de formación de una ficha.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param string $id El ID de la ficha.
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function guardarDiasFormacion(Request $request, string $id)
+    {
+        try {
+            DB::beginTransaction();
+
+            Log::info('Iniciando guardado de días de formación', [
+                'user_id' => Auth::id(),
+                'ficha_id' => $id,
+                'dias' => $request->dias ?? [],
+                'timestamp' => now()
+            ]);
+
+            // Validar datos
+            $request->validate([
+                'dias' => 'required|array|min:1',
+                'dias.*.dia_id' => 'required|exists:parametros,id',
+                'dias.*.hora_inicio' => 'required|date_format:H:i',
+                'dias.*.hora_fin' => 'required|date_format:H:i|after:dias.*.hora_inicio'
+            ], [
+                'dias.required' => 'Debe seleccionar al menos un día de formación.',
+                'dias.*.dia_id.required' => 'El día es requerido.',
+                'dias.*.dia_id.exists' => 'El día seleccionado no existe.',
+                'dias.*.hora_inicio.required' => 'La hora de inicio es requerida.',
+                'dias.*.hora_inicio.date_format' => 'La hora de inicio debe tener el formato HH:MM.',
+                'dias.*.hora_fin.required' => 'La hora de fin es requerida.',
+                'dias.*.hora_fin.date_format' => 'La hora de fin debe tener el formato HH:MM.',
+                'dias.*.hora_fin.after' => 'La hora de fin debe ser posterior a la hora de inicio.'
+            ]);
+
+            $ficha = FichaCaracterizacion::findOrFail($id);
+
+            // Validar días según jornada
+            $configuracionJornadas = $this->obtenerConfiguracionJornadas();
+            $jornadaId = $ficha->jornada_id;
+            
+            if (isset($configuracionJornadas[$jornadaId])) {
+                $diasPermitidos = $configuracionJornadas[$jornadaId]['dias_permitidos'];
+                $diasSeleccionados = collect($request->dias)->pluck('dia_id')->toArray();
+                
+                $diasNoPermitidos = array_diff($diasSeleccionados, $diasPermitidos);
+                if (!empty($diasNoPermitidos)) {
+                    $nombresDias = \App\Models\Parametro::whereIn('id', $diasNoPermitidos)->pluck('name')->toArray();
+                    return back()->withErrors([
+                        'dias' => 'Los días ' . implode(', ', $nombresDias) . ' no están permitidos para la jornada ' . $configuracionJornadas[$jornadaId]['nombre'] . '.'
+                    ]);
+                }
+            }
+
+            // Eliminar días existentes
+            $ficha->diasFormacion()->delete();
+
+            // Crear nuevos días de formación
+            foreach ($request->dias as $diaData) {
+                $ficha->diasFormacion()->create([
+                    'dia_id' => $diaData['dia_id'],
+                    'hora_inicio' => $diaData['hora_inicio'],
+                    'hora_fin' => $diaData['hora_fin']
+                ]);
+            }
+
+            // Calcular y actualizar horas totales
+            $nuevasHorasTotales = $this->calcularHorasTotales($ficha->diasFormacion()->get(), $ficha);
+            $ficha->update([
+                'total_horas' => $nuevasHorasTotales,
+                'user_edit_id' => Auth::id()
+            ]);
+
+            DB::commit();
+
+            Log::info('Días de formación guardados exitosamente', [
+                'ficha_id' => $id,
+                'total_dias' => count($request->dias),
+                'horas_totales' => $nuevasHorasTotales,
+                'user_id' => Auth::id()
+            ]);
+
+            return redirect()->route('fichaCaracterizacion.show', $id)
+                ->with('success', 'Días de formación guardados exitosamente.');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            Log::warning('Error de validación en guardado de días de formación', [
+                'ficha_id' => $id,
+                'errors' => $e->errors(),
+                'user_id' => Auth::id()
+            ]);
+            throw $e;
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error al guardar días de formación', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'line' => $e->getLine()
+            ]);
+
+            return back()->withErrors([
+                'error' => 'Error al guardar días de formación: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Actualiza un día de formación específico.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param string $id El ID de la ficha.
+     * @param string $diaId El ID del día de formación.
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function actualizarDiaFormacion(Request $request, string $id, string $diaId)
+    {
+        try {
+            DB::beginTransaction();
+
+            Log::info('Iniciando actualización de día de formación', [
+                'user_id' => Auth::id(),
+                'ficha_id' => $id,
+                'dia_id' => $diaId,
+                'timestamp' => now()
+            ]);
+
+            // Validar datos
+            $request->validate([
+                'hora_inicio' => 'required|date_format:H:i',
+                'hora_fin' => 'required|date_format:H:i|after:hora_inicio'
+            ], [
+                'hora_inicio.required' => 'La hora de inicio es requerida.',
+                'hora_inicio.date_format' => 'La hora de inicio debe tener el formato HH:MM.',
+                'hora_fin.required' => 'La hora de fin es requerida.',
+                'hora_fin.date_format' => 'La hora de fin debe tener el formato HH:MM.',
+                'hora_fin.after' => 'La hora de fin debe ser posterior a la hora de inicio.'
+            ]);
+
+            $ficha = FichaCaracterizacion::findOrFail($id);
+            $diaFormacion = $ficha->diasFormacion()->findOrFail($diaId);
+
+            // Actualizar el día de formación
+            $diaFormacion->update([
+                'hora_inicio' => $request->hora_inicio,
+                'hora_fin' => $request->hora_fin
+            ]);
+
+            // Recalcular horas totales
+            $nuevasHorasTotales = $this->calcularHorasTotales($ficha->diasFormacion()->get(), $ficha);
+            $ficha->update([
+                'total_horas' => $nuevasHorasTotales,
+                'user_edit_id' => Auth::id()
+            ]);
+
+            DB::commit();
+
+            Log::info('Día de formación actualizado exitosamente', [
+                'ficha_id' => $id,
+                'dia_id' => $diaId,
+                'horas_totales' => $nuevasHorasTotales,
+                'user_id' => Auth::id()
+            ]);
+
+            return back()->with('success', 'Día de formación actualizado exitosamente.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error al actualizar día de formación', [
+                'ficha_id' => $id,
+                'dia_id' => $diaId,
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'line' => $e->getLine()
+            ]);
+
+            return back()->withErrors([
+                'error' => 'Error al actualizar día de formación: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Elimina un día de formación específico.
+     *
+     * @param string $id El ID de la ficha.
+     * @param string $diaId El ID del día de formación.
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function eliminarDiaFormacion(string $id, string $diaId)
+    {
+        try {
+            DB::beginTransaction();
+
+            Log::info('Iniciando eliminación de día de formación', [
+                'user_id' => Auth::id(),
+                'ficha_id' => $id,
+                'dia_id' => $diaId,
+                'timestamp' => now()
+            ]);
+
+            $ficha = FichaCaracterizacion::findOrFail($id);
+            $diaFormacion = $ficha->diasFormacion()->findOrFail($diaId);
+
+            // Eliminar el día de formación
+            $diaFormacion->delete();
+
+            // Recalcular horas totales
+            $nuevasHorasTotales = $this->calcularHorasTotales($ficha->diasFormacion()->get(), $ficha);
+            $ficha->update([
+                'total_horas' => $nuevasHorasTotales,
+                'user_edit_id' => Auth::id()
+            ]);
+
+            DB::commit();
+
+            Log::info('Día de formación eliminado exitosamente', [
+                'ficha_id' => $id,
+                'dia_id' => $diaId,
+                'horas_totales' => $nuevasHorasTotales,
+                'user_id' => Auth::id()
+            ]);
+
+            return back()->with('success', 'Día de formación eliminado exitosamente.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error al eliminar día de formación', [
+                'ficha_id' => $id,
+                'dia_id' => $diaId,
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'line' => $e->getLine()
+            ]);
+
+            return back()->withErrors([
+                'error' => 'Error al eliminar día de formación: ' . $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * Obtiene la configuración de jornadas y días permitidos.
+     *
+     * @return array
+     */
+    private function obtenerConfiguracionJornadas()
+    {
+        return [
+            1 => [ // MAÑANA
+                'nombre' => 'MAÑANA',
+                'dias_permitidos' => [12, 13, 14, 15, 16], // LUNES a VIERNES
+                'horario_tipico' => ['08:00', '12:00']
+            ],
+            2 => [ // TARDE
+                'nombre' => 'TARDE',
+                'dias_permitidos' => [12, 13, 14, 15, 16], // LUNES a VIERNES
+                'horario_tipico' => ['14:00', '18:00']
+            ],
+            3 => [ // NOCHE
+                'nombre' => 'NOCHE',
+                'dias_permitidos' => [12, 13, 14, 15, 16], // LUNES a VIERNES
+                'horario_tipico' => ['18:00', '22:00']
+            ],
+            4 => [ // FIN DE SEMANA
+                'nombre' => 'FIN DE SEMANA',
+                'dias_permitidos' => [17], // SÁBADO
+                'horario_tipico' => ['08:00', '17:00']
+            ],
+            5 => [ // MIXTA
+                'nombre' => 'MIXTA',
+                'dias_permitidos' => [12, 13, 14, 15, 16, 17], // LUNES a SÁBADO
+                'horario_tipico' => ['08:00', '18:00']
+            ]
+        ];
+    }
+
+    /**
+     * Calcula las horas totales de formación basado en los días asignados.
+     *
+     * @param \Illuminate\Database\Eloquent\Collection $diasFormacion
+     * @param \App\Models\FichaCaracterizacion $ficha
+     * @return int
+     */
+    private function calcularHorasTotales($diasFormacion, $ficha)
+    {
+        $horasTotales = 0;
+        $duracionEnDias = $ficha->duracionEnDias();
+
+        foreach ($diasFormacion as $dia) {
+            $horaInicio = \Carbon\Carbon::createFromFormat('H:i', $dia->hora_inicio);
+            $horaFin = \Carbon\Carbon::createFromFormat('H:i', $dia->hora_fin);
+            $horasPorDia = $horaInicio->diffInHours($horaFin);
+            
+            $horasTotales += $horasPorDia * $duracionEnDias;
+        }
+
+        return $horasTotales;
     }
 }

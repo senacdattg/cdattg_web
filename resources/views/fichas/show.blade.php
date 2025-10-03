@@ -237,6 +237,71 @@
                 </div>
             </div>
 
+            <!-- Días de Formación -->
+            @if($ficha->diasFormacion->count() > 0)
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-calendar-week"></i> Días de Formación
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            @foreach($ficha->diasFormacion as $diaFormacion)
+                                <div class="col-md-4 mb-3">
+                                    <div class="card border-primary">
+                                        <div class="card-body text-center">
+                                            <h5 class="mb-2">
+                                                <i class="fas fa-calendar-day"></i>
+                                                {{ $diaFormacion->dia->name }}
+                                            </h5>
+                                            <p class="text-muted mb-1">
+                                                <i class="fas fa-clock"></i>
+                                                {{ $diaFormacion->hora_inicio }} - {{ $diaFormacion->hora_fin }}
+                                            </p>
+                                            <p class="text-muted mb-0">
+                                                <i class="fas fa-hourglass-half"></i>
+                                                {{ \Carbon\Carbon::createFromFormat('H:i', $diaFormacion->hora_inicio)->diffInHours(\Carbon\Carbon::createFromFormat('H:i', $diaFormacion->hora_fin)) }} horas/día
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        
+                        @can('GESTIONAR DIAS FICHA')
+                            <div class="text-center mt-3">
+                                <a href="{{ route('fichaCaracterizacion.gestionarDiasFormacion', $ficha->id) }}" 
+                                   class="btn btn-info">
+                                    <i class="fas fa-edit"></i> Gestionar Días de Formación
+                                </a>
+                            </div>
+                        @endcan
+                    </div>
+                </div>
+            @else
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-calendar-week"></i> Días de Formación
+                        </h3>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> 
+                            No hay días de formación asignados a esta ficha.
+                        </div>
+                        
+                        @can('GESTIONAR DIAS FICHA')
+                            <a href="{{ route('fichaCaracterizacion.gestionarDiasFormacion', $ficha->id) }}" 
+                               class="btn btn-info">
+                                <i class="fas fa-plus"></i> Configurar Días de Formación
+                            </a>
+                        @endcan
+                    </div>
+                </div>
+            @endif
+
             <!-- Aprendices -->
             <div class="card">
                 <div class="card-header">
@@ -318,6 +383,13 @@
                             <a href="{{ route('fichaCaracterizacion.gestionarInstructores', $ficha->id) }}" 
                                class="btn btn-primary btn-block">
                                 <i class="fas fa-chalkboard-teacher"></i> Gestionar Instructores
+                            </a>
+                        @endcan
+
+                        @can('GESTIONAR DIAS FICHA')
+                            <a href="{{ route('fichaCaracterizacion.gestionarDiasFormacion', $ficha->id) }}" 
+                               class="btn btn-info btn-block">
+                                <i class="fas fa-calendar-week"></i> Gestionar Días de Formación
                             </a>
                         @endcan
 
