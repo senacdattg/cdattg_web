@@ -681,24 +681,8 @@ class ProgramaFormacionController extends Controller
             $errors['nombre'] = 'El nombre del programa no puede contener caracteres especiales.';
         }
 
-        // 4. Validar formato específico por nivel
-        switch ($nivelFormacion->name) {
-            case 'TÉCNICO':
-                if (!preg_match('/TÉCNICO\s+EN/i', $nombre)) {
-                    $errors['nombre'] = 'Los programas técnicos deben comenzar con "TÉCNICO EN".';
-                }
-                break;
-            case 'TECNÓLOGO':
-                if (!preg_match('/TECNÓLOGO\s+EN/i', $nombre)) {
-                    $errors['nombre'] = 'Los programas tecnólogos deben comenzar con "TECNÓLOGO EN".';
-                }
-                break;
-            case 'AUXILIAR':
-                if (!preg_match('/AUXILIAR\s+EN/i', $nombre)) {
-                    $errors['nombre'] = 'Los programas auxiliares deben comenzar con "AUXILIAR EN".';
-                }
-                break;
-        }
+        // 4. Validar formato específico por nivel - REMOVIDO
+        // Ya no se requiere que el nombre inicie con el nivel de formación
 
         return $errors;
     }
