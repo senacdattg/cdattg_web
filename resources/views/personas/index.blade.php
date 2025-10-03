@@ -115,6 +115,8 @@
             </div>
         </section>
     </div>
+
+    @include('components.confirm-delete-modal')
 @endsection
 
 @section('script')
@@ -125,20 +127,8 @@
             forms.forEach(form => {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    Swal.fire({
-                        title: '¿Está seguro de eliminar esta persona?',
-                        text: "¡Esta acción no se podrá revertir!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Sí, eliminar',
-                        cancelButtonText: 'Cancelar'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            form.submit();
-                        }
-                    });
+                    const nombre = form.closest('tr').querySelector('td:nth-child(2)').textContent.trim();
+                    confirmDelete(nombre, form.action, form);
                 });
             });
         });

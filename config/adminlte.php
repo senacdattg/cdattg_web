@@ -555,13 +555,26 @@ return [
                 'TOMAR ASISTENCIA',
             ],
         ],
-        // Operaciones Académicas y Administrativas
+        // Gestión Académica
         [
-            'text' => 'Operaciones Académicas y Administrativas',
-            'icon' => 'fas fa-fw fa-book',
+            'text' => 'Gestión Académica',
+            'icon' => 'fas fa-fw fa-graduation-cap',
             'submenu' => [
                 [
-                    'text' => 'Jornadas',
+                    'text' => 'Programas de Formación',
+                    'url' => 'programa',
+                    'icon' => 'fas fa-fw fa-graduation-cap',
+                    'can' => [
+                        'programa.index',
+                        'programa.show',
+                        'programa.create',
+                        'programa.edit',
+                        'programa.delete',
+                        'programa.search',
+                    ],
+                ],
+                [
+                    'text' => 'Jornadas de Formación',
                     'url' => 'jornada',
                     'icon' => 'fas fa-fw fa-calendar',
                     'can' => [
@@ -571,21 +584,17 @@ return [
                         'ELIMINAR JORNADA',
                     ],
                 ],
+            ],
+        ],
+        // Operaciones Académicas y Administrativas
+        [
+            'text' => 'Operaciones Académicas y Administrativas',
+            'icon' => 'fas fa-fw fa-book',
+            'submenu' => [
                 [
-                    'text' => 'Programas',
-                    'url' => 'programa',
-                    'icon' => 'fas fa-fw fa-graduation-cap',
-                    'can' => [
-                        'VER PROGRAMA DE CARACTERIZACION',
-                        'CREAR PROGRAMA DE CARACTERIZACION',
-                        'EDITAR PROGRAMA DE CARACTERIZACION',
-                        'ELIMINAR PROGRAMA DE CARACTERIZACION',
-                    ],
-                ],
-                [
-                    'text' => 'Fichas',
+                    'text' => 'Fichas de Caracterización',
                     'url' => 'fichaCaracterizacion',
-                    'icon' => 'fas fa-fw fa-graduation-cap',
+                    'icon' => 'fas fa-fw fa-file-alt',
                     'can' => [
                         'VER PROGRAMA DE CARACTERIZACION'
                     ],

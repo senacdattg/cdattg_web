@@ -108,29 +108,20 @@
             </div>
         </section>
     </div>
+
+    @include('components.confirm-delete-modal')
 @endsection
 
 @section('script')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const forms = document.querySelectorAll('.eliminar-centro-form');
             forms.forEach(form => {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    Swal.fire({
-                        title: '¿Está seguro de eliminar el Centro de Formación?',
-                        text: "¡Esta acción no se podrá revertir!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Sí, eliminar',
-                        cancelButtonText: 'Cancelar'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            form.submit();
-                        }
-                    });
+                    const nombre = form.closest('tr').querySelector('td:nth-child(2)').textContent.trim();
+                    confirmDelete(nombre, form.action, form);
                 });
             });
         });

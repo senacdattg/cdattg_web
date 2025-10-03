@@ -100,6 +100,13 @@ class RolePermissionSeeder extends Seeder
             'CREAR APRENDIZ',
             'EDITAR APRENDIZ',
             'ELIMINAR APRENDIZ',
+            // Permisos para programas de formación
+            'programa.index',
+            'programa.show',
+            'programa.create',
+            'programa.edit',
+            'programa.delete',
+            'programa.search',
         ];
 
         // Crear cada permiso si no existe
@@ -164,6 +171,13 @@ class RolePermissionSeeder extends Seeder
             'CREAR APRENDIZ',
             'EDITAR APRENDIZ',
             'ELIMINAR APRENDIZ',
+            // Permisos para programas de formación
+            'programa.index',
+            'programa.show',
+            'programa.create',
+            'programa.edit',
+            'programa.delete',
+            'programa.search',
         ]);
 
         // Asignar permisos al rol ADMINISTRADOR
@@ -188,12 +202,20 @@ class RolePermissionSeeder extends Seeder
             'CREAR APRENDIZ',
             'EDITAR APRENDIZ',
             'ELIMINAR APRENDIZ',
+            // Permisos para programas de formación (solo lectura y búsqueda para administradores)
+            'programa.index',
+            'programa.show',
+            'programa.search',
         ]);
 
         // Asignar permisos al rol INSTRUCTOR
         $instructor->givePermissionTo([
             'TOMAR ASISTENCIA',
             'VER APRENDIZ',
+            // Permisos para programas de formación (solo consulta para instructores)
+            'programa.index',
+            'programa.show',
+            'programa.search',
         ]);
 
         // Asignar permisos al rol APRENDIZ
