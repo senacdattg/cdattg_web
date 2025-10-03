@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('proveedores', function (Blueprint $table) {
-            $table->string('nit')->nullable()->after('proveedor');
-            $table->string('email')->nullable()->after('nit');
+        Schema::table('productos', function (Blueprint $table) {
+            $table->date('fecha_vencimiento')->nullable()->after('ambiente_id');
         });
     }
 
@@ -22,9 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('proveedores', function (Blueprint $table) {
-            $table->dropColumn(['nit']);
-            $table->dropColumn(['email']);
+        Schema::table('productos', function (Blueprint $table) {
+            $table->dropColumn('fecha_vencimiento');
         });
     }
 };

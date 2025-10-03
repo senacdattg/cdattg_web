@@ -161,7 +161,6 @@ class ProductoController extends Controller
 
         // Manejar la imagen si se sube una nueva
         if ($request->hasFile('imagen')) {
-            // Eliminar la imagen anterior si existe
             if ($producto->imagen && file_exists(public_path($producto->imagen))) {
                 unlink(public_path($producto->imagen));
             }
