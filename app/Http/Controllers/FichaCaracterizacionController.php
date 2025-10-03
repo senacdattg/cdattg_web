@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\FichaCaracterizacion;
 use App\Models\ProgramaFormacion;
+use App\Http\Requests\StoreFichaCaracterizacionRequest;
+use App\Http\Requests\UpdateFichaCaracterizacionRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -105,40 +107,24 @@ class FichaCaracterizacionController extends Controller
     /**
      * Almacena una nueva ficha de caracterización en la base de datos.
      *
-     * @param \Illuminate\Http\Request $request La solicitud HTTP que contiene los datos de la ficha.
+     * @param \App\Http\Requests\StoreFichaCaracterizacionRequest $request La solicitud HTTP que contiene los datos de la ficha.
      *
      * @return \Illuminate\Http\RedirectResponse Redirige a la ruta 'fichaCaracterizacion.index' con un mensaje de éxito.
-     *
-     * @throws \Illuminate\Validation\ValidationException Si la validación de los datos falla.
      */
-    public function store(Request $request)
+    public function store(StoreFichaCaracterizacionRequest $request)
     {
         try {
             Log::info('Inicio de creación de nueva ficha de caracterización', [
                 'user_id' => Auth::id(),
-                'request_data' => $request->only(['programa_id', 'numero_ficha']),
+                'request_data' => $request->validated(),
                 'timestamp' => now()
-            ]);
-
-            $request->validate([
-                'programa_id' => 'required|exists:programas_formacion,id',
-                'numero_ficha' => 'required|numeric|unique:fichas_caracterizacion,ficha|min:1',
-            ], [
-                'programa_id.required' => 'El programa de formación es obligatorio.',
-                'programa_id.exists' => 'El programa de formación seleccionado no existe.',
-                'numero_ficha.required' => 'El número de ficha es obligatorio.',
-                'numero_ficha.numeric' => 'El número de ficha debe ser numérico.',
-                'numero_ficha.unique' => 'Ya existe una ficha con este número.',
-                'numero_ficha.min' => 'El número de ficha debe ser mayor a 0.',
             ]);
 
             DB::beginTransaction();
 
             $ficha = new FichaCaracterizacion();
-            $ficha->programa_formacion_id = $request->input('programa_id');
-            $ficha->ficha = $request->input('numero_ficha');
+            $ficha->fill($request->validated());
             $ficha->user_create_id = Auth::id();
-            $ficha->status = 1;
 
             if ($ficha->save()) {
                 DB::commit();
@@ -157,22 +143,13 @@ class FichaCaracterizacionController extends Controller
             DB::rollBack();
             throw new \Exception('Error al guardar la ficha en la base de datos.');
 
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::warning('Error de validación al crear ficha de caracterización', [
-                'errors' => $e->errors(),
-                'user_id' => Auth::id(),
-                'request_data' => $request->all()
-            ]);
-
-            return back()->withErrors($e->errors())->withInput();
-
         } catch (\Exception $e) {
             DB::rollBack();
             
             Log::error('Error al crear ficha de caracterización', [
                 'error' => $e->getMessage(),
                 'user_id' => Auth::id(),
-                'request_data' => $request->all(),
+                'request_data' => $request->validated(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine()
             ]);
@@ -237,33 +214,18 @@ class FichaCaracterizacionController extends Controller
     /**
      * Actualiza una ficha de caracterización existente.
      *
-     * @param \Illuminate\Http\Request $request La solicitud HTTP que contiene los datos de la ficha a actualizar.
+     * @param \App\Http\Requests\UpdateFichaCaracterizacionRequest $request La solicitud HTTP que contiene los datos de la ficha a actualizar.
      * @param string $id El ID de la ficha de caracterización que se va a actualizar.
      * @return \Illuminate\Http\RedirectResponse Redirige a la lista de fichas de caracterización con un mensaje de éxito.
-     *
-     * @throws \Illuminate\Validation\ValidationException Si la validación de los datos falla.
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException Si no se encuentra la ficha de caracterización con el ID proporcionado.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateFichaCaracterizacionRequest $request, string $id)
     {
         try {
             Log::info('Inicio de actualización de ficha de caracterización', [
                 'ficha_id' => $id,
                 'user_id' => Auth::id(),
-                'request_data' => $request->only(['programa_id', 'numero_ficha']),
+                'request_data' => $request->validated(),
                 'timestamp' => now()
-            ]);
-
-            $request->validate([
-                'programa_id' => 'required|exists:programas_formacion,id',
-                'numero_ficha' => 'required|numeric|unique:fichas_caracterizacion,ficha,' . $id . '|min:1',
-            ], [
-                'programa_id.required' => 'El programa de formación es obligatorio.',
-                'programa_id.exists' => 'El programa de formación seleccionado no existe.',
-                'numero_ficha.required' => 'El número de ficha es obligatorio.',
-                'numero_ficha.numeric' => 'El número de ficha debe ser numérico.',
-                'numero_ficha.unique' => 'Ya existe una ficha con este número.',
-                'numero_ficha.min' => 'El número de ficha debe ser mayor a 0.',
             ]);
 
             $ficha = FichaCaracterizacion::findOrFail($id);
@@ -272,12 +234,13 @@ class FichaCaracterizacionController extends Controller
             $datosOriginales = [
                 'programa_formacion_id' => $ficha->programa_formacion_id,
                 'ficha' => $ficha->ficha,
+                'fecha_inicio' => $ficha->fecha_inicio,
+                'fecha_fin' => $ficha->fecha_fin,
             ];
 
             DB::beginTransaction();
 
-            $ficha->programa_formacion_id = $request->input('programa_id');
-            $ficha->ficha = $request->input('numero_ficha');
+            $ficha->fill($request->validated());
             $ficha->user_edit_id = Auth::id();
 
             if ($ficha->save()) {
@@ -286,10 +249,7 @@ class FichaCaracterizacionController extends Controller
                 Log::info('Ficha de caracterización actualizada exitosamente', [
                     'ficha_id' => $ficha->id,
                     'datos_originales' => $datosOriginales,
-                    'datos_nuevos' => [
-                        'programa_formacion_id' => $ficha->programa_formacion_id,
-                        'ficha' => $ficha->ficha,
-                    ],
+                    'datos_nuevos' => $request->validated(),
                     'user_id' => Auth::id()
                 ]);
 
@@ -299,16 +259,6 @@ class FichaCaracterizacionController extends Controller
 
             DB::rollBack();
             throw new \Exception('Error al actualizar la ficha en la base de datos.');
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::warning('Error de validación al actualizar ficha de caracterización', [
-                'ficha_id' => $id,
-                'errors' => $e->errors(),
-                'user_id' => Auth::id(),
-                'request_data' => $request->all()
-            ]);
-
-            return back()->withErrors($e->errors())->withInput();
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::warning('Intento de actualizar ficha de caracterización inexistente', [
@@ -327,7 +277,7 @@ class FichaCaracterizacionController extends Controller
                 'ficha_id' => $id,
                 'error' => $e->getMessage(),
                 'user_id' => Auth::id(),
-                'request_data' => $request->all(),
+                'request_data' => $request->validated(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine()
             ]);
