@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categorias', function (Blueprint $table) {
+        Schema::create('marcas', function (Blueprint $table) {
             $table->id();
 
             $table->string('nombre')->unique();
@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('user_update_id');
 
             $table->timestamps();
-
+            
             $table->foreign('user_create_id')->references('id')->on('users')->onDelete('restrict');
             $table->foreign('user_update_id')->references('id')->on('users')->onDelete('restrict');
         });
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categorias');
+        Schema::dropIfExists('marcas');
     }
 };
