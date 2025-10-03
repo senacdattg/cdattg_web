@@ -22,12 +22,12 @@ class Producto extends Model
         'cantidad',
         'codigo_barras',
         'estado_producto_id',
-        'imagen',
-        'contrato_convenio',
-        'fecha_vencimiento',
         'categoria_id',
         'marca_id',
-        'ubicacion',
+        'contrato_convenio_id',
+        'ambiente_id',
+        'fecha_vencimiento',
+        'imagen',
         'user_create_id',
         'user_update_id'
     ];
