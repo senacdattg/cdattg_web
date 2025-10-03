@@ -1,377 +1,202 @@
 @extends('adminlte::page')
 
-@section('title', 'Detalles del Programa de Formación')
+@section('css')
+    @vite(['resources/css/parametros.css'])
+@endsection
 
 @section('content_header')
-    <div class="d-flex justify-content-between align-items-center">
-        <h1>
-            <i class="fas fa-eye"></i>
-            Detalles del Programa de Formación
-        </h1>
-        <div>
-            @can('programa.edit')
-                <a href="{{ route('programa.edit', $programa->id) }}" class="btn btn-warning">
-                    <i class="fas fa-edit"></i> Editar
-                </a>
-            @endcan
-            <a href="{{ route('programa.index') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Volver
-            </a>
+    <section class="content-header dashboard-header py-4">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-6 d-flex align-items-center">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
+                        style="width: 48px; height: 48px;">
+                        <i class="fas fa-graduation-cap text-white fa-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800">Programa de Formación</h1>
+                        <p class="text-muted mb-0 font-weight-light">Detalles del programa de formación</p>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
+                                    <i class="fas fa-home"></i> Inicio
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('programa.index') }}" class="link_right_header">
+                                    <i class="fas fa-graduation-cap"></i> Programas de Formación
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <i class="fas fa-info-circle"></i> Detalles del programa
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
         </div>
-    </div>
-@stop
+    </section>
+@endsection
 
 @section('content')
-    <div class="container-fluid">
-        <!-- Información principal -->
-        <div class="card card-outline card-primary">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-graduation-cap"></i> Información del Programa
-                </h3>
-                <div class="card-tools">
-                    @if($programa->status)
-                        <span class="badge badge-success badge-lg">
-                            <i class="fas fa-check"></i> Activo
-                        </span>
-                    @else
-                        <span class="badge badge-danger badge-lg">
-                            <i class="fas fa-times"></i> Inactivo
-                        </span>
-                    @endif
-                </div>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <table class="table table-borderless">
-                            <tr>
-                                <td><strong><i class="fas fa-hashtag text-info"></i> ID:</strong></td>
-                                <td><span class="badge badge-info">{{ $programa->id }}</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong><i class="fas fa-code text-secondary"></i> Código:</strong></td>
-                                <td><span class="badge badge-secondary">{{ $programa->codigo }}</span></td>
-                            </tr>
-                            <tr>
-                                <td><strong><i class="fas fa-graduation-cap text-primary"></i> Nombre:</strong></td>
-                                <td>{{ $programa->nombre }}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="col-md-6">
-                        <table class="table table-borderless">
-                            <tr>
-                                <td><strong><i class="fas fa-calendar-plus text-success"></i> Creado:</strong></td>
-                                <td>{{ $programa->created_at->format('d/m/Y H:i') }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong><i class="fas fa-calendar-edit text-warning"></i> Actualizado:</strong></td>
-                                <td>{{ $programa->updated_at->format('d/m/Y H:i') }}</td>
-                            </tr>
-                            <tr>
-                                <td><strong><i class="fas fa-user-plus text-info"></i> Creado por:</strong></td>
-                                <td>
-                                    @if($programa->userCreated)
-                                        {{ $programa->userCreated->persona->nombre ?? 'Usuario' }}
-                                    @else
-                                        <span class="text-muted">No disponible</span>
-                                    @endif
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Red de Conocimiento y Nivel de Formación -->
-        <div class="row">
-            <div class="col-md-6">
-                <div class="card card-outline card-info">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-network-wired"></i> Red de Conocimiento
-                        </h3>
-                    </div>
-                    <div class="card-body">
-                        @if($programa->redConocimiento)
-                            <div class="info-box">
-                                <span class="info-box-icon bg-info">
-                                    <i class="fas fa-network-wired"></i>
-                                </span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Red de Conocimiento</span>
-                                    <span class="info-box-number">{{ $programa->redConocimiento->nombre }}</span>
-                                    @if($programa->redConocimiento->regional)
-                                        <small class="text-muted">
-                                            Regional: {{ $programa->redConocimiento->regional->nombre }}
-                                        </small>
-                                    @endif
-                                </div>
-                            </div>
-                        @else
-                            <div class="alert alert-warning">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                No se ha asignado una red de conocimiento
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-md-6">
-                <div class="card card-outline card-success">
-                    <div class="card-header">
-                        <h3 class="card-title">
-                            <i class="fas fa-layer-group"></i> Nivel de Formación
-                        </h3>
-                    </div>
-                    <div class="card-body">
-                        @if($programa->nivelFormacion)
-                            <div class="info-box">
-                                <span class="info-box-icon bg-success">
-                                    <i class="fas fa-layer-group"></i>
-                                </span>
-                                <div class="info-box-content">
-                                    <span class="info-box-text">Nivel de Formación</span>
-                                    <span class="info-box-number">{{ $programa->nivelFormacion->name }}</span>
-                                    @if($programa->nivelFormacion->status)
-                                        <small class="text-success">Activo</small>
-                                    @else
-                                        <small class="text-danger">Inactivo</small>
-                                    @endif
-                                </div>
-                            </div>
-                        @else
-                            <div class="alert alert-warning">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                No se ha asignado un nivel de formación
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Fichas de Caracterización -->
-        <div class="card card-outline card-warning">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-file-alt"></i> Fichas de Caracterización
-                </h3>
-                <div class="card-tools">
-                    <span class="badge badge-warning">{{ $programa->fichasCaracterizacion->count() }} fichas</span>
-                </div>
-            </div>
-            <div class="card-body">
-                @if($programa->fichasCaracterizacion->count() > 0)
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Ficha</th>
-                                    <th>Instructor</th>
-                                    <th>Fecha Inicio</th>
-                                    <th>Fecha Fin</th>
-                                    <th>Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($programa->fichasCaracterizacion as $ficha)
-                                    <tr>
-                                        <td>
-                                            <span class="badge badge-primary">{{ $ficha->ficha }}</span>
-                                        </td>
-                                        <td>
-                                            @if($ficha->instructor && $ficha->instructor->persona)
-                                                {{ $ficha->instructor->persona->nombre }}
-                                            @else
-                                                <span class="text-muted">Sin asignar</span>
-                                            @endif
-                                        </td>
-                                        <td>{{ $ficha->fecha_inicio ? $ficha->fecha_inicio->format('d/m/Y') : 'N/A' }}</td>
-                                        <td>{{ $ficha->fecha_fin ? $ficha->fecha_fin->format('d/m/Y') : 'N/A' }}</td>
-                                        <td>
-                                            @if($ficha->status)
-                                                <span class="badge badge-success">Activa</span>
-                                            @else
-                                                <span class="badge badge-danger">Inactiva</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i>
-                        Este programa no tiene fichas de caracterización asociadas
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        <!-- Competencias del Programa -->
-        <div class="card card-outline card-danger">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-trophy"></i> Competencias del Programa
-                </h3>
-                <div class="card-tools">
-                    <span class="badge badge-danger">{{ $programa->competenciasProgramas->count() }} competencias</span>
-                </div>
-            </div>
-            <div class="card-body">
-                @if($programa->competenciasProgramas->count() > 0)
-                    <div class="table-responsive">
-                        <table class="table table-striped">
-                            <thead>
-                                <tr>
-                                    <th>Competencia</th>
-                                    <th>Fecha Inicio</th>
-                                    <th>Fecha Fin</th>
-                                    <th>Estado</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($programa->competenciasProgramas as $competenciaPrograma)
-                                    <tr>
-                                        <td>
-                                            @if($competenciaPrograma->competencia)
-                                                {{ $competenciaPrograma->competencia->nombre }}
-                                            @else
-                                                <span class="text-muted">Competencia eliminada</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if($competenciaPrograma->competencia)
-                                                {{ $competenciaPrograma->competencia->fecha_inicio ? $competenciaPrograma->competencia->fecha_inicio->format('d/m/Y') : 'N/A' }}
-                                            @else
-                                                N/A
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if($competenciaPrograma->competencia)
-                                                {{ $competenciaPrograma->competencia->fecha_fin ? $competenciaPrograma->competencia->fecha_fin->format('d/m/Y') : 'N/A' }}
-                                            @else
-                                                N/A
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if($competenciaPrograma->competencia)
-                                                @php
-                                                    $now = now();
-                                                    $inicio = $competenciaPrograma->competencia->fecha_inicio;
-                                                    $fin = $competenciaPrograma->competencia->fecha_fin;
-                                                @endphp
-                                                @if($inicio && $fin)
-                                                    @if($now->between($inicio, $fin))
-                                                        <span class="badge badge-success">En curso</span>
-                                                    @elseif($now->lt($inicio))
-                                                        <span class="badge badge-info">Próxima</span>
-                                                    @else
-                                                        <span class="badge badge-secondary">Finalizada</span>
-                                                    @endif
-                                                @else
-                                                    <span class="badge badge-warning">Sin fechas</span>
-                                                @endif
-                                            @else
-                                                <span class="badge badge-danger">Eliminada</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                @else
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle"></i>
-                        Este programa no tiene competencias asociadas
-                    </div>
-                @endif
-            </div>
-        </div>
-
-        <!-- Acciones -->
-        <div class="card card-outline card-secondary">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-cogs"></i> Acciones
-                </h3>
-            </div>
-            <div class="card-body">
-                <div class="btn-group" role="group">
-                    @can('programa.edit')
-                        <a href="{{ route('programa.edit', $programa->id) }}" class="btn btn-warning">
-                            <i class="fas fa-edit"></i> Editar Programa
-                        </a>
-                    @endcan
-                    @can('programa.delete')
-                        <button type="button" 
-                                class="btn btn-danger btn-delete" 
-                                data-id="{{ $programa->id }}"
-                                data-name="{{ $programa->nombre }}">
-                            <i class="fas fa-trash"></i> Eliminar Programa
-                        </button>
-                    @endcan
-                    <a href="{{ route('programa.index') }}" class="btn btn-secondary">
-                        <i class="fas fa-list"></i> Ver Todos los Programas
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ route('programa.index') }}">
+                        <i class="fas fa-arrow-left mr-1"></i> Volver
                     </a>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Modal de confirmación de eliminación -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">
-                        <i class="fas fa-exclamation-triangle text-warning"></i>
-                        Confirmar Eliminación
-                    </h5>
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span>&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>¿Estás seguro de que deseas eliminar el programa de formación <strong id="programaName"></strong>?</p>
-                    <p class="text-danger">
-                        <i class="fas fa-exclamation-circle"></i>
-                        Esta acción no se puede deshacer y eliminará todas las fichas y competencias asociadas.
-                    </p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                        <i class="fas fa-times"></i> Cancelar
-                    </button>
-                    <form id="deleteForm" method="POST" style="display: inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">
-                            <i class="fas fa-trash"></i> Eliminar
-                        </button>
-                    </form>
+                    <div class="card detail-card no-hover">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                                <i class="fas fa-info-circle mr-2"></i>Detalle del Programa de Formación
+                            </h5>
+                        </div>
+
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table detail-table mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <th class="py-3">ID</th>
+                                            <td class="py-3">{{ $programa->id }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Código</th>
+                                            <td class="py-3">
+                                                <span class="badge badge-secondary">{{ $programa->codigo }}</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Nombre</th>
+                                            <td class="py-3 font-weight-medium">{{ $programa->nombre }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Red de Conocimiento</th>
+                                            <td class="py-3">
+                                                @if ($programa->redConocimiento)
+                                                    <span class="text-primary">
+                                                        <i class="fas fa-network-wired mr-1"></i>
+                                                        {{ $programa->redConocimiento->nombre }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-muted">Sin asignar</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Nivel de Formación</th>
+                                            <td class="py-3">
+                                                @if ($programa->nivelFormacion)
+                                                    <span class="text-success">
+                                                        <i class="fas fa-layer-group mr-1"></i>
+                                                        {{ $programa->nivelFormacion->name }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-muted">Sin asignar</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Estado</th>
+                                            <td class="py-3">
+                                                <span class="status-badge {{ $programa->status ? 'text-success' : 'text-danger' }}">
+                                                    <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
+                                                    {{ $programa->status ? 'Activo' : 'Inactivo' }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Usuario que crea</th>
+                                            <td class="py-3 user-info">
+                                                @if ($programa->userCreated)
+                                                    <i class="fas fa-user mr-1"></i>
+                                                    {{ $programa->userCreated->persona->primer_nombre ?? 'Usuario' }}
+                                                    {{ $programa->userCreated->persona->primer_apellido ?? '' }}
+                                                @else
+                                                    <span class="text-muted">Usuario no disponible</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Usuario que edita</th>
+                                            <td class="py-3 user-info">
+                                                @if ($programa->userEdited)
+                                                    <i class="fas fa-user-edit mr-1"></i>
+                                                    {{ $programa->userEdited->persona->primer_nombre ?? 'Usuario' }}
+                                                    {{ $programa->userEdited->persona->primer_apellido ?? '' }}
+                                                @else
+                                                    <span class="text-muted">Usuario no disponible</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Fecha de creación</th>
+                                            <td class="py-3 timestamp">
+                                                <i class="far fa-calendar-alt mr-1"></i>
+                                                {{ $programa->created_at->diffForHumans() }}
+                                                <small class="text-muted d-block">{{ $programa->created_at->format('d/m/Y H:i:s') }}</small>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Última actualización</th>
+                                            <td class="py-3 timestamp">
+                                                <i class="far fa-calendar-alt mr-1"></i>
+                                                {{ $programa->updated_at->diffForHumans() }}
+                                                <small class="text-muted d-block">{{ $programa->updated_at->format('d/m/Y H:i:s') }}</small>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    @can('programa.edit')
+                                        <a href="{{ route('programa.edit', $programa->id) }}" class="btn btn-primary">
+                                            <i class="fas fa-edit mr-1"></i>Editar Programa
+                                        </a>
+                                    @endcan
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    @can('programa.delete')
+                                        <form action="{{ route('programa.destroy', $programa->id) }}" method="POST" class="d-inline formulario-eliminar">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-danger">
+                                                <i class="fas fa-trash mr-1"></i>Eliminar Programa
+                                            </button>
+                                        </form>
+                                    @endcan
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 @endsection
 
 @section('js')
 <script>
     $(document).ready(function() {
-        $('.btn-delete').on('click', function() {
-            const id = $(this).data('id');
-            const nombre = $(this).data('name');
+        // Confirmar eliminación
+        $('.formulario-eliminar').on('submit', function(e) {
+            e.preventDefault();
+            const form = $(this);
+            const nombre = '{{ $programa->nombre }}';
             
-            document.getElementById('programaName').textContent = nombre;
-            document.getElementById('deleteForm').action = '{{ route("programa.destroy", ":id") }}'.replace(':id', id);
-            $('#deleteModal').modal('show');
+            if (confirm(`¿Está seguro de que desea eliminar el programa "${nombre}"?`)) {
+                form.off('submit').submit();
+            }
         });
     });
 </script>

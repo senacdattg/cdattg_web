@@ -1,260 +1,153 @@
 @extends('adminlte::page')
 
-@section('title', 'Editar Programa de Formación')
+@section('css')
+    @vite(['resources/css/parametros.css'])
+@endsection
 
 @section('content_header')
-    <div class="d-flex justify-content-between align-items-center">
-        <h1>
-            <i class="fas fa-edit"></i>
-            Editar Programa de Formación
-        </h1>
-        <div>
-            <a href="{{ route('programa.show', $programa->id) }}" class="btn btn-info">
-                <i class="fas fa-eye"></i> Ver Detalles
-            </a>
-            <a href="{{ route('programa.index') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Volver
-            </a>
+    <section class="content-header dashboard-header py-4">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-6 d-flex align-items-center">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
+                        style="width: 48px; height: 48px;">
+                        <i class="fas fa-graduation-cap text-white fa-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800">Programa de Formación</h1>
+                        <p class="text-muted mb-0 font-weight-light">Edición del programa de formación</p>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
+                                    <i class="fas fa-home"></i> Inicio
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('programa.index') }}" class="link_right_header">
+                                    <i class="fas fa-graduation-cap"></i> Programas de Formación
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <i class="fas fa-edit"></i> Editar programa
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
         </div>
-    </div>
-@stop
+    </section>
+@endsection
 
 @section('content')
-    <div class="container-fluid">
-        @if ($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <h5><i class="fas fa-exclamation-triangle"></i> Error en el formulario</h5>
-                <ul class="mb-0">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-                <button type="button" class="close" data-dismiss="alert">
-                    <span>&times;</span>
-                </button>
-            </div>
-        @endif
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ route('programa.index') }}">
+                        <i class="fas fa-arrow-left mr-1"></i> Volver
+                    </a>
 
-        <!-- Información del programa -->
-        <div class="card card-outline card-info">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-info-circle"></i> Información Actual
-                </h3>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-3">
-                        <strong>ID:</strong> <span class="badge badge-info">{{ $programa->id }}</span>
-                    </div>
-                    <div class="col-md-3">
-                        <strong>Código:</strong> <span class="badge badge-secondary">{{ $programa->codigo }}</span>
-                    </div>
-                    <div class="col-md-3">
-                        <strong>Estado:</strong> 
-                        @if($programa->status)
-                            <span class="badge badge-success">Activo</span>
-                        @else
-                            <span class="badge badge-danger">Inactivo</span>
-                        @endif
-                    </div>
-                    <div class="col-md-3">
-                        <strong>Última actualización:</strong> {{ $programa->updated_at->format('d/m/Y H:i') }}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Formulario de edición -->
-        <div class="card card-outline card-primary">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-graduation-cap"></i> Editar Información del Programa
-                </h3>
-            </div>
-            <form action="{{ route('programa.update', $programa->id) }}" method="POST" id="editForm">
-                @csrf
-                @method('PUT')
-                <div class="card-body">
-                    <div class="row">
-                        <!-- Código del Programa -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="codigo" class="required">
-                                    <i class="fas fa-code"></i> Código del Programa
-                                </label>
-                                <input type="text" 
-                                       name="codigo" 
-                                       id="codigo" 
-                                       class="form-control @error('codigo') is-invalid @enderror" 
-                                       value="{{ old('codigo', $programa->codigo) }}"
-                                       placeholder="Ej: ADSO-001"
-                                       maxlength="50"
-                                       required>
-                                <small class="form-text text-muted">Máximo 50 caracteres</small>
-                                @error('codigo')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                    <div class="card shadow-sm no-hover">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                                <i class="fas fa-edit mr-2"></i>Editar Programa de Formación
+                            </h5>
                         </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ route('programa.update', $programa->id) }}" class="row">
+                                @csrf
+                                @method('PUT')
 
-                        <!-- Nombre del Programa -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="nombre" class="required">
-                                    <i class="fas fa-graduation-cap"></i> Nombre del Programa
-                                </label>
-                                <input type="text" 
-                                       name="nombre" 
-                                       id="nombre" 
-                                       class="form-control @error('nombre') is-invalid @enderror" 
-                                       value="{{ old('nombre', $programa->nombre) }}"
-                                       placeholder="Ej: Análisis y Desarrollo de Software"
-                                       maxlength="255"
-                                       required>
-                                <small class="form-text text-muted">Máximo 255 caracteres</small>
-                                @error('nombre')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <!-- Red de Conocimiento -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="red_conocimiento_id" class="required">
-                                    <i class="fas fa-network-wired"></i> Red de Conocimiento
-                                </label>
-                                <select name="red_conocimiento_id" 
-                                        id="red_conocimiento_id" 
-                                        class="form-control @error('red_conocimiento_id') is-invalid @enderror" 
-                                        required>
-                                    <option value="">Seleccione una red de conocimiento</option>
-                                    @foreach ($redesConocimiento as $red)
-                                        <option value="{{ $red->id }}" 
-                                                {{ old('red_conocimiento_id', $programa->red_conocimiento_id) == $red->id ? 'selected' : '' }}>
-                                            {{ $red->nombre }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('red_conocimiento_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <!-- Nivel de Formación -->
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="nivel_formacion_id" class="required">
-                                    <i class="fas fa-layer-group"></i> Nivel de Formación
-                                </label>
-                                <select name="nivel_formacion_id" 
-                                        id="nivel_formacion_id" 
-                                        class="form-control @error('nivel_formacion_id') is-invalid @enderror" 
-                                        required>
-                                    <option value="">Seleccione un nivel de formación</option>
-                                    @foreach ($nivelesFormacion as $nivel)
-                                        <option value="{{ $nivel->id }}" 
-                                                {{ old('nivel_formacion_id', $programa->nivel_formacion_id) == $nivel->id ? 'selected' : '' }}>
-                                            {{ $nivel->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                                @error('nivel_formacion_id')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Estado del programa -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="form-group">
-                                <label for="status">
-                                    <i class="fas fa-toggle-on"></i> Estado del Programa
-                                </label>
-                                <div class="form-check">
-                                    <input type="checkbox" 
-                                           name="status" 
-                                           id="status" 
-                                           class="form-check-input" 
-                                           value="1"
-                                           {{ old('status', $programa->status) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="status">
-                                        Programa activo
-                                    </label>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="codigo" class="form-label font-weight-bold">Código del Programa</label>
+                                        <input type="text" name="codigo" id="codigo"
+                                            class="form-control @error('codigo') is-invalid @enderror"
+                                            value="{{ old('codigo', $programa->codigo) }}" maxlength="6" required>
+                                        @error('codigo')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
                                 </div>
-                                <small class="form-text text-muted">
-                                    Los programas inactivos no estarán disponibles para nuevas asignaciones
-                                </small>
-                            </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="nombre" class="form-label font-weight-bold">Nombre del Programa</label>
+                                        <input type="text" name="nombre" id="nombre"
+                                            class="form-control @error('nombre') is-invalid @enderror"
+                                            value="{{ old('nombre', $programa->nombre) }}" required>
+                                        @error('nombre')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="red_conocimiento_id" class="form-label font-weight-bold">Red de Conocimiento</label>
+                                        <select name="red_conocimiento_id" id="red_conocimiento_id" class="form-control @error('red_conocimiento_id') is-invalid @enderror" required>
+                                            <option value="">Seleccione una red de conocimiento</option>
+                                            @foreach(\App\Models\RedConocimiento::all() as $red)
+                                                <option value="{{ $red->id }}" {{ old('red_conocimiento_id', $programa->red_conocimiento_id) == $red->id ? 'selected' : '' }}>
+                                                    {{ $red->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('red_conocimiento_id')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="nivel_formacion_id" class="form-label font-weight-bold">Nivel de Formación</label>
+                                        <select name="nivel_formacion_id" id="nivel_formacion_id" class="form-control @error('nivel_formacion_id') is-invalid @enderror" required>
+                                            <option value="">Seleccione un nivel de formación</option>
+                                            @foreach(\App\Models\Parametro::whereIn('name', ['TÉCNICO', 'TECNÓLOGO', 'AUXILIAR', 'OPERARIO'])->get() as $nivel)
+                                                <option value="{{ $nivel->id }}" {{ old('nivel_formacion_id', $programa->nivel_formacion_id) == $nivel->id ? 'selected' : '' }}>
+                                                    {{ $nivel->name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('nivel_formacion_id')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="status" class="form-label font-weight-bold">Estado</label>
+                                        <select name="status" id="status" class="form-control @error('status') is-invalid @enderror" required>
+                                            <option value="1" {{ old('status', $programa->status) == 1 ? 'selected' : '' }}>Activo</option>
+                                            <option value="0" {{ old('status', $programa->status) == 0 ? 'selected' : '' }}>Inactivo</option>
+                                        </select>
+                                        @error('status')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="form-group text-right">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save mr-1"></i>Actualizar Programa
+                                        </button>
+                                        <a href="{{ route('programa.index') }}" class="btn btn-secondary">
+                                            <i class="fas fa-times mr-1"></i>Cancelar
+                                        </a>
+                                    </div>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
-
-                <div class="card-footer">
-                    <div class="d-flex justify-content-between">
-                        <a href="{{ route('programa.index') }}" class="btn btn-secondary">
-                            <i class="fas fa-times"></i> Cancelar
-                        </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i> Actualizar Programa
-                        </button>
-                    </div>
-                </div>
-            </form>
+            </div>
         </div>
-    </div>
-@endsection
-
-@section('js')
-<script>
-    $(document).ready(function() {
-        // Validación en tiempo real
-        $('#editForm').on('submit', function(e) {
-            let isValid = true;
-            
-            // Validar campos requeridos
-            $('.required').each(function() {
-                const input = $(this).next('input, select');
-                if (!input.val()) {
-                    input.addClass('is-invalid');
-                    isValid = false;
-                } else {
-                    input.removeClass('is-invalid');
-                }
-            });
-            
-            if (!isValid) {
-                e.preventDefault();
-                toastr.error('Por favor, complete todos los campos requeridos.');
-            }
-        });
-
-        // Limpiar validación al escribir
-        $('input, select').on('input change', function() {
-            $(this).removeClass('is-invalid');
-        });
-
-        // Confirmar cambios
-        $('#editForm').on('submit', function(e) {
-            if (!confirm('¿Está seguro de que desea actualizar este programa de formación?')) {
-                e.preventDefault();
-            }
-        });
-    });
-</script>
-@endsection
-
-@section('css')
-<style>
-    .required::after {
-        content: " *";
-        color: red;
-    }
-</style>
+    </section>
 @endsection
