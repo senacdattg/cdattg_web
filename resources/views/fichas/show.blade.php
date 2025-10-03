@@ -94,6 +94,89 @@
                 </div>
             </div>
 
+            <!-- Instructores Asignados -->
+            @if($ficha->instructorFicha->count() > 0)
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chalkboard-teacher"></i> Instructores Asignados
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            @foreach($ficha->instructorFicha as $asignacion)
+                                <div class="col-md-6 mb-3">
+                                    <div class="card {{ $ficha->instructor_id == $asignacion->instructor_id ? 'border-primary' : 'border-secondary' }}">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h5 class="mb-1">
+                                                        <i class="fas fa-user"></i>
+                                                        {{ $asignacion->instructor->persona->primer_nombre }} 
+                                                        {{ $asignacion->instructor->persona->primer_apellido }}
+                                                        @if($ficha->instructor_id == $asignacion->instructor_id)
+                                                            <span class="badge badge-primary ml-2">Principal</span>
+                                                        @else
+                                                            <span class="badge badge-secondary ml-2">Auxiliar</span>
+                                                        @endif
+                                                    </h5>
+                                                    <p class="text-muted mb-1">
+                                                        <i class="fas fa-calendar"></i>
+                                                        {{ $asignacion->fecha_inicio->format('d/m/Y') }} - 
+                                                        {{ $asignacion->fecha_fin->format('d/m/Y') }}
+                                                    </p>
+                                                    <p class="text-muted mb-0">
+                                                        <i class="fas fa-clock"></i>
+                                                        {{ $asignacion->total_horas_ficha }} horas
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    @if($ficha->instructor_id == $asignacion->instructor_id)
+                                                        <span class="badge badge-primary">
+                                                            <i class="fas fa-star"></i> Principal
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        
+                        @can('GESTIONAR INSTRUCTORES FICHA')
+                            <div class="text-center mt-3">
+                                <a href="{{ route('fichaCaracterizacion.gestionarInstructores', $ficha->id) }}" 
+                                   class="btn btn-primary">
+                                    <i class="fas fa-edit"></i> Gestionar Instructores
+                                </a>
+                            </div>
+                        @endcan
+                    </div>
+                </div>
+            @else
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-chalkboard-teacher"></i> Instructores Asignados
+                        </h3>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> 
+                            No hay instructores asignados a esta ficha.
+                        </div>
+                        
+                        @can('GESTIONAR INSTRUCTORES FICHA')
+                            <a href="{{ route('fichaCaracterizacion.gestionarInstructores', $ficha->id) }}" 
+                               class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Asignar Instructores
+                            </a>
+                        @endcan
+                    </div>
+                </div>
+            @endif
+
             <!-- Fechas y Duración -->
             <div class="card">
                 <div class="card-header">
@@ -228,6 +311,13 @@
                             <a href="{{ route('fichaCaracterizacion.edit', $ficha->id) }}" 
                                class="btn btn-warning btn-block">
                                 <i class="fas fa-edit"></i> Editar Ficha
+                            </a>
+                        @endcan
+
+                        @can('GESTIONAR INSTRUCTORES FICHA')
+                            <a href="{{ route('fichaCaracterizacion.gestionarInstructores', $ficha->id) }}" 
+                               class="btn btn-primary btn-block">
+                                <i class="fas fa-chalkboard-teacher"></i> Gestionar Instructores
                             </a>
                         @endcan
 
