@@ -1,58 +1,371 @@
 @extends('adminlte::page')
-@section('content')
 
-        <section class="content">
+@section('title', 'Crear Ficha de Caracterización')
+
+@section('content_header')
+    <div class="row">
+        <div class="col-sm-6">
+            <h1><i class="fas fa-plus"></i> Crear Ficha de Caracterización</h1>
+        </div>
+        <div class="col-sm-6">
+            <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item">
+                    <a href="{{ route('home') }}">Inicio</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="{{ route('fichaCaracterizacion.index') }}">Fichas de Caracterización</a>
+                </li>
+                <li class="breadcrumb-item active">Crear</li>
+            </ol>
+        </div>
+    </div>
+@stop
+
+@section('content')
+    <div class="row">
+        <div class="col-12">
             <div class="card">
                 <div class="card-header">
-                    <div class="card-body">
-                        <a class="btn btn-warning btn-sm" href="{{ route('instructor.index') }}">
-                            <i class="fas fa-arrow-left"></i>
-                            </i>
-                            Volver
-                        </a>
-                    </div>
-                    @if (session('error'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('error') }}
-                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                    @endif
-                    <div class="card-body"></div>
-                    <form action="{{ route('fichaCaracterizacion.store') }}" method="post">
-                        @csrf
-                        <div class="form-group">
-                            <label for="nombre_programa">Número de ficha</label>
-                            <input type="number" name="numero_ficha" class="form-control" id="numero_ficha" required>
-                            @if ($errors->any())
-                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                    <ul>
-                                        @foreach ($errors->all() as $error)
-                                            <p>El número de ficha debe ser mayor a 0 y debe de ser número único</p>
-                                        @endforeach
-                                    </ul>
-                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                        <span aria-hidden="true">&times;</span>
-                                    </button>
-                                </div>
-                            @endif
-                        </div>
-                        <div class="form-group">
-                            <label for="sede_id">Programa de formación</label>
-                            <select name="programa_id" class="form-control" id="sede_id" required>
-                                <option value="">Seleccionar programa</option>
-                                @foreach ($programas as $programa)
-                                    <option value="{{ $programa->id }}">
-                                        {{ $programa->nombre }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Guardar</button>
-                    </form>
+                    <h3 class="card-title">
+                        <i class="fas fa-file-alt"></i> Información de la Ficha
+                    </h3>
                 </div>
 
+                <form action="{{ route('fichaCaracterizacion.store') }}" method="POST" id="formCreateFicha">
+                    @csrf
+                    <div class="card-body">
+                        <div class="row">
+                            <!-- Número de Ficha -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="ficha">
+                                        <i class="fas fa-hashtag"></i> Número de Ficha <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="text" class="form-control @error('ficha') is-invalid @enderror" 
+                                           id="ficha" name="ficha" value="{{ old('ficha') }}" 
+                                           placeholder="Ej: 123456" maxlength="50" required>
+                                    @error('ficha')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Programa de Formación -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="programa_formacion_id">
+                                        <i class="fas fa-graduation-cap"></i> Programa de Formación <span class="text-danger">*</span>
+                                    </label>
+                                    <select class="form-control @error('programa_formacion_id') is-invalid @enderror" 
+                                            id="programa_formacion_id" name="programa_formacion_id" required>
+                                        <option value="">Seleccione un programa...</option>
+                                        @foreach($programas as $programa)
+                                            <option value="{{ $programa->id }}" 
+                                                    {{ old('programa_formacion_id') == $programa->id ? 'selected' : '' }}
+                                                    data-sede="{{ $programa->sede_id }}">
+                                                {{ $programa->nombre }} ({{ $programa->codigo }})
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('programa_formacion_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Fecha de Inicio -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="fecha_inicio">
+                                        <i class="fas fa-calendar-alt"></i> Fecha de Inicio <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="date" class="form-control @error('fecha_inicio') is-invalid @enderror" 
+                                           id="fecha_inicio" name="fecha_inicio" value="{{ old('fecha_inicio') }}" required>
+                                    @error('fecha_inicio')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Fecha de Fin -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="fecha_fin">
+                                        <i class="fas fa-calendar-alt"></i> Fecha de Fin <span class="text-danger">*</span>
+                                    </label>
+                                    <input type="date" class="form-control @error('fecha_fin') is-invalid @enderror" 
+                                           id="fecha_fin" name="fecha_fin" value="{{ old('fecha_fin') }}" required>
+                                    @error('fecha_fin')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Sede -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="sede_id">
+                                        <i class="fas fa-building"></i> Sede
+                                    </label>
+                                    <select class="form-control @error('sede_id') is-invalid @enderror" 
+                                            id="sede_id" name="sede_id">
+                                        <option value="">Seleccione una sede...</option>
+                                        <!-- Se llenará dinámicamente -->
+                                    </select>
+                                    @error('sede_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Instructor -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="instructor_id">
+                                        <i class="fas fa-chalkboard-teacher"></i> Instructor Principal
+                                    </label>
+                                    <select class="form-control @error('instructor_id') is-invalid @enderror" 
+                                            id="instructor_id" name="instructor_id">
+                                        <option value="">Seleccione un instructor...</option>
+                                        <!-- Se llenará dinámicamente -->
+                                    </select>
+                                    @error('instructor_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Modalidad de Formación -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="modalidad_formacion_id">
+                                        <i class="fas fa-laptop"></i> Modalidad de Formación
+                                    </label>
+                                    <select class="form-control @error('modalidad_formacion_id') is-invalid @enderror" 
+                                            id="modalidad_formacion_id" name="modalidad_formacion_id">
+                                        <option value="">Seleccione una modalidad...</option>
+                                        <!-- Se llenará dinámicamente -->
+                                    </select>
+                                    @error('modalidad_formacion_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Jornada -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="jornada_id">
+                                        <i class="fas fa-clock"></i> Jornada de Formación
+                                    </label>
+                                    <select class="form-control @error('jornada_id') is-invalid @enderror" 
+                                            id="jornada_id" name="jornada_id">
+                                        <option value="">Seleccione una jornada...</option>
+                                        <!-- Se llenará dinámicamente -->
+                                    </select>
+                                    @error('jornada_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Ambiente -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="ambiente_id">
+                                        <i class="fas fa-door-open"></i> Ambiente
+                                    </label>
+                                    <select class="form-control @error('ambiente_id') is-invalid @enderror" 
+                                            id="ambiente_id" name="ambiente_id">
+                                        <option value="">Seleccione un ambiente...</option>
+                                        <!-- Se llenará dinámicamente -->
+                                    </select>
+                                    @error('ambiente_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+
+                            <!-- Total de Horas -->
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="total_horas">
+                                        <i class="fas fa-hourglass-half"></i> Total de Horas
+                                    </label>
+                                    <input type="number" class="form-control @error('total_horas') is-invalid @enderror" 
+                                           id="total_horas" name="total_horas" value="{{ old('total_horas') }}" 
+                                           min="1" max="9999" placeholder="Ej: 120">
+                                    @error('total_horas')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Estado -->
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                        <input type="checkbox" class="custom-control-input" 
+                                               id="status" name="status" value="1" 
+                                               {{ old('status', '1') ? 'checked' : '' }}>
+                                        <label class="custom-control-label" for="status">
+                                            <i class="fas fa-toggle-on"></i> Ficha Activa
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <a href="{{ route('fichaCaracterizacion.index') }}" class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left"></i> Cancelar
+                                </a>
+                            </div>
+                            <div class="col-md-6 text-right">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Crear Ficha
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
-        </section>
+        </div>
+    </div>
+@endsection
+
+@section('js')
+<script>
+    $(document).ready(function() {
+        // Cargar datos iniciales
+        loadModalidades();
+        loadJornadas();
+        loadInstructores();
+        loadSedes();
+
+        // Cuando cambie el programa de formación
+        $('#programa_formacion_id').change(function() {
+            const programaId = $(this).val();
+            if (programaId) {
+                const sedeId = $(this).find('option:selected').data('sede');
+                loadAmbientes(sedeId);
+                $('#sede_id').val(sedeId);
+            }
+        });
+
+        // Cuando cambie la sede
+        $('#sede_id').change(function() {
+            const sedeId = $(this).val();
+            if (sedeId) {
+                loadAmbientes(sedeId);
+            }
+        });
+
+        // Validación de fechas
+        $('#fecha_inicio, #fecha_fin').change(function() {
+            validateDates();
+        });
+
+        // Establecer fecha mínima como hoy
+        $('#fecha_inicio').attr('min', new Date().toISOString().split('T')[0]);
+    });
+
+    function loadModalidades() {
+        $.get('/api/modalidades', function(data) {
+            const select = $('#modalidad_formacion_id');
+            select.find('option:not(:first)').remove();
+            data.forEach(function(modalidad) {
+                select.append(new Option(modalidad.name, modalidad.id));
+            });
+        });
+    }
+
+    function loadJornadas() {
+        $.get('/api/jornadas', function(data) {
+            const select = $('#jornada_id');
+            select.find('option:not(:first)').remove();
+            data.forEach(function(jornada) {
+                select.append(new Option(jornada.name, jornada.id));
+            });
+        });
+    }
+
+    function loadInstructores() {
+        $.get('/api/instructores', function(data) {
+            const select = $('#instructor_id');
+            select.find('option:not(:first)').remove();
+            data.forEach(function(instructor) {
+                select.append(new Option(
+                    instructor.persona.primer_nombre + ' ' + instructor.persona.primer_apellido,
+                    instructor.id
+                ));
+            });
+        });
+    }
+
+    function loadSedes() {
+        $.get('/api/sedes', function(data) {
+            const select = $('#sede_id');
+            select.find('option:not(:first)').remove();
+            data.forEach(function(sede) {
+                select.append(new Option(sede.nombre, sede.id));
+            });
+        });
+    }
+
+    function loadAmbientes(sedeId) {
+        if (!sedeId) return;
+        
+        $.get('/api/ambientes/' + sedeId, function(data) {
+            const select = $('#ambiente_id');
+            select.find('option:not(:first)').remove();
+            data.forEach(function(ambiente) {
+                select.append(new Option(
+                    ambiente.nombre + ' - ' + ambiente.piso.bloque.nombre + ' - ' + ambiente.piso.nombre,
+                    ambiente.id
+                ));
+            });
+        });
+    }
+
+    function validateDates() {
+        const fechaInicio = $('#fecha_inicio').val();
+        const fechaFin = $('#fecha_fin').val();
+        
+        if (fechaInicio && fechaFin) {
+            if (new Date(fechaInicio) >= new Date(fechaFin)) {
+                $('#fecha_fin')[0].setCustomValidity('La fecha de fin debe ser posterior a la fecha de inicio');
+            } else {
+                $('#fecha_fin')[0].setCustomValidity('');
+            }
+        }
+    }
+
+    // Validación del formulario
+    $('#formCreateFicha').submit(function(e) {
+        e.preventDefault();
+        
+        // Validar fechas
+        validateDates();
+        
+        if (this.checkValidity()) {
+            this.submit();
+        } else {
+            $(this).addClass('was-validated');
+        }
+    });
+</script>
 @endsection
