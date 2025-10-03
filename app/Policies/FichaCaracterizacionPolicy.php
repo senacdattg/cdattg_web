@@ -15,7 +15,7 @@ class FichaCaracterizacionPolicy
     public function viewAny(User $user): bool
     {
         // Verificar permiso básico
-        if (!$user->can('VER PROGRAMA DE CARACTERIZACION')) {
+        if (!$user->can('VER FICHA CARACTERIZACION')) {
             return false;
         }
 
@@ -39,7 +39,7 @@ class FichaCaracterizacionPolicy
     public function view(User $user, FichaCaracterizacion $fichaCaracterizacion): bool
     {
         // Verificar permiso básico
-        if (!$user->can('VER PROGRAMA DE CARACTERIZACION')) {
+        if (!$user->can('VER FICHA CARACTERIZACION')) {
             return false;
         }
 
@@ -61,7 +61,7 @@ class FichaCaracterizacionPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('CREAR PROGRAMA DE CARACTERIZACION');
+        return $user->can('CREAR FICHA CARACTERIZACION');
     }
 
     /**
@@ -71,7 +71,7 @@ class FichaCaracterizacionPolicy
     public function update(User $user, FichaCaracterizacion $fichaCaracterizacion): bool
     {
         // Verificar permiso básico
-        if (!$user->can('EDITAR PROGRAMA DE CARACTERIZACION')) {
+        if (!$user->can('EDITAR FICHA CARACTERIZACION')) {
             return false;
         }
 
@@ -95,7 +95,7 @@ class FichaCaracterizacionPolicy
     public function delete(User $user, FichaCaracterizacion $fichaCaracterizacion): bool
     {
         // Verificar permiso básico
-        if (!$user->can('ELIMINAR PROGRAMA DE CARACTERIZACION')) {
+        if (!$user->can('ELIMINAR FICHA CARACTERIZACION')) {
             return false;
         }
 
@@ -113,7 +113,7 @@ class FichaCaracterizacionPolicy
      */
     public function restore(User $user, FichaCaracterizacion $fichaCaracterizacion): bool
     {
-        return $user->can('CREAR PROGRAMA DE CARACTERIZACION') && 
+        return $user->can('CREAR FICHA CARACTERIZACION') && 
                $user->hasRole(['SUPERADMIN', 'ADMIN']);
     }
 
@@ -122,7 +122,7 @@ class FichaCaracterizacionPolicy
      */
     public function forceDelete(User $user, FichaCaracterizacion $fichaCaracterizacion): bool
     {
-        return $user->can('ELIMINAR PROGRAMA DE CARACTERIZACION') && 
+        return $user->can('ELIMINAR FICHA CARACTERIZACION') && 
                $user->hasRole(['SUPERADMIN', 'ADMIN']);
     }
 
@@ -131,7 +131,7 @@ class FichaCaracterizacionPolicy
      */
     public function search(User $user): bool
     {
-        return $user->can('VER PROGRAMA DE CARACTERIZACION');
+        return $user->can('VER FICHA CARACTERIZACION');
     }
 
     /**
@@ -140,8 +140,8 @@ class FichaCaracterizacionPolicy
      */
     public function cambiarEstado(User $user, FichaCaracterizacion $fichaCaracterizacion): bool
     {
-        // Verificar permiso básico
-        if (!$user->can('EDITAR PROGRAMA DE CARACTERIZACION')) {
+        // Verificar permiso específico
+        if (!$user->can('CAMBIAR ESTADO FICHA')) {
             return false;
         }
 
@@ -164,8 +164,8 @@ class FichaCaracterizacionPolicy
      */
     public function gestionarInstructores(User $user, FichaCaracterizacion $fichaCaracterizacion): bool
     {
-        // Verificar permiso básico
-        if (!$user->can('EDITAR PROGRAMA DE CARACTERIZACION')) {
+        // Verificar permiso específico
+        if (!$user->can('GESTIONAR INSTRUCTORES FICHA')) {
             return false;
         }
 
@@ -195,8 +195,8 @@ class FichaCaracterizacionPolicy
      */
     public function gestionarDiasFormacion(User $user, FichaCaracterizacion $fichaCaracterizacion): bool
     {
-        // Verificar permiso básico
-        if (!$user->can('EDITAR PROGRAMA DE CARACTERIZACION')) {
+        // Verificar permiso específico
+        if (!$user->can('GESTIONAR DIAS FICHA')) {
             return false;
         }
 
@@ -242,7 +242,7 @@ class FichaCaracterizacionPolicy
      */
     public function getEstadisticasFichas(User $user): bool
     {
-        return $user->can('VER PROGRAMA DE CARACTERIZACION');
+        return $user->can('VER FICHA CARACTERIZACION');
     }
 
     /**
@@ -250,7 +250,7 @@ class FichaCaracterizacionPolicy
      */
     public function getFichasCaracterizacionPorJornada(User $user): bool
     {
-        return $user->can('VER PROGRAMA DE CARACTERIZACION');
+        return $user->can('VER FICHA CARACTERIZACION');
     }
 
     /**
@@ -258,7 +258,7 @@ class FichaCaracterizacionPolicy
      */
     public function getFichasCaracterizacionPorPrograma(User $user): bool
     {
-        return $user->can('VER PROGRAMA DE CARACTERIZACION');
+        return $user->can('VER FICHA CARACTERIZACION');
     }
 
     /**
@@ -266,7 +266,7 @@ class FichaCaracterizacionPolicy
      */
     public function getFichasCaracterizacionPorSede(User $user): bool
     {
-        return $user->can('VER PROGRAMA DE CARACTERIZACION');
+        return $user->can('VER FICHA CARACTERIZACION');
     }
 
     /**
@@ -274,7 +274,7 @@ class FichaCaracterizacionPolicy
      */
     public function getFichasCaracterizacionPorInstructor(User $user): bool
     {
-        return $user->can('VER PROGRAMA DE CARACTERIZACION');
+        return $user->can('VER FICHA CARACTERIZACION');
     }
 
     /**
@@ -314,7 +314,7 @@ class FichaCaracterizacionPolicy
      */
     public function generarReporteGeneral(User $user): bool
     {
-        return $user->can('VER PROGRAMA DE CARACTERIZACION') && 
+        return $user->can('VER FICHA CARACTERIZACION') && 
                $user->hasRole(['SUPERADMIN', 'ADMIN']);
     }
 
@@ -323,7 +323,7 @@ class FichaCaracterizacionPolicy
      */
     public function exportarFichas(User $user): bool
     {
-        return $user->can('VER PROGRAMA DE CARACTERIZACION') && 
+        return $user->can('VER FICHA CARACTERIZACION') && 
                $user->hasRole(['SUPERADMIN', 'ADMIN']);
     }
 
@@ -332,7 +332,7 @@ class FichaCaracterizacionPolicy
      */
     public function descargarPlantillaImportacion(User $user): bool
     {
-        return $user->can('CREAR PROGRAMA DE CARACTERIZACION') && 
+        return $user->can('CREAR FICHA CARACTERIZACION') && 
                $user->hasRole(['SUPERADMIN', 'ADMIN']);
     }
 
@@ -341,7 +341,7 @@ class FichaCaracterizacionPolicy
      */
     public function importarFichas(User $user): bool
     {
-        return $user->can('CREAR PROGRAMA DE CARACTERIZACION') && 
+        return $user->can('CREAR FICHA CARACTERIZACION') && 
                $user->hasRole(['SUPERADMIN', 'ADMIN']);
     }
 
