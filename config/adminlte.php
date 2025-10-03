@@ -574,6 +574,20 @@ return [
                     ],
                 ],
                 [
+                    'text' => 'Fichas de Caracterización',
+                    'url' => 'fichaCaracterizacion',
+                    'icon' => 'fas fa-fw fa-file-alt',
+                    'can' => [
+                        'VER FICHA CARACTERIZACION',
+                        'CREAR FICHA CARACTERIZACION',
+                        'EDITAR FICHA CARACTERIZACION',
+                        'ELIMINAR FICHA CARACTERIZACION',
+                        'GESTIONAR INSTRUCTORES FICHA',
+                        'GESTIONAR DIAS FICHA',
+                        'CAMBIAR ESTADO FICHA',
+                    ],
+                ],
+                [
                     'text' => 'Jornadas de Formación',
                     'url' => 'jornada',
                     'icon' => 'fas fa-fw fa-calendar',
@@ -591,14 +605,6 @@ return [
             'text' => 'Operaciones Académicas y Administrativas',
             'icon' => 'fas fa-fw fa-book',
             'submenu' => [
-                [
-                    'text' => 'Fichas de Caracterización',
-                    'url' => 'fichaCaracterizacion',
-                    'icon' => 'fas fa-fw fa-file-alt',
-                    'can' => [
-                        'VER PROGRAMA DE CARACTERIZACION'
-                    ],
-                ],
                 [
                     'text' => 'Aprendices',
                     'icon' => 'fas fa-fw fa-user-graduate',
