@@ -26,7 +26,7 @@ class UpdateProgramaFormacionRequest extends FormRequest
         return [
             'codigo' => 'required|string|max:50|unique:programas_formacion,codigo,' . $programaId,
             'nombre' => 'required|string|max:255|unique:programas_formacion,nombre,' . $programaId,
-            'red_conocimiento_id' => 'required|exists:redes_conocimiento,id',
+            'red_conocimiento_id' => 'required|exists:red_conocimientos,id',
             'nivel_formacion_id' => 'required|exists:parametros,id',
         ];
     }
