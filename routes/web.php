@@ -47,6 +47,9 @@ Route::middleware('auth')->group(function () {
     }
 
     Route::post('/verify-document', [AsistenceQrController::class, 'verifyDocument'])->name('api.verifyDocument');
+    
+    // Incluir rutas API para fichas de caracterización
+    include_once routes_path('api_fichas_caracterizacion.php');
 });
 
 // Route::get('/perfil', [ProfileController::class, 'index'])->name('profile.index');
