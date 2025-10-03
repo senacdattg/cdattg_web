@@ -183,20 +183,21 @@
             </div>
         </div>
     </section>
+
+    @include('components.confirm-delete-modal')
 @endsection
 
 @section('js')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
-        // Confirmar eliminación
+        // Confirmar eliminación con diseño unificado
         $('.formulario-eliminar').on('submit', function(e) {
             e.preventDefault();
             const form = $(this);
             const nombre = '{{ $programa->nombre }}';
             
-            if (confirm(`¿Está seguro de que desea eliminar el programa "${nombre}"?`)) {
-                form.off('submit').submit();
-            }
+            confirmDelete(nombre, form.attr('action'), form[0]);
         });
     });
 </script>

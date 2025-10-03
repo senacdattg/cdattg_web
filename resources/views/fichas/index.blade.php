@@ -85,11 +85,10 @@
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                                 <form action="{{ route('ficha.destroy', $ficha->id) }}" method="POST"
-                                                    style="display:inline;">
+                                                    style="display:inline;" class="formulario-eliminar">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm"
-                                                        onclick="return confirm('¿Estás seguro de eliminar este programa?')">
+                                                    <button type="submit" class="btn btn-danger btn-sm">
                                                         <i class="fas fa-trash"></i>
                                                     </button>
                                                 </form>
@@ -107,4 +106,22 @@
             </div>
 
     </div>
+
+    @include('components.confirm-delete-modal')
+@endsection
+
+@section('js')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(function() {
+        // Confirmar eliminación con diseño unificado
+        $('.formulario-eliminar').on('submit', function(e) {
+            e.preventDefault();
+            const form = $(this);
+            const nombre = form.closest('tr').find('td:nth-child(3)').text().trim();
+            
+            confirmDelete(nombre, form.attr('action'), form[0]);
+        });
+    });
+</script>
 @endsection
