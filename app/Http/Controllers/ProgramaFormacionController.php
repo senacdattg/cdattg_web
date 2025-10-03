@@ -17,6 +17,7 @@ class ProgramaFormacionController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('permission:programa.index')->only('index');
+        $this->middleware('permission:programa.show')->only('show');
         $this->middleware('permission:programa.create')->only('create', 'store');
         $this->middleware('permission:programa.edit')->only('edit', 'update');
         $this->middleware('permission:programa.delete')->only('destroy');
@@ -27,7 +28,7 @@ class ProgramaFormacionController extends Controller
      * Muestra una lista paginada de programas de formación.
      *
      * Este método recupera una lista de programas de formación desde la base de datos,
-     * incluyendo las relaciones con 'sede' y 'tipoPrograma', y los pagina en grupos de 7.
+     * incluyendo las relaciones con 'redConocimiento' y 'nivelFormacion', y los pagina en grupos de 6.
      * Luego, pasa esta lista a la vista 'programas.index'.
      *
      * @return \Illuminate\View\View La vista que muestra la lista de programas de formación.
@@ -37,6 +38,21 @@ class ProgramaFormacionController extends Controller
         $programas = ProgramaFormacion::with(['redConocimiento', 'nivelFormacion'])->orderBy('id', 'desc')->paginate(6);
 
         return view('programas.index', compact('programas'));
+    }
+
+    /**
+     * Muestra los detalles de un programa de formación específico.
+     *
+     * @param string $id El ID del programa de formación a mostrar.
+     * @return \Illuminate\View\View La vista que muestra los detalles del programa.
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException Si no se encuentra el programa de formación con el ID proporcionado.
+     */
+    public function show(string $id)
+    {
+        $programa = ProgramaFormacion::with(['redConocimiento', 'nivelFormacion', 'userCreated', 'userEdited'])
+            ->findOrFail($id);
+
+        return view('programas.show', compact('programa'));
     }
 
 
@@ -51,7 +67,9 @@ class ProgramaFormacionController extends Controller
     public function create()
     {
         $redesConocimiento = RedConocimiento::all();
-        $nivelesFormacion = Parametro::where('tema_id', 1)->get(); // Asumiendo que tema_id 1 corresponde a niveles de formación
+        $nivelesFormacion = Parametro::whereHas('temas', function($query) {
+            $query->where('temas.id', 6);
+        })->get(); // Tema 6 corresponde a NIVELES DE FORMACION
 
         return view('programas.create', compact('redesConocimiento', 'nivelesFormacion'));
     }
@@ -117,7 +135,9 @@ class ProgramaFormacionController extends Controller
     {
         $programa = ProgramaFormacion::findOrFail($id);
         $redesConocimiento = RedConocimiento::all();
-        $nivelesFormacion = Parametro::where('tema_id', 1)->get(); // Asumiendo que tema_id 1 corresponde a niveles de formación
+        $nivelesFormacion = Parametro::whereHas('temas', function($query) {
+            $query->where('temas.id', 6);
+        })->get(); // Tema 6 corresponde a NIVELES DE FORMACION
 
         return view('programas.edit', compact('programa', 'redesConocimiento', 'nivelesFormacion'));
     }
