@@ -95,8 +95,47 @@ class ProductoController extends Controller
      */
     public function edit(string $id)
     {
-        $producto = Producto::findOrFail($id);
-        return view('inventario.productos.edit', compact('producto'));
+        // Obtener el producto con sus relaciones
+        $producto = Producto::with(['tipoProducto', 'unidadMedida', 'estado'])->findOrFail($id);
+
+        // Obtener tipos de productos
+        $tiposProductos = ParametroTema::with(['parametro','tema'])
+            ->whereHas('tema', fn($q) => $q->where('name', 'TIPOS DE PRODUCTO'))
+            ->where('status', 1)
+            ->get();
+
+        // Obtener unidades de medida
+        $unidadesMedida = ParametroTema::with(['parametro','tema'])
+            ->whereHas('tema', fn($q) => $q->where('name', 'UNIDADES DE MEDIDA'))
+            ->where('status', 1)
+            ->get();
+
+        // Obtener estados de producto
+        $estados = ParametroTema::with(['parametro','tema'])
+            ->whereHas('tema', fn($q) => $q->where('name', 'ESTADOS DE PRODUCTO'))
+            ->where('status', 1)
+            ->get();
+
+        // Obtener categorías
+        $categorias = ParametroTema::with(['parametro','tema'])
+            ->whereHas('tema', fn($q) => $q->where('name', 'CATEGORIAS DE PRODUCTO'))
+            ->where('status', 1)
+            ->get();
+
+        // Obtener marcas
+        $marcas = ParametroTema::with(['parametro','tema'])
+            ->whereHas('tema', fn($q) => $q->where('name', 'MARCAS DE PRODUCTO'))
+            ->where('status', 1)
+            ->get();
+
+        return view('inventario.productos.edit', compact(
+            'producto',
+            'tiposProductos',
+            'unidadesMedida',
+            'estados',
+            'categorias',
+            'marcas'
+        ));
     }
 
     /**
@@ -104,7 +143,44 @@ class ProductoController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        
+        // Buscar el producto
+        $producto = Producto::findOrFail($id);
+
+        // Validar los datos
+        $validated = $request->validate([
+            'producto' => 'required|unique:productos,producto,' . $id,
+            'tipo_producto_id' => 'required|exists:parametros_temas,id',
+            'descripcion' => 'required|string',
+            'peso' => 'required|numeric|min:0',
+            'unidad_medida_id' => 'required|exists:parametros_temas,id',
+            'cantidad' => 'required|integer|min:0',
+            'codigo_barras' => 'required|string',
+            'estado_producto_id' => 'required|exists:parametros_temas,id',
+            'imagen' => 'nullable|image|mimes:jpg,jpeg,png'
+        ]);
+
+        // Manejar la imagen si se sube una nueva
+        if ($request->hasFile('imagen')) {
+            // Eliminar la imagen anterior si existe
+            if ($producto->imagen && file_exists(public_path($producto->imagen))) {
+                unlink(public_path($producto->imagen));
+            }
+            
+            // Guardar la nueva imagen
+            $nombreArchivo = time() . '.' . $request->imagen->extension();
+            $request->imagen->move(public_path('img/inventario'), $nombreArchivo);
+            $validated['imagen'] = 'img/inventario/' . $nombreArchivo;
+        }
+
+        // Actualizar el usuario que modifica
+        $validated['user_update_id'] = Auth::id();
+
+        // Actualizar el producto
+        $producto->update($validated);
+
+        // Redireccionar con mensaje de éxito
+        return redirect()->route('productos.show', $producto->id)
+            ->with('success', 'Producto actualizado correctamente.');
     }
 
     /**
@@ -112,7 +188,17 @@ class ProductoController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $producto = Producto::findOrFail($id);
+        
+        // Eliminar la imagen si existe
+        if ($producto->imagen && file_exists(public_path($producto->imagen))) {
+            unlink(public_path($producto->imagen));
+        }
+        
+        $producto->delete();
+        
+        return redirect()->route('productos.index')
+            ->with('success', 'Producto eliminado correctamente');
     }
   
 

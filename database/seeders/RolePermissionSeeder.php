@@ -17,7 +17,7 @@ class RolePermissionSeeder extends Seeder
         $visitante          = Role::firstOrCreate(['name' => 'VISITANTE']);
         $aprendiz           = Role::firstOrCreate(['name' => 'APRENDIZ']);
 
-        // Definir un arreglo de permisos para cada grupo
+        // Definir  un arreglo de permisos para cada grupo
         $permisos = [   
             // Permisos para parámetros
             'CREAR PARAMETRO',

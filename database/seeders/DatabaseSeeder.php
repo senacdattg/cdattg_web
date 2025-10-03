@@ -66,7 +66,11 @@ class DatabaseSeeder extends Seeder
 
             //Inventario:
             ProductoSeeder::class, // Crear productos para agregar al módulo de inventario
-            OrdenSeeder::class //Crear ordenes
+            OrdenSeeder::class, //Crear ordenes
+            CategoriasSeeder::class, //Crear categorias de productos
+            MarcasSeeder::class, //Crear marcas de productos
+            ProveedoresSeeder::class, //Crear proveedores
+            ContratosConveniosSeeder::class, //Crear contratos y convenios
         ]);
     }
 }
