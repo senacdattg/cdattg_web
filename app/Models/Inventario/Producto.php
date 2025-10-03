@@ -2,10 +2,11 @@
 
 namespace App\Models\Inventario;
 
+use App\Models\Ambiente;
 use App\Models\ParametroTema;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
 
 class Producto extends Model
 {
@@ -26,12 +27,18 @@ class Producto extends Model
         'marca_id',
         'contrato_convenio_id',
         'ambiente_id',
+        'proveedor_id',
         'fecha_vencimiento',
         'imagen',
         'user_create_id',
         'user_update_id'
     ];
 
+    protected $dates = [
+        'fecha_vencimiento'
+    ];
+
+    // Relaciones existentes
     public function tipoProducto()
     {
         return $this->belongsTo(ParametroTema::class, 'tipo_producto_id');
@@ -55,5 +62,31 @@ class Producto extends Model
     public function actualizador()
     {
         return $this->belongsTo(User::class, 'user_update_id');
+    }
+
+    // Nuevas relaciones
+    public function categoria()
+    {
+        return $this->belongsTo(Categoria::class);
+    }
+
+    public function marca()
+    {
+        return $this->belongsTo(Marca::class);
+    }
+
+    public function contratoConvenio()
+    {
+        return $this->belongsTo(ContratoConvenio::class);
+    }
+
+    public function ambiente()
+    {
+        return $this->belongsTo(Ambiente::class);
+    }
+
+    public function proveedor()
+    {
+        return $this->belongsTo(Proveedor::class);
     }
 }
