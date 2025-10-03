@@ -5,9 +5,24 @@ namespace App\Http\Controllers;
 use App\Models\FichaCaracterizacion;
 use App\Models\ProgramaFormacion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class FichaCaracterizacionController extends Controller
 {
+    /**
+     * Constructor del controlador.
+     * Aplica middleware de autenticación y permisos.
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+        $this->middleware('can:VER PROGRAMA DE CARACTERIZACION')->only(['index', 'show', 'create', 'edit']);
+        $this->middleware('can:CREAR PROGRAMA DE CARACTERIZACION')->only(['store']);
+        $this->middleware('can:EDITAR PROGRAMA DE CARACTERIZACION')->only(['update']);
+        $this->middleware('can:ELIMINAR PROGRAMA DE CARACTERIZACION')->only(['destroy']);
+    }
 
     /**
      * Muestra una lista de todas las fichas de caracterización.
@@ -19,9 +34,33 @@ class FichaCaracterizacionController extends Controller
      */
     public function index()
     {
+        try {
+            Log::info('Acceso al índice de fichas de caracterización', [
+                'user_id' => Auth::id(),
+                'timestamp' => now()
+            ]);
 
-        $fichas = FichaCaracterizacion::with('programaFormacion')->orderBy('id', 'desc')->paginate(10);
-        return view('fichas.index', compact('fichas'));
+            $fichas = FichaCaracterizacion::with('programaFormacion')
+                ->orderBy('id', 'desc')
+                ->paginate(10);
+
+            Log::info('Fichas de caracterización cargadas exitosamente', [
+                'total_fichas' => $fichas->total(),
+                'user_id' => Auth::id()
+            ]);
+
+            return view('fichas.index', compact('fichas'));
+
+        } catch (\Exception $e) {
+            Log::error('Error al cargar fichas de caracterización', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return redirect()->back()->with('error', 'Error al cargar las fichas de caracterización. Por favor, intente nuevamente.');
+        }
     }
 
 
@@ -35,10 +74,31 @@ class FichaCaracterizacionController extends Controller
      */
     public function create()
     {
+        try {
+            Log::info('Acceso al formulario de creación de ficha de caracterización', [
+                'user_id' => Auth::id(),
+                'timestamp' => now()
+            ]);
 
-        $programas = ProgramaFormacion::orderBy('nombre', 'asc')->get();
+            $programas = ProgramaFormacion::orderBy('nombre', 'asc')->get();
 
-        return view('fichas.create', compact('programas'));
+            Log::info('Programas de formación cargados para creación de ficha', [
+                'total_programas' => $programas->count(),
+                'user_id' => Auth::id()
+            ]);
+
+            return view('fichas.create', compact('programas'));
+
+        } catch (\Exception $e) {
+            Log::error('Error al cargar formulario de creación de ficha', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return redirect()->back()->with('error', 'Error al cargar el formulario de creación. Por favor, intente nuevamente.');
+        }
     }
 
 
@@ -53,21 +113,73 @@ class FichaCaracterizacionController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'programa_id' => 'required|exists:programas_formacion,id',
-            'numero_ficha' => 'required|numeric|unique:fichas_caracterizacion,ficha|min:1',
-        ]);
+        try {
+            Log::info('Inicio de creación de nueva ficha de caracterización', [
+                'user_id' => Auth::id(),
+                'request_data' => $request->only(['programa_id', 'numero_ficha']),
+                'timestamp' => now()
+            ]);
 
+            $request->validate([
+                'programa_id' => 'required|exists:programas_formacion,id',
+                'numero_ficha' => 'required|numeric|unique:fichas_caracterizacion,ficha|min:1',
+            ], [
+                'programa_id.required' => 'El programa de formación es obligatorio.',
+                'programa_id.exists' => 'El programa de formación seleccionado no existe.',
+                'numero_ficha.required' => 'El número de ficha es obligatorio.',
+                'numero_ficha.numeric' => 'El número de ficha debe ser numérico.',
+                'numero_ficha.unique' => 'Ya existe una ficha con este número.',
+                'numero_ficha.min' => 'El número de ficha debe ser mayor a 0.',
+            ]);
 
-        $ficha = new FichaCaracterizacion();
-        $ficha->programa_formacion_id = $request->input('programa_id');
-        $ficha->ficha = $request->input('numero_ficha');
+            DB::beginTransaction();
 
-        if ($ficha->save()) {
-            return redirect()->route('fichaCaracterizacion.index')->with('success', 'Caracterización creada exitosamente.');
+            $ficha = new FichaCaracterizacion();
+            $ficha->programa_formacion_id = $request->input('programa_id');
+            $ficha->ficha = $request->input('numero_ficha');
+            $ficha->user_create_id = Auth::id();
+            $ficha->status = 1;
+
+            if ($ficha->save()) {
+                DB::commit();
+                
+                Log::info('Ficha de caracterización creada exitosamente', [
+                    'ficha_id' => $ficha->id,
+                    'numero_ficha' => $ficha->ficha,
+                    'programa_id' => $ficha->programa_formacion_id,
+                    'user_id' => Auth::id()
+                ]);
+
+                return redirect()->route('fichaCaracterizacion.index')
+                    ->with('success', 'Ficha de caracterización creada exitosamente.');
+            }
+
+            DB::rollBack();
+            throw new \Exception('Error al guardar la ficha en la base de datos.');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::warning('Error de validación al crear ficha de caracterización', [
+                'errors' => $e->errors(),
+                'user_id' => Auth::id(),
+                'request_data' => $request->all()
+            ]);
+
+            return back()->withErrors($e->errors())->withInput();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Error al crear ficha de caracterización', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'request_data' => $request->all(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return back()->with('error', 'Ocurrió un error al crear la ficha de caracterización. Por favor, intente nuevamente.')
+                ->withInput();
         }
-
-        return back()->with('error', 'Ocurrió un error al crear la caracterización.');
     }
 
 
@@ -79,10 +191,46 @@ class FichaCaracterizacionController extends Controller
      */
     public function edit(string $id)
     {
-        $ficha = FichaCaracterizacion::findOrFail($id);
-        $programas = ProgramaFormacion::orderBy('nombre', 'asc')->get();
+        try {
+            Log::info('Acceso al formulario de edición de ficha de caracterización', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id(),
+                'timestamp' => now()
+            ]);
 
-        return view('fichas.edit', compact('ficha', 'programas'));
+            $ficha = FichaCaracterizacion::findOrFail($id);
+            $programas = ProgramaFormacion::orderBy('nombre', 'asc')->get();
+
+            Log::info('Datos cargados para edición de ficha', [
+                'ficha_id' => $ficha->id,
+                'numero_ficha' => $ficha->ficha,
+                'total_programas' => $programas->count(),
+                'user_id' => Auth::id()
+            ]);
+
+            return view('fichas.edit', compact('ficha', 'programas'));
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::warning('Intento de editar ficha de caracterización inexistente', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage()
+            ]);
+
+            return redirect()->route('fichaCaracterizacion.index')
+                ->with('error', 'La ficha de caracterización solicitada no existe.');
+
+        } catch (\Exception $e) {
+            Log::error('Error al cargar formulario de edición de ficha', [
+                'ficha_id' => $id,
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return redirect()->back()->with('error', 'Error al cargar el formulario de edición. Por favor, intente nuevamente.');
+        }
     }
 
 
@@ -98,18 +246,95 @@ class FichaCaracterizacionController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
-            'programa_id' => 'required|exists:programas_formacion,id',
-            'numero_ficha' => 'required|numeric|unique:fichas_caracterizacion,ficha,' . $id,
-        ]);
+        try {
+            Log::info('Inicio de actualización de ficha de caracterización', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id(),
+                'request_data' => $request->only(['programa_id', 'numero_ficha']),
+                'timestamp' => now()
+            ]);
 
-        $ficha = FichaCaracterizacion::findOrFail($id);
-        $ficha->programa_formacion_id = $request->input('programa_id');
-        $ficha->ficha = $request->input('numero_ficha');
+            $request->validate([
+                'programa_id' => 'required|exists:programas_formacion,id',
+                'numero_ficha' => 'required|numeric|unique:fichas_caracterizacion,ficha,' . $id . '|min:1',
+            ], [
+                'programa_id.required' => 'El programa de formación es obligatorio.',
+                'programa_id.exists' => 'El programa de formación seleccionado no existe.',
+                'numero_ficha.required' => 'El número de ficha es obligatorio.',
+                'numero_ficha.numeric' => 'El número de ficha debe ser numérico.',
+                'numero_ficha.unique' => 'Ya existe una ficha con este número.',
+                'numero_ficha.min' => 'El número de ficha debe ser mayor a 0.',
+            ]);
 
-        $ficha->save();
+            $ficha = FichaCaracterizacion::findOrFail($id);
 
-        return redirect()->route('fichaCaracterizacion.index')->with('success', 'Caracterización actualizada exitosamente.');
+            // Guardar datos originales para el log
+            $datosOriginales = [
+                'programa_formacion_id' => $ficha->programa_formacion_id,
+                'ficha' => $ficha->ficha,
+            ];
+
+            DB::beginTransaction();
+
+            $ficha->programa_formacion_id = $request->input('programa_id');
+            $ficha->ficha = $request->input('numero_ficha');
+            $ficha->user_edit_id = Auth::id();
+
+            if ($ficha->save()) {
+                DB::commit();
+                
+                Log::info('Ficha de caracterización actualizada exitosamente', [
+                    'ficha_id' => $ficha->id,
+                    'datos_originales' => $datosOriginales,
+                    'datos_nuevos' => [
+                        'programa_formacion_id' => $ficha->programa_formacion_id,
+                        'ficha' => $ficha->ficha,
+                    ],
+                    'user_id' => Auth::id()
+                ]);
+
+                return redirect()->route('fichaCaracterizacion.index')
+                    ->with('success', 'Ficha de caracterización actualizada exitosamente.');
+            }
+
+            DB::rollBack();
+            throw new \Exception('Error al actualizar la ficha en la base de datos.');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::warning('Error de validación al actualizar ficha de caracterización', [
+                'ficha_id' => $id,
+                'errors' => $e->errors(),
+                'user_id' => Auth::id(),
+                'request_data' => $request->all()
+            ]);
+
+            return back()->withErrors($e->errors())->withInput();
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::warning('Intento de actualizar ficha de caracterización inexistente', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage()
+            ]);
+
+            return redirect()->route('fichaCaracterizacion.index')
+                ->with('error', 'La ficha de caracterización solicitada no existe.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Error al actualizar ficha de caracterización', [
+                'ficha_id' => $id,
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'request_data' => $request->all(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return back()->with('error', 'Ocurrió un error al actualizar la ficha de caracterización. Por favor, intente nuevamente.')
+                ->withInput();
+        }
     }
 
 
@@ -121,30 +346,191 @@ class FichaCaracterizacionController extends Controller
      */
     public function destroy(string $id)
     {
-        $ficha = FichaCaracterizacion::findOrFail($id);
-        $ficha->delete();
+        try {
+            Log::info('Inicio de eliminación de ficha de caracterización', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id(),
+                'timestamp' => now()
+            ]);
 
-        return redirect()->route('fichaCaracterizacion.index')->with('success', 'Ficha eliminada exitosamente.');
+            $ficha = FichaCaracterizacion::findOrFail($id);
+
+            // Verificar si la ficha tiene aprendices asignados
+            if ($ficha->tieneAprendices()) {
+                Log::warning('Intento de eliminar ficha con aprendices asignados', [
+                    'ficha_id' => $id,
+                    'numero_ficha' => $ficha->ficha,
+                    'aprendices_count' => $ficha->contarAprendices(),
+                    'user_id' => Auth::id()
+                ]);
+
+                return redirect()->route('fichaCaracterizacion.index')
+                    ->with('error', 'No se puede eliminar la ficha porque tiene aprendices asignados.');
+            }
+
+            // Guardar información de la ficha antes de eliminar para el log
+            $fichaInfo = [
+                'id' => $ficha->id,
+                'numero_ficha' => $ficha->ficha,
+                'programa_formacion_id' => $ficha->programa_formacion_id,
+            ];
+
+            DB::beginTransaction();
+
+            if ($ficha->delete()) {
+                DB::commit();
+                
+                Log::info('Ficha de caracterización eliminada exitosamente', [
+                    'ficha_eliminada' => $fichaInfo,
+                    'user_id' => Auth::id()
+                ]);
+
+                return redirect()->route('fichaCaracterizacion.index')
+                    ->with('success', 'Ficha de caracterización eliminada exitosamente.');
+            }
+
+            DB::rollBack();
+            throw new \Exception('Error al eliminar la ficha de la base de datos.');
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::warning('Intento de eliminar ficha de caracterización inexistente', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage()
+            ]);
+
+            return redirect()->route('fichaCaracterizacion.index')
+                ->with('error', 'La ficha de caracterización solicitada no existe.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Error al eliminar ficha de caracterización', [
+                'ficha_id' => $id,
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return redirect()->route('fichaCaracterizacion.index')
+                ->with('error', 'Ocurrió un error al eliminar la ficha de caracterización. Por favor, intente nuevamente.');
+        }
     }
 
     public function search(Request $request)
     {
-        $request->validate([
-            'search' => 'required|string|max:255',
-        ]);
+        try {
+            Log::info('Búsqueda de fichas de caracterización', [
+                'query' => $request->input('search'),
+                'user_id' => Auth::id(),
+                'timestamp' => now()
+            ]);
 
-        $query = $request->input('search');
-        $fichas = FichaCaracterizacion::with('programaFormacion')->where('ficha', 'LIKE', "{$query}%")
-            ->orWhere('ficha', 'LIKE', "%{$query}")
-            ->orWhere('ficha', 'LIKE', "%{$query}%")
-            ->orderBy('id', 'desc')
-            ->paginate(7);
+            $request->validate([
+                'search' => 'required|string|max:255',
+            ], [
+                'search.required' => 'El término de búsqueda es obligatorio.',
+                'search.string' => 'El término de búsqueda debe ser texto.',
+                'search.max' => 'El término de búsqueda no puede exceder 255 caracteres.',
+            ]);
 
-        if (count($fichas) == 0) {
-            return back()->with('error', 'No se encontraron resultados.');
+            $query = $request->input('search');
+            $fichas = FichaCaracterizacion::with('programaFormacion')
+                ->where('ficha', 'LIKE', "%{$query}%")
+                ->orderBy('id', 'desc')
+                ->paginate(7);
+
+            Log::info('Búsqueda de fichas completada', [
+                'query' => $query,
+                'resultados_encontrados' => $fichas->count(),
+                'total_resultados' => $fichas->total(),
+                'user_id' => Auth::id()
+            ]);
+
+            if ($fichas->count() == 0) {
+                return back()->with('error', 'No se encontraron fichas que coincidan con la búsqueda: "' . $query . '".');
+            }
+
+            return view('fichas.index', compact('fichas'));
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::warning('Error de validación en búsqueda de fichas', [
+                'errors' => $e->errors(),
+                'user_id' => Auth::id(),
+                'request_data' => $request->all()
+            ]);
+
+            return back()->withErrors($e->errors())->withInput();
+
+        } catch (\Exception $e) {
+            Log::error('Error en búsqueda de fichas de caracterización', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'query' => $request->input('search'),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return back()->with('error', 'Error al realizar la búsqueda. Por favor, intente nuevamente.');
         }
+    }
 
-        return view('fichas.index', compact('fichas'));
+    /**
+     * Muestra una ficha de caracterización específica.
+     *
+     * @param string $id El ID de la ficha de caracterización a mostrar.
+     * @return \Illuminate\View\View La vista que muestra los detalles de la ficha de caracterización.
+     */
+    public function show(string $id)
+    {
+        try {
+            Log::info('Visualización de ficha de caracterización', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id(),
+                'timestamp' => now()
+            ]);
+
+            $ficha = FichaCaracterizacion::with([
+                'programaFormacion',
+                'instructor',
+                'jornadaFormacion',
+                'ambiente',
+                'modalidadFormacion',
+                'sede',
+                'aprendices'
+            ])->findOrFail($id);
+
+            Log::info('Ficha de caracterización cargada para visualización', [
+                'ficha_id' => $ficha->id,
+                'numero_ficha' => $ficha->ficha,
+                'aprendices_count' => $ficha->aprendices->count(),
+                'user_id' => Auth::id()
+            ]);
+
+            return view('fichas.show', compact('ficha'));
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::warning('Intento de visualizar ficha de caracterización inexistente', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage()
+            ]);
+
+            return redirect()->route('fichaCaracterizacion.index')
+                ->with('error', 'La ficha de caracterización solicitada no existe.');
+
+        } catch (\Exception $e) {
+            Log::error('Error al cargar ficha de caracterización para visualización', [
+                'ficha_id' => $id,
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return redirect()->back()->with('error', 'Error al cargar los detalles de la ficha. Por favor, intente nuevamente.');
+        }
     }
 
     /**
@@ -738,6 +1124,265 @@ class FichaCaracterizacionController extends Controller
                 'message' => 'Error al obtener las fichas de caracterización por jornada',
                 'error' => $e->getMessage()
             ], 500);
+        }
+    }
+
+    /**
+     * Obtiene estadísticas generales de las fichas de caracterización.
+     *
+     * @return \Illuminate\Http\JsonResponse Estadísticas de fichas de caracterización.
+     */
+    public function getEstadisticasFichas()
+    {
+        try {
+            Log::info('Solicitud de estadísticas de fichas de caracterización', [
+                'user_id' => Auth::id(),
+                'timestamp' => now()
+            ]);
+
+            $totalFichas = FichaCaracterizacion::count();
+            $fichasActivas = FichaCaracterizacion::where('status', 1)->count();
+            $fichasInactivas = FichaCaracterizacion::where('status', 0)->count();
+            $fichasConAprendices = FichaCaracterizacion::has('aprendices')->count();
+            $fichasSinAprendices = FichaCaracterizacion::doesntHave('aprendices')->count();
+            $totalAprendices = FichaCaracterizacion::withCount('aprendices')->get()->sum('aprendices_count');
+
+            $estadisticas = [
+                'total_fichas' => $totalFichas,
+                'fichas_activas' => $fichasActivas,
+                'fichas_inactivas' => $fichasInactivas,
+                'fichas_con_aprendices' => $fichasConAprendices,
+                'fichas_sin_aprendices' => $fichasSinAprendices,
+                'total_aprendices' => $totalAprendices,
+                'promedio_aprendices_por_ficha' => $fichasConAprendices > 0 ? round($totalAprendices / $fichasConAprendices, 2) : 0
+            ];
+
+            Log::info('Estadísticas de fichas calculadas exitosamente', [
+                'estadisticas' => $estadisticas,
+                'user_id' => Auth::id()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Estadísticas obtenidas exitosamente',
+                'data' => $estadisticas
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error('Error al calcular estadísticas de fichas', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener las estadísticas de fichas',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Valida si una ficha puede ser eliminada según las reglas de negocio.
+     *
+     * @param string $id El ID de la ficha a validar.
+     * @return \Illuminate\Http\JsonResponse Resultado de la validación.
+     */
+    public function validarEliminacionFicha(string $id)
+    {
+        try {
+            Log::info('Validación de eliminación de ficha', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id(),
+                'timestamp' => now()
+            ]);
+
+            $ficha = FichaCaracterizacion::findOrFail($id);
+            
+            $validaciones = [
+                'tiene_aprendices' => $ficha->tieneAprendices(),
+                'cantidad_aprendices' => $ficha->contarAprendices(),
+                'tiene_asistencias' => $this->fichaTieneAsistencias($ficha->id),
+                'puede_eliminar' => false
+            ];
+
+            // La ficha puede ser eliminada si no tiene aprendices ni asistencias
+            $validaciones['puede_eliminar'] = !$validaciones['tiene_aprendices'] && !$validaciones['tiene_asistencias'];
+
+            $mensaje = $validaciones['puede_eliminar'] 
+                ? 'La ficha puede ser eliminada' 
+                : 'La ficha no puede ser eliminada porque tiene dependencias';
+
+            Log::info('Validación de eliminación completada', [
+                'ficha_id' => $id,
+                'validaciones' => $validaciones,
+                'user_id' => Auth::id()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => $mensaje,
+                'data' => $validaciones
+            ], 200);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::warning('Validación de eliminación para ficha inexistente', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'La ficha solicitada no existe',
+                'data' => null
+            ], 404);
+
+        } catch (\Exception $e) {
+            Log::error('Error en validación de eliminación de ficha', [
+                'ficha_id' => $id,
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al validar la eliminación de la ficha',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Cambia el estado de una ficha (activar/desactivar).
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param string $id El ID de la ficha.
+     * @return \Illuminate\Http\JsonResponse Resultado del cambio de estado.
+     */
+    public function cambiarEstadoFicha(Request $request, string $id)
+    {
+        try {
+            Log::info('Cambio de estado de ficha de caracterización', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id(),
+                'request_data' => $request->all(),
+                'timestamp' => now()
+            ]);
+
+            $request->validate([
+                'status' => 'required|boolean'
+            ], [
+                'status.required' => 'El estado es obligatorio.',
+                'status.boolean' => 'El estado debe ser verdadero o falso.'
+            ]);
+
+            $ficha = FichaCaracterizacion::findOrFail($id);
+            $estadoAnterior = $ficha->status;
+            
+            DB::beginTransaction();
+
+            $ficha->status = $request->input('status');
+            $ficha->user_edit_id = Auth::id();
+
+            if ($ficha->save()) {
+                DB::commit();
+                
+                $mensaje = $ficha->status ? 'Ficha activada exitosamente' : 'Ficha desactivada exitosamente';
+                
+                Log::info('Estado de ficha cambiado exitosamente', [
+                    'ficha_id' => $ficha->id,
+                    'estado_anterior' => $estadoAnterior,
+                    'estado_nuevo' => $ficha->status,
+                    'user_id' => Auth::id()
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => $mensaje,
+                    'data' => [
+                        'ficha_id' => $ficha->id,
+                        'numero_ficha' => $ficha->ficha,
+                        'estado_anterior' => $estadoAnterior,
+                        'estado_nuevo' => $ficha->status
+                    ]
+                ], 200);
+            }
+
+            DB::rollBack();
+            throw new \Exception('Error al cambiar el estado de la ficha');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::warning('Error de validación al cambiar estado de ficha', [
+                'ficha_id' => $id,
+                'errors' => $e->errors(),
+                'user_id' => Auth::id()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error de validación',
+                'errors' => $e->errors()
+            ], 422);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::warning('Intento de cambiar estado de ficha inexistente', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'La ficha solicitada no existe'
+            ], 404);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Error al cambiar estado de ficha', [
+                'ficha_id' => $id,
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al cambiar el estado de la ficha',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Verifica si una ficha tiene asistencias registradas.
+     *
+     * @param int $fichaId El ID de la ficha.
+     * @return bool True si tiene asistencias, false en caso contrario.
+     */
+    private function fichaTieneAsistencias(int $fichaId): bool
+    {
+        try {
+            // Buscar asistencias relacionadas con aprendices de esta ficha
+            $tieneAsistencias = DB::table('asistencia_aprendices')
+                ->join('aprendiz_fichas_caracterizacion', 'asistencia_aprendices.aprendiz_id', '=', 'aprendiz_fichas_caracterizacion.aprendiz_id')
+                ->where('aprendiz_fichas_caracterizacion.ficha_id', $fichaId)
+                ->exists();
+
+            return $tieneAsistencias;
+
+        } catch (\Exception $e) {
+            Log::error('Error al verificar asistencias de ficha', [
+                'ficha_id' => $fichaId,
+                'error' => $e->getMessage()
+            ]);
+            
+            // En caso de error, asumir que sí tiene asistencias para ser conservador
+            return true;
         }
     }
 }
