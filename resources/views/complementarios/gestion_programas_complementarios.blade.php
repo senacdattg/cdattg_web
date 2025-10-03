@@ -8,7 +8,7 @@
             <h1><i class="fas fa-graduation-cap me-3"></i>Gestión de Programas de Formación</h1>
             <p>Administre los programas de formación complementaria disponibles</p>
         </div>
-        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newProgramModal">
+        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newProgramModal" data-toggle="modal" data-target="#newProgramModal">
             <i class="fas fa-plus-circle"></i> Nuevo Programa
         </a>
     </div>
@@ -137,7 +137,7 @@
                 </div>
                 <div class="card-footer bg-transparent border-0">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <button class="btn btn-sm btn-outline-primary me-md-2 mr-2">
+                        <button class="btn btn-sm btn-outline-primary me-md-2 mr-2" data-bs-toggle="modal" data-bs-target="#viewProgramModal">
                             <i class="fas fa-eye"></i> Ver
                         </button>
                         <button class="btn btn-sm btn-outline-warning me-md-2 mr-2">
@@ -344,28 +344,82 @@
 
 @section('js')
     <script>
+        console.log("AdminLTE programs: bootstrapping");
         document.addEventListener('DOMContentLoaded', function() {
-            const newProgramForm = document.getElementById('newProgramForm');
+            console.log("DOM loaded for programs view");
             
+            // Ensure bootstrap JS is loaded (Bootstrap 5)
+            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                console.log("Bootstrap modal available");
+            } else {
+                console.warn("Bootstrap modal not available. Bootstrap 5 JS may not be loaded.");
+            }
+
+            // Store reference to the button that opens the modal
+            let newProgramButton = null;
+
+            // Log button click for debugging and store reference
+            const newProgramButtons = document.querySelectorAll('[data-bs-target="#newProgramModal"]');
+            if (newProgramButtons.length > 0) {
+                newProgramButton = newProgramButtons[0];
+                newProgramButton.addEventListener('click', function() {
+                    console.log('Nuevo Programa button clicked');
+                });
+            }
+
+            // Handle modal focus management
+            const newProgramModalEl = document.getElementById('newProgramModal');
+            if (newProgramModalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                // Store the element that had focus before opening the modal
+                let previousActiveElement = null;
+                
+                newProgramModalEl.addEventListener('show.bs.modal', function() {
+                    previousActiveElement = document.activeElement;
+                });
+
+                newProgramModalEl.addEventListener('hidden.bs.modal', function() {
+                    // Restore focus to the element that opened the modal
+                    if (newProgramButton && typeof newProgramButton.focus === 'function') {
+                        newProgramButton.focus();
+                    } else if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
+                        previousActiveElement.focus();
+                    }
+                    
+                    // Ensure no element inside the hidden modal retains focus
+                    const focusedElement = document.activeElement;
+                    if (focusedElement && newProgramModalEl.contains(focusedElement)) {
+                        focusedElement.blur();
+                    }
+                });
+
+                // Prevent focus from being trapped in hidden modal
+                newProgramModalEl.addEventListener('keydown', function(e) {
+                    if (e.key === 'Tab' && !newProgramModalEl.classList.contains('show')) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            // Handle form submission
+            const newProgramForm = document.getElementById('newProgramForm');
             if (newProgramForm) {
                 newProgramForm.addEventListener('submit', function(e) {
                     e.preventDefault();
                     
-                    // Aquí iría la lógica para guardar el programa
-                    // Por ahora, mostramos un mensaje de éxito y cerramos la modal
                     alert('Programa guardado exitosamente');
                     
-                    // Cerrar la modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('newProgramModal'));
-                    modal.hide();
-                    
-                    // Limpiar el formulario
+                    // Close modal and handle focus properly
+                    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+                        const modal = bootstrap.Modal.getInstance(document.getElementById('newProgramModal'));
+                        if (modal) {
+                            modal.hide();
+                            // Focus will be handled by the hidden.bs.modal event
+                        }
+                    }
                     newProgramForm.reset();
-                    
-                    // Aquí podrías recargar la página o actualizar la lista de programas
-                    // window.location.reload();
                 });
             }
         });
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 @stop

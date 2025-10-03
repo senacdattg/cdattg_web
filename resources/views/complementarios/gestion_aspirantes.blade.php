@@ -239,7 +239,7 @@
         document.querySelectorAll('.action-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const action = this.classList.contains('action-btn-view') ? 'view' : 
-                              this.classList.contains('action-btn-edit') ? 'edit' : 'delete';
+                            this.classList.contains('action-btn-edit') ? 'edit' : 'delete';
                 const row = this.closest('tr');
                 const id = row.cells[0].textContent;
                 console.log(`${action} action for ID: ${id}`);
