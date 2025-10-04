@@ -408,7 +408,7 @@
     border-radius: 10px;
     margin-bottom: 12px;
     box-shadow: 0 2px 8px rgba(76, 175, 80, 0.07);
-    padding: 14px 22px;
+    padding: px 22px;
     font-size: 16px;
     display: flex;
     align-items: center;
@@ -418,7 +418,7 @@
 /* Efecto para el hover en los elementos de la lista de información del producto */
 .list-show .list-group-item strong {
     color: #388e3c;
-    min-width: 160px;
+    min-width: 190px;
     display: inline-block;
     font-weight: 600;
 

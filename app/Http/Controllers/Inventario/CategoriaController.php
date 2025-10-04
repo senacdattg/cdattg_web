@@ -40,6 +40,11 @@ class CategoriaController extends Controller
             ->with('success', 'Categoría creada exitosamente.');
     }
 
+    public function show(Categoria $categoria)
+    {
+        return view('inventario.categorias.show', compact('categoria'));
+    }
+
     public function edit(Categoria $categoria)
     {
         return view('inventario.categorias.edit', compact('categoria'));

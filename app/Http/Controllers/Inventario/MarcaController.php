@@ -40,6 +40,11 @@ class MarcaController extends Controller
             ->with('success', 'Marca creada exitosamente.');
     }
 
+    public function show(Marca $marca)
+    {
+        return view('inventario.marcas.show', compact('marca'));
+    }
+
     public function edit(Marca $marca)
     {
         return view('inventario.marcas.edit', compact('marca'));

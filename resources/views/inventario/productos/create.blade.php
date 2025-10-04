@@ -44,7 +44,7 @@
                             <label for="producto">Nombre</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
-                            <select name="tipo_producto_id" id="tipo_producto_id" class="form-control form-control-sm" required>
+                                                        <select name="tipo_producto_id" id="tipo_producto_id" class="form-control form-control-sm" required>
                                 <option value="">Tipo de producto</option>
                                 @foreach ($tiposProductos as $tipo)
                                     <option value="{{ $tipo->id }}" {{ old('tipo_producto_id') == $tipo->id ? 'selected' : '' }}>
@@ -60,7 +60,7 @@
                             <label for="peso">Magnitud</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
-                            <select name="unidad_medida_id" id="unidad_medida_id" class="form-control form-control-sm" required>
+                                                        <select name="unidad_medida_id" id="unidad_medida_id" class="form-control form-control-sm" required>
                                 <option value="">Unidad de medida</option>
                                 @foreach ($unidadesMedida as $unidad)
                                     <option value="{{ $unidad->id }}" {{ old('unidad_medida_id') == $unidad->id ? 'selected' : '' }}>
@@ -81,19 +81,25 @@
                             <label for="codigo_barras">Código de barras</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
-                            <select name="estado_id" id="estado_id" class="form-control form-control-sm" required>
+                            <select name="estado_producto_id" id="estado_producto_id" class="form-control form-control-sm" required>
                                 <option value="">Estado</option>
                                 @foreach ($estados as $estado)
-                                    <option value="{{ $estado->id }}" {{ old('estado_id') == $estado->id ? 'selected' : '' }}>
+                                    <option value="{{ $estado->id }}" {{ old('estado_producto_id') == $estado->id ? 'selected' : '' }}>
                                         {{ $estado->parametro->name }}
                                     </option>
                                 @endforeach
                             </select>
-                            <label for="estado_id">Estado</label>
+                            <label for="estado_producto_id">Estado</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
-                            <input type="text" name="contrato_convenio" id="contrato_convenio" class="form-control form-control-sm"
-                                value="{{ old('contrato_convenio') }}" placeholder="">
+                            <select name="contrato_convenio_id" id="contrato_convenio_id" class="form-control form-control-sm" required>
+                                <option value="">Contrato convenio</option>
+                                @foreach ($contratosConvenios as $contrato)
+                                    <option value="{{ $contrato->id }}" {{ old('contrato_convenio_id') == $contrato->id ? 'selected' : '' }}>
+                                        {{ $contrato->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                             <label for="contrato_convenio">Contrato convenio</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
@@ -102,37 +108,37 @@
                             <label for="fecha_vencimiento">Fecha de vencimiento</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
-                            <select name="categoria_id" id="categoria_id" class="form-control form-control-sm">
+                            <select name="categoria_id" id="categoria_id" class="form-control form-control-sm" required>
                                 <option value="">Categoría</option>
-                                {{-- Asumiendo que $categorias se pasa desde el controlador --}}
-                                @if(isset($categorias))
-                                    @foreach ($categorias as $categoria)
-                                        <option value="{{ $categoria->id }}" {{ old('categoria_id') == $categoria->id ? 'selected' : '' }}>
-                                            {{ $categoria->name }}
-                                        </option>
-                                    @endforeach
-                                @endif
+                                @foreach ($categorias as $categoria)
+                                    <option value="{{ $categoria->id }}" {{ old('categoria_id') == $categoria->id ? 'selected' : '' }}>
+                                        {{ $categoria->nombre }}
+                                    </option>
+                                @endforeach
                             </select>
                             <label for="categoria_id">Categoría</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
-                            <select name="marca_id" id="marca_id" class="form-control form-control-sm">
+                                <select name="marca_id" id="marca_id" class="form-control form-control-sm" required>
                                 <option value="">Marca</option>
-                                {{-- Asumiendo que $marcas se pasa desde el controlador --}}
-                                @if(isset($marcas))
-                                    @foreach ($marcas as $marca)
-                                        <option value="{{ $marca->id }}" {{ old('marca_id') == $marca->id ? 'selected' : '' }}>
-                                            {{ $marca->name }}
-                                        </option>
-                                    @endforeach
-                                @endif
+                                @foreach ($marcas as $marca)
+                                    <option value="{{ $marca->id }}" {{ old('marca_id') == $marca->id ? 'selected' : '' }}>
+                                        {{ $marca->nombre }}
+                                    </option>
+                                @endforeach
                             </select>
                             <label for="marca_id">Marca</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
-                            <input type="text" name="ubicacion" id="ubicacion" class="form-control form-control-sm"
-                                value="{{ old('ubicacion') }}" placeholder="">
-                            <label for="ubicacion">Ubicación</label>
+                            <select name="ambiente_id" id="ambiente_id" class="form-control form-control-sm" required>
+                                <option value="">Ambiente</option>
+                                @foreach ($ambientes as $ambiente)
+                                    <option value="{{ $ambiente->id }}" {{ old('ambiente_id') == $ambiente->id ? 'selected' : '' }}>
+                                        {{ $ambiente->title }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <label for="ubicacion">Ambiente</label>
                         </div>
                         <div class="col-md-12 mb-4">
                             <div class="custom-file-input-wrapper">

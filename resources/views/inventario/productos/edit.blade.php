@@ -93,45 +93,53 @@
                             <label for="estado_producto_id">Estado</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
-                            <input type="text" name="contrato_convenio" id="contrato_convenio" class="form-control form-control-sm"
-                                value="{{ old('contrato_convenio', $producto->contrato_convenio) }}" placeholder="">
+                            <select name="contrato_convenio_id" id="contrato_convenio_id" class="form-control form-control-sm" required>
+                                <option value="">Contrato convenio</option>
+                                @foreach ($contratosConvenios as $contrato)
+                                    <option value="{{ $contrato->id }}" {{ old('contrato_convenio_id', $producto->contrato_convenio_id) == $contrato->id ? 'selected' : '' }}>
+                                        {{ $contrato->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                             <label for="contrato_convenio">Contrato convenio</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
                             <input type="date" name="fecha_vencimiento" id="fecha_vencimiento" class="form-control form-control-sm"
-                                value="{{ old('fecha_vencimiento', $producto->fecha_vencimiento) }}" placeholder="">
+                                value="{{ old('fecha_vencimiento', isset($producto->fecha_vencimiento) ? date('Y-m-d', strtotime($producto->fecha_vencimiento)) : '') }}" placeholder="">
                             <label for="fecha_vencimiento">Fecha de vencimiento</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
-                            <select name="categoria_id" id="categoria_id" class="form-control form-control-sm">
+                            <select name="categoria_id" id="categoria_id" class="form-control form-control-sm" required>
                                 <option value="">Categoría</option>
-                                @if(isset($categorias))
-                                    @foreach ($categorias as $categoria)
-                                        <option value="{{ $categoria->id }}" {{ old('categoria_id', $producto->categoria_id) == $categoria->id ? 'selected' : '' }}>
-                                            {{ $categoria->name }}
-                                        </option>
-                                    @endforeach
-                                @endif
+                                @foreach ($categorias as $categoria)
+                                    <option value="{{ $categoria->id }}" {{ old('categoria_id', $producto->categoria_id) == $categoria->id ? 'selected' : '' }}>
+                                        {{ $categoria->nombre }}
+                                    </option>
+                                @endforeach
                             </select>
                             <label for="categoria_id">Categoría</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
-                            <select name="marca_id" id="marca_id" class="form-control form-control-sm">
+                                <select name="marca_id" id="marca_id" class="form-control form-control-sm" required>
                                 <option value="">Marca</option>
-                                @if(isset($marcas))
-                                    @foreach ($marcas as $marca)
-                                        <option value="{{ $marca->id }}" {{ old('marca_id', $producto->marca_id) == $marca->id ? 'selected' : '' }}>
-                                            {{ $marca->name }}
-                                        </option>
-                                    @endforeach
-                                @endif
+                                @foreach ($marcas as $marca)
+                                    <option value="{{ $marca->id }}" {{ old('marca_id', $producto->marca_id) == $marca->id ? 'selected' : '' }}>
+                                        {{ $marca->nombre }}
+                                    </option>
+                                @endforeach
                             </select>
                             <label for="marca_id">Marca</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
-                            <input type="text" name="ubicacion" id="ubicacion" class="form-control form-control-sm"
-                                value="{{ old('ubicacion', $producto->ubicacion) }}" placeholder="">
-                            <label for="ubicacion">Ubicación</label>
+                            <select name="ambiente_id" id="ambiente_id" class="form-control form-control-sm" required>
+                                <option value="">Ambiente</option>
+                                @foreach ($ambientes as $ambiente)
+                                    <option value="{{ $ambiente->id }}" {{ old('ambiente_id', $producto->ambiente_id) == $ambiente->id ? 'selected' : '' }}>
+                                        {{ $ambiente->title }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            <label for="ubicacion">Ambiente</label>
                         </div>
                         <div class="col-md-12 mb-4">
                             <div class="custom-file-input-wrapper">
