@@ -10,7 +10,7 @@
         <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
                 <li class="breadcrumb-item">
-                    <a href="{{ route('home') }}">Inicio</a>
+                    <a href="{{ url('/') }}">Inicio</a>
                 </li>
                 <li class="breadcrumb-item active">Fichas de Caracterización</li>
             </ol>
@@ -364,7 +364,9 @@
 
                                         @can('ELIMINAR PROGRAMA DE CARACTERIZACION')
                                             <button type="button" class="btn btn-danger btn-sm" 
-                                                    onclick="confirmarEliminacion('{{ $ficha->ficha }}', '{{ route('fichaCaracterizacion.destroy', $ficha->id) }}')"
+                                                    data-ficha="{{ $ficha->ficha }}" 
+                                                    data-url="{{ route('fichaCaracterizacion.destroy', $ficha->id) }}"
+                                                    onclick="confirmarEliminacion(this.dataset.ficha, this.dataset.url)"
                                                     title="Eliminar">
                                                 <i class="fas fa-trash"></i>
                                             </button>
