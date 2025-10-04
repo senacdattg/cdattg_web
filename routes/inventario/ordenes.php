@@ -2,15 +2,17 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Inventario\DetalleOrdenController;
+use App\Http\Controllers\Inventario\OrdenController;
 
 // Rutas para órdenes del inventario
-Route::get('inventario/ordenes', function () {
-    return view('inventario.ordenes.index');
-})->name('inventario.ordenes.index');
+Route::prefix('inventario')
+    ->name('inventario.')
+    ->group(function () {
+        Route::get('ordenes', [OrdenController::class, 'index'])->name('ordenes.index');
 
-// Rutas para préstamos/salidas
-Route::get('inventario/ordenes/prestamos-salidas', [DetalleOrdenController::class, 'create'])
-    ->name('inventario.ordenes.prestamos_salidas.create');
-
-Route::post('inventario/ordenes/prestamos-salidas', [DetalleOrdenController::class, 'store'])
-    ->name('inventario.ordenes.prestamos_salidas.store');
+        // Préstamos / Salidas
+        Route::get('ordenes/prestamos-salidas', [DetalleOrdenController::class, 'create'])
+            ->name('ordenes.prestamos_salidas.create');
+        Route::post('ordenes/prestamos-salidas', [DetalleOrdenController::class, 'store'])
+            ->name('ordenes.prestamos_salidas.store');
+    });

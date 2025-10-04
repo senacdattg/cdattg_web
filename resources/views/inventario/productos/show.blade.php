@@ -56,10 +56,10 @@
             </div>
         </div>
         <div class="div_btn">
-            <a href="{{ route('productos.index') }}" class="btn_show">
+            <a href="{{ route('inventario.productos.index') }}" class="btn_show">
                 <i class="fas fa-arrow-left"></i> Volver
             </a>
-            <a href="{{ route('productos.edit', $producto->id) }}" class="btn_show btn_warning">
+            <a href="{{ route('inventario.productos.edit', $producto->id) }}" class="btn_show btn_warning">
                 <i class="fas fa-edit"></i> Editar
             </a>
             <button type="button" class="btn_show btn_danger" onclick="confirmarEliminacion()">
@@ -67,7 +67,7 @@
             </button>
             
             <!-- Formulario oculto para eliminar -->
-            <form id="form-eliminar" action="{{ route('productos.destroy', $producto->id) }}" method="POST" style="display: none;">
+            <form id="form-eliminar" action="{{ route('inventario.productos.destroy', $producto->id) }}" method="POST" style="display: none;">
                 @csrf
                 @method('DELETE')
             </form>
@@ -83,7 +83,7 @@
                     <input type="number" name="cantidad" id="cantidad_carrito" class="form-control" min="1" max="{{ $producto->cantidad }}" value="1">
                 </div>
                 <div class="div_btn_carrito">
-                    <a href="{{ route('carrito.index') }}" class="btn_carrito">
+                    <a href="{{ route('inventario.carrito.index') }}" class="btn_carrito">
                         <i class="fas fa-cart-plus"></i> Agregar al carrito
                     </a>
                 </div>

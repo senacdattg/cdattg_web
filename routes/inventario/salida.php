@@ -1,10 +1,11 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Inventario\SalidaController;
 
-Route::prefix('inventario')->group(function () {
-    /* Route::resource('salida', SalidaController::class)->only(['index', 'create', 'store']); */
-    Route::get('salida/aprobar', function() {
-        return view('inventario.salida.aprobar_salida');
-    })->name('salida.aprobar');
-});
+// Rutas de Salidas del Inventario
+Route::prefix('inventario')
+    ->name('inventario.salida.')
+    ->group(function () {
+        Route::get('salida/aprobar', [SalidaController::class, 'aprobar'])->name('aprobar');
+    });

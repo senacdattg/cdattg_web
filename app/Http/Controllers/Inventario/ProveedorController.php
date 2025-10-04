@@ -36,7 +36,7 @@ class ProveedorController extends Controller
 
         Proveedor::create($validated);
 
-        return redirect()->route('proveedores.index')
+        return redirect()->route('inventario.proveedores.index')
             ->with('success', 'Proveedor creado exitosamente.');
     }
 
@@ -64,7 +64,7 @@ class ProveedorController extends Controller
 
         $proveedor->update($validated);
 
-        return redirect()->route('proveedores.index')
+        return redirect()->route('inventario.proveedores.index')
             ->with('success', 'Proveedor actualizado exitosamente.');
     }
 
@@ -72,7 +72,7 @@ class ProveedorController extends Controller
     {
         try {
             $proveedor->delete();
-            return redirect()->route('proveedores.index')
+            return redirect()->route('inventario.proveedores.index')
                 ->with('success', 'Proveedor eliminado exitosamente.');
         } catch (\Exception $e) {
             return back()->with('error', 'No se puede eliminar el proveedor porque está en uso.');

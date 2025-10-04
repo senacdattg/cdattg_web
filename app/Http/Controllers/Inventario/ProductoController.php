@@ -178,7 +178,7 @@ class ProductoController extends Controller
         $producto->update($validated);
 
         // Redireccionar con mensaje de éxito
-        return redirect()->route('productos.show', $producto->id)
+        return redirect()->route('inventario.productos.show', $producto->id)
             ->with('success', 'Producto actualizado correctamente.');
     }
 
@@ -196,7 +196,7 @@ class ProductoController extends Controller
         
         $producto->delete();
         
-        return redirect()->route('productos.index')
+        return redirect()->route('inventario.productos.index')
             ->with('success', 'Producto eliminado correctamente');
     }
   

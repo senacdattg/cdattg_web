@@ -48,7 +48,7 @@ class DetalleOrdenController extends Controller
         // Ejemplo:
         // PrestamoSalida::create($validatedData);
 
-        return redirect()->route('prestamos_salidas.index')
+        return redirect()->route('inventario.ordenes.index')
             ->with('success', 'Préstamo/Salida creado exitosamente.');
     }
 
@@ -93,7 +93,7 @@ class DetalleOrdenController extends Controller
         // $prestamoSalida = PrestamoSalida::findOrFail($id);
         // $prestamoSalida->update($validatedData);
 
-        return redirect()->route('prestamos_salidas.index')
+        return redirect()->route('inventario.ordenes.index')
             ->with('success', 'Préstamo/Salida actualizado exitosamente.');
     }
 
@@ -107,7 +107,7 @@ class DetalleOrdenController extends Controller
         // $prestamoSalida = PrestamoSalida::findOrFail($id);
         // $prestamoSalida->delete();
 
-        return redirect()->route('prestamos_salidas.index')
+        return redirect()->route('inventario.ordenes.index')
             ->with('success', 'Préstamo/Salida eliminado exitosamente.');
     }
 }

@@ -42,6 +42,14 @@ Route::middleware('auth')->group(function () {
     ];
 
     foreach ($protectedFolders as $folder) {
+        if ($folder === 'inventario') {
+            $inventarioIndex = routes_path('inventario') . '/index.php';
+            if (file_exists($inventarioIndex)) {
+                include_once $inventarioIndex;
+            }
+            continue; 
+        }
+
         foreach (glob(routes_path($folder) . '/*.php') as $routeFile) {
             include_once $routeFile;
         }

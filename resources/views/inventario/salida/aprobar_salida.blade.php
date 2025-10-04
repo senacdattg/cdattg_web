@@ -15,7 +15,7 @@
     <div class="div_titulo">
         <div class="div_titulo_cerrar">
             <h2></i> Detalle de la orden</h2>
-            <a href="{{ route('salida.aprobar') }}" class="close-modal custom-tooltip">
+            <a href="{{ route('inventario.salida.aprobar') }}" class="close-modal custom-tooltip">
                 &times;
                 <span class="tooltip-text">Volver al listado</span>
             </a>

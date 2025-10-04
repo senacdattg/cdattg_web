@@ -69,7 +69,7 @@
                         <td><span class="badge badge-warning">Rechazada</span></td>
                         <td>2025-08-17</td>
                         <td>
-                            <a href="{{ route('salida.aprobar') }}" class="btn btn-info btn-sm" title="Ver"><i class="fas fa-eye"></i></a>
+                            <a href="{{ route('inventario.salida.aprobar') }}" class="btn btn-info btn-sm" title="Ver"><i class="fas fa-eye"></i></a>
                             <a href="#" class="btn btn-warning btn-sm" title="Editar"><i class="fas fa-edit"></i></a>
                             <a href="#" class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash"></i></a>
                         </td>

@@ -36,7 +36,7 @@ class MarcaController extends Controller
 
         Marca::create($validated);
 
-        return redirect()->route('marcas.index')
+        return redirect()->route('inventario.marcas.index')
             ->with('success', 'Marca creada exitosamente.');
     }
 
@@ -57,7 +57,7 @@ class MarcaController extends Controller
 
         $marca->update($validated);
 
-        return redirect()->route('marcas.index')
+        return redirect()->route('inventario.marcas.index')
             ->with('success', 'Marca actualizada exitosamente.');
     }
 
@@ -65,7 +65,7 @@ class MarcaController extends Controller
     {
         try {
             $marca->delete();
-            return redirect()->route('marcas.index')
+            return redirect()->route('inventario.marcas.index')
                 ->with('success', 'Marca eliminada exitosamente.');
         } catch (\Exception $e) {
             return back()->with('error', 'No se puede eliminar la marca porque está en uso.');

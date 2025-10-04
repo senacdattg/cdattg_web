@@ -36,7 +36,7 @@ class CategoriaController extends Controller
 
         Categoria::create($validated);
 
-        return redirect()->route('categorias.index')
+        return redirect()->route('inventario.categorias.index')
             ->with('success', 'Categoría creada exitosamente.');
     }
 
@@ -57,7 +57,7 @@ class CategoriaController extends Controller
 
         $categoria->update($validated);
 
-        return redirect()->route('categorias.index')
+        return redirect()->route('inventario.categorias.index')
             ->with('success', 'Categoría actualizada exitosamente.');
     }
 
@@ -65,7 +65,7 @@ class CategoriaController extends Controller
     {
         try {
             $categoria->delete();
-            return redirect()->route('categorias.index')
+            return redirect()->route('inventario.categorias.index')
                 ->with('success', 'Categoría eliminada exitosamente.');
         } catch (\Exception $e) {
             return back()->with('error', 'No se puede eliminar la categoría porque está en uso.');

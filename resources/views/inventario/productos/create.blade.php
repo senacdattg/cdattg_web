@@ -150,7 +150,7 @@
                     </div>
                     <div class="form_footer">
                         <button type="submit" class="btn btn-success">Guardar</button>
-                        <a href="{{ route('productos.index') }}" class="btn btn-secondary">Cancelar</a>
+                        <a href="{{ route('inventario.productos.index') }}" class="btn btn-secondary">Cancelar</a>
                     </div>
                 </div>
             </form>
