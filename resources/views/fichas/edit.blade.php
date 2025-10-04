@@ -1,35 +1,58 @@
 @extends('adminlte::page')
 
-@section('title', 'Editar Ficha de Caracterización')
+@section('css')
+    @vite(['resources/css/parametros.css'])
+@endsection
 
 @section('content_header')
-    <div class="row">
-        <div class="col-sm-6">
-            <h1><i class="fas fa-edit"></i> Editar Ficha de Caracterización</h1>
+    <section class="content-header dashboard-header py-4">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-6 d-flex align-items-center">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
+                        style="width: 48px; height: 48px;">
+                        <i class="fas fa-edit text-white fa-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800">Editar Ficha de Caracterización</h1>
+                        <p class="text-muted mb-0 font-weight-light">Modificar información de la ficha</p>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
+                            <li class="breadcrumb-item">
+                                <a href="{{ url('/') }}" class="link_right_header">
+                                    <i class="fas fa-home"></i> Inicio
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('fichaCaracterizacion.index') }}" class="link_right_header">
+                                    <i class="fas fa-file-alt"></i> Fichas de Caracterización
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <i class="fas fa-edit"></i> Editar
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
         </div>
-        <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item">
-                    <a href="{{ route('home') }}">Inicio</a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a href="{{ route('fichaCaracterizacion.index') }}">Fichas de Caracterización</a>
-                </li>
-                <li class="breadcrumb-item active">Editar</li>
-            </ol>
-        </div>
-    </div>
-@stop
+    </section>
+@endsection
 
 @section('content')
-    <div class="row">
-        <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-file-alt"></i> Información de la Ficha: {{ $ficha->ficha }}
-                    </h3>
-                </div>
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card shadow-sm no-hover">
+                        <div class="card-header bg-white py-3 d-flex align-items-center">
+                            <h6 class="m-0 font-weight-bold text-primary d-flex flex-grow-1">
+                                <i class="fas fa-file-alt mr-2"></i> Información de la Ficha: {{ $ficha->ficha }}
+                            </h6>
+                        </div>
 
                 <form action="{{ route('fichaCaracterizacion.update', $ficha->id) }}" method="POST" id="formEditFicha">
                     @csrf
