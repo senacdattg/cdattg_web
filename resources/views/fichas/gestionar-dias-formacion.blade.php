@@ -178,7 +178,17 @@
                                     <i class="fas fa-info-circle"></i>
                                     <strong>Jornada:</strong> {{ $ficha->jornadaFormacion->jornada }}<br>
                                     <strong>Horario sugerido:</strong> {{ $ficha->jornadaFormacion->hora_inicio }} - {{ $ficha->jornadaFormacion->hora_fin }}<br>
-                                    <strong>Nota:</strong> Los horarios mostrados son sugeridos según la jornada. Puede modificarlos y aplicarlos a todos los días seleccionados.
+                                    <strong>Restricciones de horarios:</strong><br>
+                                    @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
+                                        • <strong>MAÑANA:</strong> 06:00 - 13:00 horas
+                                    @elseif($ficha->jornadaFormacion->jornada == 'TARDE')
+                                        • <strong>TARDE:</strong> 13:00 - 18:00 horas
+                                    @elseif($ficha->jornadaFormacion->jornada == 'NOCHE')
+                                        • <strong>NOCHE:</strong> 18:00 - 23:00 horas
+                                    @elseif($ficha->jornadaFormacion->jornada == 'FINES DE SEMANA')
+                                        • <strong>FINES DE SEMANA:</strong> 08:00 - 17:00 horas
+                                    @endif
+                                    <br><strong>Nota:</strong> Los horarios deben respetar las restricciones de la jornada seleccionada.
                                 </div>
                             @else
                                 <div class="alert alert-warning">
@@ -504,6 +514,70 @@
             }
         }
 
+        // Función para validar horarios según jornada
+        function validarHorariosSegunJornada(horaInicio, horaFin) {
+            @if($ficha->jornadaFormacion)
+                const jornada = '{{ $ficha->jornadaFormacion->jornada }}';
+                
+                // Convertir horas a objetos Date para comparación
+                const inicio = new Date('2000-01-01 ' + horaInicio);
+                const fin = new Date('2000-01-01 ' + horaFin);
+                
+                switch(jornada.toUpperCase()) {
+                    case 'MAÑANA':
+                        const mananaMin = new Date('2000-01-01 06:00');
+                        const mananaMax = new Date('2000-01-01 13:00');
+                        
+                        if (inicio < mananaMin || fin > mananaMax) {
+                            return {
+                                valido: false,
+                                mensaje: 'Para la jornada MAÑANA, los horarios deben estar entre las 06:00 y 13:00 horas.'
+                            };
+                        }
+                        break;
+                        
+                    case 'TARDE':
+                        const tardeMin = new Date('2000-01-01 13:00');
+                        const tardeMax = new Date('2000-01-01 18:00');
+                        
+                        if (inicio < tardeMin || fin > tardeMax) {
+                            return {
+                                valido: false,
+                                mensaje: 'Para la jornada TARDE, los horarios deben estar entre las 13:00 y 18:00 horas.'
+                            };
+                        }
+                        break;
+                        
+                    case 'NOCHE':
+                        const nocheMin = new Date('2000-01-01 18:00');
+                        const nocheMax = new Date('2000-01-01 23:00');
+                        
+                        if (inicio < nocheMin || fin > nocheMax) {
+                            return {
+                                valido: false,
+                                mensaje: 'Para la jornada NOCHE, los horarios deben estar entre las 18:00 y 23:00 horas.'
+                            };
+                        }
+                        break;
+                        
+                    case 'FINES DE SEMANA':
+                        // Para fines de semana, permitir horarios más flexibles
+                        const fsMin = new Date('2000-01-01 08:00');
+                        const fsMax = new Date('2000-01-01 17:00');
+                        
+                        if (inicio < fsMin || fin > fsMax) {
+                            return {
+                                valido: false,
+                                mensaje: 'Para FINES DE SEMANA, los horarios deben estar entre las 08:00 y 17:00 horas.'
+                            };
+                        }
+                        break;
+                }
+            @endif
+            
+            return { valido: true, mensaje: '' };
+        }
+
         // Función para aplicar horario global a todos los días
         function aplicarHorarioGlobal() {
             const horaInicio = document.getElementById('hora_inicio_global').value;
@@ -516,6 +590,13 @@
             
             if (horaInicio >= horaFin) {
                 alert('La hora de fin debe ser posterior a la hora de inicio.');
+                return;
+            }
+            
+            // Validar horarios según jornada
+            const validacion = validarHorariosSegunJornada(horaInicio, horaFin);
+            if (!validacion.valido) {
+                alert(validacion.mensaje);
                 return;
             }
             
@@ -543,10 +624,40 @@
             alert(`Horario aplicado exitosamente:\nInicio: ${horaInicio}\nFin: ${horaFin}\n\nSe aplicó a ${camposHoraInicio.length} días.`);
         }
 
-        // Agregar event listeners para el cálculo automático
+        // Función para validar horarios en tiempo real
+        function validarHorariosTiempoReal() {
+            const horaInicio = document.getElementById('hora_inicio_global').value;
+            const horaFin = document.getElementById('hora_fin_global').value;
+            
+            if (horaInicio && horaFin) {
+                const validacion = validarHorariosSegunJornada(horaInicio, horaFin);
+                
+                // Remover alertas previas
+                const alertasPrevias = document.querySelectorAll('.alert-horario-jornada');
+                alertasPrevias.forEach(alerta => alerta.remove());
+                
+                if (!validacion.valido) {
+                    // Crear alerta de error
+                    const alerta = document.createElement('div');
+                    alerta.className = 'alert alert-danger alert-horario-jornada mt-2';
+                    alerta.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${validacion.mensaje}`;
+                    
+                    // Insertar después del botón
+                    const boton = document.querySelector('button[onclick="aplicarHorarioGlobal()"]');
+                    boton.parentNode.insertAdjacentElement('afterend', alerta);
+                }
+            }
+        }
+
+        // Agregar event listeners para el cálculo automático y validación en tiempo real
         document.addEventListener('change', function(e) {
             if (e.target.matches('input[name*="[hora_inicio]"], input[name*="[hora_fin]"]')) {
                 calcularHorasTotales();
+            }
+            
+            // Validar horarios globales en tiempo real
+            if (e.target.id === 'hora_inicio_global' || e.target.id === 'hora_fin_global') {
+                validarHorariosTiempoReal();
             }
         });
     </script>
