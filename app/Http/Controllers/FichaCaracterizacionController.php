@@ -30,29 +30,59 @@ class FichaCaracterizacionController extends Controller
     /**
      * Muestra una lista de todas las fichas de caracterización.
      *
-     * Este método recupera todas las fichas de caracterización junto con su
-     * relación 'programaFormacion' y las pasa a la vista 'fichas.index'.
+     * Este método recupera todas las fichas de caracterización junto con sus
+     * relaciones y las pasa a la vista 'fichas.index'. También incluye datos
+     * necesarios para los filtros avanzados.
      *
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\View\View La vista que muestra la lista de fichas de caracterización.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
             Log::info('Acceso al índice de fichas de caracterización', [
                 'user_id' => Auth::id(),
+                'filters' => $request->all(),
                 'timestamp' => now()
             ]);
 
-            $fichas = FichaCaracterizacion::with('programaFormacion')
-                ->orderBy('id', 'desc')
-                ->paginate(10);
+            $query = FichaCaracterizacion::with([
+                'programaFormacion',
+                'instructor.persona',
+                'ambiente.piso.bloque',
+                'modalidadFormacion',
+                'sede',
+                'jornadaFormacion',
+                'aprendices'
+            ]);
+
+            // Aplicar filtros básicos si están presentes
+            if ($request->filled('search')) {
+                $searchTerm = $request->input('search');
+                $query->where('ficha', 'LIKE', "%{$searchTerm}%");
+            }
+
+            if ($request->filled('estado')) {
+                $query->where('status', $request->input('estado'));
+            }
+
+            $fichas = $query->orderBy('id', 'desc')->paginate(10);
+
+            // Obtener datos para filtros avanzados
+            $programas = ProgramaFormacion::orderBy('nombre', 'asc')->get();
+            $instructores = \App\Models\Instructor::with('persona')->orderBy('id', 'desc')->get();
+            $ambientes = \App\Models\Ambiente::with('piso.bloque')->orderBy('title', 'asc')->get();
+            $sedes = \App\Models\Sede::orderBy('nombre', 'asc')->get();
+            $modalidades = \App\Models\Parametro::where('tema_id', 3)->orderBy('name', 'asc')->get(); // Modalidades de formación
+            $jornadas = \App\Models\JornadaFormacion::orderBy('jornada', 'asc')->get();
 
             Log::info('Fichas de caracterización cargadas exitosamente', [
                 'total_fichas' => $fichas->total(),
                 'user_id' => Auth::id()
             ]);
 
-            return view('fichas.index', compact('fichas'));
+            return view('fichas.index', compact('fichas', 'programas', 'instructores', 'ambientes', 'sedes', 'modalidades', 'jornadas'))
+                ->with('filters', $request->all());
 
         } catch (\Exception $e) {
             Log::error('Error al cargar fichas de caracterización', [
@@ -369,59 +399,214 @@ class FichaCaracterizacionController extends Controller
         }
     }
 
+    /**
+     * Búsqueda avanzada de fichas de caracterización con múltiples filtros.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\View\View|\Illuminate\Http\JsonResponse
+     */
     public function search(Request $request)
     {
         try {
-            Log::info('Búsqueda de fichas de caracterización', [
-                'query' => $request->input('search'),
+            Log::info('Búsqueda avanzada de fichas de caracterización', [
+                'filters' => $request->all(),
                 'user_id' => Auth::id(),
                 'timestamp' => now()
             ]);
 
-            $request->validate([
-                'search' => 'required|string|max:255',
-            ], [
-                'search.required' => 'El término de búsqueda es obligatorio.',
-                'search.string' => 'El término de búsqueda debe ser texto.',
-                'search.max' => 'El término de búsqueda no puede exceder 255 caracteres.',
+            $query = FichaCaracterizacion::with([
+                'programaFormacion',
+                'instructor.persona',
+                'ambiente.piso.bloque',
+                'modalidadFormacion',
+                'sede',
+                'jornadaFormacion',
+                'aprendices'
             ]);
 
-            $query = $request->input('search');
-            $fichas = FichaCaracterizacion::with('programaFormacion')
-                ->where('ficha', 'LIKE', "%{$query}%")
-                ->orderBy('id', 'desc')
-                ->paginate(7);
+            // Filtro por término de búsqueda general
+            if ($request->filled('search')) {
+                $searchTerm = $request->input('search');
+                $query->where(function ($q) use ($searchTerm) {
+                    $q->where('ficha', 'LIKE', "%{$searchTerm}%")
+                      ->orWhereHas('programaFormacion', function ($subQuery) use ($searchTerm) {
+                          $subQuery->where('nombre', 'LIKE', "%{$searchTerm}%")
+                                   ->orWhere('codigo', 'LIKE', "%{$searchTerm}%");
+                      })
+                      ->orWhereHas('instructor.persona', function ($subQuery) use ($searchTerm) {
+                          $subQuery->where('primer_nombre', 'LIKE', "%{$searchTerm}%")
+                                   ->orWhere('segundo_nombre', 'LIKE', "%{$searchTerm}%")
+                                   ->orWhere('primer_apellido', 'LIKE', "%{$searchTerm}%")
+                                   ->orWhere('segundo_apellido', 'LIKE', "%{$searchTerm}%")
+                                   ->orWhere('numero_documento', 'LIKE', "%{$searchTerm}%");
+                      })
+                      ->orWhereHas('ambiente', function ($subQuery) use ($searchTerm) {
+                          $subQuery->where('title', 'LIKE', "%{$searchTerm}%");
+                      });
+                });
+            }
 
-            Log::info('Búsqueda de fichas completada', [
-                'query' => $query,
+            // Filtro por programa de formación
+            if ($request->filled('programa_id')) {
+                $query->where('programa_formacion_id', $request->input('programa_id'));
+            }
+
+            // Filtro por instructor
+            if ($request->filled('instructor_id')) {
+                $query->where('instructor_id', $request->input('instructor_id'));
+            }
+
+            // Filtro por ambiente
+            if ($request->filled('ambiente_id')) {
+                $query->where('ambiente_id', $request->input('ambiente_id'));
+            }
+
+            // Filtro por sede
+            if ($request->filled('sede_id')) {
+                $query->where('sede_id', $request->input('sede_id'));
+            }
+
+            // Filtro por modalidad de formación
+            if ($request->filled('modalidad_id')) {
+                $query->where('modalidad_formacion_id', $request->input('modalidad_id'));
+            }
+
+            // Filtro por jornada
+            if ($request->filled('jornada_id')) {
+                $query->where('jornada_id', $request->input('jornada_id'));
+            }
+
+            // Filtro por estado
+            if ($request->filled('estado')) {
+                $query->where('status', $request->input('estado'));
+            }
+
+            // Filtro por rango de fechas de inicio
+            if ($request->filled('fecha_inicio_desde')) {
+                $query->where('fecha_inicio', '>=', $request->input('fecha_inicio_desde'));
+            }
+
+            if ($request->filled('fecha_inicio_hasta')) {
+                $query->where('fecha_inicio', '<=', $request->input('fecha_inicio_hasta'));
+            }
+
+            // Filtro por rango de fechas de fin
+            if ($request->filled('fecha_fin_desde')) {
+                $query->where('fecha_fin', '>=', $request->input('fecha_fin_desde'));
+            }
+
+            if ($request->filled('fecha_fin_hasta')) {
+                $query->where('fecha_fin', '<=', $request->input('fecha_fin_hasta'));
+            }
+
+            // Filtro por fichas con/sin aprendices
+            if ($request->filled('con_aprendices')) {
+                if ($request->input('con_aprendices') == '1') {
+                    $query->has('aprendices');
+                } else {
+                    $query->doesntHave('aprendices');
+                }
+            }
+
+            // Ordenamiento
+            $sortBy = $request->input('sort_by', 'id');
+            $sortDirection = $request->input('sort_direction', 'desc');
+            $allowedSortFields = ['id', 'ficha', 'fecha_inicio', 'fecha_fin', 'total_horas', 'created_at'];
+            
+            if (in_array($sortBy, $allowedSortFields)) {
+                $query->orderBy($sortBy, $sortDirection);
+            } else {
+                $query->orderBy('id', 'desc');
+            }
+
+            // Paginación
+            $perPage = $request->input('per_page', 10);
+            $fichas = $query->paginate($perPage);
+
+            Log::info('Búsqueda avanzada completada', [
+                'filters_applied' => $request->all(),
                 'resultados_encontrados' => $fichas->count(),
                 'total_resultados' => $fichas->total(),
                 'user_id' => Auth::id()
             ]);
 
-            if ($fichas->count() == 0) {
-                return back()->with('error', 'No se encontraron fichas que coincidan con la búsqueda: "' . $query . '".');
+            // Si es una petición AJAX, devolver JSON
+            if ($request->ajax()) {
+                $fichasFormateadas = $fichas->map(function ($ficha) {
+                    return [
+                        'id' => $ficha->id,
+                        'ficha' => $ficha->ficha,
+                        'status' => $ficha->status,
+                        'fecha_inicio' => $ficha->fecha_inicio,
+                        'fecha_fin' => $ficha->fecha_fin,
+                        'total_horas' => $ficha->total_horas,
+                        'programa_formacion' => [
+                            'id' => $ficha->programaFormacion->id ?? null,
+                            'nombre' => $ficha->programaFormacion->nombre ?? 'N/A',
+                            'codigo' => $ficha->programaFormacion->codigo ?? 'N/A',
+                        ],
+                        'instructor_principal' => [
+                            'id' => $ficha->instructor->id ?? null,
+                            'persona' => [
+                                'id' => $ficha->instructor->persona->id ?? null,
+                                'primer_nombre' => $ficha->instructor->persona->primer_nombre ?? 'N/A',
+                                'primer_apellido' => $ficha->instructor->persona->primer_apellido ?? 'N/A',
+                            ]
+                        ],
+                        'sede' => [
+                            'id' => $ficha->sede->id ?? null,
+                            'sede' => $ficha->sede->nombre ?? 'N/A',
+                        ],
+                        'modalidad_formacion' => [
+                            'id' => $ficha->modalidadFormacion->id ?? null,
+                            'nombre' => $ficha->modalidadFormacion->name ?? 'N/A',
+                        ],
+                        'ambiente' => [
+                            'id' => $ficha->ambiente->id ?? null,
+                            'title' => $ficha->ambiente->title ?? 'N/A',
+                        ],
+                        'aprendices_count' => $ficha->aprendices->count() ?? 0,
+                        'created_at' => $ficha->created_at,
+                        'updated_at' => $ficha->updated_at,
+                    ];
+                });
+
+                return response()->json([
+                    'success' => true,
+                    'data' => [
+                        'fichas' => $fichasFormateadas,
+                        'pagination' => [
+                            'current_page' => $fichas->currentPage(),
+                            'last_page' => $fichas->lastPage(),
+                            'per_page' => $fichas->perPage(),
+                            'total' => $fichas->total(),
+                            'from' => $fichas->firstItem(),
+                            'to' => $fichas->lastItem()
+                        ]
+                    ]
+                ]);
             }
 
-            return view('fichas.index', compact('fichas'));
-
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::warning('Error de validación en búsqueda de fichas', [
-                'errors' => $e->errors(),
-                'user_id' => Auth::id(),
-                'request_data' => $request->all()
-            ]);
-
-            return back()->withErrors($e->errors())->withInput();
+            // Para peticiones normales, devolver vista
+            return view('fichas.index', compact('fichas'))
+                ->with('filters', $request->all());
 
         } catch (\Exception $e) {
-            Log::error('Error en búsqueda de fichas de caracterización', [
+            Log::error('Error en búsqueda avanzada de fichas', [
                 'error' => $e->getMessage(),
                 'user_id' => Auth::id(),
-                'query' => $request->input('search'),
+                'filters' => $request->all(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine()
             ]);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al realizar la búsqueda',
+                    'error' => $e->getMessage()
+                ], 500);
+            }
 
             return back()->with('error', 'Error al realizar la búsqueda. Por favor, intente nuevamente.');
         }

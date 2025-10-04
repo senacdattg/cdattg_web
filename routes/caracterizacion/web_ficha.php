@@ -8,6 +8,7 @@ Route::resource('fichaCaracterizacion', FichaCaracterizacionController::class);
 route::middleware('can:VER PROGRAMA DE CARACTERIZACION')->group(function () {
     Route::get('/ficha/index', [FichaCaracterizacionController::class, 'index'])->name('ficha.index');
     Route::get('/ficha/search', [FichaCaracterizacionController::class, 'search'])->name('ficha.search');
+    Route::post('/ficha/search-ajax', [FichaCaracterizacionController::class, 'search'])->name('ficha.search.ajax');
     Route::get('/fichaCaracterizacion/create', [FichaCaracterizacionController::class, 'create'])->name('fichaCaracterizacion.create');
     Route::post('/fichaCaracterizacion/store', [FichaCaracterizacionController::class, 'store'])->name('fichaCaracterizacion.store');
     Route::get('/fichaCaracterizacion/{id}/edit', [FichaCaracterizacionController::class, 'edit'])->name('ficha.edit');
