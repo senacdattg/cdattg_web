@@ -42,7 +42,7 @@ class FichaCaracterizacionController extends Controller
      */
     public function index(Request $request)
     {
-        //try {
+        // try {
             Log::info('Acceso al índice de fichas de caracterización', [
                 'user_id' => Auth::id(),
                 'filters' => $request->all(),
@@ -76,7 +76,9 @@ class FichaCaracterizacionController extends Controller
             $instructores = \App\Models\Instructor::with('persona')->orderBy('id', 'desc')->get();
             $ambientes = \App\Models\Ambiente::with('piso.bloque')->orderBy('title', 'asc')->get();
             $sedes = \App\Models\Sede::orderBy('sede', 'asc')->get();
-            $modalidades = \App\Models\Parametro::where('tema_id', 3)->orderBy('name', 'asc')->get(); // Modalidades de formación
+            $modalidades = \App\Models\Parametro::whereHas('parametrosTemas', function($query) {
+                $query->where('tema_id', 3);
+            })->orderBy('name', 'asc')->get(); // Modalidades de formación
             $jornadas = \App\Models\JornadaFormacion::orderBy('jornada', 'asc')->get();
 
             Log::info('Fichas de caracterización cargadas exitosamente', [
@@ -86,7 +88,16 @@ class FichaCaracterizacionController extends Controller
 
             return view('fichas.index', compact('fichas', 'programas', 'instructores', 'ambientes', 'sedes', 'modalidades', 'jornadas'))
                 ->with('filters', $request->all());
+        // } catch (\Exception $e) {
+        //     Log::error('Error al cargar fichas de caracterización', [
+        //         'error' => $e->getMessage(),
+        //         'user_id' => Auth::id(),
+        //         'file' => $e->getFile(),
+        //         'line' => $e->getLine()
+        //     ]);
 
+        //     return redirect()->back()->with('error', 'Error al cargar las fichas de caracterización. Por favor, intente nuevamente.');
+        // }
         
     }
 
