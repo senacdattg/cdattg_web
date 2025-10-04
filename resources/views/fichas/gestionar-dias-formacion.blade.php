@@ -65,20 +65,20 @@
         </div>
     </div>
 
-    <!-- PASO 1: Configuración de Horarios -->
+    <!-- Configurar Horarios y Agregar Días -->
     <div class="row mb-4">
         <div class="col-12">
             <div class="card card-outline card-primary">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <i class="fas fa-clock text-primary"></i>
-                        <span class="badge badge-primary mr-2">1</span>
-                        Configurar Horarios Según Jornada
+                        <i class="fas fa-calendar-plus text-primary"></i>
+                        Configurar Horarios y Agregar Días de Formación
                     </h3>
                 </div>
                 <div class="card-body">
                     @if($ficha->jornadaFormacion)
-                        <div class="row">
+                        <!-- Configuración de Horarios -->
+                        <div class="row mb-4">
                             <div class="col-md-4">
                                 <label class="form-label">
                                     <i class="fas fa-play-circle"></i> Hora de Inicio
@@ -118,7 +118,8 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="alert alert-info mt-3 mb-0">
+                        
+                        <div class="alert alert-info mb-4">
                             <i class="fas fa-info-circle"></i>
                             <strong>Jornada:</strong> {{ $ficha->jornadaFormacion->jornada }}<br>
                             <strong>Restricciones de horarios:</strong><br>
@@ -133,6 +134,30 @@
                             @endif
                             <br><strong>Nota:</strong> Los horarios deben respetar las restricciones de la jornada seleccionada.
                         </div>
+
+                        <!-- Formulario para agregar días -->
+                        <form action="{{ route('fichaCaracterizacion.guardarDiasFormacion', $ficha->id) }}" method="POST" id="formDiasFormacion">
+                            @csrf
+                            
+                            <div id="dias-container">
+                                <!-- Los días se agregarán dinámicamente aquí -->
+                            </div>
+                            
+                            <div class="form-group">
+                                <button type="button" class="btn btn-success" onclick="agregarDia()">
+                                    <i class="fas fa-plus"></i> Agregar Día
+                                </button>
+                            </div>
+
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Guardar Días de Formación
+                                </button>
+                                <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </form>
                     @else
                         <div class="alert alert-warning">
                             <i class="fas fa-exclamation-triangle"></i>
@@ -144,73 +169,13 @@
         </div>
     </div>
 
-    <!-- PASO 2: Agregar Días de Formación -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card card-outline card-success">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-calendar-plus text-success"></i>
-                        <span class="badge badge-success mr-2">2</span>
-                        Agregar Días de Formación
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <!-- Información de Jornada -->
-                    @if($ficha->jornada_id && isset($configuracionJornadas[$ficha->jornada_id]))
-                        <div class="alert alert-info mb-3">
-                            <h5><i class="fas fa-info-circle"></i> Jornada: {{ $configuracionJornadas[$ficha->jornada_id]['nombre'] }}</h5>
-                            <p class="mb-1"><strong>Días permitidos:</strong> 
-                                @php
-                                    $diasPermitidos = collect($configuracionJornadas[$ficha->jornada_id]['dias_permitidos'])
-                                        ->map(function($diaId) use ($diasSemana) {
-                                            return $diasSemana->where('id', $diaId)->first()->name ?? '';
-                                        })
-                                        ->filter()
-                                        ->implode(', ');
-                                @endphp
-                                {{ $diasPermitidos }}
-                            </p>
-                            <p class="mb-0"><strong>Horario típico:</strong> {{ $configuracionJornadas[$ficha->jornada_id]['horario_tipico'][0] }} - {{ $configuracionJornadas[$ficha->jornada_id]['horario_tipico'][1] }}</p>
-                        </div>
-                    @endif
-
-                    <!-- Formulario para agregar días -->
-                    <form action="{{ route('fichaCaracterizacion.guardarDiasFormacion', $ficha->id) }}" method="POST" id="formDiasFormacion">
-                        @csrf
-                        
-                        <div id="dias-container">
-                            <!-- Los días se agregarán dinámicamente aquí -->
-                        </div>
-                        
-                        <div class="form-group">
-                            <button type="button" class="btn btn-success" onclick="agregarDia()">
-                                <i class="fas fa-plus"></i> Agregar Día
-                            </button>
-                        </div>
-
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Guardar Días de Formación
-                            </button>
-                            <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Cancelar
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- PASO 3: Días Asignados -->
+    <!-- Días Asignados -->
     <div class="row">
         <div class="col-12">
             <div class="card card-outline card-info">
                 <div class="card-header">
                     <h3 class="card-title">
                         <i class="fas fa-calendar-check text-info"></i>
-                        <span class="badge badge-info mr-2">3</span>
                         Días de Formación Asignados
                         <span class="badge badge-primary ml-2">{{ $diasAsignados->count() }} días</span>
                     </h3>
@@ -218,22 +183,22 @@
                 <div class="card-body">
                     @if($diasAsignados->count() > 0)
                         <div class="row">
-                            @foreach($diasAsignados as $diaAsignado)
+                        @foreach($diasAsignados as $diaAsignado)
                                 <div class="col-md-6 mb-3">
                                     <div class="card border-success">
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-start">
-                                                <div>
-                                                    <h5 class="mb-1">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            <h5 class="mb-1">
                                                         <i class="fas fa-calendar-day text-success"></i>
-                                                        {{ $diaAsignado->dia->name }}
-                                                    </h5>
-                                                    <p class="text-muted mb-1">
-                                                        <i class="fas fa-clock"></i>
-                                                        {{ $diaAsignado->hora_inicio }} - {{ $diaAsignado->hora_fin }}
-                                                    </p>
-                                                    <p class="text-muted mb-0">
-                                                        <i class="fas fa-hourglass-half"></i>
+                                                {{ $diaAsignado->dia->name }}
+                                            </h5>
+                                            <p class="text-muted mb-1">
+                                                <i class="fas fa-clock"></i>
+                                                {{ $diaAsignado->hora_inicio }} - {{ $diaAsignado->hora_fin }}
+                                            </p>
+                                            <p class="text-muted mb-0">
+                                                <i class="fas fa-hourglass-half"></i>
                                                         @if($diaAsignado->hora_inicio && $diaAsignado->hora_fin)
                                                             @try
                                                                 {{ \Carbon\Carbon::parse($diaAsignado->hora_inicio)->diffInHours(\Carbon\Carbon::parse($diaAsignado->hora_fin)) }} horas por día
@@ -243,34 +208,34 @@
                                                         @else
                                                             Horas no definidas
                                                         @endif
-                                                    </p>
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <button type="button" class="btn btn-sm btn-warning" 
+                                                    onclick="editarDia({{ $diaAsignado->id }}, '{{ $diaAsignado->hora_inicio }}', '{{ $diaAsignado->hora_fin }}')">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <form action="{{ route('fichaCaracterizacion.eliminarDiaFormacion', [$ficha->id, $diaAsignado->id]) }}" 
+                                                  method="POST" style="display: inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-danger" 
+                                                        onclick="return confirm('¿Está seguro de eliminar este día de formación?')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </form>
                                                 </div>
-                                                <div>
-                                                    <button type="button" class="btn btn-sm btn-warning" 
-                                                            onclick="editarDia({{ $diaAsignado->id }}, '{{ $diaAsignado->hora_inicio }}', '{{ $diaAsignado->hora_fin }}')">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <form action="{{ route('fichaCaracterizacion.eliminarDiaFormacion', [$ficha->id, $diaAsignado->id]) }}" 
-                                                          method="POST" style="display: inline;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger" 
-                                                                onclick="return confirm('¿Está seguro de eliminar este día de formación?')">
-                                                            <i class="fas fa-trash"></i>
-                                                        </button>
-                                                    </form>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            @endforeach
+                            </div>
+                        @endforeach
                         </div>
                     @else
                         <div class="text-center text-muted py-4">
                             <i class="fas fa-calendar-times fa-3x mb-3"></i>
                             <h5>No hay días de formación asignados</h5>
-                            <p>Use el paso 2 para agregar días de formación a esta ficha.</p>
+                            <p>Use la sección superior para agregar días de formación a esta ficha.</p>
                         </div>
                     @endif
                 </div>
