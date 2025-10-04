@@ -195,7 +195,6 @@
                                 <div class="alert alert-info mt-3 mb-0">
                                     <i class="fas fa-info-circle"></i>
                                     <strong>Jornada:</strong> {{ $ficha->jornadaFormacion->jornada }}<br>
-                                    <strong>Horario sugerido:</strong> {{ $ficha->jornadaFormacion->hora_inicio }} - {{ $ficha->jornadaFormacion->hora_fin }}<br>
                                     <strong>Restricciones de horarios:</strong><br>
                                     @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
                                         • <strong>MAÑANA:</strong> 06:00 - 12:59 horas (solo horas completas)
@@ -297,51 +296,6 @@
         </div>
     </div>
 
-    <!-- Días Disponibles -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card card-outline card-info">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-list text-info"></i>
-                        Días Disponibles
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        @foreach($diasSemana as $dia)
-                            @php
-                                $estaAsignado = $diasAsignados->contains('dia_id', $dia->id);
-                                $esPermitido = $ficha->jornada_id && isset($configuracionJornadas[$ficha->jornada_id]) 
-                                    ? in_array($dia->id, $configuracionJornadas[$ficha->jornada_id]['dias_permitidos'])
-                                    : true;
-                            @endphp
-                            <div class="col-md-4 mb-3">
-                                <div class="card {{ $estaAsignado ? 'border-success' : ($esPermitido ? 'border-primary' : 'border-secondary') }}">
-                                    <div class="card-body text-center">
-                                        <h5 class="card-title">
-                                            <i class="fas fa-calendar-day"></i>
-                                            {{ $dia->name }}
-                                        </h5>
-                                        @if($estaAsignado)
-                                            <span class="badge badge-success">Asignado</span>
-                                        @elseif($esPermitido)
-                                            <button type="button" class="btn btn-sm btn-outline-primary" 
-                                                    onclick="agregarDiaSeleccionado({{ $dia->id }}, '{{ $dia->name }}')">
-                                                <i class="fas fa-plus"></i> Agregar
-                                            </button>
-                                        @else
-                                            <span class="badge badge-secondary">No permitido</span>
-                                        @endif
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 @stop
 
 @section('css')
