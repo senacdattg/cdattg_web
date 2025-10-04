@@ -16,7 +16,17 @@ class StoreFichaCaracterizacionRequest extends FormRequest
      */
     public function authorize()
     {
-        return $this->user()->can('CREAR PROGRAMA DE CARACTERIZACION');
+        $user = $this->user();
+        $canCreate = $user->can('CREAR PROGRAMA DE CARACTERIZACION');
+        
+        \Log::info('StoreFichaCaracterizacionRequest authorize', [
+            'user_id' => $user->id,
+            'user_roles' => $user->getRoleNames(),
+            'can_create' => $canCreate,
+            'permissions' => $user->getAllPermissions()->pluck('name')
+        ]);
+        
+        return $canCreate;
     }
 
     /**
@@ -26,6 +36,11 @@ class StoreFichaCaracterizacionRequest extends FormRequest
      */
     public function rules()
     {
+        \Log::info('StoreFichaCaracterizacionRequest rules called', [
+            'user_id' => $this->user()->id,
+            'all_data' => $this->all()
+        ]);
+        
         return [
             // Validación del número de ficha
             'ficha' => [

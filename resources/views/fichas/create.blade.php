@@ -378,27 +378,29 @@
         }
     }
 
-    // Validación del formulario
+    // Validación del formulario - VERSIÓN SIMPLIFICADA PARA DEBUG
     $('#formCreateFicha').submit(function(e) {
-        console.log('Formulario interceptado, validando...');
+        console.log('=== FORMULARIO INTERCEPTADO ===');
+        console.log('Formulario válido:', this.checkValidity());
         
         // Validar fechas
         validateDates();
         
         const isValid = this.checkValidity();
-        console.log('Formulario válido:', isValid);
         
         if (!isValid) {
+            console.log('=== FORMULARIO INVÁLIDO ===');
             e.preventDefault();
-            console.log('Formulario inválido, mostrando errores...');
             const invalidElements = this.querySelectorAll(':invalid');
+            console.log('Elementos inválidos:', invalidElements.length);
             invalidElements.forEach(function(element) {
                 console.log('Campo inválido:', element.name, 'Error:', element.validationMessage);
             });
             $(this).addClass('was-validated');
+            return false;
         } else {
-            console.log('Formulario válido, enviando...');
-            // No prevenir el envío, dejar que se envíe normalmente
+            console.log('=== FORMULARIO VÁLIDO - ENVIANDO ===');
+            // Permitir envío normal
         }
     });
 </script>
