@@ -158,14 +158,32 @@
                                             <i class="fas fa-play-circle"></i> Hora de Inicio
                                         </label>
                                         <input type="time" id="hora_inicio_global" class="form-control" 
-                                               value="{{ $ficha->jornadaFormacion->hora_inicio }}">
+                                               value="{{ $ficha->jornadaFormacion->hora_inicio }}"
+                                               @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
+                                                   min="06:00" max="13:00"
+                                               @elseif($ficha->jornadaFormacion->jornada == 'TARDE')
+                                                   min="13:00" max="18:00"
+                                               @elseif($ficha->jornadaFormacion->jornada == 'NOCHE')
+                                                   min="18:00" max="23:00"
+                                               @elseif($ficha->jornadaFormacion->jornada == 'FINES DE SEMANA')
+                                                   min="08:00" max="17:00"
+                                               @endif>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">
                                             <i class="fas fa-stop-circle"></i> Hora de Fin
                                         </label>
                                         <input type="time" id="hora_fin_global" class="form-control" 
-                                               value="{{ $ficha->jornadaFormacion->hora_fin }}">
+                                               value="{{ $ficha->jornadaFormacion->hora_fin }}"
+                                               @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
+                                                   min="06:00" max="13:00"
+                                               @elseif($ficha->jornadaFormacion->jornada == 'TARDE')
+                                                   min="13:00" max="18:00"
+                                               @elseif($ficha->jornadaFormacion->jornada == 'NOCHE')
+                                                   min="18:00" max="23:00"
+                                               @elseif($ficha->jornadaFormacion->jornada == 'FINES DE SEMANA')
+                                                   min="08:00" max="17:00"
+                                               @endif>
                                     </div>
                                     <div class="col-md-4">
                                         <label class="form-label">&nbsp;</label>
@@ -649,6 +667,48 @@
             }
         }
 
+        // Función para actualizar restricciones dinámicamente
+        function actualizarRestriccionesHorarios() {
+            const horaInicio = document.getElementById('hora_inicio_global');
+            const horaFin = document.getElementById('hora_fin_global');
+            
+            // Cuando cambie la hora de inicio, actualizar el min de hora de fin
+            horaInicio.addEventListener('change', function() {
+                const valorInicio = this.value;
+                if (valorInicio) {
+                    // Establecer el min de hora fin como la hora de inicio + 1 hora
+                    const fechaInicio = new Date('2000-01-01 ' + valorInicio);
+                    fechaInicio.setHours(fechaInicio.getHours() + 1);
+                    const minHoraFin = fechaInicio.toTimeString().slice(0, 5);
+                    
+                    horaFin.min = minHoraFin;
+                    
+                    // Si la hora fin actual es menor que la nueva restricción, ajustarla
+                    if (horaFin.value && horaFin.value <= valorInicio) {
+                        horaFin.value = minHoraFin;
+                    }
+                }
+                
+                validarHorariosTiempoReal();
+            });
+            
+            // Cuando cambie la hora de fin, validar que sea posterior a inicio
+            horaFin.addEventListener('change', function() {
+                const valorFin = this.value;
+                const valorInicio = horaInicio.value;
+                
+                if (valorInicio && valorFin && valorFin <= valorInicio) {
+                    alert('La hora de fin debe ser posterior a la hora de inicio.');
+                    // Ajustar automáticamente a 1 hora después del inicio
+                    const fechaInicio = new Date('2000-01-01 ' + valorInicio);
+                    fechaInicio.setHours(fechaInicio.getHours() + 1);
+                    this.value = fechaInicio.toTimeString().slice(0, 5);
+                }
+                
+                validarHorariosTiempoReal();
+            });
+        }
+
         // Agregar event listeners para el cálculo automático y validación en tiempo real
         document.addEventListener('change', function(e) {
             if (e.target.matches('input[name*="[hora_inicio]"], input[name*="[hora_fin]"]')) {
@@ -659,6 +719,11 @@
             if (e.target.id === 'hora_inicio_global' || e.target.id === 'hora_fin_global') {
                 validarHorariosTiempoReal();
             }
+        });
+
+        // Inicializar restricciones dinámicas cuando se carga la página
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarRestriccionesHorarios();
         });
     </script>
 @stop
