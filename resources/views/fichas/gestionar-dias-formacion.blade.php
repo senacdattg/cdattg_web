@@ -147,36 +147,45 @@
                         <div class="card-header">
                             <h5 class="mb-0">
                                 <i class="fas fa-clock text-primary"></i>
-                                Configuración Global de Horarios
+                                Horarios Según Jornada
                             </h5>
                         </div>
                         <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-4">
-                                    <label for="hora_inicio_global" class="form-label">
-                                        <i class="fas fa-play-circle"></i> Hora de Inicio
-                                    </label>
-                                    <input type="time" id="hora_inicio_global" class="form-control" 
-                                           placeholder="Ej: 08:00">
+                            @if($ficha->jornadaFormacion)
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="form-label">
+                                            <i class="fas fa-play-circle"></i> Hora de Inicio
+                                        </label>
+                                        <input type="time" id="hora_inicio_global" class="form-control" 
+                                               value="{{ $ficha->jornadaFormacion->hora_inicio }}">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">
+                                            <i class="fas fa-stop-circle"></i> Hora de Fin
+                                        </label>
+                                        <input type="time" id="hora_fin_global" class="form-control" 
+                                               value="{{ $ficha->jornadaFormacion->hora_fin }}">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">&nbsp;</label>
+                                        <button type="button" class="btn btn-primary btn-block" onclick="aplicarHorarioGlobal()">
+                                            <i class="fas fa-magic"></i> Aplicar Horario a Todos los Días
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <label for="hora_fin_global" class="form-label">
-                                        <i class="fas fa-stop-circle"></i> Hora de Fin
-                                    </label>
-                                    <input type="time" id="hora_fin_global" class="form-control" 
-                                           placeholder="Ej: 17:00">
+                                <div class="alert alert-info mt-3 mb-0">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Jornada:</strong> {{ $ficha->jornadaFormacion->jornada }}<br>
+                                    <strong>Horario sugerido:</strong> {{ $ficha->jornadaFormacion->hora_inicio }} - {{ $ficha->jornadaFormacion->hora_fin }}<br>
+                                    <strong>Nota:</strong> Los horarios mostrados son sugeridos según la jornada. Puede modificarlos y aplicarlos a todos los días seleccionados.
                                 </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">&nbsp;</label>
-                                    <button type="button" class="btn btn-primary btn-block" onclick="aplicarHorarioGlobal()">
-                                        <i class="fas fa-magic"></i> Aplicar a Todos los Días
-                                    </button>
+                            @else
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <strong>Atención:</strong> No se ha asignado una jornada a esta ficha. Por favor, configure primero la jornada en la información general de la ficha.
                                 </div>
-                            </div>
-                            <div class="alert alert-info mt-3 mb-0">
-                                <i class="fas fa-info-circle"></i>
-                                <strong>Nota:</strong> Configure las horas de inicio y fin, luego haga clic en "Aplicar a Todos los Días" para asignar automáticamente el mismo horario a todos los días seleccionados.
-                            </div>
+                            @endif
                         </div>
                     </div>
 
@@ -362,7 +371,7 @@
             div.innerHTML = `
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-md-4">
+                        <div class="col-md-8">
                             <label class="form-label">Día</label>
                             <select name="dias[${index}][dia_id]" class="form-control dia-select" required>
                                 <option value="">Seleccione un día</option>
@@ -373,17 +382,9 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Hora Inicio</label>
-                            <input type="time" name="dias[${index}][hora_inicio]" 
-                                   class="form-control hora-inicio" value="${horaInicio}" required>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Hora Fin</label>
-                            <input type="time" name="dias[${index}][hora_fin]" 
-                                   class="form-control hora-fin" value="${horaFin}" required>
-                        </div>
-                        <div class="col-md-2">
+                        <input type="hidden" name="dias[${index}][hora_inicio]" class="hora-inicio" value="${horaInicio}">
+                        <input type="hidden" name="dias[${index}][hora_fin]" class="hora-fin" value="${horaFin}">
+                        <div class="col-md-4">
                             <label class="form-label">&nbsp;</label>
                             <button type="button" class="btn btn-sm btn-danger d-block" onclick="eliminarDia(this)">
                                 <i class="fas fa-trash"></i>
@@ -521,6 +522,11 @@
             // Aplicar a todos los campos de hora existentes
             const camposHoraInicio = document.querySelectorAll('.hora-inicio');
             const camposHoraFin = document.querySelectorAll('.hora-fin');
+            
+            if (camposHoraInicio.length === 0) {
+                alert('No hay días seleccionados para aplicar el horario. Por favor, agregue días primero.');
+                return;
+            }
             
             camposHoraInicio.forEach(campo => {
                 campo.value = horaInicio;
