@@ -118,14 +118,27 @@ class FichaCaracterizacionController extends Controller
                 'timestamp' => now()
             ]);
 
+            // Obtener todos los datos necesarios para los selectores
             $programas = ProgramaFormacion::orderBy('nombre', 'asc')->get();
+            $instructores = \App\Models\Instructor::with('persona')->orderBy('id', 'desc')->get();
+            $ambientes = \App\Models\Ambiente::with('piso.bloque')->orderBy('title', 'asc')->get();
+            $sedes = \App\Models\Sede::orderBy('sede', 'asc')->get();
+            $modalidades = \App\Models\Parametro::whereHas('parametrosTemas', function($query) {
+                $query->where('tema_id', 3);
+            })->orderBy('name', 'asc')->get(); // Modalidades de formación
+            $jornadas = \App\Models\JornadaFormacion::orderBy('jornada', 'asc')->get();
 
-            Log::info('Programas de formación cargados para creación de ficha', [
+            Log::info('Datos cargados para creación de ficha', [
                 'total_programas' => $programas->count(),
+                'total_instructores' => $instructores->count(),
+                'total_ambientes' => $ambientes->count(),
+                'total_sedes' => $sedes->count(),
+                'total_modalidades' => $modalidades->count(),
+                'total_jornadas' => $jornadas->count(),
                 'user_id' => Auth::id()
             ]);
 
-            return view('fichas.create', compact('programas'));
+            return view('fichas.create', compact('programas', 'instructores', 'ambientes', 'sedes', 'modalidades', 'jornadas'));
 
         } catch (\Exception $e) {
             Log::error('Error al cargar formulario de creación de ficha', [
@@ -212,16 +225,30 @@ class FichaCaracterizacionController extends Controller
             ]);
 
             $ficha = FichaCaracterizacion::findOrFail($id);
+            
+            // Obtener todos los datos necesarios para los selectores
             $programas = ProgramaFormacion::orderBy('nombre', 'asc')->get();
+            $instructores = \App\Models\Instructor::with('persona')->orderBy('id', 'desc')->get();
+            $ambientes = \App\Models\Ambiente::with('piso.bloque')->orderBy('title', 'asc')->get();
+            $sedes = \App\Models\Sede::orderBy('sede', 'asc')->get();
+            $modalidades = \App\Models\Parametro::whereHas('parametrosTemas', function($query) {
+                $query->where('tema_id', 3);
+            })->orderBy('name', 'asc')->get(); // Modalidades de formación
+            $jornadas = \App\Models\JornadaFormacion::orderBy('jornada', 'asc')->get();
 
             Log::info('Datos cargados para edición de ficha', [
                 'ficha_id' => $ficha->id,
                 'numero_ficha' => $ficha->ficha,
                 'total_programas' => $programas->count(),
+                'total_instructores' => $instructores->count(),
+                'total_ambientes' => $ambientes->count(),
+                'total_sedes' => $sedes->count(),
+                'total_modalidades' => $modalidades->count(),
+                'total_jornadas' => $jornadas->count(),
                 'user_id' => Auth::id()
             ]);
 
-            return view('fichas.edit', compact('ficha', 'programas'));
+            return view('fichas.edit', compact('ficha', 'programas', 'instructores', 'ambientes', 'sedes', 'modalidades', 'jornadas'));
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::warning('Intento de editar ficha de caracterización inexistente', [
