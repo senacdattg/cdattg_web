@@ -86,7 +86,7 @@
                                 <input type="time" id="hora_inicio_global" class="form-control" 
                                        value="{{ $ficha->jornadaFormacion->hora_inicio }}"
                                        @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
-                                           min="06:00" max="12:59" step="3600"
+                                           min="06:00" max="13:00" step="3600"
                                        @elseif($ficha->jornadaFormacion->jornada == 'TARDE')
                                            min="13:00" max="17:59" step="3600"
                                        @elseif($ficha->jornadaFormacion->jornada == 'NOCHE')
@@ -102,7 +102,7 @@
                                 <input type="time" id="hora_fin_global" class="form-control" 
                                        value="{{ $ficha->jornadaFormacion->hora_fin }}"
                                        @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
-                                           min="06:00" max="12:59" step="3600"
+                                           min="06:00" max="13:00" step="3600"
                                        @elseif($ficha->jornadaFormacion->jornada == 'TARDE')
                                            min="13:00" max="17:59" step="3600"
                                        @elseif($ficha->jornadaFormacion->jornada == 'NOCHE')
@@ -123,7 +123,7 @@
                             <strong>Jornada:</strong> {{ $ficha->jornadaFormacion->jornada }}<br>
                             <strong>Restricciones de horarios:</strong><br>
                             @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
-                                • <strong>MAÑANA:</strong> 06:00 - 12:59 horas (solo horas completas)
+                                • <strong>MAÑANA:</strong> 06:00 - 13:00 horas (solo horas completas)
                             @elseif($ficha->jornadaFormacion->jornada == 'TARDE')
                                 • <strong>TARDE:</strong> 13:00 - 17:59 horas (solo horas completas)
                             @elseif($ficha->jornadaFormacion->jornada == 'NOCHE')
@@ -515,12 +515,12 @@
                 switch(jornada.toUpperCase()) {
                     case 'MAÑANA':
                         const mananaMin = new Date('2000-01-01 06:00');
-                        const mananaMax = new Date('2000-01-01 12:59');
+                        const mananaMax = new Date('2000-01-01 13:00');
                         
                         if (inicio < mananaMin || fin > mananaMax) {
                             return {
                                 valido: false,
-                                mensaje: 'Para la jornada MAÑANA, los horarios deben estar entre las 06:00 y 12:59 horas.'
+                                mensaje: 'Para la jornada MAÑANA, los horarios deben estar entre las 06:00 y 13:00 horas.'
                             };
                         }
                         break;
