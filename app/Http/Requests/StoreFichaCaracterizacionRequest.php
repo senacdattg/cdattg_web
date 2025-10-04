@@ -214,6 +214,11 @@ class StoreFichaCaracterizacionRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
+            \Log::info('StoreFichaCaracterizacionRequest withValidator called', [
+                'user_id' => $this->user()->id,
+                'errors_count' => $validator->errors()->count(),
+                'errors' => $validator->errors()->toArray()
+            ]);
             // 1. Validar disponibilidad del ambiente
             if ($this->ambiente_id && $this->fecha_inicio && $this->fecha_fin) {
                 $validacionAmbiente = $this->validarDisponibilidadAmbiente(
@@ -259,6 +264,12 @@ class StoreFichaCaracterizacionRequest extends FormRequest
             if (!$validacionReglas['valido']) {
                 $validator->errors()->add('reglas_negocio', $validacionReglas['mensaje']);
             }
+            
+            \Log::info('StoreFichaCaracterizacionRequest withValidator completed', [
+                'user_id' => $this->user()->id,
+                'final_errors_count' => $validator->errors()->count(),
+                'final_errors' => $validator->errors()->toArray()
+            ]);
         });
     }
 }
