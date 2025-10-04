@@ -79,6 +79,7 @@ class ProductoController extends Controller
             'marca_id' => 'required|exists:marcas,id',
             'contrato_convenio_id' => 'required|exists:contratos_convenios,id',
             'ambiente_id' => 'required|exists:ambientes,id',
+            'fecha_vencimiento' => 'nullable|date',
             'imagen' => 'nullable|image|mimes:jpg,jpeg,png'
         ]);
 
@@ -101,7 +102,15 @@ class ProductoController extends Controller
      */
     public function show(string $id)
     {
-        $producto = Producto::with(['tipoProducto', 'unidadMedida', 'estado', 'categoria', 'marca', 'contratoConvenio', 'ambiente'])->findOrFail($id);
+        $producto = Producto::with([
+            'tipoProducto.parametro',
+            'unidadMedida.parametro',
+            'estado.parametro',
+            'categoria',
+            'marca',
+            'contratoConvenio',
+            'ambiente'
+        ])->findOrFail($id);
         return view('inventario.productos.show', compact('producto'));
     }
 
@@ -145,7 +154,9 @@ class ProductoController extends Controller
             'unidadesMedida',
             'estados',
             'categorias',
-            'marcas'
+            'marcas',
+            'contratosConvenios',
+            'ambientes'
         ));
     }
 
@@ -167,6 +178,7 @@ class ProductoController extends Controller
             'cantidad' => 'required|integer|min:0',
             'codigo_barras' => 'required|string',
             'estado_producto_id' => 'required|exists:parametros_temas,id',
+            'fecha_vencimiento' => 'nullable|date',
             'imagen' => 'nullable|image|mimes:jpg,jpeg,png'
         ]);
 

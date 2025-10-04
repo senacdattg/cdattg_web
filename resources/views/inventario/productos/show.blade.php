@@ -36,14 +36,11 @@
                     <li class="list-group-item"><i class="fas fa-sort-numeric-up"></i> <strong>Cantidad:</strong> {{ $producto->cantidad }}</li>
                     <li class="list-group-item"><i class="fas fa-barcode"></i> <strong>Código de barras:</strong> {{ $producto->codigo_barras }}</li>
                     <li class="list-group-item"><i class="fas fa-check-circle"></i> <strong>Estado:</strong> {{ $producto->estado->parametro->name ?? 'N/A' }}</li>
-
-                    <li class="list-group-item"><i class="fas fa-solid fa-tag"></i> <strong>Marca:</strong> MARCA 1 </li>
-                    <li class="list-group-item"><i class="fas fa-solid fa-list"></i> <strong>Categoría:</strong> CATEGORÍA 1 </li>
-                    <li class="list-group-item"><i class="fas fa-solid fa-map-marker-alt"></i> <strong>Ubicación:</strong> UBICACIÓN 1 </li>
-                    <li class="list-group-item"><i class="fas fa-solid fa-handshake"></i> <strong>Contrato convenio:</strong> CONTRATO 1 </li>
-                    <li class="list-group-item"><i class="fas fa-calendar-alt"></i> <strong>Fecha de vencimiento:</strong> 01/01/2025 </li>
-
-                                        
+                    <li class="list-group-item"><i class="fas fa-solid fa-tag"></i> <strong>Marca:</strong> {{ $producto->marca->nombre ?? 'N/A' }}</li>
+                    <li class="list-group-item"><i class="fas fa-solid fa-list"></i> <strong>Categoría:</strong> {{ $producto->categoria->nombre ?? 'N/A' }}</li>
+                    <li class="list-group-item"><i class="fas fa-solid fa-map-marker-alt"></i> <strong>Ambiente:</strong> {{ $producto->ambiente->title ?? 'N/A' }}</li>
+                    <li class="list-group-item"><i class="fas fa-solid fa-handshake"></i> <strong>Contrato convenio:</strong> {{ $producto->contratoConvenio->name ?? 'N/A' }}</li>
+                    <li class="list-group-item"><i class="fas fa-calendar-alt"></i> <strong>Fecha de vencimiento:</strong> {{ $producto->fecha_vencimiento ? $producto->fecha_vencimiento->format('d/m/Y') : 'N/A' }}</li>
                     <li class="list-group-item"><i class="fas fa-calendar-alt"></i> <strong>Fecha de Ingreso:</strong> {{ $producto->created_at ? $producto->created_at->format('d/m/Y H:i') : 'N/A' }}</li>
                 </ul>
             </div>

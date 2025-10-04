@@ -81,7 +81,7 @@
                             <label for="codigo_barras">Código de barras</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
-                                                        <select name="estado_producto_id" id="estado_producto_id" class="form-control form-control-sm" required>
+                            <select name="estado_producto_id" id="estado_producto_id" class="form-control form-control-sm" required>
                                 <option value="">Estado</option>
                                 @foreach ($estados as $estado)
                                     <option value="{{ $estado->id }}" {{ old('estado_producto_id') == $estado->id ? 'selected' : '' }}>
@@ -108,7 +108,7 @@
                             <label for="fecha_vencimiento">Fecha de vencimiento</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
-                                                        <select name="categoria_id" id="categoria_id" class="form-control form-control-sm" required>
+                            <select name="categoria_id" id="categoria_id" class="form-control form-control-sm" required>
                                 <option value="">Categoría</option>
                                 @foreach ($categorias as $categoria)
                                     <option value="{{ $categoria->id }}" {{ old('categoria_id') == $categoria->id ? 'selected' : '' }}>
@@ -119,7 +119,7 @@
                             <label for="categoria_id">Categoría</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
-                                                        <select name="marca_id" id="marca_id" class="form-control form-control-sm" required>
+                                <select name="marca_id" id="marca_id" class="form-control form-control-sm" required>
                                 <option value="">Marca</option>
                                 @foreach ($marcas as $marca)
                                     <option value="{{ $marca->id }}" {{ old('marca_id') == $marca->id ? 'selected' : '' }}>

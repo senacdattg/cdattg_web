@@ -34,8 +34,8 @@ class Producto extends Model
         'user_update_id'
     ];
 
-    protected $dates = [
-        'fecha_vencimiento'
+    protected $casts = [
+        'fecha_vencimiento' => 'datetime'
     ];
 
     // Relaciones existentes
@@ -64,7 +64,6 @@ class Producto extends Model
         return $this->belongsTo(User::class, 'user_update_id');
     }
 
-    // Nuevas relaciones
     public function categoria()
     {
         return $this->belongsTo(Categoria::class);
@@ -83,10 +82,5 @@ class Producto extends Model
     public function ambiente()
     {
         return $this->belongsTo(Ambiente::class);
-    }
-
-    public function proveedor()
-    {
-        return $this->belongsTo(Proveedor::class);
     }
 }
