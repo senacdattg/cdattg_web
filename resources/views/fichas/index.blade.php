@@ -1,79 +1,152 @@
 @extends('adminlte::page')
 
-@section('title', 'Fichas de Caracterización')
+@section('css')
+    @vite(['resources/css/parametros.css'])
+@endsection
 
 @section('content_header')
-    <div class="row">
-        <div class="col-sm-6">
-            <h1><i class="fas fa-file-alt"></i> Fichas de Caracterización</h1>
+    <section class="content-header dashboard-header py-4">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-6 d-flex align-items-center">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
+                        style="width: 48px; height: 48px;">
+                        <i class="fas fa-file-alt text-white fa-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800">Fichas de Caracterización</h1>
+                        <p class="text-muted mb-0 font-weight-light">Gestión de fichas de caracterización del SENA</p>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
+                            <li class="breadcrumb-item">
+                                <a href="{{ url('/') }}" class="link_right_header">
+                                    <i class="fas fa-home"></i> Inicio
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <i class="fas fa-file-alt"></i> Fichas de Caracterización
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
         </div>
-        <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item">
-                    <a href="{{ url('/') }}">Inicio</a>
-                </li>
-                <li class="breadcrumb-item active">Fichas de Caracterización</li>
-            </ol>
-        </div>
-    </div>
-@stop
+    </section>
+@endsection
 
 @section('content')
-    <!-- Alertas -->
-    @if (session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            <i class="fas fa-check-circle"></i> {{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
+    <section class="content mt-4">
+        <div class="container-fluid">
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i> {{ session('success') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
 
-    @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
-    @endif
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
 
-    <!-- Botón de crear nueva ficha -->
-    @can('CREAR PROGRAMA DE CARACTERIZACION')
-        <div class="row mb-3">
-            <div class="col-12">
-                <a href="{{ route('fichaCaracterizacion.create') }}" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Nueva Ficha de Caracterización
-                </a>
-            </div>
-        </div>
-    @endcan
+            @can('CREAR PROGRAMA DE CARACTERIZACION')
+                <div class="card shadow-sm mb-4 no-hover">
+                    <div class="card-header bg-white py-3 d-flex align-items-center">
+                        <h5 class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1">
+                            <i class="fas fa-plus-circle mr-2"></i> Crear Ficha de Caracterización
+                        </h5>
+                        <a href="{{ route('fichaCaracterizacion.create') }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus mr-1"></i> Nueva Ficha
+                        </a>
+                    </div>
+                </div>
+            @endcan
 
-    <!-- Card principal -->
-    <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">
-                <i class="fas fa-list"></i> Lista de Fichas de Caracterización
-            </h3>
-            
-            <!-- Filtros avanzados -->
-            <div class="card-tools">
-                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                    <i class="fas fa-minus"></i>
-                </button>
-            </div>
-        </div>
-
-        <div class="card-body">
-            <!-- Filtros básicos -->
-            <div class="row mb-3">
-                <div class="col-md-12">
-                    <form method="GET" action="{{ route('fichaCaracterizacion.index') }}" id="searchForm" class="form-inline">
-                        <div class="form-group mr-3">
-                            <label for="search" class="sr-only">Buscar</label>
-                            <input type="text" name="search" id="searchInput" class="form-control" placeholder="Buscar por ficha, programa, instructor..." 
-                                   value="{{ request()->get('search') }}">
+            <!-- Card principal con filtros -->
+            <div class="card shadow-sm no-hover">
+                <div class="card-header bg-white py-3 d-flex align-items-center">
+                    <h6 class="m-0 font-weight-bold text-primary d-flex flex-grow-1">Lista de Fichas de Caracterización</h6>
+                    <div class="d-flex align-items-center">
+                        <!-- Filtros avanzados -->
+                        <div class="mr-3">
+                            <select id="filterPrograma" class="form-control form-control-sm select2" style="width: 180px;">
+                                <option value="">Todos los programas</option>
+                                @foreach($programas ?? [] as $programa)
+                                    <option value="{{ $programa->id }}">{{ $programa->nombre }}</option>
+                                @endforeach
+                            </select>
                         </div>
+                        <div class="mr-3">
+                            <select id="filterInstructor" class="form-control form-control-sm select2" style="width: 150px;">
+                                <option value="">Todos los instructores</option>
+                                @foreach($instructores ?? [] as $instructor)
+                                    <option value="{{ $instructor->id }}">{{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mr-3">
+                            <select id="filterAmbiente" class="form-control form-control-sm select2" style="width: 150px;">
+                                <option value="">Todos los ambientes</option>
+                                @foreach($ambientes ?? [] as $ambiente)
+                                    <option value="{{ $ambiente->id }}">{{ $ambiente->title }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mr-3">
+                            <select id="filterSede" class="form-control form-control-sm select2" style="width: 120px;">
+                                <option value="">Todas las sedes</option>
+                                @foreach($sedes ?? [] as $sede)
+                                    <option value="{{ $sede->id }}">{{ $sede->sede }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mr-3">
+                            <select id="filterModalidad" class="form-control form-control-sm select2" style="width: 120px;">
+                                <option value="">Todas las modalidades</option>
+                                @foreach($modalidades ?? [] as $modalidad)
+                                    <option value="{{ $modalidad->id }}">{{ $modalidad->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mr-3">
+                            <select id="filterJornada" class="form-control form-control-sm select2" style="width: 120px;">
+                                <option value="">Todas las jornadas</option>
+                                @foreach($jornadas ?? [] as $jornada)
+                                    <option value="{{ $jornada->id }}">{{ $jornada->jornada }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mr-3">
+                            <select id="filterStatus" class="form-control form-control-sm" style="width: 100px;">
+                                <option value="">Todos</option>
+                                <option value="1">Activos</option>
+                                <option value="0">Inactivos</option>
+                            </select>
+                        </div>
+                        <!-- Barra de búsqueda -->
+                        <div class="input-group" style="width: 250px;">
+                            <input type="text" id="searchFicha" class="form-control form-control-sm" 
+                                   placeholder="Buscar por ficha, programa..." autocomplete="off">
+                            <div class="input-group-append">
+                                <button class="btn btn-primary btn-sm" type="button" id="btnSearch">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                                <button class="btn btn-secondary btn-sm" type="button" id="btnClearFilters">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                         
                         <div class="form-group mr-3">
                             <label for="estado" class="sr-only">Estado</label>
