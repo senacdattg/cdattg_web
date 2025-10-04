@@ -297,8 +297,10 @@
         // Cuando cambie el programa de formación
         $('#programa_formacion_id').change(function() {
             const programaId = $(this).val();
+            console.log('Programa seleccionado:', programaId);
             if (programaId) {
                 const sedeId = $(this).find('option:selected').data('sede');
+                console.log('Sede del programa:', sedeId);
                 if (sedeId) {
                     $('#sede_id').val(sedeId);
                     loadAmbientesPorSede(sedeId);
@@ -332,6 +334,7 @@
     });
 
     function loadAmbientesPorSede(sedeId) {
+        console.log('Cargando ambientes para sede:', sedeId);
         if (!sedeId) return;
         
         const ambienteSelect = $('#ambiente_id');
@@ -342,6 +345,7 @@
             url: '/ficha/ambientes-por-sede/' + sedeId,
             method: 'GET',
             success: function(response) {
+                console.log('Respuesta de ambientes:', response);
                 if (response.success) {
                     ambienteSelect.html('<option value="">Seleccione un ambiente...</option>');
                     
@@ -353,6 +357,7 @@
                     });
                     
                     ambienteSelect.prop('disabled', false);
+                    console.log('Ambientes cargados:', response.data.length);
                 } else {
                     ambienteSelect.html('<option value="">Error al cargar ambientes</option>');
                     console.error('Error al cargar ambientes:', response.message);
