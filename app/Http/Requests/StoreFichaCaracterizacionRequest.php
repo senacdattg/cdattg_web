@@ -58,7 +58,7 @@ class StoreFichaCaracterizacionRequest extends FormRequest
             'instructor_id' => [
                 'nullable',
                 'integer',
-                'exists:instructores,id'
+                'exists:instructors,id'
             ],
             'ambiente_id' => [
                 'nullable',

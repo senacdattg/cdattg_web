@@ -1598,7 +1598,7 @@ class FichaCaracterizacionController extends Controller
     {
         try {
             $request->validate([
-                'instructor_id' => 'required|integer|exists:instructores,id',
+                'instructor_id' => 'required|integer|exists:instructors,id',
                 'fecha_inicio' => 'required|date',
                 'fecha_fin' => 'required|date|after:fecha_inicio',
                 'excluir_ficha_id' => 'nullable|integer'
