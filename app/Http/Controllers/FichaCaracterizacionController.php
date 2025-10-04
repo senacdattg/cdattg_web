@@ -77,8 +77,8 @@ class FichaCaracterizacionController extends Controller
             $ambientes = \App\Models\Ambiente::with('piso.bloque')->orderBy('title', 'asc')->get();
             $sedes = \App\Models\Sede::orderBy('sede', 'asc')->get();
             $modalidades = \App\Models\Parametro::whereHas('parametrosTemas', function($query) {
-                $query->where('tema_id', 3);
-            })->orderBy('name', 'asc')->get(); // Modalidades de formación
+                $query->where('tema_id', 5);
+            })->orderBy('name', 'asc')->get(); // MODALIDADES DE FORMACION (tema_id = 5)
             $jornadas = \App\Models\JornadaFormacion::orderBy('jornada', 'asc')->get();
 
             Log::info('Fichas de caracterización cargadas exitosamente', [
@@ -124,8 +124,8 @@ class FichaCaracterizacionController extends Controller
             $ambientes = \App\Models\Ambiente::with('piso.bloque')->orderBy('title', 'asc')->get();
             $sedes = \App\Models\Sede::orderBy('sede', 'asc')->get();
             $modalidades = \App\Models\Parametro::whereHas('parametrosTemas', function($query) {
-                $query->where('tema_id', 3);
-            })->orderBy('name', 'asc')->get(); // Modalidades de formación
+                $query->where('tema_id', 5);
+            })->orderBy('name', 'asc')->get(); // MODALIDADES DE FORMACION (tema_id = 5)
             $jornadas = \App\Models\JornadaFormacion::orderBy('jornada', 'asc')->get();
 
             Log::info('Datos cargados para creación de ficha', [
@@ -255,8 +255,8 @@ class FichaCaracterizacionController extends Controller
             $ambientes = \App\Models\Ambiente::with('piso.bloque')->orderBy('title', 'asc')->get();
             $sedes = \App\Models\Sede::orderBy('sede', 'asc')->get();
             $modalidades = \App\Models\Parametro::whereHas('parametrosTemas', function($query) {
-                $query->where('tema_id', 3);
-            })->orderBy('name', 'asc')->get(); // Modalidades de formación
+                $query->where('tema_id', 5);
+            })->orderBy('name', 'asc')->get(); // MODALIDADES DE FORMACION (tema_id = 5)
             $jornadas = \App\Models\JornadaFormacion::orderBy('jornada', 'asc')->get();
 
             Log::info('Datos cargados para edición de ficha', [
