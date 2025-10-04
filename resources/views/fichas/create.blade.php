@@ -380,15 +380,25 @@
 
     // Validación del formulario
     $('#formCreateFicha').submit(function(e) {
-        e.preventDefault();
+        console.log('Formulario interceptado, validando...');
         
         // Validar fechas
         validateDates();
         
-        if (this.checkValidity()) {
-            this.submit();
-        } else {
+        const isValid = this.checkValidity();
+        console.log('Formulario válido:', isValid);
+        
+        if (!isValid) {
+            e.preventDefault();
+            console.log('Formulario inválido, mostrando errores...');
+            const invalidElements = this.querySelectorAll(':invalid');
+            invalidElements.forEach(function(element) {
+                console.log('Campo inválido:', element.name, 'Error:', element.validationMessage);
+            });
             $(this).addClass('was-validated');
+        } else {
+            console.log('Formulario válido, enviando...');
+            // No prevenir el envío, dejar que se envíe normalmente
         }
     });
 </script>

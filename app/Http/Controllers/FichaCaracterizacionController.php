@@ -162,6 +162,12 @@ class FichaCaracterizacionController extends Controller
      */
     public function store(StoreFichaCaracterizacionRequest $request)
     {
+        Log::info('=== MÉTODO STORE LLAMADO ===', [
+            'user_id' => Auth::id(),
+            'all_data' => $request->all(),
+            'timestamp' => now()
+        ]);
+        
         try {
             Log::info('Inicio de creación de nueva ficha de caracterización', [
                 'user_id' => Auth::id(),
