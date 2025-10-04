@@ -8,7 +8,10 @@ use App\Models\Inventario\Producto;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\ParametroTema;
-
+use App\Models\Inventario\Categoria;
+use App\Models\Inventario\Marca;
+use App\Models\Inventario\ContratoConvenio;
+use App\Models\Ambiente;
 
 
 class ProductoController extends Controller
@@ -46,8 +49,16 @@ class ProductoController extends Controller
             ->whereHas('tema', fn($q) => $q->where('name', 'ESTADOS DE PRODUCTO'))
             ->where('status', 1)
             ->get();
+        
+        $categorias = Categoria::all();
 
-        return view('inventario.productos.create', compact('tiposProductos', 'unidadesMedida', 'estados'));
+        $marcas = Marca::all();
+
+        $contratosConvenios = ContratoConvenio::all();
+
+        $ambientes = Ambiente::all();
+
+        return view('inventario.productos.create', compact('tiposProductos', 'unidadesMedida', 'estados', 'categorias', 'marcas', 'contratosConvenios', 'ambientes'));
     }
 
     /**
@@ -64,13 +75,17 @@ class ProductoController extends Controller
             'cantidad' => 'required|integer|min:0',
             'codigo_barras' => 'required|string',
             'estado_producto_id' => 'required|exists:parametros_temas,id',
+            'categoria_id' => 'required|exists:categorias,id',
+            'marca_id' => 'required|exists:marcas,id',
+            'contrato_convenio_id' => 'required|exists:contratos_convenios,id',
+            'ambiente_id' => 'required|exists:ambientes,id',
             'imagen' => 'nullable|image|mimes:jpg,jpeg,png'
         ]);
 
         if ($request->hasFile('imagen')){
             $nombreArchivo = time() . '.' . $request->imagen->extension();
             $request->imagen->move(public_path('img/inventario'), $nombreArchivo);
-            $validated['imagen'] = 'img/inventario' . $nombreArchivo;
+            $validated['imagen'] = 'img/inventario/' . $nombreArchivo;
         }   
 
         $validated['user_create_id'] = Auth::id();
@@ -86,7 +101,7 @@ class ProductoController extends Controller
      */
     public function show(string $id)
     {
-        $producto = Producto::with(['tipoProducto', 'unidadMedida', 'estado'])->findOrFail($id);
+        $producto = Producto::with(['tipoProducto', 'unidadMedida', 'estado', 'categoria', 'marca', 'contratoConvenio', 'ambiente'])->findOrFail($id);
         return view('inventario.productos.show', compact('producto'));
     }
 
@@ -116,18 +131,14 @@ class ProductoController extends Controller
             ->where('status', 1)
             ->get();
 
-        // Obtener categorías
-        $categorias = ParametroTema::with(['parametro','tema'])
-            ->whereHas('tema', fn($q) => $q->where('name', 'CATEGORIAS DE PRODUCTO'))
-            ->where('status', 1)
-            ->get();
+        $categorias = Categoria::all();
 
-        // Obtener marcas
-        $marcas = ParametroTema::with(['parametro','tema'])
-            ->whereHas('tema', fn($q) => $q->where('name', 'MARCAS DE PRODUCTO'))
-            ->where('status', 1)
-            ->get();
+        $marcas = Marca::all();
 
+        $contratosConvenios = ContratoConvenio::all();
+
+        $ambientes = Ambiente::all();
+    
         return view('inventario.productos.edit', compact(
             'producto',
             'tiposProductos',
