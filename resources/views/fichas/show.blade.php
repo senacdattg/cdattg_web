@@ -72,7 +72,7 @@
                                 </tr>
                                 <tr>
                                     <td><strong><i class="fas fa-building"></i> Sede:</strong></td>
-                                    <td>{{ $ficha->sede->nombre ?? 'N/A' }}</td>
+                                    <td>{{ $ficha->sede->sede ?? 'N/A' }}</td>
                                 </tr>
                                 <tr>
                                     <td><strong><i class="fas fa-chalkboard-teacher"></i> Instructor:</strong></td>
@@ -94,13 +94,13 @@
                                 </tr>
                                 <tr>
                                     <td><strong><i class="fas fa-clock"></i> Jornada:</strong></td>
-                                    <td>{{ $ficha->jornadaFormacion->name ?? 'N/A' }}</td>
+                                    <td>{{ $ficha->jornadaFormacion->jornada ?? 'N/A' }}</td>
                                 </tr>
                                 <tr>
                                     <td><strong><i class="fas fa-door-open"></i> Ambiente:</strong></td>
                                     <td>
                                         @if($ficha->ambiente)
-                                            {{ $ficha->ambiente->nombre }} - {{ $ficha->ambiente->piso->nombre }}
+                                            {{ $ficha->ambiente->title }} - {{ $ficha->ambiente->piso->nombre }}
                                         @else
                                             N/A
                                         @endif

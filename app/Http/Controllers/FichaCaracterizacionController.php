@@ -2349,9 +2349,9 @@ class FichaCaracterizacionController extends Controller
                 // Usar parse() en lugar de createFromFormat() para mayor flexibilidad
                 $horaInicio = \Carbon\Carbon::parse($dia->hora_inicio);
                 $horaFin = \Carbon\Carbon::parse($dia->hora_fin);
-                $horasPorDia = $horaInicio->diffInHours($horaFin);
-                
-                $horasTotales += $horasPorDia * $duracionEnDias;
+            $horasPorDia = $horaInicio->diffInHours($horaFin);
+            
+            $horasTotales += $horasPorDia * $duracionEnDias;
             } catch (\Exception $e) {
                 // Log del error y continuar con el siguiente día
                 \Log::warning("Error al calcular horas para el día: " . $e->getMessage(), [

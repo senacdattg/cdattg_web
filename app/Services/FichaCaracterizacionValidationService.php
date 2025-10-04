@@ -349,7 +349,7 @@ class FichaCaracterizacionValidationService
     {
         try {
             $ficha = FichaCaracterizacion::find($fichaId);
-            
+
             if (!$ficha) {
                 return [
                     'valido' => false,
