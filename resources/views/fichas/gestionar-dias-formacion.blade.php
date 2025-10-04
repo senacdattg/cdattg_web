@@ -135,23 +135,63 @@
                             <br><strong>Nota:</strong> Los horarios deben respetar las restricciones de la jornada seleccionada.
                         </div>
 
-                        <!-- Formulario para agregar días -->
+                        <!-- Selección de Días con Cuadros -->
+                        <div class="mb-4">
+                            <h5 class="mb-3">
+                                <i class="fas fa-calendar-week"></i> Seleccionar Días de Formación
+                            </h5>
+                            <div class="row">
+                                @foreach($diasSemana as $dia)
+                                    @php
+                                        $estaAsignado = $diasAsignados->contains('dia_id', $dia->id);
+                                        $esPermitido = $ficha->jornada_id && isset($configuracionJornadas[$ficha->jornada_id]) 
+                                            ? in_array($dia->id, $configuracionJornadas[$ficha->jornada_id]['dias_permitidos'])
+                                            : true;
+                                    @endphp
+                                    <div class="col-md-2 mb-3">
+                                        <div class="dia-cuadro {{ $estaAsignado ? 'asignado' : ($esPermitido ? 'disponible' : 'no-permitido') }}" 
+                                             data-dia-id="{{ $dia->id }}" 
+                                             data-dia-nombre="{{ $dia->name }}"
+                                             onclick="{{ $esPermitido && !$estaAsignado ? 'seleccionarDia(this)' : '' }}">
+                                            <div class="text-center">
+                                                <i class="fas fa-calendar-day fa-2x mb-2"></i>
+                                                <div class="dia-nombre">{{ $dia->name }}</div>
+                                                @if($estaAsignado)
+                                                    <small class="text-success">
+                                                        <i class="fas fa-check"></i> Asignado
+                                                    </small>
+                                                @elseif($esPermitido)
+                                                    <small class="text-muted">Click para seleccionar</small>
+                                                @else
+                                                    <small class="text-danger">
+                                                        <i class="fas fa-ban"></i> No permitido
+                                                    </small>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <!-- Días Seleccionados -->
+                        <div id="dias-seleccionados" class="mb-4" style="display: none;">
+                            <h6>
+                                <i class="fas fa-list"></i> Días Seleccionados
+                            </h6>
+                            <div id="lista-dias-seleccionados"></div>
+                        </div>
+
+                        <!-- Formulario Oculto para Envío -->
                         <form action="{{ route('fichaCaracterizacion.guardarDiasFormacion', $ficha->id) }}" method="POST" id="formDiasFormacion">
                             @csrf
-                            
-                            <div id="dias-container">
+                            <div id="dias-container" style="display: none;">
                                 <!-- Los días se agregarán dinámicamente aquí -->
                             </div>
                             
                             <div class="form-group">
-                                <button type="button" class="btn btn-success" onclick="agregarDia()">
-                                    <i class="fas fa-plus"></i> Agregar Día
-                                </button>
-                            </div>
-
-                            <div class="form-group">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> Guardar Días de Formación
+                                <button type="button" class="btn btn-success" onclick="guardarDiasSeleccionados()" id="btn-guardar-dias" style="display: none;">
+                                    <i class="fas fa-save"></i> Guardar Días Seleccionados
                                 </button>
                                 <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}" class="btn btn-secondary">
                                     <i class="fas fa-times"></i> Cancelar
@@ -290,6 +330,92 @@
         }
         .card.border-secondary {
             border-color: #6c757d !important;
+        }
+
+        /* Estilos para cuadros de días */
+        .dia-cuadro {
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #ffffff;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dia-cuadro:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .dia-cuadro.disponible {
+            border-color: #007bff;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .dia-cuadro.disponible:hover {
+            border-color: #0056b3;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+        }
+
+        .dia-cuadro.seleccionado {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+
+        .dia-cuadro.asignado {
+            border-color: #6c757d;
+            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        .dia-cuadro.no-permitido {
+            border-color: #dc3545;
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .dia-nombre {
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #495057;
+        }
+
+        .dia-cuadro.seleccionado .dia-nombre {
+            color: #155724;
+        }
+
+        .dia-cuadro.asignado .dia-nombre {
+            color: #6c757d;
+        }
+
+        .dia-cuadro.no-permitido .dia-nombre {
+            color: #721c24;
+        }
+
+        /* Lista de días seleccionados */
+        .dia-seleccionado-item {
+            background: #e8f5e8;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 8px 12px;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dia-seleccionado-item .btn-remover {
+            padding: 2px 6px;
+            font-size: 12px;
         }
     </style>
 @stop
@@ -655,6 +781,138 @@
                 validarHorariosTiempoReal();
             }
         });
+
+        // Variables globales para días seleccionados
+        let diasSeleccionados = [];
+
+        // Función para seleccionar un día
+        function seleccionarDia(elemento) {
+            const diaId = elemento.getAttribute('data-dia-id');
+            const diaNombre = elemento.getAttribute('data-dia-nombre');
+            
+            if (!diasSeleccionados.includes(diaId)) {
+                diasSeleccionados.push(diaId);
+                elemento.classList.remove('disponible');
+                elemento.classList.add('seleccionado');
+                
+                // Actualizar texto del cuadro
+                elemento.querySelector('small').innerHTML = '<i class="fas fa-check"></i> Seleccionado';
+                elemento.querySelector('small').className = 'text-success';
+                
+                actualizarListaDiasSeleccionados();
+                mostrarBotonGuardar();
+            }
+        }
+
+        // Función para remover un día de la selección
+        function removerDiaSeleccionado(diaId, diaNombre) {
+            diasSeleccionados = diasSeleccionados.filter(id => id !== diaId);
+            
+            // Actualizar cuadro
+            const cuadro = document.querySelector(`[data-dia-id="${diaId}"]`);
+            if (cuadro) {
+                cuadro.classList.remove('seleccionado');
+                cuadro.classList.add('disponible');
+                cuadro.querySelector('small').innerHTML = 'Click para seleccionar';
+                cuadro.querySelector('small').className = 'text-muted';
+            }
+            
+            actualizarListaDiasSeleccionados();
+            mostrarBotonGuardar();
+        }
+
+        // Función para actualizar la lista de días seleccionados
+        function actualizarListaDiasSeleccionados() {
+            const container = document.getElementById('lista-dias-seleccionados');
+            const seccion = document.getElementById('dias-seleccionados');
+            
+            if (diasSeleccionados.length === 0) {
+                seccion.style.display = 'none';
+                return;
+            }
+            
+            seccion.style.display = 'block';
+            container.innerHTML = '';
+            
+            diasSeleccionados.forEach(diaId => {
+                const cuadro = document.querySelector(`[data-dia-id="${diaId}"]`);
+                const diaNombre = cuadro.getAttribute('data-dia-nombre');
+                
+                const item = document.createElement('div');
+                item.className = 'dia-seleccionado-item';
+                item.innerHTML = `
+                    <span>
+                        <i class="fas fa-calendar-day"></i> ${diaNombre}
+                    </span>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-remover" 
+                            onclick="removerDiaSeleccionado('${diaId}', '${diaNombre}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Función para mostrar/ocultar botón de guardar
+        function mostrarBotonGuardar() {
+            const boton = document.getElementById('btn-guardar-dias');
+            if (diasSeleccionados.length > 0) {
+                boton.style.display = 'inline-block';
+            } else {
+                boton.style.display = 'none';
+            }
+        }
+
+        // Función para guardar días seleccionados
+        function guardarDiasSeleccionados() {
+            const horaInicio = document.getElementById('hora_inicio_global').value;
+            const horaFin = document.getElementById('hora_fin_global').value;
+            
+            if (!horaInicio || !horaFin) {
+                alert('Por favor, configure primero las horas de inicio y fin.');
+                return;
+            }
+            
+            if (diasSeleccionados.length === 0) {
+                alert('Por favor, seleccione al menos un día.');
+                return;
+            }
+            
+            // Validar horarios según jornada
+            const validacion = validarHorariosSegunJornada(horaInicio, horaFin);
+            if (!validacion.valido) {
+                alert(validacion.mensaje);
+                return;
+            }
+            
+            // Crear campos ocultos para el formulario
+            const container = document.getElementById('dias-container');
+            container.innerHTML = '';
+            
+            diasSeleccionados.forEach((diaId, index) => {
+                const inputDiaId = document.createElement('input');
+                inputDiaId.type = 'hidden';
+                inputDiaId.name = `dias[${index}][dia_id]`;
+                inputDiaId.value = diaId;
+                
+                const inputHoraInicio = document.createElement('input');
+                inputHoraInicio.type = 'hidden';
+                inputHoraInicio.name = `dias[${index}][hora_inicio]`;
+                inputHoraInicio.value = horaInicio;
+                
+                const inputHoraFin = document.createElement('input');
+                inputHoraFin.type = 'hidden';
+                inputHoraFin.name = `dias[${index}][hora_fin]`;
+                inputHoraFin.value = horaFin;
+                
+                container.appendChild(inputDiaId);
+                container.appendChild(inputHoraInicio);
+                container.appendChild(inputHoraFin);
+            });
+            
+            // Enviar formulario
+            document.getElementById('formDiasFormacion').submit();
+        }
 
         // Inicializar restricciones dinámicas cuando se carga la página
         document.addEventListener('DOMContentLoaded', function() {
