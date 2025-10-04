@@ -283,7 +283,15 @@
                                             </p>
                                             <p class="text-muted mb-0">
                                                 <i class="fas fa-hourglass-half"></i>
-                                                {{ \Carbon\Carbon::createFromFormat('H:i', $diaFormacion->hora_inicio)->diffInHours(\Carbon\Carbon::createFromFormat('H:i', $diaFormacion->hora_fin)) }} horas/día
+                                                @if($diaFormacion->hora_inicio && $diaFormacion->hora_fin)
+                                                    @try
+                                                        {{ \Carbon\Carbon::parse($diaFormacion->hora_inicio)->diffInHours(\Carbon\Carbon::parse($diaFormacion->hora_fin)) }} horas/día
+                                                    @catch(Exception $e)
+                                                        Horas no calculables
+                                                    @endtry
+                                                @else
+                                                    Horas no definidas
+                                                @endif
                                             </p>
                                         </div>
                                     </div>
