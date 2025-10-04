@@ -65,160 +65,100 @@
         </div>
     </div>
 
-    <div class="row">
-        <!-- Días Asignados -->
-        <div class="col-md-6">
-            <div class="card card-outline card-success">
+    <!-- PASO 1: Configuración de Horarios -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-outline card-primary">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <i class="fas fa-calendar-check text-success"></i>
-                        Días de Formación Asignados
+                        <i class="fas fa-clock text-primary"></i>
+                        <span class="badge badge-primary mr-2">1</span>
+                        Configurar Horarios Según Jornada
                     </h3>
                 </div>
                 <div class="card-body">
-                    @if($diasAsignados->count() > 0)
-                        @foreach($diasAsignados as $diaAsignado)
-                            <div class="card mb-3">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <h5 class="mb-1">
-                                                <i class="fas fa-calendar-day"></i>
-                                                {{ $diaAsignado->dia->name }}
-                                            </h5>
-                                            <p class="text-muted mb-1">
-                                                <i class="fas fa-clock"></i>
-                                                {{ $diaAsignado->hora_inicio }} - {{ $diaAsignado->hora_fin }}
-                                            </p>
-                                            <p class="text-muted mb-0">
-                                                <i class="fas fa-hourglass-half"></i>
-                                                @if($diaAsignado->hora_inicio && $diaAsignado->hora_fin)
-                                                    @try
-                                                        {{ \Carbon\Carbon::parse($diaAsignado->hora_inicio)->diffInHours(\Carbon\Carbon::parse($diaAsignado->hora_fin)) }} horas por día
-                                                    @catch(Exception $e)
-                                                        Horas no calculables
-                                                    @endtry
-                                                @else
-                                                    Horas no definidas
-                                                @endif
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <button type="button" class="btn btn-sm btn-warning" 
-                                                    onclick="editarDia({{ $diaAsignado->id }}, '{{ $diaAsignado->hora_inicio }}', '{{ $diaAsignado->hora_fin }}')">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <form action="{{ route('fichaCaracterizacion.eliminarDiaFormacion', [$ficha->id, $diaAsignado->id]) }}" 
-                                                  method="POST" style="display: inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger" 
-                                                        onclick="return confirm('¿Está seguro de eliminar este día de formación?')">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
+                    @if($ficha->jornadaFormacion)
+                        <div class="row">
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    <i class="fas fa-play-circle"></i> Hora de Inicio
+                                </label>
+                                <input type="time" id="hora_inicio_global" class="form-control" 
+                                       value="{{ $ficha->jornadaFormacion->hora_inicio }}"
+                                       @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
+                                           min="06:00" max="12:59" step="3600"
+                                       @elseif($ficha->jornadaFormacion->jornada == 'TARDE')
+                                           min="13:00" max="17:59" step="3600"
+                                       @elseif($ficha->jornadaFormacion->jornada == 'NOCHE')
+                                           min="18:00" max="22:59" step="3600"
+                                       @elseif($ficha->jornadaFormacion->jornada == 'FINES DE SEMANA')
+                                           min="08:00" max="16:59" step="3600"
+                                       @endif>
                             </div>
-                        @endforeach
+                            <div class="col-md-4">
+                                <label class="form-label">
+                                    <i class="fas fa-stop-circle"></i> Hora de Fin
+                                </label>
+                                <input type="time" id="hora_fin_global" class="form-control" 
+                                       value="{{ $ficha->jornadaFormacion->hora_fin }}"
+                                       @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
+                                           min="06:00" max="12:59" step="3600"
+                                       @elseif($ficha->jornadaFormacion->jornada == 'TARDE')
+                                           min="13:00" max="17:59" step="3600"
+                                       @elseif($ficha->jornadaFormacion->jornada == 'NOCHE')
+                                           min="18:00" max="22:59" step="3600"
+                                       @elseif($ficha->jornadaFormacion->jornada == 'FINES DE SEMANA')
+                                           min="08:00" max="16:59" step="3600"
+                                       @endif>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="button" class="btn btn-primary btn-block" onclick="aplicarHorarioGlobal()">
+                                    <i class="fas fa-magic"></i> Aplicar Horario a Todos los Días
+                                </button>
+                            </div>
+                        </div>
+                        <div class="alert alert-info mt-3 mb-0">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Jornada:</strong> {{ $ficha->jornadaFormacion->jornada }}<br>
+                            <strong>Restricciones de horarios:</strong><br>
+                            @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
+                                • <strong>MAÑANA:</strong> 06:00 - 12:59 horas (solo horas completas)
+                            @elseif($ficha->jornadaFormacion->jornada == 'TARDE')
+                                • <strong>TARDE:</strong> 13:00 - 17:59 horas (solo horas completas)
+                            @elseif($ficha->jornadaFormacion->jornada == 'NOCHE')
+                                • <strong>NOCHE:</strong> 18:00 - 22:59 horas (solo horas completas)
+                            @elseif($ficha->jornadaFormacion->jornada == 'FINES DE SEMANA')
+                                • <strong>FINES DE SEMANA:</strong> 08:00 - 16:59 horas (solo horas completas)
+                            @endif
+                            <br><strong>Nota:</strong> Los horarios deben respetar las restricciones de la jornada seleccionada.
+                        </div>
                     @else
-                        <div class="text-center text-muted py-4">
-                            <i class="fas fa-calendar-times fa-3x mb-3"></i>
-                            <p>No hay días de formación asignados a esta ficha.</p>
+                        <div class="alert alert-warning">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Atención:</strong> No se ha asignado una jornada a esta ficha. Por favor, configure primero la jornada en la información general de la ficha.
                         </div>
                     @endif
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Configurar Días -->
-        <div class="col-md-6">
-            <div class="card card-outline card-warning">
+    <!-- PASO 2: Agregar Días de Formación -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card card-outline card-success">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <i class="fas fa-calendar-plus text-warning"></i>
-                        Configurar Días de Formación
+                        <i class="fas fa-calendar-plus text-success"></i>
+                        <span class="badge badge-success mr-2">2</span>
+                        Agregar Días de Formación
                     </h3>
                 </div>
                 <div class="card-body">
-                    <!-- Configuración Global de Horarios -->
-                    <div class="card bg-light mb-3">
-                        <div class="card-header">
-                            <h5 class="mb-0">
-                                <i class="fas fa-clock text-primary"></i>
-                                Horarios Según Jornada
-                            </h5>
-                        </div>
-                        <div class="card-body">
-                            @if($ficha->jornadaFormacion)
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <label class="form-label">
-                                            <i class="fas fa-play-circle"></i> Hora de Inicio
-                                        </label>
-                                        <input type="time" id="hora_inicio_global" class="form-control" 
-                                               value="{{ $ficha->jornadaFormacion->hora_inicio }}"
-                                               @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
-                                                   min="06:00" max="12:59" step="3600"
-                                               @elseif($ficha->jornadaFormacion->jornada == 'TARDE')
-                                                   min="13:00" max="17:59" step="3600"
-                                               @elseif($ficha->jornadaFormacion->jornada == 'NOCHE')
-                                                   min="18:00" max="22:59" step="3600"
-                                               @elseif($ficha->jornadaFormacion->jornada == 'FINES DE SEMANA')
-                                                   min="08:00" max="16:59" step="3600"
-                                               @endif>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">
-                                            <i class="fas fa-stop-circle"></i> Hora de Fin
-                                        </label>
-                                        <input type="time" id="hora_fin_global" class="form-control" 
-                                               value="{{ $ficha->jornadaFormacion->hora_fin }}"
-                                               @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
-                                                   min="06:00" max="12:59" step="3600"
-                                               @elseif($ficha->jornadaFormacion->jornada == 'TARDE')
-                                                   min="13:00" max="17:59" step="3600"
-                                               @elseif($ficha->jornadaFormacion->jornada == 'NOCHE')
-                                                   min="18:00" max="22:59" step="3600"
-                                               @elseif($ficha->jornadaFormacion->jornada == 'FINES DE SEMANA')
-                                                   min="08:00" max="16:59" step="3600"
-                                               @endif>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">&nbsp;</label>
-                                        <button type="button" class="btn btn-primary btn-block" onclick="aplicarHorarioGlobal()">
-                                            <i class="fas fa-magic"></i> Aplicar Horario a Todos los Días
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="alert alert-info mt-3 mb-0">
-                                    <i class="fas fa-info-circle"></i>
-                                    <strong>Jornada:</strong> {{ $ficha->jornadaFormacion->jornada }}<br>
-                                    <strong>Restricciones de horarios:</strong><br>
-                                    @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
-                                        • <strong>MAÑANA:</strong> 06:00 - 12:59 horas (solo horas completas)
-                                    @elseif($ficha->jornadaFormacion->jornada == 'TARDE')
-                                        • <strong>TARDE:</strong> 13:00 - 17:59 horas (solo horas completas)
-                                    @elseif($ficha->jornadaFormacion->jornada == 'NOCHE')
-                                        • <strong>NOCHE:</strong> 18:00 - 22:59 horas (solo horas completas)
-                                    @elseif($ficha->jornadaFormacion->jornada == 'FINES DE SEMANA')
-                                        • <strong>FINES DE SEMANA:</strong> 08:00 - 16:59 horas (solo horas completas)
-                                    @endif
-                                    <br><strong>Nota:</strong> Los horarios deben respetar las restricciones de la jornada seleccionada.
-                                </div>
-                            @else
-                                <div class="alert alert-warning">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                    <strong>Atención:</strong> No se ha asignado una jornada a esta ficha. Por favor, configure primero la jornada en la información general de la ficha.
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-
                     <!-- Información de Jornada -->
                     @if($ficha->jornada_id && isset($configuracionJornadas[$ficha->jornada_id]))
-                        <div class="alert alert-info">
+                        <div class="alert alert-info mb-3">
                             <h5><i class="fas fa-info-circle"></i> Jornada: {{ $configuracionJornadas[$ficha->jornada_id]['nombre'] }}</h5>
                             <p class="mb-1"><strong>Días permitidos:</strong> 
                                 @php
@@ -235,6 +175,7 @@
                         </div>
                     @endif
 
+                    <!-- Formulario para agregar días -->
                     <form action="{{ route('fichaCaracterizacion.guardarDiasFormacion', $ficha->id) }}" method="POST" id="formDiasFormacion">
                         @csrf
                         
@@ -243,7 +184,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <button type="button" class="btn btn-sm btn-outline-primary" onclick="agregarDia()">
+                            <button type="button" class="btn btn-success" onclick="agregarDia()">
                                 <i class="fas fa-plus"></i> Agregar Día
                             </button>
                         </div>
@@ -261,6 +202,82 @@
             </div>
         </div>
     </div>
+
+    <!-- PASO 3: Días Asignados -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card card-outline card-info">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-calendar-check text-info"></i>
+                        <span class="badge badge-info mr-2">3</span>
+                        Días de Formación Asignados
+                        <span class="badge badge-primary ml-2">{{ $diasAsignados->count() }} días</span>
+                    </h3>
+                </div>
+                <div class="card-body">
+                    @if($diasAsignados->count() > 0)
+                        <div class="row">
+                            @foreach($diasAsignados as $diaAsignado)
+                                <div class="col-md-6 mb-3">
+                                    <div class="card border-success">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h5 class="mb-1">
+                                                        <i class="fas fa-calendar-day text-success"></i>
+                                                        {{ $diaAsignado->dia->name }}
+                                                    </h5>
+                                                    <p class="text-muted mb-1">
+                                                        <i class="fas fa-clock"></i>
+                                                        {{ $diaAsignado->hora_inicio }} - {{ $diaAsignado->hora_fin }}
+                                                    </p>
+                                                    <p class="text-muted mb-0">
+                                                        <i class="fas fa-hourglass-half"></i>
+                                                        @if($diaAsignado->hora_inicio && $diaAsignado->hora_fin)
+                                                            @try
+                                                                {{ \Carbon\Carbon::parse($diaAsignado->hora_inicio)->diffInHours(\Carbon\Carbon::parse($diaAsignado->hora_fin)) }} horas por día
+                                                            @catch(Exception $e)
+                                                                Horas no calculables
+                                                            @endtry
+                                                        @else
+                                                            Horas no definidas
+                                                        @endif
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <button type="button" class="btn btn-sm btn-warning" 
+                                                            onclick="editarDia({{ $diaAsignado->id }}, '{{ $diaAsignado->hora_inicio }}', '{{ $diaAsignado->hora_fin }}')">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <form action="{{ route('fichaCaracterizacion.eliminarDiaFormacion', [$ficha->id, $diaAsignado->id]) }}" 
+                                                          method="POST" style="display: inline;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-danger" 
+                                                                onclick="return confirm('¿Está seguro de eliminar este día de formación?')">
+                                                            <i class="fas fa-trash"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <div class="text-center text-muted py-4">
+                            <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                            <h5>No hay días de formación asignados</h5>
+                            <p>Use el paso 2 para agregar días de formación a esta ficha.</p>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Modal para Editar Día -->
     <div class="modal fade" id="modalEditarDia" tabindex="-1" role="dialog">
