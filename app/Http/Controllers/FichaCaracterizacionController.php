@@ -1716,6 +1716,8 @@ class FichaCaracterizacionController extends Controller
             $ficha = FichaCaracterizacion::with([
                 'instructor.persona',
                 'instructorFicha.instructor.persona',
+                'instructorFicha.instructorFichaDias',
+                'diasFormacion.dia',
                 'programaFormacion',
                 'sede'
             ])->findOrFail($id);
@@ -1727,8 +1729,16 @@ class FichaCaracterizacionController extends Controller
 
             // Obtener instructores ya asignados a esta ficha
             $instructoresAsignados = $ficha->instructorFicha()
-                ->with('instructor.persona')
+                ->with(['instructor.persona', 'instructorFichaDias'])
                 ->get();
+
+            // Obtener días de formación asignados a la ficha
+            $diasFormacionFicha = $ficha->diasFormacion()
+                ->with('dia')
+                ->get()
+                ->pluck('dia')
+                ->unique('id')
+                ->sortBy('id');
 
             // Verificar disponibilidad de instructores
             $instructoresConDisponibilidad = $this->verificarDisponibilidadInstructores($instructoresDisponibles, $ficha);
@@ -1743,7 +1753,8 @@ class FichaCaracterizacionController extends Controller
                 'ficha',
                 'instructoresDisponibles',
                 'instructoresAsignados',
-                'instructoresConDisponibilidad'
+                'instructoresConDisponibilidad',
+                'diasFormacionFicha'
             ));
 
         } catch (\Exception $e) {
@@ -1784,7 +1795,9 @@ class FichaCaracterizacionController extends Controller
                 'instructores.*.instructor_id' => 'required|exists:instructors,id',
                 'instructores.*.fecha_inicio' => 'required|date',
                 'instructores.*.fecha_fin' => 'required|date|after_or_equal:instructores.*.fecha_inicio',
-                'instructores.*.total_horas_ficha' => 'required|integer|min:1',
+                'instructores.*.total_horas_instructor' => 'required|integer|min:1',
+                'instructores.*.dias_formacion' => 'sometimes|array',
+                'instructores.*.dias_formacion.*.dia_id' => 'required_with:instructores.*.dias_formacion|exists:parametros_temas,id',
                 'instructor_principal_id' => 'required|exists:instructors,id'
             ], [
                 'instructores.required' => 'Debe seleccionar al menos un instructor.',
@@ -1793,13 +1806,36 @@ class FichaCaracterizacionController extends Controller
                 'instructores.*.fecha_inicio.required' => 'La fecha de inicio es requerida.',
                 'instructores.*.fecha_fin.required' => 'La fecha de fin es requerida.',
                 'instructores.*.fecha_fin.after_or_equal' => 'La fecha de fin debe ser posterior o igual a la fecha de inicio.',
-                'instructores.*.total_horas_ficha.required' => 'El total de horas es requerido.',
-                'instructores.*.total_horas_ficha.min' => 'El total de horas debe ser mayor a 0.',
+                'instructores.*.total_horas_instructor.required' => 'El total de horas es requerido.',
+                'instructores.*.total_horas_instructor.min' => 'El total de horas debe ser mayor a 0.',
+                'instructores.*.dias_formacion.*.dia_id.required_with' => 'El día de formación es requerido.',
+                'instructores.*.dias_formacion.*.dia_id.exists' => 'El día seleccionado no existe.',
                 'instructor_principal_id.required' => 'Debe seleccionar un instructor principal.',
                 'instructor_principal_id.exists' => 'El instructor principal seleccionado no existe.'
             ]);
 
             $ficha = FichaCaracterizacion::findOrFail($id);
+
+            // Validar que las fechas de los instructores estén dentro del rango de la ficha
+            $fechaInicioFicha = $ficha->fecha_inicio;
+            $fechaFinFicha = $ficha->fecha_fin;
+            
+            foreach ($request->instructores as $index => $instructorData) {
+                $fechaInicioInstructor = \Carbon\Carbon::parse($instructorData['fecha_inicio']);
+                $fechaFinInstructor = \Carbon\Carbon::parse($instructorData['fecha_fin']);
+                
+                if ($fechaInicioFicha && $fechaInicioInstructor->lt($fechaInicioFicha)) {
+                    return back()->withErrors([
+                        "instructores.{$index}.fecha_inicio" => "La fecha de inicio del instructor debe ser posterior o igual a la fecha de inicio de la ficha ({$fechaInicioFicha->format('d/m/Y')})."
+                    ]);
+                }
+                
+                if ($fechaFinFicha && $fechaFinInstructor->gt($fechaFinFicha)) {
+                    return back()->withErrors([
+                        "instructores.{$index}.fecha_fin" => "La fecha de fin del instructor debe ser anterior o igual a la fecha de fin de la ficha ({$fechaFinFicha->format('d/m/Y')})."
+                    ]);
+                }
+            }
 
             // Verificar que el instructor principal esté en la lista de instructores
             $instructorPrincipalId = $request->instructor_principal_id;
@@ -1839,12 +1875,21 @@ class FichaCaracterizacionController extends Controller
 
             // Crear nuevas asignaciones
             foreach ($request->instructores as $instructorData) {
-                $ficha->instructorFicha()->create([
+                $instructorFicha = $ficha->instructorFicha()->create([
                     'instructor_id' => $instructorData['instructor_id'],
                     'fecha_inicio' => $instructorData['fecha_inicio'],
                     'fecha_fin' => $instructorData['fecha_fin'],
-                    'total_horas_ficha' => $instructorData['total_horas_ficha']
+                    'total_horas_instructor' => $instructorData['total_horas_instructor']
                 ]);
+
+                // Crear días de formación si se proporcionaron
+                if (isset($instructorData['dias_formacion']) && is_array($instructorData['dias_formacion'])) {
+                    foreach ($instructorData['dias_formacion'] as $diaData) {
+                        $instructorFicha->instructorFichaDias()->create([
+                            'dia_id' => $diaData['dia_id']
+                        ]);
+                    }
+                }
             }
 
             DB::commit();

@@ -142,6 +142,44 @@
                     </h3>
                 </div>
                 <div class="card-body">
+                    <!-- Configuración Global de Horarios -->
+                    <div class="card bg-light mb-3">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fas fa-clock text-primary"></i>
+                                Configuración Global de Horarios
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <label for="hora_inicio_global" class="form-label">
+                                        <i class="fas fa-play-circle"></i> Hora de Inicio
+                                    </label>
+                                    <input type="time" id="hora_inicio_global" class="form-control" 
+                                           placeholder="Ej: 08:00">
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="hora_fin_global" class="form-label">
+                                        <i class="fas fa-stop-circle"></i> Hora de Fin
+                                    </label>
+                                    <input type="time" id="hora_fin_global" class="form-control" 
+                                           placeholder="Ej: 17:00">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button type="button" class="btn btn-primary btn-block" onclick="aplicarHorarioGlobal()">
+                                        <i class="fas fa-magic"></i> Aplicar a Todos los Días
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="alert alert-info mt-3 mb-0">
+                                <i class="fas fa-info-circle"></i>
+                                <strong>Nota:</strong> Configure las horas de inicio y fin, luego haga clic en "Aplicar a Todos los Días" para asignar automáticamente el mismo horario a todos los días seleccionados.
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Información de Jornada -->
                     @if($ficha->jornada_id && isset($configuracionJornadas[$ficha->jornada_id]))
                         <div class="alert alert-info">
@@ -338,12 +376,12 @@
                         <div class="col-md-3">
                             <label class="form-label">Hora Inicio</label>
                             <input type="time" name="dias[${index}][hora_inicio]" 
-                                   class="form-control" value="${horaInicio}" required>
+                                   class="form-control hora-inicio" value="${horaInicio}" required>
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Hora Fin</label>
                             <input type="time" name="dias[${index}][hora_fin]" 
-                                   class="form-control" value="${horaFin}" required>
+                                   class="form-control hora-fin" value="${horaFin}" required>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">&nbsp;</label>
@@ -463,6 +501,40 @@
                     (${horasTotales.toFixed(1)} horas/día × ${duracionDias} días)
                 `;
             }
+        }
+
+        // Función para aplicar horario global a todos los días
+        function aplicarHorarioGlobal() {
+            const horaInicio = document.getElementById('hora_inicio_global').value;
+            const horaFin = document.getElementById('hora_fin_global').value;
+            
+            if (!horaInicio || !horaFin) {
+                alert('Por favor, configure tanto la hora de inicio como la hora de fin.');
+                return;
+            }
+            
+            if (horaInicio >= horaFin) {
+                alert('La hora de fin debe ser posterior a la hora de inicio.');
+                return;
+            }
+            
+            // Aplicar a todos los campos de hora existentes
+            const camposHoraInicio = document.querySelectorAll('.hora-inicio');
+            const camposHoraFin = document.querySelectorAll('.hora-fin');
+            
+            camposHoraInicio.forEach(campo => {
+                campo.value = horaInicio;
+            });
+            
+            camposHoraFin.forEach(campo => {
+                campo.value = horaFin;
+            });
+            
+            // Recalcular horas totales
+            calcularHorasTotales();
+            
+            // Mostrar mensaje de éxito
+            alert(`Horario aplicado exitosamente:\nInicio: ${horaInicio}\nFin: ${horaFin}\n\nSe aplicó a ${camposHoraInicio.length} días.`);
         }
 
         // Agregar event listeners para el cálculo automático

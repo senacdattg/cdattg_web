@@ -17,7 +17,12 @@ class InstructorFichaCaracterizacion extends Model
         "ficha_id",
         "fecha_inicio",
         "fecha_fin",
-        "total_horas_ficha"
+        "total_horas_instructor"
+    ];
+
+    protected $casts = [
+        'fecha_inicio' => 'date',
+        'fecha_fin' => 'date',
     ];
 
     public function instructor(): BelongsTo

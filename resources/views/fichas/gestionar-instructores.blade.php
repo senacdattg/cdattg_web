@@ -84,7 +84,7 @@
                                             </p>
                                             <p class="text-muted mb-0">
                                                 <i class="fas fa-clock"></i>
-                                                {{ $asignacion->total_horas_ficha }} horas
+                                                {{ $asignacion->total_horas_instructor }} horas
                                             </p>
                                         </div>
                                         <div>
@@ -151,6 +151,34 @@
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
+
+                        <!-- Información de fechas permitidas -->
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Rango de fechas permitidas:</strong>
+                            @if($ficha->fecha_inicio && $ficha->fecha_fin)
+                                Desde {{ $ficha->fecha_inicio->format('d/m/Y') }} hasta {{ $ficha->fecha_fin->format('d/m/Y') }}
+                            @else
+                                <span class="text-warning">Las fechas de la ficha no están definidas</span>
+                            @endif
+                        </div>
+
+                        <!-- Información de días de formación -->
+                        @if($diasFormacionFicha->count() > 0)
+                            <div class="alert alert-success">
+                                <i class="fas fa-calendar-check"></i>
+                                <strong>Días de formación disponibles:</strong>
+                                {{ $diasFormacionFicha->pluck('name')->implode(', ') }}
+                            </div>
+                        @else
+                            <div class="alert alert-warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <strong>Advertencia:</strong> Esta ficha no tiene días de formación asignados. 
+                                <a href="{{ route('fichaCaracterizacion.gestionarDiasFormacion', $ficha->id) }}" class="alert-link">
+                                    Asignar días de formación
+                                </a>
+                            </div>
+                        @endif
 
                         <!-- Lista de Instructores -->
                         <div class="form-group">
@@ -262,13 +290,21 @@
         function cargarInstructoresExistentes() {
             @if($instructoresAsignados->count() > 0)
                 @foreach($instructoresAsignados as $asignacion)
+                    @php
+                        $diasFormacion = $asignacion->instructorFichaDias->map(function($dia) {
+                            return [
+                                'dia_id' => $dia->dia_id
+                            ];
+                        })->toArray();
+                    @endphp
                     agregarInstructorRow(
                         {{ $asignacion->instructor_id }},
                         '{{ $asignacion->instructor->persona->primer_nombre }} {{ $asignacion->instructor->persona->primer_apellido }}',
                         '{{ $asignacion->fecha_inicio->format('Y-m-d') }}',
                         '{{ $asignacion->fecha_fin->format('Y-m-d') }}',
-                        {{ $asignacion->total_horas_ficha }},
-                        {{ $ficha->instructor_id == $asignacion->instructor_id ? 'true' : 'false' }}
+                        {{ $asignacion->total_horas_instructor }},
+                        {{ $ficha->instructor_id == $asignacion->instructor_id ? 'true' : 'false' }},
+                        @json($diasFormacion)
                     );
                 @endforeach
             @endif
@@ -292,7 +328,7 @@
         }
 
         // Función para agregar una fila de instructor
-        function agregarInstructorRow(instructorId, nombre, fechaInicio, fechaFin, horas, esPrincipal) {
+        function agregarInstructorRow(instructorId, nombre, fechaInicio, fechaFin, horas, esPrincipal, diasFormacion = []) {
             const container = document.getElementById('instructores-container');
             const index = container.children.length;
             
@@ -316,22 +352,41 @@
                         <div class="col-md-2">
                             <label class="form-label">Fecha Inicio</label>
                             <input type="date" name="instructores[${index}][fecha_inicio]" 
-                                   class="form-control" value="${fechaInicio}" required>
+                                   class="form-control" value="${fechaInicio}" 
+                                   min="{{ $ficha->fecha_inicio ? $ficha->fecha_inicio->format('Y-m-d') : '' }}"
+                                   max="{{ $ficha->fecha_fin ? $ficha->fecha_fin->format('Y-m-d') : '' }}" required>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Fecha Fin</label>
                             <input type="date" name="instructores[${index}][fecha_fin]" 
-                                   class="form-control" value="${fechaFin}" required>
+                                   class="form-control" value="${fechaFin}" 
+                                   min="{{ $ficha->fecha_inicio ? $ficha->fecha_inicio->format('Y-m-d') : '' }}"
+                                   max="{{ $ficha->fecha_fin ? $ficha->fecha_fin->format('Y-m-d') : '' }}" required>
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Horas</label>
-                            <input type="number" name="instructores[${index}][total_horas_ficha]" 
+                            <input type="number" name="instructores[${index}][total_horas_instructor]" 
                                    class="form-control" value="${horas}" min="1" required>
                         </div>
                         <div class="col-md-1">
                             <label class="form-label">&nbsp;</label>
                             <button type="button" class="btn btn-sm btn-danger d-block" onclick="eliminarInstructor(this)">
                                 <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Días de Formación -->
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <label class="form-label">
+                                <i class="fas fa-calendar-week"></i>
+                                Días de Formación
+                            </label>
+                            <div class="dias-formacion-container" data-index="${index}">
+                                <!-- Los días se agregarán dinámicamente aquí -->
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-success mt-1" onclick="agregarDiaFormacion(${index})" {{ $diasFormacionFicha->count() == 0 ? 'disabled' : '' }}>
+                                <i class="fas fa-plus"></i> Agregar Día
                             </button>
                         </div>
                     </div>
@@ -345,6 +400,31 @@
                 theme: 'bootstrap4',
                 width: '100%'
             });
+            
+            // Agregar validación de fechas
+            const fechaInicioInput = div.querySelector('input[name*="[fecha_inicio]"]');
+            const fechaFinInput = div.querySelector('input[name*="[fecha_fin]"]');
+            
+            fechaInicioInput.addEventListener('change', function() {
+                fechaFinInput.min = this.value;
+                if (fechaFinInput.value && fechaFinInput.value < this.value) {
+                    fechaFinInput.value = this.value;
+                }
+            });
+            
+            fechaFinInput.addEventListener('change', function() {
+                fechaInicioInput.max = this.value;
+                if (fechaInicioInput.value && fechaInicioInput.value > this.value) {
+                    fechaInicioInput.value = this.value;
+                }
+            });
+            
+            // Cargar días de formación existentes si los hay
+            if (diasFormacion && diasFormacion.length > 0) {
+                diasFormacion.forEach(dia => {
+                    agregarDiaFormacionRow(index, dia.dia_id);
+                });
+            }
         }
 
         // Función para eliminar un instructor
@@ -372,6 +452,56 @@
                     }
                 });
             });
+        }
+
+        // Función para agregar un día de formación
+        function agregarDiaFormacion(instructorIndex) {
+            const diasDisponibles = @json($diasFormacionFicha);
+            if (diasDisponibles.length === 0) {
+                alert('No hay días de formación asignados a esta ficha. Debe asignar días de formación primero.');
+                return;
+            }
+            agregarDiaFormacionRow(instructorIndex, '');
+        }
+
+        // Función para agregar una fila de día de formación
+        function agregarDiaFormacionRow(instructorIndex, diaId) {
+            const container = document.querySelector(`[data-index="${instructorIndex}"]`);
+            const diaIndex = container.children.length;
+            
+            const div = document.createElement('div');
+            div.className = 'row mb-2 dia-formacion-row';
+            div.innerHTML = `
+                <div class="col-md-10">
+                    <select name="instructores[${instructorIndex}][dias_formacion][${diaIndex}][dia_id]" class="form-control select2" required>
+                        <option value="">Seleccione día</option>
+                        @foreach($diasFormacionFicha as $dia)
+                            <option value="{{ $dia->id }}" ${diaId == {{ $dia->id }} ? 'selected' : ''}>
+                                {{ $dia->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-sm btn-danger" onclick="eliminarDiaFormacion(this)">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(div);
+            
+            // Inicializar Select2 en el nuevo elemento
+            $(div).find('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%'
+            });
+        }
+
+        // Función para eliminar un día de formación
+        function eliminarDiaFormacion(button) {
+            const row = button.closest('.dia-formacion-row');
+            row.remove();
         }
 
         // Validación del formulario
@@ -403,6 +533,36 @@
                 e.preventDefault();
                 alert('El instructor principal debe estar en la lista de instructores asignados.');
                 return;
+            }
+            
+            // Validar fechas de instructores
+            const fechaInicioFicha = '{{ $ficha->fecha_inicio ? $ficha->fecha_inicio->format("Y-m-d") : "" }}';
+            const fechaFinFicha = '{{ $ficha->fecha_fin ? $ficha->fecha_fin->format("Y-m-d") : "" }}';
+            
+            const fechaInicioInputs = document.querySelectorAll('input[name*="[fecha_inicio]"]');
+            const fechaFinInputs = document.querySelectorAll('input[name*="[fecha_fin]"]');
+            
+            for (let i = 0; i < fechaInicioInputs.length; i++) {
+                const fechaInicio = fechaInicioInputs[i].value;
+                const fechaFin = fechaFinInputs[i].value;
+                
+                if (fechaInicioFicha && fechaInicio < fechaInicioFicha) {
+                    e.preventDefault();
+                    alert(`La fecha de inicio del instructor ${i + 1} debe ser posterior o igual a ${fechaInicioFicha}.`);
+                    return;
+                }
+                
+                if (fechaFinFicha && fechaFin > fechaFinFicha) {
+                    e.preventDefault();
+                    alert(`La fecha de fin del instructor ${i + 1} debe ser anterior o igual a ${fechaFinFicha}.`);
+                    return;
+                }
+                
+                if (fechaInicio > fechaFin) {
+                    e.preventDefault();
+                    alert(`La fecha de inicio del instructor ${i + 1} debe ser anterior o igual a la fecha de fin.`);
+                    return;
+                }
             }
         });
     </script>
