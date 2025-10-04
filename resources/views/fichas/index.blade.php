@@ -63,11 +63,8 @@
                     @can('CREAR PROGRAMA DE CARACTERIZACION')
                         <div class="card shadow-sm mb-4 no-hover">
                             <div class="card-header bg-white py-3 d-flex align-items-center">
-                                <h5 class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1">
+                                <a href="{{ route('fichaCaracterizacion.create') }}" class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1 text-decoration-none">
                                     <i class="fas fa-plus-circle mr-2"></i> Crear Ficha de Caracterización
-                                </h5>
-                                <a href="{{ route('fichaCaracterizacion.create') }}" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-plus mr-1"></i> Nueva Ficha
                                 </a>
                             </div>
                         </div>
@@ -97,7 +94,7 @@
                                             <th class="px-4 py-3" style="width: 5%">#</th>
                                             <th class="px-4 py-3" style="width: 15%">Ficha</th>
                                             <th class="px-4 py-3" style="width: 25%">Programa</th>
-                                            <th class="px-4 py-3" style="width: 20%">Instructor</th>
+                                            <th class="px-4 py-3" style="width: 20%">Instructor Líder</th>
                                             <th class="px-4 py-3" style="width: 15%">Sede</th>
                                             <th class="px-4 py-3" style="width: 10%">Estado</th>
                                             <th class="px-4 py-3" style="width: 10%">Aprendices</th>

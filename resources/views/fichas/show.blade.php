@@ -144,8 +144,8 @@
                                                     </h5>
                                                     <p class="text-muted mb-1">
                                                         <i class="fas fa-calendar"></i>
-                                                        {{ $asignacion->fecha_inicio->format('d/m/Y') }} - 
-                                                        {{ $asignacion->fecha_fin->format('d/m/Y') }}
+                                                        {{ \Carbon\Carbon::parse($asignacion->fecha_inicio)->format('d/m/Y') }} - 
+                                                        {{ \Carbon\Carbon::parse($asignacion->fecha_fin)->format('d/m/Y') }}
                                                     </p>
                                                     <p class="text-muted mb-0">
                                                         <i class="fas fa-clock"></i>
@@ -216,7 +216,7 @@
                                 <div class="info-box-content">
                                     <span class="info-box-text">Fecha de Inicio</span>
                                     <span class="info-box-number">
-                                        {{ $ficha->fecha_inicio ? $ficha->fecha_inicio->format('d/m/Y') : 'N/A' }}
+                                        {{ $ficha->fecha_inicio ? \Carbon\Carbon::parse($ficha->fecha_inicio)->format('d/m/Y') : 'N/A' }}
                                     </span>
                                 </div>
                             </div>
@@ -229,7 +229,7 @@
                                 <div class="info-box-content">
                                     <span class="info-box-text">Fecha de Fin</span>
                                     <span class="info-box-number">
-                                        {{ $ficha->fecha_fin ? $ficha->fecha_fin->format('d/m/Y') : 'N/A' }}
+                                        {{ $ficha->fecha_fin ? \Carbon\Carbon::parse($ficha->fecha_fin)->format('d/m/Y') : 'N/A' }}
                                     </span>
                                 </div>
                             </div>
@@ -497,7 +497,7 @@
                         <li>
                             <i class="fas fa-calendar-plus text-success"></i>
                             <strong>Creada:</strong><br>
-                            {{ $ficha->created_at->format('d/m/Y H:i') }}
+                            {{ $ficha->created_at ? \Carbon\Carbon::parse($ficha->created_at)->format('d/m/Y H:i') : 'N/A' }}
                         </li>
                         
                         @if($ficha->usuarioCreacion)
@@ -512,7 +512,7 @@
                             <li>
                                 <i class="fas fa-calendar-edit text-warning"></i>
                                 <strong>Última modificación:</strong><br>
-                                {{ $ficha->updated_at->format('d/m/Y H:i') }}
+                                {{ $ficha->updated_at ? \Carbon\Carbon::parse($ficha->updated_at)->format('d/m/Y H:i') : 'N/A' }}
                             </li>
                             
                             @if($ficha->usuarioEdicion)
