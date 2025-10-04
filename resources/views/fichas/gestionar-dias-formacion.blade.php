@@ -160,13 +160,13 @@
                                         <input type="time" id="hora_inicio_global" class="form-control" 
                                                value="{{ $ficha->jornadaFormacion->hora_inicio }}"
                                                @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
-                                                   min="06:00" max="13:00"
+                                                   min="06:00" max="12:59" step="3600"
                                                @elseif($ficha->jornadaFormacion->jornada == 'TARDE')
-                                                   min="13:00" max="18:00"
+                                                   min="13:00" max="17:59" step="3600"
                                                @elseif($ficha->jornadaFormacion->jornada == 'NOCHE')
-                                                   min="18:00" max="23:00"
+                                                   min="18:00" max="22:59" step="3600"
                                                @elseif($ficha->jornadaFormacion->jornada == 'FINES DE SEMANA')
-                                                   min="08:00" max="17:00"
+                                                   min="08:00" max="16:59" step="3600"
                                                @endif>
                                     </div>
                                     <div class="col-md-4">
@@ -176,13 +176,13 @@
                                         <input type="time" id="hora_fin_global" class="form-control" 
                                                value="{{ $ficha->jornadaFormacion->hora_fin }}"
                                                @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
-                                                   min="06:00" max="13:00"
+                                                   min="06:00" max="12:59" step="3600"
                                                @elseif($ficha->jornadaFormacion->jornada == 'TARDE')
-                                                   min="13:00" max="18:00"
+                                                   min="13:00" max="17:59" step="3600"
                                                @elseif($ficha->jornadaFormacion->jornada == 'NOCHE')
-                                                   min="18:00" max="23:00"
+                                                   min="18:00" max="22:59" step="3600"
                                                @elseif($ficha->jornadaFormacion->jornada == 'FINES DE SEMANA')
-                                                   min="08:00" max="17:00"
+                                                   min="08:00" max="16:59" step="3600"
                                                @endif>
                                     </div>
                                     <div class="col-md-4">
@@ -198,13 +198,13 @@
                                     <strong>Horario sugerido:</strong> {{ $ficha->jornadaFormacion->hora_inicio }} - {{ $ficha->jornadaFormacion->hora_fin }}<br>
                                     <strong>Restricciones de horarios:</strong><br>
                                     @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
-                                        • <strong>MAÑANA:</strong> 06:00 - 13:00 horas
+                                        • <strong>MAÑANA:</strong> 06:00 - 12:59 horas (solo horas completas)
                                     @elseif($ficha->jornadaFormacion->jornada == 'TARDE')
-                                        • <strong>TARDE:</strong> 13:00 - 18:00 horas
+                                        • <strong>TARDE:</strong> 13:00 - 17:59 horas (solo horas completas)
                                     @elseif($ficha->jornadaFormacion->jornada == 'NOCHE')
-                                        • <strong>NOCHE:</strong> 18:00 - 23:00 horas
+                                        • <strong>NOCHE:</strong> 18:00 - 22:59 horas (solo horas completas)
                                     @elseif($ficha->jornadaFormacion->jornada == 'FINES DE SEMANA')
-                                        • <strong>FINES DE SEMANA:</strong> 08:00 - 17:00 horas
+                                        • <strong>FINES DE SEMANA:</strong> 08:00 - 16:59 horas (solo horas completas)
                                     @endif
                                     <br><strong>Nota:</strong> Los horarios deben respetar las restricciones de la jornada seleccionada.
                                 </div>
@@ -544,49 +544,48 @@
                 switch(jornada.toUpperCase()) {
                     case 'MAÑANA':
                         const mananaMin = new Date('2000-01-01 06:00');
-                        const mananaMax = new Date('2000-01-01 13:00');
+                        const mananaMax = new Date('2000-01-01 12:59');
                         
                         if (inicio < mananaMin || fin > mananaMax) {
                             return {
                                 valido: false,
-                                mensaje: 'Para la jornada MAÑANA, los horarios deben estar entre las 06:00 y 13:00 horas.'
+                                mensaje: 'Para la jornada MAÑANA, los horarios deben estar entre las 06:00 y 12:59 horas.'
                             };
                         }
                         break;
                         
                     case 'TARDE':
                         const tardeMin = new Date('2000-01-01 13:00');
-                        const tardeMax = new Date('2000-01-01 18:00');
+                        const tardeMax = new Date('2000-01-01 17:59');
                         
                         if (inicio < tardeMin || fin > tardeMax) {
                             return {
                                 valido: false,
-                                mensaje: 'Para la jornada TARDE, los horarios deben estar entre las 13:00 y 18:00 horas.'
+                                mensaje: 'Para la jornada TARDE, los horarios deben estar entre las 13:00 y 17:59 horas.'
                             };
                         }
                         break;
                         
                     case 'NOCHE':
                         const nocheMin = new Date('2000-01-01 18:00');
-                        const nocheMax = new Date('2000-01-01 23:00');
+                        const nocheMax = new Date('2000-01-01 22:59');
                         
                         if (inicio < nocheMin || fin > nocheMax) {
                             return {
                                 valido: false,
-                                mensaje: 'Para la jornada NOCHE, los horarios deben estar entre las 18:00 y 23:00 horas.'
+                                mensaje: 'Para la jornada NOCHE, los horarios deben estar entre las 18:00 y 22:59 horas.'
                             };
                         }
                         break;
                         
                     case 'FINES DE SEMANA':
-                        // Para fines de semana, permitir horarios más flexibles
                         const fsMin = new Date('2000-01-01 08:00');
-                        const fsMax = new Date('2000-01-01 17:00');
+                        const fsMax = new Date('2000-01-01 16:59');
                         
                         if (inicio < fsMin || fin > fsMax) {
                             return {
                                 valido: false,
-                                mensaje: 'Para FINES DE SEMANA, los horarios deben estar entre las 08:00 y 17:00 horas.'
+                                mensaje: 'Para FINES DE SEMANA, los horarios deben estar entre las 08:00 y 16:59 horas.'
                             };
                         }
                         break;
