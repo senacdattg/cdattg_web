@@ -1936,7 +1936,7 @@ class FichaCaracterizacionController extends Controller
      */
     public function gestionarDiasFormacion(string $id)
     {
-        try {
+        //try {
             Log::info('Acceso a gestión de días de formación', [
                 'user_id' => Auth::id(),
                 'ficha_id' => $id,
@@ -1982,17 +1982,17 @@ class FichaCaracterizacionController extends Controller
                 'horasTotalesActuales'
             ));
 
-        } catch (\Exception $e) {
-            Log::error('Error al cargar gestión de días de formación', [
-                'ficha_id' => $id,
-                'user_id' => Auth::id(),
-                'error' => $e->getMessage(),
-                'line' => $e->getLine()
-            ]);
+        // } catch (\Exception $e) {
+        //     Log::error('Error al cargar gestión de días de formación', [
+        //         'ficha_id' => $id,
+        //         'user_id' => Auth::id(),
+        //         'error' => $e->getMessage(),
+        //         'line' => $e->getLine()
+        //     ]);
 
-            return redirect()->route('fichaCaracterizacion.index')
-                ->with('error', 'Error al cargar la gestión de días de formación: ' . $e->getMessage());
-        }
+        //     return redirect()->route('fichaCaracterizacion.index')
+        //         ->with('error', 'Error al cargar la gestión de días de formación: ' . $e->getMessage());
+        // }
     }
 
     /**
@@ -2288,11 +2288,22 @@ class FichaCaracterizacionController extends Controller
         $duracionEnDias = $ficha->duracionEnDias();
 
         foreach ($diasFormacion as $dia) {
-            $horaInicio = \Carbon\Carbon::createFromFormat('H:i', $dia->hora_inicio);
-            $horaFin = \Carbon\Carbon::createFromFormat('H:i', $dia->hora_fin);
-            $horasPorDia = $horaInicio->diffInHours($horaFin);
-            
-            $horasTotales += $horasPorDia * $duracionEnDias;
+            try {
+                // Usar parse() en lugar de createFromFormat() para mayor flexibilidad
+                $horaInicio = \Carbon\Carbon::parse($dia->hora_inicio);
+                $horaFin = \Carbon\Carbon::parse($dia->hora_fin);
+                $horasPorDia = $horaInicio->diffInHours($horaFin);
+                
+                $horasTotales += $horasPorDia * $duracionEnDias;
+            } catch (\Exception $e) {
+                // Log del error y continuar con el siguiente día
+                \Log::warning("Error al calcular horas para el día: " . $e->getMessage(), [
+                    'dia_id' => $dia->id ?? 'N/A',
+                    'hora_inicio' => $dia->hora_inicio ?? 'N/A',
+                    'hora_fin' => $dia->hora_fin ?? 'N/A'
+                ]);
+                continue;
+            }
         }
 
         return $horasTotales;
