@@ -7,6 +7,8 @@ use App\Models\ProgramaFormacion;
 use App\Models\InstructorFichaCaracterizacion;
 use App\Http\Requests\StoreFichaCaracterizacionRequest;
 use App\Http\Requests\UpdateFichaCaracterizacionRequest;
+use App\Services\FichaCaracterizacionValidationService;
+use App\Traits\ValidacionesSena;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 
 class FichaCaracterizacionController extends Controller
 {
+    use ValidacionesSena;
     /**
      * Constructor del controlador.
      * Aplica middleware de autenticación y permisos.
@@ -1322,77 +1325,6 @@ class FichaCaracterizacionController extends Controller
         }
     }
 
-    /**
-     * Valida si una ficha puede ser eliminada según las reglas de negocio.
-     *
-     * @param string $id El ID de la ficha a validar.
-     * @return \Illuminate\Http\JsonResponse Resultado de la validación.
-     */
-    public function validarEliminacionFicha(string $id)
-    {
-        try {
-            Log::info('Validación de eliminación de ficha', [
-                'ficha_id' => $id,
-                'user_id' => Auth::id(),
-                'timestamp' => now()
-            ]);
-
-            $ficha = FichaCaracterizacion::findOrFail($id);
-            
-            $validaciones = [
-                'tiene_aprendices' => $ficha->tieneAprendices(),
-                'cantidad_aprendices' => $ficha->contarAprendices(),
-                'tiene_asistencias' => $this->fichaTieneAsistencias($ficha->id),
-                'puede_eliminar' => false
-            ];
-
-            // La ficha puede ser eliminada si no tiene aprendices ni asistencias
-            $validaciones['puede_eliminar'] = !$validaciones['tiene_aprendices'] && !$validaciones['tiene_asistencias'];
-
-            $mensaje = $validaciones['puede_eliminar'] 
-                ? 'La ficha puede ser eliminada' 
-                : 'La ficha no puede ser eliminada porque tiene dependencias';
-
-            Log::info('Validación de eliminación completada', [
-                'ficha_id' => $id,
-                'validaciones' => $validaciones,
-                'user_id' => Auth::id()
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => $mensaje,
-                'data' => $validaciones
-            ], 200);
-
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::warning('Validación de eliminación para ficha inexistente', [
-                'ficha_id' => $id,
-                'user_id' => Auth::id()
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'La ficha solicitada no existe',
-                'data' => null
-            ], 404);
-
-        } catch (\Exception $e) {
-            Log::error('Error en validación de eliminación de ficha', [
-                'ficha_id' => $id,
-                'error' => $e->getMessage(),
-                'user_id' => Auth::id(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine()
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al validar la eliminación de la ficha',
-                'error' => $e->getMessage()
-            ], 500);
-        }
-    }
 
     /**
      * Cambia el estado de una ficha (activar/desactivar).
@@ -1521,6 +1453,188 @@ class FichaCaracterizacionController extends Controller
             
             // En caso de error, asumir que sí tiene asistencias para ser conservador
             return true;
+        }
+    }
+
+    /**
+     * Valida una ficha de caracterización usando el servicio de validación.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function validarFicha(Request $request)
+    {
+        try {
+            $validator = new FichaCaracterizacionValidationService();
+            
+            $datos = $request->all();
+            $excluirFichaId = $request->input('excluir_ficha_id');
+            
+            $resultado = $validator->validarFichaCompleta($datos, $excluirFichaId);
+            
+            return response()->json($resultado);
+
+        } catch (\Exception $e) {
+            Log::error('Error al validar ficha', [
+                'error' => $e->getMessage(),
+                'datos' => $request->all(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return response()->json([
+                'valido' => false,
+                'mensaje' => 'Error interno al validar la ficha.',
+                'errores' => ['Error interno en la validación'],
+                'advertencias' => []
+            ], 500);
+        }
+    }
+
+    /**
+     * Valida la disponibilidad de un ambiente en un rango de fechas.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function validarDisponibilidadAmbiente(Request $request)
+    {
+        try {
+            $request->validate([
+                'ambiente_id' => 'required|integer|exists:ambientes,id',
+                'fecha_inicio' => 'required|date',
+                'fecha_fin' => 'required|date|after:fecha_inicio',
+                'excluir_ficha_id' => 'nullable|integer'
+            ]);
+
+            // Usar el trait directamente desde el controlador
+            $resultado = $this->validarDisponibilidadAmbiente(
+                $request->ambiente_id,
+                $request->fecha_inicio,
+                $request->fecha_fin,
+                $request->excluir_ficha_id
+            );
+            
+            return response()->json($resultado);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'valido' => false,
+                'mensaje' => 'Error de validación en los datos enviados.',
+                'errores' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Error al validar disponibilidad de ambiente', [
+                'error' => $e->getMessage(),
+                'datos' => $request->all()
+            ]);
+
+            return response()->json([
+                'valido' => false,
+                'mensaje' => 'Error interno al validar disponibilidad del ambiente.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Valida la disponibilidad de un instructor en un rango de fechas.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function validarDisponibilidadInstructor(Request $request)
+    {
+        try {
+            $request->validate([
+                'instructor_id' => 'required|integer|exists:instructores,id',
+                'fecha_inicio' => 'required|date',
+                'fecha_fin' => 'required|date|after:fecha_inicio',
+                'excluir_ficha_id' => 'nullable|integer'
+            ]);
+
+            // Usar el trait directamente desde el controlador
+            $resultado = $this->validarDisponibilidadInstructor(
+                $request->instructor_id,
+                $request->fecha_inicio,
+                $request->fecha_fin,
+                $request->excluir_ficha_id
+            );
+            
+            return response()->json($resultado);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'valido' => false,
+                'mensaje' => 'Error de validación en los datos enviados.',
+                'errores' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Error al validar disponibilidad de instructor', [
+                'error' => $e->getMessage(),
+                'datos' => $request->all()
+            ]);
+
+            return response()->json([
+                'valido' => false,
+                'mensaje' => 'Error interno al validar disponibilidad del instructor.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Valida si una ficha puede ser eliminada.
+     *
+     * @param int $id ID de la ficha
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function validarEliminacionFicha(string $id)
+    {
+        try {
+            $validator = new FichaCaracterizacionValidationService();
+            $resultado = $validator->validarEliminacionFicha($id);
+            
+            return response()->json($resultado);
+
+        } catch (\Exception $e) {
+            Log::error('Error al validar eliminación de ficha', [
+                'ficha_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'valido' => false,
+                'mensaje' => 'Error interno al validar eliminación de la ficha.',
+                'errores' => ['Error interno en la validación']
+            ], 500);
+        }
+    }
+
+    /**
+     * Valida si una ficha puede ser editada.
+     *
+     * @param int $id ID de la ficha
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function validarEdicionFicha(string $id)
+    {
+        try {
+            $validator = new FichaCaracterizacionValidationService();
+            $resultado = $validator->validarEdicionFicha($id);
+            
+            return response()->json($resultado);
+
+        } catch (\Exception $e) {
+            Log::error('Error al validar edición de ficha', [
+                'ficha_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'valido' => false,
+                'mensaje' => 'Error interno al validar edición de la ficha.',
+                'errores' => ['Error interno en la validación'],
+                'advertencias' => []
+            ], 500);
         }
     }
 

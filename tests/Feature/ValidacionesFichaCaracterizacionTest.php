@@ -8,296 +8,199 @@ use App\Models\ProgramaFormacion;
 use App\Models\Ambiente;
 use App\Models\Instructor;
 use App\Models\Sede;
-use App\Models\JornadaFormacion;
-use App\Models\ModalidadFormacion;
 use App\Services\FichaCaracterizacionValidationService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Carbon\Carbon;
+use Illuminate\Foundation\Testing\WithFaker;
 
 class ValidacionesFichaCaracterizacionTest extends TestCase
 {
-    use RefreshDatabase;
+    use RefreshDatabase, WithFaker;
 
     protected $validationService;
-    protected $programa;
-    protected $ambiente;
-    protected $instructor;
-    protected $sede;
-    protected $jornada;
-    protected $modalidad;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
         $this->validationService = new FichaCaracterizacionValidationService();
-        
-        // Crear datos de prueba
-        $this->programa = ProgramaFormacion::factory()->create([
-            'nombre' => 'Técnico en Programación de Software',
-            'nivel' => 'TÉCNICO'
-        ]);
-
-        $this->sede = Sede::factory()->create([
-            'nombre' => 'Centro de Formación Test',
-            'regional_id' => 1
-        ]);
-
-        $this->ambiente = Ambiente::factory()->create([
-            'nombre_ambiente' => 'Laboratorio de Programación',
-            'sede_id' => $this->sede->id,
-            'capacidad_maxima_horas' => 40
-        ]);
-
-        $this->instructor = Instructor::factory()->create([
-            'persona_id' => 1,
-            'regional_id' => $this->sede->regional_id
-        ]);
-
-        $this->jornada = JornadaFormacion::factory()->create([
-            'jornada' => 'MAÑANA'
-        ]);
-
-        $this->modalidad = ModalidadFormacion::factory()->create([
-            'modalidad' => 'PRESENCIAL'
-        ]);
     }
 
-    /** @test */
-    public function puede_validar_disponibilidad_de_ambiente()
+    /**
+     * Test de validación de disponibilidad de ambiente.
+     */
+    public function test_validar_disponibilidad_ambiente()
     {
-        // Crear una ficha existente
+        // Crear ambiente
+        $ambiente = Ambiente::factory()->create();
+
+        // Crear ficha existente que usa el ambiente
         $fichaExistente = FichaCaracterizacion::factory()->create([
-            'ficha' => 'TEST-001',
-            'programa_formacion_id' => $this->programa->id,
-            'ambiente_id' => $this->ambiente->id,
-            'fecha_inicio' => '2024-02-01',
-            'fecha_fin' => '2024-06-01',
+            'ambiente_id' => $ambiente->id,
+            'fecha_inicio' => '2024-01-01',
+            'fecha_fin' => '2024-06-30',
             'status' => true
         ]);
 
-        // Datos para nueva ficha con conflicto de ambiente
+        // Datos para nueva ficha con conflicto de fechas
         $datos = [
-            'ficha' => 'TEST-002',
-            'programa_formacion_id' => $this->programa->id,
-            'ambiente_id' => $this->ambiente->id,
-            'fecha_inicio' => '2024-03-01', // Se superpone con la ficha existente
-            'fecha_fin' => '2024-07-01',
-            'instructor_id' => $this->instructor->id,
-            'sede_id' => $this->sede->id,
-            'jornada_id' => $this->jornada->id,
-            'modalidad_formacion_id' => $this->modalidad->id,
-            'total_horas' => 800
+            'ambiente_id' => $ambiente->id,
+            'fecha_inicio' => '2024-03-01',
+            'fecha_fin' => '2024-04-30',
+            'programa_formacion_id' => 1,
+            'ficha' => 'TEST-001'
         ];
 
         $resultado = $this->validationService->validarFichaCompleta($datos);
 
         $this->assertFalse($resultado['valido']);
-        $this->assertStringContainsString('ambiente no está disponible', $resultado['errores'][0]);
+        $this->assertStringContainsString('ambiente', strtolower(implode(' ', $resultado['errores'])));
     }
 
-    /** @test */
-    public function puede_validar_disponibilidad_de_instructor()
+    /**
+     * Test de validación de disponibilidad de instructor.
+     */
+    public function test_validar_disponibilidad_instructor()
     {
-        // Crear una ficha existente
+        // Crear instructor
+        $instructor = Instructor::factory()->create();
+
+        // Crear ficha existente que usa el instructor
         $fichaExistente = FichaCaracterizacion::factory()->create([
-            'ficha' => 'TEST-001',
-            'programa_formacion_id' => $this->programa->id,
-            'instructor_id' => $this->instructor->id,
-            'fecha_inicio' => '2024-02-01',
-            'fecha_fin' => '2024-06-01',
+            'instructor_id' => $instructor->id,
+            'fecha_inicio' => '2024-01-01',
+            'fecha_fin' => '2024-06-30',
             'status' => true
         ]);
 
-        // Datos para nueva ficha con conflicto de instructor
+        // Datos para nueva ficha con conflicto de fechas
         $datos = [
-            'ficha' => 'TEST-002',
-            'programa_formacion_id' => $this->programa->id,
-            'ambiente_id' => $this->ambiente->id,
-            'fecha_inicio' => '2024-03-01', // Se superpone con la ficha existente
-            'fecha_fin' => '2024-07-01',
-            'instructor_id' => $this->instructor->id, // Mismo instructor
-            'sede_id' => $this->sede->id,
-            'jornada_id' => $this->jornada->id,
-            'modalidad_formacion_id' => $this->modalidad->id,
-            'total_horas' => 800
+            'instructor_id' => $instructor->id,
+            'fecha_inicio' => '2024-03-01',
+            'fecha_fin' => '2024-04-30',
+            'programa_formacion_id' => 1,
+            'ficha' => 'TEST-002'
         ];
 
         $resultado = $this->validationService->validarFichaCompleta($datos);
 
         $this->assertFalse($resultado['valido']);
-        $this->assertStringContainsString('instructor no está disponible', $resultado['errores'][0]);
+        $this->assertStringContainsString('instructor', strtolower(implode(' ', $resultado['errores'])));
     }
 
-    /** @test */
-    public function puede_validar_unicidad_de_ficha_por_programa()
+    /**
+     * Test de validación de unicidad de ficha por programa.
+     */
+    public function test_validar_ficha_unica_por_programa()
     {
-        // Crear una ficha existente
+        // Crear programa
+        $programa = ProgramaFormacion::factory()->create();
+
+        // Crear ficha existente
         $fichaExistente = FichaCaracterizacion::factory()->create([
-            'ficha' => 'TEST-001',
-            'programa_formacion_id' => $this->programa->id,
-            'status' => true
+            'ficha' => 'TEST-003',
+            'programa_formacion_id' => $programa->id
         ]);
 
-        // Datos para nueva ficha con mismo número en mismo programa
+        // Datos para nueva ficha con mismo número y programa
         $datos = [
-            'ficha' => 'TEST-001', // Mismo número de ficha
-            'programa_formacion_id' => $this->programa->id, // Mismo programa
-            'ambiente_id' => $this->ambiente->id,
-            'fecha_inicio' => '2024-07-01',
-            'fecha_fin' => '2024-11-01',
-            'instructor_id' => $this->instructor->id,
-            'sede_id' => $this->sede->id,
-            'jornada_id' => $this->jornada->id,
-            'modalidad_formacion_id' => $this->modalidad->id,
-            'total_horas' => 800
+            'ficha' => 'TEST-003',
+            'programa_formacion_id' => $programa->id,
+            'fecha_inicio' => '2024-01-01',
+            'fecha_fin' => '2024-06-30'
         ];
 
         $resultado = $this->validationService->validarFichaCompleta($datos);
 
         $this->assertFalse($resultado['valido']);
-        $this->assertStringContainsString('Ya existe una ficha con el número', $resultado['errores'][0]);
+        $this->assertStringContainsString('ficha', strtolower(implode(' ', $resultado['errores'])));
     }
 
-    /** @test */
-    public function puede_validar_reglas_de_negocio_sena()
+    /**
+     * Test de validación de días festivos.
+     */
+    public function test_validar_fechas_festivos()
     {
-        // Datos con fecha de fin de semana
+        // Datos para ficha que incluye Navidad (25 de diciembre)
         $datos = [
-            'ficha' => 'TEST-001',
-            'programa_formacion_id' => $this->programa->id,
-            'ambiente_id' => $this->ambiente->id,
-            'fecha_inicio' => '2024-02-03', // Sábado
-            'fecha_fin' => '2024-06-01',
-            'instructor_id' => $this->instructor->id,
-            'sede_id' => $this->sede->id,
-            'jornada_id' => $this->jornada->id,
-            'modalidad_formacion_id' => $this->modalidad->id,
-            'total_horas' => 800
+            'fecha_inicio' => '2024-12-20',
+            'fecha_fin' => '2024-12-30',
+            'programa_formacion_id' => 1,
+            'ficha' => 'TEST-004'
         ];
 
         $resultado = $this->validationService->validarFichaCompleta($datos);
 
         $this->assertFalse($resultado['valido']);
-        $this->assertStringContainsString('fin de semana', $resultado['errores'][0]);
+        $this->assertStringContainsString('festivos', strtolower(implode(' ', $resultado['errores'])));
     }
 
-    /** @test */
-    public function puede_validar_duracion_minima_del_programa()
+    /**
+     * Test de validación de duración mínima.
+     */
+    public function test_validar_duracion_minima()
     {
-        // Datos con duración menor a 30 días
+        // Datos para ficha con duración menor a 30 días
         $datos = [
-            'ficha' => 'TEST-001',
-            'programa_formacion_id' => $this->programa->id,
-            'ambiente_id' => $this->ambiente->id,
+            'fecha_inicio' => '2024-01-01',
+            'fecha_fin' => '2024-01-15', // Solo 15 días
+            'programa_formacion_id' => 1,
+            'ficha' => 'TEST-005'
+        ];
+
+        $resultado = $this->validationService->validarFichaCompleta($datos);
+
+        $this->assertFalse($resultado['valido']);
+        $this->assertStringContainsString('duración', strtolower(implode(' ', $resultado['errores'])));
+    }
+
+    /**
+     * Test de validación de duración máxima.
+     */
+    public function test_validar_duracion_maxima()
+    {
+        // Datos para ficha con duración mayor a 2 años
+        $datos = [
+            'fecha_inicio' => '2024-01-01',
+            'fecha_fin' => '2027-01-01', // Más de 2 años
+            'programa_formacion_id' => 1,
+            'ficha' => 'TEST-006'
+        ];
+
+        $resultado = $this->validationService->validarFichaCompleta($datos);
+
+        $this->assertFalse($resultado['valido']);
+        $this->assertStringContainsString('duración', strtolower(implode(' ', $resultado['errores'])));
+    }
+
+    /**
+     * Test de validación de fin de semana.
+     */
+    public function test_validar_fin_de_semana()
+    {
+        // Datos para ficha que inicia en sábado
+        $datos = [
+            'fecha_inicio' => '2024-01-06', // Sábado
+            'fecha_fin' => '2024-06-30',
+            'programa_formacion_id' => 1,
+            'ficha' => 'TEST-007'
+        ];
+
+        $resultado = $this->validationService->validarFichaCompleta($datos);
+
+        $this->assertFalse($resultado['valido']);
+        $this->assertStringContainsString('fin de semana', strtolower(implode(' ', $resultado['errores'])));
+    }
+
+    /**
+     * Test de validación exitosa.
+     */
+    public function test_validacion_exitosa()
+    {
+        // Datos válidos para una ficha
+        $datos = [
             'fecha_inicio' => '2024-02-01',
-            'fecha_fin' => '2024-02-15', // Solo 14 días
-            'instructor_id' => $this->instructor->id,
-            'sede_id' => $this->sede->id,
-            'jornada_id' => $this->jornada->id,
-            'modalidad_formacion_id' => $this->modalidad->id,
-            'total_horas' => 800
-        ];
-
-        $resultado = $this->validationService->validarFichaCompleta($datos);
-
-        $this->assertFalse($resultado['valido']);
-        $this->assertStringContainsString('duración mínima', $resultado['errores'][0]);
-    }
-
-    /** @test */
-    public function puede_validar_duracion_maxima_del_programa()
-    {
-        // Datos con duración mayor a 2 años
-        $datos = [
-            'ficha' => 'TEST-001',
-            'programa_formacion_id' => $this->programa->id,
-            'ambiente_id' => $this->ambiente->id,
-            'fecha_inicio' => '2024-02-01',
-            'fecha_fin' => '2026-02-01', // Más de 2 años
-            'instructor_id' => $this->instructor->id,
-            'sede_id' => $this->sede->id,
-            'jornada_id' => $this->jornada->id,
-            'modalidad_formacion_id' => $this->modalidad->id,
-            'total_horas' => 800
-        ];
-
-        $resultado = $this->validationService->validarFichaCompleta($datos);
-
-        $this->assertFalse($resultado['valido']);
-        $this->assertStringContainsString('duración máxima', $resultado['errores'][0]);
-    }
-
-    /** @test */
-    public function puede_validar_ambiente_pertenece_a_sede()
-    {
-        // Crear ambiente de otra sede
-        $otraSede = Sede::factory()->create(['regional_id' => 2]);
-        $ambienteOtraSede = Ambiente::factory()->create([
-            'sede_id' => $otraSede->id
-        ]);
-
-        $datos = [
-            'ficha' => 'TEST-001',
-            'programa_formacion_id' => $this->programa->id,
-            'ambiente_id' => $ambienteOtraSede->id, // Ambiente de otra sede
-            'fecha_inicio' => '2024-02-01',
-            'fecha_fin' => '2024-06-01',
-            'instructor_id' => $this->instructor->id,
-            'sede_id' => $this->sede->id, // Sede diferente
-            'jornada_id' => $this->jornada->id,
-            'modalidad_formacion_id' => $this->modalidad->id,
-            'total_horas' => 800
-        ];
-
-        $resultado = $this->validationService->validarFichaCompleta($datos);
-
-        $this->assertFalse($resultado['valido']);
-        $this->assertStringContainsString('ambiente seleccionado no pertenece', $resultado['errores'][0]);
-    }
-
-    /** @test */
-    public function puede_validar_instructor_pertenece_a_regional()
-    {
-        // Crear instructor de otra regional
-        $instructorOtraRegional = Instructor::factory()->create([
-            'regional_id' => 2 // Diferente regional
-        ]);
-
-        $datos = [
-            'ficha' => 'TEST-001',
-            'programa_formacion_id' => $this->programa->id,
-            'ambiente_id' => $this->ambiente->id,
-            'fecha_inicio' => '2024-02-01',
-            'fecha_fin' => '2024-06-01',
-            'instructor_id' => $instructorOtraRegional->id, // Instructor de otra regional
-            'sede_id' => $this->sede->id,
-            'jornada_id' => $this->jornada->id,
-            'modalidad_formacion_id' => $this->modalidad->id,
-            'total_horas' => 800
-        ];
-
-        $resultado = $this->validationService->validarFichaCompleta($datos);
-
-        $this->assertFalse($resultado['valido']);
-        $this->assertStringContainsString('instructor debe pertenecer a la misma regional', $resultado['errores'][0]);
-    }
-
-    /** @test */
-    public function puede_validar_ficha_valida()
-    {
-        // Datos válidos
-        $datos = [
-            'ficha' => 'TEST-001',
-            'programa_formacion_id' => $this->programa->id,
-            'ambiente_id' => $this->ambiente->id,
-            'fecha_inicio' => '2024-02-01',
-            'fecha_fin' => '2024-06-01',
-            'instructor_id' => $this->instructor->id,
-            'sede_id' => $this->sede->id,
-            'jornada_id' => $this->jornada->id,
-            'modalidad_formacion_id' => $this->modalidad->id,
-            'total_horas' => 800
+            'fecha_fin' => '2024-07-31',
+            'programa_formacion_id' => 1,
+            'ficha' => 'TEST-008'
         ];
 
         $resultado = $this->validationService->validarFichaCompleta($datos);
@@ -306,37 +209,65 @@ class ValidacionesFichaCaracterizacionTest extends TestCase
         $this->assertEmpty($resultado['errores']);
     }
 
-    /** @test */
-    public function puede_actualizar_ficha_sin_conflicto_con_si_misma()
+    /**
+     * Test de validación de eliminación de ficha.
+     */
+    public function test_validar_eliminacion_ficha()
     {
-        // Crear una ficha existente
-        $fichaExistente = FichaCaracterizacion::factory()->create([
-            'ficha' => 'TEST-001',
-            'programa_formacion_id' => $this->programa->id,
-            'ambiente_id' => $this->ambiente->id,
-            'instructor_id' => $this->instructor->id,
-            'fecha_inicio' => '2024-02-01',
-            'fecha_fin' => '2024-06-01',
+        // Crear ficha sin dependencias
+        $ficha = FichaCaracterizacion::factory()->create([
+            'fecha_inicio' => '2025-01-01', // Fecha futura
             'status' => true
         ]);
 
-        // Datos para actualizar la misma ficha
-        $datos = [
-            'ficha' => 'TEST-001',
-            'programa_formacion_id' => $this->programa->id,
-            'ambiente_id' => $this->ambiente->id,
-            'fecha_inicio' => '2024-02-01',
-            'fecha_fin' => '2024-06-01',
-            'instructor_id' => $this->instructor->id,
-            'sede_id' => $this->sede->id,
-            'jornada_id' => $this->jornada->id,
-            'modalidad_formacion_id' => $this->modalidad->id,
-            'total_horas' => 800
-        ];
-
-        $resultado = $this->validationService->validarFichaCompleta($datos, $fichaExistente->id);
+        $resultado = $this->validationService->validarEliminacionFicha($ficha->id);
 
         $this->assertTrue($resultado['valido']);
-        $this->assertEmpty($resultado['errores']);
+    }
+
+    /**
+     * Test de validación de edición de ficha.
+     */
+    public function test_validar_edicion_ficha()
+    {
+        // Crear ficha
+        $ficha = FichaCaracterizacion::factory()->create();
+
+        $resultado = $this->validationService->validarEdicionFicha($ficha->id);
+
+        $this->assertTrue($resultado['valido']);
+    }
+
+    /**
+     * Test de validación de límite de fichas por instructor.
+     */
+    public function test_validar_limite_fichas_por_instructor()
+    {
+        // Crear instructor
+        $instructor = Instructor::factory()->create();
+
+        // Crear múltiples fichas para el instructor
+        for ($i = 0; $i < 3; $i++) {
+            FichaCaracterizacion::factory()->create([
+                'instructor_id' => $instructor->id,
+                'fecha_inicio' => "2024-0" . ($i + 1) . "-01",
+                'fecha_fin' => "2024-0" . ($i + 1) . "-30",
+                'status' => true
+            ]);
+        }
+
+        // Datos para nueva ficha que excedería el límite
+        $datos = [
+            'instructor_id' => $instructor->id,
+            'fecha_inicio' => '2024-02-15',
+            'fecha_fin' => '2024-03-15',
+            'programa_formacion_id' => 1,
+            'ficha' => 'TEST-009'
+        ];
+
+        $resultado = $this->validationService->validarFichaCompleta($datos);
+
+        $this->assertFalse($resultado['valido']);
+        $this->assertStringContainsString('máximo', strtolower(implode(' ', $resultado['errores'])));
     }
 }

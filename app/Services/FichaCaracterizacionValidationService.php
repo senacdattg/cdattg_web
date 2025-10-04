@@ -89,14 +89,12 @@ class FichaCaracterizacionValidationService
                 'errores' => $errores,
                 'advertencias' => $advertencias,
                 'mensaje' => count($errores) === 0 
-                    ? 'Todas las validaciones se cumplieron correctamente.' 
+                    ? 'Todas las validaciones pasaron correctamente.' 
                     : 'Se encontraron errores en la validación.'
             ];
 
             Log::info('Validación completa de ficha finalizada', [
-                'valido' => $resultado['valido'],
-                'total_errores' => count($errores),
-                'total_advertencias' => count($advertencias),
+                'resultado' => $resultado,
                 'timestamp' => now()
             ]);
 
@@ -105,8 +103,9 @@ class FichaCaracterizacionValidationService
         } catch (\Exception $e) {
             Log::error('Error en validación completa de ficha', [
                 'error' => $e->getMessage(),
-                'line' => $e->getLine(),
-                'timestamp' => now()
+                'datos' => $datos,
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
             ]);
 
             return [
@@ -119,7 +118,7 @@ class FichaCaracterizacionValidationService
     }
 
     /**
-     * Validaciones adicionales específicas del negocio.
+     * Validaciones adicionales específicas para el SENA.
      *
      * @param array $datos Datos de la ficha
      * @param int|null $excluirFichaId ID de ficha a excluir
@@ -131,44 +130,123 @@ class FichaCaracterizacionValidationService
         $advertencias = [];
 
         try {
-            // 1. Validar que no se superpongan horarios de instructores en el mismo ambiente
-            if (isset($datos['instructor_id']) && isset($datos['ambiente_id']) && 
-                isset($datos['fecha_inicio']) && isset($datos['fecha_fin'])) {
+            // 1. Validar que el programa esté activo
+            if (isset($datos['programa_formacion_id'])) {
+                $programa = \App\Models\ProgramaFormacion::find($datos['programa_formacion_id']);
+                if ($programa && isset($programa->status) && !$programa->status) {
+                    $errores[] = 'El programa de formación seleccionado está inactivo.';
+                }
+            }
+
+            // 2. Validar que la sede esté activa
+            if (isset($datos['sede_id'])) {
+                $sede = \App\Models\Sede::find($datos['sede_id']);
+                if ($sede && isset($sede->status) && !$sede->status) {
+                    $errores[] = 'La sede seleccionada está inactiva.';
+                }
+            }
+
+            // 3. Validar que el ambiente esté activo
+            if (isset($datos['ambiente_id'])) {
+                $ambiente = Ambiente::find($datos['ambiente_id']);
+                if ($ambiente && isset($ambiente->status) && !$ambiente->status) {
+                    $errores[] = 'El ambiente seleccionado está inactivo.';
+                }
+            }
+
+            // 4. Validar que el instructor esté activo
+            if (isset($datos['instructor_id'])) {
+                $instructor = Instructor::find($datos['instructor_id']);
+                if ($instructor && isset($instructor->status) && !$instructor->status) {
+                    $errores[] = 'El instructor seleccionado está inactivo.';
+                }
+            }
+
+            // 5. Validar duración mínima según modalidad
+            if (isset($datos['modalidad_formacion_id']) && isset($datos['fecha_inicio']) && isset($datos['fecha_fin'])) {
+                $duracionDias = \Carbon\Carbon::parse($datos['fecha_inicio'])->diffInDays(\Carbon\Carbon::parse($datos['fecha_fin']));
                 
-                $validacionSuperposicion = $this->validarSuperposicionHorariosAmbiente(
-                    $datos['instructor_id'],
-                    $datos['ambiente_id'],
-                    $datos['fecha_inicio'],
-                    $datos['fecha_fin'],
-                    $excluirFichaId
-                );
+                // Duración mínima según modalidad
+                $duracionesMinimas = [
+                    1 => 30,  // Presencial
+                    2 => 60,  // Virtual
+                    3 => 90,  // Mixta
+                ];
 
-                if (!$validacionSuperposicion['valido']) {
-                    $errores[] = $validacionSuperposicion['mensaje'];
+                $duracionMinima = $duracionesMinimas[$datos['modalidad_formacion_id']] ?? 30;
+                
+                if ($duracionDias < $duracionMinima) {
+                    $advertencias[] = "La duración del programa es menor a lo recomendado para esta modalidad ({$duracionMinima} días mínimo).";
                 }
             }
 
-            // 2. Validar capacidad del ambiente
-            if (isset($datos['ambiente_id']) && isset($datos['total_horas'])) {
-                $validacionCapacidad = $this->validarCapacidadAmbiente($datos['ambiente_id'], $datos['total_horas']);
-                if (!$validacionCapacidad['valido']) {
-                    $advertencias[] = $validacionCapacidad['mensaje'];
+            // 6. Validar que no se superpongan fechas con programas similares
+            if (isset($datos['programa_formacion_id']) && isset($datos['fecha_inicio']) && isset($datos['fecha_fin'])) {
+                $programasSimilares = FichaCaracterizacion::where('programa_formacion_id', $datos['programa_formacion_id'])
+                    ->where('status', true)
+                    ->where('id', '!=', $excluirFichaId)
+                    ->where(function ($q) use ($datos) {
+                        $q->whereBetween('fecha_inicio', [$datos['fecha_inicio'], $datos['fecha_fin']])
+                            ->orWhereBetween('fecha_fin', [$datos['fecha_inicio'], $datos['fecha_fin']])
+                            ->orWhere(function ($subQuery) use ($datos) {
+                                $subQuery->where('fecha_inicio', '<=', $datos['fecha_inicio'])
+                                    ->where('fecha_fin', '>=', $datos['fecha_fin']);
+                            });
+                    })
+                    ->count();
+
+                if ($programasSimilares > 0) {
+                    $advertencias[] = 'Ya existen programas similares en las fechas seleccionadas. Se recomienda verificar la disponibilidad.';
                 }
             }
 
-            // 3. Validar carga horaria del instructor
-            if (isset($datos['instructor_id']) && isset($datos['total_horas'])) {
-                $validacionCargaHoraria = $this->validarCargaHorariaInstructor($datos['instructor_id'], $datos['total_horas']);
-                if (!$validacionCargaHoraria['valido']) {
-                    $advertencias[] = $validacionCargaHoraria['mensaje'];
+            // 7. Validar que el instructor no tenga más de X fichas en el mismo período
+            if (isset($datos['instructor_id']) && isset($datos['fecha_inicio']) && isset($datos['fecha_fin'])) {
+                $fichasInstructor = FichaCaracterizacion::where('instructor_id', $datos['instructor_id'])
+                    ->where('status', true)
+                    ->where('id', '!=', $excluirFichaId)
+                    ->where(function ($q) use ($datos) {
+                        $q->whereBetween('fecha_inicio', [$datos['fecha_inicio'], $datos['fecha_fin']])
+                            ->orWhereBetween('fecha_fin', [$datos['fecha_inicio'], $datos['fecha_fin']]);
+                    })
+                    ->count();
+
+                if ($fichasInstructor >= 2) {
+                    $advertencias[] = 'El instructor ya tiene múltiples fichas asignadas en el período seleccionado.';
                 }
             }
 
-            // 4. Validar fechas según calendario académico del SENA
-            if (isset($datos['fecha_inicio']) && isset($datos['fecha_fin'])) {
-                $validacionCalendario = $this->validarCalendarioAcademico($datos['fecha_inicio'], $datos['fecha_fin']);
-                if (!$validacionCalendario['valido']) {
-                    $errores[] = $validacionCalendario['mensaje'];
+            // 8. Validar que el ambiente no esté en mantenimiento
+            if (isset($datos['ambiente_id'])) {
+                $ambiente = Ambiente::find($datos['ambiente_id']);
+                if ($ambiente && isset($ambiente->estado) && $ambiente->estado === 'MANTENIMIENTO') {
+                    $errores[] = 'El ambiente seleccionado está en mantenimiento y no está disponible.';
+                }
+            }
+
+            // 9. Validar que las fechas no sean muy lejanas en el futuro
+            if (isset($datos['fecha_inicio'])) {
+                $fechaInicio = \Carbon\Carbon::parse($datos['fecha_inicio']);
+                $fechaActual = \Carbon\Carbon::now();
+                $diferenciaMeses = $fechaActual->diffInMonths($fechaInicio);
+
+                if ($diferenciaMeses > 12) {
+                    $advertencias[] = 'La fecha de inicio está muy lejana en el futuro (más de 12 meses).';
+                }
+            }
+
+            // 10. Validar que el programa tenga instructores disponibles
+            if (isset($datos['programa_formacion_id'])) {
+                $instructoresDisponibles = Instructor::where('status', true)
+                    ->whereHas('competencias', function ($q) use ($datos) {
+                        $q->whereHas('programas', function ($subQ) use ($datos) {
+                            $subQ->where('programa_id', $datos['programa_formacion_id']);
+                        });
+                    })
+                    ->count();
+
+                if ($instructoresDisponibles === 0) {
+                    $advertencias[] = 'No se encontraron instructores con las competencias requeridas para este programa.';
                 }
             }
 
@@ -178,6 +256,13 @@ class FichaCaracterizacionValidationService
             ];
 
         } catch (\Exception $e) {
+            Log::error('Error en validaciones adicionales', [
+                'error' => $e->getMessage(),
+                'datos' => $datos,
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
             return [
                 'errores' => ['Error en validaciones adicionales: ' . $e->getMessage()],
                 'advertencias' => []
@@ -186,189 +271,136 @@ class FichaCaracterizacionValidationService
     }
 
     /**
-     * Valida que no se superpongan horarios de instructores en el mismo ambiente.
-     */
-    private function validarSuperposicionHorariosAmbiente($instructorId, $ambienteId, $fechaInicio, $fechaFin, $excluirFichaId = null)
-    {
-        try {
-            // Buscar otras fichas que usen el mismo ambiente en el mismo horario
-            $query = FichaCaracterizacion::where('ambiente_id', $ambienteId)
-                ->where('status', true)
-                ->where(function ($q) use ($fechaInicio, $fechaFin) {
-                    $q->whereBetween('fecha_inicio', [$fechaInicio, $fechaFin])
-                        ->orWhereBetween('fecha_fin', [$fechaInicio, $fechaFin])
-                        ->orWhere(function ($subQuery) use ($fechaInicio, $fechaFin) {
-                            $subQuery->where('fecha_inicio', '<=', $fechaInicio)
-                                ->where('fecha_fin', '>=', $fechaFin);
-                        });
-                });
-
-            if ($excluirFichaId) {
-                $query->where('id', '!=', $excluirFichaId);
-            }
-
-            $fichasConflictivas = $query->get();
-
-            if ($fichasConflictivas->count() > 0) {
-                $fichasConflictivasStr = $fichasConflictivas->pluck('ficha')->implode(', ');
-                return [
-                    'valido' => false,
-                    'mensaje' => "El ambiente ya está siendo usado por otras fichas en el mismo horario: {$fichasConflictivasStr}."
-                ];
-            }
-
-            return [
-                'valido' => true,
-                'mensaje' => 'No hay conflictos de horarios en el ambiente.'
-            ];
-
-        } catch (\Exception $e) {
-            return [
-                'valido' => false,
-                'mensaje' => 'Error al validar superposición de horarios: ' . $e->getMessage()
-            ];
-        }
-    }
-
-    /**
-     * Valida la capacidad del ambiente para el número de horas.
-     */
-    private function validarCapacidadAmbiente($ambienteId, $totalHoras)
-    {
-        try {
-            $ambiente = Ambiente::find($ambienteId);
-            if (!$ambiente) {
-                return [
-                    'valido' => false,
-                    'mensaje' => 'El ambiente no existe.'
-                ];
-            }
-
-            // Capacidad máxima de horas por semana (configurable)
-            $capacidadMaximaSemanal = $ambiente->capacidad_maxima_horas ?? 40;
-
-            if ($totalHoras > $capacidadMaximaSemanal) {
-                return [
-                    'valido' => false,
-                    'mensaje' => "El ambiente tiene una capacidad máxima de {$capacidadMaximaSemanal} horas semanales."
-                ];
-            }
-
-            return [
-                'valido' => true,
-                'mensaje' => 'La capacidad del ambiente es adecuada.'
-            ];
-
-        } catch (\Exception $e) {
-            return [
-                'valido' => false,
-                'mensaje' => 'Error al validar capacidad del ambiente: ' . $e->getMessage()
-            ];
-        }
-    }
-
-    /**
-     * Valida la carga horaria del instructor.
-     */
-    private function validarCargaHorariaInstructor($instructorId, $totalHoras)
-    {
-        try {
-            // Carga horaria máxima por instructor (configurable)
-            $cargaMaximaSemanal = 40; // horas
-
-            if ($totalHoras > $cargaMaximaSemanal) {
-                return [
-                    'valido' => false,
-                    'mensaje' => "El instructor no puede tener una carga horaria superior a {$cargaMaximaSemanal} horas semanales."
-                ];
-            }
-
-            return [
-                'valido' => true,
-                'mensaje' => 'La carga horaria del instructor es adecuada.'
-            ];
-
-        } catch (\Exception $e) {
-            return [
-                'valido' => false,
-                'mensaje' => 'Error al validar carga horaria del instructor: ' . $e->getMessage()
-            ];
-        }
-    }
-
-    /**
-     * Valida las fechas según el calendario académico del SENA.
-     */
-    private function validarCalendarioAcademico($fechaInicio, $fechaFin)
-    {
-        try {
-            $fechaInicio = \Carbon\Carbon::parse($fechaInicio);
-            $fechaFin = \Carbon\Carbon::parse($fechaFin);
-
-            // Validar que no sea en época de vacaciones (diciembre-enero)
-            if (($fechaInicio->month === 12 && $fechaInicio->day >= 15) || 
-                ($fechaFin->month === 1 && $fechaFin->day <= 15)) {
-                return [
-                    'valido' => false,
-                    'mensaje' => 'Las fechas seleccionadas coinciden con la época de vacaciones del SENA (15 diciembre - 15 enero).'
-                ];
-            }
-
-            // Validar que no sea en época de exámenes (última semana de cada trimestre)
-            $ultimaSemanaTrimestre = [
-                3 => [20, 26], // Marzo
-                6 => [20, 26], // Junio
-                9 => [20, 26], // Septiembre
-                12 => [20, 26] // Diciembre
-            ];
-
-            foreach ($ultimaSemanaTrimestre as $mes => $rango) {
-                if (($fechaInicio->month === $mes && $fechaInicio->day >= $rango[0] && $fechaInicio->day <= $rango[1]) ||
-                    ($fechaFin->month === $mes && $fechaFin->day >= $rango[0] && $fechaFin->day <= $rango[1])) {
-                    return [
-                        'valido' => false,
-                        'mensaje' => 'Las fechas seleccionadas coinciden con la época de exámenes del SENA.'
-                    ];
-                }
-            }
-
-            return [
-                'valido' => true,
-                'mensaje' => 'Las fechas son válidas según el calendario académico del SENA.'
-            ];
-
-        } catch (\Exception $e) {
-            return [
-                'valido' => false,
-                'mensaje' => 'Error al validar calendario académico: ' . $e->getMessage()
-            ];
-        }
-    }
-
-    /**
-     * Obtiene un resumen de las validaciones realizadas.
+     * Valida si una ficha puede ser eliminada según las reglas de negocio.
      *
-     * @param array $resultado Resultado de la validación
-     * @return string Resumen en texto
+     * @param int $fichaId ID de la ficha
+     * @return array Resultado de la validación
      */
-    public function obtenerResumenValidacion($resultado)
+    public function validarEliminacionFicha($fichaId)
     {
-        $resumen = "Estado de validación: " . ($resultado['valido'] ? 'VÁLIDA' : 'INVÁLIDA') . "\n";
-        
-        if (count($resultado['errores']) > 0) {
-            $resumen .= "\nErrores encontrados:\n";
-            foreach ($resultado['errores'] as $error) {
-                $resumen .= "- {$error}\n";
+        try {
+            $ficha = FichaCaracterizacion::find($fichaId);
+            
+            if (!$ficha) {
+                return [
+                    'valido' => false,
+                    'mensaje' => 'La ficha no existe.'
+                ];
             }
-        }
 
-        if (count($resultado['advertencias']) > 0) {
-            $resumen .= "\nAdvertencias:\n";
-            foreach ($resultado['advertencias'] as $advertencia) {
-                $resumen .= "- {$advertencia}\n";
+            $errores = [];
+
+            // 1. Verificar si tiene aprendices asignados
+            if ($ficha->tieneAprendices()) {
+                $errores[] = 'No se puede eliminar la ficha porque tiene aprendices asignados.';
             }
-        }
 
-        return $resumen;
+            // 2. Verificar si tiene asistencias registradas
+            $tieneAsistencias = DB::table('asistencia_aprendices')
+                ->join('aprendiz_fichas_caracterizacion', 'asistencia_aprendices.aprendiz_id', '=', 'aprendiz_fichas_caracterizacion.aprendiz_id')
+                ->where('aprendiz_fichas_caracterizacion.ficha_id', $fichaId)
+                ->exists();
+
+            if ($tieneAsistencias) {
+                $errores[] = 'No se puede eliminar la ficha porque tiene asistencias registradas.';
+            }
+
+            // 3. Verificar si ya comenzó el programa
+            if ($ficha->fecha_inicio && $ficha->fecha_inicio <= now()) {
+                $errores[] = 'No se puede eliminar la ficha porque el programa ya ha comenzado.';
+            }
+
+            // 4. Verificar si tiene instructores asignados
+            if ($ficha->instructorFicha()->count() > 0) {
+                $errores[] = 'No se puede eliminar la ficha porque tiene instructores asignados.';
+            }
+
+            return [
+                'valido' => count($errores) === 0,
+                'mensaje' => count($errores) === 0 
+                    ? 'La ficha puede ser eliminada.' 
+                    : implode(' ', $errores),
+                'errores' => $errores
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Error al validar eliminación de ficha', [
+                'ficha_id' => $fichaId,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return [
+                'valido' => false,
+                'mensaje' => 'Error interno al validar eliminación: ' . $e->getMessage(),
+                'errores' => ['Error interno en la validación']
+            ];
+        }
+    }
+
+    /**
+     * Valida si una ficha puede ser editada según las reglas de negocio.
+     *
+     * @param int $fichaId ID de la ficha
+     * @return array Resultado de la validación
+     */
+    public function validarEdicionFicha($fichaId)
+    {
+        try {
+            $ficha = FichaCaracterizacion::find($fichaId);
+            
+            if (!$ficha) {
+                return [
+                    'valido' => false,
+                    'mensaje' => 'La ficha no existe.'
+                ];
+            }
+
+            $errores = [];
+            $advertencias = [];
+
+            // 1. Verificar si tiene aprendices asignados
+            if ($ficha->tieneAprendices()) {
+                $advertencias[] = 'La ficha tiene aprendices asignados. Algunos campos pueden tener restricciones de edición.';
+            }
+
+            // 2. Verificar si ya comenzó el programa
+            if ($ficha->fecha_inicio && $ficha->fecha_inicio <= now()) {
+                $advertencias[] = 'El programa ya ha comenzado. Las fechas no pueden ser modificadas.';
+            }
+
+            // 3. Verificar si tiene asistencias registradas
+            $tieneAsistencias = DB::table('asistencia_aprendices')
+                ->join('aprendiz_fichas_caracterizacion', 'asistencia_aprendices.aprendiz_id', '=', 'aprendiz_fichas_caracterizacion.aprendiz_id')
+                ->where('aprendiz_fichas_caracterizacion.ficha_id', $fichaId)
+                ->exists();
+
+            if ($tieneAsistencias) {
+                $advertencias[] = 'La ficha tiene asistencias registradas. Algunos cambios pueden afectar los registros existentes.';
+            }
+
+            return [
+                'valido' => true,
+                'mensaje' => 'La ficha puede ser editada.',
+                'errores' => $errores,
+                'advertencias' => $advertencias
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Error al validar edición de ficha', [
+                'ficha_id' => $fichaId,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
+
+            return [
+                'valido' => false,
+                'mensaje' => 'Error interno al validar edición: ' . $e->getMessage(),
+                'errores' => ['Error interno en la validación'],
+                'advertencias' => []
+            ];
+        }
     }
 }
