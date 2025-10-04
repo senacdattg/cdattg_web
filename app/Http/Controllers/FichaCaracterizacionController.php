@@ -203,6 +203,7 @@ class FichaCaracterizacionController extends Controller
             $ficha = new FichaCaracterizacion();
             $ficha->fill($request->validated());
             $ficha->user_create_id = Auth::id();
+            $ficha->user_edit_id = Auth::id(); // Agregar user_edit_id para creación
 
             if ($ficha->save()) {
                 DB::commit();
