@@ -135,6 +135,31 @@
                             <br><strong>Nota:</strong> Los horarios deben respetar las restricciones de la jornada seleccionada.
                         </div>
 
+                        <!-- Días Seleccionados -->
+                        <div id="dias-seleccionados" class="mb-4" style="display: none;">
+                            <h6>
+                                <i class="fas fa-list"></i> Días Seleccionados
+                            </h6>
+                            <div id="lista-dias-seleccionados"></div>
+                        </div>
+
+                        <!-- Formulario Oculto para Envío -->
+                        <form action="{{ route('fichaCaracterizacion.guardarDiasFormacion', $ficha->id) }}" method="POST" id="formDiasFormacion">
+                            @csrf
+                            <div id="dias-container" style="display: none;">
+                                <!-- Los días se agregarán dinámicamente aquí -->
+                            </div>
+                            
+                            <div class="form-group">
+                                <button type="button" class="btn btn-success" onclick="guardarDiasSeleccionados()" id="btn-guardar-dias" style="display: none;">
+                                    <i class="fas fa-save"></i> Guardar Días Seleccionados
+                                </button>
+                                <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </a>
+                            </div>
+                        </form>
+
                         <!-- Selección de Días con Cuadros -->
                         <div class="mb-4">
                             <h5 class="mb-3">
@@ -173,31 +198,6 @@
                                 @endforeach
                             </div>
                         </div>
-
-                        <!-- Días Seleccionados -->
-                        <div id="dias-seleccionados" class="mb-4" style="display: none;">
-                            <h6>
-                                <i class="fas fa-list"></i> Días Seleccionados
-                            </h6>
-                            <div id="lista-dias-seleccionados"></div>
-                        </div>
-
-                        <!-- Formulario Oculto para Envío -->
-                        <form action="{{ route('fichaCaracterizacion.guardarDiasFormacion', $ficha->id) }}" method="POST" id="formDiasFormacion">
-                            @csrf
-                            <div id="dias-container" style="display: none;">
-                                <!-- Los días se agregarán dinámicamente aquí -->
-                            </div>
-                            
-                            <div class="form-group">
-                                <button type="button" class="btn btn-success" onclick="guardarDiasSeleccionados()" id="btn-guardar-dias" style="display: none;">
-                                    <i class="fas fa-save"></i> Guardar Días Seleccionados
-                                </button>
-                                <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}" class="btn btn-secondary">
-                                    <i class="fas fa-times"></i> Cancelar
-                                </a>
-                            </div>
-                        </form>
                     @else
                         <div class="alert alert-warning">
                             <i class="fas fa-exclamation-triangle"></i>
