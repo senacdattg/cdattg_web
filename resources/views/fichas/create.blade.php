@@ -137,7 +137,11 @@
                                     <select class="form-control @error('sede_id') is-invalid @enderror" 
                                             id="sede_id" name="sede_id">
                                         <option value="">Seleccione una sede...</option>
-                                        <!-- Se llenará dinámicamente -->
+                                        @foreach($sedes ?? [] as $sede)
+                                            <option value="{{ $sede->id }}" {{ old('sede_id') == $sede->id ? 'selected' : '' }}>
+                                                {{ $sede->sede }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                     @error('sede_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -154,7 +158,17 @@
                                     <select class="form-control @error('instructor_id') is-invalid @enderror" 
                                             id="instructor_id" name="instructor_id">
                                         <option value="">Seleccione un instructor...</option>
-                                        <!-- Se llenará dinámicamente -->
+                                        @foreach($instructores ?? [] as $instructor)
+                                            <option value="{{ $instructor->id }}" {{ old('instructor_id') == $instructor->id ? 'selected' : '' }}>
+                                                {{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}
+                                                @if($instructor->persona->segundo_nombre)
+                                                    {{ $instructor->persona->segundo_nombre }}
+                                                @endif
+                                                @if($instructor->persona->segundo_apellido)
+                                                    {{ $instructor->persona->segundo_apellido }}
+                                                @endif
+                                            </option>
+                                        @endforeach
                                     </select>
                                     @error('instructor_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -173,7 +187,11 @@
                                     <select class="form-control @error('modalidad_formacion_id') is-invalid @enderror" 
                                             id="modalidad_formacion_id" name="modalidad_formacion_id">
                                         <option value="">Seleccione una modalidad...</option>
-                                        <!-- Se llenará dinámicamente -->
+                                        @foreach($modalidades ?? [] as $modalidad)
+                                            <option value="{{ $modalidad->id }}" {{ old('modalidad_formacion_id') == $modalidad->id ? 'selected' : '' }}>
+                                                {{ $modalidad->name }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                     @error('modalidad_formacion_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -190,7 +208,11 @@
                                     <select class="form-control @error('jornada_id') is-invalid @enderror" 
                                             id="jornada_id" name="jornada_id">
                                         <option value="">Seleccione una jornada...</option>
-                                        <!-- Se llenará dinámicamente -->
+                                        @foreach($jornadas ?? [] as $jornada)
+                                            <option value="{{ $jornada->id }}" {{ old('jornada_id') == $jornada->id ? 'selected' : '' }}>
+                                                {{ $jornada->jornada }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                     @error('jornada_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -209,7 +231,14 @@
                                     <select class="form-control @error('ambiente_id') is-invalid @enderror" 
                                             id="ambiente_id" name="ambiente_id">
                                         <option value="">Seleccione un ambiente...</option>
-                                        <!-- Se llenará dinámicamente -->
+                                        @foreach($ambientes ?? [] as $ambiente)
+                                            <option value="{{ $ambiente->id }}" {{ old('ambiente_id') == $ambiente->id ? 'selected' : '' }}>
+                                                {{ $ambiente->title }} 
+                                                @if($ambiente->piso && $ambiente->piso->bloque)
+                                                    - {{ $ambiente->piso->bloque->nombre }} - {{ $ambiente->piso->nombre }}
+                                                @endif
+                                            </option>
+                                        @endforeach
                                     </select>
                                     @error('ambiente_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
