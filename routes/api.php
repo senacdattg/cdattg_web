@@ -85,4 +85,7 @@ Route::post('/asistencia/salida', [RegistroAsistenciaController::class, 'registr
 Route::get('/asistencia/jornada', [RegistroAsistenciaController::class, 'obtenerAsistenciasPorJornada']);
 Route::get('/asistencia/fichas', [RegistroAsistenciaController::class, 'obtenerFichasConJornadas']);
 
+// Incluir rutas API para fichas de caracterización con autenticación Sanctum
+include_once routes_path('api_fichas_caracterizacion.php');
+
 

@@ -13,7 +13,7 @@ use App\Http\Controllers\Api\FichaCaracterizacionApiController;
 |
 */
 
-Route::middleware(['auth', 'throttle:api'])->prefix('api')->group(function () {
+Route::middleware(['auth:sanctum', 'throttle:api'])->prefix('api')->group(function () {
     
     // Rutas para selectores dinámicos
     Route::get('/modalidades', function () {
