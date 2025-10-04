@@ -372,9 +372,9 @@ trait ValidacionesSena
 
             // Configuración de jornadas y días permitidos
             $configuracionJornadas = [
-                1 => ['nombre' => 'MAÑANA', 'dias_permitidos' => [1, 2, 3, 4, 5]], // Lunes a Viernes
-                2 => ['nombre' => 'TARDE', 'dias_permitidos' => [1, 2, 3, 4, 5]], // Lunes a Viernes
-                3 => ['nombre' => 'NOCHE', 'dias_permitidos' => [1, 2, 3, 4, 5]], // Lunes a Viernes
+                1 => ['nombre' => 'MAÑANA', 'dias_permitidos' => [1, 2, 3, 4, 5, 6]], // Lunes a Sábado
+                2 => ['nombre' => 'TARDE', 'dias_permitidos' => [1, 2, 3, 4, 5, 6]], // Lunes a Sábado
+                3 => ['nombre' => 'NOCHE', 'dias_permitidos' => [1, 2, 3, 4, 5, 6]], // Lunes a Sábado
                 4 => ['nombre' => 'FIN DE SEMANA', 'dias_permitidos' => [6]], // Sábado
                 5 => ['nombre' => 'MIXTA', 'dias_permitidos' => [1, 2, 3, 4, 5, 6]], // Lunes a Sábado
             ];

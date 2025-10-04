@@ -2351,17 +2351,17 @@ class FichaCaracterizacionController extends Controller
         return [
             1 => [ // MAÑANA
                 'nombre' => 'MAÑANA',
-                'dias_permitidos' => [12, 13, 14, 15, 16], // LUNES a VIERNES
+                'dias_permitidos' => [12, 13, 14, 15, 16, 17], // LUNES a SÁBADO
                 'horario_tipico' => ['08:00', '12:00']
             ],
             2 => [ // TARDE
                 'nombre' => 'TARDE',
-                'dias_permitidos' => [12, 13, 14, 15, 16], // LUNES a VIERNES
+                'dias_permitidos' => [12, 13, 14, 15, 16, 17], // LUNES a SÁBADO
                 'horario_tipico' => ['14:00', '18:00']
             ],
             3 => [ // NOCHE
                 'nombre' => 'NOCHE',
-                'dias_permitidos' => [12, 13, 14, 15, 16], // LUNES a VIERNES
+                'dias_permitidos' => [12, 13, 14, 15, 16, 17], // LUNES a SÁBADO
                 'horario_tipico' => ['18:00', '22:00']
             ],
             4 => [ // FIN DE SEMANA
