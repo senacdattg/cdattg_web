@@ -154,7 +154,7 @@
                                              data-dia-nombre="{{ $dia->name }}"
                                              onclick="{{ $esPermitido && !$estaAsignado ? 'seleccionarDia(this)' : '' }}">
                                             <div class="text-center">
-                                                <i class="fas fa-calendar-day fa-2x mb-2"></i>
+                                                <i class="fas fa-calendar-day fa-lg mb-1"></i>
                                                 <div class="dia-nombre">{{ $dia->name }}</div>
                                                 @if($estaAsignado)
                                                     <small class="text-success">
@@ -335,12 +335,12 @@
         /* Estilos para cuadros de días */
         .dia-cuadro {
             border: 2px solid #dee2e6;
-            border-radius: 10px;
-            padding: 15px;
+            border-radius: 8px;
+            padding: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
             background: #ffffff;
-            min-height: 120px;
+            min-height: 80px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -384,8 +384,8 @@
 
         .dia-nombre {
             font-weight: bold;
-            font-size: 14px;
-            margin-bottom: 5px;
+            font-size: 12px;
+            margin-bottom: 3px;
             color: #495057;
         }
 
