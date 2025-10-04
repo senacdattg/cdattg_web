@@ -229,16 +229,8 @@
                                         <i class="fas fa-door-open"></i> Ambiente
                                     </label>
                                     <select class="form-control @error('ambiente_id') is-invalid @enderror" 
-                                            id="ambiente_id" name="ambiente_id">
-                                        <option value="">Seleccione un ambiente...</option>
-                                        @foreach($ambientes ?? [] as $ambiente)
-                                            <option value="{{ $ambiente->id }}" {{ old('ambiente_id') == $ambiente->id ? 'selected' : '' }}>
-                                                {{ $ambiente->title }} 
-                                                @if($ambiente->piso && $ambiente->piso->bloque)
-                                                    - {{ $ambiente->piso->bloque->nombre }} - {{ $ambiente->piso->nombre }}
-                                                @endif
-                                            </option>
-                                        @endforeach
+                                            id="ambiente_id" name="ambiente_id" disabled>
+                                        <option value="">Primero seleccione una sede...</option>
                                     </select>
                                     @error('ambiente_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -302,27 +294,31 @@
 @section('js')
 <script>
     $(document).ready(function() {
-        // Cargar datos iniciales
-        loadModalidades();
-        loadJornadas();
-        loadInstructores();
-        loadSedes();
-
         // Cuando cambie el programa de formación
         $('#programa_formacion_id').change(function() {
             const programaId = $(this).val();
             if (programaId) {
                 const sedeId = $(this).find('option:selected').data('sede');
-                loadAmbientes(sedeId);
-                $('#sede_id').val(sedeId);
+                if (sedeId) {
+                    $('#sede_id').val(sedeId);
+                    loadAmbientesPorSede(sedeId);
+                }
             }
         });
 
         // Cuando cambie la sede
         $('#sede_id').change(function() {
             const sedeId = $(this).val();
+            const ambienteSelect = $('#ambiente_id');
+            
+            // Limpiar y deshabilitar ambiente
+            ambienteSelect.prop('disabled', true);
+            ambienteSelect.find('option:not(:first)').remove();
+            
             if (sedeId) {
-                loadAmbientes(sedeId);
+                loadAmbientesPorSede(sedeId);
+            } else {
+                ambienteSelect.html('<option value="">Primero seleccione una sede...</option>');
             }
         });
 
@@ -335,61 +331,37 @@
         $('#fecha_inicio').attr('min', new Date().toISOString().split('T')[0]);
     });
 
-    function loadModalidades() {
-        $.get('/api/modalidades', function(data) {
-            const select = $('#modalidad_formacion_id');
-            select.find('option:not(:first)').remove();
-            data.forEach(function(modalidad) {
-                select.append(new Option(modalidad.name, modalidad.id));
-            });
-        });
-    }
-
-    function loadJornadas() {
-        $.get('/api/jornadas', function(data) {
-            const select = $('#jornada_id');
-            select.find('option:not(:first)').remove();
-            data.forEach(function(jornada) {
-                select.append(new Option(jornada.name, jornada.id));
-            });
-        });
-    }
-
-    function loadInstructores() {
-        $.get('/api/instructores', function(data) {
-            const select = $('#instructor_id');
-            select.find('option:not(:first)').remove();
-            data.forEach(function(instructor) {
-                select.append(new Option(
-                    instructor.persona.primer_nombre + ' ' + instructor.persona.primer_apellido,
-                    instructor.id
-                ));
-            });
-        });
-    }
-
-    function loadSedes() {
-        $.get('/api/sedes', function(data) {
-            const select = $('#sede_id');
-            select.find('option:not(:first)').remove();
-            data.forEach(function(sede) {
-                select.append(new Option(sede.nombre, sede.id));
-            });
-        });
-    }
-
-    function loadAmbientes(sedeId) {
+    function loadAmbientesPorSede(sedeId) {
         if (!sedeId) return;
         
-        $.get('/api/ambientes/' + sedeId, function(data) {
-            const select = $('#ambiente_id');
-            select.find('option:not(:first)').remove();
-            data.forEach(function(ambiente) {
-                select.append(new Option(
-                    ambiente.nombre + ' - ' + ambiente.piso.bloque.nombre + ' - ' + ambiente.piso.nombre,
-                    ambiente.id
-                ));
-            });
+        const ambienteSelect = $('#ambiente_id');
+        ambienteSelect.prop('disabled', true);
+        ambienteSelect.html('<option value="">Cargando ambientes...</option>');
+        
+        $.ajax({
+            url: '/ficha/ambientes-por-sede/' + sedeId,
+            method: 'GET',
+            success: function(response) {
+                if (response.success) {
+                    ambienteSelect.html('<option value="">Seleccione un ambiente...</option>');
+                    
+                    response.data.forEach(function(ambiente) {
+                        ambienteSelect.append(new Option(
+                            ambiente.title + ' - ' + ambiente.descripcion,
+                            ambiente.id
+                        ));
+                    });
+                    
+                    ambienteSelect.prop('disabled', false);
+                } else {
+                    ambienteSelect.html('<option value="">Error al cargar ambientes</option>');
+                    console.error('Error al cargar ambientes:', response.message);
+                }
+            },
+            error: function(xhr, status, error) {
+                ambienteSelect.html('<option value="">Error al cargar ambientes</option>');
+                console.error('Error AJAX al cargar ambientes:', error);
+            }
         });
     }
 

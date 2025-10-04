@@ -21,4 +21,7 @@ route::middleware('can:VER PROGRAMA DE CARACTERIZACION')->group(function () {
     Route::post('/ficha/validar-instructor', [FichaCaracterizacionController::class, 'validarDisponibilidadInstructor'])->name('ficha.validar.instructor');
     Route::get('/ficha/{id}/validar-eliminacion', [FichaCaracterizacionController::class, 'validarEliminacionFicha'])->name('ficha.validar.eliminacion');
     Route::get('/ficha/{id}/validar-edicion', [FichaCaracterizacionController::class, 'validarEdicionFicha'])->name('ficha.validar.edicion');
+    
+    // Ruta para obtener ambientes por sede
+    Route::get('/ficha/ambientes-por-sede/{sedeId}', [FichaCaracterizacionController::class, 'getAmbientesPorSede'])->name('ficha.ambientes.por.sede');
 });
