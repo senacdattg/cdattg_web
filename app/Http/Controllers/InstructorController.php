@@ -497,32 +497,31 @@ class InstructorController extends Controller
         try {
             DB::beginTransaction();
             
-            // Verificar si el instructor tiene relaciones que impidan su eliminación
-            $persona = Persona::find($instructor->persona_id);
-            $user = User::where('persona_id', $instructor->persona_id)->first();
+            // Obtener información del instructor antes de eliminarlo
+            $instructorId = $instructor->id;
+            $personaId = $instructor->persona_id;
             
-            // Eliminar el instructor
+            // Obtener el usuario asociado para remover el rol
+            $user = User::where('persona_id', $personaId)->first();
+            
+            // Remover el rol de instructor del usuario (si existe)
+            if ($user && $user->hasRole('INSTRUCTOR')) {
+                $user->removeRole('INSTRUCTOR');
+            }
+            
+            // Eliminar solo el registro de instructor
             $instructor->delete();
-            
-            // Si existe usuario asociado, eliminarlo también
-            if ($user) {
-                $user->delete();
-            }
-            
-            // Si existe persona asociada, eliminarla también
-            if ($persona) {
-                $persona->delete();
-            }
             
             DB::commit();
             
             Log::info('Instructor eliminado exitosamente', [
-                'instructor_id' => $instructor->id,
-                'persona_id' => $persona ? $persona->id : null,
-                'user_id' => $user ? $user->id : null
+                'instructor_id' => $instructorId,
+                'persona_id' => $personaId,
+                'user_id' => $user ? $user->id : null,
+                'rol_removido' => $user ? 'INSTRUCTOR' : null
             ]);
             
-            return redirect()->route('instructor.index')->with('success', 'Instructor eliminado exitosamente');
+            return redirect()->route('instructor.index')->with('success', 'Instructor eliminado exitosamente. La persona y usuario se mantienen intactos.');
             
         } catch (QueryException $e) {
             DB::rollBack();
@@ -670,13 +669,37 @@ class InstructorController extends Controller
 
     public function deleteWithoudUser($id)
     {
-        $instructor = Instructor::where('persona_id', $id)->delete();
-        $persona = Persona::where('id', $id)->delete();
-
-        if ($instructor && $persona) {
-            return redirect()->back()->with('success', '¡Registro eliminado exitosamente!');
-        } else {
-            return redirect()->back()->with('error', '¡Error al eliminar el registro!');
+        try {
+            DB::beginTransaction();
+            
+            // Buscar el instructor por persona_id
+            $instructor = Instructor::where('persona_id', $id)->first();
+            
+            if (!$instructor) {
+                return redirect()->back()->with('error', 'No se encontró el instructor.');
+            }
+            
+            // Eliminar solo el instructor
+            $instructor->delete();
+            
+            DB::commit();
+            
+            Log::info('Instructor sin usuario eliminado exitosamente', [
+                'instructor_id' => $instructor->id,
+                'persona_id' => $id
+            ]);
+            
+            return redirect()->back()->with('success', 'Instructor eliminado exitosamente. La persona se mantiene intacta.');
+            
+        } catch (Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Error al eliminar instructor sin usuario', [
+                'persona_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+            
+            return redirect()->back()->with('error', 'Error al eliminar el instructor.');
         }
     }
 
