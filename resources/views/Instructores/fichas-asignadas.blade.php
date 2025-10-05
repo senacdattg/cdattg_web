@@ -155,19 +155,19 @@
                                 <div class="row">
                                     <div class="col-4">
                                         <div class="stats-card">
-                                            <div class="stats-number">{{ $estadisticas['total_fichas'] }}</div>
+                                            <div class="stats-number">{{ $estadisticas['total'] }}</div>
                                             <div class="stats-label">Total Fichas</div>
                                         </div>
                                     </div>
                                     <div class="col-4">
                                         <div class="stats-card">
-                                            <div class="stats-number">{{ $estadisticas['fichas_activas'] }}</div>
+                                            <div class="stats-number">{{ $estadisticas['activas'] }}</div>
                                             <div class="stats-label">Activas</div>
                                         </div>
                                     </div>
                                     <div class="col-4">
                                         <div class="stats-card">
-                                            <div class="stats-number">{{ $estadisticas['total_horas'] }}</div>
+                                            <div class="stats-number">{{ $estadisticas['total_horas'] ?? 0 }}</div>
                                             <div class="stats-label">Horas</div>
                                         </div>
                                     </div>
