@@ -29,13 +29,23 @@
             margin: 2px;
         }
         .stats-card {
-            background: #f8f9fa;
-            color: #495057;
-            border: 1px solid #dee2e6;
+            background: #007bff;
+            color: white;
             border-radius: 8px;
             padding: 20px;
             text-align: center;
             margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .stats-card:nth-child(2) {
+            background: #28a745;
+        }
+        .stats-card:nth-child(3) {
+            background: #ffc107;
+            color: #212529;
+        }
+        .stats-card:nth-child(4) {
+            background: #dc3545;
         }
         .stats-number {
             font-size: 2rem;
@@ -99,20 +109,20 @@
                 <div class="col-sm-6">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
+                        <li class="breadcrumb-item">
                                 <a href="{{ route('verificarLogin') }}" class="link_right_header">
                                     <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item">
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item">
                                 <a href="{{ route('instructor.index') }}" class="link_right_header">
                                     <i class="fas fa-chalkboard-teacher"></i> Instructores
-                                </a>
-                            </li>
+                            </a>
+                        </li>
                             <li class="breadcrumb-item active" aria-current="page">
                                 <i class="fas fa-user"></i> {{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}
-                            </li>
-                        </ol>
+                        </li>
+                    </ol>
                     </nav>
                 </div>
             </div>
@@ -189,14 +199,14 @@
                         </div>
                     </div>
                 </div>
-            </div>
+                        </div>
 
             <!-- Información Personal -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card detail-card no-hover">
-                        <div class="card-header bg-primary text-white py-3">
-                            <h5 class="card-title m-0 font-weight-bold">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
                                 <i class="fas fa-user mr-2"></i>Información Personal
                             </h5>
                         </div>
@@ -249,18 +259,18 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                            </div>
+                        </div>
+                        </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Información de Contacto -->
+                <!-- Información de Contacto -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card detail-card no-hover">
-                        <div class="card-header bg-success text-white py-3">
-                            <h5 class="card-title m-0 font-weight-bold">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
                                 <i class="fas fa-envelope mr-2"></i>Información de Contacto
                             </h5>
                         </div>
@@ -281,33 +291,33 @@
                                         <tr>
                                             <th class="py-3">Teléfono</th>
                                             <td class="py-3">
-                                                @if($instructor->persona->telefono)
-                                                    <a href="tel:{{ $instructor->persona->telefono }}" class="text-primary">
+                        @if($instructor->persona->telefono)
+                                <a href="tel:{{ $instructor->persona->telefono }}" class="text-primary">
                                                         <i class="fas fa-phone mr-1"></i>
-                                                        {{ $instructor->persona->telefono }}
-                                                    </a>
+                                    {{ $instructor->persona->telefono }}
+                                </a>
                                                 @else
                                                     <span class="text-muted">No registrado</span>
-                                                @endif
+                        @endif
                                             </td>
                                         </tr>
                                         <tr>
                                             <th class="py-3">Celular</th>
                                             <td class="py-3">
-                                                @if($instructor->persona->celular)
-                                                    <a href="tel:{{ $instructor->persona->celular }}" class="text-primary">
+                        @if($instructor->persona->celular)
+                                <a href="tel:{{ $instructor->persona->celular }}" class="text-primary">
                                                         <i class="fas fa-mobile-alt mr-1"></i>
-                                                        {{ $instructor->persona->celular }}
-                                                    </a>
+                                    {{ $instructor->persona->celular }}
+                                </a>
                                                 @else
                                                     <span class="text-muted">No registrado</span>
-                                                @endif
+                        @endif
                                             </td>
                                         </tr>
                                         <tr>
                                             <th class="py-3">Dirección</th>
                                             <td class="py-3">
-                                                @if($instructor->persona->direccion)
+                        @if($instructor->persona->direccion)
                                                     <i class="fas fa-map-marker-alt mr-1"></i>
                                                     {{ $instructor->persona->direccion }}
                                                 @else
@@ -320,15 +330,15 @@
                             </div>
                         </div>
                     </div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Información Institucional -->
+                <!-- Información Institucional -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card detail-card no-hover">
-                        <div class="card-header bg-info text-white py-3">
-                            <h5 class="card-title m-0 font-weight-bold">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
                                 <i class="fas fa-building mr-2"></i>Información Institucional
                             </h5>
                         </div>
@@ -370,7 +380,7 @@
                                                 <span class="status-badge {{ $instructor->estaDisponible() ? 'status-active' : 'status-inactive' }}">
                                                     <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
                                                     {{ $instructor->estaDisponible() ? 'Disponible' : 'Ocupado' }}
-                                                </span>
+                                </span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -379,7 +389,7 @@
                                                 <span class="status-badge {{ $instructor->tieneFichasActivas() ? 'status-active' : 'status-inactive' }}">
                                                     <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
                                                     {{ $instructor->tieneFichasActivas() ? 'Sí tiene' : 'No tiene' }}
-                                                </span>
+                            </span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -398,18 +408,18 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                            </div>
+                        </div>
+                        </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
             <!-- Especialidades -->
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card detail-card no-hover">
-                        <div class="card-header bg-warning text-white py-3">
-                            <h5 class="card-title m-0 font-weight-bold">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
                                 <i class="fas fa-graduation-cap mr-2"></i>Especialidades
                             </h5>
                         </div>
@@ -430,7 +440,7 @@
                                                     <span class="specialty-badge bg-primary text-white">
                                                         <i class="fas fa-star mr-1"></i>
                                                         {{ $especialidadPrincipal }}
-                                                    </span>
+                                </span>
                                                 @else
                                                     <span class="text-muted">No registrada</span>
                                                 @endif
@@ -443,7 +453,7 @@
                                                     @foreach($especialidadesSecundarias as $especialidad)
                                                         <span class="specialty-badge">
                                                             {{ $especialidad }}
-                                                        </span>
+                            </span>
                                                     @endforeach
                                                 @else
                                                     <span class="text-muted">No registradas</span>
@@ -452,45 +462,45 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                            </div>
+                        </div>
+                        </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Fichas de Caracterización -->
-            @if($instructor->fichas->count() > 0)
+                <!-- Fichas de Caracterización -->
+                @if($instructor->fichas->count() > 0)
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card detail-card no-hover">
-                        <div class="card-header bg-secondary text-white py-3">
-                            <h5 class="card-title m-0 font-weight-bold">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
                                 <i class="fas fa-clipboard-list mr-2"></i>Fichas de Caracterización Asignadas
                             </h5>
                         </div>
 
                         <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-custom">
-                                    <thead>
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Ficha</th>
-                                            <th>Programa de Formación</th>
-                                            <th>Fecha Inicio</th>
-                                            <th>Fecha Fin</th>
-                                            <th>Total Horas</th>
-                                            <th>Estado</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($instructor->fichas as $index => $ficha)
-                                        <tr>
-                                            <td>{{ $index + 1 }}</td>
-                                            <td>
-                                                <strong>{{ $ficha->ficha }}</strong>
-                                            </td>
-                                            <td>{{ $ficha->programaFormacion->nombre ?? 'N/A' }}</td>
+                        <div class="table-responsive">
+                            <table class="table table-custom">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Ficha</th>
+                                        <th>Programa de Formación</th>
+                                        <th>Fecha Inicio</th>
+                                        <th>Fecha Fin</th>
+                                        <th>Total Horas</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach ($instructor->fichas as $index => $ficha)
+                                    <tr>
+                                        <td>{{ $index + 1 }}</td>
+                                        <td>
+                                            <strong>{{ $ficha->ficha }}</strong>
+                                        </td>
+                                        <td>{{ $ficha->programaFormacion->nombre ?? 'N/A' }}</td>
                                             <td>
                                                 @if($ficha->fecha_inicio)
                                                     {{ \Carbon\Carbon::parse($ficha->fecha_inicio)->format('d/m/Y') }}
@@ -505,28 +515,28 @@
                                                     N/A
                                                 @endif
                                             </td>
-                                            <td>{{ $ficha->total_horas ?? 'N/A' }}</td>
-                                            <td>
-                                                <span class="status-badge {{ $ficha->status ? 'status-active' : 'status-inactive' }}">
+                                        <td>{{ $ficha->total_horas ?? 'N/A' }}</td>
+                                        <td>
+                                            <span class="status-badge {{ $ficha->status ? 'status-active' : 'status-inactive' }}">
                                                     <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
                                                     {{ $ficha->status ? 'Activa' : 'Inactiva' }}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
                             </div>
+                        </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            @else
+                @else
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card detail-card no-hover">
-                        <div class="card-header bg-secondary text-white py-3">
-                            <h5 class="card-title m-0 font-weight-bold">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
                                 <i class="fas fa-clipboard-list mr-2"></i>Fichas de Caracterización
                             </h5>
                         </div>
@@ -534,21 +544,21 @@
                         <div class="card-body text-center py-4">
                             <i class="fas fa-info-circle fa-2x text-muted mb-3"></i>
                             <p class="text-muted mb-0">
-                                Este instructor no tiene fichas de caracterización asignadas.
-                            </p>
+                            Este instructor no tiene fichas de caracterización asignadas.
+                        </p>
                         </div>
                     </div>
+                    </div>
                 </div>
-            </div>
-            @endif
+                @endif
 
-            <!-- Botones de Acción -->
+                <!-- Botones de Acción -->
             <div class="row">
                 <div class="col-12">
                     <div class="card detail-card no-hover">
                         <div class="card-footer bg-white py-3">
-                            <div class="action-buttons">
-                                @can('EDITAR INSTRUCTOR')
+                        <div class="action-buttons">
+                            @can('EDITAR INSTRUCTOR')
                                     <a href="{{ route('instructor.edit', $instructor->id) }}" class="btn btn-outline-info btn-sm">
                                         <i class="fas fa-pencil-alt mr-1"></i> Editar
                                     </a>
@@ -563,32 +573,32 @@
                                 @can('VER FICHAS ASIGNADAS')
                                     <a href="{{ route('instructor.fichasAsignadas', $instructor->id) }}" class="btn btn-outline-success btn-sm">
                                         <i class="fas fa-clipboard-list mr-1"></i> Ver Fichas
-                                    </a>
-                                @endcan
+                                </a>
+                            @endcan
 
-                                @can('EDITAR INSTRUCTOR')
-                                    <form action="{{ route('persona.cambiarEstadoUser', $instructor->persona->user->id) }}" 
-                                          method="POST" class="d-inline">
-                                        @csrf
-                                        @method('PUT')
+                            @can('EDITAR INSTRUCTOR')
+                                <form action="{{ route('persona.cambiarEstadoUser', $instructor->persona->user->id) }}" 
+                                      method="POST" class="d-inline">
+                                    @csrf
+                                    @method('PUT')
                                         <button type="submit" class="btn btn-outline-warning btn-sm" 
-                                                onclick="return confirm('¿Está seguro de cambiar el estado del usuario?')">
+                                            onclick="return confirm('¿Está seguro de cambiar el estado del usuario?')">
                                             <i class="fas fa-sync mr-1"></i>
-                                            {{ $instructor->persona->user->status === 1 ? 'Desactivar' : 'Activar' }} Usuario
-                                        </button>
-                                    </form>
-                                @endcan
+                                        {{ $instructor->persona->user->status === 1 ? 'Desactivar' : 'Activar' }} Usuario
+                                    </button>
+                                </form>
+                            @endcan
 
-                                @can('ELIMINAR INSTRUCTOR')
-                                    <form action="{{ route('instructor.destroy', $instructor->id) }}" 
+                            @can('ELIMINAR INSTRUCTOR')
+                                <form action="{{ route('instructor.destroy', $instructor->id) }}" 
                                           method="POST" class="d-inline formulario-eliminar">
-                                        @csrf
-                                        @method('DELETE')
+                                    @csrf
+                                    @method('DELETE')
                                         <button type="submit" class="btn btn-outline-danger btn-sm">
                                             <i class="fas fa-trash mr-1"></i> Eliminar
-                                        </button>
-                                    </form>
-                                @endcan
+                                    </button>
+                                </form>
+                            @endcan
                             </div>
                         </div>
                     </div>
@@ -603,23 +613,23 @@
         $(document).ready(function() {
             // Confirmación para formularios de eliminación
             $('.formulario-eliminar').on('submit', function(e) {
-                e.preventDefault();
-                const form = this;
-                
-                Swal.fire({
+                    e.preventDefault();
+                    const form = this;
+                    
+                    Swal.fire({
                     title: '¿Eliminar Instructor?',
                     text: 'Esta acción eliminará el instructor pero mantendrá la persona intacta. ¿Está seguro?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#dc3545',
-                    cancelButtonColor: '#6c757d',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d',
                     confirmButtonText: 'Sí, eliminar',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
             });
 
             // Tooltips para elementos interactivos
