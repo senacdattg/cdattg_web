@@ -49,7 +49,7 @@ class FichaDiasFormacion extends Model
         try {
             $inicio = \Carbon\Carbon::parse($this->hora_inicio);
             $fin = \Carbon\Carbon::parse($this->hora_fin);
-            $horas = $fin->diffInMinutes($inicio) / 60;
+            $horas = $inicio->diffInMinutes($fin) / 60;
             return number_format($horas, 1) . ' horas/día';
         } catch (\Exception $e) {
             return 'Horas no calculables';
