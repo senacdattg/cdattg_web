@@ -161,7 +161,7 @@
                                 <div class="row">
                                     <div class="col-6">
                                         <div class="text-center">
-                                            <h5 class="mb-0">{{ count($especialidadesAsignadas) }}</h5>
+                                            <h5 class="mb-0">{{ count($especialidadesSecundarias) + ($especialidadPrincipal ? 1 : 0) }}</h5>
                                             <small>Asignadas</small>
                                         </div>
                                     </div>
@@ -177,7 +177,7 @@
                     </div>
 
                     <!-- Especialidades Asignadas -->
-                    @if(count($especialidadesAsignadas) > 0)
+                    @if(count($especialidadesSecundarias) > 0 || $especialidadPrincipal)
                     <div class="row mb-4">
                         <div class="col-12">
                             <div class="card shadow-sm no-hover">
@@ -188,22 +188,47 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="row">
-                                        @foreach($especialidadesAsignadas as $especialidad)
+                                        @if($especialidadPrincipal)
                                         <div class="col-md-6 col-lg-4 mb-3">
                                             <div class="card specialty-card assigned">
                                                 <div class="card-header py-2">
                                                     <h6 class="mb-0">
                                                         <i class="fas fa-graduation-cap mr-1"></i>
-                                                        {{ $especialidad->nombre }}
+                                                        {{ $especialidadPrincipal }}
                                                     </h6>
                                                 </div>
                                                 <div class="card-body py-3">
                                                     <div class="d-flex justify-content-between align-items-center">
                                                         <span class="status-badge status-primary">
                                                             <i class="fas fa-star mr-1"></i>
-                                                            {{ $especialidad->es_principal ? 'Principal' : 'Secundaria' }}
+                                                            Principal
                                                         </span>
-                                                        <form action="{{ route('instructor.removerEspecialidad', [$instructor->id, $especialidad->id]) }}" 
+                                                        <button type="button" class="btn btn-remove btn-sm" 
+                                                                onclick="alert('Para remover la especialidad principal, primero debe asignar otra como principal')">
+                                                            <i class="fas fa-times mr-1"></i>Remover
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endif
+                                        
+                                        @foreach($especialidadesSecundarias as $especialidad)
+                                        <div class="col-md-6 col-lg-4 mb-3">
+                                            <div class="card specialty-card assigned">
+                                                <div class="card-header py-2">
+                                                    <h6 class="mb-0">
+                                                        <i class="fas fa-graduation-cap mr-1"></i>
+                                                        {{ $especialidad }}
+                                                    </h6>
+                                                </div>
+                                                <div class="card-body py-3">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span class="status-badge status-secondary">
+                                                            <i class="fas fa-circle mr-1"></i>
+                                                            Secundaria
+                                                        </span>
+                                                        <form action="{{ route('instructor.removerEspecialidad', [$instructor->id, $especialidad]) }}" 
                                                               method="POST" class="d-inline">
                                                             @csrf
                                                             @method('DELETE')
