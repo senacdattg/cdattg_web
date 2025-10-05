@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class InstructorController extends Controller
 {
@@ -24,12 +25,14 @@ class InstructorController extends Controller
     {
         $this->middleware('auth'); // Middleware de autenticación para todos los métodos del controlador
 
-        // Middleware específico para métodos individuales
-        $this->middleware('can:VER PROGRAMA DE CARACTERIZACION')->only('index');
-        $this->middleware('can:VER PROGRAMA DE CARACTERIZACION')->only('show');
-        $this->middleware('can:VER PROGRAMA DE CARACTERIZACION')->only(['create', 'store']);
-        $this->middleware('can:VER PROGRAMA DE CARACTERIZACION')->only(['edit', 'update']);
-        $this->middleware('can:VER PROGRAMA DE CARACTERIZACION')->only('destroy');
+        // Middleware específico para métodos individuales usando permisos de Instructor
+        $this->middleware('can:VER INSTRUCTOR')->only(['index', 'show']);
+        $this->middleware('can:CREAR INSTRUCTOR')->only(['create', 'store']);
+        $this->middleware('can:EDITAR INSTRUCTOR')->only(['edit', 'update']);
+        $this->middleware('can:ELIMINAR INSTRUCTOR')->only('destroy');
+        $this->middleware('can:GESTIONAR ESPECIALIDADES INSTRUCTOR')->only(['especialidades', 'asignarEspecialidad']);
+        $this->middleware('can:VER FICHAS ASIGNADAS')->only('fichasAsignadas');
+        $this->middleware('can:CAMBIAR ESTADO INSTRUCTOR')->only('cambiarEstado');
     }
     /**
      * Display a listing of the resource.
@@ -521,6 +524,97 @@ class InstructorController extends Controller
             return redirect()->back()->with('success', '¡Registro eliminado exitosamente!');
         } else {
             return redirect()->back()->with('error', '¡Error al eliminar el registro!');
+        }
+    }
+
+    /**
+     * Mostrar especialidades del instructor
+     */
+    public function especialidades(Instructor $instructor)
+    {
+        $this->authorize('gestionarEspecialidades', $instructor);
+        
+        $especialidades = $instructor->especialidades;
+        
+        return view('instructores.especialidades', compact('instructor', 'especialidades'));
+    }
+
+    /**
+     * Asignar especialidad al instructor
+     */
+    public function asignarEspecialidad(Request $request, Instructor $instructor)
+    {
+        $this->authorize('gestionarEspecialidades', $instructor);
+        
+        $request->validate([
+            'especialidad_id' => 'required|exists:especialidades,id'
+        ]);
+
+        try {
+            if (!$instructor->especialidades->contains($request->especialidad_id)) {
+                $instructor->especialidades()->attach($request->especialidad_id);
+                return redirect()->back()->with('success', 'Especialidad asignada exitosamente');
+            }
+            
+            return redirect()->back()->with('warning', 'El instructor ya tiene esta especialidad asignada');
+        } catch (\Exception $e) {
+            Log::error('Error al asignar especialidad: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al asignar la especialidad');
+        }
+    }
+
+    /**
+     * Ver fichas asignadas al instructor
+     */
+    public function fichasAsignadas(Request $request, Instructor $instructor = null)
+    {
+        $user = Auth::user();
+        
+        // Autorizar acceso usando la política
+        if ($instructor) {
+            $this->authorize('verFichasAsignadas', $instructor);
+            $instructorActual = $instructor;
+        } else {
+            // Si no se especifica instructor, usar el del usuario autenticado
+            $instructorActual = $user->instructor;
+            if ($instructorActual) {
+                $this->authorize('verFichasAsignadas', $instructorActual);
+            }
+        }
+        
+        if (!$instructorActual) {
+            return redirect()->back()->with('error', 'No se encontró información del instructor');
+        }
+
+        $fichas = $instructorActual->fichas()
+            ->with(['programa', 'modalidad', 'nivelFormacion'])
+            ->paginate(10);
+
+        return view('instructores.fichas-asignadas', compact('instructorActual', 'fichas'));
+    }
+
+    /**
+     * Cambiar estado del instructor
+     */
+    public function cambiarEstado(Request $request, Instructor $instructor)
+    {
+        $this->authorize('cambiarEstado', $instructor);
+        
+        $request->validate([
+            'estado' => 'required|in:activo,inactivo'
+        ]);
+
+        try {
+            $instructor->update(['estado' => $request->estado]);
+            
+            $mensaje = $request->estado === 'activo' 
+                ? 'Instructor activado exitosamente' 
+                : 'Instructor desactivado exitosamente';
+                
+            return redirect()->back()->with('success', $mensaje);
+        } catch (\Exception $e) {
+            Log::error('Error al cambiar estado del instructor: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al cambiar el estado del instructor');
         }
     }
 }

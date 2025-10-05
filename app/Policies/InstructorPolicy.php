@@ -505,6 +505,29 @@ class InstructorPolicy
     }
 
     /**
+     * Determine whether the user can view assigned fichas.
+     */
+    public function verFichasAsignadas(User $user, Instructor $instructor): bool
+    {
+        // Verificar permiso específico
+        if (!$user->can('VER FICHAS ASIGNADAS')) {
+            return false;
+        }
+
+        // Super administradores y administradores tienen acceso total
+        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+            return true;
+        }
+
+        // Si el usuario es instructor, solo puede ver sus propias fichas
+        if ($user->hasRole('INSTRUCTOR')) {
+            return $this->esElMismoInstructor($user, $instructor);
+        }
+
+        return true;
+    }
+
+    /**
      * Determine whether the user can delete documents.
      */
     public function eliminarDocumento(User $user, Instructor $instructor): bool
