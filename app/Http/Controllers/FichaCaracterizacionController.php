@@ -1729,7 +1729,7 @@ class FichaCaracterizacionController extends Controller
 
             // Obtener instructores ya asignados a esta ficha
             $instructoresAsignados = $ficha->instructorFicha()
-                ->with(['instructor.persona', 'instructorFichaDias'])
+                ->with(['instructor.persona', 'instructorFichaDias.dia'])
                 ->get();
 
             // Obtener días de formación asignados a la ficha
