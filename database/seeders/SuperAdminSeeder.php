@@ -80,6 +80,9 @@ class SuperAdminSeeder extends Seeder
             'VER INSTRUCTOR',
             'EDITAR INSTRUCTOR',
             'ELIMINAR INSTRUCTOR',
+            'GESTIONAR ESPECIALIDADES INSTRUCTOR',
+            'VER FICHAS ASIGNADAS',
+            'CAMBIAR ESTADO INSTRUCTOR',
             
             // Permisos para fichas de caracterización
             'CREAR FICHA CARACTERIZACION',
