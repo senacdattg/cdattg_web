@@ -33,6 +33,10 @@ class RouteServiceProvider extends ServiceProvider
                 ->prefix('api')
                 ->group(base_path('routes/api.php'));
 
+            // Rutas públicas para Flutter (sin middleware)
+            Route::prefix('api')
+                ->group(base_path('routes/api_flutter.php'));
+
             Route::middleware('web')
                 ->group(base_path('routes/web.php'));
         });

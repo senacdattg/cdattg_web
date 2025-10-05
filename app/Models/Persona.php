@@ -147,6 +147,21 @@ class Persona extends Model
         return $this->instructor()->exists();
     }
 
+
+    /**
+     * Verifica si la persona tiene el rol de APRENDIZ.
+     *
+     * @return bool
+     */
+    public function tieneRolAprendiz(): bool
+    {
+        if (!$this->user) {
+            return false;
+        }
+
+        return $this->user->hasRole('APRENDIZ');
+    }
+
     /**
      * Accesor para obtener el nombre completo de la persona.
      *

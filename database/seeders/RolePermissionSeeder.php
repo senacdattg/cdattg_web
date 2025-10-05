@@ -71,10 +71,14 @@ class RolePermissionSeeder extends Seeder
             'EDITAR INSTRUCTOR',
             'ELIMINAR INSTRUCTOR',
             // Permisos para fichas de caracterización
-            'CREAR FICHA DE CARACTERIZACION',
-            'EDITAR FICHA DE CARACTERIZACION',
-            'VER FICHA DE CARACTERIZACION',
-            'ELIMINAR FICHA DE CARACTERIZACION',
+            'CREAR FICHA CARACTERIZACION',
+            'EDITAR FICHA CARACTERIZACION',
+            'VER FICHA CARACTERIZACION',
+            'ELIMINAR FICHA CARACTERIZACION',
+            'GESTIONAR INSTRUCTORES FICHA',
+            'GESTIONAR DIAS FICHA',
+            'GESTIONAR APRENDICES FICHA',
+            'CAMBIAR ESTADO FICHA',
             // Permisos para roles y permisos
             'ASIGNAR PERMISOS',
             // Permisos para asistencia
@@ -158,6 +162,15 @@ class RolePermissionSeeder extends Seeder
             'CREAR PROGRAMA DE CARACTERIZACION',
             'EDITAR PROGRAMA DE CARACTERIZACION',
             'ELIMINAR PROGRAMA DE CARACTERIZACION',
+            // Permisos para fichas de caracterización
+            'CREAR FICHA CARACTERIZACION',
+            'EDITAR FICHA CARACTERIZACION',
+            'VER FICHA CARACTERIZACION',
+            'ELIMINAR FICHA CARACTERIZACION',
+            'GESTIONAR INSTRUCTORES FICHA',
+            'GESTIONAR DIAS FICHA',
+            'GESTIONAR APRENDICES FICHA',
+            'CAMBIAR ESTADO FICHA',
             'CREAR PERSONA',
             'VER PERSONA',
             'EDITAR PERSONA',
@@ -182,22 +195,31 @@ class RolePermissionSeeder extends Seeder
 
         // Asignar permisos al rol ADMINISTRADOR
         $administrador->givePermissionTo([
-            'CREAR FICHA DE CARACTERIZACION',
-            'EDITAR FICHA DE CARACTERIZACION',
-            'VER FICHA DE CARACTERIZACION',
-            'ELIMINAR FICHA DE CARACTERIZACION',
+            // Permisos para fichas de caracterización
+            'CREAR FICHA CARACTERIZACION',
+            'EDITAR FICHA CARACTERIZACION',
+            'VER FICHA CARACTERIZACION',
+            'ELIMINAR FICHA CARACTERIZACION',
+            'GESTIONAR INSTRUCTORES FICHA',
+            'GESTIONAR DIAS FICHA',
+            'GESTIONAR APRENDICES FICHA',
+            'CAMBIAR ESTADO FICHA',
+            // Permisos para instructores
             'CREAR INSTRUCTOR',
             'VER INSTRUCTOR',
             'EDITAR INSTRUCTOR',
             'ELIMINAR INSTRUCTOR',
+            // Permisos para personas
             'CREAR PERSONA',
             'VER PERSONA',
             'EDITAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+            // Permisos para redes de conocimiento
             'CREAR RED CONOCIMIENTO',
             'EDITAR RED CONOCIMIENTO',
             'VER RED CONOCIMIENTO',
             'ELIMINAR RED CONOCIMIENTO',
+            // Permisos para aprendices
             'VER APRENDIZ',
             'CREAR APRENDIZ',
             'EDITAR APRENDIZ',
@@ -212,6 +234,12 @@ class RolePermissionSeeder extends Seeder
         $instructor->givePermissionTo([
             'TOMAR ASISTENCIA',
             'VER APRENDIZ',
+            // Permisos para fichas de caracterización (limitados a fichas asignadas)
+            'VER FICHA CARACTERIZACION',
+            'EDITAR FICHA CARACTERIZACION',
+            'GESTIONAR DIAS FICHA',
+            'GESTIONAR APRENDICES FICHA',
+            'CAMBIAR ESTADO FICHA',
             // Permisos para programas de formación (solo consulta para instructores)
             'programa.index',
             'programa.show',

@@ -34,4 +34,25 @@ class FichaDiasFormacion extends Model
     {
         return self::where('ficha_id', $this->ficha_id)->get();
     }
+
+    /**
+     * Calcula las horas de formación para este día.
+     *
+     * @return string
+     */
+    public function calcularHorasDia()
+    {
+        if (!$this->hora_inicio || !$this->hora_fin) {
+            return 'Horas no definidas';
+        }
+
+        try {
+            $inicio = \Carbon\Carbon::parse($this->hora_inicio);
+            $fin = \Carbon\Carbon::parse($this->hora_fin);
+            $horas = $inicio->diffInMinutes($fin) / 60;
+            return number_format($horas, 1) . ' horas/día';
+        } catch (\Exception $e) {
+            return 'Horas no calculables';
+        }
+    }
 }

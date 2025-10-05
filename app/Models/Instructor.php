@@ -10,6 +10,8 @@ class Instructor extends Model
 {
     use HasFactory;
 
+    protected $table = 'instructors';
+
     protected $fillable = [
         'persona_id',
         'regional_id',
