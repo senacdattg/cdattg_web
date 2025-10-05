@@ -2711,6 +2711,15 @@ class FichaCaracterizacionController extends Controller
                         'estado' => 0, // Desactivar pero mantener registro
                         'user_edit_id' => Auth::id(),
                     ]);
+                    
+                    Log::info('Aprendiz desactivado', [
+                        'aprendiz_id' => $aprendiz->id,
+                        'persona_id' => $aprendiz->persona_id,
+                        'estado_anterior' => 1,
+                        'estado_nuevo' => 0,
+                        'ficha_caracterizacion_id' => null,
+                        'user_id' => Auth::id()
+                    ]);
                 }
             }
 
