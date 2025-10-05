@@ -2399,7 +2399,7 @@ class FichaCaracterizacionController extends Controller
             $horasTotales += $horasPorDia * $duracionEnDias;
             } catch (\Exception $e) {
                 // Log del error y continuar con el siguiente día
-                \Log::warning("Error al calcular horas para el día: " . $e->getMessage(), [
+                Log::warning("Error al calcular horas para el día: " . $e->getMessage(), [
                     'dia_id' => $dia->id ?? 'N/A',
                     'hora_inicio' => $dia->hora_inicio ?? 'N/A',
                     'hora_fin' => $dia->hora_fin ?? 'N/A'
@@ -2467,6 +2467,211 @@ class FichaCaracterizacionController extends Controller
                 'success' => false,
                 'message' => 'Error al obtener los ambientes de la sede.'
             ], 500);
+        }
+    }
+
+    /**
+     * Muestra la vista para gestionar aprendices de una ficha.
+     *
+     * @param int $id ID de la ficha de caracterización
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
+    public function gestionarAprendices($id)
+    {
+        try {
+            Log::info('Acceso a gestión de aprendices', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id()
+            ]);
+
+            $ficha = FichaCaracterizacion::with([
+                'programaFormacion',
+                'aprendices.persona',
+                'aprendicesFicha'
+            ])->findOrFail($id);
+
+            // Obtener todos los aprendices disponibles (no asignados a esta ficha)
+            $aprendicesDisponibles = \App\Models\Aprendiz::with('persona')
+                ->whereDoesntHave('fichas', function($query) use ($id) {
+                    $query->where('ficha_id', $id);
+                })
+                ->where('estado', 1) // Solo aprendices activos
+                ->orderBy('id', 'desc')
+                ->get();
+
+            Log::info('Vista de gestión de aprendices cargada', [
+                'ficha_id' => $id,
+                'aprendices_asignados' => $ficha->aprendices->count(),
+                'aprendices_disponibles' => $aprendicesDisponibles->count(),
+                'user_id' => Auth::id()
+            ]);
+
+            return view('fichas.gestionar-aprendices', compact('ficha', 'aprendicesDisponibles'));
+
+        } catch (\Exception $e) {
+            Log::error('Error al cargar gestión de aprendices', [
+                'ficha_id' => $id,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'user_id' => Auth::id()
+            ]);
+
+            return redirect()->route('fichaCaracterizacion.show', $id)
+                ->with('error', 'Error al cargar la gestión de aprendices.');
+        }
+    }
+
+    /**
+     * Asigna aprendices a una ficha de caracterización.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param int $id ID de la ficha de caracterización
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function asignarAprendices(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'aprendices' => 'required|array|min:1',
+                'aprendices.*' => 'exists:aprendices,id'
+            ]);
+
+            Log::info('Iniciando asignación de aprendices', [
+                'ficha_id' => $id,
+                'aprendices_ids' => $request->input('aprendices'),
+                'user_id' => Auth::id()
+            ]);
+
+            $ficha = FichaCaracterizacion::findOrFail($id);
+            $aprendicesIds = $request->input('aprendices');
+
+            DB::beginTransaction();
+
+            // Verificar que los aprendices no estén ya asignados
+            $aprendicesYaAsignados = $ficha->aprendices()->whereIn('aprendices.id', $aprendicesIds)->pluck('aprendices.id');
+            
+            if ($aprendicesYaAsignados->count() > 0) {
+                DB::rollBack();
+                return redirect()->back()
+                    ->with('error', 'Algunos aprendices ya están asignados a esta ficha.')
+                    ->with('aprendices_duplicados', $aprendicesYaAsignados);
+            }
+
+            // Asignar aprendices
+            $ficha->aprendices()->attach($aprendicesIds);
+
+            DB::commit();
+
+            Log::info('Aprendices asignados exitosamente', [
+                'ficha_id' => $id,
+                'aprendices_asignados' => count($aprendicesIds),
+                'user_id' => Auth::id()
+            ]);
+
+            return redirect()->route('fichaCaracterizacion.gestionarAprendices', $id)
+                ->with('success', 'Aprendices asignados exitosamente a la ficha.');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::warning('Error de validación al asignar aprendices', [
+                'ficha_id' => $id,
+                'errors' => $e->errors(),
+                'user_id' => Auth::id()
+            ]);
+
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Error al asignar aprendices', [
+                'ficha_id' => $id,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'user_id' => Auth::id()
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Error al asignar aprendices. Por favor, intente nuevamente.');
+        }
+    }
+
+    /**
+     * Desasigna aprendices de una ficha de caracterización.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param int $id ID de la ficha de caracterización
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function desasignarAprendices(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'aprendices' => 'required|array|min:1',
+                'aprendices.*' => 'exists:aprendices,id'
+            ]);
+
+            Log::info('Iniciando desasignación de aprendices', [
+                'ficha_id' => $id,
+                'aprendices_ids' => $request->input('aprendices'),
+                'user_id' => Auth::id()
+            ]);
+
+            $ficha = FichaCaracterizacion::findOrFail($id);
+            $aprendicesIds = $request->input('aprendices');
+
+            DB::beginTransaction();
+
+            // Verificar que los aprendices estén asignados a la ficha
+            $aprendicesAsignados = $ficha->aprendices()->whereIn('aprendices.id', $aprendicesIds)->pluck('aprendices.id');
+            
+            if ($aprendicesAsignados->count() !== count($aprendicesIds)) {
+                DB::rollBack();
+                return redirect()->back()
+                    ->with('error', 'Algunos aprendices no están asignados a esta ficha.');
+            }
+
+            // Desasignar aprendices
+            $ficha->aprendices()->detach($aprendicesIds);
+
+            DB::commit();
+
+            Log::info('Aprendices desasignados exitosamente', [
+                'ficha_id' => $id,
+                'aprendices_desasignados' => count($aprendicesIds),
+                'user_id' => Auth::id()
+            ]);
+
+            return redirect()->route('fichaCaracterizacion.gestionarAprendices', $id)
+                ->with('success', 'Aprendices desasignados exitosamente de la ficha.');
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::warning('Error de validación al desasignar aprendices', [
+                'ficha_id' => $id,
+                'errors' => $e->errors(),
+                'user_id' => Auth::id()
+            ]);
+
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->withInput();
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Error al desasignar aprendices', [
+                'ficha_id' => $id,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'user_id' => Auth::id()
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Error al desasignar aprendices. Por favor, intente nuevamente.');
         }
     }
 }

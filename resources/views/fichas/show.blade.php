@@ -371,6 +371,13 @@
                                     </a>
                                 @endcan
                                 
+                                @can('GESTIONAR APRENDICES FICHA')
+                                    <a href="{{ route('fichaCaracterizacion.gestionarAprendices', $ficha->id) }}" 
+                                       class="btn btn-outline-info btn-sm">
+                                        <i class="fas fa-users mr-1"></i> Gestionar Aprendices
+                                    </a>
+                                @endcan
+                                
                                 @can('ELIMINAR FICHA CARACTERIZACION')
                                     <form action="{{ route('fichaCaracterizacion.destroy', $ficha->id) }}" 
                                           method="POST" class="d-inline formulario-eliminar">

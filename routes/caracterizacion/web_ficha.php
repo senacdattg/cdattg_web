@@ -24,4 +24,19 @@ route::middleware('can:VER PROGRAMA DE CARACTERIZACION')->group(function () {
     
     // Ruta para obtener ambientes por sede
     Route::get('/ficha/ambientes-por-sede/{sedeId}', [FichaCaracterizacionController::class, 'getAmbientesPorSede'])->name('ficha.ambientes.por.sede');
+    
+    // Rutas para gestión de instructores
+    Route::get('/fichaCaracterizacion/{id}/gestionar-instructores', [FichaCaracterizacionController::class, 'gestionarInstructores'])->name('fichaCaracterizacion.gestionarInstructores');
+    Route::post('/fichaCaracterizacion/{id}/asignar-instructores', [FichaCaracterizacionController::class, 'asignarInstructores'])->name('fichaCaracterizacion.asignarInstructores');
+    Route::post('/fichaCaracterizacion/{id}/desasignar-instructores', [FichaCaracterizacionController::class, 'desasignarInstructores'])->name('fichaCaracterizacion.desasignarInstructores');
+    
+    // Rutas para gestión de días de formación
+    Route::get('/fichaCaracterizacion/{id}/gestionar-dias-formacion', [FichaCaracterizacionController::class, 'gestionarDiasFormacion'])->name('fichaCaracterizacion.gestionarDiasFormacion');
+    Route::post('/fichaCaracterizacion/{id}/agregar-dia-formacion', [FichaCaracterizacionController::class, 'agregarDiaFormacion'])->name('fichaCaracterizacion.agregarDiaFormacion');
+    Route::delete('/fichaCaracterizacion/{id}/eliminar-dia-formacion/{diaId}', [FichaCaracterizacionController::class, 'eliminarDiaFormacion'])->name('fichaCaracterizacion.eliminarDiaFormacion');
+    
+    // Rutas para gestión de aprendices
+    Route::get('/fichaCaracterizacion/{id}/gestionar-aprendices', [FichaCaracterizacionController::class, 'gestionarAprendices'])->name('fichaCaracterizacion.gestionarAprendices');
+    Route::post('/fichaCaracterizacion/{id}/asignar-aprendices', [FichaCaracterizacionController::class, 'asignarAprendices'])->name('fichaCaracterizacion.asignarAprendices');
+    Route::post('/fichaCaracterizacion/{id}/desasignar-aprendices', [FichaCaracterizacionController::class, 'desasignarAprendices'])->name('fichaCaracterizacion.desasignarAprendices');
 });
