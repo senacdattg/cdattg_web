@@ -21,15 +21,15 @@
                 <div class="col-sm-6">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
+                        <li class="breadcrumb-item">
                                 <a href="{{ route('verificarLogin') }}" class="link_right_header">
                                     <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
+                            </a>
+                        </li>
                             <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-chalkboard-teacher"></i> Instructores
-                            </li>
-                        </ol>
+                                <i class="fas fa-user-tie"></i> Instructores
+                        </li>
+                    </ol>
                     </nav>
                 </div>
             </div>
@@ -49,11 +49,11 @@
                                     <i class="fas fa-plus-circle mr-2"></i> 
                                     <a href="{{ route('instructor.create') }}" class="text-primary text-decoration-none">Nuevo Instructor</a>
                                 </h5>
-                            </div>
+                        </div>
                         </div>
                     @endcan
 
-                    <!-- Estadísticas -->
+                <!-- Estadísticas -->
                     <div class="row mb-4">
                         <div class="col-md-3">
                             <div class="card border-left-primary shadow h-100 py-2">
@@ -61,7 +61,7 @@
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                Total Instructores
+                                    Total Instructores
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $estadisticas['total'] }}</div>
                                         </div>
@@ -78,7 +78,7 @@
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                Activos
+                                    Activos
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $estadisticas['activos'] }}</div>
                                         </div>
@@ -95,7 +95,7 @@
                                     <div class="row no-gutters align-items-center">
                                         <div class="col mr-2">
                                             <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                                Inactivos
+                                    Inactivos
                                             </div>
                                             <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $estadisticas['inactivos'] }}</div>
                                         </div>
@@ -120,10 +120,10 @@
                                             <i class="fas fa-clipboard-list fa-2x text-info"></i>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
+                </div>
+            </div>
 
                     <!-- Filtros Avanzados -->
                     <div class="card shadow-sm mb-4 no-hover">
@@ -140,7 +140,7 @@
                                         <input type="text" name="search" id="searchInput" class="form-control" 
                                                placeholder="Nombre, documento o email..." 
                                                value="{{ request('search') }}">
-                                    </div>
+                                                            </div>
                                     <div class="col-md-2">
                                         <label class="form-label">Estado</label>
                                         <select name="estado" class="form-control" id="filtroEstado">
@@ -148,7 +148,7 @@
                                             <option value="activos" {{ $filtroEstado === 'activos' ? 'selected' : '' }}>Activos</option>
                                             <option value="inactivos" {{ $filtroEstado === 'inactivos' ? 'selected' : '' }}>Inactivos</option>
                                         </select>
-                                    </div>
+                                                        </div>
                                     <div class="col-md-3">
                                         <label class="form-label">Especialidad</label>
                                         <select name="especialidad" class="form-control" id="filtroEspecialidad">
@@ -159,7 +159,7 @@
                                                 </option>
                                             @endforeach
                                         </select>
-                                    </div>
+                                                        </div>
                                     <div class="col-md-2">
                                         <label class="form-label">Regional</label>
                                         <select name="regional" class="form-control" id="filtroRegional">
@@ -181,7 +181,7 @@
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </div>
-                                    </div>
+                                </div>
                                 </div>
                             </form>
                         </div>
@@ -206,8 +206,8 @@
                         <div class="card-body p-0">
                             <div id="instructores-container">
                                 @include('Instructores.partials.instructores-table')
-                            </div>
-                        </div>
+                </div>
+            </div>
 
                         <div class="card-footer bg-white">
                             <div class="float-right">
@@ -289,7 +289,7 @@
                             
                             // Reinicializar tooltips
                             $('[data-toggle="tooltip"]').tooltip();
-                        } else {
+                } else {
                             showError('Error en la búsqueda: ' + response.message);
                         }
                     },
