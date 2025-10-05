@@ -283,21 +283,7 @@
                                             </p>
                                             <p class="text-muted mb-0">
                                                 <i class="fas fa-hourglass-half"></i>
-                                                @if($diaFormacion->hora_inicio && $diaFormacion->hora_fin)
-                                                    @try
-                                                        @php
-                                                            $inicio = \Carbon\Carbon::parse($diaFormacion->hora_inicio);
-                                                            $fin = \Carbon\Carbon::parse($diaFormacion->hora_fin);
-                                                            $horas = $fin->diffInMinutes($inicio) / 60;
-                                                            $horasFormateadas = number_format($horas, 1);
-                                                        @endphp
-                                                        {{ $horasFormateadas }} horas/día
-                                                    @catch(Exception $e)
-                                                        Horas no calculables
-                                                    @endtry
-                                                @else
-                                                    Horas no definidas
-                                                @endif
+                                                {{ $diaFormacion->calcularHorasDia() }}
                                             </p>
                                         </div>
                                     </div>
