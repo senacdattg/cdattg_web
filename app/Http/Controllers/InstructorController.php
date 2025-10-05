@@ -277,11 +277,55 @@ class InstructorController extends Controller
             $instructor->save();
 
             // Asignar especialidades si se proporcionan
-            if ($request->has('especialidades') && is_array($request->input('especialidades'))) {
+            if ($request->has('especialidades')) {
                 $especialidades = $request->input('especialidades');
-                if (!empty($especialidades)) {
-                    $instructor->especialidades = $especialidades;
+                
+                // Log para debugging
+                Log::info('Especialidades recibidas:', [
+                    'especialidades_raw' => $especialidades,
+                    'es_array' => is_array($especialidades),
+                    'is_json' => is_string($especialidades),
+                    'empty' => empty($especialidades)
+                ]);
+                
+                // Si es string JSON, decodificar
+                if (is_string($especialidades)) {
+                    $especialidades = json_decode($especialidades, true);
+                }
+                
+                // Si es array y no está vacío, guardar
+                if (is_array($especialidades) && !empty($especialidades)) {
+                    // Convertir array simple a formato esperado por la vista
+                    $especialidadesFormateadas = [
+                        'principal' => null,
+                        'secundarias' => []
+                    ];
+                    
+                    // Obtener nombres de especialidades desde la base de datos
+                    $especialidadesDB = \App\Models\RedConocimiento::whereIn('id', $especialidades)->get();
+                    $nombresEspecialidades = $especialidadesDB->pluck('nombre', 'id')->toArray();
+                    
+                    // Asignar la primera como principal y las demás como secundarias
+                    if (count($especialidades) > 0) {
+                        $primeraEspecialidad = $especialidades[0];
+                        $especialidadesFormateadas['principal'] = $nombresEspecialidades[$primeraEspecialidad] ?? null;
+                        
+                        // Las demás como secundarias
+                        for ($i = 1; $i < count($especialidades); $i++) {
+                            if (isset($nombresEspecialidades[$especialidades[$i]])) {
+                                $especialidadesFormateadas['secundarias'][] = $nombresEspecialidades[$especialidades[$i]];
+                            }
+                        }
+                    }
+                    
+                    $instructor->especialidades = $especialidadesFormateadas;
                     $instructor->save();
+                    
+                    Log::info('Especialidades guardadas:', [
+                        'instructor_id' => $instructor->id,
+                        'especialidades_raw' => $especialidades,
+                        'especialidades_formateadas' => $especialidadesFormateadas
+                    ]);
                 }
             }
 
