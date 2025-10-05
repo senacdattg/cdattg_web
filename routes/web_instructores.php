@@ -62,9 +62,9 @@ Route::middleware(['auth'])->group(function () {
             ->middleware('can:GESTIONAR ESPECIALIDADES INSTRUCTOR');
             
         // Remover especialidad del instructor
-        Route::delete('/{instructor}/remover-especialidad/{especialidad}', [InstructorController::class, 'removerEspecialidad'])
+        Route::delete('/{instructor}/remover-especialidad', [InstructorController::class, 'removerEspecialidad'])
             ->name('instructor.removerEspecialidad')
-            ->middleware('can:EDITAR INSTRUCTOR');
+            ->middleware('can:GESTIONAR ESPECIALIDADES INSTRUCTOR');
     });
     
     // Rutas para gestión de fichas asignadas
