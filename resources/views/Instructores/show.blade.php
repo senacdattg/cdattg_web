@@ -5,13 +5,6 @@
 @section('css')
     <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
     <style>
-        .instructor-avatar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #e3e6f0;
-        }
         .status-badge {
             padding: 4px 8px;
             border-radius: 12px;
@@ -202,29 +195,26 @@
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card detail-card no-hover">
-                        <div class="card-header bg-white py-3">
-                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                        <div class="card-header bg-primary text-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold">
                                 <i class="fas fa-user mr-2"></i>Información Personal
                             </h5>
-                            <div class="d-flex align-items-center mt-3">
-                                <img src="{{ asset('dist/img/user2-160x160.jpg') }}" alt="Avatar" class="instructor-avatar mr-3" 
-                                     onerror="this.src='{{ asset('dist/img/user3-128x128.jpg') }}'; this.onerror=null;">
-                                <div>
-                                    <h6 class="mb-0 font-weight-bold text-dark">
-                                        {{ $instructor->persona->primer_nombre }} 
-                                        {{ $instructor->persona->segundo_nombre }} 
-                                        {{ $instructor->persona->primer_apellido }} 
-                                        {{ $instructor->persona->segundo_apellido }}
-                                    </h6>
-                                    <small class="text-muted">Instructor SENA</small>
-                                </div>
-                            </div>
                         </div>
 
                         <div class="card-body p-0">
                             <div class="table-responsive">
                                 <table class="table detail-table mb-0">
                                     <tbody>
+                                        <tr>
+                                            <th class="py-3">Nombre Completo</th>
+                                            <td class="py-3">
+                                                <strong>{{ $instructor->persona->primer_nombre }} 
+                                                {{ $instructor->persona->segundo_nombre }} 
+                                                {{ $instructor->persona->primer_apellido }} 
+                                                {{ $instructor->persona->segundo_apellido }}</strong>
+                                                <br><small class="text-muted">Instructor SENA</small>
+                                            </td>
+                                        </tr>
                                         <tr>
                                             <th class="py-3">Tipo de Documento</th>
                                             <td class="py-3">{{ $instructor->persona->tipoDocumento->name ?? 'No registrado' }}</td>
@@ -269,8 +259,8 @@
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card detail-card no-hover">
-                        <div class="card-header bg-white py-3">
-                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                        <div class="card-header bg-success text-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold">
                                 <i class="fas fa-envelope mr-2"></i>Información de Contacto
                             </h5>
                         </div>
@@ -337,8 +327,8 @@
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card detail-card no-hover">
-                        <div class="card-header bg-white py-3">
-                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                        <div class="card-header bg-info text-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold">
                                 <i class="fas fa-building mr-2"></i>Información Institucional
                             </h5>
                         </div>
@@ -418,8 +408,8 @@
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card detail-card no-hover">
-                        <div class="card-header bg-white py-3">
-                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                        <div class="card-header bg-warning text-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold">
                                 <i class="fas fa-graduation-cap mr-2"></i>Especialidades
                             </h5>
                         </div>
@@ -473,8 +463,8 @@
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card detail-card no-hover">
-                        <div class="card-header bg-white py-3">
-                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                        <div class="card-header bg-secondary text-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold">
                                 <i class="fas fa-clipboard-list mr-2"></i>Fichas de Caracterización Asignadas
                             </h5>
                         </div>
@@ -535,8 +525,8 @@
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card detail-card no-hover">
-                        <div class="card-header bg-white py-3">
-                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                        <div class="card-header bg-secondary text-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold">
                                 <i class="fas fa-clipboard-list mr-2"></i>Fichas de Caracterización
                             </h5>
                         </div>
