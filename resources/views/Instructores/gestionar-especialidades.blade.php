@@ -74,26 +74,137 @@
         }
     </style>
     
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         // Función para confirmar asignación de especialidad principal
         function confirmarAsignacionPrincipal(especialidadNombre) {
-            return confirm(`¿Está seguro de asignar '${especialidadNombre}' como especialidad principal?\n\nEsto reemplazará la especialidad principal actual (si existe).`);
+            return Swal.fire({
+                title: '¿Asignar como Especialidad Principal?',
+                html: `<div class="text-left">
+                    <p><strong>Especialidad:</strong> ${especialidadNombre}</p>
+                    <p><strong>Acción:</strong> Se asignará como especialidad principal</p>
+                    <p class="text-warning"><i class="fas fa-exclamation-triangle"></i> Esto reemplazará la especialidad principal actual (si existe)</p>
+                </div>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-star"></i> Asignar Principal',
+                cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+                focusConfirm: false,
+                reverseButtons: true
+            });
         }
         
         // Función para confirmar asignación de especialidad secundaria
         function confirmarAsignacionSecundaria(especialidadNombre) {
-            return confirm(`¿Está seguro de asignar '${especialidadNombre}' como especialidad secundaria?`);
+            return Swal.fire({
+                title: '¿Asignar como Especialidad Secundaria?',
+                html: `<div class="text-left">
+                    <p><strong>Especialidad:</strong> ${especialidadNombre}</p>
+                    <p><strong>Acción:</strong> Se agregará a las especialidades secundarias</p>
+                </div>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#007bff',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-plus"></i> Asignar Secundaria',
+                cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+                focusConfirm: false,
+                reverseButtons: true
+            });
         }
         
         // Función para confirmar remoción de especialidad principal
         function confirmarRemocionPrincipal(especialidadNombre) {
-            return confirm(`⚠️ ADVERTENCIA ⚠️\n\n¿Está seguro de remover la especialidad principal '${especialidadNombre}'?\n\nEsto dejará al instructor sin especialidad principal.`);
+            return Swal.fire({
+                title: '⚠️ Remover Especialidad Principal',
+                html: `<div class="text-left">
+                    <p><strong>Especialidad:</strong> ${especialidadNombre}</p>
+                    <div class="alert alert-warning mt-3">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <strong>Advertencia:</strong> Esto dejará al instructor sin especialidad principal
+                    </div>
+                </div>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-trash"></i> Remover',
+                cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+                focusConfirm: false,
+                reverseButtons: true
+            });
         }
         
         // Función para confirmar remoción de especialidad secundaria
         function confirmarRemocionSecundaria(especialidadNombre) {
-            return confirm(`¿Está seguro de remover la especialidad secundaria '${especialidadNombre}'?`);
+            return Swal.fire({
+                title: '¿Remover Especialidad Secundaria?',
+                html: `<div class="text-left">
+                    <p><strong>Especialidad:</strong> ${especialidadNombre}</p>
+                    <p><strong>Acción:</strong> Se removerá de las especialidades secundarias</p>
+                </div>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: '<i class="fas fa-trash"></i> Remover',
+                cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+                focusConfirm: false,
+                reverseButtons: true
+            });
         }
+
+        // Interceptar envío de formularios para usar SweetAlert
+        document.addEventListener('DOMContentLoaded', function() {
+            // Interceptar formularios de asignación
+            document.querySelectorAll('form[action*="asignar-especialidad"]').forEach(function(form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const tipo = form.querySelector('input[name="tipo"]').value;
+                    const redConocimientoId = form.querySelector('input[name="red_conocimiento_id"]').value;
+                    const especialidadNombre = form.closest('.specialty-card').querySelector('h6').textContent.trim();
+                    
+                    let confirmacion;
+                    if (tipo === 'principal') {
+                        confirmacion = confirmarAsignacionPrincipal(especialidadNombre);
+                    } else {
+                        confirmacion = confirmarAsignacionSecundaria(especialidadNombre);
+                    }
+                    
+                    confirmacion.then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+            
+            // Interceptar formularios de remoción
+            document.querySelectorAll('form[action*="remover-especialidad"]').forEach(function(form) {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    const tipo = form.querySelector('input[name="tipo"]').value;
+                    const especialidad = form.querySelector('input[name="especialidad"]').value;
+                    
+                    let confirmacion;
+                    if (tipo === 'principal') {
+                        confirmacion = confirmarRemocionPrincipal(especialidad);
+                    } else {
+                        confirmacion = confirmarRemocionSecundaria(especialidad);
+                    }
+                    
+                    confirmacion.then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+        });
     </script>
 @endsection
 
@@ -247,8 +358,7 @@
                                                             @method('DELETE')
                                                             <input type="hidden" name="especialidad" value="{{ $especialidadPrincipal }}">
                                                             <input type="hidden" name="tipo" value="principal">
-                                                            <button type="submit" class="btn btn-warning btn-sm" 
-                                                                    onclick="return confirmarRemocionPrincipal('{{ $especialidadPrincipal }}')">
+                                                            <button type="submit" class="btn btn-warning btn-sm">
                                                                 <i class="fas fa-times mr-1"></i>Remover
                                                             </button>
                                                         </form>
@@ -279,8 +389,7 @@
                                                             @method('DELETE')
                                                             <input type="hidden" name="especialidad" value="{{ $especialidad }}">
                                                             <input type="hidden" name="tipo" value="secundaria">
-                                                            <button type="submit" class="btn btn-danger btn-sm" 
-                                                                    onclick="return confirmarRemocionSecundaria('{{ $especialidad }}')">
+                                                            <button type="submit" class="btn btn-danger btn-sm">
                                                                 <i class="fas fa-times mr-1"></i>Remover
                                                             </button>
                                                         </form>
@@ -327,8 +436,7 @@
                                                                 @csrf
                                                                 <input type="hidden" name="red_conocimiento_id" value="{{ $redConocimiento->id }}">
                                                                 <input type="hidden" name="tipo" value="principal">
-                                                                <button type="submit" class="btn btn-success btn-sm" 
-                                                                        onclick="return confirmarAsignacionPrincipal('{{ $redConocimiento->nombre }}')">
+                                                                <button type="submit" class="btn btn-success btn-sm">
                                                                     <i class="fas fa-star mr-1"></i>Principal
                                                                 </button>
                                                             </form>
@@ -337,8 +445,7 @@
                                                                 @csrf
                                                                 <input type="hidden" name="red_conocimiento_id" value="{{ $redConocimiento->id }}">
                                                                 <input type="hidden" name="tipo" value="secundaria">
-                                                                <button type="submit" class="btn btn-primary btn-sm" 
-                                                                        onclick="return confirmarAsignacionSecundaria('{{ $redConocimiento->nombre }}')">
+                                                                <button type="submit" class="btn btn-primary btn-sm">
                                                                     <i class="fas fa-plus mr-1"></i>Secundaria
                                                                 </button>
                                                             </form>

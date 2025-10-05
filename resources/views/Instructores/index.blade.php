@@ -209,6 +209,7 @@
 @endsection
 
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
             // Confirmación para formularios de eliminación
@@ -216,17 +217,47 @@
                 e.preventDefault();
                 const form = this;
                 
+                // Obtener información del instructor desde la fila de la tabla
+                const row = $(form).closest('tr');
+                const nombreInstructor = row.find('td:nth-child(2)').text().trim();
+                const documentoInstructor = row.find('td:nth-child(3)').text().trim();
+                
                 Swal.fire({
-                    title: '¿Eliminar Instructor?',
-                    text: 'Esta acción eliminará el instructor pero mantendrá la persona intacta. ¿Está seguro?',
+                    title: '⚠️ Eliminar Instructor',
+                    html: `<div class="text-left">
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Información del Instructor:</strong>
+                        </div>
+                        <p><strong>Nombre:</strong> ${nombreInstructor}</p>
+                        <p><strong>Documento:</strong> ${documentoInstructor}</p>
+                        <div class="alert alert-warning mt-3">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Importante:</strong> Esta acción eliminará el instructor pero mantendrá la persona intacta.
+                        </div>
+                    </div>`,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#dc3545',
                     cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Sí, eliminar',
-                    cancelButtonText: 'Cancelar'
+                    confirmButtonText: '<i class="fas fa-trash"></i> Sí, eliminar',
+                    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+                    focusConfirm: false,
+                    reverseButtons: true
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // Mostrar loading mientras se procesa
+                        Swal.fire({
+                            title: 'Eliminando...',
+                            text: 'Por favor espere mientras se procesa la solicitud',
+                            icon: 'info',
+                            allowOutsideClick: false,
+                            showConfirmButton: false,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        
                         form.submit();
                     }
                 });
