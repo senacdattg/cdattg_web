@@ -6,12 +6,14 @@
     <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
     <style>
         .stats-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #ffffff;
+            color: #495057;
+            border: 1px solid #dee2e6;
             border-radius: 8px;
-            padding: 1.5rem;
+            padding: 1rem;
             text-align: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .stats-number {
             font-size: 2rem;
@@ -23,11 +25,12 @@
             opacity: 0.9;
         }
         .instructor-info {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #f8f9fa;
+            color: #495057;
+            border: 1px solid #dee2e6;
             border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
         .table-custom {
             border-radius: 8px;
@@ -307,9 +310,7 @@
                                     </table>
                                 </div>
                             @else
-                                <div class="text-center py-5">
-                                    <img src="{{ asset('img/no-data.svg') }}" alt="No data"
-                                        style="width: 120px" class="mb-3">
+                                <div class="text-center py-4">
                                     <p class="text-muted">No hay fichas asignadas a este instructor</p>
                                 </div>
                             @endif
