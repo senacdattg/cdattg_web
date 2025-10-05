@@ -18,13 +18,14 @@
         }
         
         .specialty-card.assigned {
-            border-color: #28a745;
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-color: #007bff;
+            background: #ffffff;
         }
         
         .specialty-card.assigned .card-header {
-            background: #28a745;
-            color: white;
+            background: #f8f9fa;
+            color: #495057;
+            border-bottom: 1px solid #dee2e6;
         }
         
         .specialty-card .card-header {
@@ -32,40 +33,23 @@
             border-bottom: 1px solid #dee2e6;
         }
         
-        .btn-assign, .btn-remove {
-            border-radius: 20px;
-            padding: 8px 16px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
         .btn-assign {
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-            border: none;
-            color: white;
-        }
-        
-        .btn-assign:hover {
-            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
-            color: white;
-            transform: translateY(-1px);
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-weight: 500;
+            font-size: 0.85rem;
         }
         
         .btn-remove {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-            border: none;
-            color: white;
-        }
-        
-        .btn-remove:hover {
-            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
-            color: white;
-            transform: translateY(-1px);
+            border-radius: 4px;
+            padding: 6px 12px;
+            font-weight: 500;
+            font-size: 0.85rem;
         }
         
         .status-badge {
             padding: 4px 8px;
-            border-radius: 12px;
+            border-radius: 4px;
             font-size: 0.75rem;
             font-weight: 600;
         }
@@ -76,16 +60,17 @@
         }
         
         .status-secondary {
-            background-color: #f3e5f5;
-            color: #7b1fa2;
+            background-color: #f8f9fa;
+            color: #6c757d;
         }
         
         .instructor-info {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #f8f9fa;
+            color: #495057;
+            border: 1px solid #dee2e6;
             border-radius: 8px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
         }
     </style>
 @endsection
