@@ -1,405 +1,246 @@
 @extends('adminlte::page')
 
-@section('title', 'Lista de Instructores')
-
 @section('css')
-    <style>
-        .search-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        .search-input {
-            border-radius: 25px;
-            border: none;
-            padding: 12px 20px;
-            font-size: 1rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .search-input:focus {
-            box-shadow: 0 0 0 0.2rem rgba(255,255,255,0.25);
-        }
-        .search-btn {
-            border-radius: 25px;
-            padding: 12px 25px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border: none;
-            background: rgba(255,255,255,0.2);
-            color: white;
-            transition: all 0.3s ease;
-        }
-        .search-btn:hover {
-            background: rgba(255,255,255,0.3);
-            transform: translateY(-2px);
-        }
-        .filter-card {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            border-left: 4px solid #28a745;
-        }
-        .filter-card h6 {
-            color: #28a745;
-            font-weight: 600;
-            margin-bottom: 15px;
-        }
-        .filter-select {
-            border-radius: 8px;
-            border: 2px solid #e9ecef;
-            padding: 8px 12px;
-            transition: all 0.3s ease;
-        }
-        .filter-select:focus {
-            border-color: #28a745;
-            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
-        }
-        .stats-card {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .stats-number {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-        .stats-label {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-        .table-custom {
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            background: white;
-        }
-        .table-custom thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .table-custom thead th {
-            border: none;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-size: 0.85rem;
-            padding: 15px 10px;
-        }
-        .table-custom tbody tr {
-            transition: all 0.3s ease;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        .table-custom tbody tr:hover {
-            background: #f8f9fa;
-            transform: scale(1.01);
-        }
-        .table-custom tbody td {
-            padding: 12px 10px;
-            vertical-align: middle;
-        }
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .status-active {
-            background: #d4edda;
-            color: #155724;
-        }
-        .status-inactive {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        .btn-action {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin: 2px;
-            transition: all 0.3s ease;
-        }
-        .btn-action:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        .btn-create {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            border: none;
-            padding: 12px 25px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            border-radius: 25px;
-            color: white;
-        }
-        .btn-create:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            color: white;
-        }
-        .breadcrumb-custom {
-            background: transparent;
-            padding: 0;
-        }
-        .breadcrumb-custom .breadcrumb-item a {
-            color: #007bff;
-            text-decoration: none;
-        }
-        .breadcrumb-custom .breadcrumb-item.active {
-            color: #6c757d;
-        }
-        .alert-custom {
-            border-radius: 10px;
-            border: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #6c757d;
-        }
-        .empty-state i {
-            font-size: 4rem;
-            margin-bottom: 20px;
-            opacity: 0.5;
-        }
-        .pagination-custom {
-            justify-content: center;
-            margin-top: 30px;
-        }
-        .pagination-custom .page-link {
-            border-radius: 8px;
-            margin: 0 2px;
-            border: 2px solid #e9ecef;
-            color: #007bff;
-        }
-        .pagination-custom .page-link:hover {
-            background: #007bff;
-            color: white;
-            border-color: #007bff;
-        }
-        .pagination-custom .page-item.active .page-link {
-            background: #007bff;
-            border-color: #007bff;
-        }
-        @media (max-width: 768px) {
-            .table-responsive {
-                border-radius: 10px;
-            }
-            .btn-action {
-                padding: 4px 8px;
-                font-size: 0.7rem;
-            }
-            .search-card {
-                padding: 20px 15px;
-            }
-        }
-    </style>
+    @vite(['resources/css/parametros.css'])
 @endsection
 
-@section('content')
-    <section class="content-header">
+@section('content_header')
+    <section class="content-header dashboard-header py-4">
         <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="text-primary">
-                        <i class="fas fa-chalkboard-teacher mr-2"></i>
-                        Gestión de Instructores
-                    </h1>
+            <div class="row align-items-center">
+                <div class="col-12 col-md-6 d-flex align-items-center">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
+                        style="width: 48px; height: 48px;">
+                        <i class="fas fa-chalkboard-teacher text-white fa-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800">Instructores</h1>
+                        <p class="text-muted mb-0 font-weight-light">Gestión de instructores del sistema</p>
+                    </div>
                 </div>
                 <div class="col-sm-6">
-                    <ol class="breadcrumb breadcrumb-custom float-sm-right">
-                        <li class="breadcrumb-item">
-                            <a href="{{ route('home.index') }}">
-                                <i class="fas fa-home mr-1"></i>Inicio
-                            </a>
-                        </li>
-                        <li class="breadcrumb-item active">
-                            <i class="fas fa-chalkboard-teacher mr-1"></i>Instructores
-                        </li>
-                    </ol>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
+                                    <i class="fas fa-home"></i> Inicio
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <i class="fas fa-chalkboard-teacher"></i> Instructores
+                            </li>
+                        </ol>
+                    </nav>
                 </div>
             </div>
         </div>
     </section>
+@endsection
 
-    <section class="content">
+@section('content')
+    <section class="content mt-4">
         <div class="container-fluid">
-            <!-- Alertas -->
-            @if (session('success'))
-                <div class="alert alert-success alert-custom alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle mr-2"></i>
-                    {{ session('success') }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            @endif
-
-            @if (session('error'))
-                <div class="alert alert-danger alert-custom alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-triangle mr-2"></i>
-                    {{ session('error') }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            @endif
-
-            <!-- Barra de Búsqueda -->
-            <div class="search-card">
-                <div class="row align-items-center">
-                    <div class="col-md-8">
-                        <h4 class="mb-3">
-                            <i class="fas fa-search mr-2"></i>
-                            Buscar Instructores
-                        </h4>
-                        <form method="GET" action="{{ route('instructor.index') }}" class="d-flex">
-                            <input type="text" 
-                                   name="search" 
-                                   class="form-control search-input flex-grow-1 mr-3" 
-                                   placeholder="Buscar por nombre, apellido, documento o email..."
-                                   value="{{ request()->input('search') }}">
-                            <button type="submit" class="btn search-btn">
-                                <i class="fas fa-search mr-1"></i>
-                                Buscar
-                            </button>
-                        </form>
-                    </div>
-                    <div class="col-md-4 text-right">
-                        @can('CREAR INSTRUCTOR')
-                            <a href="{{ route('instructor.create') }}" class="btn btn-create">
-                                <i class="fas fa-plus mr-2"></i>
-                                Nuevo Instructor
-                            </a>
-                        @endcan
-                    </div>
-                </div>
-            </div>
-
-            <!-- Estadísticas -->
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="stats-card">
-                        <div class="stats-number">{{ $estadisticas['total'] }}</div>
-                        <div class="stats-label">Total Instructores</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-                        <div class="stats-number">{{ $estadisticas['activos'] }}</div>
-                        <div class="stats-label">Activos</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
-                        <div class="stats-number">{{ $estadisticas['inactivos'] }}</div>
-                        <div class="stats-label">Inactivos</div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="stats-card" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333;">
-                        <div class="stats-number">{{ $estadisticas['con_fichas'] }}</div>
-                        <div class="stats-label">Con Fichas</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Filtros Avanzados -->
-            <div class="filter-card">
-                <h6><i class="fas fa-filter mr-2"></i>Filtros Avanzados</h6>
-                <form id="searchForm">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label>Estado</label>
-                            <select name="estado" class="form-control filter-select" id="filtroEstado">
-                                <option value="todos" {{ $filtroEstado === 'todos' ? 'selected' : '' }}>Todos</option>
-                                <option value="activos" {{ $filtroEstado === 'activos' ? 'selected' : '' }}>Activos</option>
-                                <option value="inactivos" {{ $filtroEstado === 'inactivos' ? 'selected' : '' }}>Inactivos</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label>Especialidad</label>
-                            <select name="especialidad" class="form-control filter-select" id="filtroEspecialidad">
-                                <option value="">Todas</option>
-                                @foreach($especialidades as $especialidad)
-                                    <option value="{{ $especialidad->nombre }}" {{ $filtroEspecialidad === $especialidad->nombre ? 'selected' : '' }}>
-                                        {{ $especialidad->nombre }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label>Regional</label>
-                            <select name="regional" class="form-control filter-select" id="filtroRegional">
-                                <option value="">Todas</option>
-                                @foreach($regionales as $regional)
-                                    <option value="{{ $regional->id }}" {{ $filtroRegional == $regional->id ? 'selected' : '' }}>
-                                        {{ $regional->nombre }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label>&nbsp;</label>
-                            <button type="button" class="btn btn-success btn-block" id="btnFiltrar">
-                                <i class="fas fa-search mr-1"></i>Buscar
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Tabla de Instructores -->
             <div class="row">
                 <div class="col-12">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-white">
-                            <h5 class="card-title text-primary mb-0">
-                                <i class="fas fa-list mr-2"></i>
-                                Lista de Instructores
-                                @if(request()->has('search'))
-                                    <small class="text-muted">- Resultados para: "{{ request('search') }}"</small>
-                                @endif
-                            </h5>
+                    @can('CREAR INSTRUCTOR')
+                        <div class="card shadow-sm mb-4 no-hover">
+                            <div class="card-header bg-white py-3 d-flex align-items-center">
+                                <h5 class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1">
+                                    <i class="fas fa-plus-circle mr-2"></i> 
+                                    <a href="{{ route('instructor.create') }}" class="text-primary text-decoration-none">Nuevo Instructor</a>
+                                </h5>
+                                <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="collapse"
+                                    data-target="#createInstructorForm" aria-expanded="false">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
+
+                            <div class="collapse" id="createInstructorForm">
+                                <div class="card-body">
+                                    <p class="text-muted mb-3">Haz clic en "Nuevo Instructor" para crear un nuevo instructor en el sistema.</p>
+                                    <a href="{{ route('instructor.create') }}" class="btn btn-primary">
+                                        <i class="fas fa-plus mr-2"></i> Crear Instructor
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endcan
+
+                    <!-- Estadísticas -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="card border-left-primary shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                                Total Instructores
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $estadisticas['total'] }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-users fa-2x text-primary"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-left-success shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                                Activos
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $estadisticas['activos'] }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-user-check fa-2x text-success"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-left-warning shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                                Inactivos
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $estadisticas['inactivos'] }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-user-times fa-2x text-warning"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card border-left-info shadow h-100 py-2">
+                                <div class="card-body">
+                                    <div class="row no-gutters align-items-center">
+                                        <div class="col mr-2">
+                                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                                Con Fichas
+                                            </div>
+                                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $estadisticas['con_fichas'] }}</div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <i class="fas fa-clipboard-list fa-2x text-info"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtros Avanzados -->
+                    <div class="card shadow-sm mb-4 no-hover">
+                        <div class="card-header bg-white py-3">
+                            <h6 class="m-0 font-weight-bold text-primary d-flex align-items-center">
+                                <i class="fas fa-filter mr-2"></i> Filtros de Búsqueda
+                            </h6>
                         </div>
                         <div class="card-body">
+                            <form id="searchForm">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <label class="form-label">Búsqueda</label>
+                                        <input type="text" name="search" id="searchInput" class="form-control" 
+                                               placeholder="Nombre, documento o email..." 
+                                               value="{{ request('search') }}">
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Estado</label>
+                                        <select name="estado" class="form-control" id="filtroEstado">
+                                            <option value="todos" {{ $filtroEstado === 'todos' ? 'selected' : '' }}>Todos</option>
+                                            <option value="activos" {{ $filtroEstado === 'activos' ? 'selected' : '' }}>Activos</option>
+                                            <option value="inactivos" {{ $filtroEstado === 'inactivos' ? 'selected' : '' }}>Inactivos</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label">Especialidad</label>
+                                        <select name="especialidad" class="form-control" id="filtroEspecialidad">
+                                            <option value="">Todas</option>
+                                            @foreach($especialidades as $especialidad)
+                                                <option value="{{ $especialidad->nombre }}" {{ $filtroEspecialidad === $especialidad->nombre ? 'selected' : '' }}>
+                                                    {{ $especialidad->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">Regional</label>
+                                        <select name="regional" class="form-control" id="filtroRegional">
+                                            <option value="">Todas</option>
+                                            @foreach($regionales as $regional)
+                                                <option value="{{ $regional->id }}" {{ $filtroRegional == $regional->id ? 'selected' : '' }}>
+                                                    {{ $regional->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <label class="form-label">&nbsp;</label>
+                                        <div class="d-flex">
+                                            <button type="button" class="btn btn-primary btn-sm mr-2" id="btnFiltrar">
+                                                <i class="fas fa-search"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-outline-secondary btn-sm" id="btnLimpiar">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm no-hover">
+                        <div class="card-header bg-white py-3 d-flex align-items-center">
+                            <h6 class="m-0 font-weight-bold text-primary d-flex flex-grow-1">Lista de Instructores</h6>
+                            <div class="input-group w-25">
+                                <form action="{{ route('instructor.index') }}" method="GET" class="input-group">
+                                    <input type="text" name="search" id="searchParameter"
+                                        class="form-control form-control-sm" placeholder="Buscar instructor..."
+                                        value="{{ request('search') }}" autocomplete="off">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary btn-sm" type="submit">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
                             <div id="instructores-container">
                                 @include('Instructores.partials.instructores-table')
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white">
+                            <div class="float-right">
+                                {{ $instructores->links() }}
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Paginación -->
-            @if($instructores->hasPages())
-                <div class="row">
-                    <div class="col-12">
-                        <nav aria-label="Paginación de instructores">
-                            {{ $instructores->appends(request()->query())->links('pagination::bootstrap-4', ['class' => 'pagination-custom']) }}
-                        </nav>
-                    </div>
-                </div>
-            @endif
         </div>
     </section>
 @endsection
 
+@section('footer')
+    @include('layout.footer')
+@endsection
+
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @vite(['resources/js/parametros.js'])
     <script>
         $(document).ready(function() {
             let searchTimeout;
@@ -559,21 +400,6 @@
                 `);
             }
 
-            // Animación de entrada para las tarjetas
-            $('.stats-card, .filter-card').each(function(index) {
-                $(this).css('opacity', '0').delay(index * 100).animate({
-                    opacity: 1
-                }, 500);
-            });
-
-            // Auto-hide alerts
-            setTimeout(function() {
-                $('.alert').fadeOut('slow');
-            }, 5000);
-
-            // Tooltip initialization
-            $('[data-toggle="tooltip"]').tooltip();
-
             // Limpiar filtros
             $('#btnLimpiar').on('click', function() {
                 $('#searchInput').val('');
@@ -608,6 +434,9 @@
                     });
                 }
             });
+
+            // Tooltip initialization
+            $('[data-toggle="tooltip"]').tooltip();
         });
     </script>
 @endsection
