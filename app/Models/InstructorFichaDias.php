@@ -15,4 +15,9 @@ class InstructorFichaDias extends Model
     {
         return $this->belongsTo(InstructorFichaCaracterizacion::class, 'instructor_ficha_id');
     }
+
+    public function dia(): BelongsTo
+    {
+        return $this->belongsTo(Parametro::class, 'dia_id');
+    }
 }
