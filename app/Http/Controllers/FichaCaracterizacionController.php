@@ -2565,23 +2565,24 @@ class FichaCaracterizacionController extends Controller
             foreach ($personasIds as $personaId) {
                 $persona = \App\Models\Persona::with('user')->findOrFail($personaId);
                 
-                // Crear registro de aprendiz si no existe
-                $aprendiz = \App\Models\Aprendiz::firstOrCreate([
+                // Crear o actualizar registro de aprendiz
+                $aprendiz = \App\Models\Aprendiz::updateOrCreate([
                     'persona_id' => $personaId,
                 ], [
+                    'ficha_caracterizacion_id' => $id, // Asignar la ficha actual
                     'estado' => 1,
                     'user_create_id' => Auth::id(),
                     'user_edit_id' => Auth::id(),
                 ]);
                 
-                // Verificar que el aprendiz no esté ya asignado a esta ficha
+                // Verificar que el aprendiz no esté ya asignado a esta ficha en la tabla pivot
                 if ($ficha->aprendices()->where('aprendiz_id', $aprendiz->id)->exists()) {
                     DB::rollBack();
                     return redirect()->back()
                         ->with('error', 'La persona ya está asignada como aprendiz a esta ficha.');
                 }
                 
-                // Asignar aprendiz a la ficha
+                // Asignar aprendiz a la ficha en la tabla pivot
                 $ficha->aprendices()->attach($aprendiz->id);
                 
                 // Asignar rol de APRENDIZ al usuario si tiene usuario asociado
@@ -2677,11 +2678,12 @@ class FichaCaracterizacionController extends Controller
             // Desasignar aprendices de la ficha
             $ficha->aprendices()->detach($aprendicesIds);
 
-            // Opcional: Desactivar registros de aprendiz (no eliminar para mantener historial)
+            // Actualizar registros de aprendiz: limpiar ficha_caracterizacion_id y desactivar
             foreach ($aprendicesIds as $aprendizId) {
                 $aprendiz = \App\Models\Aprendiz::find($aprendizId);
                 if ($aprendiz) {
                     $aprendiz->update([
+                        'ficha_caracterizacion_id' => null, // Limpiar la ficha asignada
                         'estado' => 0, // Desactivar pero mantener registro
                         'user_edit_id' => Auth::id(),
                     ]);
