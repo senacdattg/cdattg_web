@@ -290,85 +290,77 @@
                 </div>
             </div>
 
-            <!-- Filtros Avanzados -->
-            <div class="row">
+            <!-- Estadísticas -->
+            <div class="row mb-4">
                 <div class="col-md-3">
-                    <div class="filter-card">
-                        <h6>
-                            <i class="fas fa-filter mr-2"></i>
-                            Filtros Rápidos
-                        </h6>
-                        <div class="form-group">
-                            <label for="status_filter">Estado</label>
-                            <select class="form-control filter-select" id="status_filter">
-                                <option value="">Todos los estados</option>
-                                <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Activos</option>
-                                <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Inactivos</option>
+                    <div class="stats-card">
+                        <div class="stats-number">{{ $estadisticas['total'] }}</div>
+                        <div class="stats-label">Total Instructores</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="stats-number">{{ $estadisticas['activos'] }}</div>
+                        <div class="stats-label">Activos</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <div class="stats-number">{{ $estadisticas['inactivos'] }}</div>
+                        <div class="stats-label">Inactivos</div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card" style="background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333;">
+                        <div class="stats-number">{{ $estadisticas['con_fichas'] }}</div>
+                        <div class="stats-label">Con Fichas</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filtros Avanzados -->
+            <div class="filter-card">
+                <h6><i class="fas fa-filter mr-2"></i>Filtros Avanzados</h6>
+                <form id="searchForm">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label>Estado</label>
+                            <select name="estado" class="form-control filter-select" id="filtroEstado">
+                                <option value="todos" {{ $filtroEstado === 'todos' ? 'selected' : '' }}>Todos</option>
+                                <option value="activos" {{ $filtroEstado === 'activos' ? 'selected' : '' }}>Activos</option>
+                                <option value="inactivos" {{ $filtroEstado === 'inactivos' ? 'selected' : '' }}>Inactivos</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="regional_filter">Regional</label>
-                            <select class="form-control filter-select" id="regional_filter">
-                                <option value="">Todas las regionales</option>
-                                @foreach($regionales ?? [] as $regional)
-                                    <option value="{{ $regional->id }}" {{ request('regional') == $regional->id ? 'selected' : '' }}>
-                                        {{ $regional->regional }}
+                        <div class="col-md-3">
+                            <label>Especialidad</label>
+                            <select name="especialidad" class="form-control filter-select" id="filtroEspecialidad">
+                                <option value="">Todas</option>
+                                @foreach($especialidades as $especialidad)
+                                    <option value="{{ $especialidad->nombre }}" {{ $filtroEspecialidad === $especialidad->nombre ? 'selected' : '' }}>
+                                        {{ $especialidad->nombre }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label for="fichas_filter">Fichas</label>
-                            <select class="form-control filter-select" id="fichas_filter">
-                                <option value="">Todos</option>
-                                <option value="con_fichas" {{ request('fichas') == 'con_fichas' ? 'selected' : '' }}>Con fichas</option>
-                                <option value="sin_fichas" {{ request('fichas') == 'sin_fichas' ? 'selected' : '' }}>Sin fichas</option>
+                        <div class="col-md-3">
+                            <label>Regional</label>
+                            <select name="regional" class="form-control filter-select" id="filtroRegional">
+                                <option value="">Todas</option>
+                                @foreach($regionales as $regional)
+                                    <option value="{{ $regional->id }}" {{ $filtroRegional == $regional->id ? 'selected' : '' }}>
+                                        {{ $regional->nombre }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Estadísticas -->
-                <div class="col-md-9">
-                    <div class="row">
                         <div class="col-md-3">
-                            <div class="stats-card">
-                                <div class="stats-number">{{ $instructores->total() }}</div>
-                                <div class="stats-label">
-                                    <i class="fas fa-users mr-1"></i>
-                                    Total Instructores
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stats-card">
-                                <div class="stats-number">{{ $instructores->where('persona.user.status', 1)->count() }}</div>
-                                <div class="stats-label">
-                                    <i class="fas fa-user-check mr-1"></i>
-                                    Activos
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stats-card">
-                                <div class="stats-number">{{ $instructores->where('persona.user.status', 0)->count() }}</div>
-                                <div class="stats-label">
-                                    <i class="fas fa-user-times mr-1"></i>
-                                    Inactivos
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stats-card">
-                                <div class="stats-number">{{ $instructores->whereDoesntHave('fichas')->count() }}</div>
-                                <div class="stats-label">
-                                    <i class="fas fa-user-clock mr-1"></i>
-                                    Disponibles
-                                </div>
-                            </div>
+                            <label>&nbsp;</label>
+                            <button type="button" class="btn btn-success btn-block" id="btnFiltrar">
+                                <i class="fas fa-search mr-1"></i>Buscar
+                            </button>
                         </div>
                     </div>
-                </div>
+                </form>
             </div>
 
             <!-- Tabla de Instructores -->
@@ -384,159 +376,10 @@
                                 @endif
                             </h5>
                         </div>
-                        <div class="card-body p-0">
-                            @if($instructores->count() > 0)
-                                <div class="table-responsive">
-                                    <table class="table table-custom mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th style="width: 5%">#</th>
-                                                <th style="width: 25%">
-                                                    <i class="fas fa-user mr-1"></i>
-                                                    Nombre Completo
-                                                </th>
-                                                <th style="width: 15%">
-                                                    <i class="fas fa-id-card mr-1"></i>
-                                                    Documento
-                                                </th>
-                                                <th style="width: 20%">
-                                                    <i class="fas fa-envelope mr-1"></i>
-                                                    Email
-                                                </th>
-                                                <th style="width: 15%">
-                                                    <i class="fas fa-building mr-1"></i>
-                                                    Regional
-                                                </th>
-                                                <th style="width: 10%">
-                                                    <i class="fas fa-info-circle mr-1"></i>
-                                                    Estado
-                                                </th>
-                                                <th style="width: 10%">
-                                                    <i class="fas fa-cogs mr-1"></i>
-                                                    Acciones
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach ($instructores as $index => $instructor)
-                                                <tr>
-                                                    <td>
-                                                        <strong>{{ $instructores->firstItem() + $index }}</strong>
-                                                    </td>
-                                                    <td>
-                                                        <div class="d-flex align-items-center">
-                                                            <img src="{{ asset('dist/img/LogoSena.jpeg') }}" 
-                                                                 alt="Avatar" 
-                                                                 class="rounded-circle mr-3" 
-                                                                 style="width: 40px; height: 40px; object-fit: cover;">
-                                                            <div>
-                                                                <strong>{{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}</strong>
-                                                                @if($instructor->persona->segundo_nombre || $instructor->persona->segundo_apellido)
-                                                                    <br>
-                                                                    <small class="text-muted">
-                                                                        {{ $instructor->persona->segundo_nombre }} {{ $instructor->persona->segundo_apellido }}
-                                                                    </small>
-                                                                @endif
-                                                            </div>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div>
-                                                            <strong>{{ $instructor->persona->numero_documento }}</strong>
-                                                            <br>
-                                                            <small class="text-muted">{{ $instructor->persona->tipoDocumento->name ?? 'N/A' }}</small>
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <a href="mailto:{{ $instructor->persona->email }}" class="text-primary">
-                                                            {{ $instructor->persona->email }}
-                                                        </a>
-                                                    </td>
-                                                    <td>
-                                                        <span class="badge badge-info">
-                                                            {{ $instructor->regional->regional ?? 'N/A' }}
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <span class="status-badge {{ $instructor->persona->user->status === 1 ? 'status-active' : 'status-inactive' }}">
-                                                            {{ $instructor->persona->user->status === 1 ? 'ACTIVO' : 'INACTIVO' }}
-                                                        </span>
-                                                    </td>
-                                                    <td>
-                                                        <div class="btn-group" role="group">
-                                                            @can('VER INSTRUCTOR')
-                                                                <a href="{{ route('instructor.show', $instructor->id) }}" 
-                                                                   class="btn btn-info btn-action" 
-                                                                   data-toggle="tooltip" 
-                                                                   title="Ver perfil">
-                                                                    <i class="fas fa-eye"></i>
-                                                                </a>
-                                                            @endcan
-
-                                                            @can('EDITAR INSTRUCTOR')
-                                                                <a href="{{ route('instructor.edit', $instructor->id) }}" 
-                                                                   class="btn btn-warning btn-action" 
-                                                                   data-toggle="tooltip" 
-                                                                   title="Editar">
-                                                                    <i class="fas fa-edit"></i>
-                                                                </a>
-                                                            @endcan
-
-                                                            @can('EDITAR INSTRUCTOR')
-                                                                <form action="{{ route('persona.cambiarEstadoUser', $instructor->persona->user->id) }}" 
-                                                                      method="POST" class="d-inline">
-                                                                    @csrf
-                                                                    @method('PUT')
-                                                                    <button type="submit" 
-                                                                            class="btn btn-success btn-action" 
-                                                                            data-toggle="tooltip" 
-                                                                            title="{{ $instructor->persona->user->status === 1 ? 'Desactivar' : 'Activar' }}"
-                                                                            onclick="return confirm('¿Cambiar estado del usuario?')">
-                                                                        <i class="fas fa-sync"></i>
-                                                                    </button>
-                                                                </form>
-                                                            @endcan
-
-                                                            @can('ELIMINAR INSTRUCTOR')
-                                                                <form action="{{ route('instructor.destroy', $instructor->id) }}" 
-                                                                      method="POST" class="d-inline">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="submit" 
-                                                                            class="btn btn-danger btn-action" 
-                                                                            data-toggle="tooltip" 
-                                                                            title="Eliminar"
-                                                                            onclick="return confirm('¿Eliminar instructor? Esta acción no se puede deshacer.')">
-                                                                        <i class="fas fa-trash"></i>
-                                                                    </button>
-                                                                </form>
-                                                            @endcan
-                                                        </div>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            @else
-                                <div class="empty-state">
-                                    <i class="fas fa-user-slash"></i>
-                                    <h4>No se encontraron instructores</h4>
-                                    <p class="text-muted">
-                                        @if(request()->has('search'))
-                                            No hay instructores que coincidan con la búsqueda "{{ request('search') }}".
-                                        @else
-                                            No hay instructores registrados en el sistema.
-                                        @endif
-                                    </p>
-                                    @can('CREAR INSTRUCTOR')
-                                        <a href="{{ route('instructor.create') }}" class="btn btn-primary">
-                                            <i class="fas fa-plus mr-2"></i>
-                                            Crear Primer Instructor
-                                        </a>
-                                    @endcan
-                                </div>
-                            @endif
+                        <div class="card-body">
+                            <div id="instructores-container">
+                                @include('Instructores.partials.instructores-table')
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -559,31 +402,189 @@
 @section('js')
     <script>
         $(document).ready(function() {
-            // Aplicar filtros automáticamente
-            $('.filter-select').on('change', function() {
-                const url = new URL(window.location);
-                const filterName = $(this).attr('id').replace('_filter', '');
-                const filterValue = $(this).val();
+            let searchTimeout;
+            
+            // Búsqueda en tiempo real
+            $('#searchInput').on('keyup', function() {
+                const searchTerm = $(this).val();
                 
-                if (filterValue) {
-                    url.searchParams.set(filterName, filterValue);
-                } else {
-                    url.searchParams.delete(filterName);
+                // Debounce search
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    performSearch();
+                }, 300);
+            });
+
+            // Filtros automáticos
+            $('#filtroEstado, #filtroEspecialidad, #filtroRegional').on('change', function() {
+                performSearch();
+            });
+
+            // Botón de búsqueda
+            $('#btnFiltrar').on('click', function() {
+                performSearch();
+            });
+
+            // Función principal de búsqueda AJAX
+            function performSearch() {
+                const searchTerm = $('#searchInput').val();
+                const estado = $('#filtroEstado').val();
+                const especialidad = $('#filtroEspecialidad').val();
+                const regional = $('#filtroRegional').val();
+
+                // Mostrar loading
+                $('#instructores-container').html(`
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Cargando...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Buscando instructores...</p>
+                    </div>
+                `);
+
+                $.ajax({
+                    url: '{{ route("instructor.search") }}',
+                    method: 'GET',
+                    data: {
+                        search: searchTerm,
+                        estado: estado,
+                        especialidad: especialidad,
+                        regional: regional,
+                        page: 1
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#instructores-container').html(response.html);
+                            
+                            // Actualizar URL sin recargar la página
+                            updateURL(searchTerm, estado, especialidad, regional);
+                            
+                            // Reinicializar tooltips
+                            $('[data-toggle="tooltip"]').tooltip();
+                        } else {
+                            showError('Error en la búsqueda: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error en búsqueda:', error);
+                        showError('Error en la búsqueda. Por favor, inténtelo de nuevo.');
+                    }
+                });
+            }
+
+            // Manejar paginación AJAX
+            $(document).on('click', '.pagination a', function(e) {
+                e.preventDefault();
+                const url = $(this).attr('href');
+                const page = new URL(url).searchParams.get('page');
+                
+                if (page) {
+                    performPagination(page);
                 }
+            });
+
+            // Función de paginación AJAX
+            function performPagination(page) {
+                const searchTerm = $('#searchInput').val();
+                const estado = $('#filtroEstado').val();
+                const especialidad = $('#filtroEspecialidad').val();
+                const regional = $('#filtroRegional').val();
+
+                $('#instructores-container').html(`
+                    <div class="text-center py-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Cargando...</span>
+                        </div>
+                    </div>
+                `);
+
+                $.ajax({
+                    url: '{{ route("instructor.search") }}',
+                    method: 'GET',
+                    data: {
+                        search: searchTerm,
+                        estado: estado,
+                        especialidad: especialidad,
+                        regional: regional,
+                        page: page
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            $('#instructores-container').html(response.html);
+                            $('[data-toggle="tooltip"]').tooltip();
+                            
+                            // Scroll to top
+                            $('html, body').animate({ scrollTop: $('#instructores-container').offset().top - 100 }, 300);
+                        } else {
+                            showError('Error en la paginación: ' + response.message);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error en paginación:', error);
+                        showError('Error en la paginación. Por favor, inténtelo de nuevo.');
+                    }
+                });
+            }
+
+            // Actualizar URL sin recargar página
+            function updateURL(search, estado, especialidad, regional) {
+                const url = new URL(window.location);
                 
-                window.location.href = url.toString();
+                if (search) url.searchParams.set('search', search);
+                else url.searchParams.delete('search');
+                
+                if (estado && estado !== 'todos') url.searchParams.set('estado', estado);
+                else url.searchParams.delete('estado');
+                
+                if (especialidad) url.searchParams.set('especialidad', especialidad);
+                else url.searchParams.delete('especialidad');
+                
+                if (regional) url.searchParams.set('regional', regional);
+                else url.searchParams.delete('regional');
+                
+                // Actualizar URL sin recargar
+                window.history.pushState({}, '', url.toString());
+            }
+
+            // Mostrar error
+            function showError(message) {
+                $('#instructores-container').html(`
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        ${message}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                `);
+            }
+
+            // Animación de entrada para las tarjetas
+            $('.stats-card, .filter-card').each(function(index) {
+                $(this).css('opacity', '0').delay(index * 100).animate({
+                    opacity: 1
+                }, 500);
             });
 
-            // Limpiar filtros
-            $('#clear_filters').on('click', function() {
-                window.location.href = '{{ route("instructor.index") }}';
-            });
+            // Auto-hide alerts
+            setTimeout(function() {
+                $('.alert').fadeOut('slow');
+            }, 5000);
 
-            // Tooltips
+            // Tooltip initialization
             $('[data-toggle="tooltip"]').tooltip();
 
+            // Limpiar filtros
+            $('#btnLimpiar').on('click', function() {
+                $('#searchInput').val('');
+                $('#filtroEstado').val('todos');
+                $('#filtroEspecialidad').val('');
+                $('#filtroRegional').val('');
+                performSearch();
+            });
+
             // Confirmación para acciones críticas
-            $('form').on('submit', function(e) {
+            $(document).on('submit', 'form', function(e) {
                 const button = $(this).find('button[type="submit"]');
                 const title = button.attr('title');
                 
@@ -606,22 +607,6 @@
                         }
                     });
                 }
-            });
-
-            // Animación de entrada para las tarjetas
-            $('.stats-card, .filter-card').each(function(index) {
-                $(this).css('opacity', '0').delay(index * 100).animate({
-                    opacity: 1
-                }, 500);
-            });
-
-            // Búsqueda en tiempo real (opcional)
-            let searchTimeout;
-            $('input[name="search"]').on('input', function() {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(function() {
-                    // Aquí se podría implementar búsqueda AJAX si se desea
-                }, 500);
             });
         });
     </script>

@@ -41,18 +41,68 @@ class InstructorController extends Controller
     {
         try {
             $search = $request->input('search');
+            $filtroEstado = $request->input('estado', 'todos');
+            $filtroEspecialidad = $request->input('especialidad');
+            $filtroRegional = $request->input('regional');
 
-            $instructores = Instructor::whereHas('persona', function ($query) use ($search) {
-                if ($search) {
-                    $query->where('primer_nombre', 'like', "%{$search}%")
-                        ->orWhere('segundo_nombre', 'like', "%{$search}%")
-                        ->orWhere('primer_apellido', 'like', "%{$search}%")
-                        ->orWhere('segundo_apellido', 'like', "%{$search}%")
-                        ->orWhere('numero_documento', 'like', "%{$search}%");
+            // Construir query base con relaciones
+            $query = Instructor::with([
+                'persona',
+                'regional',
+                'instructorFichas' => function($q) {
+                    $q->with('ficha.programaFormacion');
                 }
-            })->orderBy('id', 'desc')
-                ->paginate(10);
+            ]);
 
+            // Aplicar filtro de búsqueda por nombre o documento
+            if ($search) {
+                $query->where(function($q) use ($search) {
+                    $q->whereHas('persona', function($personaQuery) use ($search) {
+                        $personaQuery->where('primer_nombre', 'like', "%{$search}%")
+                            ->orWhere('segundo_nombre', 'like', "%{$search}%")
+                            ->orWhere('primer_apellido', 'like', "%{$search}%")
+                            ->orWhere('segundo_apellido', 'like', "%{$search}%")
+                            ->orWhere('numero_documento', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
+                });
+            }
+
+            // Aplicar filtro por estado
+            if ($filtroEstado !== 'todos') {
+                if ($filtroEstado === 'activos') {
+                    $query->where('status', true);
+                } elseif ($filtroEstado === 'inactivos') {
+                    $query->where('status', false);
+                }
+            }
+
+            // Aplicar filtro por especialidad
+            if ($filtroEspecialidad) {
+                $query->whereJsonContains('especialidades', $filtroEspecialidad);
+            }
+
+            // Aplicar filtro por regional
+            if ($filtroRegional) {
+                $query->where('regional_id', $filtroRegional);
+            }
+
+            // Ordenar y paginar
+            $instructores = $query->orderBy('id', 'desc')->paginate(15)->withQueryString();
+
+            // Obtener datos para filtros
+            $regionales = \App\Models\Regional::where('status', true)->orderBy('nombre')->get();
+            $especialidades = \App\Models\RedConocimiento::where('status', true)->orderBy('nombre')->get();
+
+            // Estadísticas
+            $estadisticas = [
+                'total' => Instructor::count(),
+                'activos' => Instructor::where('status', true)->count(),
+                'inactivos' => Instructor::where('status', false)->count(),
+                'con_fichas' => Instructor::whereHas('instructorFichas')->count()
+            ];
+
+            // Verificar personas sin usuario
             $personasSinUsuario = DB::table('personas')
                 ->leftJoin('users', 'personas.id', '=', 'users.persona_id')
                 ->whereNull('users.id')
@@ -63,7 +113,16 @@ class InstructorController extends Controller
                 return view('Instructores.error', compact('personasSinUsuario'))->with('error', 'Existen personas sin usuario asociado. Por favor, cree un usuario para cada persona.');
             }
 
-            return view('Instructores.index', compact('instructores'));
+            return view('Instructores.index', compact(
+                'instructores', 
+                'regionales', 
+                'especialidades', 
+                'estadisticas',
+                'search',
+                'filtroEstado',
+                'filtroEspecialidad',
+                'filtroRegional'
+            ));
             
         } catch (Exception $e) {
             Log::error('Error al listar instructores', [
@@ -71,6 +130,90 @@ class InstructorController extends Controller
                 'search' => $request->input('search')
             ]);
             return redirect()->back()->with('error', 'Error al cargar la lista de instructores. Por favor, inténtelo de nuevo.');
+        }
+    }
+
+    /**
+     * Búsqueda avanzada de instructores con AJAX
+     */
+    public function search(Request $request)
+    {
+        try {
+            $search = $request->input('search');
+            $filtroEstado = $request->input('estado', 'todos');
+            $filtroEspecialidad = $request->input('especialidad');
+            $filtroRegional = $request->input('regional');
+            $page = $request->input('page', 1);
+
+            // Construir query base con relaciones
+            $query = Instructor::with([
+                'persona',
+                'regional',
+                'instructorFichas' => function($q) {
+                    $q->with('ficha.programaFormacion');
+                }
+            ]);
+
+            // Aplicar filtros
+            if ($search) {
+                $query->where(function($q) use ($search) {
+                    $q->whereHas('persona', function($personaQuery) use ($search) {
+                        $personaQuery->where('primer_nombre', 'like', "%{$search}%")
+                            ->orWhere('segundo_nombre', 'like', "%{$search}%")
+                            ->orWhere('primer_apellido', 'like', "%{$search}%")
+                            ->orWhere('segundo_apellido', 'like', "%{$search}%")
+                            ->orWhere('numero_documento', 'like', "%{$search}%")
+                            ->orWhere('email', 'like', "%{$search}%");
+                    });
+                });
+            }
+
+            if ($filtroEstado !== 'todos') {
+                if ($filtroEstado === 'activos') {
+                    $query->where('status', true);
+                } elseif ($filtroEstado === 'inactivos') {
+                    $query->where('status', false);
+                }
+            }
+
+            if ($filtroEspecialidad) {
+                $query->whereJsonContains('especialidades', $filtroEspecialidad);
+            }
+
+            if ($filtroRegional) {
+                $query->where('regional_id', $filtroRegional);
+            }
+
+            // Obtener resultados paginados
+            $instructores = $query->orderBy('id', 'desc')->paginate(15, ['*'], 'page', $page);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'html' => view('Instructores.partials.instructores-table', compact('instructores'))->render(),
+                    'pagination' => $instructores->links()->render()
+                ]);
+            }
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Solicitud no válida'
+            ]);
+
+        } catch (Exception $e) {
+            Log::error('Error en búsqueda de instructores', [
+                'error' => $e->getMessage(),
+                'filters' => $request->all()
+            ]);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error en la búsqueda'
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Error en la búsqueda de instructores.');
         }
     }
 

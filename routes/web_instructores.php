@@ -26,6 +26,11 @@ Route::resource('instructor', InstructorController::class)->names([
     'destroy' => 'instructor.destroy'
 ]);
 
+// Ruta para búsqueda avanzada con AJAX
+Route::get('/instructor/search', [InstructorController::class, 'search'])
+    ->name('instructor.search')
+    ->middleware(['auth', 'can:VER INSTRUCTOR']);
+
 // Rutas específicas para instructores con middleware de autenticación
 Route::middleware(['auth'])->group(function () {
     
