@@ -133,17 +133,17 @@
                                                             </p>
                                                         </div>
                                                         <div>
-                                                            @if($ficha->instructor_id != $asignacion->instructor_id)
-                                                                <form action="{{ route('fichaCaracterizacion.desasignarInstructor', [$ficha->id, $asignacion->instructor_id]) }}" 
-                                                                      method="POST" style="display: inline;">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                                                            onclick="return confirm('¿Está seguro de desasignar este instructor?')">
-                                                                        <i class="fas fa-times"></i>
-                                                                    </button>
-                                                                </form>
-                                                            @endif
+                                                            <form action="{{ route('fichaCaracterizacion.desasignarInstructor', [$ficha->id, $asignacion->instructor_id]) }}" 
+                                                                  method="POST" style="display: inline;">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                                        onclick="return confirm('¿Está seguro de desasignar este instructor?')"
+                                                                        title="Desasignar instructor">
+                                                                    <i class="fas fa-user-minus mr-1"></i>
+                                                                    Desasignar
+                                                                </button>
+                                                            </form>
                                                         </div>
                                                     </div>
                                                 </div>
