@@ -16,7 +16,10 @@ class ProveedorController extends Controller
 
     public function index()
     {
-        $proveedores = Proveedor::all();
+        $proveedores = Proveedor::with(['userCreate.persona', 'userUpdate.persona'])
+            ->withCount('contratosConvenios')
+            ->latest()
+            ->get();
         return view('inventario.proveedores.index', compact('proveedores'));
     }
 

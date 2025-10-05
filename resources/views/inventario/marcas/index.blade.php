@@ -41,6 +41,8 @@
                     <tr>
                         <th style="width:60px">#</th>
                         <th>Marca</th>
+                        <th style="width:100px">Productos</th>
+                        <th style="width:100px">Estado</th>
                         <th style="width:120px">Agregado por</th>
                         <th style="width:120px">Actualizado por</th>
                         <th style="width:130px">Fecha creación</th>
@@ -55,6 +57,16 @@
                                 <div class="marca-inicial">{{ strtoupper(substr($marca->nombre ?? $marca->marca, 0, 1)) }}</div>
                             </td>
                             <td class="fw-semibold">{{ $marca->nombre ?? $marca->marca }}</td>
+                            <td>
+                                <span class="badge bg-info text-white">{{ $marca->productos_count ?? 0 }}</span>
+                            </td>
+                            <td>
+                                @if(($marca->status ?? 1) == 1)
+                                    <span class="badge bg-success">ACTIVO</span>
+                                @else
+                                    <span class="badge bg-danger">INACTIVO</span>
+                                @endif
+                            </td>
                             <td>
                                 <div class="audit-info">
                                     <span class="user-id">{{ $marca->userCreate->name ?? 'ID: '.$marca->user_create_id }}</span>
@@ -79,7 +91,7 @@
                             </td>
                             <td class="text-center actions-cell">
                                 <button type="button" class="btn btn-xs btn-info" title="Ver" 
-                                    onclick="viewMarca({{ $marca->id }}, '{{ addslashes($marca->nombre ?? $marca->marca) }}', '{{ $marca->userCreate->name ?? 'Usuario desconocido' }}', '{{ $marca->userUpdate->name ?? 'Usuario desconocido' }}', '{{ $marca->created_at?->format('d/m/Y H:i') }}', '{{ $marca->updated_at?->format('d/m/Y H:i') }}')"
+                                    onclick="viewMarca({{ $marca->id }}, '{{ addslashes($marca->nombre ?? $marca->marca) }}', {{ $marca->productos_count ?? 0 }}, {{ $marca->status ?? 1 }}, '{{ $marca->userCreate->name ?? 'Usuario desconocido' }}', '{{ $marca->userUpdate->name ?? 'Usuario desconocido' }}', '{{ $marca->created_at?->format('d/m/Y H:i') }}', '{{ $marca->updated_at?->format('d/m/Y H:i') }}')"
                                     data-toggle="modal" data-target="#viewMarcaModal">
                                     <i class="fas fa-eye"></i>
                                 </button>
@@ -144,6 +156,22 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold text-muted">Nombre</label>
                             <p class="form-control-plaintext" id="view_marca_nombre">-</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold text-muted">Productos Asociados</label>
+                            <p class="form-control-plaintext" id="view_marca_productos">-</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold text-muted">Estado</label>
+                            <p class="form-control-plaintext" id="view_marca_estado">-</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold text-muted">Tiempo en Sistema</label>
+                            <p class="form-control-plaintext" id="view_marca_tiempo_sistema">-</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold text-muted">Última Actividad</label>
+                            <p class="form-control-plaintext" id="view_marca_ultima_actividad">-</p>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold text-muted">Creado por</label>

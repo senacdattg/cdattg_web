@@ -41,7 +41,7 @@ window.confirmDelete = function(id, nombre) {
 }
 
 // Función para ver contrato
-window.viewContrato = function(id, name, codigo, fechaInicio, fechaFin, proveedor, estado, createdBy, createdAt, updatedAt) {
+window.viewContrato = function(id, name, codigo, fechaInicio, fechaFin, proveedor, estado, createdBy, updatedBy, createdAt, updatedAt) {
     document.getElementById('view_name').textContent = name || '-';
     document.getElementById('view_codigo').textContent = codigo || '-';
     document.getElementById('view_proveedor').textContent = proveedor || '-';
@@ -49,23 +49,65 @@ window.viewContrato = function(id, name, codigo, fechaInicio, fechaFin, proveedo
     document.getElementById('view_fecha_inicio').textContent = fechaInicio || '-';
     document.getElementById('view_fecha_fin').textContent = fechaFin || '-';
     document.getElementById('view_created_by').textContent = createdBy || '-';
+    document.getElementById('view_updated_by').textContent = updatedBy || '-';
     document.getElementById('view_created_at').textContent = createdAt || '-';
     document.getElementById('view_updated_at').textContent = updatedAt || '-';
+    
+    // Calcular vigencia y días restantes
+    if (fechaInicio && fechaFin) {
+        const inicio = new Date(fechaInicio);
+        const fin = new Date(fechaFin);
+        const hoy = new Date();
+        
+        // Calcular vigencia total
+        const vigenciaDias = Math.ceil((fin - inicio) / (1000 * 60 * 60 * 24));
+        document.getElementById('view_vigencia').textContent = vigenciaDias + ' días';
+        
+        // Calcular días restantes
+        const diasRestantes = Math.ceil((fin - hoy) / (1000 * 60 * 60 * 24));
+        const diasRestantesElement = document.getElementById('view_dias_restantes');
+        
+        if (diasRestantes > 0) {
+            diasRestantesElement.textContent = diasRestantes + ' días';
+            diasRestantesElement.className = 'form-control-plaintext text-success';
+        } else if (diasRestantes === 0) {
+            diasRestantesElement.textContent = 'Vence hoy';
+            diasRestantesElement.className = 'form-control-plaintext text-warning';
+        } else {
+            diasRestantesElement.textContent = 'Vencido (' + Math.abs(diasRestantes) + ' días)';
+            diasRestantesElement.className = 'form-control-plaintext text-danger';
+        }
+    } else {
+        document.getElementById('view_vigencia').textContent = '-';
+        document.getElementById('view_dias_restantes').textContent = '-';
+    }
 };
 
 // Función para editar contrato
 window.editContrato = function(id, name, codigo, fechaInicio, fechaFin, proveedorId, estadoId) {
-    document.getElementById('edit_id').value = id;
-    document.getElementById('edit_name').value = name;
-    document.getElementById('edit_codigo').value = codigo;
-    document.getElementById('edit_fecha_inicio').value = fechaInicio;
-    document.getElementById('edit_fecha_fin').value = fechaFin;
-    document.getElementById('edit_proveedor_id').value = proveedorId;
-    document.getElementById('edit_estado_id').value = estadoId;
+    // Debug: Verificar que se reciben los datos
+    console.log('Datos recibidos:', {id, name, codigo, fechaInicio, fechaFin, proveedorId, estadoId});
+    
+    // Poblar los campos del modal
+    const nameField = document.getElementById('edit_name');
+    const codigoField = document.getElementById('edit_codigo');
+    const fechaInicioField = document.getElementById('edit_fecha_inicio');
+    const fechaFinField = document.getElementById('edit_fecha_fin');
+    const proveedorField = document.getElementById('edit_proveedor_id');
+    const estadoField = document.getElementById('edit_estado_id');
+    
+    if (nameField) nameField.value = name || '';
+    if (codigoField) codigoField.value = codigo || '';
+    if (fechaInicioField) fechaInicioField.value = fechaInicio || '';
+    if (fechaFinField) fechaFinField.value = fechaFin || '';
+    if (proveedorField) proveedorField.value = (proveedorId && proveedorId !== 'null') ? proveedorId : '';
+    if (estadoField) estadoField.value = (estadoId && estadoId !== 'null') ? estadoId : '';
     
     // Actualizar la action del formulario
     const form = document.getElementById('editContratoForm');
-    form.action = `/inventario/contratos-convenios/${id}`;
+    if (form) {
+        form.action = `/inventario/contratos-convenios/${id}`;
+    }
 };
 
 document.addEventListener('DOMContentLoaded', () => {

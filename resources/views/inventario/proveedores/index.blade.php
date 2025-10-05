@@ -48,6 +48,8 @@
                         <th>Proveedor</th>
                         <th style="width:120px">NIT</th>
                         <th>Contacto</th>
+                        <th style="width:90px">Contratos</th>
+                        <th style="width:80px">Estado</th>
                         <th style="width:100px">Agregado por</th>
                         <th style="width:100px">Actualizado por</th>
                         <th style="width:110px">Creación</th>
@@ -75,6 +77,16 @@
                                 </div>
                             </td>
                             <td>
+                                <span class="badge bg-info text-white">{{ $proveedor->contratos_convenios_count ?? 0 }}</span>
+                            </td>
+                            <td>
+                                @if(($proveedor->status ?? 1) == 1)
+                                    <span class="badge bg-success">ACTIVO</span>
+                                @else
+                                    <span class="badge bg-danger">INACTIVO</span>
+                                @endif
+                            </td>
+                            <td>
                                 <div class="audit-info">
                                     <span class="user-id">{{ $proveedor->userCreate->name ?? 'ID: '.$proveedor->user_create_id }}</span>
                                 </div>
@@ -98,7 +110,7 @@
                             </td>
                             <td class="text-center actions-cell">
                                 <button type="button" class="btn btn-xs btn-info" title="Ver" 
-                                    onclick="viewProveedor({{ $proveedor->id }}, '{{ addslashes($proveedor->proveedor) }}', '{{ $proveedor->nit }}', '{{ $proveedor->email }}', '{{ $proveedor->userCreate->name ?? 'Usuario desconocido' }}', '{{ $proveedor->userUpdate->name ?? 'Usuario desconocido' }}', '{{ $proveedor->created_at?->format('d/m/Y H:i') }}', '{{ $proveedor->updated_at?->format('d/m/Y H:i') }}')"
+                                    onclick="viewProveedor({{ $proveedor->id }}, '{{ addslashes($proveedor->proveedor) }}', '{{ $proveedor->nit }}', '{{ $proveedor->email }}', {{ $proveedor->contratos_convenios_count ?? 0 }}, {{ $proveedor->status ?? 1 }}, '{{ $proveedor->userCreate->name ?? 'Usuario desconocido' }}', '{{ $proveedor->userUpdate->name ?? 'Usuario desconocido' }}', '{{ $proveedor->created_at?->format('d/m/Y H:i') }}', '{{ $proveedor->updated_at?->format('d/m/Y H:i') }}')"
                                     data-toggle="modal" data-target="#viewProveedorModal">
                                     <i class="fas fa-eye"></i>
                                 </button>
@@ -116,7 +128,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="text-center text-muted py-4">
+                            <td colspan="11" class="text-center text-muted py-4">
                                 <i class="fas fa-truck fa-2x mb-2 d-block"></i>
                                 Sin proveedores registrados.
                             </td>
@@ -171,6 +183,22 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold text-muted">Email</label>
                             <p class="form-control-plaintext" id="view_proveedor_email">-</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold text-muted">Contratos/Convenios</label>
+                            <p class="form-control-plaintext" id="view_proveedor_contratos">-</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold text-muted">Estado</label>
+                            <p class="form-control-plaintext" id="view_proveedor_estado">-</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold text-muted">Tiempo en Sistema</label>
+                            <p class="form-control-plaintext" id="view_proveedor_tiempo_sistema">-</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold text-muted">Última Actividad</label>
+                            <p class="form-control-plaintext" id="view_proveedor_ultima_actividad">-</p>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold text-muted">Creado por</label>

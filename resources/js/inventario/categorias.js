@@ -197,13 +197,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Función para ver categoría
-    window.viewCategoria = function(id, nombre, createdBy, updatedBy, createdAt, updatedAt) {
+    window.viewCategoria = function(id, nombre, productosCount, status, createdBy, updatedBy, createdAt, updatedAt) {
         document.getElementById('view_categoria_id').textContent = id || '-';
         document.getElementById('view_categoria_nombre').textContent = nombre || '-';
+        document.getElementById('view_categoria_productos').textContent = (productosCount || 0) + ' productos';
+        document.getElementById('view_categoria_estado').textContent = (status == 1) ? 'ACTIVO' : 'INACTIVO';
         document.getElementById('view_categoria_created_by').textContent = createdBy || '-';
         document.getElementById('view_categoria_updated_by').textContent = updatedBy || '-';
         document.getElementById('view_categoria_created_at').textContent = createdAt || '-';
         document.getElementById('view_categoria_updated_at').textContent = updatedAt || '-';
+        
+        // Calcular tiempo en sistema
+        if (createdAt) {
+            const fechaCreacion = new Date(createdAt.replace(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/, '$3-$2-$1T$4:$5:00'));
+            const hoy = new Date();
+            const diasEnSistema = Math.ceil((hoy - fechaCreacion) / (1000 * 60 * 60 * 24));
+            document.getElementById('view_categoria_tiempo_sistema').textContent = diasEnSistema + ' días';
+        } else {
+            document.getElementById('view_categoria_tiempo_sistema').textContent = '-';
+        }
+        
+        // Calcular última actividad
+        if (updatedAt) {
+            const fechaActualizacion = new Date(updatedAt.replace(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/, '$3-$2-$1T$4:$5:00'));
+            const hoy = new Date();
+            const diasUltimaActividad = Math.ceil((hoy - fechaActualizacion) / (1000 * 60 * 60 * 24));
+            
+            if (diasUltimaActividad === 0) {
+                document.getElementById('view_categoria_ultima_actividad').textContent = 'Hoy';
+            } else if (diasUltimaActividad === 1) {
+                document.getElementById('view_categoria_ultima_actividad').textContent = 'Ayer';
+            } else {
+                document.getElementById('view_categoria_ultima_actividad').textContent = 'Hace ' + diasUltimaActividad + ' días';
+            }
+        } else {
+            document.getElementById('view_categoria_ultima_actividad').textContent = '-';
+        }
     };
 
     // Función para editar categoría

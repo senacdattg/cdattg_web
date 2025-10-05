@@ -191,13 +191,42 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Función para ver marca
-    window.viewMarca = function(id, nombre, createdBy, updatedBy, createdAt, updatedAt) {
+    window.viewMarca = function(id, nombre, productosCount, status, createdBy, updatedBy, createdAt, updatedAt) {
         document.getElementById('view_marca_id').textContent = id || '-';
         document.getElementById('view_marca_nombre').textContent = nombre || '-';
+        document.getElementById('view_marca_productos').textContent = (productosCount || 0) + ' productos';
+        document.getElementById('view_marca_estado').textContent = (status == 1) ? 'ACTIVO' : 'INACTIVO';
         document.getElementById('view_marca_created_by').textContent = createdBy || '-';
         document.getElementById('view_marca_updated_by').textContent = updatedBy || '-';
         document.getElementById('view_marca_created_at').textContent = createdAt || '-';
         document.getElementById('view_marca_updated_at').textContent = updatedAt || '-';
+        
+        // Calcular tiempo en sistema
+        if (createdAt) {
+            const fechaCreacion = new Date(createdAt.replace(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/, '$3-$2-$1T$4:$5:00'));
+            const hoy = new Date();
+            const diasEnSistema = Math.ceil((hoy - fechaCreacion) / (1000 * 60 * 60 * 24));
+            document.getElementById('view_marca_tiempo_sistema').textContent = diasEnSistema + ' días';
+        } else {
+            document.getElementById('view_marca_tiempo_sistema').textContent = '-';
+        }
+        
+        // Calcular última actividad
+        if (updatedAt) {
+            const fechaActualizacion = new Date(updatedAt.replace(/(\d{2})\/(\d{2})\/(\d{4}) (\d{2}):(\d{2})/, '$3-$2-$1T$4:$5:00'));
+            const hoy = new Date();
+            const diasUltimaActividad = Math.ceil((hoy - fechaActualizacion) / (1000 * 60 * 60 * 24));
+            
+            if (diasUltimaActividad === 0) {
+                document.getElementById('view_marca_ultima_actividad').textContent = 'Hoy';
+            } else if (diasUltimaActividad === 1) {
+                document.getElementById('view_marca_ultima_actividad').textContent = 'Ayer';
+            } else {
+                document.getElementById('view_marca_ultima_actividad').textContent = 'Hace ' + diasUltimaActividad + ' días';
+            }
+        } else {
+            document.getElementById('view_marca_ultima_actividad').textContent = '-';
+        }
     };
 
     // Función para editar marca

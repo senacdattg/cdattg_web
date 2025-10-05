@@ -50,9 +50,11 @@
                         <th style="width:120px">Código</th>
                         <th style="width:110px">Fecha Inicio</th>
                         <th style="width:110px">Fecha Fin</th>
-                        <th style="width:100px">Proveedor</th>
+                        <th style="width:100px">Vigencia</th>
+                        <th style="width:130px">Proveedor</th>
                         <th style="width:80px">Estado</th>
                         <th style="width:90px">Agregado por</th>
+                        <th style="width:90px">Actualizado por</th>
                         <th style="width:100px">Creación</th>
                         <th class="actions-cell text-center" style="width:140px">Acciones</th>
                     </tr>
@@ -76,6 +78,18 @@
                                 </span>
                             </td>
                             <td>
+                                @if($item->fecha_inicio && $item->fecha_fin)
+                                    @php
+                                        $inicio = \Carbon\Carbon::parse($item->fecha_inicio);
+                                        $fin = \Carbon\Carbon::parse($item->fecha_fin);
+                                        $vigencia = $inicio->diffInDays($fin);
+                                    @endphp
+                                    <span class="badge bg-primary text-white">{{ $vigencia }} días</span>
+                                @else
+                                    <span class="badge bg-secondary">N/A</span>
+                                @endif
+                            </td>
+                            <td>
                                 @if($item->proveedor)
                                     <span class="badge bg-warning text-dark">{{ $item->proveedor->proveedor }}</span>
                                 @else
@@ -84,7 +98,7 @@
                             </td>
                             <td>
                                 @if($item->estado)
-                                    <span class="badge bg-success">{{ $item->estado->name }}</span>
+                                    <span class="badge bg-success">{{ $item->estado->parametro->name }}</span>
                                 @else
                                     <span class="badge bg-secondary">Sin estado</span>
                                 @endif
@@ -96,18 +110,23 @@
                             </td>
                             <td>
                                 <div class="audit-info">
+                                    <span class="user-id">{{ $item->userUpdate->name ?? 'ID: '.$item->user_update_id }}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="audit-info">
                                     <span class="badge badge-created">{{ $item->created_at?->format('d/m/Y') }}</span>
                                     <span class="date">{{ $item->created_at?->format('H:i') }}</span>
                                 </div>
                             </td>
                             <td class="text-center actions-cell">
                                 <button type="button" class="btn btn-xs btn-info" title="Ver" 
-                                    onclick="viewContrato({{ $item->id }}, '{{ addslashes($item->name) }}', '{{ $item->codigo }}', '{{ $item->fecha_inicio }}', '{{ $item->fecha_fin }}', '{{ $item->proveedor->proveedor ?? 'Sin proveedor' }}', '{{ $item->estado->name ?? 'Sin estado' }}', '{{ $item->userCreate->name ?? 'Usuario desconocido' }}', '{{ $item->created_at?->format('d/m/Y H:i') }}', '{{ $item->updated_at?->format('d/m/Y H:i') }}')"
+                                    onclick="viewContrato({{ $item->id }}, '{{ addslashes($item->name) }}', '{{ $item->codigo }}', '{{ $item->fecha_inicio }}', '{{ $item->fecha_fin }}', '{{ $item->proveedor->proveedor ?? 'Sin proveedor' }}', '{{ $item->estado->parametro->name ?? 'Sin estado' }}', '{{ $item->userCreate->name ?? 'Usuario desconocido' }}', '{{ $item->userUpdate->name ?? 'Usuario desconocido' }}', '{{ $item->created_at?->format('d/m/Y H:i') }}', '{{ $item->updated_at?->format('d/m/Y H:i') }}')"
                                     data-toggle="modal" data-target="#viewContratoModal">
                                     <i class="fas fa-eye"></i>
                                 </button>
                                 <button type="button" class="btn btn-xs btn-warning" title="Editar" 
-                                    onclick="editContrato({{ $item->id }}, '{{ addslashes($item->name) }}', '{{ $item->codigo }}', '{{ $item->fecha_inicio }}', '{{ $item->fecha_fin }}', {{ $item->proveedor_id }}, {{ $item->estado_id }})"
+                                    onclick="editContrato({{ $item->id }}, '{{ addslashes($item->name) }}', '{{ $item->codigo }}', '{{ $item->fecha_inicio }}', '{{ $item->fecha_fin }}', {{ $item->proveedor_id ?? 'null' }}, {{ $item->estado_id ?? 'null' }})"
                                     data-toggle="modal" data-target="#editContratoModal">
                                     <i class="fas fa-edit"></i>
                                 </button>
@@ -119,7 +138,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="10" class="text-center text-muted py-4">
+                            <td colspan="12" class="text-center text-muted py-4">
                                 <i class="fas fa-file-contract fa-2x mb-2 d-block"></i>
                                 Sin contratos/convenios registrados.
                             </td>
@@ -184,8 +203,20 @@
                             <p class="form-control-plaintext" id="view_fecha_fin">-</p>
                         </div>
                         <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold text-muted">Vigencia</label>
+                            <p class="form-control-plaintext" id="view_vigencia">-</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold text-muted">Días Restantes</label>
+                            <p class="form-control-plaintext" id="view_dias_restantes">-</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold text-muted">Creado por</label>
                             <p class="form-control-plaintext" id="view_created_by">-</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold text-muted">Actualizado por</label>
+                            <p class="form-control-plaintext" id="view_updated_by">-</p>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold text-muted">Fecha de Creación</label>
@@ -274,24 +305,34 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="create_proveedor_id" class="form-label fw-semibold">
-                                    <i class="fas fa-building text-primary me-1"></i>Proveedor ID
+                                    <i class="fas fa-building text-primary me-1"></i>Proveedor
                                 </label>
-                                <input type="number" name="proveedor_id" id="create_proveedor_id" 
-                                    class="form-control @error('proveedor_id') is-invalid @enderror" 
-                                    placeholder="ID del proveedor" 
-                                    value="{{ old('proveedor_id', 1) }}">
+                                <select name="proveedor_id" id="create_proveedor_id" 
+                                    class="form-control @error('proveedor_id') is-invalid @enderror">
+                                    <option value="">Seleccionar proveedor...</option>
+                                    @foreach($proveedores as $proveedor)
+                                        <option value="{{ $proveedor->id }}" {{ old('proveedor_id') == $proveedor->id ? 'selected' : '' }}>
+                                            {{ $proveedor->proveedor }}
+                                        </option>
+                                    @endforeach
+                                </select>
                                 @error('proveedor_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="create_estado_id" class="form-label fw-semibold">
-                                    <i class="fas fa-flag text-primary me-1"></i>Estado ID
+                                    <i class="fas fa-flag text-primary me-1"></i>Estado
                                 </label>
-                                <input type="number" name="estado_id" id="create_estado_id" 
-                                    class="form-control @error('estado_id') is-invalid @enderror" 
-                                    placeholder="ID del estado" 
-                                    value="{{ old('estado_id', 1) }}">
+                                <select name="estado_id" id="create_estado_id" 
+                                    class="form-control @error('estado_id') is-invalid @enderror">
+                                    <option value="">Seleccionar estado...</option>
+                                    @foreach($estados as $estado)
+                                        <option value="{{ $estado->id }}" {{ old('estado_id') == $estado->id ? 'selected' : '' }}>
+                                            {{ $estado->parametro->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                                 @error('estado_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -347,15 +388,25 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="edit_proveedor_id" class="form-label fw-semibold">
-                                    <i class="fas fa-building text-warning me-1"></i>Proveedor ID
+                                    <i class="fas fa-building text-warning me-1"></i>Proveedor
                                 </label>
-                                <input type="number" name="proveedor_id" id="edit_proveedor_id" class="form-control">
+                                <select name="proveedor_id" id="edit_proveedor_id" class="form-control">
+                                    <option value="">Seleccionar proveedor...</option>
+                                    @foreach($proveedores as $proveedor)
+                                        <option value="{{ $proveedor->id }}">{{ $proveedor->proveedor }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="edit_estado_id" class="form-label fw-semibold">
-                                    <i class="fas fa-flag text-warning me-1"></i>Estado ID
+                                    <i class="fas fa-flag text-warning me-1"></i>Estado
                                 </label>
-                                <input type="number" name="estado_id" id="edit_estado_id" class="form-control">
+                                <select name="estado_id" id="edit_estado_id" class="form-control">
+                                    <option value="">Seleccionar estado...</option>
+                                    @foreach($estados as $estado)
+                                        <option value="{{ $estado->id }}">{{ $estado->parametro->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
                         <div class="row">

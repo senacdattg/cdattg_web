@@ -41,6 +41,8 @@
                     <tr>
                         <th style="width:60px">#</th>
                         <th>Categoria</th>
+                        <th style="width:100px">Productos</th>
+                        <th style="width:100px">Estado</th>
                         <th style="width:120px">Agregado por</th>
                         <th style="width:120px">Actualizado por</th>
                         <th style="width:130px">Fecha creación</th>
@@ -53,6 +55,16 @@
                         <tr>
                             <td><span class="badge badge-light">{{ $loop->iteration }}</span></td>
                             <td class="fw-semibold">{{ $categoria->nombre }}</td>
+                            <td>
+                                <span class="badge bg-info text-white">{{ $categoria->productos_count ?? 0 }}</span>
+                            </td>
+                            <td>
+                                @if(($categoria->status ?? 1) == 1)
+                                    <span class="badge bg-success">ACTIVO</span>
+                                @else
+                                    <span class="badge bg-danger">INACTIVO</span>
+                                @endif
+                            </td>
                             <td>
                                 <div class="audit-info">
                                     <span class="user-id">{{ $categoria->userCreate->name ?? 'ID: '.$categoria->user_create_id }}</span>
@@ -77,7 +89,7 @@
                             </td>
                             <td class="text-center actions-cell">
                                 <button type="button" class="btn btn-xs btn-info" title="Ver" 
-                                    onclick="viewCategoria({{ $categoria->id }}, '{{ addslashes($categoria->nombre) }}', '{{ $categoria->userCreate->name ?? 'Usuario desconocido' }}', '{{ $categoria->userUpdate->name ?? 'Usuario desconocido' }}', '{{ $categoria->created_at?->format('d/m/Y H:i') }}', '{{ $categoria->updated_at?->format('d/m/Y H:i') }}')"
+                                    onclick="viewCategoria({{ $categoria->id }}, '{{ addslashes($categoria->nombre) }}', {{ $categoria->productos_count ?? 0 }}, {{ $categoria->status ?? 1 }}, '{{ $categoria->userCreate->name ?? 'Usuario desconocido' }}', '{{ $categoria->userUpdate->name ?? 'Usuario desconocido' }}', '{{ $categoria->created_at?->format('d/m/Y H:i') }}', '{{ $categoria->updated_at?->format('d/m/Y H:i') }}')"
                                     data-toggle="modal" data-target="#viewCategoriaModal">
                                     <i class="fas fa-eye"></i>
                                 </button>
@@ -142,6 +154,22 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold text-muted">Nombre</label>
                             <p class="form-control-plaintext" id="view_categoria_nombre">-</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold text-muted">Productos Asociados</label>
+                            <p class="form-control-plaintext" id="view_categoria_productos">-</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold text-muted">Estado</label>
+                            <p class="form-control-plaintext" id="view_categoria_estado">-</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold text-muted">Tiempo en Sistema</label>
+                            <p class="form-control-plaintext" id="view_categoria_tiempo_sistema">-</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold text-muted">Última Actividad</label>
+                            <p class="form-control-plaintext" id="view_categoria_ultima_actividad">-</p>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold text-muted">Creado por</label>

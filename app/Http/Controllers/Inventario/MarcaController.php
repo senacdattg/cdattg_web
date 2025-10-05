@@ -16,7 +16,10 @@ class MarcaController extends Controller
 
     public function index()
     {
-        $marcas = Marca::all();
+        $marcas = Marca::with(['userCreate.persona', 'userUpdate.persona'])
+            ->withCount('productos')
+            ->latest()
+            ->get();
         return view('inventario.marcas.index', compact('marcas'));
     }
 

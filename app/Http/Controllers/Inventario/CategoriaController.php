@@ -16,7 +16,10 @@ class CategoriaController extends Controller
 
     public function index()
     {
-        $categorias = Categoria::all();
+        $categorias = Categoria::with(['userCreate.persona', 'userUpdate.persona'])
+            ->withCount('productos')
+            ->latest()
+            ->get();
         return view('inventario.categorias.index', compact('categorias'));
     }
 
