@@ -6,6 +6,7 @@ use App\Models\Instructor;
 use App\Http\Requests\StoreInstructorRequest;
 use App\Http\Requests\UpdateInstructorRequest;
 use App\Http\Requests\InstructorRequest;
+use App\Http\Requests\CreateInstructorRequest;
 use App\Services\InstructorBusinessRulesService;
 use App\Models\FichaCaracterizacion;
 use App\Models\Persona;
@@ -226,19 +227,16 @@ class InstructorController extends Controller
     public function create()
     {
         try {
-            // llamar los tipos de documentos
-            $documentos = Tema::with(['parametros' => function ($query) {
-                $query->wherePivot('status', 1);
-            }])->findOrFail(2);
-            
-            // llamar los generos
-            $generos = Tema::with(['parametros' => function ($query) {
-                $query->wherePivot('status', 1);
-            }])->findOrFail(3);
+            // Obtener personas que no son instructores
+            $personas = \App\Models\Persona::whereDoesntHave('instructor')
+                ->whereHas('user') // Solo personas que tienen usuario
+                ->with(['user', 'tipoDocumento'])
+                ->get();
             
             $regionales = Regional::where('status', 1)->get();
+            $especialidades = \App\Models\RedConocimiento::where('status', true)->orderBy('nombre')->get();
 
-            return view('Instructores.create', compact('documentos', 'generos', 'regionales'));
+            return view('Instructores.create', compact('personas', 'regionales', 'especialidades'));
             
         } catch (Exception $e) {
             Log::error('Error al cargar formulario de creación de instructor', [
@@ -251,36 +249,36 @@ class InstructorController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreInstructorRequest $request)
+    public function store(CreateInstructorRequest $request)
     {
         try {
             DB::beginTransaction();
             
-            // Crear Persona
-            $persona = new Persona();
-            $persona->tipo_documento = $request->input('tipo_documento');
-            $persona->numero_documento = $request->input('numero_documento');
-            $persona->primer_nombre = $request->input('primer_nombre');
-            $persona->segundo_nombre = $request->input('segundo_nombre');
-            $persona->primer_apellido = $request->input('primer_apellido');
-            $persona->segundo_apellido = $request->input('segundo_apellido');
-            $persona->fecha_de_nacimiento = $request->input('fecha_de_nacimiento');
-            $persona->genero = $request->input('genero');
-            $persona->email = $request->input('email');
-            $persona->save();
+            // Validar que la persona existe y no es instructor
+            $persona = \App\Models\Persona::whereDoesntHave('instructor')
+                ->whereHas('user')
+                ->findOrFail($request->input('persona_id'));
 
             // Crear Instructor
             $instructor = new Instructor();
             $instructor->persona_id = $persona->id;
             $instructor->regional_id = $request->input('regional_id');
+            $instructor->anos_experiencia = $request->input('anos_experiencia');
+            $instructor->experiencia_laboral = $request->input('experiencia_laboral');
+            $instructor->status = true;
             $instructor->save();
 
-            // Crear Usuario asociado a la Persona
-            $user = new User();
-            $user->email = $request->input('email');
-            $user->password = Hash::make($request->input('numero_documento'));
-            $user->persona_id = $persona->id;
-            $user->save();
+            // Asignar especialidades si se proporcionan
+            if ($request->has('especialidades')) {
+                $especialidades = $request->input('especialidades');
+                if (is_array($especialidades) && !empty($especialidades)) {
+                    $instructor->especialidades = $especialidades;
+                    $instructor->save();
+                }
+            }
+
+            // Asignar rol de instructor al usuario existente
+            $user = $persona->user;
             $user->assignRole('INSTRUCTOR');
 
             DB::commit();
@@ -289,10 +287,11 @@ class InstructorController extends Controller
                 'instructor_id' => $instructor->id,
                 'persona_id' => $persona->id,
                 'user_id' => $user->id,
-                'email' => $request->input('email')
+                'email' => $user->email,
+                'especialidades' => $instructor->especialidades
             ]);
             
-            return redirect()->route('instructor.index')->with('success', '¡Registro Exitoso!');
+            return redirect()->route('instructor.index')->with('success', '¡Instructor asignado exitosamente!');
             
         } catch (QueryException $e) {
             DB::rollBack();
