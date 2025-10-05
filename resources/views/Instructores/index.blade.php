@@ -27,7 +27,7 @@
                                 </a>
                             </li>
                             <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-user-tie"></i> Instructores
+                                <i class="fas fa-chalkboard-teacher"></i> Instructores
                             </li>
                         </ol>
                     </nav>
