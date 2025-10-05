@@ -2486,27 +2486,31 @@ class FichaCaracterizacionController extends Controller
 
             $ficha = FichaCaracterizacion::with([
                 'programaFormacion',
-                'aprendices.persona',
-                'aprendicesFicha'
+                'personas.user'
             ])->findOrFail($id);
 
-            // Obtener todos los aprendices disponibles (no asignados a esta ficha)
-            $aprendicesDisponibles = \App\Models\Aprendiz::with('persona')
+            // Obtener todas las personas que NO tienen rol de APRENDIZ y NO están asignadas a esta ficha
+            $personasDisponibles = \App\Models\Persona::with('user')
                 ->whereDoesntHave('fichas', function($query) use ($id) {
                     $query->where('ficha_id', $id);
                 })
-                ->where('estado', 1) // Solo aprendices activos
+                ->whereHas('user', function($query) {
+                    $query->whereDoesntHave('roles', function($roleQuery) {
+                        $roleQuery->where('name', 'APRENDIZ');
+                    });
+                })
+                ->where('status', 1) // Solo personas activas
                 ->orderBy('id', 'desc')
                 ->get();
 
             Log::info('Vista de gestión de aprendices cargada', [
                 'ficha_id' => $id,
-                'aprendices_asignados' => $ficha->aprendices->count(),
-                'aprendices_disponibles' => $aprendicesDisponibles->count(),
+                'personas_asignadas' => $ficha->personas->count(),
+                'personas_disponibles' => $personasDisponibles->count(),
                 'user_id' => Auth::id()
             ]);
 
-            return view('fichas.gestionar-aprendices', compact('ficha', 'aprendicesDisponibles'));
+            return view('fichas.gestionar-aprendices', compact('ficha', 'personasDisponibles'));
 
         } catch (\Exception $e) {
             Log::error('Error al cargar gestión de aprendices', [
@@ -2533,47 +2537,77 @@ class FichaCaracterizacionController extends Controller
     {
         try {
             $request->validate([
-                'aprendices' => 'required|array|min:1',
-                'aprendices.*' => 'exists:aprendices,id'
+                'personas' => 'required|array|min:1',
+                'personas.*' => 'exists:personas,id'
             ]);
 
-            Log::info('Iniciando asignación de aprendices', [
+            Log::info('Iniciando asignación de personas como aprendices', [
                 'ficha_id' => $id,
-                'aprendices_ids' => $request->input('aprendices'),
+                'personas_ids' => $request->input('personas'),
                 'user_id' => Auth::id()
             ]);
 
             $ficha = FichaCaracterizacion::findOrFail($id);
-            $aprendicesIds = $request->input('aprendices');
+            $personasIds = $request->input('personas');
 
             DB::beginTransaction();
 
-            // Verificar que los aprendices no estén ya asignados
-            $aprendicesYaAsignados = $ficha->aprendices()->whereIn('aprendices.id', $aprendicesIds)->pluck('aprendices.id');
+            // Verificar que las personas no estén ya asignadas
+            $personasYaAsignadas = $ficha->personas()->whereIn('personas.id', $personasIds)->pluck('personas.id');
             
-            if ($aprendicesYaAsignados->count() > 0) {
+            if ($personasYaAsignadas->count() > 0) {
                 DB::rollBack();
                 return redirect()->back()
-                    ->with('error', 'Algunos aprendices ya están asignados a esta ficha.')
-                    ->with('aprendices_duplicados', $aprendicesYaAsignados);
+                    ->with('error', 'Algunas personas ya están asignadas a esta ficha.')
+                    ->with('personas_duplicadas', $personasYaAsignadas);
             }
 
-            // Asignar aprendices
-            $ficha->aprendices()->attach($aprendicesIds);
+            // Obtener el rol de APRENDIZ
+            $rolAprendiz = \Spatie\Permission\Models\Role::where('name', 'APRENDIZ')->first();
+            
+            if (!$rolAprendiz) {
+                DB::rollBack();
+                return redirect()->back()
+                    ->with('error', 'El rol de APRENDIZ no existe en el sistema.');
+            }
+
+            // Procesar cada persona
+            foreach ($personasIds as $personaId) {
+                $persona = \App\Models\Persona::with('user')->findOrFail($personaId);
+                
+                // Asignar persona a la ficha
+                $ficha->personas()->attach($personaId);
+                
+                // Crear registro de aprendiz si no existe
+                $aprendiz = \App\Models\Aprendiz::firstOrCreate([
+                    'persona_id' => $personaId,
+                ], [
+                    'estado' => 1,
+                    'user_create_id' => Auth::id(),
+                    'user_edit_id' => Auth::id(),
+                ]);
+                
+                // Asignar rol de APRENDIZ al usuario si tiene usuario asociado
+                if ($persona->user) {
+                    if (!$persona->user->hasRole('APRENDIZ')) {
+                        $persona->user->assignRole('APRENDIZ');
+                    }
+                }
+            }
 
             DB::commit();
 
-            Log::info('Aprendices asignados exitosamente', [
+            Log::info('Personas asignadas como aprendices exitosamente', [
                 'ficha_id' => $id,
-                'aprendices_asignados' => count($aprendicesIds),
+                'personas_asignadas' => count($personasIds),
                 'user_id' => Auth::id()
             ]);
 
             return redirect()->route('fichaCaracterizacion.gestionarAprendices', $id)
-                ->with('success', 'Aprendices asignados exitosamente a la ficha.');
+                ->with('success', 'Personas asignadas como aprendices exitosamente a la ficha.');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::warning('Error de validación al asignar aprendices', [
+            Log::warning('Error de validación al asignar personas como aprendices', [
                 'ficha_id' => $id,
                 'errors' => $e->errors(),
                 'user_id' => Auth::id()
@@ -2586,7 +2620,7 @@ class FichaCaracterizacionController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             
-            Log::error('Error al asignar aprendices', [
+            Log::error('Error al asignar personas como aprendices', [
                 'ficha_id' => $id,
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
@@ -2595,7 +2629,7 @@ class FichaCaracterizacionController extends Controller
             ]);
 
             return redirect()->back()
-                ->with('error', 'Error al asignar aprendices. Por favor, intente nuevamente.');
+                ->with('error', 'Error al asignar personas como aprendices. Por favor, intente nuevamente.');
         }
     }
 
@@ -2610,46 +2644,57 @@ class FichaCaracterizacionController extends Controller
     {
         try {
             $request->validate([
-                'aprendices' => 'required|array|min:1',
-                'aprendices.*' => 'exists:aprendices,id'
+                'personas' => 'required|array|min:1',
+                'personas.*' => 'exists:personas,id'
             ]);
 
-            Log::info('Iniciando desasignación de aprendices', [
+            Log::info('Iniciando desasignación de personas como aprendices', [
                 'ficha_id' => $id,
-                'aprendices_ids' => $request->input('aprendices'),
+                'personas_ids' => $request->input('personas'),
                 'user_id' => Auth::id()
             ]);
 
             $ficha = FichaCaracterizacion::findOrFail($id);
-            $aprendicesIds = $request->input('aprendices');
+            $personasIds = $request->input('personas');
 
             DB::beginTransaction();
 
-            // Verificar que los aprendices estén asignados a la ficha
-            $aprendicesAsignados = $ficha->aprendices()->whereIn('aprendices.id', $aprendicesIds)->pluck('aprendices.id');
+            // Verificar que las personas estén asignadas a la ficha
+            $personasAsignadas = $ficha->personas()->whereIn('personas.id', $personasIds)->pluck('personas.id');
             
-            if ($aprendicesAsignados->count() !== count($aprendicesIds)) {
+            if ($personasAsignadas->count() !== count($personasIds)) {
                 DB::rollBack();
                 return redirect()->back()
-                    ->with('error', 'Algunos aprendices no están asignados a esta ficha.');
+                    ->with('error', 'Algunas personas no están asignadas a esta ficha.');
             }
 
-            // Desasignar aprendices
-            $ficha->aprendices()->detach($aprendicesIds);
+            // Desasignar personas de la ficha
+            $ficha->personas()->detach($personasIds);
+
+            // Opcional: Desactivar registros de aprendiz (no eliminar para mantener historial)
+            foreach ($personasIds as $personaId) {
+                $aprendiz = \App\Models\Aprendiz::where('persona_id', $personaId)->first();
+                if ($aprendiz) {
+                    $aprendiz->update([
+                        'estado' => 0, // Desactivar pero mantener registro
+                        'user_edit_id' => Auth::id(),
+                    ]);
+                }
+            }
 
             DB::commit();
 
-            Log::info('Aprendices desasignados exitosamente', [
+            Log::info('Personas desasignadas como aprendices exitosamente', [
                 'ficha_id' => $id,
-                'aprendices_desasignados' => count($aprendicesIds),
+                'personas_desasignadas' => count($personasIds),
                 'user_id' => Auth::id()
             ]);
 
             return redirect()->route('fichaCaracterizacion.gestionarAprendices', $id)
-                ->with('success', 'Aprendices desasignados exitosamente de la ficha.');
+                ->with('success', 'Personas desasignadas como aprendices exitosamente de la ficha.');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::warning('Error de validación al desasignar aprendices', [
+            Log::warning('Error de validación al desasignar personas como aprendices', [
                 'ficha_id' => $id,
                 'errors' => $e->errors(),
                 'user_id' => Auth::id()
@@ -2662,7 +2707,7 @@ class FichaCaracterizacionController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             
-            Log::error('Error al desasignar aprendices', [
+            Log::error('Error al desasignar personas como aprendices', [
                 'ficha_id' => $id,
                 'error' => $e->getMessage(),
                 'file' => $e->getFile(),
@@ -2671,7 +2716,7 @@ class FichaCaracterizacionController extends Controller
             ]);
 
             return redirect()->back()
-                ->with('error', 'Error al desasignar aprendices. Por favor, intente nuevamente.');
+                ->with('error', 'Error al desasignar personas como aprendices. Por favor, intente nuevamente.');
         }
     }
 }

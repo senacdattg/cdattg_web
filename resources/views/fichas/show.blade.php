@@ -299,11 +299,11 @@
                                 <i class="fas fa-users mr-2"></i> Aprendices Asignados
                             </h5>
                             <div class="card-tools">
-                                <span class="badge badge-info">{{ $ficha->contarAprendices() }} aprendices</span>
+                                <span class="badge badge-info">{{ $ficha->personas->count() }} personas asignadas</span>
                             </div>
                         </div>
                         <div class="card-body">
-                            @if($ficha->tieneAprendices())
+                            @if($ficha->personas->count() > 0)
                                 <div class="table-responsive">
                                     <table class="table table-striped">
                                         <thead>
@@ -316,22 +316,22 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($ficha->aprendices as $aprendiz)
+                                            @foreach($ficha->personas as $persona)
                                                 <tr>
-                                                    <td>{{ $aprendiz->persona->numero_documento }}</td>
+                                                    <td>{{ $persona->numero_documento }}</td>
                                                     <td>
-                                                        {{ $aprendiz->persona->primer_nombre }} {{ $aprendiz->persona->primer_apellido }}
-                                                        @if($aprendiz->persona->segundo_nombre)
-                                                            {{ $aprendiz->persona->segundo_nombre }}
+                                                        {{ $persona->primer_nombre }} {{ $persona->primer_apellido }}
+                                                        @if($persona->segundo_nombre)
+                                                            {{ $persona->segundo_nombre }}
                                                         @endif
-                                                        @if($aprendiz->persona->segundo_apellido)
-                                                            {{ $aprendiz->persona->segundo_apellido }}
+                                                        @if($persona->segundo_apellido)
+                                                            {{ $persona->segundo_apellido }}
                                                         @endif
                                                     </td>
-                                                    <td>{{ $aprendiz->persona->email ?? 'N/A' }}</td>
-                                                    <td>{{ $aprendiz->persona->telefono ?? 'N/A' }}</td>
+                                                    <td>{{ $persona->email ?? 'N/A' }}</td>
+                                                    <td>{{ $persona->telefono ?? 'N/A' }}</td>
                                                     <td>
-                                                        @if($aprendiz->estado)
+                                                        @if($persona->status)
                                                             <span class="badge badge-success">Activo</span>
                                                         @else
                                                             <span class="badge badge-danger">Inactivo</span>
@@ -344,7 +344,7 @@
                                 </div>
                             @else
                                 <div class="alert alert-info">
-                                    <i class="fas fa-info-circle"></i> No hay aprendices asignados a esta ficha.
+                                    <i class="fas fa-info-circle"></i> No hay personas asignadas como aprendices a esta ficha.
                                 </div>
                             @endif
                         </div>
@@ -354,14 +354,6 @@
                                     <a href="{{ route('fichaCaracterizacion.edit', $ficha->id) }}" 
                                        class="btn btn-outline-info btn-sm">
                                         <i class="fas fa-pencil-alt mr-1"></i> Editar
-                                    </a>
-                                @endcan
-                                
-                                
-                                @can('GESTIONAR DIAS FICHA')
-                                    <a href="{{ route('fichaCaracterizacion.gestionarDiasFormacion', $ficha->id) }}" 
-                                       class="btn btn-outline-warning btn-sm">
-                                        <i class="fas fa-calendar-week mr-1"></i> Gestionar Días
                                     </a>
                                 @endcan
                                 

@@ -60,12 +60,12 @@
                     <div class="card detail-card no-hover">
                         <div class="card-header bg-white py-3">
                             <h5 class="card-title m-0 font-weight-bold text-primary">
-                                <i class="fas fa-user-check mr-2"></i> Aprendices Asignados
-                                <span class="badge badge-info ml-2">{{ $ficha->aprendices->count() }}</span>
+                                <i class="fas fa-user-check mr-2"></i> Personas Asignadas como Aprendices
+                                <span class="badge badge-info ml-2">{{ $ficha->personas->count() }}</span>
                             </h5>
                         </div>
                         <div class="card-body">
-                            @if($ficha->aprendices->count() > 0)
+                            @if($ficha->personas->count() > 0)
                                 <form id="form-desasignar" action="{{ route('fichaCaracterizacion.desasignarAprendices', $ficha->id) }}" method="POST">
                                     @csrf
                                     <div class="table-responsive">
@@ -83,27 +83,27 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @foreach($ficha->aprendices as $aprendiz)
+                                                @foreach($ficha->personas as $persona)
                                                     <tr>
                                                         <td>
-                                                            <input type="checkbox" name="aprendices[]" value="{{ $aprendiz->id }}" class="form-check-input checkbox-aprendiz">
+                                                            <input type="checkbox" name="personas[]" value="{{ $persona->id }}" class="form-check-input checkbox-aprendiz">
                                                         </td>
-                                                        <td>{{ $aprendiz->persona->numero_documento }}</td>
+                                                        <td>{{ $persona->numero_documento }}</td>
                                                         <td>
                                                             <strong>
-                                                                {{ $aprendiz->persona->primer_nombre }} {{ $aprendiz->persona->primer_apellido }}
-                                                                @if($aprendiz->persona->segundo_nombre)
-                                                                    {{ $aprendiz->persona->segundo_nombre }}
+                                                                {{ $persona->primer_nombre }} {{ $persona->primer_apellido }}
+                                                                @if($persona->segundo_nombre)
+                                                                    {{ $persona->segundo_nombre }}
                                                                 @endif
-                                                                @if($aprendiz->persona->segundo_apellido)
-                                                                    {{ $aprendiz->persona->segundo_apellido }}
+                                                                @if($persona->segundo_apellido)
+                                                                    {{ $persona->segundo_apellido }}
                                                                 @endif
                                                             </strong>
                                                         </td>
-                                                        <td>{{ $aprendiz->persona->email ?? 'N/A' }}</td>
-                                                        <td>{{ $aprendiz->persona->telefono ?? 'N/A' }}</td>
+                                                        <td>{{ $persona->email ?? 'N/A' }}</td>
+                                                        <td>{{ $persona->telefono ?? 'N/A' }}</td>
                                                         <td>
-                                                            @if($aprendiz->estado)
+                                                            @if($persona->status)
                                                                 <span class="badge badge-success">Activo</span>
                                                             @else
                                                                 <span class="badge badge-danger">Inactivo</span>
@@ -117,18 +117,18 @@
                                     
                                     <div class="d-flex justify-content-between align-items-center mt-3">
                                         <small class="text-muted">
-                                            <span id="contador-seleccionados">0</span> aprendices seleccionados
+                                            <span id="contador-seleccionados">0</span> personas seleccionadas
                                         </small>
                                         <button type="button" id="btn-desasignar" class="btn btn-outline-danger btn-sm" disabled>
-                                            <i class="fas fa-user-minus mr-1"></i> Desasignar Seleccionados
+                                            <i class="fas fa-user-minus mr-1"></i> Desasignar Seleccionadas
                                         </button>
                                     </div>
                                 </form>
                             @else
                                 <div class="text-center py-4">
                                     <i class="fas fa-users fa-3x text-muted mb-3"></i>
-                                    <h5 class="text-muted">No hay aprendices asignados</h5>
-                                    <p class="text-muted">Utiliza el panel de la derecha para asignar aprendices a esta ficha.</p>
+                                    <h5 class="text-muted">No hay personas asignadas como aprendices</h5>
+                                    <p class="text-muted">Utiliza el panel de la derecha para asignar personas como aprendices a esta ficha.</p>
                                 </div>
                             @endif
                         </div>
@@ -140,12 +140,12 @@
                     <div class="card detail-card no-hover">
                         <div class="card-header bg-white py-3">
                             <h5 class="card-title m-0 font-weight-bold text-success">
-                                <i class="fas fa-user-plus mr-2"></i> Aprendices Disponibles
-                                <span class="badge badge-success ml-2">{{ $aprendicesDisponibles->count() }}</span>
+                                <i class="fas fa-user-plus mr-2"></i> Personas Disponibles (Sin Rol APRENDIZ)
+                                <span class="badge badge-success ml-2">{{ $personasDisponibles->count() }}</span>
                             </h5>
                         </div>
                         <div class="card-body">
-                            @if($aprendicesDisponibles->count() > 0)
+                            @if($personasDisponibles->count() > 0)
                                 <form id="form-asignar" action="{{ route('fichaCaracterizacion.asignarAprendices', $ficha->id) }}" method="POST">
                                     @csrf
                                     
@@ -177,29 +177,29 @@
                                                 </tr>
                                             </thead>
                                             <tbody id="tabla-aprendices">
-                                                @foreach($aprendicesDisponibles as $aprendiz)
+                                                @foreach($personasDisponibles as $persona)
                                                     <tr class="fila-aprendiz" 
-                                                        data-nombre="{{ strtolower($aprendiz->persona->primer_nombre . ' ' . $aprendiz->persona->primer_apellido) }}"
-                                                        data-documento="{{ $aprendiz->persona->numero_documento }}"
-                                                        data-estado="{{ $aprendiz->estado }}">
+                                                        data-nombre="{{ strtolower($persona->primer_nombre . ' ' . $persona->primer_apellido) }}"
+                                                        data-documento="{{ $persona->numero_documento }}"
+                                                        data-estado="{{ $persona->status }}">
                                                         <td>
-                                                            <input type="checkbox" name="aprendices[]" value="{{ $aprendiz->id }}" class="form-check-input checkbox-disponible">
+                                                            <input type="checkbox" name="personas[]" value="{{ $persona->id }}" class="form-check-input checkbox-disponible">
                                                         </td>
-                                                        <td>{{ $aprendiz->persona->numero_documento }}</td>
+                                                        <td>{{ $persona->numero_documento }}</td>
                                                         <td>
                                                             <strong>
-                                                                {{ $aprendiz->persona->primer_nombre }} {{ $aprendiz->persona->primer_apellido }}
-                                                                @if($aprendiz->persona->segundo_nombre)
-                                                                    {{ $aprendiz->persona->segundo_nombre }}
+                                                                {{ $persona->primer_nombre }} {{ $persona->primer_apellido }}
+                                                                @if($persona->segundo_nombre)
+                                                                    {{ $persona->segundo_nombre }}
                                                                 @endif
-                                                                @if($aprendiz->persona->segundo_apellido)
-                                                                    {{ $aprendiz->persona->segundo_apellido }}
+                                                                @if($persona->segundo_apellido)
+                                                                    {{ $persona->segundo_apellido }}
                                                                 @endif
                                                             </strong>
                                                         </td>
-                                                        <td>{{ $aprendiz->persona->email ?? 'N/A' }}</td>
+                                                        <td>{{ $persona->email ?? 'N/A' }}</td>
                                                         <td>
-                                                            @if($aprendiz->estado)
+                                                            @if($persona->status)
                                                                 <span class="badge badge-success">Activo</span>
                                                             @else
                                                                 <span class="badge badge-danger">Inactivo</span>
@@ -213,18 +213,18 @@
                                     
                                     <div class="d-flex justify-content-between align-items-center mt-3">
                                         <small class="text-muted">
-                                            <span id="contador-disponibles">0</span> aprendices seleccionados
+                                            <span id="contador-disponibles">0</span> personas seleccionadas
                                         </small>
                                         <button type="button" id="btn-asignar" class="btn btn-outline-success btn-sm" disabled>
-                                            <i class="fas fa-user-plus mr-1"></i> Asignar Seleccionados
+                                            <i class="fas fa-user-plus mr-1"></i> Asignar como Aprendices
                                         </button>
                                     </div>
                                 </form>
                             @else
                                 <div class="text-center py-4">
                                     <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
-                                    <h5 class="text-muted">No hay aprendices disponibles</h5>
-                                    <p class="text-muted">Todos los aprendices activos ya están asignados a fichas.</p>
+                                    <h5 class="text-muted">No hay personas disponibles</h5>
+                                    <p class="text-muted">Todas las personas ya tienen el rol de APRENDIZ o están asignadas a fichas.</p>
                                 </div>
                             @endif
                         </div>
