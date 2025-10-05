@@ -685,11 +685,103 @@ class InstructorController extends Controller
             return redirect()->back()->with('error', 'No se encontró información del instructor');
         }
 
-        $fichas = $instructorActual->fichas()
-            ->with(['programa', 'modalidad', 'nivelFormacion'])
-            ->paginate(10);
+        // Obtener parámetros de filtro
+        $filtroEstado = $request->get('estado', 'todas');
+        $filtroFechaInicio = $request->get('fecha_inicio');
+        $filtroFechaFin = $request->get('fecha_fin');
+        $filtroPrograma = $request->get('programa');
 
-        return view('instructores.fichas-asignadas', compact('instructorActual', 'fichas'));
+        // Construir query base con relaciones
+        $query = $instructorActual->instructorFichas()
+            ->with([
+                'ficha' => function($q) {
+                    $q->with([
+                        'programaFormacion.redConocimiento',
+                        'modalidadFormacion',
+                        'ambiente.sede',
+                        'jornadaFormacion',
+                        'diasFormacion'
+                    ]);
+                }
+            ]);
+
+        // Aplicar filtros
+        if ($filtroEstado !== 'todas') {
+            if ($filtroEstado === 'activas') {
+                $query->whereHas('ficha', function($q) {
+                    $q->where('status', true)
+                      ->where('fecha_fin', '>=', now()->toDateString());
+                });
+            } elseif ($filtroEstado === 'finalizadas') {
+                $query->whereHas('ficha', function($q) {
+                    $q->where('fecha_fin', '<', now()->toDateString());
+                });
+            } elseif ($filtroEstado === 'inactivas') {
+                $query->whereHas('ficha', function($q) {
+                    $q->where('status', false);
+                });
+            }
+        }
+
+        if ($filtroFechaInicio) {
+            $query->whereHas('ficha', function($q) use ($filtroFechaInicio) {
+                $q->where('fecha_inicio', '>=', $filtroFechaInicio);
+            });
+        }
+
+        if ($filtroFechaFin) {
+            $query->whereHas('ficha', function($q) use ($filtroFechaFin) {
+                $q->where('fecha_fin', '<=', $filtroFechaFin);
+            });
+        }
+
+        if ($filtroPrograma) {
+            $query->whereHas('ficha.programaFormacion', function($q) use ($filtroPrograma) {
+                $q->where('nombre', 'like', "%{$filtroPrograma}%");
+            });
+        }
+
+        // Ordenar por fecha de inicio descendente
+        $query->orderBy('fecha_inicio', 'desc');
+
+        // Paginar resultados
+        $fichasAsignadas = $query->paginate(15)->withQueryString();
+
+        // Obtener estadísticas
+        $estadisticas = [
+            'total' => $instructorActual->instructorFichas()->count(),
+            'activas' => $instructorActual->instructorFichas()
+                ->whereHas('ficha', function($q) {
+                    $q->where('status', true)
+                      ->where('fecha_fin', '>=', now()->toDateString());
+                })->count(),
+            'finalizadas' => $instructorActual->instructorFichas()
+                ->whereHas('ficha', function($q) {
+                    $q->where('fecha_fin', '<', now()->toDateString());
+                })->count(),
+            'total_horas' => $instructorActual->instructorFichas()->sum('total_horas_instructor')
+        ];
+
+        // Obtener programas únicos para el filtro
+        $programas = $instructorActual->instructorFichas()
+            ->with('ficha.programaFormacion')
+            ->get()
+            ->pluck('ficha.programaFormacion.nombre')
+            ->filter()
+            ->unique()
+            ->sort()
+            ->values();
+
+        return view('instructores.fichas-asignadas', compact(
+            'instructorActual', 
+            'fichasAsignadas', 
+            'estadisticas',
+            'programas',
+            'filtroEstado',
+            'filtroFechaInicio',
+            'filtroFechaFin',
+            'filtroPrograma'
+        ));
     }
 
     /**
