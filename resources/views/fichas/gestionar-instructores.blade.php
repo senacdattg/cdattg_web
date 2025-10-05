@@ -97,159 +97,153 @@
                         </div>
                     </div>
 
-                    <div class="row">
-                        <!-- Instructores Asignados -->
-                        <div class="col-md-6">
-                            <div class="card shadow-sm no-hover mb-4">
-                                <div class="card-header bg-white py-3">
-                                    <h5 class="card-title m-0 font-weight-bold text-success">
-                                        <i class="fas fa-users mr-2"></i>Instructores Asignados
-                                    </h5>
-                                </div>
-                                <div class="card-body">
-                                    @if($instructoresAsignados->count() > 0)
-                                        @foreach($instructoresAsignados as $asignacion)
-                                            <div class="card mb-3 {{ $ficha->instructor_id == $asignacion->instructor_id ? 'border-primary' : '' }}">
-                                                <div class="card-body">
-                                                    <div class="d-flex justify-content-between align-items-start">
-                                                        <div>
-                                                            <h6 class="mb-1">
-                                                                {{ $asignacion->instructor->persona->primer_nombre }} 
-                                                                {{ $asignacion->instructor->persona->primer_apellido }}
-                                                                @if($ficha->instructor_id == $asignacion->instructor_id)
-                                                                    <span class="badge badge-primary ml-2">Principal</span>
-                                                                @else
-                                                                    <span class="badge badge-secondary ml-2">Auxiliar</span>
-                                                                @endif
-                                                            </h6>
-                                                            <p class="text-muted mb-2 small">
-                                                                <i class="fas fa-calendar mr-1"></i>
-                                                                {{ $asignacion->fecha_inicio->format('d/m/Y') }} - 
-                                                                {{ $asignacion->fecha_fin->format('d/m/Y') }}
-                                                            </p>
-                                                            <p class="text-muted mb-0 small">
-                                                                <i class="fas fa-clock mr-1"></i>
-                                                                {{ $asignacion->total_horas_instructor }} horas
-                                                            </p>
-                                                        </div>
-                                                        <div>
-                                                            <form action="{{ route('fichaCaracterizacion.desasignarInstructor', [$ficha->id, $asignacion->instructor_id]) }}" 
-                                                                  method="POST" style="display: inline;">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                                                        onclick="return confirm('¿Está seguro de desasignar este instructor?')"
-                                                                        title="Desasignar instructor">
-                                                                    <i class="fas fa-user-minus mr-1"></i>
-                                                                    Desasignar
-                                                                </button>
-                                                            </form>
-                                                        </div>
-                                                    </div>
+                    <!-- Instructores Asignados -->
+                    <div class="card shadow-sm no-hover mb-4">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-success">
+                                <i class="fas fa-users mr-2"></i>Instructores Asignados
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            @if($instructoresAsignados->count() > 0)
+                                @foreach($instructoresAsignados as $asignacion)
+                                    <div class="card mb-3 {{ $ficha->instructor_id == $asignacion->instructor_id ? 'border-primary' : '' }}">
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <h6 class="mb-1">
+                                                        {{ $asignacion->instructor->persona->primer_nombre }} 
+                                                        {{ $asignacion->instructor->persona->primer_apellido }}
+                                                        @if($ficha->instructor_id == $asignacion->instructor_id)
+                                                            <span class="badge badge-primary ml-2">Principal</span>
+                                                        @else
+                                                            <span class="badge badge-secondary ml-2">Auxiliar</span>
+                                                        @endif
+                                                    </h6>
+                                                    <p class="text-muted mb-2 small">
+                                                        <i class="fas fa-calendar mr-1"></i>
+                                                        {{ $asignacion->fecha_inicio->format('d/m/Y') }} - 
+                                                        {{ $asignacion->fecha_fin->format('d/m/Y') }}
+                                                    </p>
+                                                    <p class="text-muted mb-0 small">
+                                                        <i class="fas fa-clock mr-1"></i>
+                                                        {{ $asignacion->total_horas_instructor }} horas
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <form action="{{ route('fichaCaracterizacion.desasignarInstructor', [$ficha->id, $asignacion->instructor_id]) }}" 
+                                                          method="POST" style="display: inline;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                                onclick="return confirm('¿Está seguro de desasignar este instructor?')"
+                                                                title="Desasignar instructor">
+                                                            <i class="fas fa-user-minus mr-1"></i>
+                                                            Desasignar
+                                                        </button>
+                                                    </form>
                                                 </div>
                                             </div>
-                                        @endforeach
-                                    @else
-                                        <div class="text-center text-muted py-4">
-                                            <i class="fas fa-user-slash fa-3x mb-3"></i>
-                                            <p>No hay instructores asignados a esta ficha.</p>
                                         </div>
+                                    </div>
+                                @endforeach
+                            @else
+                                <div class="text-center text-muted py-4">
+                                    <i class="fas fa-user-slash fa-3x mb-3"></i>
+                                    <p>No hay instructores asignados a esta ficha.</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    <!-- Asignar Instructores -->
+                    <div class="card shadow-sm no-hover mb-4">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-warning">
+                                <i class="fas fa-user-plus mr-2"></i>Asignar Instructores
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form action="{{ route('fichaCaracterizacion.asignarInstructores', $ficha->id) }}" method="POST" id="formAsignarInstructores">
+                                @csrf
+                                
+                                <!-- Instructor Principal -->
+                                <div class="form-group">
+                                    <label for="instructor_principal_id" class="form-label font-weight-bold">
+                                        <i class="fas fa-star text-warning mr-1"></i>
+                                        Instructor Principal <span class="text-danger">*</span>
+                                    </label>
+                                    <select name="instructor_principal_id" id="instructor_principal_id" class="form-control select2" required>
+                                        <option value="">Seleccione un instructor principal</option>
+                                        @foreach($instructoresConDisponibilidad as $instructorId => $data)
+                                            <option value="{{ $instructorId }}" 
+                                                    {{ $ficha->instructor_id == $instructorId ? 'selected' : '' }}
+                                                    {{ !$data['disponible'] ? 'disabled' : '' }}>
+                                                {{ $data['instructor']->persona->primer_nombre }} 
+                                                {{ $data['instructor']->persona->primer_apellido }}
+                                                @if(!$data['disponible'])
+                                                    (No disponible - {{ $data['fichas_superpuestas'] }} fichas superpuestas)
+                                                @endif
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('instructor_principal_id')
+                                        <div class="text-danger small">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <!-- Información de fechas permitidas -->
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle"></i>
+                                    <strong>Rango de fechas permitidas:</strong>
+                                    @if($ficha->fecha_inicio && $ficha->fecha_fin)
+                                        Desde {{ $ficha->fecha_inicio->format('d/m/Y') }} hasta {{ $ficha->fecha_fin->format('d/m/Y') }}
+                                    @else
+                                        <span class="text-warning">Las fechas de la ficha no están definidas</span>
                                     @endif
                                 </div>
-                            </div>
-                        </div>
 
-                        <!-- Asignar Instructores -->
-                        <div class="col-md-6">
-                            <div class="card shadow-sm no-hover mb-4">
-                                <div class="card-header bg-white py-3">
-                                    <h5 class="card-title m-0 font-weight-bold text-warning">
-                                        <i class="fas fa-user-plus mr-2"></i>Asignar Instructores
-                                    </h5>
+                                <!-- Información de días de formación -->
+                                @if($diasFormacionFicha->count() > 0)
+                                    <div class="alert alert-success">
+                                        <i class="fas fa-calendar-check"></i>
+                                        <strong>Días de formación disponibles:</strong>
+                                        {{ $diasFormacionFicha->pluck('name')->implode(', ') }}
+                                    </div>
+                                @else
+                                    <div class="alert alert-warning">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <strong>Advertencia:</strong> Esta ficha no tiene días de formación asignados. 
+                                        <a href="{{ route('fichaCaracterizacion.gestionarDiasFormacion', $ficha->id) }}" class="alert-link">
+                                            Asignar días de formación
+                                        </a>
+                                    </div>
+                                @endif
+
+                                <!-- Lista de Instructores -->
+                                <div class="form-group">
+                                    <label class="form-label font-weight-bold">
+                                        <i class="fas fa-users mr-1"></i>
+                                        Instructores Asignados <span class="text-danger">*</span>
+                                    </label>
+                                    <div id="instructores-container">
+                                        <!-- Los instructores se agregarán dinámicamente aquí -->
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="agregarInstructor()">
+                                        <i class="fas fa-plus mr-1"></i> Agregar Instructor
+                                    </button>
                                 </div>
-                                <div class="card-body">
-                                    <form action="{{ route('fichaCaracterizacion.asignarInstructores', $ficha->id) }}" method="POST" id="formAsignarInstructores">
-                                        @csrf
-                                        
-                                        <!-- Instructor Principal -->
-                                        <div class="form-group">
-                                            <label for="instructor_principal_id" class="form-label font-weight-bold">
-                                                <i class="fas fa-star text-warning mr-1"></i>
-                                                Instructor Principal <span class="text-danger">*</span>
-                                            </label>
-                                            <select name="instructor_principal_id" id="instructor_principal_id" class="form-control select2" required>
-                                                <option value="">Seleccione un instructor principal</option>
-                                                @foreach($instructoresConDisponibilidad as $instructorId => $data)
-                                                    <option value="{{ $instructorId }}" 
-                                                            {{ $ficha->instructor_id == $instructorId ? 'selected' : '' }}
-                                                            {{ !$data['disponible'] ? 'disabled' : '' }}>
-                                                        {{ $data['instructor']->persona->primer_nombre }} 
-                                                        {{ $data['instructor']->persona->primer_apellido }}
-                                                        @if(!$data['disponible'])
-                                                            (No disponible - {{ $data['fichas_superpuestas'] }} fichas superpuestas)
-                                                        @endif
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            @error('instructor_principal_id')
-                                                <div class="text-danger small">{{ $message }}</div>
-                                            @enderror
-                                        </div>
 
-                                        <!-- Información de fechas permitidas -->
-                                        <div class="alert alert-info">
-                                            <i class="fas fa-info-circle"></i>
-                                            <strong>Rango de fechas permitidas:</strong>
-                                            @if($ficha->fecha_inicio && $ficha->fecha_fin)
-                                                Desde {{ $ficha->fecha_inicio->format('d/m/Y') }} hasta {{ $ficha->fecha_fin->format('d/m/Y') }}
-                                            @else
-                                                <span class="text-warning">Las fechas de la ficha no están definidas</span>
-                                            @endif
-                                        </div>
-
-                                        <!-- Información de días de formación -->
-                                        @if($diasFormacionFicha->count() > 0)
-                                            <div class="alert alert-success">
-                                                <i class="fas fa-calendar-check"></i>
-                                                <strong>Días de formación disponibles:</strong>
-                                                {{ $diasFormacionFicha->pluck('name')->implode(', ') }}
-                                            </div>
-                                        @else
-                                            <div class="alert alert-warning">
-                                                <i class="fas fa-exclamation-triangle"></i>
-                                                <strong>Advertencia:</strong> Esta ficha no tiene días de formación asignados. 
-                                                <a href="{{ route('fichaCaracterizacion.gestionarDiasFormacion', $ficha->id) }}" class="alert-link">
-                                                    Asignar días de formación
-                                                </a>
-                                            </div>
-                                        @endif
-
-                                        <!-- Lista de Instructores -->
-                                        <div class="form-group">
-                                            <label class="form-label font-weight-bold">
-                                                <i class="fas fa-users mr-1"></i>
-                                                Instructores Asignados <span class="text-danger">*</span>
-                                            </label>
-                                            <div id="instructores-container">
-                                                <!-- Los instructores se agregarán dinámicamente aquí -->
-                                            </div>
-                                            <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="agregarInstructor()">
-                                                <i class="fas fa-plus mr-1"></i> Agregar Instructor
-                                            </button>
-                                        </div>
-
-                                        <hr class="mt-4">
-                                        <div class="d-flex justify-content-end">
-                                            <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}" class="btn btn-light mr-2">
-                                                <i class="fas fa-times mr-1"></i> Cancelar
-                                            </a>
-                                            <button type="submit" class="btn btn-primary">
-                                                <i class="fas fa-save mr-1"></i> Guardar Asignaciones
-                                            </button>
-                                        </div>
-                                    </form>
+                                <hr class="mt-4">
+                                <div class="d-flex justify-content-end">
+                                    <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}" class="btn btn-light mr-2">
+                                        <i class="fas fa-times mr-1"></i> Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save mr-1"></i> Guardar Asignaciones
+                                    </button>
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
 
