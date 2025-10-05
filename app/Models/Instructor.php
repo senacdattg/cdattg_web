@@ -21,11 +21,20 @@ class Instructor extends Model
         'regional_id',
         'status',
         'user_create_id',
-        'user_edit_id'
+        'user_edit_id',
+        'especialidades',
+        'competencias',
+        'anos_experiencia',
+        'experiencia_laboral',
+        'numero_documento_cache',
+        'nombre_completo_cache'
     ];
 
     protected $casts = [
         'status' => 'boolean',
+        'especialidades' => 'array',
+        'competencias' => 'array',
+        'anos_experiencia' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime'
     ];
@@ -36,6 +45,11 @@ class Instructor extends Model
 
         static::creating(function ($instructor) {
             $instructor->status = $instructor->status ?? true;
+            $instructor->actualizarCache();
+        });
+
+        static::updating(function ($instructor) {
+            $instructor->actualizarCache();
         });
     }
 
@@ -286,5 +300,120 @@ class Instructor extends Model
     public function getFechaActualizacionFormateadaAttribute(): string
     {
         return $this->updated_at ? $this->updated_at->format('d/m/Y H:i:s') : 'Sin fecha';
+    }
+
+    /**
+     * Actualizar campos de caché para optimizar búsquedas
+     */
+    public function actualizarCache(): void
+    {
+        if ($this->persona) {
+            $this->numero_documento_cache = $this->persona->numero_documento;
+            $this->nombre_completo_cache = $this->getNombreCompletoAttribute();
+        }
+    }
+
+    /**
+     * Agregar especialidad al instructor
+     */
+    public function agregarEspecialidad(string $especialidad): void
+    {
+        $especialidades = $this->especialidades ?? [];
+        if (!in_array($especialidad, $especialidades)) {
+            $especialidades[] = $especialidad;
+            $this->especialidades = $especialidades;
+            $this->save();
+        }
+    }
+
+    /**
+     * Remover especialidad del instructor
+     */
+    public function removerEspecialidad(string $especialidad): void
+    {
+        $especialidades = $this->especialidades ?? [];
+        $especialidades = array_filter($especialidades, function($esp) use ($especialidad) {
+            return $esp !== $especialidad;
+        });
+        $this->especialidades = array_values($especialidades);
+        $this->save();
+    }
+
+    /**
+     * Agregar competencia al instructor
+     */
+    public function agregarCompetencia(string $competencia): void
+    {
+        $competencias = $this->competencias ?? [];
+        if (!in_array($competencia, $competencias)) {
+            $competencias[] = $competencia;
+            $this->competencias = $competencias;
+            $this->save();
+        }
+    }
+
+    /**
+     * Remover competencia del instructor
+     */
+    public function removerCompetencia(string $competencia): void
+    {
+        $competencias = $this->competencias ?? [];
+        $competencias = array_filter($competencias, function($comp) use ($competencia) {
+            return $comp !== $competencia;
+        });
+        $this->competencias = array_values($competencias);
+        $this->save();
+    }
+
+    /**
+     * Verificar si el instructor tiene una especialidad específica
+     */
+    public function tieneEspecialidad(string $especialidad): bool
+    {
+        return in_array($especialidad, $this->especialidades ?? []);
+    }
+
+    /**
+     * Verificar si el instructor tiene una competencia específica
+     */
+    public function tieneCompetencia(string $competencia): bool
+    {
+        return in_array($competencia, $this->competencias ?? []);
+    }
+
+    /**
+     * Obtener años de experiencia formateados
+     */
+    public function getAnosExperienciaFormateadosAttribute(): string
+    {
+        if (!$this->anos_experiencia) {
+            return 'Sin especificar';
+        }
+        
+        return $this->anos_experiencia . ' año' . ($this->anos_experiencia > 1 ? 's' : '');
+    }
+
+    /**
+     * Scope para buscar por especialidad
+     */
+    public function scopePorEspecialidad(Builder $query, string $especialidad): Builder
+    {
+        return $query->whereJsonContains('especialidades', $especialidad);
+    }
+
+    /**
+     * Scope para buscar por competencia
+     */
+    public function scopePorCompetencia(Builder $query, string $competencia): Builder
+    {
+        return $query->whereJsonContains('competencias', $competencia);
+    }
+
+    /**
+     * Scope para filtrar por años de experiencia mínimos
+     */
+    public function scopeConExperienciaMinima(Builder $query, int $anosMinimos): Builder
+    {
+        return $query->where('anos_experiencia', '>=', $anosMinimos);
     }
 }
