@@ -36,8 +36,9 @@
             margin: 2px;
         }
         .stats-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #f8f9fa;
+            color: #495057;
+            border: 1px solid #dee2e6;
             border-radius: 8px;
             padding: 20px;
             text-align: center;
@@ -64,7 +65,7 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         .table-custom thead {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #007bff;
             color: white;
         }
         .table-custom thead th {
@@ -202,18 +203,20 @@
                 <div class="col-12">
                     <div class="card detail-card no-hover">
                         <div class="card-header bg-white py-3">
-                            <div class="d-flex align-items-center">
-                                <img src="{{ asset('dist/img/LogoSena.jpeg') }}" alt="Avatar" class="instructor-avatar mr-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                                <i class="fas fa-user mr-2"></i>Información Personal
+                            </h5>
+                            <div class="d-flex align-items-center mt-3">
+                                <img src="{{ asset('dist/img/user2-160x160.jpg') }}" alt="Avatar" class="instructor-avatar mr-3" 
+                                     onerror="this.src='{{ asset('dist/img/user3-128x128.jpg') }}'; this.onerror=null;">
                                 <div>
-                                    <h5 class="card-title m-0 font-weight-bold text-primary">
-                                        <i class="fas fa-user mr-2"></i>Información Personal
-                                    </h5>
-                                    <p class="text-muted mb-0">
+                                    <h6 class="mb-0 font-weight-bold text-dark">
                                         {{ $instructor->persona->primer_nombre }} 
                                         {{ $instructor->persona->segundo_nombre }} 
                                         {{ $instructor->persona->primer_apellido }} 
                                         {{ $instructor->persona->segundo_apellido }}
-                                    </p>
+                                    </h6>
+                                    <small class="text-muted">Instructor SENA</small>
                                 </div>
                             </div>
                         </div>
