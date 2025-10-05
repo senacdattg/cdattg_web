@@ -2486,12 +2486,12 @@ class FichaCaracterizacionController extends Controller
 
             $ficha = FichaCaracterizacion::with([
                 'programaFormacion',
-                'personas.user'
+                'aprendices.persona.user'
             ])->findOrFail($id);
 
             // Obtener todas las personas que NO tienen rol de APRENDIZ y NO están asignadas a esta ficha
             $personasDisponibles = \App\Models\Persona::with('user')
-                ->whereDoesntHave('fichas', function($query) use ($id) {
+                ->whereDoesntHave('aprendiz.fichas', function($query) use ($id) {
                     $query->where('ficha_id', $id);
                 })
                 ->whereHas('user', function($query) {
@@ -2505,7 +2505,7 @@ class FichaCaracterizacionController extends Controller
 
             Log::info('Vista de gestión de aprendices cargada', [
                 'ficha_id' => $id,
-                'personas_asignadas' => $ficha->personas->count(),
+                'aprendices_asignados' => $ficha->aprendices->count(),
                 'personas_disponibles' => $personasDisponibles->count(),
                 'user_id' => Auth::id()
             ]);
@@ -2552,16 +2552,6 @@ class FichaCaracterizacionController extends Controller
 
             DB::beginTransaction();
 
-            // Verificar que las personas no estén ya asignadas
-            $personasYaAsignadas = $ficha->personas()->whereIn('personas.id', $personasIds)->pluck('personas.id');
-            
-            if ($personasYaAsignadas->count() > 0) {
-                DB::rollBack();
-                return redirect()->back()
-                    ->with('error', 'Algunas personas ya están asignadas a esta ficha.')
-                    ->with('personas_duplicadas', $personasYaAsignadas);
-            }
-
             // Obtener el rol de APRENDIZ
             $rolAprendiz = \Spatie\Permission\Models\Role::where('name', 'APRENDIZ')->first();
             
@@ -2575,9 +2565,6 @@ class FichaCaracterizacionController extends Controller
             foreach ($personasIds as $personaId) {
                 $persona = \App\Models\Persona::with('user')->findOrFail($personaId);
                 
-                // Asignar persona a la ficha
-                $ficha->personas()->attach($personaId);
-                
                 // Crear registro de aprendiz si no existe
                 $aprendiz = \App\Models\Aprendiz::firstOrCreate([
                     'persona_id' => $personaId,
@@ -2586,6 +2573,16 @@ class FichaCaracterizacionController extends Controller
                     'user_create_id' => Auth::id(),
                     'user_edit_id' => Auth::id(),
                 ]);
+                
+                // Verificar que el aprendiz no esté ya asignado a esta ficha
+                if ($ficha->aprendices()->where('aprendiz_id', $aprendiz->id)->exists()) {
+                    DB::rollBack();
+                    return redirect()->back()
+                        ->with('error', 'La persona ya está asignada como aprendiz a esta ficha.');
+                }
+                
+                // Asignar aprendiz a la ficha
+                $ficha->aprendices()->attach($aprendiz->id);
                 
                 // Asignar rol de APRENDIZ al usuario si tiene usuario asociado
                 if ($persona->user) {
@@ -2659,21 +2656,30 @@ class FichaCaracterizacionController extends Controller
 
             DB::beginTransaction();
 
-            // Verificar que las personas estén asignadas a la ficha
-            $personasAsignadas = $ficha->personas()->whereIn('personas.id', $personasIds)->pluck('personas.id');
+            // Obtener los aprendices correspondientes a las personas
+            $aprendicesIds = \App\Models\Aprendiz::whereIn('persona_id', $personasIds)->pluck('id');
             
-            if ($personasAsignadas->count() !== count($personasIds)) {
+            if ($aprendicesIds->count() !== count($personasIds)) {
                 DB::rollBack();
                 return redirect()->back()
-                    ->with('error', 'Algunas personas no están asignadas a esta ficha.');
+                    ->with('error', 'Algunas personas no tienen registro de aprendiz.');
             }
 
-            // Desasignar personas de la ficha
-            $ficha->personas()->detach($personasIds);
+            // Verificar que los aprendices estén asignados a la ficha
+            $aprendicesAsignados = $ficha->aprendices()->whereIn('aprendices.id', $aprendicesIds)->pluck('aprendices.id');
+            
+            if ($aprendicesAsignados->count() !== count($aprendicesIds)) {
+                DB::rollBack();
+                return redirect()->back()
+                    ->with('error', 'Algunos aprendices no están asignados a esta ficha.');
+            }
+
+            // Desasignar aprendices de la ficha
+            $ficha->aprendices()->detach($aprendicesIds);
 
             // Opcional: Desactivar registros de aprendiz (no eliminar para mantener historial)
-            foreach ($personasIds as $personaId) {
-                $aprendiz = \App\Models\Aprendiz::where('persona_id', $personaId)->first();
+            foreach ($aprendicesIds as $aprendizId) {
+                $aprendiz = \App\Models\Aprendiz::find($aprendizId);
                 if ($aprendiz) {
                     $aprendiz->update([
                         'estado' => 0, // Desactivar pero mantener registro

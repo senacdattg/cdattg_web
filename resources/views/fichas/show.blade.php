@@ -299,11 +299,11 @@
                                 <i class="fas fa-users mr-2"></i> Aprendices Asignados
                             </h5>
                             <div class="card-tools">
-                                <span class="badge badge-info">{{ $ficha->personas->count() }} personas asignadas</span>
+                                <span class="badge badge-info">{{ $ficha->aprendices->count() }} aprendices asignados</span>
                             </div>
                         </div>
                         <div class="card-body">
-                            @if($ficha->personas->count() > 0)
+                            @if($ficha->aprendices->count() > 0)
                                 <div class="table-responsive">
                                     <table class="table table-striped">
                                         <thead>
@@ -316,22 +316,22 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($ficha->personas as $persona)
+                                            @foreach($ficha->aprendices as $aprendiz)
                                                 <tr>
-                                                    <td>{{ $persona->numero_documento }}</td>
+                                                    <td>{{ $aprendiz->persona->numero_documento }}</td>
                                                     <td>
-                                                        {{ $persona->primer_nombre }} {{ $persona->primer_apellido }}
-                                                        @if($persona->segundo_nombre)
-                                                            {{ $persona->segundo_nombre }}
+                                                        {{ $aprendiz->persona->primer_nombre }} {{ $aprendiz->persona->primer_apellido }}
+                                                        @if($aprendiz->persona->segundo_nombre)
+                                                            {{ $aprendiz->persona->segundo_nombre }}
                                                         @endif
-                                                        @if($persona->segundo_apellido)
-                                                            {{ $persona->segundo_apellido }}
+                                                        @if($aprendiz->persona->segundo_apellido)
+                                                            {{ $aprendiz->persona->segundo_apellido }}
                                                         @endif
                                                     </td>
-                                                    <td>{{ $persona->email ?? 'N/A' }}</td>
-                                                    <td>{{ $persona->telefono ?? 'N/A' }}</td>
+                                                    <td>{{ $aprendiz->persona->email ?? 'N/A' }}</td>
+                                                    <td>{{ $aprendiz->persona->telefono ?? 'N/A' }}</td>
                                                     <td>
-                                                        @if($persona->status)
+                                                        @if($aprendiz->estado)
                                                             <span class="badge badge-success">Activo</span>
                                                         @else
                                                             <span class="badge badge-danger">Inactivo</span>
@@ -344,7 +344,7 @@
                                 </div>
                             @else
                                 <div class="alert alert-info">
-                                    <i class="fas fa-info-circle"></i> No hay personas asignadas como aprendices a esta ficha.
+                                    <i class="fas fa-info-circle"></i> No hay aprendices asignados a esta ficha.
                                 </div>
                             @endif
                         </div>

@@ -147,21 +147,6 @@ class Persona extends Model
         return $this->instructor()->exists();
     }
 
-    /**
-     * Relación Many-to-Many con FichaCaracterizacion a través de la tabla pivot.
-     * Una persona puede estar asignada a múltiples fichas de caracterización.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function fichas(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            FichaCaracterizacion::class,
-            'aprendiz_fichas_caracterizacion',
-            'persona_id',
-            'ficha_id'
-        )->withTimestamps();
-    }
 
     /**
      * Verifica si la persona tiene el rol de APRENDIZ.

@@ -175,21 +175,6 @@ class FichaCaracterizacion extends Model
         )->withTimestamps();
     }
 
-    /**
-     * Relación Many-to-Many con Persona.
-     * Obtiene directamente las personas asignadas a esta ficha como aprendices.
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
-     */
-    public function personas(): BelongsToMany
-    {
-        return $this->belongsToMany(
-            Persona::class,
-            'aprendiz_fichas_caracterizacion',
-            'ficha_id',
-            'persona_id'
-        )->withTimestamps();
-    }
 
     /**
      * Obtiene solo los aprendices activos de esta ficha.
