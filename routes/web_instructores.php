@@ -166,6 +166,31 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/{instructor}/verificar-disponibilidad', [InstructorController::class, 'verificarDisponibilidad'])
             ->name('instructor.verificarDisponibilidad')
             ->middleware('can:VER INSTRUCTOR');
+            
+        // Obtener instructores disponibles para una ficha
+        Route::get('/disponibles-para-ficha', [InstructorController::class, 'instructoresDisponibles'])
+            ->name('instructor.instructoresDisponibles')
+            ->middleware('can:VER INSTRUCTOR');
+            
+        // Validar reglas SENA para asignación
+        Route::get('/{instructor}/validar-reglas-sena', [InstructorController::class, 'validarReglasSENA'])
+            ->name('instructor.validarReglasSENA')
+            ->middleware('can:VER INSTRUCTOR');
+            
+        // Estadísticas de carga de trabajo
+        Route::get('/estadisticas-carga-trabajo', [InstructorController::class, 'estadisticasCargaTrabajo'])
+            ->name('instructor.estadisticasCargaTrabajo')
+            ->middleware('can:VER INSTRUCTOR');
+            
+        // Asignar ficha con validaciones
+        Route::post('/{instructor}/asignar-ficha', [InstructorController::class, 'asignarFicha'])
+            ->name('instructor.asignarFicha')
+            ->middleware('can:EDITAR INSTRUCTOR');
+            
+        // Desasignar ficha
+        Route::delete('/{instructor}/desasignar-ficha/{ficha}', [InstructorController::class, 'desasignarFicha'])
+            ->name('instructor.desasignarFicha')
+            ->middleware('can:EDITAR INSTRUCTOR');
     });
     
     // Rutas para gestión de horarios

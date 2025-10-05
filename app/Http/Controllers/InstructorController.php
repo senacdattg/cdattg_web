@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Instructor;
 use App\Http\Requests\StoreInstructorRequest;
 use App\Http\Requests\UpdateInstructorRequest;
+use App\Http\Requests\InstructorRequest;
+use App\Services\InstructorBusinessRulesService;
 use App\Models\FichaCaracterizacion;
 use App\Models\Persona;
 use App\Models\Regional;
@@ -21,9 +23,12 @@ use Illuminate\Support\Facades\Auth;
 
 class InstructorController extends Controller
 {
-    public function __construct()
+    protected $businessRulesService;
+
+    public function __construct(InstructorBusinessRulesService $businessRulesService)
     {
         $this->middleware('auth'); // Middleware de autenticación para todos los métodos del controlador
+        $this->businessRulesService = $businessRulesService;
 
         // Middleware específico para métodos individuales usando permisos de Instructor
         $this->middleware('can:VER INSTRUCTOR')->only(['index', 'show']);
@@ -949,6 +954,312 @@ class InstructorController extends Controller
         } catch (\Exception $e) {
             Log::error('Error al cambiar estado del instructor: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Error al cambiar el estado del instructor');
+        }
+    }
+
+    /**
+     * Verificar disponibilidad del instructor para una nueva ficha
+     */
+    public function verificarDisponibilidad(Request $request, Instructor $instructor)
+    {
+        try {
+            $request->validate([
+                'fecha_inicio' => 'required|date',
+                'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
+                'especialidad_requerida' => 'nullable|string',
+                'horas_semanales' => 'nullable|integer|min:0|max:48'
+            ]);
+
+            $datosFicha = $request->only(['fecha_inicio', 'fecha_fin', 'especialidad_requerida', 'horas_semanales']);
+
+            $disponibilidad = $this->businessRulesService->verificarDisponibilidad($instructor, $datosFicha);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'disponibilidad' => $disponibilidad
+                ]);
+            }
+
+            return response()->json($disponibilidad);
+
+        } catch (\Exception $e) {
+            Log::error('Error verificando disponibilidad del instructor', [
+                'instructor_id' => $instructor->id,
+                'error' => $e->getMessage()
+            ]);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al verificar disponibilidad'
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Error al verificar disponibilidad del instructor');
+        }
+    }
+
+    /**
+     * Obtener instructores disponibles para una ficha específica
+     */
+    public function instructoresDisponibles(Request $request)
+    {
+        try {
+            $request->validate([
+                'fecha_inicio' => 'required|date',
+                'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
+                'especialidad_requerida' => 'nullable|string',
+                'regional_id' => 'nullable|integer|exists:regionals,id'
+            ]);
+
+            $criterios = $request->only(['fecha_inicio', 'fecha_fin', 'especialidad_requerida', 'regional_id']);
+            $instructoresDisponibles = $this->businessRulesService->obtenerInstructoresDisponibles($criterios);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'instructores' => $instructoresDisponibles,
+                    'total' => count($instructoresDisponibles)
+                ]);
+            }
+
+            return view('instructores.disponibles', compact('instructoresDisponibles', 'criterios'));
+
+        } catch (\Exception $e) {
+            Log::error('Error obteniendo instructores disponibles', [
+                'error' => $e->getMessage(),
+                'criterios' => $request->all()
+            ]);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al obtener instructores disponibles'
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Error al obtener instructores disponibles');
+        }
+    }
+
+    /**
+     * Validar reglas SENA para asignación de ficha
+     */
+    public function validarReglasSENA(Request $request, Instructor $instructor)
+    {
+        try {
+            $request->validate([
+                'fecha_inicio' => 'required|date',
+                'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
+                'especialidad_requerida' => 'nullable|string',
+                'regional_id' => 'nullable|integer|exists:regionals,id'
+            ]);
+
+            $datosFicha = $request->only(['fecha_inicio', 'fecha_fin', 'especialidad_requerida', 'regional_id']);
+            $validacion = $this->businessRulesService->validarReglasSENA($instructor, $datosFicha);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'validacion' => $validacion
+                ]);
+            }
+
+            return response()->json($validacion);
+
+        } catch (\Exception $e) {
+            Log::error('Error validando reglas SENA', [
+                'instructor_id' => $instructor->id,
+                'error' => $e->getMessage()
+            ]);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al validar reglas de negocio'
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Error al validar reglas de negocio');
+        }
+    }
+
+    /**
+     * Obtener estadísticas de carga de trabajo
+     */
+    public function estadisticasCargaTrabajo(Request $request)
+    {
+        try {
+            $estadisticas = $this->businessRulesService->obtenerEstadisticasCargaTrabajo();
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'estadisticas' => $estadisticas
+                ]);
+            }
+
+            return view('instructores.estadisticas-carga', compact('estadisticas'));
+
+        } catch (\Exception $e) {
+            Log::error('Error obteniendo estadísticas de carga', [
+                'error' => $e->getMessage()
+            ]);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al obtener estadísticas'
+                ], 500);
+            }
+
+            return redirect()->back()->with('error', 'Error al obtener estadísticas de carga de trabajo');
+        }
+    }
+
+    /**
+     * Asignar ficha a instructor con validaciones de negocio
+     */
+    public function asignarFicha(Request $request, Instructor $instructor)
+    {
+        try {
+            $request->validate([
+                'ficha_id' => 'required|integer|exists:ficha_caracterizacions,id',
+                'total_horas_instructor' => 'required|integer|min:1|max:1000',
+                'fecha_inicio' => 'required|date',
+                'fecha_fin' => 'required|date|after_or_equal:fecha_inicio'
+            ]);
+
+            $ficha = FichaCaracterizacion::findOrFail($request->ficha_id);
+            
+            // Verificar que la ficha esté activa
+            if (!$ficha->status) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'La ficha seleccionada no está activa'
+                ], 400);
+            }
+
+            // Validar disponibilidad del instructor
+            $datosFicha = [
+                'fecha_inicio' => $request->fecha_inicio,
+                'fecha_fin' => $request->fecha_fin,
+                'especialidad_requerida' => $ficha->programaFormacion->redConocimiento->nombre ?? null,
+                'regional_id' => $ficha->regional_id,
+                'horas_semanales' => $request->total_horas_instructor
+            ];
+
+            $disponibilidad = $this->businessRulesService->verificarDisponibilidad($instructor, $datosFicha);
+            
+            if (!$disponibilidad['disponible']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El instructor no está disponible para esta ficha',
+                    'razones' => $disponibilidad['razones'],
+                    'conflictos' => $disponibilidad['conflictos'] ?? []
+                ], 400);
+            }
+
+            // Validar reglas SENA
+            $validacionSENA = $this->businessRulesService->validarReglasSENA($instructor, $datosFicha);
+            
+            if (!$validacionSENA['valido']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se cumplen las reglas de negocio del SENA',
+                    'errores' => $validacionSENA['errores']
+                ], 400);
+            }
+
+            // Crear la asignación
+            $instructorFicha = $instructor->instructorFichas()->create([
+                'ficha_caracterizacion_id' => $ficha->id,
+                'total_horas_instructor' => $request->total_horas_instructor,
+                'fecha_inicio' => $request->fecha_inicio,
+                'fecha_fin' => $request->fecha_fin,
+                'status' => true,
+                'user_create_id' => Auth::id()
+            ]);
+
+            Log::info('Ficha asignada al instructor', [
+                'instructor_id' => $instructor->id,
+                'ficha_id' => $ficha->id,
+                'total_horas' => $request->total_horas_instructor
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Ficha asignada exitosamente al instructor',
+                'asignacion' => $instructorFicha,
+                'advertencias' => $validacionSENA['advertencias'] ?? []
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error asignando ficha al instructor', [
+                'instructor_id' => $instructor->id,
+                'ficha_id' => $request->ficha_id ?? null,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al asignar la ficha al instructor'
+            ], 500);
+        }
+    }
+
+    /**
+     * Desasignar ficha del instructor
+     */
+    public function desasignarFicha(Request $request, Instructor $instructor, $fichaId)
+    {
+        try {
+            $instructorFicha = $instructor->instructorFichas()
+                ->where('ficha_caracterizacion_id', $fichaId)
+                ->first();
+
+            if (!$instructorFicha) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'La ficha no está asignada a este instructor'
+                ], 404);
+            }
+
+            // Verificar que la ficha no haya comenzado aún
+            if (Carbon::parse($instructorFicha->fecha_inicio)->isPast()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se puede desasignar una ficha que ya ha comenzado'
+                ], 400);
+            }
+
+            $instructorFicha->update([
+                'status' => false,
+                'user_edit_id' => Auth::id()
+            ]);
+
+            Log::info('Ficha desasignada del instructor', [
+                'instructor_id' => $instructor->id,
+                'ficha_id' => $fichaId
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Ficha desasignada exitosamente del instructor'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error desasignando ficha del instructor', [
+                'instructor_id' => $instructor->id,
+                'ficha_id' => $fichaId,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al desasignar la ficha del instructor'
+            ], 500);
         }
     }
 }
