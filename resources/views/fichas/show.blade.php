@@ -45,6 +45,10 @@
 @section('content')
     <section class="content mt-4">
         <div class="container-fluid">
+            <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ route('fichaCaracterizacion.index') }}">
+                <i class="fas fa-arrow-left"></i> Volver a Fichas de Caracterización
+            </a>
+            
             <div class="row">
                 <!-- Información Principal -->
                 <div class="col-md-8">
