@@ -2,275 +2,318 @@
 
 @section('title', 'Gestionar Instructores - Ficha ' . $ficha->ficha)
 
-@section('content_header')
-    <div class="d-flex justify-content-between align-items-center">
-        <h1>
-            <i class="fas fa-chalkboard-teacher text-primary"></i>
-            Gestionar Instructores - Ficha {{ $ficha->ficha }}
-        </h1>
-        <div>
-            <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Volver a la Ficha
-            </a>
-        </div>
-    </div>
-@stop
+@section('css')
+    @vite(['resources/css/parametros.css'])
+    <link rel="stylesheet" href="{{ asset('vendor/adminlte/plugins/select2/css/select2.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
+@endsection
 
-@section('content')
-    <!-- Información de la Ficha -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card card-outline card-info">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-info-circle"></i>
-                        Información de la Ficha
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <strong>Programa:</strong><br>
-                            <span class="text-muted">{{ $ficha->programaFormacion->nombre ?? 'No asignado' }}</span>
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Fecha Inicio:</strong><br>
-                            <span class="text-muted">{{ $ficha->fecha_inicio ? $ficha->fecha_inicio->format('d/m/Y') : 'No definida' }}</span>
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Fecha Fin:</strong><br>
-                            <span class="text-muted">{{ $ficha->fecha_fin ? $ficha->fecha_fin->format('d/m/Y') : 'No definida' }}</span>
-                        </div>
-                        <div class="col-md-3">
-                            <strong>Total Horas:</strong><br>
-                            <span class="text-muted">{{ $ficha->total_horas ?? 'No definido' }}</span>
-                        </div>
+@section('content_header')
+    <section class="content-header dashboard-header py-4">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-6 d-flex align-items-center">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
+                        style="width: 48px; height: 48px;">
+                        <i class="fas fa-chalkboard-teacher text-white fa-lg"></i>
                     </div>
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800">Gestionar Instructores</h1>
+                        <p class="text-muted mb-0 font-weight-light">Ficha {{ $ficha->ficha }}</p>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
+                                    <i class="fas fa-home"></i> Inicio
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('fichaCaracterizacion.index') }}" class="link_right_header">
+                                    <i class="fas fa-list"></i> Fichas de Caracterización
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}" class="link_right_header">
+                                    <i class="fas fa-eye"></i> Ficha {{ $ficha->ficha }}
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <i class="fas fa-chalkboard-teacher"></i> Gestionar Instructores
+                            </li>
+                        </ol>
+                    </nav>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
+@endsection
 
-    <div class="row">
-        <!-- Instructores Asignados -->
-        <div class="col-md-6">
-            <div class="card card-outline card-success">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-users text-success"></i>
-                        Instructores Asignados
-                    </h3>
-                </div>
-                <div class="card-body">
-                    @if($instructoresAsignados->count() > 0)
-                        @foreach($instructoresAsignados as $asignacion)
-                            <div class="card mb-3 {{ $ficha->instructor_id == $asignacion->instructor_id ? 'border-primary' : '' }}">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <h5 class="mb-1">
-                                                {{ $asignacion->instructor->persona->primer_nombre }} 
-                                                {{ $asignacion->instructor->persona->primer_apellido }}
-                                                @if($ficha->instructor_id == $asignacion->instructor_id)
-                                                    <span class="badge badge-primary ml-2">Principal</span>
-                                                @else
-                                                    <span class="badge badge-secondary ml-2">Auxiliar</span>
-                                                @endif
-                                            </h5>
-                                            <p class="text-muted mb-2">
-                                                <i class="fas fa-calendar"></i>
-                                                {{ $asignacion->fecha_inicio->format('d/m/Y') }} - 
-                                                {{ $asignacion->fecha_fin->format('d/m/Y') }}
-                                            </p>
-                                            <p class="text-muted mb-0">
-                                                <i class="fas fa-clock"></i>
-                                                {{ $asignacion->total_horas_instructor }} horas
-                                            </p>
-                                        </div>
-                                        <div>
-                                            @if($ficha->instructor_id != $asignacion->instructor_id)
-                                                <form action="{{ route('fichaCaracterizacion.desasignarInstructor', [$ficha->id, $asignacion->instructor_id]) }}" 
-                                                      method="POST" style="display: inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" 
-                                                            onclick="return confirm('¿Está seguro de desasignar este instructor?')">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                </form>
-                                            @endif
-                                        </div>
+@section('content')
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ route('fichaCaracterizacion.show', $ficha->id) }}">
+                        <i class="fas fa-arrow-left mr-1"></i> Volver a la Ficha
+                    </a>
+
+                    <!-- Información de la Ficha -->
+                    <div class="card detail-card no-hover mb-4">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                                <i class="fas fa-info-circle mr-2"></i>Información de la Ficha
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <div class="info-item">
+                                        <strong>Programa:</strong><br>
+                                        <span class="text-muted">{{ $ficha->programaFormacion->nombre ?? 'No asignado' }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="info-item">
+                                        <strong>Fecha Inicio:</strong><br>
+                                        <span class="text-muted">{{ $ficha->fecha_inicio ? $ficha->fecha_inicio->format('d/m/Y') : 'No definida' }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="info-item">
+                                        <strong>Fecha Fin:</strong><br>
+                                        <span class="text-muted">{{ $ficha->fecha_fin ? $ficha->fecha_fin->format('d/m/Y') : 'No definida' }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="info-item">
+                                        <strong>Total Horas:</strong><br>
+                                        <span class="text-muted">{{ $ficha->total_horas ?? 'No definido' }}</span>
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
-                    @else
-                        <div class="text-center text-muted py-4">
-                            <i class="fas fa-user-slash fa-3x mb-3"></i>
-                            <p>No hay instructores asignados a esta ficha.</p>
                         </div>
-                    @endif
-                </div>
-            </div>
-        </div>
+                    </div>
 
-        <!-- Asignar Instructores -->
-        <div class="col-md-6">
-            <div class="card card-outline card-warning">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-user-plus text-warning"></i>
-                        Asignar Instructores
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <form action="{{ route('fichaCaracterizacion.asignarInstructores', $ficha->id) }}" method="POST" id="formAsignarInstructores">
-                        @csrf
-                        
-                        <!-- Instructor Principal -->
-                        <div class="form-group">
-                            <label for="instructor_principal_id">
-                                <i class="fas fa-star text-warning"></i>
-                                Instructor Principal <span class="text-danger">*</span>
-                            </label>
-                            <select name="instructor_principal_id" id="instructor_principal_id" class="form-control select2" required>
-                                <option value="">Seleccione un instructor principal</option>
-                                @foreach($instructoresConDisponibilidad as $instructorId => $data)
-                                    <option value="{{ $instructorId }}" 
-                                            {{ $ficha->instructor_id == $instructorId ? 'selected' : '' }}
-                                            {{ !$data['disponible'] ? 'disabled' : '' }}>
-                                        {{ $data['instructor']->persona->primer_nombre }} 
-                                        {{ $data['instructor']->persona->primer_apellido }}
-                                        @if(!$data['disponible'])
-                                            (No disponible - {{ $data['fichas_superpuestas'] }} fichas superpuestas)
+                    <div class="row">
+                        <!-- Instructores Asignados -->
+                        <div class="col-md-6">
+                            <div class="card shadow-sm no-hover mb-4">
+                                <div class="card-header bg-white py-3">
+                                    <h5 class="card-title m-0 font-weight-bold text-success">
+                                        <i class="fas fa-users mr-2"></i>Instructores Asignados
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    @if($instructoresAsignados->count() > 0)
+                                        @foreach($instructoresAsignados as $asignacion)
+                                            <div class="card mb-3 {{ $ficha->instructor_id == $asignacion->instructor_id ? 'border-primary' : '' }}">
+                                                <div class="card-body">
+                                                    <div class="d-flex justify-content-between align-items-start">
+                                                        <div>
+                                                            <h6 class="mb-1">
+                                                                {{ $asignacion->instructor->persona->primer_nombre }} 
+                                                                {{ $asignacion->instructor->persona->primer_apellido }}
+                                                                @if($ficha->instructor_id == $asignacion->instructor_id)
+                                                                    <span class="badge badge-primary ml-2">Principal</span>
+                                                                @else
+                                                                    <span class="badge badge-secondary ml-2">Auxiliar</span>
+                                                                @endif
+                                                            </h6>
+                                                            <p class="text-muted mb-2 small">
+                                                                <i class="fas fa-calendar mr-1"></i>
+                                                                {{ $asignacion->fecha_inicio->format('d/m/Y') }} - 
+                                                                {{ $asignacion->fecha_fin->format('d/m/Y') }}
+                                                            </p>
+                                                            <p class="text-muted mb-0 small">
+                                                                <i class="fas fa-clock mr-1"></i>
+                                                                {{ $asignacion->total_horas_instructor }} horas
+                                                            </p>
+                                                        </div>
+                                                        <div>
+                                                            @if($ficha->instructor_id != $asignacion->instructor_id)
+                                                                <form action="{{ route('fichaCaracterizacion.desasignarInstructor', [$ficha->id, $asignacion->instructor_id]) }}" 
+                                                                      method="POST" style="display: inline;">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                                            onclick="return confirm('¿Está seguro de desasignar este instructor?')">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </button>
+                                                                </form>
+                                                            @endif
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="text-center text-muted py-4">
+                                            <i class="fas fa-user-slash fa-3x mb-3"></i>
+                                            <p>No hay instructores asignados a esta ficha.</p>
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Asignar Instructores -->
+                        <div class="col-md-6">
+                            <div class="card shadow-sm no-hover mb-4">
+                                <div class="card-header bg-white py-3">
+                                    <h5 class="card-title m-0 font-weight-bold text-warning">
+                                        <i class="fas fa-user-plus mr-2"></i>Asignar Instructores
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <form action="{{ route('fichaCaracterizacion.asignarInstructores', $ficha->id) }}" method="POST" id="formAsignarInstructores">
+                                        @csrf
+                                        
+                                        <!-- Instructor Principal -->
+                                        <div class="form-group">
+                                            <label for="instructor_principal_id" class="form-label font-weight-bold">
+                                                <i class="fas fa-star text-warning mr-1"></i>
+                                                Instructor Principal <span class="text-danger">*</span>
+                                            </label>
+                                            <select name="instructor_principal_id" id="instructor_principal_id" class="form-control select2" required>
+                                                <option value="">Seleccione un instructor principal</option>
+                                                @foreach($instructoresConDisponibilidad as $instructorId => $data)
+                                                    <option value="{{ $instructorId }}" 
+                                                            {{ $ficha->instructor_id == $instructorId ? 'selected' : '' }}
+                                                            {{ !$data['disponible'] ? 'disabled' : '' }}>
+                                                        {{ $data['instructor']->persona->primer_nombre }} 
+                                                        {{ $data['instructor']->persona->primer_apellido }}
+                                                        @if(!$data['disponible'])
+                                                            (No disponible - {{ $data['fichas_superpuestas'] }} fichas superpuestas)
+                                                        @endif
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('instructor_principal_id')
+                                                <div class="text-danger small">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        <!-- Información de fechas permitidas -->
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle"></i>
+                                            <strong>Rango de fechas permitidas:</strong>
+                                            @if($ficha->fecha_inicio && $ficha->fecha_fin)
+                                                Desde {{ $ficha->fecha_inicio->format('d/m/Y') }} hasta {{ $ficha->fecha_fin->format('d/m/Y') }}
+                                            @else
+                                                <span class="text-warning">Las fechas de la ficha no están definidas</span>
+                                            @endif
+                                        </div>
+
+                                        <!-- Información de días de formación -->
+                                        @if($diasFormacionFicha->count() > 0)
+                                            <div class="alert alert-success">
+                                                <i class="fas fa-calendar-check"></i>
+                                                <strong>Días de formación disponibles:</strong>
+                                                {{ $diasFormacionFicha->pluck('name')->implode(', ') }}
+                                            </div>
+                                        @else
+                                            <div class="alert alert-warning">
+                                                <i class="fas fa-exclamation-triangle"></i>
+                                                <strong>Advertencia:</strong> Esta ficha no tiene días de formación asignados. 
+                                                <a href="{{ route('fichaCaracterizacion.gestionarDiasFormacion', $ficha->id) }}" class="alert-link">
+                                                    Asignar días de formación
+                                                </a>
+                                            </div>
                                         @endif
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('instructor_principal_id')
-                                <span class="text-danger">{{ $message }}</span>
-                            @enderror
-                        </div>
 
-                        <!-- Información de fechas permitidas -->
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i>
-                            <strong>Rango de fechas permitidas:</strong>
-                            @if($ficha->fecha_inicio && $ficha->fecha_fin)
-                                Desde {{ $ficha->fecha_inicio->format('d/m/Y') }} hasta {{ $ficha->fecha_fin->format('d/m/Y') }}
-                            @else
-                                <span class="text-warning">Las fechas de la ficha no están definidas</span>
-                            @endif
-                        </div>
+                                        <!-- Lista de Instructores -->
+                                        <div class="form-group">
+                                            <label class="form-label font-weight-bold">
+                                                <i class="fas fa-users mr-1"></i>
+                                                Instructores Asignados <span class="text-danger">*</span>
+                                            </label>
+                                            <div id="instructores-container">
+                                                <!-- Los instructores se agregarán dinámicamente aquí -->
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="agregarInstructor()">
+                                                <i class="fas fa-plus mr-1"></i> Agregar Instructor
+                                            </button>
+                                        </div>
 
-                        <!-- Información de días de formación -->
-                        @if($diasFormacionFicha->count() > 0)
-                            <div class="alert alert-success">
-                                <i class="fas fa-calendar-check"></i>
-                                <strong>Días de formación disponibles:</strong>
-                                {{ $diasFormacionFicha->pluck('name')->implode(', ') }}
+                                        <hr class="mt-4">
+                                        <div class="d-flex justify-content-end">
+                                            <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}" class="btn btn-light mr-2">
+                                                <i class="fas fa-times mr-1"></i> Cancelar
+                                            </a>
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="fas fa-save mr-1"></i> Guardar Asignaciones
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
-                        @else
-                            <div class="alert alert-warning">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <strong>Advertencia:</strong> Esta ficha no tiene días de formación asignados. 
-                                <a href="{{ route('fichaCaracterizacion.gestionarDiasFormacion', $ficha->id) }}" class="alert-link">
-                                    Asignar días de formación
-                                </a>
-                            </div>
-                        @endif
-
-                        <!-- Lista de Instructores -->
-                        <div class="form-group">
-                            <label>
-                                <i class="fas fa-users"></i>
-                                Instructores Asignados <span class="text-danger">*</span>
-                            </label>
-                            <div id="instructores-container">
-                                <!-- Los instructores se agregarán dinámicamente aquí -->
-                            </div>
-                            <button type="button" class="btn btn-sm btn-outline-primary mt-2" onclick="agregarInstructor()">
-                                <i class="fas fa-plus"></i> Agregar Instructor
-                            </button>
                         </div>
+                    </div>
 
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Guardar Asignaciones
-                            </button>
-                            <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}" class="btn btn-secondary">
-                                <i class="fas fa-times"></i> Cancelar
-                            </a>
+                    <!-- Instructores Disponibles -->
+                    <div class="card shadow-sm no-hover">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-info">
+                                <i class="fas fa-list mr-2"></i>Instructores Disponibles
+                            </h5>
                         </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Instructores Disponibles -->
-    <div class="row mt-4">
-        <div class="col-12">
-            <div class="card card-outline card-info">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-list text-info"></i>
-                        Instructores Disponibles
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>Disponibilidad</th>
-                                    <th>Fichas Superpuestas</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach($instructoresConDisponibilidad as $instructorId => $data)
-                                    <tr class="{{ $data['disponible'] ? '' : 'table-warning' }}">
-                                        <td>
-                                            {{ $data['instructor']->persona->primer_nombre }} 
-                                            {{ $data['instructor']->persona->primer_apellido }}
-                                        </td>
-                                        <td>
-                                            @if($data['disponible'])
-                                                <span class="badge badge-success">Disponible</span>
-                                            @else
-                                                <span class="badge badge-danger">No disponible</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <span class="badge badge-info">{{ $data['fichas_superpuestas'] }}</span>
-                                        </td>
-                                        <td>
-                                            @if($data['disponible'])
-                                                <button type="button" class="btn btn-sm btn-outline-primary" 
-                                                        onclick="agregarInstructorSeleccionado({{ $instructorId }})">
-                                                    <i class="fas fa-plus"></i> Agregar
-                                                </button>
-                                            @else
-                                                <span class="text-muted">No disponible</span>
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th class="py-3">Nombre</th>
+                                            <th class="py-3">Disponibilidad</th>
+                                            <th class="py-3">Fichas Superpuestas</th>
+                                            <th class="py-3">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($instructoresConDisponibilidad as $instructorId => $data)
+                                            <tr class="{{ $data['disponible'] ? '' : 'table-warning' }}">
+                                                <td class="py-3">
+                                                    {{ $data['instructor']->persona->primer_nombre }} 
+                                                    {{ $data['instructor']->persona->primer_apellido }}
+                                                </td>
+                                                <td class="py-3">
+                                                    @if($data['disponible'])
+                                                        <span class="badge badge-success">Disponible</span>
+                                                    @else
+                                                        <span class="badge badge-danger">No disponible</span>
+                                                    @endif
+                                                </td>
+                                                <td class="py-3">
+                                                    <span class="badge badge-info">{{ $data['fichas_superpuestas'] }}</span>
+                                                </td>
+                                                <td class="py-3">
+                                                    @if($data['disponible'])
+                                                        <button type="button" class="btn btn-sm btn-outline-primary" 
+                                                                onclick="agregarInstructorSeleccionado({{ $instructorId }})">
+                                                            <i class="fas fa-plus mr-1"></i> Agregar
+                                                        </button>
+                                                    @else
+                                                        <span class="text-muted">No disponible</span>
+                                                    @endif
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-@stop
+    </section>
+@endsection
 
-@section('css')
-    <link rel="stylesheet" href="{{ asset('vendor/adminlte/plugins/select2/css/select2.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('vendor/adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
-@stop
+@section('footer')
+    @include('layout.footer')
+@endsection
 
 @section('js')
     <script src="{{ asset('vendor/adminlte/plugins/select2/js/select2.min.js') }}"></script>
@@ -299,12 +342,12 @@
                     @endphp
                     agregarInstructorRow(
                         {{ $asignacion->instructor_id }},
-                        '{{ $asignacion->instructor->persona->primer_nombre }} {{ $asignacion->instructor->persona->primer_apellido }}',
+                        '{{ addslashes($asignacion->instructor->persona->primer_nombre) }} {{ addslashes($asignacion->instructor->persona->primer_apellido) }}',
                         '{{ $asignacion->fecha_inicio->format('Y-m-d') }}',
                         '{{ $asignacion->fecha_fin->format('Y-m-d') }}',
                         {{ $asignacion->total_horas_instructor }},
                         {{ $ficha->instructor_id == $asignacion->instructor_id ? 'true' : 'false' }},
-                        @json($diasFormacion)
+                        {!! json_encode($diasFormacion) !!}
                     );
                 @endforeach
             @endif
@@ -318,7 +361,7 @@
         // Función para agregar un instructor seleccionado de la tabla
         function agregarInstructorSeleccionado(instructorId) {
             // Buscar el instructor en los datos disponibles
-            const instructores = @json($instructoresConDisponibilidad);
+            const instructores = {!! json_encode($instructoresConDisponibilidad) !!};
             const instructor = instructores[instructorId];
             
             if (instructor && instructor.disponible) {
@@ -332,45 +375,51 @@
             const container = document.getElementById('instructores-container');
             const index = container.children.length;
             
+            // Obtener datos de instructores disponibles
+            const instructoresDisponibles = {!! json_encode($instructoresConDisponibilidad) !!};
+            const diasFormacionDisponibles = {!! json_encode($diasFormacionFicha) !!};
+            const fechaInicioMin = '{{ $ficha->fecha_inicio ? $ficha->fecha_inicio->format('Y-m-d') : '' }}';
+            const fechaFinMax = '{{ $ficha->fecha_fin ? $ficha->fecha_fin->format('Y-m-d') : '' }}';
+            const diasFormacionDisabled = {{ $diasFormacionFicha->count() == 0 ? 'true' : 'false' }};
+            
             const div = document.createElement('div');
             div.className = 'card mb-2 instructor-row';
             div.innerHTML = `
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-5">
-                            <label class="form-label">Instructor</label>
+                            <label class="form-label font-weight-bold">Instructor</label>
                             <select name="instructores[${index}][instructor_id]" class="form-control select2 instructor-select" required>
                                 <option value="">Seleccione un instructor</option>
-                                @foreach($instructoresConDisponibilidad as $id => $data)
-                                    <option value="{{ $id }}" ${instructorId == {{ $id }} ? 'selected' : ''}>
-                                        {{ $data['instructor']->persona->primer_nombre }} 
-                                        {{ $data['instructor']->persona->primer_apellido }}
-                                    </option>
-                                @endforeach
+                                ${Object.keys(instructoresDisponibles).map(id => {
+                                    const data = instructoresDisponibles[id];
+                                    const selected = instructorId == id ? 'selected' : '';
+                                    return `<option value="${id}" ${selected}>${data.instructor.persona.primer_nombre} ${data.instructor.persona.primer_apellido}</option>`;
+                                }).join('')}
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label">Fecha Inicio</label>
+                            <label class="form-label font-weight-bold">Fecha Inicio</label>
                             <input type="date" name="instructores[${index}][fecha_inicio]" 
                                    class="form-control" value="${fechaInicio}" 
-                                   min="{{ $ficha->fecha_inicio ? $ficha->fecha_inicio->format('Y-m-d') : '' }}"
-                                   max="{{ $ficha->fecha_fin ? $ficha->fecha_fin->format('Y-m-d') : '' }}" required>
+                                   min="${fechaInicioMin}"
+                                   max="${fechaFinMax}" required>
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label">Fecha Fin</label>
+                            <label class="form-label font-weight-bold">Fecha Fin</label>
                             <input type="date" name="instructores[${index}][fecha_fin]" 
                                    class="form-control" value="${fechaFin}" 
-                                   min="{{ $ficha->fecha_inicio ? $ficha->fecha_inicio->format('Y-m-d') : '' }}"
-                                   max="{{ $ficha->fecha_fin ? $ficha->fecha_fin->format('Y-m-d') : '' }}" required>
+                                   min="${fechaInicioMin}"
+                                   max="${fechaFinMax}" required>
                         </div>
                         <div class="col-md-2">
-                            <label class="form-label">Horas</label>
+                            <label class="form-label font-weight-bold">Horas</label>
                             <input type="number" name="instructores[${index}][total_horas_instructor]" 
                                    class="form-control" value="${horas}" min="1" required>
                         </div>
                         <div class="col-md-1">
-                            <label class="form-label">&nbsp;</label>
-                            <button type="button" class="btn btn-sm btn-danger d-block" onclick="eliminarInstructor(this)">
+                            <label class="form-label font-weight-bold">&nbsp;</label>
+                            <button type="button" class="btn btn-sm btn-outline-danger d-block" onclick="eliminarInstructor(this)">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
@@ -378,15 +427,15 @@
                     <!-- Días de Formación -->
                     <div class="row mt-2">
                         <div class="col-12">
-                            <label class="form-label">
-                                <i class="fas fa-calendar-week"></i>
+                            <label class="form-label font-weight-bold">
+                                <i class="fas fa-calendar-week mr-1"></i>
                                 Días de Formación
                             </label>
                             <div class="dias-formacion-container" data-index="${index}">
                                 <!-- Los días se agregarán dinámicamente aquí -->
                             </div>
-                            <button type="button" class="btn btn-sm btn-outline-success mt-1" onclick="agregarDiaFormacion(${index})" {{ $diasFormacionFicha->count() == 0 ? 'disabled' : '' }}>
-                                <i class="fas fa-plus"></i> Agregar Día
+                            <button type="button" class="btn btn-sm btn-outline-success mt-1" onclick="agregarDiaFormacion(${index})" ${diasFormacionDisabled ? 'disabled' : ''}>
+                                <i class="fas fa-plus mr-1"></i> Agregar Día
                             </button>
                         </div>
                     </div>
@@ -456,7 +505,7 @@
 
         // Función para agregar un día de formación
         function agregarDiaFormacion(instructorIndex) {
-            const diasDisponibles = @json($diasFormacionFicha);
+            const diasDisponibles = {!! json_encode($diasFormacionFicha) !!};
             if (diasDisponibles.length === 0) {
                 alert('No hay días de formación asignados a esta ficha. Debe asignar días de formación primero.');
                 return;
@@ -468,6 +517,7 @@
         function agregarDiaFormacionRow(instructorIndex, diaId) {
             const container = document.querySelector(`[data-index="${instructorIndex}"]`);
             const diaIndex = container.children.length;
+            const diasFormacionDisponibles = {!! json_encode($diasFormacionFicha) !!};
             
             const div = document.createElement('div');
             div.className = 'row mb-2 dia-formacion-row';
@@ -475,15 +525,14 @@
                 <div class="col-md-10">
                     <select name="instructores[${instructorIndex}][dias_formacion][${diaIndex}][dia_id]" class="form-control select2" required>
                         <option value="">Seleccione día</option>
-                        @foreach($diasFormacionFicha as $dia)
-                            <option value="{{ $dia->id }}" ${diaId == {{ $dia->id }} ? 'selected' : ''}>
-                                {{ $dia->name }}
-                            </option>
-                        @endforeach
+                        ${diasFormacionDisponibles.map(dia => {
+                            const selected = diaId == dia.id ? 'selected' : '';
+                            return `<option value="${dia.id}" ${selected}>${dia.name}</option>`;
+                        }).join('')}
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <button type="button" class="btn btn-sm btn-danger" onclick="eliminarDiaFormacion(this)">
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarDiaFormacion(this)">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -566,4 +615,4 @@
             }
         });
     </script>
-@stop
+@endsection
