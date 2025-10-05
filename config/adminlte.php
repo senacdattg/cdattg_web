@@ -511,6 +511,9 @@ return [
                         'CREAR INSTRUCTOR',
                         'EDITAR INSTRUCTOR',
                         'ELIMINAR INSTRUCTOR',
+                        'GESTIONAR ESPECIALIDADES INSTRUCTOR',
+                        'VER FICHAS ASIGNADAS',
+                        'CAMBIAR ESTADO INSTRUCTOR',
                     ],
                 ],
                 [

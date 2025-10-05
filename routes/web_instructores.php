@@ -35,7 +35,7 @@ Route::middleware(['auth'])->group(function () {
         // Cambiar estado del instructor (activar/desactivar)
         Route::put('/{instructor}/cambiar-estado', [InstructorController::class, 'cambiarEstado'])
             ->name('instructor.cambiarEstado')
-            ->middleware('can:EDITAR INSTRUCTOR');
+            ->middleware('can:CAMBIAR ESTADO INSTRUCTOR');
             
         // Cambiar estado del usuario asociado al instructor
         Route::put('/{instructor}/cambiar-estado-usuario', [InstructorController::class, 'cambiarEstadoUsuario'])
@@ -49,17 +49,17 @@ Route::middleware(['auth'])->group(function () {
         // Ver especialidades del instructor
         Route::get('/{instructor}/especialidades', [InstructorController::class, 'especialidades'])
             ->name('instructor.especialidades')
-            ->middleware('can:VER INSTRUCTOR');
+            ->middleware('can:GESTIONAR ESPECIALIDADES INSTRUCTOR');
             
         // Gestionar especialidades del instructor
         Route::get('/{instructor}/gestionar-especialidades', [InstructorController::class, 'gestionarEspecialidades'])
             ->name('instructor.gestionarEspecialidades')
-            ->middleware('can:EDITAR INSTRUCTOR');
+            ->middleware('can:GESTIONAR ESPECIALIDADES INSTRUCTOR');
             
         // Asignar especialidad al instructor
         Route::post('/{instructor}/asignar-especialidad', [InstructorController::class, 'asignarEspecialidad'])
             ->name('instructor.asignarEspecialidad')
-            ->middleware('can:EDITAR INSTRUCTOR');
+            ->middleware('can:GESTIONAR ESPECIALIDADES INSTRUCTOR');
             
         // Remover especialidad del instructor
         Route::delete('/{instructor}/remover-especialidad/{especialidad}', [InstructorController::class, 'removerEspecialidad'])
@@ -70,10 +70,15 @@ Route::middleware(['auth'])->group(function () {
     // Rutas para gestión de fichas asignadas
     Route::prefix('instructor')->group(function () {
         
-        // Ver fichas asignadas al instructor
+        // Ver fichas asignadas al instructor (específico)
         Route::get('/{instructor}/fichas-asignadas', [InstructorController::class, 'fichasAsignadas'])
             ->name('instructor.fichasAsignadas')
-            ->middleware('can:VER INSTRUCTOR');
+            ->middleware('can:VER FICHAS ASIGNADAS');
+            
+        // Ver fichas asignadas del instructor autenticado
+        Route::get('/mis-fichas-asignadas', [InstructorController::class, 'fichasAsignadas'])
+            ->name('instructor.misFichasAsignadas')
+            ->middleware('can:VER FICHAS ASIGNADAS');
             
         // Ver fichas activas del instructor
         Route::get('/{instructor}/fichas-activas', [InstructorController::class, 'fichasActivas'])
