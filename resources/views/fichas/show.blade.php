@@ -357,12 +357,6 @@
                                     </a>
                                 @endcan
                                 
-                                @can('GESTIONAR INSTRUCTORES FICHA')
-                                    <a href="{{ route('fichaCaracterizacion.gestionarInstructores', $ficha->id) }}" 
-                                       class="btn btn-outline-primary btn-sm">
-                                        <i class="fas fa-chalkboard-teacher mr-1"></i> Gestionar Instructores
-                                    </a>
-                                @endcan
                                 
                                 @can('GESTIONAR DIAS FICHA')
                                     <a href="{{ route('fichaCaracterizacion.gestionarDiasFormacion', $ficha->id) }}" 

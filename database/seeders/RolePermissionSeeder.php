@@ -77,6 +77,7 @@ class RolePermissionSeeder extends Seeder
             'ELIMINAR FICHA CARACTERIZACION',
             'GESTIONAR INSTRUCTORES FICHA',
             'GESTIONAR DIAS FICHA',
+            'GESTIONAR APRENDICES FICHA',
             'CAMBIAR ESTADO FICHA',
             // Permisos para roles y permisos
             'ASIGNAR PERMISOS',
@@ -168,6 +169,7 @@ class RolePermissionSeeder extends Seeder
             'ELIMINAR FICHA CARACTERIZACION',
             'GESTIONAR INSTRUCTORES FICHA',
             'GESTIONAR DIAS FICHA',
+            'GESTIONAR APRENDICES FICHA',
             'CAMBIAR ESTADO FICHA',
             'CREAR PERSONA',
             'VER PERSONA',
@@ -200,6 +202,7 @@ class RolePermissionSeeder extends Seeder
             'ELIMINAR FICHA CARACTERIZACION',
             'GESTIONAR INSTRUCTORES FICHA',
             'GESTIONAR DIAS FICHA',
+            'GESTIONAR APRENDICES FICHA',
             'CAMBIAR ESTADO FICHA',
             // Permisos para instructores
             'CREAR INSTRUCTOR',
@@ -235,6 +238,7 @@ class RolePermissionSeeder extends Seeder
             'VER FICHA CARACTERIZACION',
             'EDITAR FICHA CARACTERIZACION',
             'GESTIONAR DIAS FICHA',
+            'GESTIONAR APRENDICES FICHA',
             'CAMBIAR ESTADO FICHA',
             // Permisos para programas de formación (solo consulta para instructores)
             'programa.index',
