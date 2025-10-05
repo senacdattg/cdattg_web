@@ -107,15 +107,13 @@ class InstructorController extends Controller
                 'con_fichas' => Instructor::whereHas('instructorFichas')->count()
             ];
 
-            // Verificar personas sin usuario
-            $personasSinUsuario = DB::table('personas')
-                ->leftJoin('users', 'personas.id', '=', 'users.persona_id')
-                ->whereNull('users.id')
-                ->select('personas.id', 'personas.primer_nombre', 'personas.primer_apellido', 'personas.numero_documento', 'personas.email')
+            // Verificar instructores sin usuario
+            $instructoresSinUsuario = Instructor::whereDoesntHave('persona.user')
+                ->with('persona:id,primer_nombre,primer_apellido,numero_documento,email')
                 ->get();
 
-            if ($personasSinUsuario->count() > 0) {
-                return view('Instructores.error', compact('personasSinUsuario'))->with('error', 'Existen personas sin usuario asociado. Por favor, cree un usuario para cada persona.');
+            if ($instructoresSinUsuario->count() > 0) {
+                return view('Instructores.error', compact('instructoresSinUsuario'))->with('error', 'Existen instructores sin usuario asociado. Por favor, cree un usuario para cada instructor.');
             }
 
             return view('Instructores.index', compact(

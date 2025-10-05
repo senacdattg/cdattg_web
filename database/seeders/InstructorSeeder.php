@@ -33,10 +33,10 @@ class InstructorSeeder extends Seeder
             $redConstruccion = RedConocimiento::where('nombre', 'like', '%Construcción%')->first();
             $redGastronomia = RedConocimiento::where('nombre', 'like', '%Gastronomía%')->first();
             
-            // Obtener tipo de documento C.C.
-            $tipoDocumento = Tema::whereHas('parametros', function($q) {
-                $q->where('name', 'Cédula de Ciudadanía');
-            })->first()?->parametros()->where('name', 'Cédula de Ciudadanía')->first();
+            // Usar valores por defecto simples
+            $tipoDocumentoId = 1; // ID por defecto para Cédula de Ciudadanía
+            $generoMasculinoId = 1; // ID por defecto para Masculino
+            $generoFemeninoId = 2; // ID por defecto para Femenino
 
             // Instructores de ejemplo
             $instructores = [
@@ -51,8 +51,8 @@ class InstructorSeeder extends Seeder
                         'telefono' => '3001234567',
                         'direccion' => 'Calle 15 #10-25, San José del Guaviare',
                         'fecha_nacimiento' => '1985-03-15',
-                        'genero' => 'M',
-                        'tipo_documento_id' => $tipoDocumento?->id ?? 1
+                        'genero' => $generoMasculinoId,
+                        'tipo_documento' => $tipoDocumentoId
                     ],
                     'instructor' => [
                         'regional_id' => $regionalGuaviare?->id ?? 1,
@@ -84,8 +84,8 @@ class InstructorSeeder extends Seeder
                         'telefono' => '3002345678',
                         'direccion' => 'Carrera 20 #15-40, San José del Guaviare',
                         'fecha_nacimiento' => '1982-07-22',
-                        'genero' => 'F',
-                        'tipo_documento_id' => $tipoDocumento?->id ?? 1
+                        'genero' => $generoFemeninoId,
+                        'tipo_documento' => $tipoDocumentoId
                     ],
                     'instructor' => [
                         'regional_id' => $regionalGuaviare?->id ?? 1,
@@ -119,8 +119,8 @@ class InstructorSeeder extends Seeder
                         'telefono' => '3003456789',
                         'direccion' => 'Calle 25 #30-15, San José del Guaviare',
                         'fecha_nacimiento' => '1978-11-08',
-                        'genero' => 'M',
-                        'tipo_documento_id' => $tipoDocumento?->id ?? 1
+                        'genero' => $generoMasculinoId,
+                        'tipo_documento' => $tipoDocumentoId
                     ],
                     'instructor' => [
                         'regional_id' => $regionalGuaviare?->id ?? 1,
@@ -153,8 +153,8 @@ class InstructorSeeder extends Seeder
                         'telefono' => '3004567890',
                         'direccion' => 'Carrera 10 #25-30, San José del Guaviare',
                         'fecha_nacimiento' => '1990-05-12',
-                        'genero' => 'F',
-                        'tipo_documento_id' => $tipoDocumento?->id ?? 1
+                        'genero' => $generoFemeninoId,
+                        'tipo_documento' => $tipoDocumentoId
                     ],
                     'instructor' => [
                         'regional_id' => $regionalGuaviare?->id ?? 1,
@@ -185,8 +185,8 @@ class InstructorSeeder extends Seeder
                         'telefono' => '3005678901',
                         'direccion' => 'Calle 30 #40-20, San José del Guaviare',
                         'fecha_nacimiento' => '1983-09-18',
-                        'genero' => 'M',
-                        'tipo_documento_id' => $tipoDocumento?->id ?? 1
+                        'genero' => $generoMasculinoId,
+                        'tipo_documento' => $tipoDocumentoId
                     ],
                     'instructor' => [
                         'regional_id' => $regionalGuaviare?->id ?? 1,
@@ -219,8 +219,8 @@ class InstructorSeeder extends Seeder
                         'telefono' => '3006789012',
                         'direccion' => 'Carrera 5 #12-35, San José del Guaviare',
                         'fecha_nacimiento' => '1987-12-03',
-                        'genero' => 'F',
-                        'tipo_documento_id' => $tipoDocumento?->id ?? 1
+                        'genero' => $generoFemeninoId,
+                        'tipo_documento' => $tipoDocumentoId
                     ],
                     'instructor' => [
                         'regional_id' => $regionalGuaviare?->id ?? 1,
@@ -268,7 +268,6 @@ class InstructorSeeder extends Seeder
         
         // Crear usuario
         $usuario = User::create([
-            'name' => $data['persona']['primer_nombre'] . ' ' . $data['persona']['primer_apellido'],
             'email' => $data['persona']['email'],
             'password' => Hash::make('12345678'), // Contraseña por defecto
             'persona_id' => $persona->id,
@@ -306,9 +305,9 @@ class InstructorSeeder extends Seeder
     public function createAdditionalInstructors(int $count = 10): void
     {
         $regionalGuaviare = Regional::where('nombre', 'like', '%Guaviare%')->first();
-        $tipoDocumento = Tema::whereHas('parametros', function($q) {
-            $q->where('name', 'Cédula de Ciudadanía');
-        })->first()?->parametros()->where('name', 'Cédula de Ciudadanía')->first();
+        $tipoDocumentoId = 1; // ID por defecto para Cédula de Ciudadanía
+        $generoMasculinoId = 1; // ID por defecto para Masculino
+        $generoFemeninoId = 2; // ID por defecto para Femenino
 
         $nombres = ['Juan', 'Pedro', 'Luis', 'Miguel', 'Andrés', 'Fernando', 'Ricardo', 'Diego', 'Alejandro', 'Gabriel'];
         $apellidos = ['García', 'López', 'Martínez', 'González', 'Pérez', 'Sánchez', 'Ramírez', 'Cruz', 'Flores', 'Herrera'];
@@ -338,8 +337,8 @@ class InstructorSeeder extends Seeder
                     'telefono' => '300' . str_pad(rand(1000000, 9999999), 7, '0', STR_PAD_LEFT),
                     'direccion' => 'Dirección ' . $i . ', San José del Guaviare',
                     'fecha_nacimiento' => Carbon::now()->subYears(rand(25, 55))->format('Y-m-d'),
-                    'genero' => rand(0, 1) ? 'M' : 'F',
-                    'tipo_documento_id' => $tipoDocumento?->id ?? 1
+                    'genero' => rand(0, 1) ? $generoMasculinoId : $generoFemeninoId,
+                    'tipo_documento' => $tipoDocumentoId
                 ],
                 'instructor' => [
                     'regional_id' => $regionalGuaviare?->id ?? 1,

@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('css')
-    @vite(['resources/css/parametros.css'])
+    @vite(['parametros_css'])
 @endsection
 
 @section('content_header')
@@ -49,19 +49,6 @@
                                     <i class="fas fa-plus-circle mr-2"></i> 
                                     <a href="{{ route('instructor.create') }}" class="text-primary text-decoration-none">Nuevo Instructor</a>
                                 </h5>
-                                <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="collapse"
-                                    data-target="#createInstructorForm" aria-expanded="false">
-                                    <i class="fas fa-chevron-down"></i>
-                                </button>
-                            </div>
-
-                            <div class="collapse" id="createInstructorForm">
-                                <div class="card-body">
-                                    <p class="text-muted mb-3">Haz clic en "Nuevo Instructor" para crear un nuevo instructor en el sistema.</p>
-                                    <a href="{{ route('instructor.create') }}" class="btn btn-primary">
-                                        <i class="fas fa-plus mr-2"></i> Crear Instructor
-                                    </a>
-                                </div>
                             </div>
                         </div>
                     @endcan
