@@ -47,6 +47,9 @@ Route::middleware('auth')->group(function () {
     }
 
     Route::post('/verify-document', [AsistenceQrController::class, 'verifyDocument'])->name('api.verifyDocument');
+    
+    // Incluir rutas específicas de instructores
+    include_once routes_path('web_instructores.php');
 });
 
 // Route::get('/perfil', [ProfileController::class, 'index'])->name('profile.index');
