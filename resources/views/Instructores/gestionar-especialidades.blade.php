@@ -1,320 +1,314 @@
 @extends('adminlte::page')
 
-@section('title', 'Gestionar Especialidades - ' . $instructor->nombre_completo)
-
-@section('content_header')
-    <div class="row">
-        <div class="col-sm-6">
-            <h1>
-                <i class="fas fa-chalkboard-teacher mr-2"></i>
-                Gestionar Especialidades
-            </h1>
-        </div>
-        <div class="col-sm-6">
-            <ol class="breadcrumb breadcrumb-custom float-sm-right">
-                <li class="breadcrumb-item">
-                    <a href="{{ route('home.index') }}">
-                        <i class="fas fa-home mr-1"></i>Inicio
-                    </a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a href="{{ route('instructor.index') }}">
-                        <i class="fas fa-chalkboard-teacher mr-1"></i>Instructores
-                    </a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a href="{{ route('instructor.show', $instructor->id) }}">
-                        {{ $instructor->nombre_completo }}
-                    </a>
-                </li>
-                <li class="breadcrumb-item active">
-                    <i class="fas fa-cogs mr-1"></i>Especialidades
-                </li>
-            </ol>
-        </div>
-    </div>
-@stop
+@section('title', 'Gestionar Especialidades')
 
 @section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
     <style>
         .specialty-card {
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
             transition: all 0.3s ease;
+            border: 1px solid #dee2e6;
         }
         
         .specialty-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
         
-        .primary-specialty {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .specialty-card.assigned {
+            border-color: #28a745;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        }
+        
+        .specialty-card.assigned .card-header {
+            background: #28a745;
             color: white;
         }
         
-        .secondary-specialty {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
+        .specialty-card .card-header {
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
         }
         
-        .available-specialty {
-            background: white;
-            border: 2px solid #e9ecef;
-        }
-        
-        .specialty-icon {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-        
-        .btn-specialty {
-            border-radius: 25px;
-            padding: 8px 20px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .btn-assign, .btn-remove {
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-weight: 500;
             transition: all 0.3s ease;
         }
         
-        .btn-primary-specialty {
-            background: rgba(255,255,255,0.2);
+        .btn-assign {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            border: none;
             color: white;
-            border: 2px solid rgba(255,255,255,0.3);
         }
         
-        .btn-primary-specialty:hover {
-            background: rgba(255,255,255,0.3);
+        .btn-assign:hover {
+            background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+            color: white;
             transform: translateY(-1px);
         }
         
-        .btn-secondary-specialty {
-            background: rgba(255,255,255,0.2);
+        .btn-remove {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            border: none;
             color: white;
-            border: 2px solid rgba(255,255,255,0.3);
         }
         
-        .btn-secondary-specialty:hover {
-            background: rgba(255,255,255,0.3);
+        .btn-remove:hover {
+            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+            color: white;
             transform: translateY(-1px);
         }
         
-        .section-title {
-            color: #495057;
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
             font-weight: 600;
-            margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #e9ecef;
         }
         
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #6c757d;
+        .status-primary {
+            background-color: #e3f2fd;
+            color: #1976d2;
         }
         
-        .empty-state i {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
+        .status-secondary {
+            background-color: #f3e5f5;
+            color: #7b1fa2;
+        }
+        
+        .instructor-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
         }
     </style>
-@stop
+@endsection
+
+@section('content_header')
+    <section class="content-header dashboard-header py-4">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-6 d-flex align-items-center">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
+                        style="width: 48px; height: 48px;">
+                        <i class="fas fa-graduation-cap text-white fa-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800">Especialidades</h1>
+                        <p class="text-muted mb-0 font-weight-light">Gestión de especialidades del instructor</p>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
+                                    <i class="fas fa-home"></i> Inicio
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('instructor.index') }}" class="link_right_header">
+                                    <i class="fas fa-chalkboard-teacher"></i> Instructores
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('instructor.show', $instructor->id) }}" class="link_right_header">
+                                    <i class="fas fa-user"></i> {{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <i class="fas fa-graduation-cap"></i> Especialidades
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+@endsection
 
 @section('content')
-    <div class="container-fluid">
-        <!-- Información del Instructor -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card specialty-card available-specialty">
-                    <div class="card-body">
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ route('instructor.show', $instructor->id) }}">
+                        <i class="fas fa-arrow-left mr-1"></i> Volver
+                    </a>
+
+                    <!-- Información del Instructor -->
+                    <div class="instructor-info">
                         <div class="row align-items-center">
-                            <div class="col-md-2 text-center">
-                                <i class="fas fa-user-circle specialty-icon text-primary"></i>
-                            </div>
                             <div class="col-md-8">
-                                <h4 class="mb-1">{{ $instructor->nombre_completo }}</h4>
-                                <p class="mb-1"><strong>Documento:</strong> {{ $instructor->numero_documento }}</p>
-                                <p class="mb-0"><strong>Regional:</strong> {{ $instructor->regional->nombre ?? 'Sin asignar' }}</p>
+                                <h4 class="mb-2">
+                                    <i class="fas fa-chalkboard-teacher mr-2"></i>
+                                    {{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}
+                                </h4>
+                                <p class="mb-1">
+                                    <strong>Documento:</strong> {{ $instructor->persona->numero_documento }}
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Regional:</strong> {{ $instructor->regional->nombre ?? 'No asignada' }}
+                                </p>
                             </div>
-                            <div class="col-md-2 text-right">
-                                <a href="{{ route('instructor.show', $instructor->id) }}" class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-eye mr-1"></i>Ver Perfil
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <!-- Especialidad Principal -->
-            <div class="col-md-6">
-                <div class="card specialty-card">
-                    <div class="card-header primary-specialty">
-                        <h5 class="mb-0">
-                            <i class="fas fa-star mr-2"></i>
-                            Especialidad Principal
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        @if($especialidadPrincipal)
-                            <div class="text-center">
-                                <i class="fas fa-medal specialty-icon"></i>
-                                <h5>{{ $especialidadPrincipal }}</h5>
-                                <form method="POST" action="{{ route('instructor.removerEspecialidad', $instructor->id) }}" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <input type="hidden" name="especialidad" value="{{ $especialidadPrincipal }}">
-                                    <input type="hidden" name="tipo" value="principal">
-                                    <button type="submit" class="btn btn-danger btn-sm btn-specialty" 
-                                            onclick="return confirm('¿Está seguro de remover esta especialidad principal?')">
-                                        <i class="fas fa-times mr-1"></i>Remover
-                                    </button>
-                                </form>
-                            </div>
-                        @else
-                            <div class="empty-state">
-                                <i class="fas fa-plus-circle"></i>
-                                <h6>Sin especialidad principal</h6>
-                                <p class="mb-3">Asigne una especialidad principal al instructor</p>
-                                
-                                <!-- Formulario para asignar especialidad principal -->
-                                <form method="POST" action="{{ route('instructor.asignarEspecialidad', $instructor->id) }}" class="d-inline">
-                                    @csrf
-                                    <input type="hidden" name="tipo" value="principal">
-                                    <div class="form-group mb-3">
-                                        <select name="red_conocimiento_id" class="form-control" required>
-                                            <option value="">Seleccionar red de conocimiento</option>
-                                            @foreach($redesConocimiento as $red)
-                                                <option value="{{ $red->id }}">{{ $red->nombre }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <button type="submit" class="btn btn-primary btn-specialty">
-                                        <i class="fas fa-plus mr-1"></i>Asignar Principal
-                                    </button>
-                                </form>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-
-            <!-- Especialidades Secundarias -->
-            <div class="col-md-6">
-                <div class="card specialty-card">
-                    <div class="card-header secondary-specialty">
-                        <h5 class="mb-0">
-                            <i class="fas fa-layer-group mr-2"></i>
-                            Especialidades Secundarias
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        @if(count($especialidadesSecundarias) > 0)
-                            <div class="row">
-                                @foreach($especialidadesSecundarias as $especialidad)
-                                    <div class="col-12 mb-3">
-                                        <div class="d-flex justify-content-between align-items-center p-3 rounded" 
-                                             style="background: rgba(240, 147, 251, 0.1); border: 1px solid rgba(240, 147, 251, 0.3);">
-                                            <span><i class="fas fa-check-circle mr-2 text-success"></i>{{ $especialidad }}</span>
-                                            <form method="POST" action="{{ route('instructor.removerEspecialidad', $instructor->id) }}" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-                                                <input type="hidden" name="especialidad" value="{{ $especialidad }}">
-                                                <input type="hidden" name="tipo" value="secundaria">
-                                                <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                                        onclick="return confirm('¿Está seguro de remover esta especialidad secundaria?')">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </form>
+                            <div class="col-md-4 text-right">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <div class="text-center">
+                                            <h5 class="mb-0">{{ count($especialidadesAsignadas) }}</h5>
+                                            <small>Asignadas</small>
                                         </div>
                                     </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <div class="empty-state">
-                                <i class="fas fa-layer-group"></i>
-                                <h6>Sin especialidades secundarias</h6>
-                                <p class="mb-3">Puede asignar hasta 3 especialidades secundarias</p>
-                            </div>
-                        @endif
-
-                        @if(count($especialidadesSecundarias) < 3)
-                            <!-- Formulario para asignar especialidad secundaria -->
-                            <div class="mt-3 p-3 rounded" style="background: rgba(240, 147, 251, 0.05); border: 1px dashed rgba(240, 147, 251, 0.3);">
-                                <form method="POST" action="{{ route('instructor.asignarEspecialidad', $instructor->id) }}">
-                                    @csrf
-                                    <input type="hidden" name="tipo" value="secundaria">
-                                    <div class="form-group mb-2">
-                                        <select name="red_conocimiento_id" class="form-control form-control-sm" required>
-                                            <option value="">Seleccionar especialidad secundaria</option>
-                                            @foreach($redesConocimiento as $red)
-                                                @if($red->nombre !== $especialidadPrincipal && !in_array($red->nombre, $especialidadesSecundarias))
-                                                    <option value="{{ $red->id }}">{{ $red->nombre }}</option>
-                                                @endif
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                    <button type="submit" class="btn btn-secondary btn-sm btn-specialty">
-                                        <i class="fas fa-plus mr-1"></i>Agregar Secundaria
-                                    </button>
-                                </form>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Redes de Conocimiento Disponibles -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card specialty-card available-specialty">
-                    <div class="card-header">
-                        <h5 class="mb-0">
-                            <i class="fas fa-network-wired mr-2"></i>
-                            Redes de Conocimiento Disponibles
-                        </h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            @foreach($redesConocimiento as $red)
-                                <div class="col-md-4 mb-3">
-                                    <div class="p-3 rounded" style="background: #f8f9fa; border: 1px solid #e9ecef;">
-                                        <h6 class="mb-1">{{ $red->nombre }}</h6>
-                                        <small class="text-muted">
-                                            @if($red->nombre === $especialidadPrincipal)
-                                                <span class="badge badge-primary">Principal</span>
-                                            @elseif(in_array($red->nombre, $especialidadesSecundarias))
-                                                <span class="badge badge-secondary">Secundaria</span>
-                                            @else
-                                                <span class="badge badge-light">Disponible</span>
-                                            @endif
-                                        </small>
+                                    <div class="col-6">
+                                        <div class="text-center">
+                                            <h5 class="mb-0">{{ $redesConocimiento->count() }}</h5>
+                                            <small>Disponibles</small>
+                                        </div>
                                     </div>
                                 </div>
-                            @endforeach
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Especialidades Asignadas -->
+                    @if(count($especialidadesAsignadas) > 0)
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <div class="card shadow-sm no-hover">
+                                <div class="card-header bg-white py-3">
+                                    <h5 class="card-title m-0 font-weight-bold text-primary">
+                                        <i class="fas fa-check-circle mr-2"></i>Especialidades Asignadas
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        @foreach($especialidadesAsignadas as $especialidad)
+                                        <div class="col-md-6 col-lg-4 mb-3">
+                                            <div class="card specialty-card assigned">
+                                                <div class="card-header py-2">
+                                                    <h6 class="mb-0">
+                                                        <i class="fas fa-graduation-cap mr-1"></i>
+                                                        {{ $especialidad->nombre }}
+                                                    </h6>
+                                                </div>
+                                                <div class="card-body py-3">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <span class="status-badge status-primary">
+                                                            <i class="fas fa-star mr-1"></i>
+                                                            {{ $especialidad->es_principal ? 'Principal' : 'Secundaria' }}
+                                                        </span>
+                                                        <form action="{{ route('instructor.removerEspecialidad', [$instructor->id, $especialidad->id]) }}" 
+                                                              method="POST" class="d-inline">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-remove btn-sm" 
+                                                                    onclick="return confirm('¿Está seguro de remover esta especialidad?')">
+                                                                <i class="fas fa-times mr-1"></i>Remover
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Especialidades Disponibles -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card shadow-sm no-hover">
+                                <div class="card-header bg-white py-3">
+                                    <h5 class="card-title m-0 font-weight-bold text-primary">
+                                        <i class="fas fa-plus-circle mr-2"></i>Especialidades Disponibles
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        @foreach($redesConocimiento as $redConocimiento)
+                                        <div class="col-md-6 col-lg-4 mb-3">
+                                            <div class="card specialty-card">
+                                                <div class="card-header py-2">
+                                                    <h6 class="mb-0">
+                                                        <i class="fas fa-graduation-cap mr-1"></i>
+                                                        {{ $redConocimiento->nombre }}
+                                                    </h6>
+                                                </div>
+                                                <div class="card-body py-3">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <small class="text-muted">
+                                                            {{ $redConocimiento->descripcion ?? 'Sin descripción' }}
+                                                        </small>
+                                                        <form action="{{ route('instructor.asignarEspecialidad', [$instructor->id, $redConocimiento->id]) }}" 
+                                                              method="POST" class="d-inline">
+                                                            @csrf
+                                                            <button type="submit" class="btn btn-assign btn-sm">
+                                                                <i class="fas fa-plus mr-1"></i>Asignar
+                                                            </button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-@stop
+    </section>
+@endsection
+
+@section('footer')
+    @include('layout.footer')
+@endsection
 
 @section('js')
     <script>
         $(document).ready(function() {
-            // Auto-hide alerts after 5 seconds
-            setTimeout(function() {
-                $('.alert').fadeOut('slow');
-            }, 5000);
+            // Tooltips para elementos interactivos
+            $('[data-toggle="tooltip"]').tooltip();
+
+            // Animación de entrada para las cards
+            $('.specialty-card').each(function(index) {
+                $(this).css('opacity', '0').delay(index * 100).animate({
+                    opacity: 1
+                }, 500);
+            });
+
+            // Confirmación para acciones de remover especialidad
+            $('form[action*="removerEspecialidad"]').on('submit', function(e) {
+                e.preventDefault();
+                const form = this;
+                
+                Swal.fire({
+                    title: '¿Remover Especialidad?',
+                    text: 'Esta acción removerá la especialidad del instructor. ¿Está seguro?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Sí, remover',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
         });
     </script>
-@stop
-
-@section('footer')
-    @include('layout.footer')
 @endsection

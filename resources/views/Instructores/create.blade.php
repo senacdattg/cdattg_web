@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('title', 'Asignar Rol de Instructor')
+@section('title', 'Crear Instructor')
 
 @section('css')
     <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
@@ -48,12 +48,13 @@
             padding: 0.5rem 1rem;
             margin: 0.25rem;
             display: inline-block;
-            cursor: pointer;
-            transition: all 0.2s ease;
             font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
         .specialty-item:hover {
             background: #e9ecef;
+            border-color: #adb5bd;
         }
         .specialty-item.selected {
             background: #007bff;
@@ -61,107 +62,24 @@
             border-color: #007bff;
         }
         
-        .selected-person-info {
-            background: #e8f4fd;
-            border: 1px solid #bee5eb;
+        .person-info {
+            background: #e3f2fd;
+            border: 1px solid #bbdefb;
             border-radius: 8px;
             padding: 1rem;
-            margin-bottom: 1rem;
+            margin-top: 1rem;
+            display: none;
         }
-        .selected-person-info h6 {
-            color: #0c5460;
-            margin-bottom: 0.5rem;
-        }
-        .selected-person-info .person-name {
-            font-weight: 600;
-            color: #0c5460;
-        }
-        .selected-person-info .person-details {
-            color: #6c757d;
-            font-size: 0.85rem;
-            margin-top: 0.5rem;
+        .person-info.show {
+            display: block;
         }
         
         .floating-save-btn {
             position: fixed;
-            bottom: 2rem;
-            right: 2rem;
+            bottom: 30px;
+            right: 30px;
             z-index: 1000;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        
-        .back-btn {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            z-index: 10;
-        }
-        
-        .search-box {
-            position: relative;
-        }
-        
-        .search-results {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #dee2e6;
-            border-top: none;
-            border-radius: 0 0 8px 8px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1000;
-            display: none;
-        }
-        
-        .search-result-item {
-            padding: 0.75rem;
-            cursor: pointer;
-            border-bottom: 1px solid #f8f9fa;
-            transition: background-color 0.2s;
-        }
-        
-        .search-result-item:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .search-result-item:last-child {
-            border-bottom: none;
-        }
-        
-        .person-option {
-            font-weight: 500;
-            color: #2c3e50;
-        }
-        
-        .person-details-small {
-            font-size: 0.8rem;
-            color: #6c757d;
-            margin-top: 0.25rem;
-        }
-        
-        .form-row {
-            display: flex;
-            gap: 1rem;
-        }
-        
-        .form-row .form-group {
-            flex: 1;
-        }
-        
-        @media (max-width: 768px) {
-            .form-row {
-                flex-direction: column;
-                gap: 0;
-            }
-            .floating-save-btn {
-                bottom: 1rem;
-                right: 1rem;
-                left: 1rem;
-                width: auto;
-            }
         }
     </style>
 @endsection
@@ -173,30 +91,30 @@
                 <div class="col-12 col-md-6 d-flex align-items-center">
                     <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
                         style="width: 48px; height: 48px;">
-                        <i class="fas fa-user-plus text-white fa-lg"></i>
+                        <i class="fas fa-chalkboard-teacher text-white fa-lg"></i>
                     </div>
                     <div>
-                        <h1 class="h3 mb-0 text-gray-800">Asignar Rol de Instructor</h1>
-                        <p class="text-muted mb-0 font-weight-light">Asignar instructor a persona existente</p>
+                        <h1 class="h3 mb-0 text-gray-800">Instructor</h1>
+                        <p class="text-muted mb-0 font-weight-light">Asignar rol de instructor a persona existente</p>
                     </div>
                 </div>
                 <div class="col-sm-6">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                        <li class="breadcrumb-item">
+                            <li class="breadcrumb-item">
                                 <a href="{{ route('verificarLogin') }}" class="link_right_header">
                                     <i class="fas fa-home"></i> Inicio
-                            </a>
-                        </li>
-                        <li class="breadcrumb-item">
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">
                                 <a href="{{ route('instructor.index') }}" class="link_right_header">
                                     <i class="fas fa-chalkboard-teacher"></i> Instructores
-                            </a>
-                        </li>
+                                </a>
+                            </li>
                             <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-user-plus"></i> Asignar Instructor
-                        </li>
-                    </ol>
+                                <i class="fas fa-plus-circle"></i> Crear instructor
+                            </li>
+                        </ol>
                     </nav>
                 </div>
             </div>
@@ -205,224 +123,165 @@
 @endsection
 
 @section('content')
-    <section class="content">
+    <section class="content mt-4">
         <div class="container-fluid">
-            <!-- Botón Volver -->
-            <div class="back-btn">
-                <a href="{{ route('instructor.index') }}" class="btn btn-outline-secondary btn-sm">
-                    <i class="fas fa-arrow-left mr-1"></i>
-                    Volver
-                </a>
-            </div>
+            <div class="row">
+                <div class="col-12">
+                    <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ route('instructor.index') }}">
+                        <i class="fas fa-arrow-left mr-1"></i> Volver
+                    </a>
 
-            <!-- Alertas -->
-            @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle mr-2"></i>
-                    {{ session('success') }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            @endif
-
-            @if (session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-triangle mr-2"></i>
-                    {{ session('error') }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            @endif
-
-            @if($personas->count() > 0)
-                        <form action="{{ route('instructor.store') }}" method="post" id="instructorForm">
-                            @csrf
-                            
-                    <!-- Información de la Persona -->
-                                <div class="form-section">
-                        <h6><i class="fas fa-users"></i> Seleccionar Persona</h6>
-                        <div class="row compact-form">
-                                        <div class="col-md-6">
-                                <div class="form-group search-box">
-                                    <label for="persona_search" class="form-label required-field">Buscar Persona</label>
-                                    <input type="text" 
-                                        class="form-control" 
-                                        id="persona_search" 
-                                        placeholder="Escriba nombre, documento o email..."
-                                        autocomplete="off">
-                                    <div class="search-results" id="search-results"></div>
-                                            </div>
+                    <div class="card shadow-sm no-hover">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                                <i class="fas fa-plus-circle mr-2"></i>Crear Instructor
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ route('instructor.store') }}" class="row compact-form" id="instructorForm">
+                                @csrf
+                                
+                                <!-- Selección de Persona -->
+                                <div class="col-md-12">
+                                    <div class="form-section">
+                                        <h6><i class="fas fa-user"></i> Seleccionar Persona</h6>
+                                        <div class="form-group">
+                                            <label for="persona_search" class="form-label required-field">Buscar Persona</label>
+                                            <input type="text" id="persona_search" class="form-control" 
+                                                   placeholder="Escriba nombre o documento para buscar...">
+                                            <select name="persona_id" id="persona_id" class="form-control @error('persona_id') is-invalid @enderror" required style="display: none;">
+                                                <option value="">Seleccione una persona</option>
+                                                @foreach($personas as $persona)
+                                                    <option value="{{ $persona->id }}" 
+                                                            data-nombre="{{ $persona->primer_nombre }} {{ $persona->segundo_nombre }} {{ $persona->primer_apellido }} {{ $persona->segundo_apellido }}"
+                                                            data-documento="{{ $persona->numero_documento }}"
+                                                            data-email="{{ $persona->email }}">
+                                                        {{ $persona->primer_nombre }} {{ $persona->primer_apellido }} - {{ $persona->numero_documento }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('persona_id')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                    <label for="persona_id" class="form-label required-field">Persona Seleccionada</label>
-                                    <select name="persona_id" id="persona_id" class="form-control @error('persona_id') is-invalid @enderror" required>
-                                        <option value="" disabled selected>Seleccione una persona</option>
-                                        @foreach($personas as $persona)
-                                            <option value="{{ $persona->id }}" 
-                                                data-nombre="{{ $persona->primer_nombre }} {{ $persona->primer_apellido }}"
-                                                data-documento="{{ $persona->numero_documento }}"
-                                                data-email="{{ $persona->email }}"
-                                                data-usuario="{{ $persona->user->email }}"
-                                                {{ old('persona_id') == $persona->id ? 'selected' : '' }}>
-                                                {{ $persona->primer_nombre }} {{ $persona->primer_apellido }} - {{ $persona->numero_documento }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('persona_id')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
+                                        
+                                        <div id="search-results" class="mt-2"></div>
+                                        
+                                        <div id="selected-person-info" class="person-info">
+                                            <h6 class="mb-2"><i class="fas fa-user-check text-success"></i> Persona Seleccionada</h6>
+                                            <p class="mb-1"><strong>Nombre:</strong> <span id="selected-name"></span></p>
+                                            <p class="mb-1"><strong>Documento:</strong> <span id="selected-document"></span></p>
+                                            <p class="mb-0"><strong>Email:</strong> <span id="selected-email"></span></p>
                                         </div>
                                     </div>
                                 </div>
 
-                        <!-- Información de la persona seleccionada -->
-                        <div class="selected-person-info" id="selected-person-info" style="display: none;">
-                            <h6><i class="fas fa-user-check"></i> Información de la Persona</h6>
-                            <div class="person-name" id="selected-person-name"></div>
-                            <div class="person-details" id="selected-person-details"></div>
-                                    </div>
-                                </div>
-
-                    <!-- Información del Instructor -->
-                                <div class="form-section">
-                        <h6><i class="fas fa-chalkboard-teacher"></i> Información del Instructor</h6>
-                        <div class="row compact-form">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                    <label for="regional_id" class="form-label required-field">Regional</label>
-                                    <select name="regional_id" id="regional_id" class="form-control @error('regional_id') is-invalid @enderror" required>
-                                        <option value="" disabled selected>Seleccione una regional</option>
-                                        @foreach($regionales as $regional)
-                                            <option value="{{ $regional->id }}" {{ old('regional_id') == $regional->id ? 'selected' : '' }}>
-                                                {{ $regional->nombre }}
-                                            </option>
-                                        @endforeach
-                                                </select>
-                                    @error('regional_id')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                    <label for="anos_experiencia" class="form-label">Años de Experiencia</label>
-                                    <select name="anos_experiencia" id="anos_experiencia" class="form-control @error('anos_experiencia') is-invalid @enderror">
-                                        <option value="" {{ old('anos_experiencia') == '' ? 'selected' : '' }}>Sin especificar</option>
-                                        @for($i = 0; $i <= 50; $i++)
-                                            <option value="{{ $i }}" {{ old('anos_experiencia') == $i ? 'selected' : '' }}>
-                                                {{ $i }} {{ $i == 1 ? 'año' : 'años' }}
-                                            </option>
-                                        @endfor
-                                    </select>
-                                    @error('anos_experiencia')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-                        <div class="row compact-form">
-                            <div class="col-12">
-                                            <div class="form-group">
-                                    <label for="experiencia_laboral" class="form-label">Experiencia Laboral</label>
-                                    <textarea class="form-control @error('experiencia_laboral') is-invalid @enderror"
-                                        name="experiencia_laboral" 
-                                        id="experiencia_laboral"
-                                        rows="3"
-                                        placeholder="Describa brevemente la experiencia laboral del instructor...">{{ old('experiencia_laboral') }}</textarea>
-                                    @error('experiencia_laboral')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                    <!-- Especialidades -->
-                    <div class="form-section">
-                        <h6><i class="fas fa-graduation-cap"></i> Especialidades (Opcional)</h6>
-                        @if($especialidades->count() > 0)
-                            <div class="row compact-form">
+                                <!-- Información del Instructor -->
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label for="especialidades" class="form-label">Especialidades</label>
-                                        <select name="especialidades[]" id="especialidades" class="form-control" multiple>
-                                            @foreach($especialidades as $especialidad)
-                                                <option value="{{ $especialidad->id }}" 
-                                                    {{ in_array($especialidad->id, old('especialidades', [])) ? 'selected' : '' }}>
-                                                    {{ $especialidad->nombre }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        <small class="form-text text-muted">
-                                            <i class="fas fa-info-circle mr-1"></i>
-                                            Mantenga presionada la tecla Ctrl (Cmd en Mac) para seleccionar múltiples especialidades.
-                                        </small>
+                                    <div class="form-section">
+                                        <h6><i class="fas fa-building"></i> Información Institucional</h6>
+                                        <div class="form-group">
+                                            <label for="regional_id" class="form-label required-field">Regional</label>
+                                            <select name="regional_id" id="regional_id" class="form-control @error('regional_id') is-invalid @enderror" required>
+                                                <option value="">Seleccione una regional</option>
+                                                @foreach($regionales as $regional)
+                                                    <option value="{{ $regional->id }}" {{ old('regional_id') == $regional->id ? 'selected' : '' }}>
+                                                        {{ $regional->nombre }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('regional_id')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        
+                                        <div class="form-group">
+                                            <label for="anos_experiencia" class="form-label">Años de Experiencia</label>
+                                            <input type="number" name="anos_experiencia" id="anos_experiencia" 
+                                                   class="form-control @error('anos_experiencia') is-invalid @enderror" 
+                                                   value="{{ old('anos_experiencia') }}" min="0" max="50">
+                                            @error('anos_experiencia')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
                                     </div>
                                 </div>
+
                                 <div class="col-md-6">
-                                    <div class="form-group">
-                                        <label class="form-label">Especialidades Seleccionadas</label>
-                                        <div id="selected-specialties-display" class="form-control" style="min-height: 38px; background-color: #f8f9fa;">
+                                    <div class="form-section">
+                                        <h6><i class="fas fa-briefcase"></i> Experiencia Laboral</h6>
+                                        <div class="form-group">
+                                            <label for="experiencia_laboral" class="form-label">Descripción de Experiencia</label>
+                                            <textarea name="experiencia_laboral" id="experiencia_laboral" rows="4" 
+                                                      class="form-control @error('experiencia_laboral') is-invalid @enderror" 
+                                                      placeholder="Describa la experiencia laboral del instructor...">{{ old('experiencia_laboral') }}</textarea>
+                                            @error('experiencia_laboral')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Especialidades -->
+                                <div class="col-md-12">
+                                    <div class="form-section">
+                                        <h6><i class="fas fa-graduation-cap"></i> Especialidades</h6>
+                                        <div class="form-group">
+                                            <label for="especialidades" class="form-label">Seleccionar Especialidades</label>
+                                            <select name="especialidades[]" id="especialidades" class="form-control" multiple>
+                                                @foreach($especialidades as $especialidad)
+                                                    <option value="{{ $especialidad->id }}" 
+                                                        {{ in_array($especialidad->id, old('especialidades', [])) ? 'selected' : '' }}>
+                                                        {{ $especialidad->nombre }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <small class="form-text text-muted">
+                                                Mantenga presionado Ctrl (Cmd en Mac) para seleccionar múltiples especialidades
+                                            </small>
+                                        </div>
+                                        
+                                        <div id="selected-specialties-display" class="mt-2">
                                             <span class="text-muted">Ninguna especialidad seleccionada</span>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        @else
-                            <div class="alert alert-warning">
-                                <i class="fas fa-exclamation-triangle mr-2"></i>
-                                No hay especialidades disponibles para asignar.
-                            </div>
-                        @endif
-                    </div>
-                        </form>
 
-                <!-- Botón Flotante de Guardar -->
-                <button type="button" class="btn btn-success floating-save-btn" id="floating-save-btn">
-                    <i class="fas fa-save mr-2"></i>
-                    Asignar como Instructor
-                </button>
-
-            @else
-                <!-- Sin Personas Disponibles -->
-                <div class="card shadow-sm">
-                    <div class="card-body text-center py-5">
-                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
-                        <h4 class="text-muted">No hay personas disponibles</h4>
-                        <p class="text-muted mb-4">
-                            No se encontraron personas que puedan ser asignadas como instructores.<br>
-                            Las personas deben tener un usuario asociado y no ser instructores actualmente.
-                        </p>
-                        <a href="{{ route('instructor.index') }}" class="btn btn-primary">
-                            <i class="fas fa-arrow-left mr-1"></i>
-                            Volver a Instructores
-                        </a>
+                                <!-- Botones -->
+                                <div class="col-12">
+                                    <hr class="mt-4">
+                                    <div class="d-flex justify-content-end">
+                                        <a href="{{ route('instructor.index') }}" class="btn btn-light mr-2">
+                                            Cancelar
+                                        </a>
+                                        <button type="submit" class="btn btn-primary" id="saveBtn">
+                                            <i class="fas fa-save mr-1"></i>Crear Instructor
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
                     </div>
                 </div>
-            @endif
+            </div>
         </div>
     </section>
 @endsection
 
-@section('js')
-    <script>
-        window.personasData = {!! json_encode($personas->map(function($persona) {
-            return [
-                'id' => $persona->id,
-                'nombre' => $persona->primer_nombre . ' ' . $persona->primer_apellido,
-                'documento' => $persona->numero_documento,
-                'email' => $persona->email,
-                'usuario' => $persona->user->email,
-                'tipo_documento' => $persona->tipoDocumento->name ?? 'N/A'
-            ];
-        })) !!};
-    </script>
-    <script src="{{ asset('js/instructor-create.js') }}"></script>
-@endsection
-
 @section('footer')
     @include('layout.footer')
+@endsection
+
+@section('js')
+    <script>
+        window.personasData = @json($personas->map(function($persona) {
+            return [
+                'id' => $persona->id,
+                'nombre' => $persona->primer_nombre . ' ' . $persona->segundo_nombre . ' ' . $persona->primer_apellido . ' ' . $persona->segundo_apellido,
+                'documento' => $persona->numero_documento,
+                'email' => $persona->email
+            ];
+        }));
+    </script>
+    <script src="{{ asset('js/instructor-create.js') }}"></script>
 @endsection

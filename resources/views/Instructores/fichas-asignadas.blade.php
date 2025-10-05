@@ -1,403 +1,343 @@
 @extends('adminlte::page')
 
-@section('title', 'Fichas Asignadas - ' . $instructorActual->nombre_completo)
-
-@section('content_header')
-    <div class="row">
-        <div class="col-sm-6">
-            <h1>
-                <i class="fas fa-clipboard-list mr-2"></i>
-                Fichas Asignadas
-            </h1>
-        </div>
-        <div class="col-sm-6">
-            <ol class="breadcrumb breadcrumb-custom float-sm-right">
-                <li class="breadcrumb-item">
-                    <a href="{{ route('home.index') }}">
-                        <i class="fas fa-home mr-1"></i>Inicio
-                    </a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a href="{{ route('instructor.index') }}">
-                        <i class="fas fa-chalkboard-teacher mr-1"></i>Instructores
-                    </a>
-                </li>
-                <li class="breadcrumb-item">
-                    <a href="{{ route('instructor.show', $instructorActual->id) }}">
-                        {{ $instructorActual->nombre_completo }}
-                    </a>
-                </li>
-                <li class="breadcrumb-item active">
-                    <i class="fas fa-clipboard-list mr-1"></i>Fichas Asignadas
-                </li>
-            </ol>
-        </div>
-    </div>
-@stop
+@section('title', 'Fichas Asignadas')
 
 @section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
     <style>
         .stats-card {
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-            border: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            margin-bottom: 1rem;
         }
-        
-        .stats-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-        }
-        
-        .stats-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
-        .stats-success { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; }
-        .stats-warning { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; }
-        .stats-info { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; }
-        
-        .ficha-card {
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-            border-left: 4px solid #007bff;
-        }
-        
-        .ficha-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
-        }
-        
-        .ficha-card.activa { border-left-color: #28a745; }
-        .ficha-card.finalizada { border-left-color: #6c757d; }
-        .ficha-card.inactiva { border-left-color: #dc3545; }
-        
-        .status-badge {
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .badge-activa { background: #d4edda; color: #155724; }
-        .badge-finalizada { background: #e2e3e5; color: #383d41; }
-        .badge-inactiva { background: #f8d7da; color: #721c24; }
-        
-        .info-item {
-            display: flex;
-            align-items: center;
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
             margin-bottom: 0.5rem;
         }
-        
-        .info-item i {
-            width: 20px;
-            margin-right: 0.5rem;
-            color: #6c757d;
+        .stats-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
         }
-        
-        .filter-card {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            border: 1px solid #e9ecef;
-        }
-        
-        .btn-filter {
-            border-radius: 20px;
-            padding: 8px 16px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
-        .progress-mini {
-            height: 4px;
-            border-radius: 2px;
-            background: #e9ecef;
-        }
-        
-        .progress-mini .progress-bar {
-            border-radius: 2px;
-        }
-        
-        .progress-bar-custom {
-            transition: width 0.6s ease;
-        }
-        
         .instructor-info {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border-radius: 15px;
+            border-radius: 8px;
             padding: 1.5rem;
+            margin-bottom: 2rem;
         }
-        
-        .empty-state {
-            text-align: center;
-            padding: 3rem;
-            color: #6c757d;
+        .table-custom {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        
-        .empty-state i {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
+        .table-custom thead {
+            background: #007bff;
+            color: white;
+        }
+        .table-custom thead th {
+            border: none;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.8rem;
+            padding: 12px 8px;
+        }
+        .table-custom tbody tr {
+            transition: all 0.3s ease;
+        }
+        .table-custom tbody tr:hover {
+            background: #f8f9fa;
+        }
+        .table-custom tbody td {
+            padding: 12px 8px;
+            vertical-align: middle;
+        }
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .progress-bar-custom {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 0.3s ease;
         }
     </style>
-@stop
+@endsection
+
+@section('content_header')
+    <section class="content-header dashboard-header py-4">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-6 d-flex align-items-center">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
+                        style="width: 48px; height: 48px;">
+                        <i class="fas fa-clipboard-list text-white fa-lg"></i>
+                    </div>
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800">Fichas Asignadas</h1>
+                        <p class="text-muted mb-0 font-weight-light">Gestión de fichas del instructor</p>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
+                                    <i class="fas fa-home"></i> Inicio
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('instructor.index') }}" class="link_right_header">
+                                    <i class="fas fa-chalkboard-teacher"></i> Instructores
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('instructor.show', $instructor->id) }}" class="link_right_header">
+                                    <i class="fas fa-user"></i> {{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <i class="fas fa-clipboard-list"></i> Fichas asignadas
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+@endsection
 
 @section('content')
-    <div class="container-fluid">
-        <!-- Información del Instructor -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="instructor-info">
-                    <div class="row align-items-center">
-                        <div class="col-md-2 text-center">
-                            <i class="fas fa-user-circle" style="font-size: 3rem; opacity: 0.8;"></i>
-                        </div>
-                        <div class="col-md-8">
-                            <h4 class="mb-1">{{ $instructorActual->nombre_completo }}</h4>
-                            <p class="mb-1"><strong>Documento:</strong> {{ $instructorActual->numero_documento }}</p>
-                            <p class="mb-0"><strong>Regional:</strong> {{ $instructorActual->regional->nombre ?? 'Sin asignar' }}</p>
-                        </div>
-                        <div class="col-md-2 text-right">
-                            <a href="{{ route('instructor.show', $instructorActual->id) }}" class="btn btn-light btn-sm">
-                                <i class="fas fa-eye mr-1"></i>Ver Perfil
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Estadísticas -->
-        <div class="row mb-4">
-            <div class="col-md-3">
-                <div class="card stats-card stats-primary">
-                    <div class="card-body text-center">
-                        <i class="fas fa-clipboard-list" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                        <h4 class="mb-1">{{ $estadisticas['total'] }}</h4>
-                        <p class="mb-0">Total Fichas</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card stats-card stats-success">
-                    <div class="card-body text-center">
-                        <i class="fas fa-play-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                        <h4 class="mb-1">{{ $estadisticas['activas'] }}</h4>
-                        <p class="mb-0">Fichas Activas</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card stats-card stats-warning">
-                    <div class="card-body text-center">
-                        <i class="fas fa-check-circle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                        <h4 class="mb-1">{{ $estadisticas['finalizadas'] }}</h4>
-                        <p class="mb-0">Fichas Finalizadas</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3">
-                <div class="card stats-card stats-info">
-                    <div class="card-body text-center">
-                        <i class="fas fa-clock" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                        <h4 class="mb-1">{{ number_format($estadisticas['total_horas']) }}</h4>
-                        <p class="mb-0">Total Horas</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Filtros -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="filter-card p-3">
-                    <form method="GET" action="{{ request()->url() }}" class="row align-items-end">
-                        <div class="col-md-3">
-                            <label class="form-label">Estado</label>
-                            <select name="estado" class="form-control">
-                                <option value="todas" {{ $filtroEstado === 'todas' ? 'selected' : '' }}>Todas las fichas</option>
-                                <option value="activas" {{ $filtroEstado === 'activas' ? 'selected' : '' }}>Solo activas</option>
-                                <option value="finalizadas" {{ $filtroEstado === 'finalizadas' ? 'selected' : '' }}>Solo finalizadas</option>
-                                <option value="inactivas" {{ $filtroEstado === 'inactivas' ? 'selected' : '' }}>Solo inactivas</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Fecha Inicio</label>
-                            <input type="date" name="fecha_inicio" class="form-control" value="{{ $filtroFechaInicio }}">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Fecha Fin</label>
-                            <input type="date" name="fecha_fin" class="form-control" value="{{ $filtroFechaFin }}">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Programa</label>
-                            <select name="programa" class="form-control">
-                                <option value="">Todos los programas</option>
-                                @foreach($programas as $programa)
-                                    <option value="{{ $programa }}" {{ $filtroPrograma === $programa ? 'selected' : '' }}>
-                                        {{ $programa }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <button type="submit" class="btn btn-primary btn-filter">
-                                <i class="fas fa-search mr-1"></i>Filtrar
-                            </button>
-                            <a href="{{ request()->url() }}" class="btn btn-secondary btn-filter ml-1">
-                                <i class="fas fa-times mr-1"></i>Limpiar
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Lista de Fichas -->
-        <div class="row">
-            @forelse($fichasAsignadas as $instructorFicha)
-                @php
-                    $ficha = $instructorFicha->ficha;
-                    $esActiva = $ficha->status && $ficha->fecha_fin >= now()->toDateString();
-                    $esFinalizada = $ficha->fecha_fin < now()->toDateString();
-                    $esInactiva = !$ficha->status;
-                    
-                    $diasTranscurridos = now()->diffInDays($ficha->fecha_inicio);
-                    $diasTotales = $ficha->fecha_inicio->diffInDays($ficha->fecha_fin);
-                    $progreso = $diasTotales > 0 ? min(($diasTranscurridos / $diasTotales) * 100, 100) : 0;
-                    $progresoWidth = number_format($progreso, 1);
-                @endphp
-                
-                <div class="col-md-6 mb-4">
-                    <div class="card ficha-card {{ $esActiva ? 'activa' : ($esFinalizada ? 'finalizada' : 'inactiva') }}">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div>
-                                    <h5 class="mb-1">{{ $ficha->programaFormacion->nombre ?? 'Sin programa' }}</h5>
-                                    <p class="mb-1 text-muted">Ficha: {{ $ficha->ficha }}</p>
-                                </div>
-                                <span class="status-badge {{ $esActiva ? 'badge-activa' : ($esFinalizada ? 'badge-finalizada' : 'badge-inactiva') }}">
-                                    @if($esActiva)
-                                        <i class="fas fa-play mr-1"></i>Activa
-                                    @elseif($esFinalizada)
-                                        <i class="fas fa-check mr-1"></i>Finalizada
-                                    @else
-                                        <i class="fas fa-pause mr-1"></i>Inactiva
-                                    @endif
-                                </span>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="info-item">
-                                        <i class="fas fa-calendar-alt"></i>
-                                        <span><strong>Inicio:</strong> {{ $ficha->fecha_inicio->format('d/m/Y') }}</span>
-                                    </div>
-                                    <div class="info-item">
-                                        <i class="fas fa-calendar-check"></i>
-                                        <span><strong>Fin:</strong> {{ $ficha->fecha_fin->format('d/m/Y') }}</span>
-                                    </div>
-                                    <div class="info-item">
-                                        <i class="fas fa-clock"></i>
-                                        <span><strong>Horas:</strong> {{ number_format($instructorFicha->total_horas_instructor) }}h</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="info-item">
-                                        <i class="fas fa-graduation-cap"></i>
-                                        <span>{{ $ficha->programaFormacion->redConocimiento->nombre ?? 'Sin red' }}</span>
-                                    </div>
-                                    <div class="info-item">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                        <span>{{ $ficha->ambiente->sede->nombre ?? 'Sin sede' }}</span>
-                                    </div>
-                                    <div class="info-item">
-                                        <i class="fas fa-door-open"></i>
-                                        <span>{{ $ficha->ambiente->nombre ?? 'Sin ambiente' }}</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            @if($esActiva && $progreso > 0)
-                                <div class="mt-3">
-                                    <div class="d-flex justify-content-between mb-1">
-                                        <small class="text-muted">Progreso del curso</small>
-                                        <small class="text-muted">{{ number_format($progreso, 1) }}%</small>
-                                    </div>
-                                    <div class="progress progress-mini">
-                                        <div class="progress-bar bg-success progress-bar-custom" data-width="{{ $progresoWidth }}"></div>
-                                    </div>
-                                </div>
-                            @endif
-
-                            @if($ficha->diasFormacion->count() > 0)
-                                <div class="mt-3">
-                                    <small class="text-muted">
-                                        <i class="fas fa-calendar-week mr-1"></i>
-                                        Horarios: 
-                                        @foreach($ficha->diasFormacion as $dia)
-                                            {{ $dia->dia_nombre }} ({{ $dia->hora_inicio }}-{{ $dia->hora_fin }})
-                                            @if(!$loop->last), @endif
-                                        @endforeach
-                                    </small>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            @empty
-                <div class="col-12">
-                    <div class="empty-state">
-                        <i class="fas fa-clipboard-list"></i>
-                        <h5>No se encontraron fichas asignadas</h5>
-                        <p class="mb-3">Este instructor no tiene fichas asignadas con los filtros actuales.</p>
-                        @if($filtroEstado !== 'todas' || $filtroFechaInicio || $filtroFechaFin || $filtroPrograma)
-                            <a href="{{ request()->url() }}" class="btn btn-primary">
-                                <i class="fas fa-refresh mr-1"></i>Ver todas las fichas
-                            </a>
-                        @endif
-                    </div>
-                </div>
-            @endforelse
-        </div>
-
-        <!-- Paginación -->
-        @if($fichasAsignadas->hasPages())
+    <section class="content mt-4">
+        <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    <div class="d-flex justify-content-center">
-                        {{ $fichasAsignadas->links() }}
+                    <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ route('instructor.show', $instructor->id) }}">
+                        <i class="fas fa-arrow-left mr-1"></i> Volver
+                    </a>
+
+                    <!-- Información del Instructor -->
+                    <div class="instructor-info">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h4 class="mb-2">
+                                    <i class="fas fa-chalkboard-teacher mr-2"></i>
+                                    {{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}
+                                </h4>
+                                <p class="mb-1">
+                                    <strong>Documento:</strong> {{ $instructor->persona->numero_documento }}
+                                </p>
+                                <p class="mb-0">
+                                    <strong>Regional:</strong> {{ $instructor->regional->nombre ?? 'No asignada' }}
+                                </p>
+                            </div>
+                            <div class="col-md-4 text-right">
+                                <div class="row">
+                                    <div class="col-4">
+                                        <div class="stats-card">
+                                            <div class="stats-number">{{ $estadisticas['total_fichas'] }}</div>
+                                            <div class="stats-label">Total Fichas</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="stats-card">
+                                            <div class="stats-number">{{ $estadisticas['fichas_activas'] }}</div>
+                                            <div class="stats-label">Activas</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        <div class="stats-card">
+                                            <div class="stats-number">{{ $estadisticas['total_horas'] }}</div>
+                                            <div class="stats-label">Horas</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filtros -->
+                    <div class="card shadow-sm mb-4 no-hover">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                                <i class="fas fa-filter mr-2"></i>Filtros
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="GET" action="{{ route('instructor.fichasAsignadas', $instructor->id) }}" class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+                                        <input type="date" name="fecha_inicio" id="fecha_inicio" 
+                                               class="form-control" value="{{ request('fecha_inicio') }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="fecha_fin" class="form-label">Fecha Fin</label>
+                                        <input type="date" name="fecha_fin" id="fecha_fin" 
+                                               class="form-control" value="{{ request('fecha_fin') }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="estado" class="form-label">Estado</label>
+                                        <select name="estado" id="estado" class="form-control">
+                                            <option value="">Todos</option>
+                                            <option value="1" {{ request('estado') == '1' ? 'selected' : '' }}>Activas</option>
+                                            <option value="0" {{ request('estado') == '0' ? 'selected' : '' }}>Inactivas</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="d-flex justify-content-end">
+                                        <a href="{{ route('instructor.fichasAsignadas', $instructor->id) }}" class="btn btn-light mr-2">
+                                            Limpiar Filtros
+                                        </a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-search mr-1"></i>Filtrar
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Lista de Fichas -->
+                    <div class="card shadow-sm no-hover">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                                <i class="fas fa-list mr-2"></i>Lista de Fichas Asignadas
+                            </h5>
+                        </div>
+                        <div class="card-body p-0">
+                            @if($fichas->count() > 0)
+                                <div class="table-responsive">
+                                    <table class="table table-custom">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Ficha</th>
+                                                <th>Programa de Formación</th>
+                                                <th>Fecha Inicio</th>
+                                                <th>Fecha Fin</th>
+                                                <th>Total Horas</th>
+                                                <th>Progreso</th>
+                                                <th>Estado</th>
+                                                <th>Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($fichas as $index => $ficha)
+                                            <tr>
+                                                <td>{{ $index + 1 }}</td>
+                                                <td>
+                                                    <strong>{{ $ficha->ficha }}</strong>
+                                                </td>
+                                                <td>{{ $ficha->programaFormacion->nombre ?? 'N/A' }}</td>
+                                                <td>
+                                                    @if($ficha->fecha_inicio)
+                                                        {{ \Carbon\Carbon::parse($ficha->fecha_inicio)->format('d/m/Y') }}
+                                                    @else
+                                                        N/A
+                                                    @endif
+                                                </td>
+                                                <td>
+                                                    @if($ficha->fecha_fin)
+                                                        {{ \Carbon\Carbon::parse($ficha->fecha_fin)->format('d/m/Y') }}
+                                                    @else
+                                                        N/A
+                                                    @endif
+                                                </td>
+                                                <td>{{ $ficha->total_horas ?? 'N/A' }}</td>
+                                                <td>
+                                                    @php
+                                                        $progreso = rand(20, 90); // Simulación de progreso
+                                                    @endphp
+                                                    <div class="progress-bar-custom">
+                                                        <div class="progress-fill" data-width="{{ $progreso }}%" style="width: {{ $progreso }}%"></div>
+                                                    </div>
+                                                    <small class="text-muted">{{ $progreso }}%</small>
+                                                </td>
+                                                <td>
+                                                    <span class="status-badge {{ $ficha->status ? 'status-active' : 'status-inactive' }}">
+                                                        <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
+                                                        {{ $ficha->status ? 'Activa' : 'Inactiva' }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="btn-group">
+                                                        <a href="{{ route('ficha.show', $ficha->id) }}" 
+                                                           class="btn btn-light btn-sm" 
+                                                           data-toggle="tooltip" 
+                                                           title="Ver detalles">
+                                                            <i class="fas fa-eye text-info"></i>
+                                                        </a>
+                                                        <a href="{{ route('ficha.edit', $ficha->id) }}" 
+                                                           class="btn btn-light btn-sm" 
+                                                           data-toggle="tooltip" 
+                                                           title="Editar">
+                                                            <i class="fas fa-pencil-alt text-warning"></i>
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            @else
+                                <div class="text-center py-5">
+                                    <img src="{{ asset('img/no-data.svg') }}" alt="No data"
+                                        style="width: 120px" class="mb-3">
+                                    <p class="text-muted">No hay fichas asignadas a este instructor</p>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 </div>
             </div>
-        @endif
-    </div>
-@stop
+        </div>
+    </section>
+@endsection
+
+@section('footer')
+    @include('layout.footer')
+@endsection
 
 @section('js')
     <script>
         $(document).ready(function() {
-            // Auto-hide alerts after 5 seconds
-            setTimeout(function() {
-                $('.alert').fadeOut('slow');
-            }, 5000);
+            // Tooltips para elementos interactivos
+            $('[data-toggle="tooltip"]').tooltip();
 
-            // Initialize date picker with today as default for fecha_fin
-            if (!$('input[name="fecha_fin"]').val()) {
-                $('input[name="fecha_fin"]').val('{{ now()->format("Y-m-d") }}');
-            }
-
-            // Set progress bar widths
-            $('.progress-bar-custom').each(function() {
-                var width = $(this).data('width');
-                $(this).css('width', width + '%');
+            // Animación de barras de progreso
+            $('.progress-fill').each(function() {
+                const width = $(this).data('width');
+                $(this).css('width', '0%').animate({
+                    width: width
+                }, 1000);
             });
         });
     </script>
-@stop
-
-@section('footer')
-    @include('layout.footer')
 @endsection
