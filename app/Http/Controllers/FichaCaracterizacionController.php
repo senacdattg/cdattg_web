@@ -1864,6 +1864,26 @@ class FichaCaracterizacionController extends Controller
                 }
             }
 
+            // Verificar conflictos de fechas específicos para cada instructor
+            foreach ($request->instructores as $index => $instructorData) {
+                $conflictos = $this->verificarConflictosFechasInstructor(
+                    $instructorData['instructor_id'],
+                    $instructorData['fecha_inicio'],
+                    $instructorData['fecha_fin']
+                );
+
+                if ($conflictos['tiene_conflictos']) {
+                    $instructor = \App\Models\Instructor::find($instructorData['instructor_id']);
+                    $conflictosText = $conflictos['conflictos']->map(function($conflicto) {
+                        return "Ficha {$conflicto['ficha']} ({$conflicto['programa']}) del {$conflicto['fecha_inicio']} al {$conflicto['fecha_fin']}";
+                    })->implode(', ');
+
+                    return back()->withErrors([
+                        "instructores.{$index}.fecha_inicio" => "El instructor {$instructor->persona->primer_nombre} {$instructor->persona->primer_apellido} ya tiene asignaciones superpuestas: {$conflictosText}. Por favor, elija otro rango de fechas."
+                    ]);
+                }
+            }
+
             // Eliminar asignaciones existentes
             $ficha->instructorFicha()->delete();
 
@@ -2758,6 +2778,121 @@ class FichaCaracterizacionController extends Controller
 
             return redirect()->back()
                 ->with('error', 'Error al desasignar personas como aprendices. Por favor, intente nuevamente.');
+        }
+    }
+
+    /**
+     * Verifica si un instructor tiene asignaciones superpuestas en un rango de fechas.
+     *
+     * @param int $instructorId
+     * @param string $fechaInicio
+     * @param string $fechaFin
+     * @param int|null $excludeInstructorFichaId (opcional, para excluir una asignación específica al editar)
+     * @return array
+     */
+    public function verificarConflictosFechasInstructor($instructorId, $fechaInicio, $fechaFin, $excludeInstructorFichaId = null)
+    {
+        try {
+            $query = \App\Models\InstructorFichaCaracterizacion::where('instructor_id', $instructorId)
+                ->where(function($q) use ($fechaInicio, $fechaFin) {
+                    // Verificar superposición de rangos de fechas
+                    $q->where(function($subQ) use ($fechaInicio, $fechaFin) {
+                        // La nueva fecha de inicio está dentro de un rango existente
+                        $subQ->where('fecha_inicio', '<=', $fechaInicio)
+                             ->where('fecha_fin', '>=', $fechaInicio);
+                    })->orWhere(function($subQ) use ($fechaInicio, $fechaFin) {
+                        // La nueva fecha de fin está dentro de un rango existente
+                        $subQ->where('fecha_inicio', '<=', $fechaFin)
+                             ->where('fecha_fin', '>=', $fechaFin);
+                    })->orWhere(function($subQ) use ($fechaInicio, $fechaFin) {
+                        // El nuevo rango contiene completamente un rango existente
+                        $subQ->where('fecha_inicio', '>=', $fechaInicio)
+                             ->where('fecha_fin', '<=', $fechaFin);
+                    });
+                });
+
+            // Excluir una asignación específica si se está editando
+            if ($excludeInstructorFichaId) {
+                $query->where('id', '!=', $excludeInstructorFichaId);
+            }
+
+            $conflictos = $query->with(['fichaCaracterizacion.programaFormacion'])->get();
+
+            return [
+                'tiene_conflictos' => $conflictos->count() > 0,
+                'conflictos' => $conflictos->map(function($conflicto) {
+                    return [
+                        'id' => $conflicto->id,
+                        'fecha_inicio' => $conflicto->fecha_inicio->format('d/m/Y'),
+                        'fecha_fin' => $conflicto->fecha_fin->format('d/m/Y'),
+                        'ficha' => $conflicto->fichaCaracterizacion->ficha,
+                        'programa' => $conflicto->fichaCaracterizacion->programaFormacion->nombre ?? 'Sin programa',
+                        'total_horas' => $conflicto->total_horas_instructor
+                    ];
+                })
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Error al verificar conflictos de fechas del instructor', [
+                'instructor_id' => $instructorId,
+                'fecha_inicio' => $fechaInicio,
+                'fecha_fin' => $fechaFin,
+                'error' => $e->getMessage()
+            ]);
+
+            return [
+                'tiene_conflictos' => false,
+                'conflictos' => [],
+                'error' => 'Error al verificar disponibilidad de fechas'
+            ];
+        }
+    }
+
+    /**
+     * API endpoint para verificar conflictos de fechas de un instructor.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function verificarDisponibilidadFechasInstructor(Request $request)
+    {
+        try {
+            $request->validate([
+                'instructor_id' => 'required|exists:instructors,id',
+                'fecha_inicio' => 'required|date',
+                'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
+                'exclude_instructor_ficha_id' => 'nullable|integer'
+            ]);
+
+            $resultado = $this->verificarConflictosFechasInstructor(
+                $request->instructor_id,
+                $request->fecha_inicio,
+                $request->fecha_fin,
+                $request->exclude_instructor_ficha_id
+            );
+
+            return response()->json([
+                'disponible' => !$resultado['tiene_conflictos'],
+                'conflictos' => $resultado['conflictos'],
+                'mensaje' => $resultado['tiene_conflictos'] 
+                    ? 'El instructor tiene asignaciones superpuestas en ese rango de fechas'
+                    : 'El instructor está disponible en ese rango de fechas'
+            ]);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'error' => 'Datos de entrada inválidos',
+                'details' => $e->errors()
+            ], 422);
+        } catch (\Exception $e) {
+            Log::error('Error en verificación de disponibilidad de fechas', [
+                'error' => $e->getMessage(),
+                'request_data' => $request->all()
+            ]);
+
+            return response()->json([
+                'error' => 'Error interno del servidor'
+            ], 500);
         }
     }
 }

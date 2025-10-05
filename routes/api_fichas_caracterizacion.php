@@ -175,4 +175,8 @@ Route::middleware(['auth:sanctum', 'throttle:api'])->prefix('api')->group(functi
             'jornadaFormacion:id,name'
         ])->paginate(15);
     })->name('api.fichas.filtrar');
+
+    // Endpoint para verificar disponibilidad de fechas de instructores
+    Route::post('/verificar-disponibilidad-fechas-instructor', [FichaCaracterizacionController::class, 'verificarDisponibilidadFechasInstructor'])
+        ->name('api.fichas.verificar-disponibilidad-fechas-instructor');
 });

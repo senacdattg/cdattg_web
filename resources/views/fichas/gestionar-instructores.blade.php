@@ -2,6 +2,10 @@
 
 @section('title', 'Gestionar Instructores - Ficha ' . $ficha->ficha)
 
+@section('meta')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+@endsection
+
 @section('css')
     @vite(['resources/css/parametros.css'])
     <link rel="stylesheet" href="{{ asset('vendor/adminlte/plugins/select2/css/select2.min.css') }}">
@@ -462,12 +466,68 @@
             // Agregar validación de fechas
             const fechaInicioInput = div.querySelector('input[name*="[fecha_inicio]"]');
             const fechaFinInput = div.querySelector('input[name*="[fecha_fin]"]');
+            const instructorSelect = div.querySelector('select[name*="[instructor_id]"]');
+            
+            // Función para validar disponibilidad de fechas
+            function validarDisponibilidadFechas() {
+                const instructorId = instructorSelect.value;
+                const fechaInicio = fechaInicioInput.value;
+                const fechaFin = fechaFinInput.value;
+                
+                if (instructorId && fechaInicio && fechaFin) {
+                    // Crear elemento de mensaje de validación si no existe
+                    let mensajeValidacion = div.querySelector('.mensaje-validacion-fechas');
+                    if (!mensajeValidacion) {
+                        mensajeValidacion = document.createElement('div');
+                        mensajeValidacion.className = 'mensaje-validacion-fechas alert mt-2';
+                        div.querySelector('.card-body').appendChild(mensajeValidacion);
+                    }
+                    
+                    // Mostrar loading
+                    mensajeValidacion.className = 'mensaje-validacion-fechas alert alert-info mt-2';
+                    mensajeValidacion.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Verificando disponibilidad...';
+                    
+                    // Llamar al endpoint de validación
+                    fetch('{{ route("api.fichas.verificar-disponibilidad-fechas-instructor") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({
+                            instructor_id: instructorId,
+                            fecha_inicio: fechaInicio,
+                            fecha_fin: fechaFin
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.disponible) {
+                            mensajeValidacion.className = 'mensaje-validacion-fechas alert alert-success mt-2';
+                            mensajeValidacion.innerHTML = '<i class="fas fa-check mr-1"></i> ' + data.mensaje;
+                        } else {
+                            mensajeValidacion.className = 'mensaje-validacion-fechas alert alert-danger mt-2';
+                            let conflictosText = data.conflictos.map(c => 
+                                `Ficha ${c.ficha} (${c.programa}) del ${c.fecha_inicio} al ${c.fecha_fin}`
+                            ).join(', ');
+                            mensajeValidacion.innerHTML = `<i class="fas fa-exclamation-triangle mr-1"></i> ${data.mensaje}: ${conflictosText}`;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al verificar disponibilidad:', error);
+                        mensajeValidacion.className = 'mensaje-validacion-fechas alert alert-warning mt-2';
+                        mensajeValidacion.innerHTML = '<i class="fas fa-exclamation-triangle mr-1"></i> Error al verificar disponibilidad. Intente nuevamente.';
+                    });
+                }
+            }
             
             fechaInicioInput.addEventListener('change', function() {
                 fechaFinInput.min = this.value;
                 if (fechaFinInput.value && fechaFinInput.value < this.value) {
                     fechaFinInput.value = this.value;
                 }
+                // Validar disponibilidad cuando cambie la fecha de inicio
+                setTimeout(validarDisponibilidadFechas, 500);
             });
             
             fechaFinInput.addEventListener('change', function() {
@@ -475,6 +535,13 @@
                 if (fechaInicioInput.value && fechaInicioInput.value > this.value) {
                     fechaInicioInput.value = this.value;
                 }
+                // Validar disponibilidad cuando cambie la fecha de fin
+                setTimeout(validarDisponibilidadFechas, 500);
+            });
+            
+            instructorSelect.addEventListener('change', function() {
+                // Validar disponibilidad cuando cambie el instructor
+                setTimeout(validarDisponibilidadFechas, 500);
             });
             
             // Cargar días de formación existentes si los hay
