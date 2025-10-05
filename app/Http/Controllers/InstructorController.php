@@ -233,6 +233,22 @@ class InstructorController extends Controller
                 ->with(['user', 'tipoDocumento'])
                 ->get();
             
+            // Preparar datos para JavaScript
+            $personasData = $personas->map(function($persona) {
+                return [
+                    'id' => $persona->id,
+                    'nombre' => trim($persona->primer_nombre . ' ' . $persona->segundo_nombre . ' ' . $persona->primer_apellido . ' ' . $persona->segundo_apellido),
+                    'documento' => $persona->numero_documento,
+                    'email' => $persona->email
+                ];
+            });
+            
+            // Generar archivo JavaScript con los datos
+            $jsContent = "// Datos de personas para el formulario de creación de instructor\n";
+            $jsContent .= "// Generado automáticamente desde el controlador\n";
+            $jsContent .= "window.personasData = " . json_encode($personasData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . ";";
+            file_put_contents(public_path('js/instructor-create-data.js'), $jsContent);
+            
             $regionales = Regional::where('status', 1)->get();
             $especialidades = \App\Models\RedConocimiento::where('status', true)->orderBy('nombre')->get();
 

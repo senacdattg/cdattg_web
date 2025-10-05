@@ -273,15 +273,6 @@
 @endsection
 
 @section('js')
-    <script>
-        window.personasData = @json($personas->map(function($persona) {
-            return [
-                'id' => $persona->id,
-                'nombre' => $persona->primer_nombre . ' ' . $persona->segundo_nombre . ' ' . $persona->primer_apellido . ' ' . $persona->segundo_apellido,
-                'documento' => $persona->numero_documento,
-                'email' => $persona->email
-            ];
-        }));
-    </script>
+    <script src="{{ asset('js/instructor-create-data.js') }}"></script>
     <script src="{{ asset('js/instructor-create.js') }}"></script>
 @endsection
