@@ -2500,23 +2500,31 @@ class FichaCaracterizacionController extends Controller
                     });
                 })
                 ->where(function($query) {
-                    // Personas que NO tienen rol APRENDIZ O que son aprendices desasignados (estado = 0)
+                    // Personas que NO tienen rol APRENDIZ
                     $query->whereHas('user', function($userQuery) {
                         $userQuery->whereDoesntHave('roles', function($roleQuery) {
                             $roleQuery->where('name', 'APRENDIZ');
                         });
                     })
+                    // O que son aprendices desasignados (estado = 0)
                     ->orWhereHas('aprendiz', function($aprendizQuery) {
                         $aprendizQuery->where('estado', 0); // Aprendices desasignados
-                    });
+                    })
+                    // O que no tienen registro de aprendiz
+                    ->orWhereDoesntHave('aprendiz');
                 })
                 ->orderBy('id', 'desc')
                 ->get();
 
+            // Debug: Obtener algunos aprendices desasignados para verificar
+            $aprendicesDesasignados = \App\Models\Aprendiz::where('estado', 0)->with('persona')->get();
+            
             Log::info('Vista de gestión de aprendices cargada', [
                 'ficha_id' => $id,
                 'aprendices_asignados' => $ficha->aprendices->count(),
                 'personas_disponibles' => $personasDisponibles->count(),
+                'aprendices_desasignados_total' => $aprendicesDesasignados->count(),
+                'aprendices_desasignados_ids' => $aprendicesDesasignados->pluck('id')->toArray(),
                 'user_id' => Auth::id()
             ]);
 
