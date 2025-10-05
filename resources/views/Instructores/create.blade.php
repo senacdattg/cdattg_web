@@ -297,8 +297,8 @@
                                         <option value="" disabled selected>Seleccione una regional</option>
                                         @foreach($regionales as $regional)
                                             <option value="{{ $regional->id }}" {{ old('regional_id') == $regional->id ? 'selected' : '' }}>
-                                                {{ $regional->regional }}
-                                                        </option>
+                                                {{ $regional->nombre }}
+                                            </option>
                                         @endforeach
                                                 </select>
                                     @error('regional_id')
@@ -341,32 +341,43 @@
                                 </div>
 
                     <!-- Especialidades -->
-                                <div class="form-section">
+                    <div class="form-section">
                         <h6><i class="fas fa-graduation-cap"></i> Especialidades (Opcional)</h6>
                         @if($especialidades->count() > 0)
-                            <div class="specialties-container">
-                                @foreach($especialidades as $especialidad)
-                                    <div class="specialty-item" data-specialty-id="{{ $especialidad->id }}">
-                                        <i class="fas fa-plus-circle mr-1"></i>
-                                        {{ $especialidad->nombre }}
+                            <div class="row compact-form">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label for="especialidades" class="form-label">Especialidades</label>
+                                        <select name="especialidades[]" id="especialidades" class="form-control" multiple>
+                                            @foreach($especialidades as $especialidad)
+                                                <option value="{{ $especialidad->id }}" 
+                                                    {{ in_array($especialidad->id, old('especialidades', [])) ? 'selected' : '' }}>
+                                                    {{ $especialidad->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        <small class="form-text text-muted">
+                                            <i class="fas fa-info-circle mr-1"></i>
+                                            Mantenga presionada la tecla Ctrl (Cmd en Mac) para seleccionar múltiples especialidades.
+                                        </small>
                                     </div>
-                                @endforeach
                                 </div>
-                            <div class="selected-specialties mt-3" style="display: none;">
-                                <h6 class="text-muted mb-2">
-                                    <i class="fas fa-check-circle mr-1"></i>
-                                    Especialidades seleccionadas:
-                                </h6>
-                                <div id="selected-specialties-list"></div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label">Especialidades Seleccionadas</label>
+                                        <div id="selected-specialties-display" class="form-control" style="min-height: 38px; background-color: #f8f9fa;">
+                                            <span class="text-muted">Ninguna especialidad seleccionada</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <input type="hidden" name="especialidades" id="especialidades" value="">
                         @else
                             <div class="alert alert-warning">
                                 <i class="fas fa-exclamation-triangle mr-2"></i>
                                 No hay especialidades disponibles para asignar.
                             </div>
                         @endif
-                            </div>
+                    </div>
                         </form>
 
                 <!-- Botón Flotante de Guardar -->

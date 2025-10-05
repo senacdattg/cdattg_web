@@ -269,9 +269,9 @@ class InstructorController extends Controller
             $instructor->save();
 
             // Asignar especialidades si se proporcionan
-            if ($request->has('especialidades')) {
+            if ($request->has('especialidades') && is_array($request->input('especialidades'))) {
                 $especialidades = $request->input('especialidades');
-                if (is_array($especialidades) && !empty($especialidades)) {
+                if (!empty($especialidades)) {
                     $instructor->especialidades = $especialidades;
                     $instructor->save();
                 }

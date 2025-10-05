@@ -72,52 +72,30 @@ $(document).ready(function() {
     });
 
     // Selección de especialidades
-    $('.specialty-item').on('click', function() {
-        const specialtyId = $(this).data('specialty-id');
-        const specialtyName = $(this).text().replace('+', '').trim();
-        
-        if ($(this).hasClass('selected')) {
-            $(this).removeClass('selected');
-            selectedSpecialties = selectedSpecialties.filter(id => id != specialtyId);
-        } else {
-            $(this).addClass('selected');
-            selectedSpecialties.push(specialtyId);
-        }
-        
+    $('#especialidades').on('change', function() {
         updateSelectedSpecialties();
-        $('#especialidades').val(JSON.stringify(selectedSpecialties));
     });
 
     function updateSelectedSpecialties() {
-        const container = $('#selected-specialties-list');
-        container.empty();
+        const selectedOptions = $('#especialidades option:selected');
+        const display = $('#selected-specialties-display');
         
-        if (selectedSpecialties.length > 0) {
-            $('.selected-specialties').show();
-            
-            selectedSpecialties.forEach(id => {
-                const specialtyElement = $(`.specialty-item[data-specialty-id="${id}"]`);
-                const specialtyName = specialtyElement.text().replace('+', '').trim();
-                
-                container.append(`
+        if (selectedOptions.length > 0) {
+            let html = '';
+            selectedOptions.each(function() {
+                const specialtyName = $(this).text();
+                const specialtyId = $(this).val();
+                html += `
                     <span class="badge badge-primary mr-1 mb-1">
                         ${specialtyName}
-                        <i class="fas fa-times ml-1" style="cursor: pointer;" onclick="removeSpecialty(${id})"></i>
                     </span>
-                `);
+                `;
             });
+            display.html(html);
         } else {
-            $('.selected-specialties').hide();
+            display.html('<span class="text-muted">Ninguna especialidad seleccionada</span>');
         }
     }
-
-    // Función global para remover especialidad
-    window.removeSpecialty = function(id) {
-        selectedSpecialties = selectedSpecialties.filter(specialtyId => specialtyId != id);
-        $(`.specialty-item[data-specialty-id="${id}"]`).removeClass('selected');
-        updateSelectedSpecialties();
-        $('#especialidades').val(JSON.stringify(selectedSpecialties));
-    };
 
     // Validación del botón flotante
     function updateFloatingButton() {
