@@ -21,15 +21,15 @@
                 <div class="col-sm-6">
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                        <li class="breadcrumb-item">
+                            <li class="breadcrumb-item">
                                 <a href="{{ route('verificarLogin') }}" class="link_right_header">
                                     <i class="fas fa-home"></i> Inicio
-                            </a>
-                        </li>
+                                </a>
+                            </li>
                             <li class="breadcrumb-item active" aria-current="page">
                                 <i class="fas fa-user-tie"></i> Instructores
-                        </li>
-                    </ol>
+                            </li>
+                        </ol>
                     </nav>
                 </div>
             </div>
