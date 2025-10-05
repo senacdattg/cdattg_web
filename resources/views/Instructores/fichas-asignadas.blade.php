@@ -112,8 +112,8 @@
                                 </a>
                             </li>
                             <li class="breadcrumb-item">
-                                <a href="{{ route('instructor.show', $instructor->id) }}" class="link_right_header">
-                                    <i class="fas fa-user"></i> {{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}
+                                <a href="{{ route('instructor.show', $instructorActual->id) }}" class="link_right_header">
+                                    <i class="fas fa-user"></i> {{ $instructorActual->persona->primer_nombre }} {{ $instructorActual->persona->primer_apellido }}
                                 </a>
                             </li>
                             <li class="breadcrumb-item active" aria-current="page">
@@ -132,7 +132,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ route('instructor.show', $instructor->id) }}">
+                    <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ route('instructor.show', $instructorActual->id) }}">
                         <i class="fas fa-arrow-left mr-1"></i> Volver
                     </a>
 
@@ -142,13 +142,13 @@
                             <div class="col-md-8">
                                 <h4 class="mb-2">
                                     <i class="fas fa-chalkboard-teacher mr-2"></i>
-                                    {{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}
+                                    {{ $instructorActual->persona->primer_nombre }} {{ $instructorActual->persona->primer_apellido }}
                                 </h4>
                                 <p class="mb-1">
-                                    <strong>Documento:</strong> {{ $instructor->persona->numero_documento }}
+                                    <strong>Documento:</strong> {{ $instructorActual->persona->numero_documento }}
                                 </p>
                                 <p class="mb-0">
-                                    <strong>Regional:</strong> {{ $instructor->regional->nombre ?? 'No asignada' }}
+                                    <strong>Regional:</strong> {{ $instructorActual->regional->nombre ?? 'No asignada' }}
                                 </p>
                             </div>
                             <div class="col-md-4 text-right">
@@ -184,7 +184,7 @@
                             </h5>
                         </div>
                         <div class="card-body">
-                            <form method="GET" action="{{ route('instructor.fichasAsignadas', $instructor->id) }}" class="row">
+                            <form method="GET" action="{{ route('instructor.fichasAsignadas', $instructorActual->id) }}" class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
                                         <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
@@ -211,7 +211,7 @@
                                 </div>
                                 <div class="col-12">
                                     <div class="d-flex justify-content-end">
-                                        <a href="{{ route('instructor.fichasAsignadas', $instructor->id) }}" class="btn btn-light mr-2">
+                                        <a href="{{ route('instructor.fichasAsignadas', $instructorActual->id) }}" class="btn btn-light mr-2">
                                             Limpiar Filtros
                                         </a>
                                         <button type="submit" class="btn btn-primary">
