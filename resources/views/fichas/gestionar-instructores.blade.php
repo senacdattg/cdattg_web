@@ -129,6 +129,13 @@
                                                         <i class="fas fa-clock mr-1"></i>
                                                         {{ $asignacion->total_horas_instructor }} horas
                                                     </p>
+                                                    @if($asignacion->instructorFichaDias->count() > 0)
+                                                        <p class="text-muted mb-0 small mt-1">
+                                                            <i class="fas fa-calendar-week mr-1"></i>
+                                                            <strong>Días asignados:</strong> 
+                                                            {{ $asignacion->instructorFichaDias->map(function($dia) { return $dia->dia->name; })->implode(', ') }}
+                                                        </p>
+                                                    @endif
                                                 </div>
                                                 <div>
                                                     <form action="{{ route('fichaCaracterizacion.desasignarInstructor', [$ficha->id, $asignacion->instructor_id]) }}" 
