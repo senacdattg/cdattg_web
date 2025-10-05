@@ -2490,28 +2490,34 @@ class FichaCaracterizacionController extends Controller
             ])->findOrFail($id);
 
             // Obtener todas las personas que NO están asignadas a esta ficha
-            // Incluir tanto personas sin rol APRENDIZ como aprendices desasignados
+            // Estrategia: obtener personas que no están en la tabla pivot para esta ficha
+            $aprendicesAsignadosIds = $ficha->aprendices()->pluck('aprendices.id');
+            
             $personasDisponibles = \App\Models\Persona::with('user', 'aprendiz')
                 ->where('status', 1) // Solo personas activas
-                ->where(function($query) use ($id) {
+                ->where(function($query) use ($aprendicesAsignadosIds) {
                     // Personas que no tienen aprendiz asignado a esta ficha
-                    $query->whereDoesntHave('aprendiz.fichas', function($subQuery) use ($id) {
-                        $subQuery->where('ficha_id', $id);
-                    });
-                })
-                ->where(function($query) {
-                    // Personas que NO tienen rol APRENDIZ
-                    $query->whereHas('user', function($userQuery) {
-                        $userQuery->whereDoesntHave('roles', function($roleQuery) {
-                            $roleQuery->where('name', 'APRENDIZ');
+                    if ($aprendicesAsignadosIds->count() > 0) {
+                        $query->whereDoesntHave('aprendiz', function($subQuery) use ($aprendicesAsignadosIds) {
+                            $subQuery->whereIn('id', $aprendicesAsignadosIds);
                         });
-                    })
-                    // O que son aprendices desasignados (estado = 0)
-                    ->orWhereHas('aprendiz', function($aprendizQuery) {
-                        $aprendizQuery->where('estado', 0); // Aprendices desasignados
-                    })
-                    // O que no tienen registro de aprendiz
-                    ->orWhereDoesntHave('aprendiz');
+                    }
+                    
+                    // Personas sin rol APRENDIZ O aprendices desasignados
+                    $query->where(function($subQuery) {
+                        // Sin rol APRENDIZ
+                        $subQuery->whereHas('user', function($userQuery) {
+                            $userQuery->whereDoesntHave('roles', function($roleQuery) {
+                                $roleQuery->where('name', 'APRENDIZ');
+                            });
+                        })
+                        // O aprendices desasignados (estado = 0)
+                        ->orWhereHas('aprendiz', function($aprendizQuery) {
+                            $aprendizQuery->where('estado', 0);
+                        })
+                        // O sin registro de aprendiz
+                        ->orWhereDoesntHave('aprendiz');
+                    });
                 })
                 ->orderBy('id', 'desc')
                 ->get();
