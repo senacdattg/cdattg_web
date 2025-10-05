@@ -12,7 +12,7 @@ class CreateInstructorRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check() && auth()->user()->can('CREAR INSTRUCTOR');
+        return true; // La autorización se maneja en el controlador
     }
 
     /**
@@ -24,15 +24,7 @@ class CreateInstructorRequest extends FormRequest
             'persona_id' => [
                 'required',
                 'integer',
-                'exists:personas,id',
-                // Validar que la persona no sea ya instructor
-                Rule::exists('personas', 'id')->where(function ($query) {
-                    return $query->whereDoesntHave('instructor');
-                }),
-                // Validar que la persona tenga usuario
-                Rule::exists('personas', 'id')->where(function ($query) {
-                    return $query->whereHas('user');
-                })
+                'exists:personas,id'
             ],
             'regional_id' => [
                 'required',
@@ -88,13 +80,18 @@ class CreateInstructorRequest extends FormRequest
         $validator->after(function ($validator) {
             // Validaciones adicionales de negocio
             if ($this->has('persona_id')) {
-                $persona = \App\Models\Persona::find($this->input('persona_id'));
+                $persona = \App\Models\Persona::with(['instructor', 'user'])->find($this->input('persona_id'));
                 
-                if ($persona && $persona->instructor) {
+                if (!$persona) {
+                    $validator->errors()->add('persona_id', 'La persona seleccionada no existe.');
+                    return;
+                }
+                
+                if ($persona->instructor) {
                     $validator->errors()->add('persona_id', 'Esta persona ya es instructor.');
                 }
                 
-                if ($persona && !$persona->user) {
+                if (!$persona->user) {
                     $validator->errors()->add('persona_id', 'Esta persona no tiene un usuario asociado.');
                 }
             }

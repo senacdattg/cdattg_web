@@ -254,10 +254,18 @@ class InstructorController extends Controller
         try {
             DB::beginTransaction();
             
-            // Validar que la persona existe y no es instructor
-            $persona = \App\Models\Persona::whereDoesntHave('instructor')
-                ->whereHas('user')
+            // Validar que la persona existe
+            $persona = \App\Models\Persona::with(['instructor', 'user'])
                 ->findOrFail($request->input('persona_id'));
+
+            // Validaciones de negocio
+            if ($persona->instructor) {
+                return redirect()->back()->withInput()->with('error', 'Esta persona ya es instructor.');
+            }
+
+            if (!$persona->user) {
+                return redirect()->back()->withInput()->with('error', 'Esta persona no tiene un usuario asociado.');
+            }
 
             // Crear Instructor
             $instructor = new Instructor();
