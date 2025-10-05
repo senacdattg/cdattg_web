@@ -397,3 +397,7 @@
         });
     </script>
 @stop
+
+@section('footer')
+    @include('layout.footer')
+@endsection

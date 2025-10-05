@@ -422,3 +422,7 @@
     </script>
     <script src="{{ asset('js/instructor-create.js') }}"></script>
 @endsection
+
+@section('footer')
+    @include('layout.footer')
+@endsection
