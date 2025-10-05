@@ -2489,17 +2489,27 @@ class FichaCaracterizacionController extends Controller
                 'aprendices.persona.user'
             ])->findOrFail($id);
 
-            // Obtener todas las personas que NO tienen rol de APRENDIZ y NO están asignadas a esta ficha
-            $personasDisponibles = \App\Models\Persona::with('user')
-                ->whereDoesntHave('aprendiz.fichas', function($query) use ($id) {
-                    $query->where('ficha_id', $id);
-                })
-                ->whereHas('user', function($query) {
-                    $query->whereDoesntHave('roles', function($roleQuery) {
-                        $roleQuery->where('name', 'APRENDIZ');
+            // Obtener todas las personas que NO están asignadas a esta ficha
+            // Incluir tanto personas sin rol APRENDIZ como aprendices desasignados
+            $personasDisponibles = \App\Models\Persona::with('user', 'aprendiz')
+                ->where('status', 1) // Solo personas activas
+                ->where(function($query) use ($id) {
+                    // Personas que no tienen aprendiz asignado a esta ficha
+                    $query->whereDoesntHave('aprendiz.fichas', function($subQuery) use ($id) {
+                        $subQuery->where('ficha_id', $id);
                     });
                 })
-                ->where('status', 1) // Solo personas activas
+                ->where(function($query) {
+                    // Personas que NO tienen rol APRENDIZ O que son aprendices desasignados (estado = 0)
+                    $query->whereHas('user', function($userQuery) {
+                        $userQuery->whereDoesntHave('roles', function($roleQuery) {
+                            $roleQuery->where('name', 'APRENDIZ');
+                        });
+                    })
+                    ->orWhereHas('aprendiz', function($aprendizQuery) {
+                        $aprendizQuery->where('estado', 0); // Aprendices desasignados
+                    });
+                })
                 ->orderBy('id', 'desc')
                 ->get();
 
