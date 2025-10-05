@@ -800,6 +800,8 @@ class InstructorController extends Controller
         ]);
 
         try {
+            DB::beginTransaction();
+            
             // Validar que la red de conocimiento pertenezca a la regional del instructor
             $redConocimiento = \App\Models\RedConocimiento::where('id', $request->red_conocimiento_id)
                 ->where('regionals_id', $instructor->regional_id)
@@ -813,9 +815,19 @@ class InstructorController extends Controller
             $especialidadesActuales = $instructor->especialidades ?? [];
 
             if ($request->tipo === 'principal') {
+                // Verificar que no esté ya asignada como secundaria
+                $especialidadesSecundarias = $especialidadesActuales['secundarias'] ?? [];
+                if (in_array($redConocimiento->nombre, $especialidadesSecundarias)) {
+                    // Remover de secundarias antes de asignar como principal
+                    $especialidadesSecundarias = array_filter($especialidadesSecundarias, function($esp) use ($redConocimiento) {
+                        return $esp !== $redConocimiento->nombre;
+                    });
+                    $especialidadesActuales['secundarias'] = array_values($especialidadesSecundarias);
+                }
+                
                 // Solo puede haber una especialidad principal
                 $especialidadesActuales['principal'] = $redConocimiento->nombre;
-                $mensaje = 'Especialidad principal asignada exitosamente';
+                $mensaje = "Especialidad principal '{$redConocimiento->nombre}' asignada exitosamente";
             } else {
                 // Agregar especialidad secundaria
                 $especialidadesSecundarias = $especialidadesActuales['secundarias'] ?? [];
@@ -832,16 +844,31 @@ class InstructorController extends Controller
                 
                 $especialidadesSecundarias[] = $redConocimiento->nombre;
                 $especialidadesActuales['secundarias'] = $especialidadesSecundarias;
-                $mensaje = 'Especialidad secundaria asignada exitosamente';
+                $mensaje = "Especialidad secundaria '{$redConocimiento->nombre}' asignada exitosamente";
             }
 
             $instructor->especialidades = $especialidadesActuales;
             $instructor->save();
 
+            DB::commit();
+
+            Log::info('Especialidad asignada exitosamente', [
+                'instructor_id' => $instructor->id,
+                'especialidad' => $redConocimiento->nombre,
+                'tipo' => $request->tipo,
+                'especialidades_actuales' => $especialidadesActuales
+            ]);
+
             return redirect()->back()->with('success', $mensaje);
         } catch (\Exception $e) {
-            Log::error('Error al asignar especialidad: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Error al asignar la especialidad');
+            DB::rollBack();
+            Log::error('Error al asignar especialidad', [
+                'instructor_id' => $instructor->id,
+                'red_conocimiento_id' => $request->red_conocimiento_id,
+                'tipo' => $request->tipo,
+                'error' => $e->getMessage()
+            ]);
+            return redirect()->back()->with('error', 'Error al asignar la especialidad. Por favor, inténtelo de nuevo.');
         }
     }
 
@@ -858,27 +885,61 @@ class InstructorController extends Controller
         ]);
 
         try {
+            DB::beginTransaction();
+            
             $especialidadesActuales = $instructor->especialidades ?? [];
+            $especialidadNombre = $request->especialidad;
 
             if ($request->tipo === 'principal') {
+                // Verificar que la especialidad principal existe
+                if ($especialidadesActuales['principal'] !== $especialidadNombre) {
+                    return redirect()->back()->with('error', 'La especialidad principal especificada no coincide');
+                }
+                
                 $especialidadesActuales['principal'] = null;
-                $mensaje = 'Especialidad principal removida exitosamente';
+                $mensaje = "Especialidad principal '{$especialidadNombre}' removida exitosamente";
+                
+                Log::info('Especialidad principal removida', [
+                    'instructor_id' => $instructor->id,
+                    'especialidad_removida' => $especialidadNombre
+                ]);
             } else {
                 $especialidadesSecundarias = $especialidadesActuales['secundarias'] ?? [];
-                $especialidadesSecundarias = array_filter($especialidadesSecundarias, function($esp) use ($request) {
-                    return $esp !== $request->especialidad;
+                
+                // Verificar que la especialidad secundaria existe
+                if (!in_array($especialidadNombre, $especialidadesSecundarias)) {
+                    return redirect()->back()->with('error', 'La especialidad secundaria especificada no existe');
+                }
+                
+                // Remover la especialidad de la lista
+                $especialidadesSecundarias = array_filter($especialidadesSecundarias, function($esp) use ($especialidadNombre) {
+                    return $esp !== $especialidadNombre;
                 });
                 $especialidadesActuales['secundarias'] = array_values($especialidadesSecundarias);
-                $mensaje = 'Especialidad secundaria removida exitosamente';
+                $mensaje = "Especialidad secundaria '{$especialidadNombre}' removida exitosamente";
+                
+                Log::info('Especialidad secundaria removida', [
+                    'instructor_id' => $instructor->id,
+                    'especialidad_removida' => $especialidadNombre,
+                    'especialidades_restantes' => $especialidadesSecundarias
+                ]);
             }
 
             $instructor->especialidades = $especialidadesActuales;
             $instructor->save();
 
+            DB::commit();
+
             return redirect()->back()->with('success', $mensaje);
         } catch (\Exception $e) {
-            Log::error('Error al remover especialidad: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Error al remover la especialidad');
+            DB::rollBack();
+            Log::error('Error al remover especialidad', [
+                'instructor_id' => $instructor->id,
+                'especialidad' => $request->especialidad,
+                'tipo' => $request->tipo,
+                'error' => $e->getMessage()
+            ]);
+            return redirect()->back()->with('error', 'Error al remover la especialidad. Por favor, inténtelo de nuevo.');
         }
     }
 

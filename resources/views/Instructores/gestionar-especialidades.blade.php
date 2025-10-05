@@ -73,6 +73,28 @@
             margin-bottom: 1rem;
         }
     </style>
+    
+    <script>
+        // Función para confirmar asignación de especialidad principal
+        function confirmarAsignacionPrincipal(especialidadNombre) {
+            return confirm(`¿Está seguro de asignar '${especialidadNombre}' como especialidad principal?\n\nEsto reemplazará la especialidad principal actual (si existe).`);
+        }
+        
+        // Función para confirmar asignación de especialidad secundaria
+        function confirmarAsignacionSecundaria(especialidadNombre) {
+            return confirm(`¿Está seguro de asignar '${especialidadNombre}' como especialidad secundaria?`);
+        }
+        
+        // Función para confirmar remoción de especialidad principal
+        function confirmarRemocionPrincipal(especialidadNombre) {
+            return confirm(`⚠️ ADVERTENCIA ⚠️\n\n¿Está seguro de remover la especialidad principal '${especialidadNombre}'?\n\nEsto dejará al instructor sin especialidad principal.`);
+        }
+        
+        // Función para confirmar remoción de especialidad secundaria
+        function confirmarRemocionSecundaria(especialidadNombre) {
+            return confirm(`¿Está seguro de remover la especialidad secundaria '${especialidadNombre}'?`);
+        }
+    </script>
 @endsection
 
 @section('content_header')
@@ -126,6 +148,37 @@
                     <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ route('instructor.show', $instructor->id) }}">
                         <i class="fas fa-arrow-left mr-1"></i> Volver
                     </a>
+
+                    <!-- Mensajes de Alerta -->
+                    @if(session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            {{ session('success') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                            {{ session('error') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+
+                    @if(session('warning'))
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            {{ session('warning') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
 
                     <!-- Información del Instructor -->
                     <div class="instructor-info">
@@ -188,10 +241,17 @@
                                                             <i class="fas fa-star mr-1"></i>
                                                             Principal
                                                         </span>
-                                                        <button type="button" class="btn btn-remove btn-sm" 
-                                                                onclick="alert('Para remover la especialidad principal, primero debe asignar otra como principal')">
-                                                            <i class="fas fa-times mr-1"></i>Remover
-                                                        </button>
+                                                        <form action="{{ route('instructor.removerEspecialidad', $instructor->id) }}" 
+                                                              method="POST" class="d-inline">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <input type="hidden" name="especialidad" value="{{ $especialidadPrincipal }}">
+                                                            <input type="hidden" name="tipo" value="principal">
+                                                            <button type="submit" class="btn btn-warning btn-sm" 
+                                                                    onclick="return confirmarRemocionPrincipal('{{ $especialidadPrincipal }}')">
+                                                                <i class="fas fa-times mr-1"></i>Remover
+                                                            </button>
+                                                        </form>
                                                     </div>
                                                 </div>
                                             </div>
@@ -213,12 +273,14 @@
                                                             <i class="fas fa-circle mr-1"></i>
                                                             Secundaria
                                                         </span>
-                                                        <form action="{{ route('instructor.removerEspecialidad', [$instructor->id, $especialidad]) }}" 
+                                                        <form action="{{ route('instructor.removerEspecialidad', $instructor->id) }}" 
                                                               method="POST" class="d-inline">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="btn btn-remove btn-sm" 
-                                                                    onclick="return confirm('¿Está seguro de remover esta especialidad?')">
+                                                            <input type="hidden" name="especialidad" value="{{ $especialidad }}">
+                                                            <input type="hidden" name="tipo" value="secundaria">
+                                                            <button type="submit" class="btn btn-danger btn-sm" 
+                                                                    onclick="return confirmarRemocionSecundaria('{{ $especialidad }}')">
                                                                 <i class="fas fa-times mr-1"></i>Remover
                                                             </button>
                                                         </form>
@@ -259,13 +321,28 @@
                                                         <small class="text-muted">
                                                             {{ $redConocimiento->descripcion ?? 'Sin descripción' }}
                                                         </small>
-                                                        <form action="{{ route('instructor.asignarEspecialidad', [$instructor->id, $redConocimiento->id]) }}" 
-                                                              method="POST" class="d-inline">
-                                                            @csrf
-                                                            <button type="submit" class="btn btn-assign btn-sm">
-                                                                <i class="fas fa-plus mr-1"></i>Asignar
-                                                            </button>
-                                                        </form>
+                                                        <div class="btn-group" role="group">
+                                                            <form action="{{ route('instructor.asignarEspecialidad', $instructor->id) }}" 
+                                                                  method="POST" class="d-inline">
+                                                                @csrf
+                                                                <input type="hidden" name="red_conocimiento_id" value="{{ $redConocimiento->id }}">
+                                                                <input type="hidden" name="tipo" value="principal">
+                                                                <button type="submit" class="btn btn-success btn-sm" 
+                                                                        onclick="return confirmarAsignacionPrincipal('{{ $redConocimiento->nombre }}')">
+                                                                    <i class="fas fa-star mr-1"></i>Principal
+                                                                </button>
+                                                            </form>
+                                                            <form action="{{ route('instructor.asignarEspecialidad', $instructor->id) }}" 
+                                                                  method="POST" class="d-inline">
+                                                                @csrf
+                                                                <input type="hidden" name="red_conocimiento_id" value="{{ $redConocimiento->id }}">
+                                                                <input type="hidden" name="tipo" value="secundaria">
+                                                                <button type="submit" class="btn btn-primary btn-sm" 
+                                                                        onclick="return confirmarAsignacionSecundaria('{{ $redConocimiento->nombre }}')">
+                                                                    <i class="fas fa-plus mr-1"></i>Secundaria
+                                                                </button>
+                                                            </form>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
