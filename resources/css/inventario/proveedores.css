@@ -1,0 +1,113 @@
+/* Proveedores - Estilos específicos */
+
+/* Headers y títulos */
+.proveedores-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    color: white;
+    padding: 2rem 1.5rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 25px rgba(216, 204, 204, 0.897);
+}
+
+.proveedores-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.proveedores-header .subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-top: 0.5rem;
+}
+
+/* Tabla de proveedores */
+.proveedores-table {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: none;
+}
+
+.proveedores-table thead {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.proveedores-table thead th {
+    border: none;
+    padding: 1rem 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    position: relative;
+}
+
+.proveedores-table tbody td {
+    padding: 1rem 0.75rem;
+    border-bottom: 1px solid #f1f3f4;
+    vertical-align: middle;
+}
+
+.proveedores-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.proveedores-table tbody tr:hover {
+    background: linear-gradient(135deg, #f8f9ff, #fff5f5);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.proveedores-table td:nth-child(2) {
+    font-weight: 500;
+}
+
+.proveedor-contacto {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.85rem;
+    color: var(--inv-muted);
+}
+
+.proveedor-contacto span+span {
+    margin-top: 0.15rem;
+}
+
+/* Información de auditoría */
+.audit-info {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.user-id {
+    background: linear-gradient(135deg, #a8edea, #fed6e3);
+    color: #2d3748;
+    padding: 0.25rem 0.5rem;
+    border-radius: 15px;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 0.25rem;
+}
+
+.badge-created {
+    background: linear-gradient(135deg, #d299c2, #fef9d7);
+    color: #2d3748;
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.badge-updated {
+    background: linear-gradient(135deg, #ffecd2, #fcb69f);
+    color: #2d3748;
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
