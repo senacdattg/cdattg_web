@@ -56,6 +56,7 @@ class DatabaseSeeder extends Seeder
 
             // las relaciones
             InstructorSeeder::class,
+            InstructorTestDataSeeder::class,
             UpdatePersonasUserFieldsSeeder::class,
             AprendizSeeder::class,
             FichaCaracterizacionSeeder::class,//Depende super-admin, instructor, ambiente, modalidad de formacion, sede, jornada
