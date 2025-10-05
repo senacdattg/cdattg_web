@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('css')
-    @vite(['parametros_css'])
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
 @endsection
 
 @section('content_header')
@@ -27,7 +27,7 @@
                                 </a>
                             </li>
                             <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-chalkboard-teacher"></i> Instructores
+                                <i class="fas fa-user-tie"></i> Instructores
                             </li>
                         </ol>
                     </nav>
