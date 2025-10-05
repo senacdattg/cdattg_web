@@ -16,6 +16,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class InstructorController extends Controller
 {
@@ -35,33 +36,39 @@ class InstructorController extends Controller
      */
     public function index(Request $request)
     {
-        // $instructores = Instructor::paginate(10);
-        $search = $request->input('search');
+        try {
+            $search = $request->input('search');
 
-        $instructores = Instructor::whereHas('persona', function ($query) use ($search) {
-            if ($search) {
-                $query->where('primer_nombre', 'like', "%{$search}%")
-                    ->orWhere('segundo_nombre', 'like', "%{$search}%")
-                    ->orWhere('primer_apellido', 'like', "%{$search}%")
-                    ->orWhere('segundo_apellido', 'like', "%{$search}%")
-                    ->orWhere('numero_documento', 'like', "%{$search}%");
+            $instructores = Instructor::whereHas('persona', function ($query) use ($search) {
+                if ($search) {
+                    $query->where('primer_nombre', 'like', "%{$search}%")
+                        ->orWhere('segundo_nombre', 'like', "%{$search}%")
+                        ->orWhere('primer_apellido', 'like', "%{$search}%")
+                        ->orWhere('segundo_apellido', 'like', "%{$search}%")
+                        ->orWhere('numero_documento', 'like', "%{$search}%");
+                }
+            })->orderBy('id', 'desc')
+                ->paginate(10);
+
+            $personasSinUsuario = DB::table('personas')
+                ->leftJoin('users', 'personas.id', '=', 'users.persona_id')
+                ->whereNull('users.id')
+                ->select('personas.id', 'personas.primer_nombre', 'personas.primer_apellido', 'personas.numero_documento', 'personas.email')
+                ->get();
+
+            if ($personasSinUsuario->count() > 0) {
+                return view('Instructores.error', compact('personasSinUsuario'))->with('error', 'Existen personas sin usuario asociado. Por favor, cree un usuario para cada persona.');
             }
-        })->orderBy('id', 'desc')
-            ->paginate(10);
 
-        $personasSinUsuario = DB::table('personas')
-            ->leftJoin('users', 'personas.id', '=', 'users.persona_id')
-            ->whereNull('users.id')
-            ->select('personas.id', 'personas.primer_nombre', 'personas.primer_apellido', 'personas.numero_documento', 'personas.email')
-            ->get();
-
-        // dd($personasSinUsuario);
-
-        if ($personasSinUsuario->count() > 0) {
-            return view('Instructores.error', compact('personasSinUsuario'))->with('error', 'Existen personas sin usuario asociado. Por favor, cree un usuario para cada persona.');
+            return view('Instructores.index', compact('instructores'));
+            
+        } catch (Exception $e) {
+            Log::error('Error al listar instructores', [
+                'error' => $e->getMessage(),
+                'search' => $request->input('search')
+            ]);
+            return redirect()->back()->with('error', 'Error al cargar la lista de instructores. Por favor, inténtelo de nuevo.');
         }
-
-        return view('Instructores.index', compact('instructores'));
     }
 
     /**
@@ -69,18 +76,27 @@ class InstructorController extends Controller
      */
     public function create()
     {
-        // llamar los tipos de documentos
-        $documentos = Tema::with(['parametros' => function ($query) {
-            $query->wherePivot('status', 1);
-        }])->findOrFail(2);
-        // llamar los generos
-        $generos = Tema::with(['parametros' => function ($query) {
-            $query->wherePivot('status', 1);
-        }])->findOrFail(3);
-        $regionales = Regional::where('status', 1)->get();
+        try {
+            // llamar los tipos de documentos
+            $documentos = Tema::with(['parametros' => function ($query) {
+                $query->wherePivot('status', 1);
+            }])->findOrFail(2);
+            
+            // llamar los generos
+            $generos = Tema::with(['parametros' => function ($query) {
+                $query->wherePivot('status', 1);
+            }])->findOrFail(3);
+            
+            $regionales = Regional::where('status', 1)->get();
 
-
-        return view('Instructores.create', compact('documentos', 'generos', 'regionales'));
+            return view('Instructores.create', compact('documentos', 'generos', 'regionales'));
+            
+        } catch (Exception $e) {
+            Log::error('Error al cargar formulario de creación de instructor', [
+                'error' => $e->getMessage()
+            ]);
+            return redirect()->route('instructor.index')->with('error', 'Error al cargar el formulario. Por favor, inténtelo de nuevo.');
+        }
     }
 
     /**
@@ -88,48 +104,62 @@ class InstructorController extends Controller
      */
     public function store(StoreInstructorRequest $request)
     {
-        //dd($request);
-        $fechaNacimiento = $request->fecha_de_nacimiento;
-        // @dd($fechaNacimiento);
+        try {
+            DB::beginTransaction();
+            
+            // Crear Persona
+            $persona = new Persona();
+            $persona->tipo_documento = $request->input('tipo_documento');
+            $persona->numero_documento = $request->input('numero_documento');
+            $persona->primer_nombre = $request->input('primer_nombre');
+            $persona->segundo_nombre = $request->input('segundo_nombre');
+            $persona->primer_apellido = $request->input('primer_apellido');
+            $persona->segundo_apellido = $request->input('segundo_apellido');
+            $persona->fecha_de_nacimiento = $request->input('fecha_de_nacimiento');
+            $persona->genero = $request->input('genero');
+            $persona->email = $request->input('email');
+            $persona->save();
 
-        DB::beginTransaction();
-        // Crear Persona
-        $persona = new Persona();
-        $persona->tipo_documento = $request->input('tipo_documento');
-        $persona->numero_documento = $request->input('numero_documento');
-        $persona->primer_nombre = $request->input('primer_nombre');
-        $persona->segundo_nombre = $request->input('segundo_nombre');
-        $persona->primer_apellido = $request->input('primer_apellido');
-        $persona->segundo_apellido = $request->input('segundo_apellido');
-        $persona->fecha_de_nacimiento = $request->input('fecha_de_nacimiento');
-        $persona->genero = $request->input('genero');
-        $persona->email = $request->input('email');
-        $persona->save();
+            // Crear Instructor
+            $instructor = new Instructor();
+            $instructor->persona_id = $persona->id;
+            $instructor->regional_id = $request->input('regional_id');
+            $instructor->save();
 
+            // Crear Usuario asociado a la Persona
+            $user = new User();
+            $user->email = $request->input('email');
+            $user->password = Hash::make($request->input('numero_documento'));
+            $user->persona_id = $persona->id;
+            $user->save();
+            $user->assignRole('INSTRUCTOR');
 
-        $instructor = new Instructor();
-        $instructor->persona_id = $persona->id;
-        $instructor->regional_id = $request->input('regional_id');
-        $instructor->save();
-
-
-        // Crear Usuario asociado a la Persona
-        $user = new User();
-        $user->email = $request->input('email');
-        $user->password = Hash::make($request->input('numero_documento'));
-        $user->persona_id = $persona->id;
-        $user->save();
-        $user->assignRole('INSTRUCTOR');
-
-        DB::commit();
-        return redirect()->route('instructor.index')->with('success', '¡Registro Exitoso!');
-
-        // Manejar excepciones de la base de datos
-        // @dd($e);
-
-        if (!$persona || !$instructor || !$user) {
+            DB::commit();
+            
+            Log::info('Instructor creado exitosamente', [
+                'instructor_id' => $instructor->id,
+                'persona_id' => $persona->id,
+                'user_id' => $user->id,
+                'email' => $request->input('email')
+            ]);
+            
+            return redirect()->route('instructor.index')->with('success', '¡Registro Exitoso!');
+            
+        } catch (QueryException $e) {
             DB::rollBack();
-            return redirect()->back()->withInput()->with('error', 'Error al guardar los datos. Por favor, inténtelo de nuevo.');
+            Log::error('Error al crear instructor - QueryException', [
+                'error' => $e->getMessage(),
+                'request_data' => $request->except(['password'])
+            ]);
+            return redirect()->back()->withInput()->with('error', 'Error de base de datos. Por favor, inténtelo de nuevo.');
+            
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Error al crear instructor - Exception', [
+                'error' => $e->getMessage(),
+                'request_data' => $request->except(['password'])
+            ]);
+            return redirect()->back()->withInput()->with('error', 'Error inesperado. Por favor, inténtelo de nuevo.');
         }
     }
 
@@ -138,10 +168,20 @@ class InstructorController extends Controller
      */
     public function show(Instructor $instructor)
     {
-        $fichasCaracterizacion = FichaCaracterizacion::all();
-        $instructor->persona->edad = Carbon::parse($instructor->persona->fecha_de_nacimiento)->age;
-        $instructor->persona->fecha_de_nacimiento = Carbon::parse($instructor->persona->fecha_de_nacimiento)->format('d/m/Y');
-        return view('Instructores.show', compact('instructor', 'fichasCaracterizacion'));
+        try {
+            $fichasCaracterizacion = FichaCaracterizacion::all();
+            $instructor->persona->edad = Carbon::parse($instructor->persona->fecha_de_nacimiento)->age;
+            $instructor->persona->fecha_de_nacimiento = Carbon::parse($instructor->persona->fecha_de_nacimiento)->format('d/m/Y');
+            
+            return view('Instructores.show', compact('instructor', 'fichasCaracterizacion'));
+            
+        } catch (Exception $e) {
+            Log::error('Error al mostrar instructor', [
+                'instructor_id' => $instructor->id,
+                'error' => $e->getMessage()
+            ]);
+            return redirect()->route('instructor.index')->with('error', 'Error al cargar los datos del instructor. Por favor, inténtelo de nuevo.');
+        }
     }
 
     /**
@@ -149,16 +189,28 @@ class InstructorController extends Controller
      */
     public function edit(Instructor $instructor)
     {
-        // llamar los tipos de documentos
-        $documentos = Tema::with(['parametros' => function ($query) {
-            $query->wherePivot('status', 1);
-        }])->findOrFail(2);
-        // llamar los generos
-        $generos = Tema::with(['parametros' => function ($query) {
-            $query->wherePivot('status', 1);
-        }])->findOrFail(3);
-        $regionales = Regional::where('status', 1)->get();
-        return view('Instructores.edit', ['instructor' => $instructor], compact('documentos', 'generos', 'regionales'));
+        try {
+            // llamar los tipos de documentos
+            $documentos = Tema::with(['parametros' => function ($query) {
+                $query->wherePivot('status', 1);
+            }])->findOrFail(2);
+            
+            // llamar los generos
+            $generos = Tema::with(['parametros' => function ($query) {
+                $query->wherePivot('status', 1);
+            }])->findOrFail(3);
+            
+            $regionales = Regional::where('status', 1)->get();
+            
+            return view('Instructores.edit', ['instructor' => $instructor], compact('documentos', 'generos', 'regionales'));
+            
+        } catch (Exception $e) {
+            Log::error('Error al cargar formulario de edición de instructor', [
+                'instructor_id' => $instructor->id,
+                'error' => $e->getMessage()
+            ]);
+            return redirect()->route('instructor.index')->with('error', 'Error al cargar el formulario de edición. Por favor, inténtelo de nuevo.');
+        }
     }
 
     /**
@@ -168,7 +220,8 @@ class InstructorController extends Controller
     {
         try {
             DB::beginTransaction();
-            $persona = Persona::find($instructor->persona_id);
+            
+            $persona = Persona::findOrFail($instructor->persona_id);
             $persona->update([
                 'tipo_documento' => $request->input('tipo_documento'),
                 'numero_documento' => $request->input('numero_documento'),
@@ -185,20 +238,44 @@ class InstructorController extends Controller
                 'persona_id' => $persona->id,
                 'regional_id' => $request->regional_id,
             ]);
-            // actualizar Usuario asociado a la Persona
-            $user = User::where('persona_id', $persona->id);
-            $user->update([
-                'email' => $request->input('email'),
-                'password' => Hash::make($request->input('numero_documento')),
-            ]);
+            
+            // Actualizar Usuario asociado a la Persona
+            $user = User::where('persona_id', $persona->id)->first();
+            if ($user) {
+                $user->update([
+                    'email' => $request->input('email'),
+                    'password' => Hash::make($request->input('numero_documento')),
+                ]);
+            }
 
             DB::commit();
+            
+            Log::info('Instructor actualizado exitosamente', [
+                'instructor_id' => $instructor->id,
+                'persona_id' => $persona->id,
+                'user_id' => $user ? $user->id : null,
+                'email' => $request->input('email')
+            ]);
+            
             return redirect()->route('instructor.index')->with('success', '¡Actualización Exitosa!');
+            
         } catch (QueryException $e) {
-            // Manejar excepciones de la base de datos
-            // @dd($e);
             DB::rollBack();
-            return redirect()->back()->withInput()->with('error', 'Error de base de datos. Por favor, inténtelo de nuevo.' . $e->getMessage());
+            Log::error('Error al actualizar instructor - QueryException', [
+                'instructor_id' => $instructor->id,
+                'error' => $e->getMessage(),
+                'request_data' => $request->except(['password'])
+            ]);
+            return redirect()->back()->withInput()->with('error', 'Error de base de datos. Por favor, inténtelo de nuevo.');
+            
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Error al actualizar instructor - Exception', [
+                'instructor_id' => $instructor->id,
+                'error' => $e->getMessage(),
+                'request_data' => $request->except(['password'])
+            ]);
+            return redirect()->back()->withInput()->with('error', 'Error inesperado. Por favor, inténtelo de nuevo.');
         }
     }
     public function ApiUpdate(Request $request)
@@ -263,15 +340,58 @@ class InstructorController extends Controller
     {
         try {
             DB::beginTransaction();
+            
+            // Verificar si el instructor tiene relaciones que impidan su eliminación
+            $persona = Persona::find($instructor->persona_id);
+            $user = User::where('persona_id', $instructor->persona_id)->first();
+            
+            // Eliminar el instructor
             $instructor->delete();
+            
+            // Si existe usuario asociado, eliminarlo también
+            if ($user) {
+                $user->delete();
+            }
+            
+            // Si existe persona asociada, eliminarla también
+            if ($persona) {
+                $persona->delete();
+            }
+            
             DB::commit();
+            
+            Log::info('Instructor eliminado exitosamente', [
+                'instructor_id' => $instructor->id,
+                'persona_id' => $persona ? $persona->id : null,
+                'user_id' => $user ? $user->id : null
+            ]);
+            
             return redirect()->route('instructor.index')->with('success', 'Instructor eliminado exitosamente');
+            
         } catch (QueryException $e) {
             DB::rollBack();
+            
+            Log::error('Error al eliminar instructor - QueryException', [
+                'instructor_id' => $instructor->id,
+                'error' => $e->getMessage(),
+                'error_code' => $e->getCode()
+            ]);
+            
             if ($e->getCode() == 23000) {
-
                 return redirect()->back()->with('error', 'El instructor se encuentra en uso en estos momentos, no se puede eliminar');
             }
+            
+            return redirect()->back()->with('error', 'Error de base de datos al eliminar el instructor. Por favor, inténtelo de nuevo.');
+            
+        } catch (Exception $e) {
+            DB::rollBack();
+            
+            Log::error('Error al eliminar instructor - Exception', [
+                'instructor_id' => $instructor->id,
+                'error' => $e->getMessage()
+            ]);
+            
+            return redirect()->back()->with('error', 'Error inesperado al eliminar el instructor. Por favor, inténtelo de nuevo.');
         }
     }
     public function createImportarCSV()
