@@ -111,12 +111,6 @@
                                            min="08:00" max="16:59" step="3600"
                                        @endif>
                             </div>
-                            <div class="col-md-4">
-                                <label class="form-label">&nbsp;</label>
-                                <button type="button" class="btn btn-primary btn-block" onclick="aplicarHorarioGlobal()">
-                                    <i class="fas fa-magic"></i> Aplicar Horario a Todos los Días
-                                </button>
-                            </div>
                         </div>
                         
                         <div class="alert alert-info mb-4">
@@ -241,7 +235,13 @@
                                                 <i class="fas fa-hourglass-half"></i>
                                                         @if($diaAsignado->hora_inicio && $diaAsignado->hora_fin)
                                                             @try
-                                                                {{ \Carbon\Carbon::parse($diaAsignado->hora_inicio)->diffInHours(\Carbon\Carbon::parse($diaAsignado->hora_fin)) }} horas por día
+                                                                @php
+                                                                    $inicio = \Carbon\Carbon::parse($diaAsignado->hora_inicio);
+                                                                    $fin = \Carbon\Carbon::parse($diaAsignado->hora_fin);
+                                                                    $horas = $fin->diffInMinutes($inicio) / 60;
+                                                                    $horasFormateadas = number_format($horas, 1);
+                                                                @endphp
+                                                                {{ $horasFormateadas }} horas/día
                                                             @catch(Exception $e)
                                                                 Horas no calculables
                                                             @endtry
