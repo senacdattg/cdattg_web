@@ -191,6 +191,11 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{instructor}/desasignar-ficha/{ficha}', [InstructorController::class, 'desasignarFicha'])
             ->name('instructor.desasignarFicha')
             ->middleware('can:EDITAR INSTRUCTOR');
+            
+        // Dashboard específico para instructores
+        Route::get('/dashboard', [InstructorController::class, 'dashboard'])
+            ->name('instructor.dashboard')
+            ->middleware('can:VER INSTRUCTOR');
     });
     
     // Rutas para gestión de horarios

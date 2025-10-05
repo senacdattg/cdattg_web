@@ -811,6 +811,288 @@ class InstructorController extends Controller
     }
 
     /**
+     * Dashboard específico para instructores
+     */
+    public function dashboard(Request $request)
+    {
+        try {
+            $user = Auth::user();
+            $instructor = $user->instructor;
+
+            if (!$instructor) {
+                return redirect()->back()->with('error', 'No se encontró información del instructor');
+            }
+
+            // Autorizar acceso
+            $this->authorize('viewAny', Instructor::class);
+
+            // Obtener fichas activas
+            $fichasActivas = $instructor->instructorFichas()
+                ->with(['ficha' => function($q) {
+                    $q->with([
+                        'programaFormacion.redConocimiento',
+                        'modalidadFormacion',
+                        'ambiente.sede',
+                        'jornadaFormacion',
+                        'diasFormacion'
+                    ]);
+                }])
+                ->whereHas('ficha', function($q) {
+                    $q->where('status', true)
+                      ->where('fecha_fin', '>=', now()->toDateString());
+                })
+                ->orderBy('fecha_inicio')
+                ->get();
+
+            // Obtener fichas próximas (próximos 30 días)
+            $fichasProximas = $instructor->instructorFichas()
+                ->with(['ficha' => function($q) {
+                    $q->with([
+                        'programaFormacion.redConocimiento',
+                        'modalidadFormacion',
+                        'ambiente.sede',
+                        'jornadaFormacion',
+                        'diasFormacion'
+                    ]);
+                }])
+                ->whereHas('ficha', function($q) {
+                    $q->where('status', true)
+                      ->where('fecha_inicio', '>=', now()->toDateString())
+                      ->where('fecha_inicio', '<=', now()->addDays(30)->toDateString());
+                })
+                ->orderBy('fecha_inicio')
+                ->get();
+
+            // Obtener estadísticas de desempeño
+            $estadisticas = $this->obtenerEstadisticasDesempeño($instructor);
+
+            // Obtener eventos del calendario (clases)
+            $eventosCalendario = $this->obtenerEventosCalendario($instructor);
+
+            // Obtener notificaciones recientes
+            $notificaciones = $this->obtenerNotificacionesRecientes($instructor);
+
+            // Obtener resumen de actividades
+            $actividadesRecientes = $this->obtenerActividadesRecientes($instructor);
+
+            return view('instructores.dashboard', compact(
+                'instructor',
+                'fichasActivas',
+                'fichasProximas',
+                'estadisticas',
+                'eventosCalendario',
+                'notificaciones',
+                'actividadesRecientes'
+            ));
+
+        } catch (\Exception $e) {
+            Log::error('Error cargando dashboard del instructor', [
+                'instructor_id' => Auth::user()->instructor?->id,
+                'error' => $e->getMessage()
+            ]);
+            return redirect()->back()->with('error', 'Error al cargar el dashboard del instructor');
+        }
+    }
+
+    /**
+     * Obtener estadísticas de desempeño del instructor
+     */
+    private function obtenerEstadisticasDesempeño(Instructor $instructor): array
+    {
+        $fichasActivas = $instructor->instructorFichas()
+            ->whereHas('ficha', function($q) {
+                $q->where('status', true)
+                  ->where('fecha_fin', '>=', now()->toDateString());
+            })
+            ->get();
+
+        $fichasFinalizadas = $instructor->instructorFichas()
+            ->whereHas('ficha', function($q) {
+                $q->where('fecha_fin', '<', now()->toDateString());
+            })
+            ->get();
+
+        $totalHoras = $instructor->instructorFichas()->sum('total_horas_instructor');
+        $horasEsteMes = $instructor->instructorFichas()
+            ->whereHas('ficha', function($q) {
+                $q->whereMonth('fecha_inicio', now()->month)
+                  ->whereYear('fecha_inicio', now()->year);
+            })
+            ->sum('total_horas_instructor');
+
+        return [
+            'fichas_activas' => $fichasActivas->count(),
+            'fichas_proximas' => $instructor->instructorFichas()
+                ->whereHas('ficha', function($q) {
+                    $q->where('status', true)
+                      ->where('fecha_inicio', '>=', now()->toDateString())
+                      ->where('fecha_inicio', '<=', now()->addDays(30)->toDateString());
+                })
+                ->count(),
+            'fichas_finalizadas' => $fichasFinalizadas->count(),
+            'total_horas' => $totalHoras,
+            'horas_este_mes' => $horasEsteMes,
+            'promedio_horas_mes' => $instructor->instructorFichas()
+                ->whereHas('ficha', function($q) {
+                    $q->where('fecha_inicio', '>=', now()->subMonths(6)->toDateString());
+                })
+                ->sum('total_horas_instructor') / 6,
+            'anos_experiencia' => $instructor->anos_experiencia ?? 0,
+            'especialidades' => count($instructor->especialidades['secundarias'] ?? []) + 
+                               (empty($instructor->especialidades['principal']) ? 0 : 1)
+        ];
+    }
+
+    /**
+     * Obtener eventos del calendario para el instructor
+     */
+    private function obtenerEventosCalendario(Instructor $instructor): array
+    {
+        $eventos = [];
+
+        $fichasActivas = $instructor->instructorFichas()
+            ->with(['ficha.diasFormacion'])
+            ->whereHas('ficha', function($q) {
+                $q->where('status', true)
+                  ->where('fecha_fin', '>=', now()->toDateString());
+            })
+            ->get();
+
+        foreach ($fichasActivas as $instructorFicha) {
+            $ficha = $instructorFicha->ficha;
+            
+            foreach ($ficha->diasFormacion as $diaFormacion) {
+                $fechaInicio = Carbon::parse($ficha->fecha_inicio);
+                $fechaFin = Carbon::parse($ficha->fecha_fin);
+                
+                // Generar eventos para cada día de formación en el rango
+                $fechaActual = $fechaInicio->copy();
+                while ($fechaActual->lte($fechaFin)) {
+                    if ($this->esDiaFormacion($fechaActual, $diaFormacion->dia_nombre)) {
+                        $eventos[] = [
+                            'title' => $ficha->programaFormacion->nombre ?? 'Sin programa',
+                            'start' => $fechaActual->format('Y-m-d') . 'T' . $diaFormacion->hora_inicio,
+                            'end' => $fechaActual->format('Y-m-d') . 'T' . $diaFormacion->hora_fin,
+                            'backgroundColor' => $this->obtenerColorPorEspecialidad($ficha->programaFormacion->redConocimiento->nombre ?? ''),
+                            'borderColor' => $this->obtenerColorPorEspecialidad($ficha->programaFormacion->redConocimiento->nombre ?? ''),
+                            'extendedProps' => [
+                                'ficha_id' => $ficha->id,
+                                'ambiente' => $ficha->ambiente->nombre ?? 'Sin ambiente',
+                                'sede' => $ficha->ambiente->sede->nombre ?? 'Sin sede',
+                                'modalidad' => $ficha->modalidadFormacion->nombre ?? 'Sin modalidad'
+                            ]
+                        ];
+                    }
+                    $fechaActual->addDay();
+                }
+            }
+        }
+
+        return $eventos;
+    }
+
+    /**
+     * Verificar si una fecha corresponde a un día de formación
+     */
+    private function esDiaFormacion(Carbon $fecha, string $diaNombre): bool
+    {
+        $diasSemana = [
+            'Lunes' => 1,
+            'Martes' => 2,
+            'Miércoles' => 3,
+            'Jueves' => 4,
+            'Viernes' => 5,
+            'Sábado' => 6,
+            'Domingo' => 0
+        ];
+
+        return $fecha->dayOfWeek === ($diasSemana[$diaNombre] ?? -1);
+    }
+
+    /**
+     * Obtener color por especialidad para el calendario
+     */
+    private function obtenerColorPorEspecialidad(string $especialidad): string
+    {
+        $colores = [
+            'Tecnologías de la Información y las Comunicaciones' => '#3498db',
+            'Electrónica' => '#e74c3c',
+            'Mecánica Industrial' => '#f39c12',
+            'Construcción' => '#2ecc71',
+            'Gastronomía' => '#9b59b6',
+            'Agropecuaria' => '#27ae60',
+            'Comercio' => '#34495e'
+        ];
+
+        return $colores[$especialidad] ?? '#95a5a6';
+    }
+
+    /**
+     * Obtener notificaciones recientes para el instructor
+     */
+    private function obtenerNotificacionesRecientes(Instructor $instructor): array
+    {
+        // Simular notificaciones - en un sistema real vendrían de una tabla de notificaciones
+        $notificaciones = [
+            [
+                'id' => 1,
+                'titulo' => 'Nueva ficha asignada',
+                'mensaje' => 'Se te ha asignado una nueva ficha de programación web',
+                'tipo' => 'success',
+                'fecha' => now()->subHours(2),
+                'leida' => false
+            ],
+            [
+                'id' => 2,
+                'titulo' => 'Recordatorio de clase',
+                'mensaje' => 'Tienes una clase programada mañana a las 8:00 AM',
+                'tipo' => 'info',
+                'fecha' => now()->subHours(5),
+                'leida' => false
+            ],
+            [
+                'id' => 3,
+                'titulo' => 'Evaluación pendiente',
+                'mensaje' => 'Debes completar la evaluación de la ficha 12345',
+                'tipo' => 'warning',
+                'fecha' => now()->subDays(1),
+                'leida' => true
+            ]
+        ];
+
+        return $notificaciones;
+    }
+
+    /**
+     * Obtener actividades recientes del instructor
+     */
+    private function obtenerActividadesRecientes(Instructor $instructor): array
+    {
+        $actividades = [];
+
+        // Obtener fichas recientes
+        $fichasRecientes = $instructor->instructorFichas()
+            ->with(['ficha.programaFormacion'])
+            ->whereHas('ficha')
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        foreach ($fichasRecientes as $instructorFicha) {
+            $actividades[] = [
+                'tipo' => 'ficha_asignada',
+                'titulo' => 'Ficha asignada',
+                'descripcion' => 'Se asignó la ficha ' . $instructorFicha->ficha->ficha . ' - ' . 
+                               ($instructorFicha->ficha->programaFormacion->nombre ?? 'Sin programa'),
+                'fecha' => $instructorFicha->created_at,
+                'icono' => 'fas fa-clipboard-list'
+            ];
+        }
+
+        return $actividades;
+    }
+
+    /**
      * Ver fichas asignadas al instructor
      */
     public function fichasAsignadas(Request $request, Instructor $instructor = null)
