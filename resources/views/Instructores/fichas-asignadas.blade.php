@@ -231,7 +231,7 @@
                             </h5>
                         </div>
                         <div class="card-body p-0">
-                            @if($fichas->count() > 0)
+                            @if($fichasAsignadas->count() > 0)
                                 <div class="table-responsive">
                                     <table class="table table-custom">
                                         <thead>
@@ -248,28 +248,28 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($fichas as $index => $ficha)
+                                            @foreach($fichasAsignadas as $index => $ficha)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>
-                                                    <strong>{{ $ficha->ficha }}</strong>
+                                                    <strong>{{ $ficha->ficha->ficha ?? 'N/A' }}</strong>
                                                 </td>
-                                                <td>{{ $ficha->programaFormacion->nombre ?? 'N/A' }}</td>
+                                                <td>{{ $ficha->ficha->programaFormacion->nombre ?? 'N/A' }}</td>
                                                 <td>
-                                                    @if($ficha->fecha_inicio)
-                                                        {{ \Carbon\Carbon::parse($ficha->fecha_inicio)->format('d/m/Y') }}
+                                                    @if($ficha->ficha->fecha_inicio)
+                                                        {{ \Carbon\Carbon::parse($ficha->ficha->fecha_inicio)->format('d/m/Y') }}
                                                     @else
                                                         N/A
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    @if($ficha->fecha_fin)
-                                                        {{ \Carbon\Carbon::parse($ficha->fecha_fin)->format('d/m/Y') }}
+                                                    @if($ficha->ficha->fecha_fin)
+                                                        {{ \Carbon\Carbon::parse($ficha->ficha->fecha_fin)->format('d/m/Y') }}
                                                     @else
                                                         N/A
                                                     @endif
                                                 </td>
-                                                <td>{{ $ficha->total_horas ?? 'N/A' }}</td>
+                                                <td>{{ $ficha->ficha->total_horas ?? 'N/A' }}</td>
                                                 <td>
                                                     @php
                                                         $progreso = rand(20, 90); // Simulación de progreso
@@ -280,20 +280,20 @@
                                                     <small class="text-muted">{{ $progreso }}%</small>
                                                 </td>
                                                 <td>
-                                                    <span class="status-badge {{ $ficha->status ? 'status-active' : 'status-inactive' }}">
+                                                    <span class="status-badge {{ $ficha->ficha->status ? 'status-active' : 'status-inactive' }}">
                                                         <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
-                                                        {{ $ficha->status ? 'Activa' : 'Inactiva' }}
+                                                        {{ $ficha->ficha->status ? 'Activa' : 'Inactiva' }}
                                                     </span>
                                                 </td>
                                                 <td>
                                                     <div class="btn-group">
-                                                        <a href="{{ route('ficha.show', $ficha->id) }}" 
+                                                        <a href="{{ route('ficha.show', $ficha->ficha->id) }}" 
                                                            class="btn btn-light btn-sm" 
                                                            data-toggle="tooltip" 
                                                            title="Ver detalles">
                                                             <i class="fas fa-eye text-info"></i>
                                                         </a>
-                                                        <a href="{{ route('ficha.edit', $ficha->id) }}" 
+                                                        <a href="{{ route('ficha.edit', $ficha->ficha->id) }}" 
                                                            class="btn btn-light btn-sm" 
                                                            data-toggle="tooltip" 
                                                            title="Editar">
