@@ -50,7 +50,11 @@ class InstructorBusinessRulesService
             // Verificar límite de fichas activas
             if ($this->excedeLimiteFichasActivas($instructor)) {
                 $resultado['disponible'] = false;
-                $resultado['razones'][] = 'El instructor excede el límite máximo de fichas activas (' . self::MAX_FICHAS_ACTIVAS . ')';
+                $fichasActivas = $this->obtenerFichasActivas($instructor);
+                $ejemploFichas = $fichasActivas->take(2)->map(function($ficha) {
+                    return "Ficha {$ficha->ficha} ({$ficha->programaFormacion->nombre})";
+                })->implode(', ');
+                $resultado['razones'][] = "El instructor excede el límite máximo de fichas activas (" . count($fichasActivas) . "/" . self::MAX_FICHAS_ACTIVAS . "). Ejemplo: {$ejemploFichas}";
             }
 
             // Verificar superposición de fechas
@@ -58,20 +62,24 @@ class InstructorBusinessRulesService
             if (!empty($conflictos)) {
                 $resultado['disponible'] = false;
                 $resultado['conflictos'] = $conflictos;
-                $resultado['razones'][] = 'El instructor tiene fichas con fechas superpuestas';
+                $ejemploConflicto = $conflictos[0];
+                $programaNombre = $ejemploConflicto->ficha->programaFormacion->nombre ?? 'Sin programa';
+                $resultado['razones'][] = "El instructor tiene fichas con fechas superpuestas. Ejemplo: Ficha {$ejemploConflicto->ficha->ficha} ({$programaNombre}) del {$ejemploConflicto->fecha_inicio->format('d/m/Y')} al {$ejemploConflicto->fecha_fin->format('d/m/Y')}";
             }
 
             // Verificar carga horaria semanal
             $cargaHoraria = $this->calcularCargaHorariaSemanal($instructor, $fechaInicio, $fechaFin, $datosFicha['horas_semanales'] ?? 0);
             if ($cargaHoraria > self::MAX_HORAS_SEMANA) {
                 $resultado['disponible'] = false;
-                $resultado['razones'][] = "El instructor excedería la carga horaria máxima semanal ({$cargaHoraria}h > " . self::MAX_HORAS_SEMANA . "h)";
+                $resultado['razones'][] = "El instructor excedería la carga horaria máxima semanal ({$cargaHoraria}h > " . self::MAX_HORAS_SEMANA . "h). Ejemplo: Actualmente tiene " . ($cargaHoraria - ($datosFicha['horas_semanales'] ?? 0)) . "h semanales asignadas";
             }
 
             // Verificar especialidades requeridas
             if (!$this->tieneEspecialidadesRequeridas($instructor, $datosFicha['especialidad_requerida'] ?? null)) {
                 $resultado['disponible'] = false;
-                $resultado['razones'][] = 'El instructor no tiene las especialidades requeridas para esta ficha';
+                $especialidadRequerida = $datosFicha['especialidad_requerida'] ?? 'No especificada';
+                $especialidadesInstructor = $this->obtenerEspecialidadesInstructor($instructor);
+                $resultado['razones'][] = "El instructor no tiene las especialidades requeridas para esta ficha. Requerida: {$especialidadRequerida}. Instructor tiene: {$especialidadesInstructor}";
             }
 
         } catch (\Exception $e) {
@@ -280,20 +288,25 @@ class InstructorBusinessRulesService
             // Verificar experiencia mínima
             if (!$this->validarExperienciaMinima($instructor)) {
                 $resultado['valido'] = false;
-                $resultado['errores'][] = 'El instructor no cumple con la experiencia mínima requerida (' . self::EXPERIENCIA_MINIMA . ' año)';
+                $experienciaActual = $instructor->anos_experiencia ?? 0;
+                $resultado['errores'][] = "El instructor no cumple con la experiencia mínima requerida ({$experienciaActual}/" . self::EXPERIENCIA_MINIMA . " años). Ejemplo: Necesita al menos " . self::EXPERIENCIA_MINIMA . " año de experiencia";
             }
 
             // Verificar que el instructor esté en la misma regional que la ficha
             if (isset($datosFicha['regional_id']) && $instructor->regional_id != $datosFicha['regional_id']) {
                 $resultado['valido'] = false;
-                $resultado['errores'][] = 'El instructor debe pertenecer a la misma regional que la ficha';
+                $regionalInstructor = $instructor->regional->nombre ?? 'Sin regional';
+                $regionalFicha = $datosFicha['regional_nombre'] ?? 'Sin especificar';
+                $resultado['errores'][] = "El instructor debe pertenecer a la misma regional que la ficha. Instructor: {$regionalInstructor}, Ficha: {$regionalFicha}";
             }
 
-            // Verificar disponibilidad general
-            $disponibilidad = $this->verificarDisponibilidad($instructor, $datosFicha);
-            if (!$disponibilidad['disponible']) {
-                $resultado['valido'] = false;
-                $resultado['errores'] = array_merge($resultado['errores'], $disponibilidad['razones']);
+            // Verificar disponibilidad general (solo si no hay errores previos para evitar duplicados)
+            if ($resultado['valido']) {
+                $disponibilidad = $this->verificarDisponibilidad($instructor, $datosFicha);
+                if (!$disponibilidad['disponible']) {
+                    $resultado['valido'] = false;
+                    $resultado['errores'] = array_merge($resultado['errores'], $disponibilidad['razones']);
+                }
             }
 
             // Advertencias adicionales
@@ -356,5 +369,46 @@ class InstructorBusinessRulesService
         }
 
         return $estadisticas;
+    }
+
+    /**
+     * Obtener fichas activas del instructor
+     */
+    private function obtenerFichasActivas(Instructor $instructor)
+    {
+        return $instructor->instructorFichas()
+            ->with(['ficha.programaFormacion'])
+            ->whereHas('ficha', function($q) {
+                $q->where('status', true)
+                  ->where('fecha_fin', '>=', now()->toDateString());
+            })
+            ->get()
+            ->pluck('ficha');
+    }
+
+    /**
+     * Obtener especialidades del instructor en formato legible
+     */
+    private function obtenerEspecialidadesInstructor(Instructor $instructor): string
+    {
+        $especialidades = [];
+        
+        if ($instructor->especialidades) {
+            $data = is_string($instructor->especialidades) 
+                ? json_decode($instructor->especialidades, true) 
+                : $instructor->especialidades;
+            
+            if (isset($data['principal']) && $data['principal']) {
+                $especialidades[] = $data['principal'] . ' (Principal)';
+            }
+            
+            if (isset($data['secundarias']) && is_array($data['secundarias'])) {
+                foreach ($data['secundarias'] as $secundaria) {
+                    $especialidades[] = $secundaria . ' (Secundaria)';
+                }
+            }
+        }
+        
+        return empty($especialidades) ? 'Ninguna' : implode(', ', $especialidades);
     }
 }
