@@ -38,4 +38,22 @@ class ResultadosAprendizaje extends Model
     {
         return $this->hasMany(GuiaAprendizajeRap::class, 'rap_id');
     }
+
+    /**
+     * Relación muchos a muchos con Competencia a través de la tabla intermedia
+     */
+    public function competencias()
+    {
+        return $this->belongsToMany(Competencia::class, 'resultados_aprendizaje_competencia', 'rap_id', 'competencia_id')
+                    ->withPivot('user_create_id', 'user_edit_id')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Relación con la tabla intermedia resultados_aprendizaje_competencia
+     */
+    public function resultadosCompetencia()
+    {
+        return $this->hasMany(ResultadosCompetencia::class, 'rap_id');
+    }
 }
