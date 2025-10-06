@@ -170,7 +170,7 @@ class AsignacionInstructorLog extends Model
      */
     public function getNombreInstructorAttribute(): string
     {
-        return $this->instructor ? $this->instructor->nombre_completo : 'Instructor eliminado';
+        return $this->instructor ? ($this->instructor->nombre_completo ?? 'Sin nombre') : 'Instructor eliminado';
     }
 
     /**
@@ -178,7 +178,7 @@ class AsignacionInstructorLog extends Model
      */
     public function getNumeroFichaAttribute(): string
     {
-        return $this->ficha ? $this->ficha->ficha : 'Ficha eliminada';
+        return $this->ficha ? ($this->ficha->ficha ?? 'Sin número') : 'Ficha eliminada';
     }
 
     /**
@@ -186,7 +186,7 @@ class AsignacionInstructorLog extends Model
      */
     public function getNombreUsuarioAttribute(): string
     {
-        return $this->user ? $this->user->name : 'Usuario eliminado';
+        return $this->user ? ($this->user->name ?? 'Sin nombre') : 'Usuario eliminado';
     }
 
     /**
