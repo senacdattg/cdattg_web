@@ -19,15 +19,7 @@
             $canEditarGuiaAprendizaje = $user->can('EDITAR GUIA APRENDIZAJE');
             $canEliminarGuiaAprendizaje = $user->can('ELIMINAR GUIA APRENDIZAJE');
             
-            // Debug temporal - remover después de verificar
-            if (config('app.debug')) {
-                \Log::info('Sidebar Debug', [
-                    'user_roles' => $user->getRoleNames(),
-                    'canVerGuiaAprendizaje' => $canVerGuiaAprendizaje,
-                    'canCrearGuiaAprendizaje' => $canCrearGuiaAprendizaje,
-                    'all_permissions' => $user->getAllPermissions()->pluck('name')
-                ]);
-            }
+            // Variables de permisos para uso en el sidebar
         @endphp
 
         <nav class="mt-2">
@@ -97,36 +89,44 @@
                     </li>
                 @endif
 
-                {{-- Gestión Académica - TEMPORAL: Siempre visible para debug --}}
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-graduation-cap"></i>
-                        <p>
-                            Gestión Académica
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{ route('guias-aprendizaje.index') }}" class="nav-link">
-                                <i class="fas fa-book-open"></i>
-                                <p>Guías de Aprendizaje</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('guias-aprendizaje.create') }}" class="nav-link">
-                                <i class="fas fa-plus-circle"></i>
-                                <p>Crear Guía</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="fas fa-chart-bar"></i>
-                                <p>Estadísticas</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
+                {{-- Gestión Académica --}}
+                @if ($user->can('VER GUIA APRENDIZAJE') || $user->can('CREAR GUIA APRENDIZAJE'))
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-graduation-cap"></i>
+                            <p>
+                                Gestión Académica
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @can('VER GUIA APRENDIZAJE')
+                                <li class="nav-item">
+                                    <a href="{{ route('guias-aprendizaje.index') }}" class="nav-link">
+                                        <i class="fas fa-book-open"></i>
+                                        <p>Guías de Aprendizaje</p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('CREAR GUIA APRENDIZAJE')
+                                <li class="nav-item">
+                                    <a href="{{ route('guias-aprendizaje.create') }}" class="nav-link">
+                                        <i class="fas fa-plus-circle"></i>
+                                        <p>Crear Guía</p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('VER GUIA APRENDIZAJE')
+                                <li class="nav-item">
+                                    <a href="#" class="nav-link">
+                                        <i class="fas fa-chart-bar"></i>
+                                        <p>Estadísticas</p>
+                                    </a>
+                                </li>
+                            @endcan
+                        </ul>
+                    </li>
+                @endif
 
                 {{-- Administrar Sedes --}}
                 @can('VER SEDE')
