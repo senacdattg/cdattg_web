@@ -31,6 +31,11 @@ Route::get('/instructor/search', [InstructorController::class, 'search'])
     ->name('instructor.search')
     ->middleware(['auth', 'can:VER INSTRUCTOR']);
 
+// Ruta temporal para debuggear create
+Route::get('/instructor/create-debug', [InstructorController::class, 'create'])
+    ->name('instructor.create.debug')
+    ->middleware('auth');
+
 // Rutas específicas para instructores con middleware de autenticación
 Route::middleware(['auth'])->group(function () {
     
