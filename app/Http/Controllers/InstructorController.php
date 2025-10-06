@@ -247,7 +247,14 @@ class InstructorController extends Controller
             $jsContent = "// Datos de personas para el formulario de creación de instructor\n";
             $jsContent .= "// Generado automáticamente desde el controlador\n";
             $jsContent .= "window.personasData = " . json_encode($personasData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . ";";
-            file_put_contents(public_path('js/instructor-create-data.js'), $jsContent);
+            
+            // Verificar que el directorio existe
+            $jsPath = public_path('js');
+            if (!is_dir($jsPath)) {
+                mkdir($jsPath, 0755, true);
+            }
+            
+            file_put_contents($jsPath . '/instructor-create-data.js', $jsContent);
             
             $regionales = Regional::where('status', 1)->get();
             $especialidades = \App\Models\RedConocimiento::where('status', true)->orderBy('nombre')->get();
@@ -256,14 +263,17 @@ class InstructorController extends Controller
             Log::info('Variables pasadas a la vista create:', [
                 'personas_count' => $personas->count(),
                 'regionales_count' => $regionales->count(),
-                'especialidades_count' => $especialidades->count()
+                'especialidades_count' => $especialidades->count(),
+                'js_file_created' => file_exists($jsPath . '/instructor-create-data.js'),
+                'js_file_size' => file_exists($jsPath . '/instructor-create-data.js') ? filesize($jsPath . '/instructor-create-data.js') : 0
             ]);
             
             return view('Instructores.create', compact('personas', 'regionales', 'especialidades'));
             
         } catch (Exception $e) {
             Log::error('Error al cargar formulario de creación de instructor', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
             return redirect()->route('instructor.index')->with('error', 'Error al cargar el formulario. Por favor, inténtelo de nuevo.');
         }
