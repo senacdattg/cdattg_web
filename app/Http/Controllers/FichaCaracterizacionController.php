@@ -7,6 +7,7 @@ use App\Models\ProgramaFormacion;
 use App\Models\InstructorFichaCaracterizacion;
 use App\Http\Requests\StoreFichaCaracterizacionRequest;
 use App\Http\Requests\UpdateFichaCaracterizacionRequest;
+use App\Http\Requests\AsignarInstructoresRequest;
 use App\Services\FichaCaracterizacionValidationService;
 use App\Traits\ValidacionesSena;
 use Illuminate\Http\Request;
@@ -1777,155 +1778,38 @@ class FichaCaracterizacionController extends Controller
      * @param string $id El ID de la ficha.
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function asignarInstructores(Request $request, string $id)
+    public function asignarInstructores(AsignarInstructoresRequest $request, string $id)
     {
         try {
-            DB::beginTransaction();
+            // El FormRequest ya maneja todas las validaciones
+            $instructoresData = $request->validated()['instructores'];
+            $instructorPrincipalId = $request->validated()['instructor_principal_id'];
 
-            Log::info('Iniciando asignación de instructores', [
+            Log::info('Iniciando asignación de instructores con validaciones robustas', [
                 'user_id' => Auth::id(),
                 'ficha_id' => $id,
-                'instructores' => $request->instructores ?? [],
+                'instructores_count' => count($instructoresData),
+                'instructor_principal_id' => $instructorPrincipalId,
                 'timestamp' => now()
             ]);
 
-            // Validar datos
-            $request->validate([
-                'instructores' => 'required|array|min:1',
-                'instructores.*.instructor_id' => 'required|exists:instructors,id',
-                'instructores.*.fecha_inicio' => 'required|date',
-                'instructores.*.fecha_fin' => 'required|date|after_or_equal:instructores.*.fecha_inicio',
-                'instructores.*.total_horas_instructor' => 'required|integer|min:1',
-                'instructores.*.dias_formacion' => 'sometimes|array',
-                'instructores.*.dias_formacion.*.dia_id' => 'required_with:instructores.*.dias_formacion|exists:parametros_temas,id',
-                'instructor_principal_id' => 'required|exists:instructors,id'
-            ], [
-                'instructores.required' => 'Debe seleccionar al menos un instructor.',
-                'instructores.*.instructor_id.required' => 'El instructor es requerido.',
-                'instructores.*.instructor_id.exists' => 'El instructor seleccionado no existe.',
-                'instructores.*.fecha_inicio.required' => 'La fecha de inicio es requerida.',
-                'instructores.*.fecha_fin.required' => 'La fecha de fin es requerida.',
-                'instructores.*.fecha_fin.after_or_equal' => 'La fecha de fin debe ser posterior o igual a la fecha de inicio.',
-                'instructores.*.total_horas_instructor.required' => 'El total de horas es requerido.',
-                'instructores.*.total_horas_instructor.min' => 'El total de horas debe ser mayor a 0.',
-                'instructores.*.dias_formacion.*.dia_id.required_with' => 'El día de formación es requerido.',
-                'instructores.*.dias_formacion.*.dia_id.exists' => 'El día seleccionado no existe.',
-                'instructor_principal_id.required' => 'Debe seleccionar un instructor principal.',
-                'instructor_principal_id.exists' => 'El instructor principal seleccionado no existe.'
-            ]);
-
-            $ficha = FichaCaracterizacion::findOrFail($id);
-
-            // Validar que las fechas de los instructores estén dentro del rango de la ficha
-            $fechaInicioFicha = $ficha->fecha_inicio;
-            $fechaFinFicha = $ficha->fecha_fin;
-            
-            foreach ($request->instructores as $index => $instructorData) {
-                $fechaInicioInstructor = \Carbon\Carbon::parse($instructorData['fecha_inicio']);
-                $fechaFinInstructor = \Carbon\Carbon::parse($instructorData['fecha_fin']);
-                
-                if ($fechaInicioFicha && $fechaInicioInstructor->lt($fechaInicioFicha)) {
-                    return back()->withErrors([
-                        "instructores.{$index}.fecha_inicio" => "La fecha de inicio del instructor debe ser posterior o igual a la fecha de inicio de la ficha ({$fechaInicioFicha->format('d/m/Y')})."
-                    ]);
-                }
-                
-                if ($fechaFinFicha && $fechaFinInstructor->gt($fechaFinFicha)) {
-                    return back()->withErrors([
-                        "instructores.{$index}.fecha_fin" => "La fecha de fin del instructor debe ser anterior o igual a la fecha de fin de la ficha ({$fechaFinFicha->format('d/m/Y')})."
-                    ]);
-                }
-            }
-
-            // Verificar que el instructor principal esté en la lista de instructores
-            $instructorPrincipalId = $request->instructor_principal_id;
-            $instructorPrincipalEnLista = collect($request->instructores)
-                ->contains('instructor_id', $instructorPrincipalId);
-
-            if (!$instructorPrincipalEnLista) {
-                return back()->withErrors([
-                    'instructor_principal_id' => 'El instructor principal debe estar en la lista de instructores asignados.'
-                ]);
-            }
-
-            // Verificar disponibilidad de instructores
-            $instructoresIds = collect($request->instructores)->pluck('instructor_id')->toArray();
-            $disponibilidad = $this->verificarDisponibilidadInstructores(
-                \App\Models\Instructor::whereIn('id', $instructoresIds)->get(),
-                $ficha
+            // Usar el servicio especializado para la asignación
+            $asignacionService = app(\App\Services\AsignacionInstructorService::class);
+            $resultado = $asignacionService->asignarInstructores(
+                $instructoresData,
+                $id,
+                $instructorPrincipalId,
+                Auth::id()
             );
 
-            foreach ($instructoresIds as $instructorId) {
-                if (!isset($disponibilidad[$instructorId]) || !$disponibilidad[$instructorId]['disponible']) {
-                    $instructor = \App\Models\Instructor::find($instructorId);
-                    return back()->withErrors([
-                        'instructores' => "El instructor {$instructor->persona->primer_nombre} {$instructor->persona->primer_apellido} no está disponible en el rango de fechas especificado."
-                    ]);
-                }
+            if ($resultado['success']) {
+                return redirect()->route('fichaCaracterizacion.show', $id)
+                    ->with('success', $resultado['message'] . ' Se asignaron ' . $resultado['total_asignados'] . ' instructores.');
+            } else {
+                return back()->withErrors(['error' => $resultado['message']]);
             }
-
-            // Verificar conflictos de fechas específicos para cada instructor
-            foreach ($request->instructores as $index => $instructorData) {
-                $conflictos = $this->verificarConflictosFechasInstructor(
-                    $instructorData['instructor_id'],
-                    $instructorData['fecha_inicio'],
-                    $instructorData['fecha_fin']
-                );
-
-                if ($conflictos['tiene_conflictos']) {
-                    $instructor = \App\Models\Instructor::find($instructorData['instructor_id']);
-                    $conflictosText = $conflictos['conflictos']->map(function($conflicto) {
-                        return "Ficha {$conflicto['ficha']} ({$conflicto['programa']}) del {$conflicto['fecha_inicio']} al {$conflicto['fecha_fin']}";
-                    })->implode(', ');
-
-                    return back()->withErrors([
-                        "instructores.{$index}.fecha_inicio" => "El instructor {$instructor->persona->primer_nombre} {$instructor->persona->primer_apellido} ya tiene asignaciones superpuestas: {$conflictosText}. Por favor, elija otro rango de fechas."
-                    ]);
-                }
-            }
-
-            // Eliminar asignaciones existentes
-            $ficha->instructorFicha()->delete();
-
-            // Actualizar instructor principal en la ficha
-            $ficha->update([
-                'instructor_id' => $instructorPrincipalId,
-                'user_edit_id' => Auth::id()
-            ]);
-
-            // Crear nuevas asignaciones
-            foreach ($request->instructores as $instructorData) {
-                $instructorFicha = $ficha->instructorFicha()->create([
-                    'instructor_id' => $instructorData['instructor_id'],
-                    'fecha_inicio' => $instructorData['fecha_inicio'],
-                    'fecha_fin' => $instructorData['fecha_fin'],
-                    'total_horas_instructor' => $instructorData['total_horas_instructor']
-                ]);
-
-                // Crear días de formación si se proporcionaron
-                if (isset($instructorData['dias_formacion']) && is_array($instructorData['dias_formacion'])) {
-                    foreach ($instructorData['dias_formacion'] as $diaData) {
-                        $instructorFicha->instructorFichaDias()->create([
-                            'dia_id' => $diaData['dia_id']
-                        ]);
-                    }
-                }
-            }
-
-            DB::commit();
-
-            Log::info('Instructores asignados exitosamente', [
-                'ficha_id' => $id,
-                'instructor_principal_id' => $instructorPrincipalId,
-                'total_instructores' => count($request->instructores),
-                'user_id' => Auth::id()
-            ]);
-
-            return redirect()->route('fichaCaracterizacion.show', $id)
-                ->with('success', 'Instructores asignados exitosamente.');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
-            DB::rollBack();
             Log::warning('Error de validación en asignación de instructores', [
                 'ficha_id' => $id,
                 'errors' => $e->errors(),
@@ -1934,17 +1818,14 @@ class FichaCaracterizacionController extends Controller
             throw $e;
 
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error al asignar instructores', [
+            Log::error('Error crítico en asignación de instructores', [
                 'ficha_id' => $id,
-                'user_id' => Auth::id(),
                 'error' => $e->getMessage(),
-                'line' => $e->getLine()
+                'trace' => $e->getTraceAsString(),
+                'user_id' => Auth::id()
             ]);
 
-            return back()->withErrors([
-                'error' => 'Error al asignar instructores: ' . $e->getMessage()
-            ]);
+            return back()->withErrors(['error' => 'Error crítico al asignar instructores. Por favor, contacte al administrador.']);
         }
     }
 
@@ -1958,60 +1839,37 @@ class FichaCaracterizacionController extends Controller
     public function desasignarInstructor(string $id, string $instructorId)
     {
         try {
-            DB::beginTransaction();
-
-            Log::info('Iniciando desasignación de instructor', [
+            Log::info('Iniciando desasignación de instructor con servicio robusto', [
                 'user_id' => Auth::id(),
                 'ficha_id' => $id,
                 'instructor_id' => $instructorId,
                 'timestamp' => now()
             ]);
 
-            $ficha = FichaCaracterizacion::findOrFail($id);
+            // Usar el servicio especializado para la desasignación
+            $asignacionService = app(\App\Services\AsignacionInstructorService::class);
+            $resultado = $asignacionService->desasignarInstructor(
+                (int)$instructorId,
+                (int)$id,
+                Auth::id()
+            );
 
-            // Verificar que no sea el instructor principal
-            if ($ficha->instructor_id == $instructorId) {
-                return back()->withErrors([
-                    'error' => 'No se puede desasignar al instructor principal. Primero debe asignar otro instructor como principal.'
-                ]);
-            }
-
-            // Eliminar la asignación
-            $asignacion = $ficha->instructorFicha()
-                ->where('instructor_id', $instructorId)
-                ->first();
-
-            if ($asignacion) {
-                $asignacion->delete();
-
-                Log::info('Instructor desasignado exitosamente', [
-                    'ficha_id' => $id,
-                    'instructor_id' => $instructorId,
-                    'user_id' => Auth::id()
-                ]);
-
-                DB::commit();
-                return back()->with('success', 'Instructor desasignado exitosamente.');
+            if ($resultado['success']) {
+                return back()->with('success', $resultado['message']);
             } else {
-                DB::rollBack();
-                return back()->withErrors([
-                    'error' => 'No se encontró la asignación del instructor.'
-                ]);
+                return back()->withErrors(['error' => $resultado['message']]);
             }
 
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error al desasignar instructor', [
+            Log::error('Error crítico al desasignar instructor', [
                 'ficha_id' => $id,
                 'instructor_id' => $instructorId,
-                'user_id' => Auth::id(),
                 'error' => $e->getMessage(),
-                'line' => $e->getLine()
+                'trace' => $e->getTraceAsString(),
+                'user_id' => Auth::id()
             ]);
 
-            return back()->withErrors([
-                'error' => 'Error al desasignar instructor: ' . $e->getMessage()
-            ]);
+            return back()->withErrors(['error' => 'Error crítico al desasignar instructor. Por favor, contacte al administrador.']);
         }
     }
 
