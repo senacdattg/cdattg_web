@@ -31,7 +31,7 @@ export default defineConfig({
         port: 5173,
         strictPort: true,
         hmr: {
-            host: '192.168.1.8',  // Tu IP de red local
+            host: '10.7.55.88',  // Tu IP de red local
         },
         cors: true,  // Habilita CORS para permitir peticiones cross-origin
     },

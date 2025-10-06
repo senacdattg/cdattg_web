@@ -282,30 +282,16 @@
                             <form action="{{ route('fichaCaracterizacion.asignarInstructores', $ficha->id) }}" method="POST" id="formAsignarInstructores">
                                 @csrf
                                 
-                                <!-- Instructor Principal -->
-                                <div class="form-group">
-                                    <label for="instructor_principal_id" class="form-label font-weight-bold">
+                                <!-- Información del Instructor Principal -->
+                                @if($ficha->instructor)
+                                    <div class="alert alert-success">
                                         <i class="fas fa-star text-warning mr-1"></i>
-                                        Instructor Principal <span class="text-danger">*</span>
-                                    </label>
-                                    <select name="instructor_principal_id" id="instructor_principal_id" class="form-control select2" required>
-                                        <option value="">Seleccione un instructor principal</option>
-                                        @foreach($instructoresConDisponibilidad as $instructorId => $data)
-                                            <option value="{{ $instructorId }}" 
-                                                    {{ $ficha->instructor_id == $instructorId ? 'selected' : '' }}
-                                                    {{ !$data['disponible'] ? 'disabled' : '' }}>
-                                                {{ $data['instructor']->persona->primer_nombre }} 
-                                                {{ $data['instructor']->persona->primer_apellido }}
-                                                @if(!$data['disponible'])
-                                                    (No disponible - {{ count($data['conflictos'] ?? []) }} conflictos)
-                                                @endif
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('instructor_principal_id')
-                                        <div class="text-danger small">{{ $message }}</div>
-                                    @enderror
-                                </div>
+                                        <strong>Instructor Principal Asignado:</strong>
+                                        {{ $ficha->instructor->persona->primer_nombre }} 
+                                        {{ $ficha->instructor->persona->primer_apellido }}
+                                        <small class="text-muted">({{ $ficha->instructor->persona->numero_documento }})</small>
+                                    </div>
+                                @endif
 
                                 <!-- Información de fechas permitidas -->
                                 <div class="alert alert-info">
