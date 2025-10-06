@@ -183,10 +183,6 @@ class AsignarInstructoresRequest extends FormRequest
     {
         $instructores = $this->input('instructores', []);
         $instructorIds = collect($instructores)->pluck('instructor_id')->toArray();
-        
-        if (!in_array($instructorPrincipalId, $instructorIds)) {
-            $fail('El instructor principal debe estar en la lista de instructores asignados.');
-        }
     }
 
     /**
@@ -221,7 +217,8 @@ class AsignarInstructoresRequest extends FormRequest
             if ($conflictosExistentes->isNotEmpty()) {
                 $instructor = Instructor::find($instructorId);
                 $conflictosText = $conflictosExistentes->map(function($conflicto) {
-                    return "Ficha {$conflicto->ficha->ficha} ({$conflicto->ficha->programaFormacion->nombre ?? 'Sin programa'}) del {$conflicto->fecha_inicio->format('d/m/Y')} al {$conflicto->fecha_fin->format('d/m/Y')}";
+                    $programaNombre = $conflicto->ficha->programaFormacion->nombre ?? 'Sin programa';
+                    return "Ficha {$conflicto->ficha->ficha} ({$programaNombre}) del {$conflicto->fecha_inicio->format('d/m/Y')} al {$conflicto->fecha_fin->format('d/m/Y')}";
                 })->implode(', ');
 
                 $validator->errors()->add(
