@@ -114,14 +114,6 @@ class RolePermissionSeeder extends Seeder
             'programa.edit',
             'programa.delete',
             'programa.search',
-            // Permisos para guías de aprendizaje
-            'VER GUIA APRENDIZAJE',
-            'CREAR GUIA APRENDIZAJE',
-            'EDITAR GUIA APRENDIZAJE',
-            'ELIMINAR GUIA APRENDIZAJE',
-            'GESTIONAR RESULTADOS GUIA',
-            'GESTIONAR EVIDENCIAS GUIA',
-            'CAMBIAR ESTADO GUIA',
         ];
 
         // Crear cada permiso si no existe
@@ -210,14 +202,6 @@ class RolePermissionSeeder extends Seeder
             'programa.edit',
             'programa.delete',
             'programa.search',
-            // Permisos para guías de aprendizaje
-            'VER GUIA APRENDIZAJE',
-            'CREAR GUIA APRENDIZAJE',
-            'EDITAR GUIA APRENDIZAJE',
-            'ELIMINAR GUIA APRENDIZAJE',
-            'GESTIONAR RESULTADOS GUIA',
-            'GESTIONAR EVIDENCIAS GUIA',
-            'CAMBIAR ESTADO GUIA',
         ]);
 
         // Asignar permisos al rol ADMINISTRADOR
@@ -258,14 +242,6 @@ class RolePermissionSeeder extends Seeder
             'programa.index',
             'programa.show',
             'programa.search',
-            // Permisos para guías de aprendizaje
-            'VER GUIA APRENDIZAJE',
-            'CREAR GUIA APRENDIZAJE',
-            'EDITAR GUIA APRENDIZAJE',
-            'ELIMINAR GUIA APRENDIZAJE',
-            'GESTIONAR RESULTADOS GUIA',
-            'GESTIONAR EVIDENCIAS GUIA',
-            'CAMBIAR ESTADO GUIA',
         ]);
 
         // Asignar permisos al rol INSTRUCTOR
@@ -285,13 +261,6 @@ class RolePermissionSeeder extends Seeder
             'programa.index',
             'programa.show',
             'programa.search',
-            // Permisos para guías de aprendizaje (limitados para instructores)
-            'VER GUIA APRENDIZAJE',
-            'CREAR GUIA APRENDIZAJE',
-            'EDITAR GUIA APRENDIZAJE',
-            'GESTIONAR RESULTADOS GUIA',
-            'GESTIONAR EVIDENCIAS GUIA',
-            'CAMBIAR ESTADO GUIA',
         ]);
 
         // Asignar permisos al rol APRENDIZ
