@@ -305,4 +305,153 @@ class GuiaAprendizajeController extends Controller
                 ->with('error', 'Error al cambiar el estado. Intente nuevamente.');
         }
     }
+
+    /**
+     * Gestionar resultados de aprendizaje de una guía.
+     * 
+     * @param GuiasAprendizaje $guiaAprendizaje
+     * @return \Illuminate\View\View
+     */
+    public function gestionarResultados(GuiasAprendizaje $guiaAprendizaje)
+    {
+        try {
+            // Obtener resultados ya asignados a la guía
+            $resultadosAsignados = $guiaAprendizaje->resultadosAprendizaje()
+                ->with(['competencias'])
+                ->get();
+            
+            // Obtener todos los resultados disponibles (excluyendo los ya asignados)
+            $resultadosDisponibles = ResultadosAprendizaje::whereNotIn('id', $resultadosAsignados->pluck('id'))
+                ->with(['competencias'])
+                ->orderBy('codigo')
+                ->get();
+            
+            // Agrupar por competencia para mejor organización
+            $resultadosPorCompetencia = $resultadosDisponibles->groupBy(function ($resultado) {
+                return $resultado->competencias->first()->nombre ?? 'Sin Competencia';
+            });
+            
+            return view('guias_aprendizaje.gestionar_resultados', compact(
+                'guiaAprendizaje',
+                'resultadosAsignados',
+                'resultadosDisponibles',
+                'resultadosPorCompetencia'
+            ));
+            
+        } catch (Exception $e) {
+            Log::error('Error al gestionar resultados de guía: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al cargar la gestión de resultados.');
+        }
+    }
+
+    /**
+     * Asociar un resultado de aprendizaje a una guía.
+     * 
+     * @param Request $request
+     * @param GuiasAprendizaje $guiaAprendizaje
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function asociarResultado(Request $request, GuiasAprendizaje $guiaAprendizaje)
+    {
+        try {
+            $request->validate([
+                'resultado_id' => 'required|exists:resultados_aprendizajes,id',
+                'es_obligatorio' => 'boolean',
+            ]);
+            
+            $resultadoId = $request->resultado_id;
+            $esObligatorio = $request->boolean('es_obligatorio', true);
+            
+            // Verificar que el resultado no esté ya asignado
+            if ($guiaAprendizaje->resultadosAprendizaje()->where('resultados_aprendizajes.id', $resultadoId)->exists()) {
+                return redirect()->back()->with('error', 'Este resultado ya está asignado a la guía.');
+            }
+            
+            // Validar competencia si hay resultados ya asignados
+            $resultadosExistentes = $guiaAprendizaje->resultadosAprendizaje()->with('competencias')->get();
+            if ($resultadosExistentes->isNotEmpty()) {
+                $competenciaExistente = $resultadosExistentes->first()->competencias->first();
+                $nuevoResultado = ResultadosAprendizaje::with('competencias')->find($resultadoId);
+                $competenciaNueva = $nuevoResultado->competencias->first();
+                
+                if ($competenciaExistente && $competenciaNueva && $competenciaExistente->id !== $competenciaNueva->id) {
+                    return redirect()->back()->with('error', 'Los resultados deben pertenecer a la misma competencia.');
+                }
+            }
+            
+            // Asociar el resultado
+            $guiaAprendizaje->resultadosAprendizaje()->attach($resultadoId, [
+                'es_obligatorio' => $esObligatorio,
+                'user_create_id' => Auth::id(),
+                'user_edit_id' => Auth::id(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            
+            return redirect()->back()->with('success', 'Resultado asociado exitosamente.');
+            
+        } catch (Exception $e) {
+            Log::error('Error al asociar resultado: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al asociar el resultado.');
+        }
+    }
+
+    /**
+     * Desasociar un resultado de aprendizaje de una guía.
+     * 
+     * @param GuiasAprendizaje $guiaAprendizaje
+     * @param ResultadosAprendizaje $resultado
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function desasociarResultado(GuiasAprendizaje $guiaAprendizaje, ResultadosAprendizaje $resultado)
+    {
+        try {
+            // Verificar que el resultado esté asignado
+            if (!$guiaAprendizaje->resultadosAprendizaje()->where('resultados_aprendizajes.id', $resultado->id)->exists()) {
+                return redirect()->back()->with('error', 'Este resultado no está asignado a la guía.');
+            }
+            
+            // Desasociar el resultado
+            $guiaAprendizaje->resultadosAprendizaje()->detach($resultado->id);
+            
+            return redirect()->back()->with('success', 'Resultado desasociado exitosamente.');
+            
+        } catch (Exception $e) {
+            Log::error('Error al desasociar resultado: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al desasociar el resultado.');
+        }
+    }
+
+    /**
+     * Cambiar el estado de obligatoriedad de un resultado.
+     * 
+     * @param Request $request
+     * @param GuiasAprendizaje $guiaAprendizaje
+     * @param ResultadosAprendizaje $resultado
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function cambiarObligatoriedad(Request $request, GuiasAprendizaje $guiaAprendizaje, ResultadosAprendizaje $resultado)
+    {
+        try {
+            $request->validate([
+                'es_obligatorio' => 'required|boolean',
+            ]);
+            
+            $esObligatorio = $request->boolean('es_obligatorio');
+            
+            // Actualizar el estado de obligatoriedad en el pivot
+            $guiaAprendizaje->resultadosAprendizaje()->updateExistingPivot($resultado->id, [
+                'es_obligatorio' => $esObligatorio,
+                'user_edit_id' => Auth::id(),
+                'updated_at' => now(),
+            ]);
+            
+            $mensaje = $esObligatorio ? 'Resultado marcado como obligatorio' : 'Resultado marcado como opcional';
+            return redirect()->back()->with('success', $mensaje);
+            
+        } catch (Exception $e) {
+            Log::error('Error al cambiar obligatoriedad: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al cambiar la obligatoriedad del resultado.');
+        }
+    }
 }

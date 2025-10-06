@@ -75,7 +75,7 @@ class GuiasAprendizaje extends Model
     public function resultadosAprendizaje()
     {
         return $this->belongsToMany(ResultadosAprendizaje::class, 'guia_aprendizaje_rap', 'guia_aprendizaje_id', 'rap_id')
-                    ->withPivot('user_create_id', 'user_edit_id')
+                    ->withPivot('user_create_id', 'user_edit_id', 'es_obligatorio')
                     ->withTimestamps();
     }
 
