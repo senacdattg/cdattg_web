@@ -318,7 +318,7 @@ class AsignarInstructoresRequest extends FormRequest
     private function validarReglasSENA($validator): void
     {
         $fichaId = $this->route('id');
-        $ficha = FichaCaracterizacion::with('regional')->find($fichaId);
+        $ficha = FichaCaracterizacion::with('sede.regional')->find($fichaId);
         $instructores = $this->input('instructores', []);
 
         foreach ($instructores as $index => $instructorData) {
@@ -326,7 +326,8 @@ class AsignarInstructoresRequest extends FormRequest
             if (!$instructor) continue;
 
             // Verificar que el instructor pertenezca a la misma regional
-            if ($ficha && $ficha->regional_id && $instructor->regional_id !== $ficha->regional_id) {
+            $fichaRegionalId = $ficha && $ficha->sede ? $ficha->sede->regional_id : null;
+            if ($ficha && $fichaRegionalId && $instructor->regional_id !== $fichaRegionalId) {
                 $validator->errors()->add(
                     "instructores.{$index}.instructor_id",
                     "El instructor {$instructor->nombre_completo} debe pertenecer a la misma regional que la ficha."
