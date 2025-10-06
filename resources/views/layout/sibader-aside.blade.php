@@ -13,6 +13,11 @@
             $canVerTema = $user->can('VER TEMA');
             $canVerRegional = $user->can('VER REGIONAL');
             $canCrearRegional = $user->can('CREAR REGIONAL');
+            // Permisos para Guías de Aprendizaje
+            $canVerGuiaAprendizaje = $user->can('VER GUIA APRENDIZAJE');
+            $canCrearGuiaAprendizaje = $user->can('CREAR GUIA APRENDIZAJE');
+            $canEditarGuiaAprendizaje = $user->can('EDITAR GUIA APRENDIZAJE');
+            $canEliminarGuiaAprendizaje = $user->can('ELIMINAR GUIA APRENDIZAJE');
             // ... agrega otras variables según convenga.
         @endphp
 
@@ -76,6 +81,45 @@
                                     <a href="{{ route('personas.index') }}" class="nav-link">
                                         <i class="fas fa-users"></i>
                                         <p>Personas</p>
+                                    </a>
+                                </li>
+                            @endcan
+                        </ul>
+                    </li>
+                @endif
+
+                {{-- Gestión Académica --}}
+                @if ($canVerGuiaAprendizaje || $canCrearGuiaAprendizaje)
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-graduation-cap"></i>
+                            <p>
+                                Gestión Académica
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            @can('VER GUIA APRENDIZAJE')
+                                <li class="nav-item">
+                                    <a href="{{ route('guias-aprendizaje.index') }}" class="nav-link">
+                                        <i class="fas fa-book-open"></i>
+                                        <p>Guías de Aprendizaje</p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('CREAR GUIA APRENDIZAJE')
+                                <li class="nav-item">
+                                    <a href="{{ route('guias-aprendizaje.create') }}" class="nav-link">
+                                        <i class="fas fa-plus-circle"></i>
+                                        <p>Crear Guía</p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('VER GUIA APRENDIZAJE')
+                                <li class="nav-item">
+                                    <a href="{{ route('guias-aprendizaje.estadisticasGenerales') }}" class="nav-link">
+                                        <i class="fas fa-chart-bar"></i>
+                                        <p>Estadísticas</p>
                                     </a>
                                 </li>
                             @endcan
