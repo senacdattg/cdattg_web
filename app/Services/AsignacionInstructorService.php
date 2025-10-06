@@ -318,20 +318,34 @@ class AsignacionInstructorService
     public function obtenerInstructoresDisponibles(int $fichaId): array
     {
         try {
-            $ficha = FichaCaracterizacion::with(['programaFormacion.redConocimiento', 'diasFormacion'])->findOrFail($fichaId);
+            $ficha = FichaCaracterizacion::with(['programaFormacion.redConocimiento', 'diasFormacion', 'sede.regional'])->findOrFail($fichaId);
+            
+            $regionalId = $ficha->sede->regional_id ?? null;
             
             $datosFicha = [
                 'fecha_inicio' => $ficha->fecha_inicio,
                 'fecha_fin' => $ficha->fecha_fin,
                 'especialidad_requerida' => $ficha->programaFormacion->redConocimiento->nombre ?? null,
-                'regional_id' => $ficha->regional_id,
+                'regional_id' => $regionalId,
                 'horas_semanales' => 0
             ];
 
             $instructores = Instructor::with(['persona', 'regional', 'especialidades'])
-                ->where('status', true)
-                ->where('regional_id', $ficha->regional_id)
-                ->get();
+                ->where('status', true);
+            
+            // Solo filtrar por regional si existe
+            if ($regionalId) {
+                $instructores->where('regional_id', $regionalId);
+            }
+            
+            $instructores = $instructores->get();
+
+            Log::info('Instructores encontrados para ficha', [
+                'ficha_id' => $fichaId,
+                'regional_id' => $regionalId,
+                'total_instructores' => $instructores->count(),
+                'instructores' => $instructores->pluck('id')->toArray()
+            ]);
 
             $disponibles = [];
             foreach ($instructores as $instructor) {
@@ -347,12 +361,19 @@ class AsignacionInstructorService
                 ];
             }
 
+            Log::info('Instructores disponibles procesados', [
+                'ficha_id' => $fichaId,
+                'total_disponibles' => count($disponibles),
+                'disponibles_ids' => array_map(fn($d) => $d['instructor']->id, $disponibles)
+            ]);
+
             return $disponibles;
 
         } catch (\Exception $e) {
             Log::error('Error obteniendo instructores disponibles', [
                 'ficha_id' => $fichaId,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
             ]);
 
             return [];
