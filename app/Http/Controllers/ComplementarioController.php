@@ -44,15 +44,6 @@ class ComplementarioController extends Controller
 
         return view('complementarios.estadisticas', compact('departamentos', 'municipios'));
     }
-
-    public function getMunicipiosByDepartamento($departamento_id)
-    {
-        $municipios = Municipio::where('departamento_id', $departamento_id)
-            ->select('id', 'municipio')
-            ->get();
-
-        return response()->json($municipios);
-    }
     public function verAspirantes($curso)
     {
 
