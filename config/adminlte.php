@@ -517,7 +517,7 @@ return [
                     'submenu' => [
                         [
                             'text' => 'Dashboard',
-                            'url' => 'instructor/dashboard',
+                            'route' => 'instructor.dashboard',
                             'icon' => 'fas fa-fw fa-tachometer-alt',
                             'can' => 'VER INSTRUCTOR',
                         ],

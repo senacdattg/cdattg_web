@@ -204,8 +204,8 @@ Route::middleware(['auth'])->group(function () {
             
         // Dashboard específico para instructores
         Route::get('/dashboard', [InstructorController::class, 'dashboard'])
-            ->name('instructor.dashboard')
-            ->middleware('can:VER INSTRUCTOR');
+            ->name('instructor.dashboard');
+            // ->middleware('can:VER INSTRUCTOR'); // Temporalmente comentado para debuggear
     });
     
     // Rutas para gestión de horarios
