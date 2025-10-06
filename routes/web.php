@@ -40,6 +40,9 @@ Route::middleware('auth')->group(function () {
         'actividades'
     ];
 
+    // Incluir rutas de guías de aprendizaje
+    include_once routes_path('web_guias_aprendizaje.php');
+
     foreach ($protectedFolders as $folder) {
         foreach (glob(routes_path($folder) . '/*.php') as $routeFile) {
             include_once $routeFile;
