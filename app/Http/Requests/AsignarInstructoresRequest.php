@@ -106,6 +106,11 @@ class AsignarInstructoresRequest extends FormRequest
             $this->validarEspecialidadesRequeridas($validator);
             $this->validarDisponibilidadHoraria($validator);
             $this->validarReglasSENA($validator);
+            
+            // Si hay errores, mostrar sugerencias
+            if ($validator->errors()->any()) {
+                $this->mostrarSugerenciasInstructores($validator);
+            }
         });
     }
 
@@ -223,7 +228,7 @@ class AsignarInstructoresRequest extends FormRequest
 
                 $validator->errors()->add(
                     "instructores.{$index}.fecha_inicio",
-                    "El instructor {$instructor->nombre_completo} ya tiene fichas con fechas superpuestas: {$conflictosText}."
+                    "📅 El instructor {$instructor->nombre_completo} ya tiene fichas con fechas superpuestas: {$conflictosText}. Ajuste las fechas para evitar conflictos."
                 );
             }
         }
@@ -258,7 +263,7 @@ class AsignarInstructoresRequest extends FormRequest
             if (!$tieneEspecialidad) {
                 $validator->errors()->add(
                     "instructores.{$index}.instructor_id",
-                    "El instructor {$instructor->nombre_completo} no tiene la especialidad requerida: {$especialidadRequerida}."
+                    "🎯 El instructor {$instructor->nombre_completo} no tiene la especialidad requerida: {$especialidadRequerida}. Seleccione un instructor con esta especialidad."
                 );
             }
         }
@@ -306,7 +311,7 @@ class AsignarInstructoresRequest extends FormRequest
                 $instructor = Instructor::find($instructorId);
                 $validator->errors()->add(
                     "instructores.{$index}.dias_formacion",
-                    "El instructor {$instructor->nombre_completo} ya tiene clases en los días seleccionados durante el período especificado."
+                    "⚠️ El instructor {$instructor->nombre_completo} ya tiene clases en los días seleccionados. Seleccione otros días o fechas diferentes."
                 );
             }
         }
@@ -338,9 +343,40 @@ class AsignarInstructoresRequest extends FormRequest
             if (($instructor->anos_experiencia ?? 0) < 1) {
                 $validator->errors()->add(
                     "instructores.{$index}.instructor_id",
-                    "El instructor {$instructor->nombre_completo} no cumple con la experiencia mínima requerida (1 año)."
+                    "👨‍🏫 El instructor {$instructor->nombre_completo} no cumple con la experiencia mínima requerida (1 año). Seleccione un instructor con más experiencia."
                 );
             }
+        }
+    }
+
+    /**
+     * Mostrar sugerencias de instructores disponibles
+     */
+    private function mostrarSugerenciasInstructores($validator): void
+    {
+        $fichaId = $this->route('id');
+        $ficha = FichaCaracterizacion::with(['sede.regional', 'programaFormacion.redConocimiento'])->find($fichaId);
+        
+        if (!$ficha) return;
+
+        // Obtener instructores disponibles para esta ficha
+        $instructoresDisponibles = Instructor::where('status', true)
+            ->whereHas('persona.user')
+            ->when($ficha->sede && $ficha->sede->regional_id, function($query) use ($ficha) {
+                return $query->where('regional_id', $ficha->sede->regional_id);
+            })
+            ->with('persona')
+            ->get();
+
+        if ($instructoresDisponibles->isNotEmpty()) {
+            $sugerencias = $instructoresDisponibles->take(3)->map(function($instructor) {
+                return "• {$instructor->nombre_completo} (Doc: {$instructor->persona->numero_documento})";
+            })->implode("\n");
+
+            $validator->errors()->add(
+                'sugerencias',
+                "💡 <strong>Sugerencias de instructores disponibles:</strong>\n\n{$sugerencias}\n\n💡 <em>Vaya a 'Gestión de Instructores' para ver más opciones disponibles.</em>"
+            );
         }
     }
 }
