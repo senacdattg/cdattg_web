@@ -1,160 +1,262 @@
 @extends('adminlte::page')
-@section('content')
 
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Instructores</h1>
+@section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+@endsection
+
+@section('content_header')
+    <section class="content-header dashboard-header py-4">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-6 d-flex align-items-center">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
+                        style="width: 48px; height: 48px;">
+                        <i class="fas fa-chalkboard-teacher text-white fa-lg"></i>
                     </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
+                    <div>
+                        <h1 class="h3 mb-0 text-gray-800">Instructores</h1>
+                        <p class="text-muted mb-0 font-weight-light">Gestión de instructores del sistema</p>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
                             <li class="breadcrumb-item">
-                                <a href="{{ route('home.index') }}">Inicio</a>
+                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
+                                    <i class="fas fa-home"></i> Inicio
+                                </a>
                             </li>
-                            <li class="breadcrumb-item active">Instructores
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <i class="fas fa-chalkboard-teacher"></i> Instructores
                             </li>
                         </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </section>
+@endsection
+
+@section('content')
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    @can('CREAR INSTRUCTOR')
+                        <a href="{{ route('instructor.create') }}" class="text-decoration-none">
+                            <div class="card shadow-sm mb-4 hover-card">
+                                <div class="card-header bg-white py-3 d-flex align-items-center">
+                                    <h5 class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1">
+                                        <i class="fas fa-plus-circle mr-2"></i> Crear Instructor
+                                    </h5>
+                                </div>
+                            </div>
+                        </a>
+                    @endcan
+
+                    <div class="card shadow-sm no-hover">
+                        <div class="card-header bg-white py-3 d-flex align-items-center">
+                            <h6 class="m-0 font-weight-bold text-primary d-flex flex-grow-1">Lista de Instructores</h6>
+                            <div class="input-group w-25">
+                                <form action="{{ route('instructor.index') }}" method="GET" class="input-group">
+                                    <input type="text" name="search" id="searchInstructor"
+                                        class="form-control form-control-sm" placeholder="Buscar instructor..."
+                                        value="{{ request('search') }}" autocomplete="off">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary btn-sm" type="submit">
+                                            <i class="fas fa-search"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-borderless table-striped mb-0">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th class="px-4 py-3" style="width: 5%">#</th>
+                                            <th class="px-4 py-3" style="width: 25%">Nombre</th>
+                                            <th class="px-4 py-3" style="width: 15%">Documento</th>
+                                            <th class="px-4 py-3" style="width: 20%">Especialidades</th>
+                                            <th class="px-4 py-3" style="width: 10%">Estado</th>
+                                            <th class="px-4 py-3 text-center" style="width: 25%">Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse ($instructores as $instructor)
+                                            <tr>
+                                                <td class="px-4">{{ $loop->iteration }}</td>
+                                                <td class="px-4 font-weight-medium">
+                                                    {{ $instructor->persona->primer_nombre }} 
+                                                    {{ $instructor->persona->primer_apellido }}
+                                                </td>
+                                                <td class="px-4">{{ $instructor->persona->numero_documento }}</td>
+                                                <td class="px-4">
+                                                    @php
+                                                        $especialidades = $instructor->especialidades ?? [];
+                                                        $especialidadPrincipal = $especialidades['principal'] ?? null;
+                                                        $especialidadesSecundarias = $especialidades['secundarias'] ?? [];
+                                                    @endphp
+                                                    @if($especialidadPrincipal)
+                                                        <div class="d-inline-block px-2 py-1 rounded-pill bg-primary-light text-primary mr-1 mb-1 font-weight-medium">
+                                                            {{ $especialidadPrincipal }}
+                                                        </div>
+                                                    @endif
+                                                    @if(count($especialidadesSecundarias) > 0)
+                                                        @foreach(array_slice($especialidadesSecundarias, 0, 2) as $especialidad)
+                                                            <div class="d-inline-block px-2 py-1 rounded-pill bg-secondary-light text-secondary mr-1 mb-1 font-weight-medium">{{ $especialidad }}</div>
+                                                        @endforeach
+                                                        @if(count($especialidadesSecundarias) > 2)
+                                                            <div class="d-inline-block px-2 py-1 rounded-pill bg-light text-muted mr-1 mb-1 font-weight-medium">+{{ count($especialidadesSecundarias) - 2 }}</div>
+                                                        @endif
+                                                    @endif
+                                                    @if(!$especialidadPrincipal && count($especialidadesSecundarias) === 0)
+                                                        <span class="text-muted">Sin especialidades</span>
+                                                    @endif
+                                                </td>
+                                                <td class="px-4">
+                                                    <div class="d-inline-block px-3 py-1 rounded-pill {{ $instructor->status ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}">
+                                                        <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
+                                                        {{ $instructor->status ? 'Activo' : 'Inactivo' }}
+                                                    </div>
+                                                </td>
+                                                <td class="px-4 text-center">
+                                                    <div class="btn-group">
+                                                        @can('VER INSTRUCTOR')
+                                                            <a href="{{ route('instructor.show', $instructor->id) }}" 
+                                                               class="btn btn-light btn-sm" 
+                                                               data-toggle="tooltip" 
+                                                               title="Ver detalles">
+                                                                <i class="fas fa-eye text-warning"></i>
+                                                            </a>
+                                                        @endcan
+                                                        @can('EDITAR INSTRUCTOR')
+                                                            <a href="{{ route('instructor.edit', $instructor->id) }}" 
+                                                               class="btn btn-light btn-sm" 
+                                                               data-toggle="tooltip" 
+                                                               title="Editar">
+                                                                <i class="fas fa-pencil-alt text-info"></i>
+                                                            </a>
+                                                        @endcan
+                                                        @can('GESTIONAR ESPECIALIDADES INSTRUCTOR')
+                                                            <a href="{{ route('instructor.gestionarEspecialidades', $instructor->id) }}" 
+                                                               class="btn btn-light btn-sm" 
+                                                               data-toggle="tooltip" 
+                                                               title="Gestionar especialidades">
+                                                                <i class="fas fa-graduation-cap text-primary"></i>
+                                                            </a>
+                                                        @endcan
+                                                        @can('VER FICHAS ASIGNADAS')
+                                                            <a href="{{ route('instructor.fichasAsignadas', $instructor->id) }}" 
+                                                               class="btn btn-light btn-sm" 
+                                                               data-toggle="tooltip" 
+                                                               title="Ver fichas asignadas">
+                                                                <i class="fas fa-clipboard-list text-success"></i>
+                                                            </a>
+                                                        @endcan
+                                                        @can('ELIMINAR INSTRUCTOR')
+                                                            <form action="{{ route('instructor.destroy', $instructor->id) }}" 
+                                                                  method="POST" class="d-inline formulario-eliminar">
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-light btn-sm" 
+                                                                        data-toggle="tooltip" 
+                                                                        title="Eliminar">
+                                                                    <i class="fas fa-trash text-danger"></i>
+                                                                </button>
+                                                            </form>
+                                                        @endcan
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="6" class="text-center py-5">
+                                                    <img src="{{ asset('img/no-data.svg') }}" alt="No data"
+                                                        style="width: 120px" class="mb-3">
+                                                    <p class="text-muted">No hay instructores registrados</p>
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white">
+                            <div class="float-right">
+                                {{ $instructores->links() }}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </section>
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        @endif
-        <section class="content">
-            <div class="card">
-                <div class="card-header">
-                    <form method="GET" action="{{ route('instructor.index') }}">
-                        <div class="input-group input-group-sm">
-                            <input type="text" name="search" class="form-control"
-                                placeholder="Buscar por nombre o documento" value="{{ request()->input('search') }}">
-                            <div class="input-group-append">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-search"></i> Buscar
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="card-body p-0">
-                    <table class="table table-responsive">
-                        <thead>
-                            <tr>
-                                <th style="width: 1%">
-                                    #
-                                </th>
-                                <th style="width: 20%">
-                                    Nombre y apellido
-                                </th>
-                                <th style="width: 30%">
-                                    Numero de documento
-                                </th>
-                                <th style="width: 40%">
-                                    Correo electronico
-                                </th>
-                                <th style="width: 50%">
-                                    Estado
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $i = 1;
-                            ?>
-                            @forelse ($instructores as $instructor)
-                                <tr>
-                                    <td>
-                                        {{ $i++ }}
-                                    </td>
-                                    <td>
-                                        {{ $instructor->persona->primer_nombre }}
-                                        {{ $instructor->persona->primer_apellido }}
-                                    </td>
-
-                                    <td>
-                                        {{ $instructor->persona->numero_documento }}
-                                    </td>
-                                    <td>
-                                        {{ $instructor->persona->email }}
-                                    </td>
-                                    <td>
-                                        <span
-                                            class="badge badge-{{ $instructor->persona->user->status === 1 ? 'success' : 'danger' }}">
-                                            @if ($instructor->persona->user->status === 1)
-                                                ACTIVO
-                                            @else
-                                                INACTIVO
-                                            @endif
-                                        </span>
-                                    </td>
-                                    @can('EDITAR INSTRUCTOR')
-                                        <td>
-                                            <form id="cambiarEstadoForm" class=" d-inline"
-                                                action="{{ route('persona.cambiarEstadoUser', ['persona' => $instructor->persona->user->id]) }}"
-                                                method="POST">
-                                                @csrf
-                                                @method('PUT')
-                                                <button type="submit" class="btn btn-success btn-sm"><i
-                                                        class="fas fa-sync"></i></button>
-                                            </form>
-                                        </td>
-                                    @endcan
-                                    @can('VER INSTRUCTOR')
-                                        <td>
-                                            <a class="btn btn-warning btn-sm"
-                                                href="{{ route('instructor.show', ['instructor' => $instructor->id]) }}">
-                                                <i class="fas fa-eye"></i>
-
-                                            </a>
-                                        </td>
-                                    @endcan
-                                    @can('EDITAR INSTRUCTOR')
-                                        <td>
-                                            <a class="btn btn-info btn-sm"
-                                                href="{{ route('instructor.edit', ['instructor' => $instructor->id]) }}">
-                                                <i class="fas fa-pencil-alt">
-                                                </i>
-                                            </a>
-                                        </td>
-                                    @endcan
-                                    @can('ELIMINAR INSTRUCTOR')
-                                        <td>
-
-
-                                            <form class="formulario-eliminar btn"
-                                                action="{{ route('instructor.destroy', ['instructor' => $instructor->id]) }}"
-                                                method="POST" class="d-inline">
-                                                @csrf
-                                                @method('DELETE')
-
-                                                <button type="submit" class="btn btn-danger btn-sm">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    @endcan
-                                </tr>
-
-                            @empty
-                                <tr>
-                                    <td colspan="4">No hay instructores registrados</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-    </div>
-
-    <div class="card-footer">
-        <div class="float-right">
-            {{ $instructores->links() }}
         </div>
-    </div>
+    </section>
+@endsection
+
+@section('footer')
+    @include('layout.footer')
+@endsection
+
+@section('js')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        $(document).ready(function() {
+            // Confirmación para formularios de eliminación
+            $('.formulario-eliminar').on('submit', function(e) {
+                e.preventDefault();
+                const form = this;
+                
+                // Obtener información del instructor desde la fila de la tabla
+                const row = $(form).closest('tr');
+                const nombreInstructor = row.find('td:nth-child(2)').text().trim();
+                const documentoInstructor = row.find('td:nth-child(3)').text().trim();
+                
+                Swal.fire({
+                    title: '⚠️ Eliminar Instructor',
+                    html: `<div class="text-left">
+                        <div class="alert alert-info mb-3">
+                            <i class="fas fa-info-circle"></i>
+                            <strong>Información del Instructor:</strong>
+                        </div>
+                        <p><strong>Nombre:</strong> ${nombreInstructor}</p>
+                        <p><strong>Documento:</strong> ${documentoInstructor}</p>
+                        <div class="alert alert-warning mt-3">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <strong>Importante:</strong> Esta acción eliminará el instructor pero mantendrá la persona intacta.
+                        </div>
+                    </div>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fas fa-trash"></i> Sí, eliminar',
+                    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+                    focusConfirm: false,
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Mostrar loading mientras se procesa
+                        Swal.fire({
+                            title: 'Eliminando...',
+                            text: 'Por favor espere mientras se procesa la solicitud',
+                            icon: 'info',
+                            allowOutsideClick: false,
+                            showConfirmButton: false,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        
+                        form.submit();
+                    }
+                });
+            });
+
+            // Tooltips para elementos interactivos
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
 @endsection

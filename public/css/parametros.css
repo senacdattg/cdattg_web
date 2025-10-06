@@ -218,3 +218,23 @@ td[style*="white-space: nowrap"] {
         text-align: center;
     }
 }
+
+/* Estilo para cards clickeables con hover */
+.hover-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.hover-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+    border-left-color: #007bff !important;
+}
+
+.hover-card:hover .card-title {
+    color: #007bff !important;
+}
+
+.hover-card:hover .fas {
+    color: #007bff !important;
+}

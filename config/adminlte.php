@@ -504,13 +504,35 @@ return [
             'submenu' => [
                 [
                     'text' => 'Instructores',
-                    'url' => 'instructor',
                     'icon' => 'fas fa-fw fa-chalkboard-teacher',
                     'can' => [
                         'VER INSTRUCTOR',
                         'CREAR INSTRUCTOR',
                         'EDITAR INSTRUCTOR',
                         'ELIMINAR INSTRUCTOR',
+                        'GESTIONAR ESPECIALIDADES INSTRUCTOR',
+                        'VER FICHAS ASIGNADAS',
+                        'CAMBIAR ESTADO INSTRUCTOR',
+                    ],
+                    'submenu' => [
+                        [
+                            'text' => 'Dashboard',
+                            'route' => 'instructor.dashboard',
+                            'icon' => 'fas fa-fw fa-tachometer-alt',
+                            'can' => 'VER INSTRUCTOR',
+                        ],
+                        [
+                            'text' => 'Lista de Instructores',
+                            'url' => 'instructor',
+                            'icon' => 'fas fa-fw fa-list',
+                            'can' => 'VER INSTRUCTOR',
+                        ],
+                        [
+                            'text' => 'Crear Instructor',
+                            'url' => 'instructor/create',
+                            'icon' => 'fas fa-fw fa-plus',
+                            'can' => 'CREAR INSTRUCTOR',
+                        ],
                     ],
                 ],
                 [

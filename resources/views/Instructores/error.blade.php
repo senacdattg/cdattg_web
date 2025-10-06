@@ -39,11 +39,11 @@
                 </button>
             </div>
         @endif
-        @if ($personasSinUsuario->count() > 0)
+        @if ($instructoresSinUsuario->count() > 0)
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <p>
-                    los instructores a continuación no tienen un usuario asociado, por favor vuelve a registralos o
-                    eliminalos.
+                    Los instructores a continuación no tienen un usuario asociado, por favor vuelve a registrarlos o
+                    eliminarlos.
                 </p>
                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -71,26 +71,31 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php foreach ($personasSinUsuario as $user): ?>
+                            @foreach ($instructoresSinUsuario as $instructor)
                             <tr>
-                                <td>{{ $user->primer_nombre }} {{ $user->primer_apellido }}</td>
-                                <td>{{ $user->numero_documento }}</td>
-                                <td>{{ $user->email ?? 'N/A' }}</td>
+                                <td>{{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}</td>
+                                <td>{{ $instructor->persona->numero_documento }}</td>
+                                <td>{{ $instructor->persona->email ?? 'N/A' }}</td>
                                 <td>
                                     <div class="btn-group" role="group">
-                                        <a href="" class="btn btn-primary mr-2">
+                                        <a href="{{ route('instructor.create') }}?persona_id={{ $instructor->persona->id }}" class="btn btn-primary mr-2" title="Crear Usuario">
                                             <i class="fas fa-user-plus"></i>
                                         </a>
-                                        <a href="{{ route('instructor.deleteWithoudUser', ['id' => $user->id]) }}"
-                                            class="btn btn-danger">
+                                        <a href="{{ route('instructor.deleteWithoudUser', ['id' => $instructor->id]) }}"
+                                            class="btn btn-danger" title="Eliminar Instructor"
+                                            onclick="return confirm('¿Está seguro de eliminar este instructor?')">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>
                                 </td>
                             </tr>
-                            <?php endforeach; ?>
+                            @endforeach
                     </table>
                 </div>
             </div>
     </div>
+@endsection
+
+@section('footer')
+    @include('layout.footer')
 @endsection
