@@ -236,37 +236,13 @@ class AsignarInstructoresRequest extends FormRequest
 
     /**
      * Validar especialidades requeridas
+     * NOTA: Esta validación se maneja en InstructorBusinessRulesService para evitar duplicados
      */
     private function validarEspecialidadesRequeridas($validator): void
     {
-        $fichaId = $this->route('id');
-        $ficha = FichaCaracterizacion::with('programaFormacion.redConocimiento')->find($fichaId);
-        
-        if (!$ficha || !$ficha->programaFormacion || !$ficha->programaFormacion->redConocimiento) {
-            return;
-        }
-
-        $especialidadRequerida = $ficha->programaFormacion->redConocimiento->nombre;
-        $instructores = $this->input('instructores', []);
-
-        foreach ($instructores as $index => $instructorData) {
-            $instructor = Instructor::find($instructorData['instructor_id']);
-            if (!$instructor) continue;
-
-            $especialidades = $instructor->especialidades ?? [];
-            $especialidadPrincipal = $especialidades['principal'] ?? null;
-            $especialidadesSecundarias = $especialidades['secundarias'] ?? [];
-
-            $tieneEspecialidad = ($especialidadPrincipal === $especialidadRequerida) || 
-                                in_array($especialidadRequerida, $especialidadesSecundarias);
-
-            if (!$tieneEspecialidad) {
-                $validator->errors()->add(
-                    "instructores.{$index}.instructor_id",
-                    "🎯 El instructor {$instructor->nombre_completo} no tiene la especialidad requerida: {$especialidadRequerida}. Seleccione un instructor con esta especialidad."
-                );
-            }
-        }
+        // La validación de especialidades se maneja en InstructorBusinessRulesService
+        // para evitar duplicados con verificarDisponibilidad()
+        return;
     }
 
     /**
@@ -340,12 +316,13 @@ class AsignarInstructoresRequest extends FormRequest
             }
 
             // Verificar experiencia mínima
-            if (($instructor->anos_experiencia ?? 0) < 1) {
-                $validator->errors()->add(
-                    "instructores.{$index}.instructor_id",
-                    "👨‍🏫 El instructor {$instructor->nombre_completo} no cumple con la experiencia mínima requerida (1 año). Seleccione un instructor con más experiencia."
-                );
-            }
+            // NOTA: Esta validación se maneja en InstructorBusinessRulesService para evitar duplicados
+            // if (($instructor->anos_experiencia ?? 0) < 1) {
+            //     $validator->errors()->add(
+            //         "instructores.{$index}.instructor_id",
+            //         "👨‍🏫 El instructor {$instructor->nombre_completo} no cumple con la experiencia mínima requerida (1 año). Seleccione un instructor con más experiencia."
+            //     );
+            // }
         }
     }
 
