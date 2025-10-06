@@ -151,14 +151,18 @@
                                                    placeholder="Escriba nombre o documento para buscar...">
                                             <select name="persona_id" id="persona_id" class="form-control @error('persona_id') is-invalid @enderror" required style="display: none;">
                                                 <option value="">Seleccione una persona</option>
-                                                @foreach($personas as $persona)
+                                                @if(isset($personas))
+                                                    @foreach($personas as $persona)
                                                     <option value="{{ $persona->id }}" 
                                                             data-nombre="{{ $persona->primer_nombre }} {{ $persona->segundo_nombre }} {{ $persona->primer_apellido }} {{ $persona->segundo_apellido }}"
                                                             data-documento="{{ $persona->numero_documento }}"
                                                             data-email="{{ $persona->email }}">
                                                         {{ $persona->primer_nombre }} {{ $persona->primer_apellido }} - {{ $persona->numero_documento }}
                                                     </option>
-                                                @endforeach
+                                                    @endforeach
+                                                @else
+                                                    <option value="" disabled>No hay personas disponibles</option>
+                                                @endif
                                             </select>
                                             @error('persona_id')
                                                 <div class="invalid-feedback">{{ $message }}</div>

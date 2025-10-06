@@ -252,6 +252,13 @@ class InstructorController extends Controller
             $regionales = Regional::where('status', 1)->get();
             $especialidades = \App\Models\RedConocimiento::where('status', true)->orderBy('nombre')->get();
 
+            // Debug temporal
+            Log::info('Variables pasadas a la vista create:', [
+                'personas_count' => $personas->count(),
+                'regionales_count' => $regionales->count(),
+                'especialidades_count' => $especialidades->count()
+            ]);
+            
             return view('Instructores.create', compact('personas', 'regionales', 'especialidades'));
             
         } catch (Exception $e) {
