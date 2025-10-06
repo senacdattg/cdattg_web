@@ -39,8 +39,10 @@ class ComplementarioController extends Controller
     public function gestionProgramasComplementarios()
     {
 
-        $programas = ComplementarioOfertado::with(['modalidad', 'jornada', 'diasFormacion'])->get();
-        return view('complementarios.gestion_programas_complementarios', compact('programas'));
+        $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion'])->get();
+        $modalidades = \App\Models\ParametroTema::with('parametro')->get();
+        $jornadas = \App\Models\JornadaFormacion::all();
+        return view('complementarios.gestion_programas_complementarios', compact('programas', 'modalidades', 'jornadas'));
     }
     public function estadisticas()
     {
@@ -63,7 +65,7 @@ class ComplementarioController extends Controller
             'descripcion' => $programa->descripcion,
             'duracion' => $programa->duracion . ' horas',
             'icono' => $this->getIconoForPrograma($programa->nombre),
-            'modalidad' => $programa->modalidad->name ?? 'N/A',
+            'modalidad' => $programa->modalidad->parametro->name ?? 'N/A',
             'jornada' => $programa->jornada->jornada ?? 'N/A',
             'dias' => $programa->diasFormacion->map(function ($dia) {
                 return $dia->name . ' (' . $dia->pivot->hora_inicio . ' - ' . $dia->pivot->hora_fin . ')';
