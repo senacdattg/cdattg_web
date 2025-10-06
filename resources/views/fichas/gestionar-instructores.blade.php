@@ -690,5 +690,134 @@
                 }
             }
         });
+
+        // Cargar instructores existentes al inicializar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            @if($instructoresAsignados->count() > 0)
+                @foreach($instructoresAsignados as $asignacion)
+                    agregarInstructorExistente({
+                        instructor_id: {{ $asignacion->instructor_id }},
+                        fecha_inicio: '{{ $asignacion->fecha_inicio->format("Y-m-d") }}',
+                        fecha_fin: '{{ $asignacion->fecha_fin->format("Y-m-d") }}',
+                        total_horas_instructor: {{ $asignacion->total_horas_instructor }},
+                        dias_formacion: {!! json_encode($asignacion->instructorFichaDias->pluck('dia_id')->toArray()) !!}
+                    });
+                @endforeach
+            @endif
+        });
+
+        // Función para agregar instructores existentes
+        function agregarInstructorExistente(data) {
+            const container = document.getElementById('instructores-container');
+            const index = container.children.length;
+            
+            const div = document.createElement('div');
+            div.className = 'card mb-3 instructor-card';
+            div.innerHTML = `
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <label class="form-label font-weight-bold">Instructor</label>
+                            <select name="instructores[${index}][instructor_id]" class="form-control select2 instructor-select" required>
+                                <option value="">Seleccione un instructor</option>
+                                ${Object.keys(instructoresDisponibles).map(id => {
+                                    const instructorData = instructoresDisponibles[id];
+                                    const selected = data.instructor_id == id ? 'selected' : '';
+                                    return `<option value="${id}" ${selected}>${instructorData.instructor.persona.primer_nombre} ${instructorData.instructor.persona.primer_apellido}</option>`;
+                                }).join('')}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label font-weight-bold">Fecha Inicio</label>
+                            <input type="date" name="instructores[${index}][fecha_inicio]" 
+                                   class="form-control" value="${data.fecha_inicio}" 
+                                   min="${fechaInicioMin}"
+                                   max="${fechaFinMax}" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label font-weight-bold">Fecha Fin</label>
+                            <input type="date" name="instructores[${index}][fecha_fin]" 
+                                   class="form-control" value="${data.fecha_fin}" 
+                                   min="${fechaInicioMin}"
+                                   max="${fechaFinMax}" required>
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label font-weight-bold">Horas</label>
+                            <input type="number" name="instructores[${index}][total_horas_instructor]" 
+                                   class="form-control" value="${data.total_horas_instructor}" min="1" required>
+                        </div>
+                        <div class="col-md-1">
+                            <label class="form-label font-weight-bold">&nbsp;</label>
+                            <button type="button" class="btn btn-sm btn-outline-danger d-block" onclick="eliminarInstructor(this)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Días de Formación -->
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <label class="form-label font-weight-bold">
+                                <i class="fas fa-calendar-week mr-1"></i>
+                                Días de Formación
+                            </label>
+                            <div class="dias-formacion-container" data-index="${index}">
+                                <!-- Los días se agregarán dinámicamente aquí -->
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-success mt-2" onclick="agregarDiaFormacion(${index})">
+                                <i class="fas fa-plus mr-1"></i> Agregar Día
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(div);
+            
+            // Inicializar Select2
+            $(div).find('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%'
+            });
+
+            // Cargar días de formación existentes
+            if (data.dias_formacion && data.dias_formacion.length > 0) {
+                data.dias_formacion.forEach(diaId => {
+                    agregarDiaFormacionExistente(index, diaId);
+                });
+            }
+        }
+
+        // Función para agregar días de formación existentes
+        function agregarDiaFormacionExistente(index, diaId) {
+            const container = document.querySelector(`.dias-formacion-container[data-index="${index}"]`);
+            const diaIndex = container.children.length;
+            
+            const div = document.createElement('div');
+            div.className = 'row mt-1 dia-formacion-row';
+            div.innerHTML = `
+                <div class="col-md-8">
+                    <select name="instructores[${index}][dias_formacion][${diaIndex}][dia_id]" class="form-control select2" required>
+                        <option value="">Seleccione un día</option>
+                        ${diasFormacionFicha.map(dia => {
+                            const selected = diaId == dia.id ? 'selected' : '';
+                            return `<option value="${dia.id}" ${selected}>${dia.name}</option>`;
+                        }).join('')}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="eliminarDiaFormacion(this)">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                </div>
+            `;
+            
+            container.appendChild(div);
+            
+            // Inicializar Select2
+            $(div).find('.select2').select2({
+                theme: 'bootstrap4',
+                width: '100%'
+            });
+        }
     </script>
 @endsection
