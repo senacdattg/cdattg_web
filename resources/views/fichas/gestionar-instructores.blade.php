@@ -297,7 +297,7 @@
                                                 {{ $data['instructor']->persona->primer_nombre }} 
                                                 {{ $data['instructor']->persona->primer_apellido }}
                                                 @if(!$data['disponible'])
-                                                    (No disponible - {{ $data['fichas_superpuestas'] }} fichas superpuestas)
+                                                    (No disponible - {{ count($data['conflictos'] ?? []) }} conflictos)
                                                 @endif
                                             </option>
                                         @endforeach
