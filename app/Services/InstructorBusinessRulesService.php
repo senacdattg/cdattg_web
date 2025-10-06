@@ -232,7 +232,7 @@ class InstructorBusinessRulesService
         $especialidadRequerida = $criterios['especialidad_requerida'] ?? null;
         $regionalId = $criterios['regional_id'] ?? null;
 
-        $query = Instructor::with(['persona', 'regional', 'especialidades'])
+        $query = Instructor::with(['persona', 'regional'])
             ->where('status', true);
 
         // Filtrar por regional

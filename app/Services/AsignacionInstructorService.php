@@ -330,7 +330,7 @@ class AsignacionInstructorService
                 'horas_semanales' => 0
             ];
 
-            $instructores = Instructor::with(['persona', 'regional', 'especialidades'])
+            $instructores = Instructor::with(['persona', 'regional'])
                 ->where('status', true);
             
             // Solo filtrar por regional si existe
