@@ -244,6 +244,9 @@ class GuiasAprendizaje extends Model
      */
     public function diasDesdeCreacion(): int
     {
+        if (!$this->created_at) {
+            return 0;
+        }
         return $this->created_at->diffInDays(Carbon::now());
     }
 
@@ -252,6 +255,9 @@ class GuiasAprendizaje extends Model
      */
     public function diasDesdeUltimaActualizacion(): int
     {
+        if (!$this->updated_at) {
+            return 0;
+        }
         return $this->updated_at->diffInDays(Carbon::now());
     }
 
