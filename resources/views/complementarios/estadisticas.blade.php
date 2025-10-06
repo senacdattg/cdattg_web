@@ -260,7 +260,7 @@
 
                 if (departamentoId) {
                     // Hacer petición AJAX para obtener municipios
-                    fetch(`/complementarios/api/municipios/${departamentoId}`)
+                    fetch(`/municipios/${departamentoId}`)
                         .then(response => response.json())
                         .then(municipios => {
                             municipios.forEach(mun => {
