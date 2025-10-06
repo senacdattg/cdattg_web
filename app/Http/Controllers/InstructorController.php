@@ -116,21 +116,21 @@ class InstructorController extends Controller
                 'con_fichas' => Instructor::whereHas('instructorFichas')->count()
             ];
 
-            // Verificar instructores sin usuario
-            $instructoresSinUsuario = Instructor::whereDoesntHave('persona.user')
-                ->with('persona:id,primer_nombre,primer_apellido,numero_documento,email')
-                ->get();
+            // Verificar instructores sin usuario - TEMPORALMENTE COMENTADO
+            // $instructoresSinUsuario = Instructor::whereDoesntHave('persona.user')
+            //     ->with('persona:id,primer_nombre,primer_apellido,numero_documento,email')
+            //     ->get();
 
             // Debug temporal
-            Log::info('Instructores sin usuario:', [
-                'count' => $instructoresSinUsuario->count(),
-                'instructores' => $instructoresSinUsuario->toArray()
-            ]);
+            // Log::info('Instructores sin usuario:', [
+            //     'count' => $instructoresSinUsuario->count(),
+            //     'instructores' => $instructoresSinUsuario->toArray()
+            // ]);
 
-            if ($instructoresSinUsuario->count() > 0) {
-                Log::info('Redirigiendo a vista de error');
-                return view('Instructores.error', compact('instructoresSinUsuario'))->with('error', 'Existen instructores sin usuario asociado. Por favor, cree un usuario para cada instructor.');
-            }
+            // if ($instructoresSinUsuario->count() > 0) {
+            //     Log::info('Redirigiendo a vista de error');
+            //     return view('Instructores.error', compact('instructoresSinUsuario'))->with('error', 'Existen instructores sin usuario asociado. Por favor, cree un usuario para cada instructor.');
+            // }
 
             return view('Instructores.index', compact(
                 'instructores', 
