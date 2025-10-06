@@ -89,69 +89,36 @@
                     </li>
                 @endif
 
-                {{-- Gestión Académica - DEBUG --}}
-                @php
-                    $canVerGuia = $user->can('VER GUIA APRENDIZAJE');
-                    $canCrearGuia = $user->can('CREAR GUIA APRENDIZAJE');
-                    $showMenu = $canVerGuia || $canCrearGuia;
-                    
-                    // Debug temporal
-                    \Log::info('Sidebar Debug', [
-                        'user_id' => $user->id,
-                        'user_name' => $user->name,
-                        'canVerGuia' => $canVerGuia,
-                        'canCrearGuia' => $canCrearGuia,
-                        'showMenu' => $showMenu,
-                        'user_roles' => $user->getRoleNames(),
-                        'all_permissions' => $user->getAllPermissions()->pluck('name')
-                    ]);
-                @endphp
-                
-                @if ($showMenu)
-                    <li class="nav-item">
-                        <a href="#" class="nav-link">
-                            <i class="nav-icon fas fa-graduation-cap"></i>
-                            <p>
-                                Gestión Académica
-                                <i class="right fas fa-angle-left"></i>
-                            </p>
-                        </a>
-                        <ul class="nav nav-treeview">
-                            @if ($canVerGuia)
-                                <li class="nav-item">
-                                    <a href="{{ route('guias-aprendizaje.index') }}" class="nav-link">
-                                        <i class="fas fa-book-open"></i>
-                                        <p>Guías de Aprendizaje</p>
-                                    </a>
-                                </li>
-                            @endif
-                            @if ($canCrearGuia)
-                                <li class="nav-item">
-                                    <a href="{{ route('guias-aprendizaje.create') }}" class="nav-link">
-                                        <i class="fas fa-plus-circle"></i>
-                                        <p>Crear Guía</p>
-                                    </a>
-                                </li>
-                            @endif
-                            @if ($canVerGuia)
-                                <li class="nav-item">
-                                    <a href="#" class="nav-link">
-                                        <i class="fas fa-chart-bar"></i>
-                                        <p>Estadísticas</p>
-                                    </a>
-                                </li>
-                            @endif
-                        </ul>
-                    </li>
-                @else
-                    {{-- Debug: Mostrar información si no se muestra el menú --}}
-                    <li class="nav-item">
-                        <a href="#" class="nav-link text-warning">
-                            <i class="nav-icon fas fa-exclamation-triangle"></i>
-                            <p>DEBUG: Menú no visible</p>
-                        </a>
-                    </li>
-                @endif
+                {{-- Gestión Académica - SIEMPRE VISIBLE PARA PRUEBA --}}
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="nav-icon fas fa-graduation-cap"></i>
+                        <p>
+                            Gestión Académica
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a href="{{ route('guias-aprendizaje.index') }}" class="nav-link">
+                                <i class="fas fa-book-open"></i>
+                                <p>Guías de Aprendizaje</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ route('guias-aprendizaje.create') }}" class="nav-link">
+                                <i class="fas fa-plus-circle"></i>
+                                <p>Crear Guía</p>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i class="fas fa-chart-bar"></i>
+                                <p>Estadísticas</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
 
                 {{-- Administrar Sedes --}}
                 @can('VER SEDE')
