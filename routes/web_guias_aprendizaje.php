@@ -16,6 +16,9 @@ use App\Http\Controllers\GuiaAprendizajeController;
 // Rutas resource para CRUD completo
 Route::resource('guias-aprendizaje', GuiaAprendizajeController::class);
 
+// Búsqueda AJAX
+Route::get('/guias-aprendizaje-search', [GuiaAprendizajeController::class, 'search'])->name('guias-aprendizaje.search');
+
 // Rutas adicionales para funcionalidades específicas
 Route::middleware('can:EDITAR GUIA APRENDIZAJE')->group(function () {
     // Cambiar estado de la guía de aprendizaje

@@ -33,17 +33,163 @@ class GuiaAprendizajeController extends Controller
      * 
      * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $guiasAprendizaje = GuiasAprendizaje::with(['resultadosAprendizaje', 'actividades'])
-                ->orderBy('created_at', 'desc')
-                ->paginate(10);
+            $query = GuiasAprendizaje::with(['resultadosAprendizaje.competencias', 'actividades', 'userCreate', 'userEdit']);
             
-            return view('guias_aprendizaje.index', compact('guiasAprendizaje'));
+            // Aplicar filtros si existen
+            if ($request->filled('search')) {
+                $searchTerm = $request->search;
+                $query->where(function($q) use ($searchTerm) {
+                    $q->where('codigo', 'LIKE', "%{$searchTerm}%")
+                      ->orWhere('nombre', 'LIKE', "%{$searchTerm}%")
+                      ->orWhere('descripcion', 'LIKE', "%{$searchTerm}%");
+                });
+            }
+            
+            if ($request->filled('codigo')) {
+                $query->where('codigo', 'LIKE', "%{$request->codigo}%");
+            }
+            
+            if ($request->filled('nombre')) {
+                $query->where('nombre', 'LIKE', "%{$request->nombre}%");
+            }
+            
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+            
+            if ($request->filled('nivel_dificultad')) {
+                $query->where('nivel_dificultad', $request->nivel_dificultad);
+            }
+            
+            if ($request->filled('competencia_id')) {
+                $query->whereHas('resultadosAprendizaje.competencias', function($q) use ($request) {
+                    $q->where('competencias.id', $request->competencia_id);
+                });
+            }
+            
+            if ($request->filled('resultado_id')) {
+                $query->whereHas('resultadosAprendizaje', function($q) use ($request) {
+                    $q->where('resultados_aprendizajes.id', $request->resultado_id);
+                });
+            }
+            
+            if ($request->filled('user_create_id')) {
+                $query->where('user_create_id', $request->user_create_id);
+            }
+            
+            if ($request->filled('fecha_desde')) {
+                $query->whereDate('created_at', '>=', $request->fecha_desde);
+            }
+            
+            if ($request->filled('fecha_hasta')) {
+                $query->whereDate('created_at', '<=', $request->fecha_hasta);
+            }
+            
+            // Ordenamiento
+            $sortBy = $request->get('sort_by', 'created_at');
+            $sortOrder = $request->get('sort_order', 'desc');
+            $query->orderBy($sortBy, $sortOrder);
+            
+            $guiasAprendizaje = $query->paginate(10)->withQueryString();
+            
+            // Obtener datos para filtros
+            $competencias = \App\Models\Competencia::orderBy('nombre')->get();
+            $resultadosAprendizaje = ResultadosAprendizaje::orderBy('codigo')->get();
+            $usuarios = \App\Models\User::with('persona')->get();
+            
+            return view('guias_aprendizaje.index', compact(
+                'guiasAprendizaje', 
+                'competencias', 
+                'resultadosAprendizaje', 
+                'usuarios'
+            ));
         } catch (Exception $e) {
             Log::error('Error al obtener lista de guías de aprendizaje: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Error al cargar las guías de aprendizaje.');
+        }
+    }
+
+    /**
+     * Búsqueda avanzada con AJAX.
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function search(Request $request)
+    {
+        try {
+            $query = GuiasAprendizaje::with(['resultadosAprendizaje.competencias', 'userCreate', 'userEdit']);
+            
+            // Búsqueda general
+            if ($request->filled('q')) {
+                $searchTerm = $request->q;
+                $query->where(function($q) use ($searchTerm) {
+                    $q->where('codigo', 'LIKE', "%{$searchTerm}%")
+                      ->orWhere('nombre', 'LIKE', "%{$searchTerm}%")
+                      ->orWhere('descripcion', 'LIKE', "%{$searchTerm}%");
+                });
+            }
+            
+            // Filtros específicos
+            if ($request->filled('codigo')) {
+                $query->where('codigo', 'LIKE', "%{$request->codigo}%");
+            }
+            
+            if ($request->filled('nombre')) {
+                $query->where('nombre', 'LIKE', "%{$request->nombre}%");
+            }
+            
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+            
+            if ($request->filled('competencia_id')) {
+                $query->whereHas('resultadosAprendizaje.competencias', function($q) use ($request) {
+                    $q->where('competencias.id', $request->competencia_id);
+                });
+            }
+            
+            if ($request->filled('resultado_id')) {
+                $query->whereHas('resultadosAprendizaje', function($q) use ($request) {
+                    $q->where('resultados_aprendizajes.id', $request->resultado_id);
+                });
+            }
+            
+            // Ordenamiento
+            $sortBy = $request->get('sort_by', 'created_at');
+            $sortOrder = $request->get('sort_order', 'desc');
+            $query->orderBy($sortBy, $sortOrder);
+            
+            $guiasAprendizaje = $query->paginate(10);
+            
+            // Preparar datos para respuesta JSON
+            $data = [
+                'success' => true,
+                'data' => $guiasAprendizaje->items(),
+                'pagination' => [
+                    'current_page' => $guiasAprendizaje->currentPage(),
+                    'last_page' => $guiasAprendizaje->lastPage(),
+                    'per_page' => $guiasAprendizaje->perPage(),
+                    'total' => $guiasAprendizaje->total(),
+                    'from' => $guiasAprendizaje->firstItem(),
+                    'to' => $guiasAprendizaje->lastItem(),
+                ],
+                'links' => $guiasAprendizaje->links()->toHtml(),
+            ];
+            
+            return response()->json($data);
+            
+        } catch (Exception $e) {
+            Log::error('Error en búsqueda de guías de aprendizaje: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al realizar la búsqueda',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 

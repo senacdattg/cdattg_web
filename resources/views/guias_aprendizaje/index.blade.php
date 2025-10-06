@@ -27,6 +27,40 @@
             font-size: 0.8em;
             padding: 0.4em 0.8em;
         }
+        .search-container {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .filter-section {
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        .filter-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .search-results {
+            min-height: 200px;
+        }
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+        }
+        .search-stats {
+            background: #e9ecef;
+            padding: 10px 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+        }
     </style>
 @endsection
 
@@ -130,55 +164,187 @@
                 </div>
             </div>
 
-            <!-- Filtros Avanzados -->
+            <!-- Búsqueda Avanzada -->
             <div class="row mb-4">
                 <div class="col-12">
-                    <div class="card filter-card">
-                        <div class="card-header">
-                            <h5 class="card-title m-0">
-                                <i class="fas fa-filter mr-2"></i>Filtros Avanzados
-                            </h5>
+                    <div class="search-container">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <h5 class="mb-3">
+                                    <i class="fas fa-search"></i>
+                                    Búsqueda Avanzada
+                                </h5>
+                            </div>
                         </div>
-                        <div class="card-body">
-                            <form method="GET" action="{{ route('guias-aprendizaje.index') }}" class="row g-3">
-                                <div class="col-md-3">
-                                    <label class="form-label">Buscar por código o nombre</label>
-                                    <input type="text" name="search" class="form-control" 
-                                           placeholder="Código o nombre..." value="{{ request('search') }}">
+                        
+                        <form id="searchForm" method="GET" action="{{ route('guias-aprendizaje.index') }}">
+                            <!-- Búsqueda General -->
+                            <div class="filter-section">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <div class="form-group">
+                                            <label for="search">Búsqueda General</label>
+                                            <div class="input-group">
+                                                <input type="text" 
+                                                       class="form-control" 
+                                                       id="search" 
+                                                       name="search" 
+                                                       value="{{ request('search') }}"
+                                                       placeholder="Buscar por código, nombre o descripción...">
+                                                <div class="input-group-append">
+                                                    <button class="btn btn-primary" type="submit">
+                                                        <i class="fas fa-search"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="status">Estado</label>
+                                            <select class="form-control" id="status" name="status">
+                                                <option value="">Todos los estados</option>
+                                                <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Activo</option>
+                                                <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Inactivo</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <label class="form-label">Estado</label>
-                                    <select name="status" class="form-control">
-                                        <option value="">Todos</option>
-                                        <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Activo</option>
-                                        <option value="0" {{ request('status') == '0' ? 'selected' : '' }}>Inactivo</option>
-                                    </select>
+                            </div>
+
+                            <!-- Filtros Específicos -->
+                            <div class="filter-section">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="codigo">Código</label>
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   id="codigo" 
+                                                   name="codigo" 
+                                                   value="{{ request('codigo') }}"
+                                                   placeholder="Filtrar por código...">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="nombre">Nombre</label>
+                                            <input type="text" 
+                                                   class="form-control" 
+                                                   id="nombre" 
+                                                   name="nombre" 
+                                                   value="{{ request('nombre') }}"
+                                                   placeholder="Filtrar por nombre...">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="nivel_dificultad">Nivel de Dificultad</label>
+                                            <select class="form-control" id="nivel_dificultad" name="nivel_dificultad">
+                                                <option value="">Todos los niveles</option>
+                                                <option value="BASICO" {{ request('nivel_dificultad') == 'BASICO' ? 'selected' : '' }}>Básico</option>
+                                                <option value="INTERMEDIO" {{ request('nivel_dificultad') == 'INTERMEDIO' ? 'selected' : '' }}>Intermedio</option>
+                                                <option value="AVANZADO" {{ request('nivel_dificultad') == 'AVANZADO' ? 'selected' : '' }}>Avanzado</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <label class="form-label">Fecha desde</label>
-                                    <input type="date" name="fecha_desde" class="form-control" 
-                                           value="{{ request('fecha_desde') }}">
+                            </div>
+
+                            <!-- Filtros por Relaciones -->
+                            <div class="filter-section">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="competencia_id">Competencia</label>
+                                            <select class="form-control select2" id="competencia_id" name="competencia_id">
+                                                <option value="">Todas las competencias</option>
+                                                @foreach($competencias as $competencia)
+                                                    <option value="{{ $competencia->id }}" {{ request('competencia_id') == $competencia->id ? 'selected' : '' }}>
+                                                        {{ $competencia->nombre }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="resultado_id">Resultado de Aprendizaje</label>
+                                            <select class="form-control select2" id="resultado_id" name="resultado_id">
+                                                <option value="">Todos los resultados</option>
+                                                @foreach($resultadosAprendizaje as $resultado)
+                                                    <option value="{{ $resultado->id }}" {{ request('resultado_id') == $resultado->id ? 'selected' : '' }}>
+                                                        {{ $resultado->codigo }} - {{ $resultado->nombre }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="user_create_id">Creado por</label>
+                                            <select class="form-control select2" id="user_create_id" name="user_create_id">
+                                                <option value="">Todos los usuarios</option>
+                                                @foreach($usuarios as $usuario)
+                                                    <option value="{{ $usuario->id }}" {{ request('user_create_id') == $usuario->id ? 'selected' : '' }}>
+                                                        {{ $usuario->persona->primer_nombre ?? $usuario->name }} {{ $usuario->persona->primer_apellido ?? '' }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <label class="form-label">Fecha hasta</label>
-                                    <input type="date" name="fecha_hasta" class="form-control" 
-                                           value="{{ request('fecha_hasta') }}">
+                            </div>
+
+                            <!-- Filtros por Fecha -->
+                            <div class="filter-section">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="fecha_desde">Fecha Desde</label>
+                                            <input type="date" 
+                                                   class="form-control" 
+                                                   id="fecha_desde" 
+                                                   name="fecha_desde" 
+                                                   value="{{ request('fecha_desde') }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="fecha_hasta">Fecha Hasta</label>
+                                            <input type="date" 
+                                                   class="form-control" 
+                                                   id="fecha_hasta" 
+                                                   name="fecha_hasta" 
+                                                   value="{{ request('fecha_hasta') }}">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="sort_by">Ordenar por</label>
+                                            <select class="form-control" id="sort_by" name="sort_by">
+                                                <option value="created_at" {{ request('sort_by') == 'created_at' ? 'selected' : '' }}>Fecha de Creación</option>
+                                                <option value="nombre" {{ request('sort_by') == 'nombre' ? 'selected' : '' }}>Nombre</option>
+                                                <option value="codigo" {{ request('sort_by') == 'codigo' ? 'selected' : '' }}>Código</option>
+                                                <option value="nivel_dificultad" {{ request('sort_by') == 'nivel_dificultad' ? 'selected' : '' }}>Nivel de Dificultad</option>
+                                            </select>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-md-2">
-                                    <label class="form-label">Ordenar por</label>
-                                    <select name="ordenar" class="form-control">
-                                        <option value="created_at_desc" {{ request('ordenar') == 'created_at_desc' ? 'selected' : '' }}>Más recientes</option>
-                                        <option value="nombre_asc" {{ request('ordenar') == 'nombre_asc' ? 'selected' : '' }}>Nombre A-Z</option>
-                                        <option value="codigo_asc" {{ request('ordenar') == 'codigo_asc' ? 'selected' : '' }}>Código A-Z</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-1 d-flex align-items-end">
-                                    <button type="submit" class="btn btn-primary btn-block">
-                                        <i class="fas fa-search"></i>
+                            </div>
+
+                            <!-- Botones de Acción -->
+                            <div class="row">
+                                <div class="col-md-12 text-right">
+                                    <button type="button" class="btn btn-secondary" onclick="clearFilters()">
+                                        <i class="fas fa-eraser"></i> Limpiar Filtros
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-search"></i> Buscar
                                     </button>
                                 </div>
-                            </form>
-                        </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -358,8 +524,129 @@
             });
 
             // Auto-submit del formulario de filtros al cambiar select
-            $('select[name="status"], select[name="ordenar"]').on('change', function() {
+            $('select[name="status"], select[name="sort_by"]').on('change', function() {
                 $(this).closest('form').submit();
+            });
+
+            // Búsqueda en tiempo real con AJAX
+            let searchTimeout;
+            $('#search').on('input', function() {
+                clearTimeout(searchTimeout);
+                const query = $(this).val();
+                
+                if (query.length >= 2 || query.length === 0) {
+                    searchTimeout = setTimeout(function() {
+                        performAjaxSearch();
+                    }, 500);
+                }
+            });
+
+            // Función para realizar búsqueda AJAX
+            function performAjaxSearch() {
+                const formData = $('#searchForm').serialize();
+                
+                $.ajax({
+                    url: '{{ route("guias-aprendizaje.search") }}',
+                    method: 'GET',
+                    data: formData,
+                    beforeSend: function() {
+                        $('.loading-spinner').show();
+                        $('.search-results').hide();
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            updateSearchResults(response);
+                        } else {
+                            showErrorMessage(response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Error en búsqueda AJAX:', xhr);
+                        showErrorMessage('Error al realizar la búsqueda');
+                    },
+                    complete: function() {
+                        $('.loading-spinner').hide();
+                    }
+                });
+            }
+
+            // Actualizar resultados de búsqueda
+            function updateSearchResults(response) {
+                const resultsContainer = $('.search-results');
+                
+                if (response.data.length === 0) {
+                    resultsContainer.html(`
+                        <div class="no-results">
+                            <i class="fas fa-search fa-3x mb-3"></i>
+                            <h5>No se encontraron resultados</h5>
+                            <p>Intenta con otros términos de búsqueda</p>
+                        </div>
+                    `);
+                } else {
+                    let html = '<div class="table-responsive"><table class="table table-striped">';
+                    html += '<thead><tr><th>Código</th><th>Nombre</th><th>Estado</th><th>Resultados</th><th>Actividades</th><th>Acciones</th></tr></thead>';
+                    html += '<tbody>';
+                    
+                    response.data.forEach(function(guia) {
+                        html += `
+                            <tr>
+                                <td><span class="badge badge-primary">${guia.codigo}</span></td>
+                                <td>${guia.nombre}</td>
+                                <td>
+                                    <span class="badge badge-status ${guia.status == 1 ? 'badge-success' : 'badge-danger'}">
+                                        <i class="fas fa-circle mr-1" style="font-size: 6px;"></i>
+                                        ${guia.status == 1 ? 'Activo' : 'Inactivo'}
+                                    </span>
+                                </td>
+                                <td><span class="badge badge-info">${guia.resultados_aprendizaje ? guia.resultados_aprendizaje.length : 0}</span></td>
+                                <td><span class="badge badge-warning">${guia.actividades ? guia.actividades.length : 0}</span></td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="/guias-aprendizaje/${guia.id}" class="btn btn-light btn-sm" title="Ver detalles">
+                                            <i class="fas fa-eye text-info"></i>
+                                        </a>
+                                        <a href="/guias-aprendizaje/${guia.id}/edit" class="btn btn-light btn-sm" title="Editar">
+                                            <i class="fas fa-pencil-alt text-warning"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                    
+                    html += '</tbody></table></div>';
+                    
+                    // Agregar paginación si existe
+                    if (response.links) {
+                        html += '<div class="d-flex justify-content-center mt-3">' + response.links + '</div>';
+                    }
+                    
+                    resultsContainer.html(html);
+                }
+                
+                resultsContainer.show();
+            }
+
+            // Mostrar mensaje de error
+            function showErrorMessage(message) {
+                $('.search-results').html(`
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-circle"></i>
+                        ${message}
+                    </div>
+                `).show();
+            }
+
+            // Función para limpiar filtros
+            window.clearFilters = function() {
+                $('#searchForm')[0].reset();
+                window.location.href = '{{ route("guias-aprendizaje.index") }}';
+            };
+
+            // Inicializar Select2
+            $('.select2').select2({
+                placeholder: 'Seleccionar...',
+                allowClear: true
             });
         });
     </script>
