@@ -1707,26 +1707,27 @@ class FichaCaracterizacionController extends Controller
     public function gestionarInstructores(string $id)
     {
         try {
-            Log::info('Acceso a gestión de instructores', [
+            Log::info('Acceso a gestión de instructores con sistema robusto', [
                 'user_id' => Auth::id(),
                 'ficha_id' => $id,
                 'timestamp' => now()
             ]);
 
-            // Buscar la ficha con sus relaciones
+            // Buscar la ficha con todas sus relaciones necesarias
             $ficha = FichaCaracterizacion::with([
                 'instructor.persona',
                 'instructorFicha.instructor.persona',
-                'instructorFicha.instructorFichaDias',
+                'instructorFicha.instructorFichaDias.dia',
                 'diasFormacion.dia',
-                'programaFormacion',
-                'sede'
+                'programaFormacion.redConocimiento',
+                'sede.regional'
             ])->findOrFail($id);
 
-            // Obtener todos los instructores disponibles
-            $instructoresDisponibles = \App\Models\Instructor::with('persona')
-                ->where('regional_id', $ficha->sede->regional_id ?? null)
-                ->get();
+            // Verificar que la ficha esté activa
+            if (!$ficha->status) {
+                return redirect()->route('fichaCaracterizacion.show', $id)
+                    ->with('warning', 'La ficha no está activa. No se pueden gestionar instructores.');
+            }
 
             // Obtener instructores ya asignados a esta ficha
             $instructoresAsignados = $ficha->instructorFicha()
@@ -1741,21 +1742,35 @@ class FichaCaracterizacionController extends Controller
                 ->unique('id')
                 ->sortBy('id');
 
-            // Verificar disponibilidad de instructores
-            $instructoresConDisponibilidad = $this->verificarDisponibilidadInstructores($instructoresDisponibles, $ficha);
+            // Usar el servicio robusto para obtener instructores disponibles
+            $asignacionService = app(\App\Services\AsignacionInstructorService::class);
+            $instructoresConDisponibilidad = $asignacionService->obtenerInstructoresDisponibles((int)$id);
 
-            Log::info('Datos de gestión de instructores cargados', [
+            // Obtener estadísticas de asignaciones para mostrar en la vista
+            $estadisticasAsignaciones = $asignacionService->obtenerEstadisticasAsignaciones();
+
+            // Obtener logs recientes de asignaciones para esta ficha
+            $logsRecientes = \App\Models\AsignacionInstructorLog::where('ficha_id', $id)
+                ->with(['instructor.persona', 'user'])
+                ->orderBy('fecha_accion', 'desc')
+                ->limit(10)
+                ->get();
+
+            Log::info('Datos de gestión de instructores cargados con sistema robusto', [
                 'ficha_id' => $id,
-                'total_instructores_disponibles' => $instructoresDisponibles->count(),
-                'instructores_asignados' => $instructoresAsignados->count()
+                'total_instructores_evaluados' => count($instructoresConDisponibilidad),
+                'instructores_disponibles' => count(array_filter($instructoresConDisponibilidad, fn($i) => $i['disponible'])),
+                'instructores_asignados' => $instructoresAsignados->count(),
+                'logs_recientes' => $logsRecientes->count()
             ]);
 
             return view('fichas.gestionar-instructores', compact(
                 'ficha',
-                'instructoresDisponibles',
                 'instructoresAsignados',
                 'instructoresConDisponibilidad',
-                'diasFormacionFicha'
+                'diasFormacionFicha',
+                'estadisticasAsignaciones',
+                'logsRecientes'
             ));
 
         } catch (\Exception $e) {
