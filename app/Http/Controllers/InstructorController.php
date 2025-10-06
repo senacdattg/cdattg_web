@@ -121,7 +121,14 @@ class InstructorController extends Controller
                 ->with('persona:id,primer_nombre,primer_apellido,numero_documento,email')
                 ->get();
 
+            // Debug temporal
+            Log::info('Instructores sin usuario:', [
+                'count' => $instructoresSinUsuario->count(),
+                'instructores' => $instructoresSinUsuario->toArray()
+            ]);
+
             if ($instructoresSinUsuario->count() > 0) {
+                Log::info('Redirigiendo a vista de error');
                 return view('Instructores.error', compact('instructoresSinUsuario'))->with('error', 'Existen instructores sin usuario asociado. Por favor, cree un usuario para cada instructor.');
             }
 
