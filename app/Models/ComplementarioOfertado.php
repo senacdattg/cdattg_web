@@ -21,7 +21,7 @@ class ComplementarioOfertado extends Model
 
     public function modalidad()
     {
-        return $this->belongsTo(Parametro::class, 'modalidad_id');
+        return $this->belongsTo(ParametroTema::class, 'modalidad_id');
     }
 
     public function jornada()

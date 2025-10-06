@@ -109,39 +109,55 @@
                     <p>Complete el formulario para registrar un nuevo programa de formación</p>
                     <form id="newProgramForm">
                         <div class="mb-3">
-                            <label for="programName" class="form-label">Nombre del Programa</label>
-                            <input type="text" class="form-control" id="programName" name="programName" required>
+                            <label for="nombre" class="form-label">Nombre del Programa</label>
+                            <input type="text" class="form-control" id="nombre" name="nombre" required>
                         </div>
                         <div class="mb-3">
-                            <label for="programCode" class="form-label">Código del Programa</label>
-                            <input type="text" class="form-control" id="programCode" name="programCode" required>
+                            <label for="codigo" class="form-label">Código del Programa</label>
+                            <input type="text" class="form-control" id="codigo" name="codigo" required>
                         </div>
                         <div class="mb-3">
-                            <label for="programDescription" class="form-label">Descripción</label>
-                            <textarea class="form-control" id="programDescription" name="programDescription" rows="3" required></textarea>
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="programDuration" class="form-label">Duración (horas)</label>
-                                    <input type="number" class="form-control" id="programDuration"
-                                        name="programDuration" required min="1">
+                                    <label for="duracion" class="form-label">Duración (horas)</label>
+                                    <input type="number" class="form-control" id="duracion"
+                                        name="duracion" required min="1">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="programCapacity" class="form-label">Cupos</label>
-                                    <input type="number" class="form-control" id="programCapacity"
-                                        name="programCapacity" required min="1">
+                                    <label for="cupos" class="form-label">Cupos</label>
+                                    <input type="number" class="form-control" id="cupos"
+                                        name="cupos" required min="1">
                                 </div>
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label for="programStatus" class="form-label">Estado</label>
-                            <select class="form-select" id="programStatus" name="programStatus" required>
-                                <option value="activo">Activo</option>
-                                <option value="proximo">Próximo a iniciar</option>
-                                <option value="inactivo">Inactivo</option>
+                            <label for="modalidad_id" class="form-label">Modalidad</label>
+                            <select class="form-select" id="modalidad_id" name="modalidad_id" required>
+                                @foreach($modalidades as $mod)
+                                <option value="{{ $mod->id }}">{{ $mod->parametro->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="jornada_id" class="form-label">Jornada</label>
+                            <select class="form-select" id="jornada_id" name="jornada_id" required>
+                                @foreach($jornadas as $jor)
+                                <option value="{{ $jor->id }}">{{ $jor->jornada }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="estado" class="form-label">Estado</label>
+                            <select class="form-select" id="estado" name="estado" required>
+                                <option value="0">Activo</option>
+                                <option value="1">Próximo a iniciar</option>
+                                <option value="2">Inactivo</option>
                             </select>
                         </div>
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
