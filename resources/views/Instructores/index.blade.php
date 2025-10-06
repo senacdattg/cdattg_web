@@ -43,23 +43,15 @@
             <div class="row">
                 <div class="col-12">
                     @can('CREAR INSTRUCTOR')
-                        <div class="card shadow-sm mb-4 no-hover">
-                            <div class="card-header bg-white py-3 d-flex align-items-center">
-                                <h5 class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1">
-                                    <i class="fas fa-plus-circle mr-2"></i> Crear Instructor
-                                </h5>
-                                <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="collapse"
-                                    data-target="#createInstructorForm" aria-expanded="false">
-                                    <i class="fas fa-chevron-down"></i>
-                                </button>
-                            </div>
-
-                            <div class="collapse" id="createInstructorForm">
-                                <div class="card-body">
-                                    @include('Instructores.create')
+                        <a href="{{ route('instructor.create') }}" class="text-decoration-none">
+                            <div class="card shadow-sm mb-4 hover-card">
+                                <div class="card-header bg-white py-3 d-flex align-items-center">
+                                    <h5 class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1">
+                                        <i class="fas fa-plus-circle mr-2"></i> Crear Instructor
+                                    </h5>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     @endcan
 
                     <div class="card shadow-sm no-hover">
