@@ -16,8 +16,8 @@ class ComplementariosOfertadosSeeder extends Seeder
         $complementarios = [
             [
                 'codigo' => 'COMP001',
-                'nombre' => 'Curso de Inglés Básico',
-                'descripcion' => 'Curso introductorio al idioma inglés.',
+                'nombre' => 'Auxiliar de Cocina',
+                'descripcion' => 'Fundamentos de cocina, manipulación de alimentos y técnicas básicas de preparación.',
                 'duracion' => 40,
                 'cupos' => 20,
                 'estado' => 0,
@@ -26,8 +26,8 @@ class ComplementariosOfertadosSeeder extends Seeder
             ],
             [
                 'codigo' => 'COMP002',
-                'nombre' => 'Taller de Programación Web',
-                'descripcion' => 'Aprende desarrollo web con HTML, CSS y JS.',
+                'nombre' => 'Acabados en Madera',
+                'descripcion' => 'Técnicas de acabado, barnizado y restauración de muebles de madera.',
                 'duracion' => 60,
                 'cupos' => 15,
                 'estado' => 0,
@@ -36,11 +36,11 @@ class ComplementariosOfertadosSeeder extends Seeder
             ],
             [
                 'codigo' => 'COMP003',
-                'nombre' => 'Seminario de Liderazgo',
-                'descripcion' => 'Desarrollo de habilidades de liderazgo.',
-                'duracion' => 20,
+                'nombre' => 'Confección de Prendas',
+                'descripcion' => 'Técnicas básicas de corte, confección y terminado de prendas de vestir.',
+                'duracion' => 50,
                 'cupos' => 10,
-                'estado' => 1, // sin oferta
+                'estado' => 0,
                 'modalidad_id' => 20, // MIXTA
                 'jornada_id' => 3, // NOCHE
             ],

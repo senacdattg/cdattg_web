@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Departamento;
 use App\Models\Municipio;
+use App\Models\ComplementarioOfertado;
+use App\Models\Parametro;
+use App\Models\JornadaFormacion;
 
 class ComplementarioController extends Controller
 {
@@ -35,7 +38,9 @@ class ComplementarioController extends Controller
      */
     public function gestionProgramasComplementarios()
     {
-        return view('complementarios.gestion_programas_complementarios');
+
+        $programas = ComplementarioOfertado::with(['modalidad', 'jornada', 'diasFormacion'])->get();
+        return view('complementarios.gestion_programas_complementarios', compact('programas'));
     }
     public function estadisticas()
     {
@@ -49,58 +54,120 @@ class ComplementarioController extends Controller
 
         return view('complementarios.ver_aspirantes', compact('curso'));
     }
-    public function verPrograma($programa)
+    public function verPrograma($id)
     {
-        $programas = [
-            'auxiliar-cocina' => [
-                'nombre' => 'Auxiliar de Cocina',
-                'descripcion' => 'Fundamentos de cocina, manipulación de alimentos y técnicas básicas de preparación.',
-                'duracion' => '40 horas',
-                'icono' => 'fas fa-utensils'
-            ],
-            'Acabados-en-Madera' => [
-                'nombre' => 'Acabados en Madera',
-                'descripcion' => 'Técnicas de acabado, barnizado y restauración de muebles de madera.',
-                'duracion' => '60 horas',
-                'icono' => 'fas fa-hammer'
-            ],
-            'Confección-de-Prendas' => [
-                'nombre' => 'Confección de Prendas',
-                'descripcion' => 'Técnicas básicas de corte, confección y terminado de prendas de vestir.',
-                'duracion' => '50 horas',
-                'icono' => 'fas fa-cut'
-            ],
-            'Mecánica-Básica-Automotriz' => [
-                'nombre' => 'Mecánica Básica Automotriz',
-                'descripcion' => 'Mantenimiento preventivo y diagnóstico básico de vehículos.',
-                'duracion' => '90 horas',
-                'icono' => 'fas fa-car'
-            ],
-            'Cultivos-de-Huertas-Urbanas' => [
-                'nombre' => 'Cultivos de Huertas Urbanas',
-                'descripcion' => 'Técnicas de cultivo y mantenimiento de huertas en espacios urbanos.',
-                'duracion' => '120 horas',
-                'icono' => 'fas fa-spa'
-            ],
-            'Normatividad-Laboral' => [
-                'nombre' => 'Normatividad Laboral',
-                'descripcion' => 'Actualización en normatividad laboral y seguridad social.',
-                'duracion' => '60 horas',
-                'icono' => 'fas fa-gavel'
-            ]
+        $programa = ComplementarioOfertado::with(['modalidad', 'jornada', 'diasFormacion'])->findOrFail($id);
+
+        $programaData = [
+            'nombre' => $programa->nombre,
+            'descripcion' => $programa->descripcion,
+            'duracion' => $programa->duracion . ' horas',
+            'icono' => $this->getIconoForPrograma($programa->nombre),
+            'modalidad' => $programa->modalidad->name ?? 'N/A',
+            'jornada' => $programa->jornada->jornada ?? 'N/A',
+            'dias' => $programa->diasFormacion->map(function ($dia) {
+                return $dia->name . ' (' . $dia->pivot->hora_inicio . ' - ' . $dia->pivot->hora_fin . ')';
+            })->implode(', '),
+            'cupos' => $programa->cupos,
+            'estado' => $programa->estado_label,
         ];
 
-        $programaData = $programas[$programa] ?? null;
-
-        if (!$programaData) {
-            abort(404);
-        }
-
         return view('complementarios.ver_programa_publico', compact('programaData'));
+    }
+
+    private function getIconoForPrograma($nombre)
+    {
+        $iconos = [
+            'Auxiliar de Cocina' => 'fas fa-utensils',
+            'Acabados en Madera' => 'fas fa-hammer',
+            'Confección de Prendas' => 'fas fa-cut',
+            'Mecánica Básica Automotriz' => 'fas fa-car',
+            'Cultivos de Huertas Urbanas' => 'fas fa-spa',
+            'Normatividad Laboral' => 'fas fa-gavel',
+        ];
+
+        return $iconos[$nombre] ?? 'fas fa-graduation-cap';
     }
 
     public function programasPublicos()
     {
         return view('complementarios.programas_publicos');
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'codigo' => 'required|unique:complementarios_ofertados',
+            'nombre' => 'required',
+            'descripcion' => 'nullable',
+            'duracion' => 'required|integer|min:1',
+            'cupos' => 'required|integer|min:1',
+            'estado' => 'required|integer|in:0,1,2',
+            'modalidad_id' => 'required|exists:parametros_temas,id',
+            'jornada_id' => 'required|exists:jornadas_formacion,id',
+            'dias' => 'nullable|array',
+            'dias.*.dia_id' => 'exists:parametros_temas,id',
+            'dias.*.hora_inicio' => 'nullable|date_format:H:i',
+            'dias.*.hora_fin' => 'nullable|date_format:H:i',
+        ]);
+
+        $programa = ComplementarioOfertado::create($request->only([
+            'codigo', 'nombre', 'descripcion', 'duracion', 'cupos', 'estado', 'modalidad_id', 'jornada_id'
+        ]));
+
+        if ($request->dias) {
+            foreach ($request->dias as $dia) {
+                $programa->diasFormacion()->attach($dia['dia_id'], [
+                    'hora_inicio' => $dia['hora_inicio'],
+                    'hora_fin' => $dia['hora_fin'],
+                ]);
+            }
+        }
+
+        return response()->json(['success' => true, 'message' => 'Programa creado exitosamente.']);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $programa = ComplementarioOfertado::findOrFail($id);
+
+        $request->validate([
+            'codigo' => 'required|unique:complementarios_ofertados,codigo,' . $id,
+            'nombre' => 'required',
+            'descripcion' => 'nullable',
+            'duracion' => 'required|integer|min:1',
+            'cupos' => 'required|integer|min:1',
+            'estado' => 'required|integer|in:0,1,2',
+            'modalidad_id' => 'required|exists:parametros_temas,id',
+            'jornada_id' => 'required|exists:jornadas_formacion,id',
+            'dias' => 'nullable|array',
+            'dias.*.dia_id' => 'exists:parametros_temas,id',
+            'dias.*.hora_inicio' => 'nullable|date_format:H:i',
+            'dias.*.hora_fin' => 'nullable|date_format:H:i',
+        ]);
+
+        $programa->update($request->only([
+            'codigo', 'nombre', 'descripcion', 'duracion', 'cupos', 'estado', 'modalidad_id', 'jornada_id'
+        ]));
+
+        $programa->diasFormacion()->detach();
+        if ($request->dias) {
+            foreach ($request->dias as $dia) {
+                $programa->diasFormacion()->attach($dia['dia_id'], [
+                    'hora_inicio' => $dia['hora_inicio'],
+                    'hora_fin' => $dia['hora_fin'],
+                ]);
+            }
+        }
+
+        return response()->json(['success' => true, 'message' => 'Programa actualizado exitosamente.']);
+    }
+
+    public function destroy($id)
+    {
+        $programa = ComplementarioOfertado::findOrFail($id);
+        $programa->delete();
+
+        return response()->json(['success' => true, 'message' => 'Programa eliminado exitosamente.']);
     }
 }
