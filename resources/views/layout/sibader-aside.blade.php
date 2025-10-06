@@ -89,36 +89,6 @@
                     </li>
                 @endif
 
-                {{-- Gestión Académica - SIEMPRE VISIBLE PARA PRUEBA --}}
-                <li class="nav-item">
-                    <a href="#" class="nav-link">
-                        <i class="nav-icon fas fa-graduation-cap"></i>
-                        <p>
-                            Gestión Académica
-                            <i class="right fas fa-angle-left"></i>
-                        </p>
-                    </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{ route('guias-aprendizaje.index') }}" class="nav-link">
-                                <i class="fas fa-book-open"></i>
-                                <p>Guías de Aprendizaje</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('guias-aprendizaje.create') }}" class="nav-link">
-                                <i class="fas fa-plus-circle"></i>
-                                <p>Crear Guía</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="#" class="nav-link">
-                                <i class="fas fa-chart-bar"></i>
-                                <p>Estadísticas</p>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
 
                 {{-- Administrar Sedes --}}
                 @can('VER SEDE')

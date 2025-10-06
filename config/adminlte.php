@@ -620,6 +620,34 @@ return [
                         'ELIMINAR JORNADA',
                     ],
                 ],
+                [
+                    'text' => 'Guías de Aprendizaje',
+                    'icon' => 'fas fa-fw fa-book-open',
+                    'can' => [
+                        'VER GUIA APRENDIZAJE',
+                        'CREAR GUIA APRENDIZAJE',
+                    ],
+                    'submenu' => [
+                        [
+                            'text' => 'Lista de Guías',
+                            'url' => 'guias-aprendizaje',
+                            'icon' => 'fas fa-fw fa-list',
+                            'can' => 'VER GUIA APRENDIZAJE',
+                        ],
+                        [
+                            'text' => 'Crear Guía',
+                            'url' => 'guias-aprendizaje/create',
+                            'icon' => 'fas fa-fw fa-plus-circle',
+                            'can' => 'CREAR GUIA APRENDIZAJE',
+                        ],
+                        [
+                            'text' => 'Estadísticas',
+                            'url' => '#',
+                            'icon' => 'fas fa-fw fa-chart-bar',
+                            'can' => 'VER GUIA APRENDIZAJE',
+                        ],
+                    ],
+                ],
             ],
         ],
         // Operaciones Académicas y Administrativas
