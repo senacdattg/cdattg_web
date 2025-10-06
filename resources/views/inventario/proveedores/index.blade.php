@@ -2,7 +2,7 @@
 
 @section('title', 'Proveedores')
 @section('css')
-    @vite(['resources/css/inventario/shared/base.css', 'resources/css/inventario/proveedores.css'])
+    @vite(['resources/css/inventario/inventario_listas.css'])
 @stop
 
 @section('content_header')
@@ -31,7 +31,7 @@
     <div class="search-filter-container">
         <div class="row align-items-center">
             <div class="col-md-6">
-                <input type="text" id="filtro-proveedores" class="form-control" placeholder=" Buscar proveedores...">
+                <input type="text" id="filtro-proveedores" class="form-control" placeholder="Buscar proveedores...">
             </div>
             <div class="col-md-6 text-end">
                 <span id="filter-counter" class="filter-counter"></span>
@@ -119,11 +119,10 @@
                                     data-toggle="modal" data-target="#editProveedorModal">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <form action="{{ route('inventario.proveedores.destroy', $proveedor) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-xs btn-danger" title="Eliminar"><i class="fas fa-trash"></i></button>
-                                </form>
+                                <button type="button" class="btn btn-xs btn-danger" title="Eliminar" 
+                                    onclick="confirmDeleteProveedor({{ $proveedor->id }}, '{{ addslashes($proveedor->proveedor) }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </td>
                         </tr>
                     @empty
@@ -139,20 +138,8 @@
         </div>
     </div>
 
-    <div class="pagination-container">
-        <div class="pagination-info" id="pagination-info">
-            Mostrando registros
-        </div>
-        <div class="pagination-controls">
-            <button class="btn btn-sm btn-outline-primary" id="prev-page">
-                <i class="fas fa-chevron-left"></i> Anterior
-            </button>
-            <div class="page-numbers" id="page-numbers"></div>
-            <button class="btn btn-sm btn-outline-primary" id="next-page">
-                Siguiente <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-    </div>
+    <!-- Paginación JS -->
+    <div id="pagination-container" class="mt-3"></div>
 
     <!-- Modal Ver Proveedor -->
     <div class="modal fade" id="viewProveedorModal" tabindex="-1" aria-labelledby="viewProveedorModalLabel" aria-hidden="true">
@@ -359,5 +346,5 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @vite(['resources/js/inventario/proveedores.js'])
+    @vite(['resources/js/inventario/inventario_listas.js', 'resources/js/inventario/proveedores.js', 'resources/js/inventario/paginacion.js'])
 @stop

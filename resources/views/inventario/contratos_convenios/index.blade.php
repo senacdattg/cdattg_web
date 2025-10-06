@@ -3,7 +3,7 @@
 @section('title', 'Contratos y Convenios')
 
 @section('css')
-    @vite(['resources/css/inventario/shared/base.css', 'resources/css/inventario/contratos_convenios.css'])
+    @vite(['resources/css/inventario/inventario_listas.css'])
 @stop
 
 @section('content_header')
@@ -32,7 +32,7 @@
     <div class="search-filter-container">
         <div class="row align-items-center">
             <div class="col-md-6">
-                <input type="text" id="filtro-contratos" class="form-control" placeholder=" Buscar contratos/convenios...">
+                <input type="text" id="filtro-contratos" class="form-control" placeholder="Buscar contratos/convenios...">
             </div>
             <div class="col-md-6 text-end">
                 <span id="filter-counter" class="filter-counter"></span>
@@ -149,20 +149,8 @@
         </div>
     </div>
 
-    <div class="pagination-container">
-        <div class="pagination-info" id="pagination-info">
-            Mostrando registros
-        </div>
-        <div class="pagination-controls">
-            <button class="btn btn-sm btn-outline-primary" id="prev-page">
-                <i class="fas fa-chevron-left"></i> Anterior
-            </button>
-            <div class="page-numbers" id="page-numbers"></div>
-            <button class="btn btn-sm btn-outline-primary" id="next-page">
-                Siguiente <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-    </div>
+    <!-- Paginación JS -->
+    <div id="pagination-container" class="mt-3"></div>
 
     <!-- Modal Ver Contrato/Convenio -->
     <div class="modal fade" id="viewContratoModal" tabindex="-1" aria-labelledby="viewContratoModalLabel" aria-hidden="true">
@@ -447,5 +435,5 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @vite(['resources/js/inventario/contratos_convenios.js'])
+    @vite(['resources/js/inventario/inventario_listas.js', 'resources/js/inventario/contratos-convenios.js', 'resources/js/inventario/paginacion.js'])
 @stop

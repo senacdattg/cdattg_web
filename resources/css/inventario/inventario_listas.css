@@ -1,0 +1,828 @@
+/**
+ * inventario-common.css
+ * Estilos CSS comunes para el módulo de inventario
+ * Incluye: tablas, modales, badges, botones, utilidades
+ */
+
+/* ==============================
+   HEADERS Y TÍTULOS
+   ============================== */
+
+.marcas-header,
+.categorias-header,
+.proveedores-header,
+.contratos-header {
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    color: white;
+    padding: 2rem 1.5rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 25px rgba(216, 204, 204, 0.897);
+}
+
+.marcas-header h1,
+.categorias-header h1,
+.proveedores-header h1,
+.contratos-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.marcas-header .subtitle,
+.categorias-header .subtitle,
+.proveedores-header .subtitle,
+.contratos-header .subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-top: 0.5rem;
+}
+
+
+.search-filter-container {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e9ecef;
+}
+
+.search-filter-container .form-control {
+    border-radius: 8px;
+    border: 1px solid #ced4da;
+    padding: 0.5rem 1rem;
+    font-size: 0.95rem;
+}
+
+.search-filter-container .form-control:focus {
+    border-color: var(--inv-primary);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
+}
+
+.filter-counter {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+/* ==============================
+   ESTILOS DE TABLAS
+   ============================== */
+
+.marcas-table,
+.categorias-table,
+.proveedores-table,
+.contratos-table {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    border: none;
+    font-size: 0.9rem;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.marcas-table thead,
+.categorias-table thead,
+.proveedores-table thead,
+.contratos-table thead {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.marcas-table th,
+.categorias-table th,
+.proveedores-table th,
+.contratos-table th {
+    border: none;
+    padding: 1rem 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+    position: relative;
+    color: white;
+}
+
+.marcas-table td,
+.categorias-table td,
+.proveedores-table td,
+.contratos-table td {
+    padding: 1rem 0.75rem;
+    border-bottom: 1px solid #f1f3f4;
+    vertical-align: middle;
+}
+
+.marcas-table tbody tr,
+.categorias-table tbody tr,
+.proveedores-table tbody tr,
+.contratos-table tbody tr {
+    transition: all 0.3s ease;
+}
+
+.marcas-table tbody tr:hover,
+.categorias-table tbody tr:hover,
+.proveedores-table tbody tr:hover,
+.contratos-table tbody tr:hover {
+    background: linear-gradient(135deg, #f8f9ff, #fff5f5);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.marcas-table td:nth-child(2),
+.categorias-table td:nth-child(2),
+.proveedores-table td:nth-child(2),
+.contratos-table td:nth-child(2) {
+    font-weight: 500;
+}
+
+/* ==============================
+   BADGES Y ESTADOS
+   ============================== */
+
+.badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.badge-light {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+}
+
+.badge-created {
+    background: linear-gradient(135deg, #d299c2, #fef9d7);
+    color: #2d3748;
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.badge-updated {
+    background: linear-gradient(135deg, #ffecd2, #fcb69f);
+    color: #2d3748;
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.bg-info {
+    background-color: #17a2b8 !important;
+}
+
+.bg-success {
+    background-color: #28a745 !important;
+}
+
+.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+.bg-warning {
+    background-color: #ffc107 !important;
+}
+
+.bg-primary {
+    background-color: #007bff !important;
+}
+
+.bg-secondary {
+    background-color: #6c757d !important;
+}
+
+/* ==============================
+   ELEMENTOS ESPECÍFICOS
+   ============================== */
+
+/* Inicial de marca */
+.marca-inicial {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    font-size: 0.85rem;
+    margin: 0 auto;
+}
+
+/* Badges específicos de categorías */
+.categoria-badge {
+    font-size: 0.6rem;
+    letter-spacing: 0.05em;
+    padding: 0.35rem 0.5rem;
+    border-radius: var(--inv-radius);
+    background: var(--inv-bg-alt);
+    border: 1px solid var(--inv-border);
+    text-transform: uppercase;
+    color: var(--inv-muted);
+}
+
+/* Información de contacto de proveedor */
+.proveedor-contacto {
+    display: flex;
+    flex-direction: column;
+    font-size: 0.85rem;
+    color: var(--inv-muted);
+    gap: 2px;
+}
+
+.proveedor-contacto span {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.proveedor-contacto span+span {
+    margin-top: 0.15rem;
+}
+
+.proveedor-contacto i {
+    width: 12px;
+    margin-right: 4px;
+}
+
+/* Estilos específicos para contratos y convenios */
+.contrato-detalles {
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 1px solid #dee2e6;
+    margin-bottom: 1rem;
+}
+
+.contrato-montos {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.contrato-monto {
+    text-align: center;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #ffffff 0%, #f1f3f4 100%);
+    border: 1px solid #e1e5e9;
+    flex: 1;
+}
+
+.contrato-monto-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.2rem;
+}
+
+.contrato-monto-valor {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #2c3e50;
+}
+
+/* Badge de estado de contrato */
+.badge-contrato-activo {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+}
+
+.badge-contrato-vencido {
+    background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+    color: white;
+    border: none;
+}
+
+.badge-contrato-proximo {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+    color: #212529;
+    border: none;
+}
+
+/* Badge de vigencia */
+.vigencia-badge {
+    background: linear-gradient(135deg, #4facfe, #00f2fe);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+/* Marca inicial circular */
+.marca-inicial {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--inv-primary);
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+/* Vista previa de archivos */
+.archivo-preview {
+    background: linear-gradient(135deg, #f8f9ff, #fff5f5);
+    transition: all 0.3s ease;
+}
+
+.archivo-preview:hover {
+    transform: scale(1.02);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+/* Estado vacío mejorado */
+.empty-state {
+    text-align: center;
+    padding: 3rem;
+}
+
+.empty-state i {
+    font-size: 4rem;
+    color: var(--inv-secondary);
+    margin-bottom: 1rem;
+    opacity: 0.6;
+}
+
+.empty-state h4 {
+    color: var(--inv-text-primary);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.empty-state p {
+    color: var(--inv-muted);
+    font-size: 1rem;
+}
+
+/* Modales mejorados */
+.modal-xl .modal-content {
+    border-radius: 20px;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+}
+
+/* Información de auditoría */
+.audit-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.audit-info .user-id {
+    background: linear-gradient(135deg, #a8edea, #fed6e3);
+    color: #2d3748;
+    padding: 0.25rem 0.5rem;
+    border-radius: 15px;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 0.25rem;
+    font-size: 0.8rem;
+}
+
+.audit-info .date {
+    color: #6c757d;
+    font-size: 0.75rem;
+}
+
+/* ==============================
+   BOTONES Y ACCIONES
+   ============================== */
+
+.actions-cell {
+    white-space: nowrap;
+}
+
+.btn-xs {
+    padding: 4px 8px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    margin: 0 1px;
+}
+
+.btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+    color: white;
+}
+
+.btn-info:hover {
+    background-color: #138496;
+    border-color: #117a8b;
+    color: white;
+}
+
+.btn-warning {
+    background-color: #ffc107;
+    border-color: #ffc107;
+    color: #212529;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+    border-color: #d39e00;
+    color: #212529;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background-color: #c82333;
+    border-color: #bd2130;
+    color: white;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #0069d9;
+    border-color: #0062cc;
+    color: white;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    border-color: #545b62;
+    color: white;
+}
+
+/* ==============================
+   MODALES
+   ============================== */
+
+.modal-header {
+    border-bottom: 1px solid #dee2e6;
+    padding: 1rem 1.5rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+    padding: 1rem 1.5rem;
+}
+
+.modal-title {
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.modal-title i {
+    margin-right: 8px;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 4px;
+}
+
+.form-control-plaintext {
+    padding: 8px 0;
+    color: #212529;
+    font-weight: 500;
+}
+
+/* ==============================
+   PAGINACIÓN
+   ============================== */
+
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+.pagination-info {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.pagination-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.page-numbers {
+    display: flex;
+    gap: 5px;
+}
+
+.page-numbers button {
+    padding: 6px 12px;
+    border: 1px solid #dee2e6;
+    background-color: white;
+    color: #007bff;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.875rem;
+}
+
+.page-numbers button:hover {
+    background-color: #e9ecef;
+    border-color: #adb5bd;
+}
+
+.page-numbers button.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+/* ==============================
+   UTILIDADES
+   ============================== */
+
+.fw-semibold {
+    font-weight: 600 !important;
+}
+
+.text-sm {
+    font-size: 0.875rem;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+.text-danger {
+    color: #dc3545 !important;
+}
+
+.text-warning {
+    color: #ffc107 !important;
+}
+
+.text-info {
+    color: #17a2b8 !important;
+}
+
+.text-primary {
+    color: #007bff !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.me-1 {
+    margin-right: 0.25rem !important;
+}
+
+.me-2 {
+    margin-right: 0.5rem !important;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem !important;
+}
+
+.mb-3 {
+    margin-bottom: 1rem !important;
+}
+
+.py-4 {
+    padding-top: 1.5rem !important;
+    padding-bottom: 1.5rem !important;
+}
+
+.d-block {
+    display: block !important;
+}
+
+.d-flex {
+    display: flex !important;
+}
+
+/* ==============================
+   RESPONSIVO
+   ============================== */
+
+@media (max-width: 768px) {
+    .marcas-table,
+    .categorias-table,
+    .proveedores-table,
+    .contratos-table {
+        font-size: 0.8rem;
+    }
+    
+    .marcas-table th,
+    .categorias-table th,
+    .proveedores-table th,
+    .contratos-table th,
+    .marcas-table td,
+    .categorias-table td,
+    .proveedores-table td,
+    .contratos-table td {
+        padding: 8px 4px;
+    }
+    
+    .btn-xs {
+        padding: 2px 6px;
+        font-size: 0.7rem;
+    }
+    
+    .pagination-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .audit-info {
+        font-size: 0.75rem;
+    }
+}
+
+/* ==============================
+   ANIMACIONES
+   ============================== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal.fade .modal-dialog {
+    transform: translateY(-50px);
+    transition: transform 0.3s ease-out;
+}
+
+.modal.show .modal-dialog {
+    transform: translateY(0);
+}
+
+.table tbody tr {
+    transition: all 0.2s ease;
+}
+
+/* ==============================
+   ESTADOS DE FORMULARIO
+   ============================== */
+
+.form-control.is-valid {
+    border-color: #28a745;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.form-control.is-invalid {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.invalid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #dc3545;
+}
+
+.valid-feedback {
+    display: block;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    color: #28a745;
+}
+
+/* ==============================
+   LOADING STATES
+   ============================== */
+
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.spinner-border-sm {
+    width: 1rem;
+    height: 1rem;
+}
+
+/* Clase para botones con loading */
+.btn-loading {
+    position: relative;
+}
+
+.btn-loading:after {
+    content: "";
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    margin: auto;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 1s ease infinite;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ==============================
+   PAGINACIÓN JS
+   ============================== */
+
+#pagination-container {
+    margin-top: 1.5rem;
+    display: flex;
+    justify-content: center;
+}
+
+#pagination-container .pagination {
+    margin-bottom: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+#pagination-container .page-link {
+    border: none;
+    color: #6c757d;
+    padding: 0.75rem 1rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+#pagination-container .page-link:hover {
+    background: #f8f9fa;
+    color: var(--inv-primary);
+    transform: translateY(-1px);
+}
+
+#pagination-container .page-item.active .page-link {
+    background: linear-gradient(135deg, var(--inv-primary) 0%, var(--inv-secondary) 100%);
+    border-color: var(--inv-primary);
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+}
+
+#pagination-container .page-item.disabled .page-link {
+    color: #ced4da;
+    background: #f8f9fa;
+}
+
+#pagination-container .page-item:first-child .page-link {
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+#pagination-container .page-item:last-child .page-link {
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}

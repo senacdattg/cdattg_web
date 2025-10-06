@@ -3,7 +3,7 @@
 @section('title', 'Categorías')
 
 @section('css')
-    @vite(['resources/css/inventario/shared/base.css', 'resources/css/inventario/categorias.css'])
+    @vite(['resources/css/inventario/inventario_listas.css'])
 @stop
 
 @section('content_header')
@@ -26,7 +26,7 @@
     <div class="search-filter-container">
         <div class="row align-items-center">
             <div class="col-md-6">
-                <input type="text" id="filtro-categorias" class="form-control" placeholder=" Buscar categorías...">
+                <input type="text" id="filtro-categorias" class="form-control" placeholder="Buscar categorías...">
             </div>
             <div class="col-md-6 text-end">
                 <span id="filter-counter" class="filter-counter"></span>
@@ -98,11 +98,10 @@
                                     data-toggle="modal" data-target="#editCategoriaModal">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <form action="{{ route('inventario.categorias.destroy', $categoria) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-xs btn-danger" title="Eliminar"><i class="fas fa-trash"></i></button>
-                                </form>
+                                <button type="button" class="btn btn-xs btn-danger" title="Eliminar" 
+                                    onclick="confirmDeleteCategoria({{ $categoria->id }}, '{{ addslashes($categoria->categoria) }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </td>
                         </tr>
                     @empty
@@ -118,20 +117,8 @@
         </div>
     </div>
 
-    <div class="pagination-container">
-        <div class="pagination-info" id="pagination-info">
-            Mostrando registros
-        </div>
-        <div class="pagination-controls">
-            <button class="btn btn-sm btn-outline-primary" id="prev-page">
-                <i class="fas fa-chevron-left"></i> Anterior
-            </button>
-            <div class="page-numbers" id="page-numbers"></div>
-            <button class="btn btn-sm btn-outline-primary" id="next-page">
-                Siguiente <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-    </div>
+    <!-- Paginación JS -->
+    <div id="pagination-container" class="mt-3"></div>
 
     <!-- Modal Ver Categoría -->
     <div class="modal fade" id="viewCategoriaModal" tabindex="-1" aria-labelledby="viewCategoriaModalLabel" aria-hidden="true">
@@ -295,5 +282,5 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @vite(['resources/js/inventario/categorias.js'])
+    @vite(['resources/js/inventario/inventario_listas.js', 'resources/js/inventario/categorias.js', 'resources/js/inventario/paginacion.js'])
 @stop

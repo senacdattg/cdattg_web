@@ -3,7 +3,7 @@
 @section('title', 'Marcas')
 
 @section('css')
-    @vite(['resources/css/inventario/shared/base.css', 'resources/css/inventario/marcas.css'])
+    @vite(['resources/css/inventario/inventario_listas.css'])
 @stop
 
 @section('content_header')
@@ -26,7 +26,7 @@
     <div class="search-filter-container">
         <div class="row align-items-center">
             <div class="col-md-6">
-                <input type="text" id="filtro-marcas" class="form-control" placeholder=" Buscar marcas...">
+                <input type="text" id="filtro-marcas" class="form-control" placeholder="Buscar marcas...">
             </div>
             <div class="col-md-6 text-end">
                 <span id="filter-counter" class="filter-counter"></span>
@@ -53,9 +53,7 @@
                 <tbody>
                     @forelse($marcas as $marca)
                         <tr>
-                            <td>
-                                <div class="marca-inicial">{{ strtoupper(substr($marca->nombre ?? $marca->marca, 0, 1)) }}</div>
-                            </td>
+                            <td><span class="badge badge-light">{{ $loop->iteration }}</span></td>
                             <td class="fw-semibold">{{ $marca->nombre ?? $marca->marca }}</td>
                             <td>
                                 <span class="badge bg-info text-white">{{ $marca->productos_count ?? 0 }}</span>
@@ -100,11 +98,10 @@
                                     data-toggle="modal" data-target="#editMarcaModal">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <form action="{{ route('inventario.marcas.destroy', $marca) }}" method="POST" class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button class="btn btn-xs btn-danger" title="Eliminar"><i class="fas fa-trash"></i></button>
-                                </form>
+                                <button type="button" class="btn btn-xs btn-danger" title="Eliminar" 
+                                    onclick="confirmDeleteMarca({{ $marca->id }}, '{{ addslashes($marca->marca) }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </td>
                         </tr>
                     @empty
@@ -120,20 +117,8 @@
         </div>
     </div>
 
-    <div class="pagination-container">
-        <div class="pagination-info" id="pagination-info">
-            Mostrando registros
-        </div>
-        <div class="pagination-controls">
-            <button class="btn btn-sm btn-outline-primary" id="prev-page">
-                <i class="fas fa-chevron-left"></i> Anterior
-            </button>
-            <div class="page-numbers" id="page-numbers"></div>
-            <button class="btn btn-sm btn-outline-primary" id="next-page">
-                Siguiente <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-    </div>
+    <!-- Paginación JS -->
+    <div id="pagination-container" class="mt-3"></div>
 
     <!-- Modal Ver Marca -->
     <div class="modal fade" id="viewMarcaModal" tabindex="-1" aria-labelledby="viewMarcaModalLabel" aria-hidden="true">
@@ -293,5 +278,5 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @vite(['resources/js/inventario/marcas.js'])
+    @vite(['resources/js/inventario/inventario_listas.js', 'resources/js/inventario/marcas.js', 'resources/js/inventario/paginacion.js'])
 @stop
