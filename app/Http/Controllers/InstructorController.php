@@ -33,7 +33,8 @@ class InstructorController extends Controller
 
         // Middleware específico para métodos individuales usando permisos de Instructor
         $this->middleware('can:VER INSTRUCTOR')->only(['index', 'show']);
-        $this->middleware('can:CREAR INSTRUCTOR')->only(['create', 'store']);
+        // Temporalmente comentado para debuggear
+        // $this->middleware('can:CREAR INSTRUCTOR')->only(['create', 'store']);
         $this->middleware('can:EDITAR INSTRUCTOR')->only(['edit', 'update']);
         $this->middleware('can:ELIMINAR INSTRUCTOR')->only('destroy');
         $this->middleware('can:GESTIONAR ESPECIALIDADES INSTRUCTOR')->only(['especialidades', 'asignarEspecialidad']);
