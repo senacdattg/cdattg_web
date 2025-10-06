@@ -36,6 +36,11 @@ Route::get('/instructor/create-debug', [InstructorController::class, 'create'])
     ->name('instructor.create.debug')
     ->middleware('auth');
 
+// Ruta temporal para debuggear index
+Route::get('/instructor/index-debug', [InstructorController::class, 'index'])
+    ->name('instructor.index.debug')
+    ->middleware('auth');
+
 // Rutas específicas para instructores con middleware de autenticación
 Route::middleware(['auth'])->group(function () {
     

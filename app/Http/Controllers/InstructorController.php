@@ -46,6 +46,13 @@ class InstructorController extends Controller
      */
     public function index(Request $request)
     {
+        // Debug temporal
+        Log::info('Método index ejecutado', [
+            'url' => $request->url(),
+            'method' => $request->method(),
+            'user_id' => auth()->id()
+        ]);
+        
         try {
             $search = $request->input('search');
             $filtroEstado = $request->input('estado', 'todos');
