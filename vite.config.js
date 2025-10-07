@@ -25,12 +25,12 @@ export default defineConfig({
                 'municipios': 'resources/js/municipios.js',
                 
                 // Inventario files
-                'inventario_common_js': 'resources/js/inventario/inventario-common.js',
-                'marcas_simple': 'resources/js/inventario/marcas-simple.js',
-                'categorias_simple': 'resources/js/inventario/categorias-simple.js',
-                'proveedores_simple': 'resources/js/inventario/proveedores-simple.js',
-                'contratos_convenios_simple': 'resources/js/inventario/contratos-convenios-simple.js',
-                'paginacion_simple': 'resources/js/inventario/paginacion-simple.js',
+                'inventario_js': 'resources/js/inventario/inventario_listas.js',
+                'marcas': 'resources/js/inventario/marcas.js',
+                'categorias': 'resources/js/inventario/categorias.js',
+                'proveedores': 'resources/js/inventario/proveedores.js',
+                'contratos_convenios': 'resources/js/inventario/contratos_convenios.js',
+                'paginacion': 'resources/js/inventario/paginacion.js',
             },
             refresh: true,
         }),

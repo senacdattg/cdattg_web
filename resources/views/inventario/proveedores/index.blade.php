@@ -2,7 +2,7 @@
 
 @section('title', 'Proveedores')
 @section('css')
-    @vite(['resources/css/inventario/inventario_listas.css'])
+    @vite(['resources/css/inventario/inventario_listas.css', 'resources/css/inventario/shared/base.css'])
 @stop
 
 @section('content_header')
@@ -14,7 +14,7 @@
                 </h1>
                 <p class="subtitle mb-0">Administra los proveedores del inventario</p>
             </div>
-            <button type="button" class="btn btn-light btn-lg" data-toggle="modal" data-target="#createProveedorModal">
+            <button type="button" class="btn_crear" data-toggle="modal" data-target="#createProveedorModal">
                 <i class="fas fa-plus me-2"></i>Nuevo Proveedor
             </button>
         </div>
@@ -50,10 +50,6 @@
                         <th>Contacto</th>
                         <th style="width:90px">Contratos</th>
                         <th style="width:80px">Estado</th>
-                        <th style="width:100px">Agregado por</th>
-                        <th style="width:100px">Actualizado por</th>
-                        <th style="width:110px">Creación</th>
-                        <th style="width:110px">Actualización</th>
                         <th class="actions-cell text-center" style="width:160px">Acciones</th>
                     </tr>
                 </thead>
@@ -85,28 +81,6 @@
                                 @else
                                     <span class="badge bg-danger">INACTIVO</span>
                                 @endif
-                            </td>
-                            <td>
-                                <div class="audit-info">
-                                    <span class="user-id">{{ $proveedor->userCreate->name ?? 'ID: '.$proveedor->user_create_id }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="audit-info">
-                                    <span class="user-id">{{ $proveedor->userUpdate->name ?? 'ID: '.$proveedor->user_update_id }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="audit-info">
-                                    <span class="badge badge-created">{{ $proveedor->created_at?->format('d/m/Y') }}</span>
-                                    <span class="date">{{ $proveedor->created_at?->format('H:i') }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="audit-info">
-                                    <span class="badge badge-updated">{{ $proveedor->updated_at?->format('d/m/Y') }}</span>
-                                    <span class="date">{{ $proveedor->updated_at?->format('H:i') }}</span>
-                                </div>
                             </td>
                             <td class="text-center actions-cell">
                                 <button type="button" class="btn btn-xs btn-info" title="Ver" 

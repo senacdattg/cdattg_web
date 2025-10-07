@@ -3,7 +3,7 @@
 @section('title', 'Categorías')
 
 @section('css')
-    @vite(['resources/css/inventario/inventario_listas.css'])
+    @vite(['resources/css/inventario/inventario_listas.css', 'resources/css/inventario/shared/base.css'])
 @stop
 
 @section('content_header')
@@ -15,7 +15,7 @@
                 </h1>
                 <p class="subtitle mb-0">Administra las categorías del inventario</p>
             </div>
-            <button type="button" class="btn btn-light btn-lg" data-toggle="modal" data-target="#createCategoriaModal">
+            <button type="button" class="btn_crear" data-toggle="modal" data-target="#createCategoriaModal">
                 <i class="fas fa-plus me-2"></i>Nueva Categoría
             </button>
         </div>
@@ -43,10 +43,6 @@
                         <th>Categoria</th>
                         <th style="width:100px">Productos</th>
                         <th style="width:100px">Estado</th>
-                        <th style="width:120px">Agregado por</th>
-                        <th style="width:120px">Actualizado por</th>
-                        <th style="width:130px">Fecha creación</th>
-                        <th style="width:130px">Última actualización</th>
                         <th class="actions-cell text-center" style="width:180px">Acciones</th>
                     </tr>
                 </thead>
@@ -64,28 +60,6 @@
                                 @else
                                     <span class="badge bg-danger">INACTIVO</span>
                                 @endif
-                            </td>
-                            <td>
-                                <div class="audit-info">
-                                    <span class="user-id">{{ $categoria->userCreate->name ?? 'ID: '.$categoria->user_create_id }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="audit-info">
-                                    <span class="user-id">{{ $categoria->userUpdate->name ?? 'ID: '.$categoria->user_update_id }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="audit-info">
-                                    <span class="badge badge-created">{{ $categoria->created_at?->format('d/m/Y') }}</span>
-                                    <span class="date">{{ $categoria->created_at?->format('H:i') }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="audit-info">
-                                    <span class="badge badge-updated">{{ $categoria->updated_at?->format('d/m/Y') }}</span>
-                                    <span class="date">{{ $categoria->updated_at?->format('H:i') }}</span>
-                                </div>
                             </td>
                             <td class="text-center actions-cell">
                                 <button type="button" class="btn btn-xs btn-info" title="Ver" 

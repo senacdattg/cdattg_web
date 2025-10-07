@@ -3,7 +3,7 @@
 @section('title', 'Contratos y Convenios')
 
 @section('css')
-    @vite(['resources/css/inventario/inventario_listas.css'])
+    @vite(['resources/css/inventario/inventario_listas.css', 'resources/css/inventario/shared/base.css'])
 @stop
 
 @section('content_header')
@@ -15,7 +15,7 @@
                 </h1>
                 <p class="subtitle mb-0">Administra los contratos y convenios del inventario</p>
             </div>
-            <button type="button" class="btn btn-light btn-lg" data-toggle="modal" data-target="#createContratoModal">
+            <button type="button" class="btn_crear" data-toggle="modal" data-target="#createContratoModal">
                 <i class="fas fa-plus me-2"></i>Nuevo Contrato/Convenio
             </button>
         </div>
@@ -53,9 +53,6 @@
                         <th style="width:100px">Vigencia</th>
                         <th style="width:130px">Proveedor</th>
                         <th style="width:80px">Estado</th>
-                        <th style="width:90px">Agregado por</th>
-                        <th style="width:90px">Actualizado por</th>
-                        <th style="width:100px">Creación</th>
                         <th class="actions-cell text-center" style="width:140px">Acciones</th>
                     </tr>
                 </thead>
@@ -102,22 +99,6 @@
                                 @else
                                     <span class="badge bg-secondary">Sin estado</span>
                                 @endif
-                            </td>
-                            <td>
-                                <div class="audit-info">
-                                    <span class="user-id">{{ $item->userCreate->name ?? 'ID: '.$item->user_create_id }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="audit-info">
-                                    <span class="user-id">{{ $item->userUpdate->name ?? 'ID: '.$item->user_update_id }}</span>
-                                </div>
-                            </td>
-                            <td>
-                                <div class="audit-info">
-                                    <span class="badge badge-created">{{ $item->created_at?->format('d/m/Y') }}</span>
-                                    <span class="date">{{ $item->created_at?->format('H:i') }}</span>
-                                </div>
                             </td>
                             <td class="text-center actions-cell">
                                 <button type="button" class="btn btn-xs btn-info" title="Ver" 
@@ -435,5 +416,5 @@
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @vite(['resources/js/inventario/inventario_listas.js', 'resources/js/inventario/contratos-convenios.js', 'resources/js/inventario/paginacion.js'])
+    @vite(['resources/js/inventario/inventario_listas.js', 'resources/js/inventario/contratos_convenios.js', 'resources/js/inventario/paginacion.js'])
 @stop

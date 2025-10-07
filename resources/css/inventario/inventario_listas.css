@@ -1,19 +1,10 @@
-/**
- * inventario-common.css
- * Estilos CSS comunes para el módulo de inventario
- * Incluye: tablas, modales, badges, botones, utilidades
- */
-
-/* ==============================
-   HEADERS Y TÍTULOS
-   ============================== */
 
 .marcas-header,
 .categorias-header,
 .proveedores-header,
 .contratos-header {
     background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-    color: white;
+    color: rgba(20, 228, 82, 0.897);
     padding: 2rem 1.5rem;
     border-radius: 15px;
     margin-bottom: 2rem;
@@ -41,11 +32,12 @@
 
 
 .search-filter-container {
-    background: #f8f9fa;
+    background: rgb(14 21 50);
     padding: 1rem;
     border-radius: 10px;
     margin-bottom: 1.5rem;
     border: 1px solid #e9ecef;
+    box-shadow: 0 8px 25px rgba(216, 204, 204, 0.897);
 }
 
 .search-filter-container .form-control {
@@ -62,13 +54,11 @@
 
 .filter-counter {
     font-size: 0.85rem;
-    color: #6c757d;
+    color:  rgba(20, 228, 82, 0.897);
     font-weight: 500;
 }
 
-/* ==============================
-   ESTILOS DE TABLAS
-   ============================== */
+/*  ESTILOS DE TABLAS */
 
 .marcas-table,
 .categorias-table,
@@ -88,7 +78,7 @@
 .categorias-table thead,
 .proveedores-table thead,
 .contratos-table thead {
-    background: linear-gradient(135deg, #667eea, #764ba2);
+    background: linear-gradient(135deg, rgb(135 130 142), rgb(14 21 50));
     color: white;
 }
 
@@ -138,9 +128,7 @@
     font-weight: 500;
 }
 
-/* ==============================
-   BADGES Y ESTADOS
-   ============================== */
+/*  BADGES Y ESTADOS */
 
 .badge {
     font-size: 0.75rem;
@@ -199,9 +187,7 @@
     background-color: #6c757d !important;
 }
 
-/* ==============================
-   ELEMENTOS ESPECÍFICOS
-   ============================== */
+/* ELEMENTOS ESPECÍFICOS */
 
 /* Inicial de marca */
 .marca-inicial {
@@ -389,7 +375,7 @@
 }
 
 .audit-info .user-id {
-    background: linear-gradient(135deg, #a8edea, #fed6e3);
+    background: #0c815e;
     color: #2d3748;
     padding: 0.25rem 0.5rem;
     border-radius: 15px;
@@ -518,59 +504,7 @@
     font-weight: 500;
 }
 
-/* ==============================
-   PAGINACIÓN
-   ============================== */
-
-.pagination-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px;
-    background-color: #f8f9fa;
-    border-top: 1px solid #dee2e6;
-}
-
-.pagination-info {
-    color: #6c757d;
-    font-size: 0.9rem;
-}
-
-.pagination-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.page-numbers {
-    display: flex;
-    gap: 5px;
-}
-
-.page-numbers button {
-    padding: 6px 12px;
-    border: 1px solid #dee2e6;
-    background-color: white;
-    color: #007bff;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.875rem;
-}
-
-.page-numbers button:hover {
-    background-color: #e9ecef;
-    border-color: #adb5bd;
-}
-
-.page-numbers button.active {
-    background-color: #007bff;
-    color: white;
-    border-color: #007bff;
-}
-
-/* ==============================
-   UTILIDADES
-   ============================== */
+/*   UTILIDADES  */
 
 .fw-semibold {
     font-weight: 600 !important;
@@ -637,10 +571,6 @@
     display: flex !important;
 }
 
-/* ==============================
-   RESPONSIVO
-   ============================== */
-
 @media (max-width: 768px) {
     .marcas-table,
     .categorias-table,
@@ -675,9 +605,7 @@
     }
 }
 
-/* ==============================
-   ANIMACIONES
-   ============================== */
+/* ANIMACIONES */
 
 @keyframes fadeIn {
     from {
@@ -702,10 +630,6 @@
 .table tbody tr {
     transition: all 0.2s ease;
 }
-
-/* ==============================
-   ESTADOS DE FORMULARIO
-   ============================== */
 
 .form-control.is-valid {
     border-color: #28a745;
@@ -733,9 +657,6 @@
     color: #28a745;
 }
 
-/* ==============================
-   LOADING STATES
-   ============================== */
 
 .loading {
     opacity: 0.6;
@@ -772,10 +693,7 @@
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
-
-/* ==============================
-   PAGINACIÓN JS
-   ============================== */
+/* Paginación estilizada */
 
 #pagination-container {
     margin-top: 1.5rem;
@@ -785,14 +703,14 @@
 
 #pagination-container .pagination {
     margin-bottom: 0;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(233, 228, 228);
+    border-radius: 50px;
     overflow: hidden;
 }
 
 #pagination-container .page-link {
     border: none;
-    color: #6c757d;
+    color: #14b84b;
     padding: 0.75rem 1rem;
     font-weight: 500;
     transition: all 0.3s ease;
@@ -800,7 +718,7 @@
 }
 
 #pagination-container .page-link:hover {
-    background: #f8f9fa;
+    background: #14b84b;
     color: var(--inv-primary);
     transform: translateY(-1px);
 }
@@ -808,13 +726,13 @@
 #pagination-container .page-item.active .page-link {
     background: linear-gradient(135deg, var(--inv-primary) 0%, var(--inv-secondary) 100%);
     border-color: var(--inv-primary);
-    color: white;
-    box-shadow: 0 2px 8px rgba(0, 123, 255, 0.3);
+    color: rgb(8, 8, 8);
+    box-shadow: 0 2px 8px rgba(0, 255, 55, 0.3);
 }
 
 #pagination-container .page-item.disabled .page-link {
-    color: #ced4da;
-    background: #f8f9fa;
+    color: #0da139;
+    background: #f1f5f3;
 }
 
 #pagination-container .page-item:first-child .page-link {
@@ -825,4 +743,22 @@
 #pagination-container .page-item:last-child .page-link {
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
+}
+
+.card {
+    border-radius: 14px !important;
+    border: none;
+}
+
+.btn_crear {
+    padding: 9px 20px;
+    border-radius: 10px;
+    box-shadow: 0 8px 25px rgba(216, 204, 204, 0.897);
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.btn_crear:hover {
+    background:  #212922;
+    color: white;
 }
