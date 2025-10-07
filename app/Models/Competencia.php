@@ -62,6 +62,17 @@ class Competencia extends Model
         return $this->belongsTo(User::class, 'user_edit_id');
     }
 
+    public function programasFormacion()
+    {
+        return $this->belongsToMany(
+            ProgramaFormacion::class,
+            'competencia_programa',
+            'competencia_id',
+            'programa_id'
+        )->withTimestamps()
+         ->withPivot('user_create_id', 'user_edit_id');
+    }
+
     // ========================================
     // SCOPES
     // ========================================
@@ -99,6 +110,13 @@ class Competencia extends Model
     public function scopeOrdenadoPorCodigo($query)
     {
         return $query->orderBy('codigo', 'asc');
+    }
+
+    public function scopePorPrograma($query, $programaId)
+    {
+        return $query->whereHas('programasFormacion', function($q) use ($programaId) {
+            $q->where('programas_formacion.id', $programaId);
+        });
     }
 
     // ========================================
