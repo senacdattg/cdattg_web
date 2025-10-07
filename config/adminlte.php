@@ -691,6 +691,34 @@ return [
                         ],
                     ],
                 ],
+                [
+                    'text' => 'Resultados de Aprendizaje',
+                    'icon' => 'fas fa-fw fa-graduation-cap',
+                    'can' => [
+                        'VER RESULTADO APRENDIZAJE',
+                        'CREAR RESULTADO APRENDIZAJE',
+                    ],
+                    'submenu' => [
+                        [
+                            'text' => 'Lista de Resultados',
+                            'url' => 'resultados-aprendizaje',
+                            'icon' => 'fas fa-fw fa-list',
+                            'can' => 'VER RESULTADO APRENDIZAJE',
+                        ],
+                        [
+                            'text' => 'Crear Resultado',
+                            'url' => 'resultados-aprendizaje/create',
+                            'icon' => 'fas fa-fw fa-plus-circle',
+                            'can' => 'CREAR RESULTADO APRENDIZAJE',
+                        ],
+                        [
+                            'text' => 'Reportes',
+                            'url' => '#',
+                            'icon' => 'fas fa-fw fa-chart-line',
+                            'can' => 'VER RESULTADO APRENDIZAJE',
+                        ],
+                    ],
+                ],
             ],
         ],
 
