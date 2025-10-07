@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\FichaCaracterizacionApiController;
+use App\Http\Controllers\FichaCaracterizacionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,7 +14,8 @@ use App\Http\Controllers\Api\FichaCaracterizacionApiController;
 |
 */
 
-Route::middleware(['auth:sanctum', 'throttle:api'])->prefix('api')->group(function () {
+// Rutas sin autenticación (middleware removido)
+Route::prefix('api')->group(function () {
     
     // Rutas para selectores dinámicos
     Route::get('/modalidades', function () {
