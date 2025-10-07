@@ -246,25 +246,27 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
-        let searchTimeout;
-        
         $('[data-toggle="tooltip"]').tooltip();
 
+        // Auto-dismiss de alertas después de 5 segundos
         setTimeout(function() {
             $('.alert').fadeOut('slow');
         }, 5000);
 
-        $('#searchRAP').on('input', function() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(function() {
+        // Buscar al presionar Enter en el campo de búsqueda
+        $('#searchRAP').on('keypress', function(e) {
+            if (e.which === 13) { // Enter key
+                e.preventDefault();
                 performSearch();
-            }, 500);
+            }
         });
 
+        // Buscar al hacer clic en el botón
         $('#btnSearch').on('click', function() {
             performSearch();
         });
 
+        // Limpiar todos los filtros
         $('#btnClearFilters').on('click', function() {
             $('#searchRAP').val('');
             $('#filterCompetencia').val('');
@@ -272,10 +274,7 @@
             window.location.href = '{{ route("resultados-aprendizaje.index") }}';
         });
 
-        $('#filterCompetencia, #filterStatus').on('change', function() {
-            performSearch();
-        });
-
+        // Función para realizar la búsqueda
         function performSearch() {
             const searchTerm = $('#searchRAP').val();
             const competenciaId = $('#filterCompetencia').val();
@@ -290,10 +289,12 @@
 
             if (params.length > 0) {
                 url += params.join('&');
-                window.location.href = url;
             }
+            
+            window.location.href = url;
         }
 
+        // Mantener los valores de los filtros de la URL
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('search')) $('#searchRAP').val(urlParams.get('search'));
         if (urlParams.has('competencia_id')) $('#filterCompetencia').val(urlParams.get('competencia_id'));
