@@ -3,6 +3,7 @@
 @section('title', 'Marcas')
 
 @section('css')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @vite(['resources/css/inventario/inventario_listas.css', 'resources/css/inventario/shared/base.css'])
 @stop
 

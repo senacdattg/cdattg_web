@@ -7,5 +7,7 @@ use App\Http\Controllers\Inventario\ContratoConvenioController;
 Route::prefix('inventario')
     ->name('inventario.')
     ->group(function () {
-        Route::resource('contratos-convenios', ContratoConvenioController::class);
+        Route::resource('contratos-convenios', ContratoConvenioController::class)->parameters([
+            'contratos-convenios' => 'contratoConvenio'
+        ]);
     });

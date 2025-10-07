@@ -7,5 +7,7 @@ use App\Http\Controllers\Inventario\ProveedorController;
 Route::prefix('inventario')
     ->name('inventario.')
     ->group(function () {
-        Route::resource('proveedores', ProveedorController::class);
+        Route::resource('proveedores', ProveedorController::class)->parameters([
+            'proveedores' => 'proveedor'
+        ]);
     });

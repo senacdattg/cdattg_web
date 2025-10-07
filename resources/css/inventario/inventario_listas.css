@@ -588,6 +588,7 @@
     .proveedores-table td,
     .contratos-table td {
         padding: 8px 4px;
+        font-size: 0.8rem;
     }
     
     .btn-xs {
@@ -756,9 +757,362 @@
     box-shadow: 0 8px 25px rgba(216, 204, 204, 0.897);
     transition: background-color 0.3s ease;
     cursor: pointer;
+
 }
 
 .btn_crear:hover {
     background:  #212922;
     color: white;
+}
+
+/* ==============================
+   ESTILOS MEJORADOS PARA MODALES
+   ============================== */
+
+.modal-content {
+    border-radius: 20px !important;
+    border: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+
+.modal-header {
+    border-bottom: 1px solid #dee2e6;
+    padding: 1.25rem 1.5rem;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    color: white;
+}
+
+.modal-header.bg-info {
+    background: linear-gradient(135deg, #17a2b8, #138496) !important;
+}
+
+.modal-header.bg-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3) !important;
+}
+
+.modal-header.bg-warning {
+    background: linear-gradient(135deg, #ffc107, #d39e00) !important;
+    color: #212529 !important;
+}
+
+.modal-header.bg-success {
+    background: linear-gradient(135deg, #28a745, #1e7e34) !important;
+}
+
+.modal-title {
+    font-weight: 700;
+    font-size: 1.2rem;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+.modal-title i {
+    margin-right: 10px;
+    font-size: 1.1em;
+}
+
+.modal-body {
+    padding: 2rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+}
+
+.modal-footer {
+    border-top: 1px solid #dee2e6;
+    padding: 1.25rem 1.5rem;
+    background: #f8f9fa;
+}
+
+.modal .form-label {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.modal .form-label i {
+    margin-right: 8px;
+    width: 16px;
+    text-align: center;
+}
+
+.modal .form-control {
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+    padding: 0.75rem 1rem;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.modal .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.15);
+    background: #fff;
+}
+
+.modal .form-control.form-control-lg {
+    padding: 1rem 1.25rem;
+    font-size: 1.1rem;
+    border-radius: 12px;
+}
+
+.modal .form-text {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.modal .form-text i {
+    margin-right: 6px;
+}
+
+.modal .btn {
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.modal .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.modal .btn-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+}
+
+.modal .btn-warning {
+    background: linear-gradient(135deg, #ffc107, #d39e00);
+    color: #212529;
+}
+
+.modal .btn-secondary {
+    background: linear-gradient(135deg, #6c757d, #545b62);
+    color: white;
+}
+
+.modal .btn-success {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    color: white;
+}
+
+.modal .close {
+    color: white;
+    opacity: 1;
+    text-shadow: none;
+    font-size: 1.5rem;
+    font-weight: 300;
+}
+
+.modal .close:hover {
+    color: white;
+    opacity: 0.8;
+}
+
+/* Campos de solo lectura en modales de visualización */
+.modal .form-control-plaintext {
+    padding: 12px 16px;
+    color: #2c3e50;
+    font-weight: 500;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    margin-bottom: 0;
+}
+
+/* Validación de formularios */
+.modal .is-invalid {
+    border-color: #dc3545 !important;
+    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+
+.modal .invalid-feedback {
+    display: block;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+    font-weight: 500;
+}
+
+.modal .is-valid {
+    border-color: #28a745 !important;
+    box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25) !important;
+}
+
+/* Animaciones de modal mejoradas */
+.modal.fade .modal-dialog {
+    transform: translateY(-100px) scale(0.8);
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.modal.show .modal-dialog {
+    transform: translateY(0) scale(1);
+}
+
+/* Responsive para modales */
+@media (max-width: 768px) {
+    .modal-body {
+        padding: 1.5rem;
+    }
+    
+    .modal-header,
+    .modal-footer {
+        padding: 1rem;
+    }
+}
+
+
+/* Badges en modales */
+.modal .badge {
+    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.modal .badge-created {
+    background: linear-gradient(135deg, #d299c2, #fef9d7);
+    color: #2d3748;
+    border: 1px solid #e2c9f1;
+}
+
+.modal .badge-updated {
+    background: linear-gradient(135deg, #ffecd2, #fcb69f);
+    color: #2d3748;
+    border: 1px solid #f4d1ae;
+}
+
+/* Información de auditoría en modales */
+.modal .audit-info {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid #e9ecef;
+    margin-top: 1rem;
+}
+
+.modal .audit-info .user-id {
+    background: linear-gradient(135deg, #0c815e, #17a2b8);
+    color: white;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 8px rgba(12, 129, 94, 0.3);
+}
+
+.modal .audit-info .date {
+    color: #495057;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Elementos específicos de cada módulo en modales */
+.modal .marca-inicial {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    margin: 0 auto 1rem auto;
+}
+
+.modal .proveedor-contacto {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.modal .proveedor-contacto span {
+    color: #495057;
+    font-weight: 500;
+}
+
+.modal .contrato-detalles {
+    background: linear-gradient(135deg, #f8f9ff, #fff5f5);
+    border: 2px solid #e9ecef;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.modal .contrato-monto {
+    background: white;
+    border: 2px solid #e9ecef;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.modal .vigencia-badge {
+    font-size: 0.85rem;
+    padding: 0.5rem 1rem;
+    box-shadow: 0 2px 8px rgba(79, 172, 254, 0.3);
+}
+
+/* Mejoras para campos de texto largo */
+.modal textarea.form-control {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Mejoras para selects */
+.modal select.form-control {
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px 12px;
+    padding-right: 40px;
+    appearance: none;
+    line-height: 1.5;
+    min-height: 50px;
+}
+
+.modal select.form-control option {
+    padding: 8px 12px;
+    color: #2c3e50;
+    background: white;
+    line-height: 1.4;
+}
+
+/* Grupos de campos en modales */
+.modal .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.modal .form-row .col-md-6 {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/* Estados de carga */
+.modal .loading {
+    position: relative;
+    pointer-events: none;
+}
+
+.modal .loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Mensajes de ayuda mejorados */
+.modal .form-text {
+    background: #e7f3ff;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border-left: 3px solid #007bff;
 }

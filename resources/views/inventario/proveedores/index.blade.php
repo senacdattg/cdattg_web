@@ -2,6 +2,7 @@
 
 @section('title', 'Proveedores')
 @section('css')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     @vite(['resources/css/inventario/inventario_listas.css', 'resources/css/inventario/shared/base.css'])
 @stop
 
@@ -22,12 +23,6 @@
 @stop
 
 @section('content')
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show">{{ session('success') }}
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-        </div>
-    @endif
-
     <div class="search-filter-container">
         <div class="row align-items-center">
             <div class="col-md-6">

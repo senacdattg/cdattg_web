@@ -12,7 +12,8 @@ export default defineConfig({
                 'dashboard_superadmin': 'resources/css/dashboards/dashboard_superadmin.css',
                 'caracter_selecter': 'resources/css/Asistencia/caracter_selecter.css',
                 'navbar': 'resources/css/shared/navbar.css',
-                'inventario_common_css': 'resources/css/inventario/inventario-common.css',
+                'inventario_listas_css': 'resources/css/inventario/inventario_listas.css',
+                'inventario_base_css': 'resources/css/inventario/shared/base.css',
                 
                 // JavaScript files
                 'app': 'resources/js/app.js',
