@@ -342,12 +342,12 @@ return [
             ],
         ],
 
-
         // Sidebar items:
         [
             'type' => 'sidebar-menu-search',
             'text' => 'search',
         ],
+        
         // Home
         [
             'header' => 'Home',
@@ -359,224 +359,267 @@ return [
             'icon' => 'fas fa-fw fa-tachometer-alt',
         ],
 
-        // Panel de control
+        // Panel de Control
         [
-            'header' => 'Panel de control',
+            'header' => 'Panel de Control',
             'icon' => 'fas fa-fw fa-tachometer-alt',
         ],
-        // Configuración y Seguridad
         [
-            'text' => 'Configuración y Seguridad',
-            'icon' => 'fas fa-fw fa-cogs',
+            'text' => 'Panel de Control',
+            'icon' => 'fas fa-fw fa-chart-pie',
+            'can' => [
+                'VER PARAMETRO',
+                'VER TEMA',
+            ],
             'submenu' => [
                 [
                     'text' => 'Parámetros',
                     'url' => 'parametro',
                     'icon' => 'fas fa-fw fa-sliders-h',
-                    'can' => [
-                        'CREAR PARAMETRO',
-                        'EDITAR PARAMETRO',
-                        'VER PARAMETRO',
-                        'ELIMINAR PARAMETRO',
-                    ]
+                    'can' => 'VER PARAMETRO',
                 ],
                 [
                     'text' => 'Temas',
                     'url' => 'tema',
                     'icon' => 'fas fa-fw fa-paint-brush',
-                    'can' => [
-                        'CREAR TEMA',
-                        'EDITAR TEMA',
-                        'VER TEMA',
-                        'ELIMINAR TEMA',
-                        'ELIMINAR PARAMETRO DE TEMA',
-                    ]
+                    'can' => 'VER TEMA',
                 ],
                 [
                     'text' => 'Asignar Permisos',
                     'url' => 'permiso',
                     'icon' => 'fas fa-fw fa-lock',
-                    'can' => [
-                        'ASIGNAR PERMISOS',
-                    ]
+                    'can' => 'ASIGNAR PERMISOS',
                 ],
-            ],
-        ],
-        // Ubicación e Infraestructura
-        [
-            'text' => 'Ubicación e Infraestructura',
-            'icon' => 'fas fa-fw fa-building',
-            'submenu' => [
                 [
                     'text' => 'Regionales',
                     'url' => 'regional',
                     'icon' => 'fas fa-fw fa-map-marker-alt',
-                    'can' => [
-                        'CREAR REGIONAL',
-                        'EDITAR REGIONAL',
-                        'VER REGIONAL',
-                        'ELIMINAR REGIONAL',
-                    ]
-                ],
-                [
-                    'text' => 'Redes de Conocimiento',
-                    'url' => 'red-conocimiento',
-                    'icon' => 'fas fa-fw fa-network-wired',
-                    'can' => [
-                        'CREAR RED CONOCIMIENTO',
-                        'EDITAR RED CONOCIMIENTO',
-                        'VER RED CONOCIMIENTO',
-                        'ELIMINAR RED CONOCIMIENTO',
-                    ]
-                ],
-                [
-                    'text' => 'Municipios',
-                    'url' => 'municipio',
-                    'icon' => 'fas fa-fw fa-map-marker-alt',
-                    'can' => [
-                        'CREAR MUNICIPIO',
-                        'EDITAR MUNICIPIO',
-                        'VER MUNICIPIO',
-                        'ELIMINAR MUNICIPIO',
-                    ]
+                    'can' => 'VER REGIONAL',
                 ],
                 [
                     'text' => 'Centros de Formación',
                     'url' => 'centros',
                     'icon' => 'fas fa-fw fa-school',
-                    'can' => [
-                        'CREAR CENTRO DE FORMACION',
-                        'EDITAR CENTRO DE FORMACION',
-                        'VER CENTRO DE FORMACION',
-                        'ELIMINAR CENTRO DE FORMACION',
-                    ]
+                    'can' => 'VER CENTROS DE FORMACION',
                 ],
                 [
-                    'text' => 'Sedes',
-                    'url' => 'sede',
-                    'icon' => 'fas fa-fw fa-hospital',
-                    'can' => [
-                        'CREAR SEDE',
-                        'EDITAR SEDE',
-                        'VER SEDE',
-                        'ELIMINAR SEDE',
-                    ]
-                ],
-                [
-                    'text' => 'Bloques',
-                    'url' => 'bloque',
-                    'icon' => 'fas fa-fw fa-th-large',
-                    'can' => [
-                        'CREAR BLOQUE',
-                        'EDITAR BLOQUE',
-                        'VER BLOQUE',
-                        'ELIMINAR BLOQUE',
-                    ],
-                ],
-                [
-                    'text' => 'Pisos',
-                    'url' => 'piso',
-                    'icon' => 'fas fa-fw fa-layer-group',
-                    'can' => [
-                        'CREAR PISO',
-                        'EDITAR PISO',
-                        'VER PISO',
-                        'ELIMINAR PISO',
-                    ],
-                ],
-                [
-                    'text' => 'Ambientes',
-                    'url' => 'ambiente',
-                    'icon' => 'fas fa-fw fa-door-open',
-                    'can' => [
-                        'CREAR AMBIENTE',
-                        'EDITAR AMBIENTE',
-                        'VER AMBIENTE',
-                        'ELIMINAR AMBIENTE',
-                    ],
+                    'text' => 'Personas',
+                    'url' => 'personas',
+                    'icon' => 'fas fa-fw fa-users',
+                    'can' => 'VER PERSONA',
                 ],
             ],
         ],
-        // Gestión de Personal y Roles
+
+        // Administrar Sedes
         [
-            'text' => 'Gestión de Personal y Roles',
+            'text' => 'Administrar Sedes',
+            'icon' => 'fas fa-fw fa-building',
+            'can' => 'VER SEDE',
+            'submenu' => [
+                [
+                    'text' => 'Sedes',
+                    'url' => 'sede',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER SEDE',
+                ],
+                [
+                    'text' => 'Crear Sede',
+                    'url' => 'sede/create',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'CREAR SEDE',
+                ],
+            ],
+        ],
+
+        // Administrar Bloques
+        [
+            'text' => 'Administrar Bloques',
+            'icon' => 'fas fa-fw fa-th-large',
+            'can' => 'VER BLOQUE',
+            'submenu' => [
+                [
+                    'text' => 'Bloques',
+                    'url' => 'bloque',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER BLOQUE',
+                ],
+                [
+                    'text' => 'Crear Bloque',
+                    'url' => 'bloque/create',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'CREAR BLOQUE',
+                ],
+            ],
+        ],
+
+        // Administrar Pisos
+        [
+            'text' => 'Administrar Pisos',
+            'icon' => 'fas fa-fw fa-layer-group',
+            'can' => 'VER PISO',
+            'submenu' => [
+                [
+                    'text' => 'Pisos',
+                    'url' => 'piso',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER PISO',
+                ],
+                [
+                    'text' => 'Crear Piso',
+                    'url' => 'piso/create',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'CREAR PISO',
+                ],
+            ],
+        ],
+
+        // Administrar Ambientes
+        [
+            'text' => 'Administrar Ambientes',
+            'icon' => 'fas fa-fw fa-door-open',
+            'can' => 'VER AMBIENTE',
+            'submenu' => [
+                [
+                    'text' => 'Ambientes',
+                    'url' => 'ambiente',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER AMBIENTE',
+                ],
+                [
+                    'text' => 'Crear Ambiente',
+                    'url' => 'ambiente/create',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'CREAR AMBIENTE',
+                ],
+            ],
+        ],
+
+        // Administrar Personal
+        [
+            'text' => 'Administrar Personal',
             'icon' => 'fas fa-fw fa-users',
+            'can' => 'VER PROGRAMA DE CARACTERIZACION',
             'submenu' => [
                 [
                     'text' => 'Instructores',
-                    'icon' => 'fas fa-fw fa-chalkboard-teacher',
-                    'can' => [
-                        'VER INSTRUCTOR',
-                        'CREAR INSTRUCTOR',
-                        'EDITAR INSTRUCTOR',
-                        'ELIMINAR INSTRUCTOR',
-                        'GESTIONAR ESPECIALIDADES INSTRUCTOR',
-                        'VER FICHAS ASIGNADAS',
-                        'CAMBIAR ESTADO INSTRUCTOR',
-                    ],
-                    'submenu' => [
-                        [
-                            'text' => 'Dashboard',
-                            'route' => 'instructor.dashboard',
-                            'icon' => 'fas fa-fw fa-tachometer-alt',
-                            'can' => 'VER INSTRUCTOR',
-                        ],
-                        [
-                            'text' => 'Lista de Instructores',
-                            'url' => 'instructor',
-                            'icon' => 'fas fa-fw fa-list',
-                            'can' => 'VER INSTRUCTOR',
-                        ],
-                        [
-                            'text' => 'Crear Instructor',
-                            'url' => 'instructor/create',
-                            'icon' => 'fas fa-fw fa-plus',
-                            'can' => 'CREAR INSTRUCTOR',
-                        ],
-                    ],
+                    'url' => 'instructor',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
                 ],
                 [
-                    'text' => 'Vigilantes',
-                    'url' => 'vigilante',
-                    'icon' => 'fas fa-fw fa-user-shield',
-                    'can' => [
-                        'VER VIGILANTE',
-                        'CREAR VIGILANTE',
-                        'EDITAR VIGILANTE',
-                        'ELIMINAR VIGILANTE',
-                    ],
+                    'text' => 'Crear Instructor',
+                    'url' => 'instructor/create',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
                 ],
                 [
                     'text' => 'Importar CSV',
                     'url' => 'createImportarCSV',
-                    'icon' => 'fas fa-fw fa-file-upload',
-                    'can' => [
-                        'IMPORTAR CSV' //Este permiso no esta todavia en los seeders
-                    ],
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
+                ],
+                [
+                    'text' => 'Crear Vigilante',
+                    'url' => 'instructor/create',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
                 ],
             ],
         ],
-        // Personas
+
+        // Administrar Jornadas
         [
-            'text' => 'Personas',
-            'icon' => 'fas fa-fw fa-user',
-            'url' => 'personas',
-            'can' => [
-                'VER PERSONA',
-                'CREAR PERSONA',
-                'EDITAR PERSONA',
-                'ELIMINAR PERSONA',
+            'text' => 'Administrar Jornadas',
+            'icon' => 'fas fa-fw fa-calendar-alt',
+            'can' => 'VER PROGRAMA DE CARACTERIZACION',
+            'submenu' => [
+                [
+                    'text' => 'Ver Jornadas',
+                    'url' => 'jornada',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
+                ],
+                [
+                    'text' => 'Crear Jornada',
+                    'url' => 'jornada/create',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
+                ],
             ],
         ],
-        //Tomat Asistencias
+
+        // Administrar Programas
+        [
+            'text' => 'Administrar Programas',
+            'icon' => 'fas fa-fw fa-book',
+            'can' => 'VER PROGRAMA DE CARACTERIZACION',
+            'submenu' => [
+                [
+                    'text' => 'Ver Programas',
+                    'url' => '/programa/index',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
+                ],
+                [
+                    'text' => 'Crear Programa',
+                    'url' => '/programa/create',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
+                ],
+            ],
+        ],
+
+        // Administrar Fichas
+        [
+            'text' => 'Administrar Fichas',
+            'icon' => 'fas fa-fw fa-file-alt',
+            'can' => 'VER PROGRAMA DE CARACTERIZACION',
+            'submenu' => [
+                [
+                    'text' => 'Ver Fichas',
+                    'url' => 'ficha',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
+                ],
+                [
+                    'text' => 'Crear Fichas',
+                    'url' => 'fichaCaracterizacion/create',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
+                ],
+            ],
+        ],
+
+        // Admin Caracterización
+        [
+            'text' => 'Admin Caracterización',
+            'icon' => 'fas fa-fw fa-edit',
+            'can' => 'VER PROGRAMA DE CARACTERIZACION',
+            'submenu' => [
+                [
+                    'text' => 'Ver Caracterización',
+                    'url' => 'caracter',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
+                ],
+                [
+                    'text' => 'Crear Caracterización',
+                    'url' => 'caracterizacion/create',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
+                ],
+            ],
+        ],
+
+        // Tomar Asistencia
         [
             'text' => 'Tomar Asistencia',
             'url' => 'asistencia',
             'icon' => 'fas fa-fw fa-check-square',
-            'can' => [
-                'TOMAR ASISTENCIA',
-            ],
+            'can' => 'TOMAR ASISTENCIA',
         ],
+
         // Gestión Académica
         [
             'text' => 'Gestión Académica',
@@ -620,8 +663,73 @@ return [
                         'ELIMINAR JORNADA',
                     ],
                 ],
+                [
+                    'text' => 'Guías de Aprendizaje',
+                    'icon' => 'fas fa-fw fa-book-open',
+                    'can' => [
+                        'VER GUIA APRENDIZAJE',
+                        'CREAR GUIA APRENDIZAJE',
+                    ],
+                    'submenu' => [
+                        [
+                            'text' => 'Lista de Guías',
+                            'url' => 'guias-aprendizaje',
+                            'icon' => 'fas fa-fw fa-list',
+                            'can' => 'VER GUIA APRENDIZAJE',
+                        ],
+                        [
+                            'text' => 'Crear Guía',
+                            'url' => 'guias-aprendizaje/create',
+                            'icon' => 'fas fa-fw fa-plus-circle',
+                            'can' => 'CREAR GUIA APRENDIZAJE',
+                        ],
+                        [
+                            'text' => 'Estadísticas',
+                            'url' => '#',
+                            'icon' => 'fas fa-fw fa-chart-bar',
+                            'can' => 'VER GUIA APRENDIZAJE',
+                        ],
+                    ],
+                ],
             ],
         ],
+
+        // Administrar Asistencias para Administrador
+        [
+            'text' => 'Administrar Asistencias',
+            'icon' => 'fas fa-fw fa-clipboard-check',
+            'can' => 'VER PROGRAMA DE CARACTERIZACION',
+            'submenu' => [
+                [
+                    'text' => 'Consultas',
+                    'url' => 'asistencia',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
+                ],
+                [
+                    'text' => 'Consulta Personalizada',
+                    'url' => '#',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
+                ],
+            ],
+        ],
+
+        // Administrar Carnets QR
+        [
+            'text' => 'Administrar Carnet',
+            'icon' => 'fas fa-fw fa-id-card',
+            'can' => 'VER PROGRAMA DE CARACTERIZACION',
+            'submenu' => [
+                [
+                    'text' => 'Crear Carnet',
+                    'url' => 'carnet',
+                    'icon' => 'far fa-circle nav-icon',
+                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
+                ],
+            ],
+        ],
+
         // Operaciones Académicas y Administrativas
         [
             'text' => 'Operaciones Académicas y Administrativas',
@@ -665,6 +773,7 @@ return [
                 ],
             ],
         ],
+
         // Consultas y Gestión de Carnet
         [
             'text' => 'Consultas y Gestión de Carnet',

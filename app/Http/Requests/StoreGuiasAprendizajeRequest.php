@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class Storeguia_aprendizajeRequest extends FormRequest
+class StoreGuiasAprendizajeRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,7 +24,8 @@ class Storeguia_aprendizajeRequest extends FormRequest
         return [
             'codigo' => 'required|string|max:50|unique:guia_aprendizajes,codigo',
             'nombre' => 'required|string|max:255',
-            'resultados_aprendizaje' => 'sometimes|array',
+            'status' => 'nullable|boolean',
+            'resultados_aprendizaje' => 'required|array|min:1',
             'resultados_aprendizaje.*' => 'exists:resultados_aprendizajes,id',
         ];
     }
@@ -38,12 +39,32 @@ class Storeguia_aprendizajeRequest extends FormRequest
     {
         return [
             'codigo.required' => 'El código es obligatorio.',
-            'codigo.unique' => 'El código ya existe.',
+            'codigo.string' => 'El código debe ser una cadena de texto.',
             'codigo.max' => 'El código no puede tener más de 50 caracteres.',
+            'codigo.unique' => 'El código ya existe en el sistema.',
             'nombre.required' => 'El nombre es obligatorio.',
+            'nombre.string' => 'El nombre debe ser una cadena de texto.',
             'nombre.max' => 'El nombre no puede tener más de 255 caracteres.',
+            'status.boolean' => 'El estado debe ser verdadero o falso.',
+            'resultados_aprendizaje.required' => 'Debe seleccionar al menos un resultado de aprendizaje.',
             'resultados_aprendizaje.array' => 'Los resultados de aprendizaje deben ser un arreglo.',
-            'resultados_aprendizaje.*.exists' => 'Uno o más resultados de aprendizaje no existen.',
+            'resultados_aprendizaje.min' => 'Debe seleccionar al menos un resultado de aprendizaje.',
+            'resultados_aprendizaje.*.exists' => 'Uno o más resultados de aprendizaje no existen en el sistema.',
+        ];
+    }
+
+    /**
+     * Get custom attributes for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function attributes(): array
+    {
+        return [
+            'codigo' => 'código',
+            'nombre' => 'nombre',
+            'status' => 'estado',
+            'resultados_aprendizaje' => 'resultados de aprendizaje',
         ];
     }
 }
