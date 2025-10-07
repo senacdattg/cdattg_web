@@ -21,6 +21,7 @@ class ResultadosAprendizajeSeeder extends Seeder
                 'duracion' => 36,
                 'fecha_inicio' => '2026-01-01',
                 'fecha_fin' => '2026-01-01',
+                'status' => 1,
                 'user_create_id' => 1,
                 'user_edit_id' => 1,
             ],
@@ -328,6 +329,10 @@ class ResultadosAprendizajeSeeder extends Seeder
         ];
 
         foreach ($resultados_aprendizajes as $resultados_aprendizaje) {
+            // Agregar status por defecto si no existe
+            if (!isset($resultados_aprendizaje['status'])) {
+                $resultados_aprendizaje['status'] = 1;
+            }
             ResultadosAprendizaje::create($resultados_aprendizaje);
         }
     }

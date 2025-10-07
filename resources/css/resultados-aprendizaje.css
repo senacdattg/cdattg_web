@@ -1,0 +1,433 @@
+/**
+ * Estilos para el módulo de Resultados de Aprendizaje (RAP)
+ * Sistema de Asistencia CDATTG - SENA
+ */
+
+/* ========================================
+   HEADER Y TÍTULOS
+======================================== */
+.rap-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.rap-header h1 {
+    color: white;
+    font-weight: 700;
+    font-size: 2rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    margin: 0;
+}
+
+.rap-header p {
+    color: rgba(255,255,255,0.9);
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+}
+
+/* ========================================
+   BADGES Y ESTADOS
+======================================== */
+.badge-rap-activo {
+    background-color: #28a745;
+    color: white;
+    padding: 0.35em 0.65em;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 0.25rem;
+}
+
+.badge-rap-inactivo {
+    background-color: #dc3545;
+    color: white;
+    padding: 0.35em 0.65em;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 0.25rem;
+}
+
+.badge-rap-codigo {
+    background-color: #17a2b8;
+    color: white;
+    padding: 0.35em 0.65em;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 0.25rem;
+}
+
+.badge-rap-duracion {
+    background-color: #ffc107;
+    color: #212529;
+    padding: 0.35em 0.65em;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 0.25rem;
+}
+
+/* ========================================
+   CARDS Y CONTENEDORES
+======================================== */
+.rap-card {
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.rap-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+.rap-card-header {
+    border-radius: 10px 10px 0 0 !important;
+    font-weight: 600;
+    padding: 1rem 1.25rem;
+}
+
+.rap-card-body {
+    padding: 1.5rem;
+}
+
+/* ========================================
+   TABLA DE RESULTADOS
+======================================== */
+.rap-table {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.rap-table thead th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    border-bottom: 2px solid #dee2e6;
+    padding: 0.75rem;
+    vertical-align: middle;
+}
+
+.rap-table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.rap-table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.rap-table td {
+    padding: 0.75rem;
+    vertical-align: middle;
+}
+
+/* ========================================
+   FILTROS
+======================================== */
+.rap-filters {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.rap-filter-group {
+    margin-bottom: 1rem;
+}
+
+.rap-filter-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.rap-filter-input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out;
+}
+
+.rap-filter-input:focus {
+    border-color: #667eea;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+/* ========================================
+   BOTONES
+======================================== */
+.btn-rap-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-rap-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    color: white;
+}
+
+.btn-rap-success {
+    background-color: #28a745;
+    border: none;
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-rap-success:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
+.btn-rap-danger {
+    background-color: #dc3545;
+    border: none;
+    color: white;
+    padding: 0.5rem 1.5rem;
+    border-radius: 0.25rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-rap-danger:hover {
+    background-color: #c82333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+/* ========================================
+   FORMULARIOS
+======================================== */
+.rap-form-group {
+    margin-bottom: 1.5rem;
+}
+
+.rap-form-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.rap-form-control {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+    transition: border-color 0.15s ease-in-out;
+}
+
+.rap-form-control:focus {
+    border-color: #667eea;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+}
+
+.rap-form-error {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+.rap-form-help {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* ========================================
+   GESTIÓN DE COMPETENCIAS
+======================================== */
+.rap-competencias-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+    .rap-competencias-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+.rap-competencias-asignadas {
+    border: 2px solid #28a745;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.rap-competencias-disponibles {
+    border: 2px solid #17a2b8;
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.rap-competencia-item {
+    padding: 0.5rem;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.rap-competencia-item:last-child {
+    border-bottom: none;
+}
+
+.rap-competencia-item:hover {
+    background-color: #f8f9fa;
+}
+
+/* ========================================
+   ALERTAS Y NOTIFICACIONES
+======================================== */
+.rap-alert {
+    padding: 1rem 1.25rem;
+    margin-bottom: 1rem;
+    border-radius: 0.25rem;
+    border-left: 4px solid transparent;
+}
+
+.rap-alert-success {
+    background-color: #d4edda;
+    border-left-color: #28a745;
+    color: #155724;
+}
+
+.rap-alert-danger {
+    background-color: #f8d7da;
+    border-left-color: #dc3545;
+    color: #721c24;
+}
+
+.rap-alert-warning {
+    background-color: #fff3cd;
+    border-left-color: #ffc107;
+    color: #856404;
+}
+
+.rap-alert-info {
+    background-color: #d1ecf1;
+    border-left-color: #17a2b8;
+    color: #0c5460;
+}
+
+/* ========================================
+   LOADING Y ESTADOS
+======================================== */
+.rap-loading {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(0,0,0,.1);
+    border-radius: 50%;
+    border-top-color: #667eea;
+    animation: rap-spin 0.6s linear infinite;
+}
+
+@keyframes rap-spin {
+    to { transform: rotate(360deg); }
+}
+
+.rap-empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+}
+
+.rap-empty-state i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.5;
+}
+
+/* ========================================
+   TOOLTIPS
+======================================== */
+.rap-tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.rap-tooltip .rap-tooltiptext {
+    visibility: hidden;
+    width: 200px;
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -100px;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.rap-tooltip:hover .rap-tooltiptext {
+    visibility: visible;
+    opacity: 1;
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+@media (max-width: 768px) {
+    .rap-header {
+        padding: 1.5rem;
+    }
+    
+    .rap-header h1 {
+        font-size: 1.5rem;
+    }
+    
+    .rap-table {
+        font-size: 0.875rem;
+    }
+    
+    .rap-card-body {
+        padding: 1rem;
+    }
+}
+
+/* ========================================
+   UTILIDADES
+======================================== */
+.rap-text-center {
+    text-align: center;
+}
+
+.rap-text-right {
+    text-align: right;
+}
+
+.rap-mt-1 { margin-top: 0.25rem; }
+.rap-mt-2 { margin-top: 0.5rem; }
+.rap-mt-3 { margin-top: 1rem; }
+.rap-mt-4 { margin-top: 1.5rem; }
+
+.rap-mb-1 { margin-bottom: 0.25rem; }
+.rap-mb-2 { margin-bottom: 0.5rem; }
+.rap-mb-3 { margin-bottom: 1rem; }
+.rap-mb-4 { margin-bottom: 1.5rem; }
+
+.rap-p-1 { padding: 0.25rem; }
+.rap-p-2 { padding: 0.5rem; }
+.rap-p-3 { padding: 1rem; }
+.rap-p-4 { padding: 1.5rem; }
+

@@ -21,6 +21,9 @@ class DatabaseSeeder extends Seeder
             
             // Permisos específicos de Guías de Aprendizaje
             GuiasAprendizajePermissionsSeeder::class,
+            
+            // Permisos específicos de Resultados de Aprendizaje
+            ResultadosAprendizajePermissionsSeeder::class,
 
             // Luego los datos geográficos
             PaisSeeder::class,

@@ -114,6 +114,13 @@ class RolePermissionSeeder extends Seeder
             'programa.edit',
             'programa.delete',
             'programa.search',
+            // Permisos para resultados de aprendizaje
+            'VER RESULTADO APRENDIZAJE',
+            'CREAR RESULTADO APRENDIZAJE',
+            'EDITAR RESULTADO APRENDIZAJE',
+            'ELIMINAR RESULTADO APRENDIZAJE',
+            'GESTIONAR COMPETENCIAS RAP',
+            'CAMBIAR ESTADO RAP',
         ];
 
         // Crear cada permiso si no existe
@@ -202,6 +209,13 @@ class RolePermissionSeeder extends Seeder
             'programa.edit',
             'programa.delete',
             'programa.search',
+            // Permisos para resultados de aprendizaje
+            'VER RESULTADO APRENDIZAJE',
+            'CREAR RESULTADO APRENDIZAJE',
+            'EDITAR RESULTADO APRENDIZAJE',
+            'ELIMINAR RESULTADO APRENDIZAJE',
+            'GESTIONAR COMPETENCIAS RAP',
+            'CAMBIAR ESTADO RAP',
         ]);
 
         // Asignar permisos al rol ADMINISTRADOR
@@ -261,6 +275,12 @@ class RolePermissionSeeder extends Seeder
             'programa.index',
             'programa.show',
             'programa.search',
+            // Permisos para resultados de aprendizaje
+            'VER RESULTADO APRENDIZAJE',
+            'CREAR RESULTADO APRENDIZAJE',
+            'EDITAR RESULTADO APRENDIZAJE',
+            'GESTIONAR COMPETENCIAS RAP',
+            'CAMBIAR ESTADO RAP',
         ]);
 
         // Asignar permisos al rol APRENDIZ

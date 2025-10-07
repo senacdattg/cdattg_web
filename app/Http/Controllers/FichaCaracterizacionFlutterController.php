@@ -147,4 +147,30 @@ class FichaCaracterizacionFlutterController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Obtener todas las fichas con la cantidad de aprendices
+     */
+    public function getAllFichasConAprendices()
+    {
+        try {
+            $fichas = FichaCaracterizacion::all()->map(function ($ficha) {
+                return [
+                    'id' => $ficha->id,
+                    'ficha' => $ficha->ficha,
+                    'jornada_id' => $ficha->jornada_id,
+                    'total_aprendices' => $ficha->aprendices()->count()
+                ];
+            });
+
+            return response()->json($fichas, 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener las fichas con cantidad de aprendices',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }
