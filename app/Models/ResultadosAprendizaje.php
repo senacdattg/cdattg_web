@@ -83,4 +83,122 @@ class ResultadosAprendizaje extends Model
     {
         return $this->belongsTo(User::class, 'user_edit_id');
     }
+
+    /**
+     * SCOPE: Filtrar resultados activos
+     */
+    public function scopeActivos($query)
+    {
+        return $query->where('status', 1);
+    }
+
+    /**
+     * SCOPE: Filtrar resultados inactivos
+     */
+    public function scopeInactivos($query)
+    {
+        return $query->where('status', 0);
+    }
+
+    /**
+     * SCOPE: Filtrar por competencia
+     */
+    public function scopePorCompetencia($query, $competenciaId)
+    {
+        return $query->whereHas('competencias', function($q) use ($competenciaId) {
+            $q->where('competencias.id', $competenciaId);
+        });
+    }
+
+    /**
+     * SCOPE: Filtrar por código
+     */
+    public function scopePorCodigo($query, $codigo)
+    {
+        return $query->where('codigo', 'LIKE', "%{$codigo}%");
+    }
+
+    /**
+     * SCOPE: Filtrar por fecha de inicio
+     */
+    public function scopePorFecha($query, $fechaInicio, $fechaFin = null)
+    {
+        $query->where('fecha_inicio', '>=', $fechaInicio);
+        
+        if ($fechaFin) {
+            $query->where('fecha_fin', '<=', $fechaFin);
+        }
+        
+        return $query;
+    }
+
+    /**
+     * SCOPE: Ordenar por código ascendente
+     */
+    public function scopeOrdenadoPorCodigo($query)
+    {
+        return $query->orderBy('codigo', 'asc');
+    }
+
+    /**
+     * MÉTODO HELPER: Verificar si el resultado está activo
+     */
+    public function isActivo(): bool
+    {
+        return $this->status == 1;
+    }
+
+    /**
+     * MÉTODO HELPER: Obtener duración en horas
+     */
+    public function duracionEnHoras(): int
+    {
+        return $this->duracion ?? 0;
+    }
+
+    /**
+     * MÉTODO HELPER: Verificar si tiene fechas definidas
+     */
+    public function tieneFechasDefinidas(): bool
+    {
+        return !is_null($this->fecha_inicio) && !is_null($this->fecha_fin);
+    }
+
+    /**
+     * MÉTODO HELPER: Verificar si está vigente
+     */
+    public function estaVigente(): bool
+    {
+        if (!$this->tieneFechasDefinidas()) {
+            return true;
+        }
+
+        $hoy = now();
+        return $hoy->greaterThanOrEqualTo($this->fecha_inicio) && 
+               $hoy->lessThanOrEqualTo($this->fecha_fin);
+    }
+
+    /**
+     * MÉTODO HELPER: Contar guías asociadas
+     */
+    public function contarGuiasAsociadas(): int
+    {
+        return $this->guiasAprendizaje()->count();
+    }
+
+    /**
+     * MÉTODO HELPER: Obtener estado formateado
+     */
+    public function getEstadoFormateadoAttribute(): string
+    {
+        return $this->status == 1 ? 'ACTIVO' : 'INACTIVO';
+    }
+
+    /**
+     * MÉTODO HELPER: Obtener nombre completo con código
+     */
+    public function getNombreCompletoAttribute(): string
+    {
+        return "{$this->codigo} - {$this->nombre}";
+    }
 }
