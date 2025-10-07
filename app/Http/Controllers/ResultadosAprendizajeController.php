@@ -218,11 +218,21 @@ class ResultadosAprendizajeController extends Controller
         try {
             DB::beginTransaction();
             
-            if ($resultadoAprendizaje->guiasAprendizaje()->count() > 0) {
+            // Validación de negocio: No se puede eliminar RAP con guías asociadas
+            $cantidadGuias = $resultadoAprendizaje->guiasAprendizaje()->count();
+            if ($cantidadGuias > 0) {
+                Log::warning('Intento de eliminar RAP con guías asociadas', [
+                    'resultado_id' => $resultadoAprendizaje->id,
+                    'codigo' => $resultadoAprendizaje->codigo,
+                    'cantidad_guias' => $cantidadGuias,
+                    'user_id' => Auth::id()
+                ]);
+                
                 return redirect()->back()
-                    ->with('error', 'No se puede eliminar el resultado de aprendizaje porque tiene guías asociadas.');
+                    ->with('error', "No se puede eliminar el resultado de aprendizaje '{$resultadoAprendizaje->codigo}' porque tiene {$cantidadGuias} guía(s) de aprendizaje asociada(s). Primero debe desasociar o eliminar las guías relacionadas.");
             }
             
+            // Desasociar competencias antes de eliminar
             $resultadoAprendizaje->competencias()->detach();
             $resultadoAprendizaje->delete();
             
@@ -230,17 +240,20 @@ class ResultadosAprendizajeController extends Controller
             
             Log::info('Resultado de aprendizaje eliminado exitosamente', [
                 'resultado_id' => $resultadoAprendizaje->id,
+                'codigo' => $resultadoAprendizaje->codigo,
                 'user_id' => Auth::id()
             ]);
             
             return redirect()->route('resultados-aprendizaje.index')
-                ->with('success', 'Resultado de aprendizaje eliminado exitosamente.');
+                ->with('success', "Resultado de aprendizaje '{$resultadoAprendizaje->codigo}' eliminado exitosamente.");
                 
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error al eliminar resultado de aprendizaje: ' . $e->getMessage(), [
                 'resultado_id' => $resultadoAprendizaje->id,
-                'user_id' => Auth::id()
+                'codigo' => $resultadoAprendizaje->codigo ?? 'N/A',
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString()
             ]);
             
             return redirect()->back()

@@ -22,10 +22,11 @@ class UpdateResultadosAprendizajeRequest extends FormRequest
                 Rule::unique('resultados_aprendizajes', 'codigo')->ignore($this->route('resultado_aprendizaje'))
             ],
             'nombre' => 'required|string|max:500',
-            'duracion' => 'nullable|integer|min:1|max:9999',
-            'fecha_inicio' => 'nullable|date',
-            'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
+            'duracion' => 'required|numeric|min:1|max:9999',
+            'fecha_inicio' => 'required|date|before_or_equal:fecha_fin',
+            'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
             'competencia_id' => 'nullable|exists:competencias,id',
+            'status' => 'nullable|boolean',
         ];
     }
 
@@ -35,17 +36,22 @@ class UpdateResultadosAprendizajeRequest extends FormRequest
             'codigo.required' => 'El código es obligatorio.',
             'codigo.string' => 'El código debe ser una cadena de texto.',
             'codigo.max' => 'El código no puede tener más de 50 caracteres.',
-            'codigo.unique' => 'El código ya existe en el sistema.',
+            'codigo.unique' => 'Este código ya está registrado en el sistema. Por favor use uno diferente.',
             'nombre.required' => 'El nombre es obligatorio.',
             'nombre.string' => 'El nombre debe ser una cadena de texto.',
             'nombre.max' => 'El nombre no puede tener más de 500 caracteres.',
-            'duracion.integer' => 'La duración debe ser un número entero.',
+            'duracion.required' => 'La duración es obligatoria.',
+            'duracion.numeric' => 'La duración debe ser un número válido.',
             'duracion.min' => 'La duración debe ser de al menos 1 hora.',
             'duracion.max' => 'La duración no puede superar las 9999 horas.',
+            'fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
             'fecha_inicio.date' => 'La fecha de inicio debe ser una fecha válida.',
+            'fecha_inicio.before_or_equal' => 'La fecha de inicio debe ser anterior o igual a la fecha de fin.',
+            'fecha_fin.required' => 'La fecha de fin es obligatoria.',
             'fecha_fin.date' => 'La fecha de fin debe ser una fecha válida.',
             'fecha_fin.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
             'competencia_id.exists' => 'La competencia seleccionada no existe en el sistema.',
+            'status.boolean' => 'El estado debe ser verdadero o falso.',
         ];
     }
 
@@ -58,6 +64,7 @@ class UpdateResultadosAprendizajeRequest extends FormRequest
             'fecha_inicio' => 'fecha de inicio',
             'fecha_fin' => 'fecha de fin',
             'competencia_id' => 'competencia',
+            'status' => 'estado',
         ];
     }
 }
