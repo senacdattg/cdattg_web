@@ -214,6 +214,71 @@
                             </div>
                         @endif
 
+                        <!-- Actividades Asociadas -->
+                        @if($guiaAprendizaje->actividades->count() > 0)
+                            <div class="card-body">
+                                <div class="section-card">
+                                    <div class="section-card-title text-primary">
+                                        <i class="fas fa-tasks mr-1"></i> Actividades/Evidencias Asociadas ({{ $guiaAprendizaje->actividades->count() }})
+                                    </div>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover mb-0">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th style="width: 5%">#</th>
+                                                    <th style="width: 20%">Código</th>
+                                                    <th style="width: 35%">Nombre</th>
+                                                    <th style="width: 15%">Fecha</th>
+                                                    <th style="width: 15%">Estado</th>
+                                                    <th style="width: 10%">Tipo</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($guiaAprendizaje->actividades as $actividad)
+                                                    <tr>
+                                                        <td>{{ $loop->iteration }}</td>
+                                                        <td><span class="badge badge-secondary">{{ $actividad->codigo ?? 'N/A' }}</span></td>
+                                                        <td>{{ $actividad->nombre }}</td>
+                                                        <td>
+                                                            @if($actividad->fecha_evidencia)
+                                                                <small class="text-muted">
+                                                                    <i class="far fa-calendar mr-1"></i>
+                                                                    {{ \Carbon\Carbon::parse($actividad->fecha_evidencia)->format('d/m/Y') }}
+                                                                </small>
+                                                            @else
+                                                                <span class="text-muted">Sin fecha</span>
+                                                            @endif
+                                                        </td>
+                                                        <td>
+                                                            @php
+                                                                $estadoBadge = 'secondary';
+                                                                $estadoTexto = 'Sin estado';
+                                                                
+                                                                if($actividad->id_estado == 25) {
+                                                                    $estadoBadge = 'success';
+                                                                    $estadoTexto = 'Completada';
+                                                                } elseif($actividad->id_estado == 27) {
+                                                                    $estadoBadge = 'warning';
+                                                                    $estadoTexto = 'Pendiente';
+                                                                } elseif($actividad->id_estado) {
+                                                                    $estadoBadge = 'info';
+                                                                    $estadoTexto = 'En proceso';
+                                                                }
+                                                            @endphp
+                                                            <span class="badge badge-{{ $estadoBadge }}">{{ $estadoTexto }}</span>
+                                                        </td>
+                                                        <td>
+                                                            <span class="badge badge-primary">{{ $actividad->tipo ?? 'Evidencia' }}</span>
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+
                         <div class="card-footer bg-white py-3">
                             <div class="d-flex justify-content-center gap-2">
                                 @can('EDITAR GUIA APRENDIZAJE')
