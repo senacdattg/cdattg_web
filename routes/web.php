@@ -45,6 +45,9 @@ Route::middleware('auth')->group(function () {
     
     // Incluir rutas de resultados de aprendizaje
     include_once routes_path('web_resultados_aprendizaje.php');
+    
+    // Incluir rutas de competencias
+    include_once routes_path('web_competencias.php');
 
     foreach ($protectedFolders as $folder) {
         foreach (glob(routes_path($folder) . '/*.php') as $routeFile) {

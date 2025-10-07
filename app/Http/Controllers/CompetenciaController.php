@@ -355,4 +355,70 @@ class CompetenciaController extends Controller
                 ->with('error', 'Error al cambiar el estado. Intente nuevamente.');
         }
     }
+
+    public function gestionarResultados(Competencia $competencia)
+    {
+        try {
+            $resultadosAsignados = $competencia->resultadosAprendizaje()->get();
+            
+            $resultadosDisponibles = ResultadosAprendizaje::whereNotIn('id', $resultadosAsignados->pluck('id'))
+                ->orderBy('codigo')
+                ->get();
+            
+            return view('competencias.gestionar_resultados', compact(
+                'competencia',
+                'resultadosAsignados',
+                'resultadosDisponibles'
+            ));
+            
+        } catch (Exception $e) {
+            Log::error('Error al gestionar resultados de competencia: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al cargar la gestión de resultados.');
+        }
+    }
+
+    public function asociarResultado(Request $request, Competencia $competencia)
+    {
+        try {
+            $request->validate([
+                'resultado_id' => 'required|exists:resultados_aprendizajes,id',
+            ]);
+            
+            $resultadoId = $request->resultado_id;
+            
+            if ($competencia->resultadosAprendizaje()->where('resultados_aprendizajes.id', $resultadoId)->exists()) {
+                return redirect()->back()->with('error', 'Este resultado de aprendizaje ya está asignado a la competencia.');
+            }
+            
+            $competencia->resultadosAprendizaje()->attach($resultadoId, [
+                'user_create_id' => Auth::id(),
+                'user_edit_id' => Auth::id(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+            
+            return redirect()->back()->with('success', 'Resultado de aprendizaje asociado exitosamente.');
+            
+        } catch (Exception $e) {
+            Log::error('Error al asociar resultado: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al asociar el resultado de aprendizaje.');
+        }
+    }
+
+    public function desasociarResultado(Competencia $competencia, ResultadosAprendizaje $resultado)
+    {
+        try {
+            if (!$competencia->resultadosAprendizaje()->where('resultados_aprendizajes.id', $resultado->id)->exists()) {
+                return redirect()->back()->with('error', 'Este resultado de aprendizaje no está asignado a la competencia.');
+            }
+            
+            $competencia->resultadosAprendizaje()->detach($resultado->id);
+            
+            return redirect()->back()->with('success', 'Resultado de aprendizaje desasociado exitosamente.');
+            
+        } catch (Exception $e) {
+            Log::error('Error al desasociar resultado: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al desasociar el resultado de aprendizaje.');
+        }
+    }
 }
