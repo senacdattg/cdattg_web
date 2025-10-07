@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\GuiasAprendizaje;
+use App\Models\User;
 
 class ResultadosAprendizaje extends Model
 {
@@ -17,8 +18,18 @@ class ResultadosAprendizaje extends Model
         'duracion',
         'fecha_inicio',
         'fecha_fin',
+        'status',
         'user_create_id',
         'user_edit_id',
+    ];
+
+    protected $casts = [
+        'duracion' => 'integer',
+        'status' => 'boolean',
+        'fecha_inicio' => 'date',
+        'fecha_fin' => 'date',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     /**
@@ -55,5 +66,21 @@ class ResultadosAprendizaje extends Model
     public function resultadosCompetencia()
     {
         return $this->hasMany(ResultadosCompetencia::class, 'rap_id');
+    }
+
+    /**
+     * Relación con el usuario que creó el resultado
+     */
+    public function userCreate()
+    {
+        return $this->belongsTo(User::class, 'user_create_id');
+    }
+
+    /**
+     * Relación con el usuario que editó el resultado
+     */
+    public function userEdit()
+    {
+        return $this->belongsTo(User::class, 'user_edit_id');
     }
 }
