@@ -178,24 +178,6 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group">
-                                                <label for="descripcion" class="form-label">Descripción</label>
-                                                <textarea class="form-control @error('descripcion') is-invalid @enderror" 
-                                                          id="descripcion" 
-                                                          name="descripcion" 
-                                                          rows="4" 
-                                                          placeholder="Descripción detallada de la guía de aprendizaje">{{ old('descripcion', $guiaAprendizaje->descripcion) }}</textarea>
-                                                @error('descripcion')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                                <small class="form-text text-muted">
-                                                    Descripción opcional de los objetivos y contenido de la guía
-                                                </small>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
 
                                 <!-- Resultados de Aprendizaje -->

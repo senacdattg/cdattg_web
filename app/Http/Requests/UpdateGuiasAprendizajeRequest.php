@@ -30,7 +30,8 @@ class UpdateGuiasAprendizajeRequest extends FormRequest
                 Rule::unique('guia_aprendizajes', 'codigo')->ignore($this->route('guia_aprendizaje'))
             ],
             'nombre' => 'required|string|max:255',
-            'resultados_aprendizaje' => 'required|array',
+            'status' => 'nullable|boolean',
+            'resultados_aprendizaje' => 'required|array|min:1',
             'resultados_aprendizaje.*' => 'exists:resultados_aprendizajes,id',
         ];
     }
@@ -50,8 +51,10 @@ class UpdateGuiasAprendizajeRequest extends FormRequest
             'nombre.required' => 'El nombre es obligatorio.',
             'nombre.string' => 'El nombre debe ser una cadena de texto.',
             'nombre.max' => 'El nombre no puede tener más de 255 caracteres.',
-            'resultados_aprendizaje.required' => 'Los resultados de aprendizaje son obligatorios.',
+            'status.boolean' => 'El estado debe ser verdadero o falso.',
+            'resultados_aprendizaje.required' => 'Debe seleccionar al menos un resultado de aprendizaje.',
             'resultados_aprendizaje.array' => 'Los resultados de aprendizaje deben ser un arreglo.',
+            'resultados_aprendizaje.min' => 'Debe seleccionar al menos un resultado de aprendizaje.',
             'resultados_aprendizaje.*.exists' => 'Uno o más resultados de aprendizaje no existen en el sistema.',
         ];
     }
@@ -66,6 +69,7 @@ class UpdateGuiasAprendizajeRequest extends FormRequest
         return [
             'codigo' => 'código',
             'nombre' => 'nombre',
+            'status' => 'estado',
             'resultados_aprendizaje' => 'resultados de aprendizaje',
         ];
     }

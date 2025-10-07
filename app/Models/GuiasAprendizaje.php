@@ -16,13 +16,13 @@ class GuiasAprendizaje extends Model
     protected $fillable = [
         'codigo',
         'nombre',
-        'descripcion',
         'status',
         'user_create_id',
         'user_edit_id',
     ];
 
     protected $casts = [
+        'status' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime',

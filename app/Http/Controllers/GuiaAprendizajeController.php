@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\Storeguia_aprendizajeRequest;
-use App\Http\Requests\Updateguia_aprendizajeRequest;
+use App\Http\Requests\StoreGuiasAprendizajeRequest;
+use App\Http\Requests\UpdateGuiasAprendizajeRequest;
 use App\Models\GuiasAprendizaje;
 use App\Models\ResultadosAprendizaje;
 use Illuminate\Http\Request;
@@ -201,7 +201,7 @@ class GuiaAprendizajeController extends Controller
     public function create()
     {
         try {
-            $resultadosAprendizaje = ResultadosAprendizaje::where('status', 1)->get();
+            $resultadosAprendizaje = ResultadosAprendizaje::orderBy('codigo')->get();
             
             return view('guias_aprendizaje.create', compact('resultadosAprendizaje'));
         } catch (Exception $e) {
@@ -213,10 +213,10 @@ class GuiaAprendizajeController extends Controller
     /**
      * Store a newly created resource in storage.
      * 
-     * @param Storeguia_aprendizajeRequest $request
+     * @param StoreGuiasAprendizajeRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Storeguia_aprendizajeRequest $request)
+    public function store(StoreGuiasAprendizajeRequest $request)
     {
         try {
             DB::beginTransaction();
@@ -286,7 +286,7 @@ class GuiaAprendizajeController extends Controller
     public function edit(GuiasAprendizaje $guiaAprendizaje)
     {
         try {
-            $resultadosAprendizaje = ResultadosAprendizaje::where('status', 1)->get();
+            $resultadosAprendizaje = ResultadosAprendizaje::orderBy('codigo')->get();
             $guiaAprendizaje->load('resultadosAprendizaje');
             
             return view('guias_aprendizaje.edit', compact('guiaAprendizaje', 'resultadosAprendizaje'));
@@ -303,11 +303,11 @@ class GuiaAprendizajeController extends Controller
     /**
      * Update the specified resource in storage.
      * 
-     * @param Updateguia_aprendizajeRequest $request
+     * @param UpdateGuiasAprendizajeRequest $request
      * @param GuiasAprendizaje $guiaAprendizaje
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Updateguia_aprendizajeRequest $request, GuiasAprendizaje $guiaAprendizaje)
+    public function update(UpdateGuiasAprendizajeRequest $request, GuiasAprendizaje $guiaAprendizaje)
     {
         try {
             DB::beginTransaction();

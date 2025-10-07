@@ -206,12 +206,6 @@
                                             <p><strong>Creada por:</strong> {{ $guiaAprendizaje->userCreate->persona->primer_nombre ?? 'N/A' }}</p>
                                         </div>
                                     </div>
-                                    @if($guiaAprendizaje->descripcion)
-                                        <div class="mt-3">
-                                            <strong>Descripción:</strong>
-                                            <p class="mt-2 text-muted">{{ $guiaAprendizaje->descripcion }}</p>
-                                        </div>
-                                    @endif
                                 </div>
                                 <div class="col-md-4">
                                     <h5 class="text-primary mb-3">
@@ -445,3 +439,4 @@
         });
     </script>
 @endsection
+
