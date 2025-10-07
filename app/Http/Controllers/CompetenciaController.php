@@ -2,65 +2,357 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StorecompetenciaRequest;
-use App\Http\Requests\UpdatecompetenciaRequest;
-use App\Models\competencia;
+use App\Http\Requests\StoreCompetenciaRequest;
+use App\Http\Requests\UpdateCompetenciaRequest;
+use App\Models\Competencia;
+use App\Models\ResultadosAprendizaje;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Exception;
 
 class CompetenciaController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct()
     {
-        //
+        $this->middleware('auth');
+        $this->middleware('can:VER COMPETENCIA')->only(['index', 'show']);
+        $this->middleware('can:CREAR COMPETENCIA')->only(['create', 'store']);
+        $this->middleware('can:EDITAR COMPETENCIA')->only(['edit', 'update']);
+        $this->middleware('can:ELIMINAR COMPETENCIA')->only('destroy');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    public function index(Request $request)
+    {
+        try {
+            $query = Competencia::with(['userCreate', 'userEdit']);
+            
+            // Filtro de búsqueda por código o nombre
+            if ($request->filled('search')) {
+                $searchTerm = $request->search;
+                $query->where(function($q) use ($searchTerm) {
+                    $q->where('codigo', 'LIKE', "%{$searchTerm}%")
+                      ->orWhere('nombre', 'LIKE', "%{$searchTerm}%")
+                      ->orWhere('descripcion', 'LIKE', "%{$searchTerm}%");
+                });
+            }
+            
+            // Filtro por estado
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+            
+            // Filtro por rango de fechas
+            if ($request->filled('fecha_inicio')) {
+                $query->whereDate('fecha_inicio', '>=', $request->fecha_inicio);
+            }
+            
+            if ($request->filled('fecha_fin')) {
+                $query->whereDate('fecha_fin', '<=', $request->fecha_fin);
+            }
+            
+            // Filtro por duración
+            if ($request->filled('duracion_min')) {
+                $query->where('duracion', '>=', $request->duracion_min);
+            }
+            
+            if ($request->filled('duracion_max')) {
+                $query->where('duracion', '<=', $request->duracion_max);
+            }
+            
+            $query->orderBy('codigo', 'asc');
+            
+            $competencias = $query->paginate(10)->withQueryString();
+            
+            return view('competencias.index', compact('competencias'));
+            
+        } catch (Exception $e) {
+            Log::error('Error al obtener lista de competencias: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al cargar las competencias.');
+        }
+    }
+
     public function create()
     {
-        //
+        try {
+            return view('competencias.create');
+        } catch (Exception $e) {
+            Log::error('Error al cargar formulario de creación de competencia: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al cargar el formulario de creación.');
+        }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StorecompetenciaRequest $request)
+    public function store(StoreCompetenciaRequest $request)
     {
-        //
+        try {
+            DB::beginTransaction();
+            
+            $data = $request->validated();
+            $data['user_create_id'] = Auth::id();
+            $data['user_edit_id'] = Auth::id();
+            
+            // Agregar status por defecto si no viene
+            if (!isset($data['status'])) {
+                $data['status'] = 1;
+            }
+            
+            $competencia = Competencia::create($data);
+            
+            DB::commit();
+            
+            Log::info('Competencia creada exitosamente', [
+                'competencia_id' => $competencia->id,
+                'codigo' => $competencia->codigo,
+                'user_id' => Auth::id()
+            ]);
+            
+            return redirect()->route('competencias.index')
+                ->with('success', "Competencia '{$competencia->codigo}' creada exitosamente.");
+                
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Error al crear competencia: ' . $e->getMessage(), [
+                'user_id' => Auth::id(),
+                'data' => $request->all()
+            ]);
+            
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error al crear la competencia. Intente nuevamente.');
+        }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(competencia $competencia)
+    public function show(Competencia $competencia)
     {
-        //
+        try {
+            $competencia->load(['resultadosCompetencia.rap', 'userCreate', 'userEdit']);
+            
+            // Contar resultados de aprendizaje asociados
+            $cantidadRAPs = $competencia->resultadosCompetencia->count();
+            
+            return view('competencias.show', compact('competencia', 'cantidadRAPs'));
+            
+        } catch (Exception $e) {
+            Log::error('Error al ver detalle de competencia: ' . $e->getMessage(), [
+                'competencia_id' => $competencia->id
+            ]);
+            
+            return redirect()->back()->with('error', 'Error al cargar la competencia.');
+        }
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(competencia $competencia)
+    public function edit(Competencia $competencia)
     {
-        //
+        try {
+            return view('competencias.edit', compact('competencia'));
+        } catch (Exception $e) {
+            Log::error('Error al cargar formulario de edición: ' . $e->getMessage(), [
+                'competencia_id' => $competencia->id
+            ]);
+            
+            return redirect()->back()->with('error', 'Error al cargar el formulario de edición.');
+        }
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatecompetenciaRequest $request, competencia $competencia)
+    public function update(UpdateCompetenciaRequest $request, Competencia $competencia)
     {
-        //
+        try {
+            DB::beginTransaction();
+            
+            $data = $request->validated();
+            $data['user_edit_id'] = Auth::id();
+            
+            $competencia->update($data);
+            
+            DB::commit();
+            
+            Log::info('Competencia actualizada exitosamente', [
+                'competencia_id' => $competencia->id,
+                'codigo' => $competencia->codigo,
+                'user_id' => Auth::id()
+            ]);
+            
+            return redirect()->route('competencias.index')
+                ->with('success', "Competencia '{$competencia->codigo}' actualizada exitosamente.");
+                
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Error al actualizar competencia: ' . $e->getMessage(), [
+                'competencia_id' => $competencia->id,
+                'user_id' => Auth::id()
+            ]);
+            
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error al actualizar la competencia. Intente nuevamente.');
+        }
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(competencia $competencia)
+    public function destroy(Competencia $competencia)
     {
-        //
+        try {
+            DB::beginTransaction();
+            
+            // Validación de negocio: No se puede eliminar competencia con RAPs asociados
+            $cantidadRAPs = $competencia->resultadosCompetencia->count();
+            if ($cantidadRAPs > 0) {
+                Log::warning('Intento de eliminar competencia con RAPs asociados', [
+                    'competencia_id' => $competencia->id,
+                    'codigo' => $competencia->codigo,
+                    'cantidad_raps' => $cantidadRAPs,
+                    'user_id' => Auth::id()
+                ]);
+                
+                return redirect()->back()
+                    ->with('error', "No se puede eliminar la competencia '{$competencia->codigo}' porque tiene {$cantidadRAPs} resultado(s) de aprendizaje asociado(s). Primero debe desasociar o eliminar los RAPs relacionados.");
+            }
+            
+            $competencia->delete();
+            
+            DB::commit();
+            
+            Log::info('Competencia eliminada exitosamente', [
+                'competencia_id' => $competencia->id,
+                'codigo' => $competencia->codigo,
+                'user_id' => Auth::id()
+            ]);
+            
+            return redirect()->route('competencias.index')
+                ->with('success', "Competencia '{$competencia->codigo}' eliminada exitosamente.");
+                
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Error al eliminar competencia: ' . $e->getMessage(), [
+                'competencia_id' => $competencia->id,
+                'codigo' => $competencia->codigo ?? 'N/A',
+                'user_id' => Auth::id(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            return redirect()->back()
+                ->with('error', 'Error al eliminar la competencia. Intente nuevamente.');
+        }
+    }
+
+    public function search(Request $request)
+    {
+        try {
+            $query = Competencia::with(['userCreate', 'userEdit']);
+            
+            // Búsqueda general por código, nombre o descripción
+            if ($request->filled('q')) {
+                $searchTerm = $request->q;
+                $query->where(function($q) use ($searchTerm) {
+                    $q->where('codigo', 'LIKE', "%{$searchTerm}%")
+                      ->orWhere('nombre', 'LIKE', "%{$searchTerm}%")
+                      ->orWhere('descripcion', 'LIKE', "%{$searchTerm}%");
+                });
+            }
+            
+            // Filtro específico por código
+            if ($request->filled('codigo')) {
+                $query->where('codigo', 'LIKE', "%{$request->codigo}%");
+            }
+            
+            // Filtro específico por nombre
+            if ($request->filled('nombre')) {
+                $query->where('nombre', 'LIKE', "%{$request->nombre}%");
+            }
+            
+            // Filtro por estado
+            if ($request->filled('status')) {
+                $query->where('status', $request->status);
+            }
+            
+            // Filtro por rango de fechas de inicio
+            if ($request->filled('fecha_inicio_desde')) {
+                $query->whereDate('fecha_inicio', '>=', $request->fecha_inicio_desde);
+            }
+            
+            if ($request->filled('fecha_inicio_hasta')) {
+                $query->whereDate('fecha_inicio', '<=', $request->fecha_inicio_hasta);
+            }
+            
+            // Filtro por rango de fechas de fin
+            if ($request->filled('fecha_fin_desde')) {
+                $query->whereDate('fecha_fin', '>=', $request->fecha_fin_desde);
+            }
+            
+            if ($request->filled('fecha_fin_hasta')) {
+                $query->whereDate('fecha_fin', '<=', $request->fecha_fin_hasta);
+            }
+            
+            // Filtro por duración
+            if ($request->filled('duracion_min')) {
+                $query->where('duracion', '>=', $request->duracion_min);
+            }
+            
+            if ($request->filled('duracion_max')) {
+                $query->where('duracion', '<=', $request->duracion_max);
+            }
+            
+            // Orden
+            $orderBy = $request->get('order_by', 'codigo');
+            $orderDirection = $request->get('order_direction', 'asc');
+            $query->orderBy($orderBy, $orderDirection);
+            
+            $perPage = $request->get('per_page', 10);
+            $competencias = $query->paginate($perPage);
+            
+            return response()->json([
+                'success' => true,
+                'data' => $competencias->items(),
+                'pagination' => [
+                    'total' => $competencias->total(),
+                    'per_page' => $competencias->perPage(),
+                    'current_page' => $competencias->currentPage(),
+                    'last_page' => $competencias->lastPage(),
+                    'from' => $competencias->firstItem(),
+                    'to' => $competencias->lastItem(),
+                ],
+                'filters' => $request->except(['page', 'per_page'])
+            ]);
+            
+        } catch (Exception $e) {
+            Log::error('Error en búsqueda de competencias: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al realizar la búsqueda',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function cambiarEstado(Competencia $competencia)
+    {
+        try {
+            $nuevoEstado = $competencia->status === 1 ? 0 : 1;
+            $competencia->status = $nuevoEstado;
+            $competencia->user_edit_id = Auth::id();
+            $competencia->save();
+            
+            $estadoTexto = $nuevoEstado === 1 ? 'activa' : 'inactiva';
+            
+            Log::info('Estado de competencia cambiado', [
+                'competencia_id' => $competencia->id,
+                'codigo' => $competencia->codigo,
+                'nuevo_estado' => $nuevoEstado,
+                'user_id' => Auth::id()
+            ]);
+            
+            return redirect()->back()
+                ->with('success', "Competencia '{$competencia->codigo}' marcada como {$estadoTexto}.");
+                
+        } catch (Exception $e) {
+            Log::error('Error al cambiar estado de competencia: ' . $e->getMessage(), [
+                'competencia_id' => $competencia->id,
+                'user_id' => Auth::id()
+            ]);
+            
+            return redirect()->back()
+                ->with('error', 'Error al cambiar el estado. Intente nuevamente.');
+        }
     }
 }
