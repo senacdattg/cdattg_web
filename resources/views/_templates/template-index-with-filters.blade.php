@@ -1,41 +1,19 @@
 @extends('adminlte::page')
 
+{{-- 
+    PLANTILLA DE INDEX CON FILTROS AVANZADOS
+    Reemplazar:
+    - {module} = nombre del módulo (ej: usuarios, productos)
+    - {Module} = nombre en singular capitalizado (ej: Usuario, Producto)
+    - {icon} = icono FontAwesome (ej: fa-users, fa-box)
+    - {permission-prefix} = prefijo del permiso (ej: USUARIO, PRODUCTO)
+    - $items = colección de elementos
+    - $item = elemento individual
+    - Agregar/quitar filtros según necesites
+--}}
+
 @section('css')
-    @vite(['resources/css/guias_aprendizaje.css'])
-    <style>
-        .dashboard-header {
-            background: #fff;
-            border-bottom: 1px solid rgba(0, 0, 0, .05);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, .03);
-        }
-        .text-gray-800 {
-            color: #5a5c69 !important;
-        }
-        .link_right_header {
-            color: #4a5568;
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-        .link_right_header:hover {
-            color: #4299e1;
-        }
-        .breadcrumb-item {
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-        }
-        .breadcrumb-item i {
-            font-size: 0.8rem;
-            margin-right: 0.4rem;
-        }
-        .breadcrumb-item a {
-            color: #4a5568;
-            text-decoration: none;
-        }
-        .breadcrumb-item.active {
-            color: #718096;
-        }
-    </style>
+    @vite(['resources/css/{module}.css'])
 @endsection
 
 @section('content_header')
@@ -45,11 +23,11 @@
                 <div class="col-12 col-md-6 d-flex align-items-center">
                     <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
                         style="width: 48px; height: 48px;">
-                        <i class="fas fa-book-open text-white fa-lg"></i>
+                        <i class="fas {icon} text-white fa-lg"></i>
                     </div>
                     <div>
-                        <h1 class="h3 mb-0 text-gray-800">Guías de Aprendizaje</h1>
-                        <p class="text-muted mb-0 font-weight-light">Gestión de guías de aprendizaje del SENA</p>
+                        <h1 class="h3 mb-0 text-gray-800">{Module}s</h1>
+                        <p class="text-muted mb-0 font-weight-light">Gestión de {module}s del sistema</p>
                     </div>
                 </div>
                 <div class="col-sm-6">
@@ -61,7 +39,7 @@
                                 </a>
                             </li>
                             <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-book-open"></i> Guías de Aprendizaje
+                                <i class="fas {icon}"></i> {Module}s
                             </li>
                         </ol>
                     </nav>
@@ -96,11 +74,11 @@
             <div class="row">
                 <div class="col-12">
                     {{-- Botón de Crear --}}
-                    @can('CREAR GUIA APRENDIZAJE')
+                    @can('CREAR {permission-prefix}')
                         <div class="card shadow-sm mb-4 no-hover">
                             <div class="card-header bg-white py-3 d-flex align-items-center">
-                                <a href="{{ route('guias-aprendizaje.create') }}" class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1 text-decoration-none">
-                                    <i class="fas fa-plus-circle mr-2"></i> Crear Guía de Aprendizaje
+                                <a href="{{ route('{module}.create') }}" class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1 text-decoration-none">
+                                    <i class="fas fa-plus-circle mr-2"></i> Crear {Module}
                                 </a>
                             </div>
                         </div>
@@ -109,11 +87,11 @@
                     {{-- Tabla Principal con Filtros --}}
                     <div class="card shadow-sm no-hover">
                         <div class="card-header bg-white py-3">
-                            <h6 class="m-0 font-weight-bold text-primary mb-3">Lista de Guías de Aprendizaje</h6>
+                            <h6 class="m-0 font-weight-bold text-primary mb-3">Lista de {Module}s</h6>
                             
                             {{-- Filtros Avanzados --}}
                             <div class="d-flex flex-wrap align-items-center gap-2">
-                                {{-- Filtro por Programa de Formación --}}
+                                {{-- EJEMPLO: Filtro por Programa de Formación --}}
                                 <div class="mr-2">
                                     <select id="filterPrograma" class="form-control form-control-sm" style="width: 200px;">
                                         <option value="">Todos los programas</option>
@@ -126,16 +104,11 @@
                                     </select>
                                 </div>
 
-                                {{-- Filtro por Competencia --}}
+                                {{-- EJEMPLO: Filtro por Categoría/Tipo --}}
                                 <div class="mr-2">
-                                    <select id="filterCompetencia" class="form-control form-control-sm" style="width: 180px;">
-                                        <option value="">Todas las competencias</option>
-                                        @php
-                                            $competencias = \App\Models\Competencia::orderBy('nombre')->get();
-                                        @endphp
-                                        @foreach($competencias as $competencia)
-                                            <option value="{{ $competencia->id }}">{{ Str::limit($competencia->nombre, 22) }}</option>
-                                        @endforeach
+                                    <select id="filterCategoria" class="form-control form-control-sm" style="width: 180px;">
+                                        <option value="">Todas las categorías</option>
+                                        {{-- Agrega tus opciones aquí --}}
                                     </select>
                                 </div>
 
@@ -150,8 +123,8 @@
 
                                 {{-- Barra de Búsqueda --}}
                                 <div class="input-group" style="width: 250px;">
-                                    <input type="text" id="searchGuia" class="form-control form-control-sm" 
-                                           placeholder="Buscar por código, nombre..." autocomplete="off">
+                                    <input type="text" id="searchInput" class="form-control form-control-sm" 
+                                           placeholder="Buscar..." autocomplete="off">
                                     <div class="input-group-append">
                                         <button class="btn btn-primary btn-sm" type="button" id="btnSearch">
                                             <i class="fas fa-search"></i>
@@ -170,59 +143,41 @@
                                     <thead class="thead-light">
                                         <tr>
                                             <th class="px-4 py-3" style="width: 5%">#</th>
-                                            <th class="px-4 py-3" style="width: 15%">Código</th>
                                             <th class="px-4 py-3" style="width: 30%">Nombre</th>
-                                            <th class="px-4 py-3" style="width: 15%">Estado</th>
-                                            <th class="px-4 py-3" style="width: 10%">Resultados</th>
-                                            <th class="px-4 py-3" style="width: 10%">Actividades</th>
+                                            <th class="px-4 py-3" style="width: 20%">Estado</th>
                                             <th class="px-4 py-3 text-center" style="width: 15%">Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="guiasTableBody">
-                                        @forelse ($guiasAprendizaje as $guia)
+                                    <tbody id="tableBody">
+                                        @forelse ($items as $item)
                                             <tr>
                                                 <td class="px-4">{{ $loop->iteration }}</td>
-                                                <td class="px-4 font-weight-medium">{{ $guia->codigo }}</td>
-                                                <td class="px-4">{{ $guia->nombre }}</td>
+                                                <td class="px-4 font-weight-medium">{{ $item->nombre }}</td>
                                                 <td class="px-4">
-                                                    <div class="d-inline-block px-3 py-1 rounded-pill {{ $guia->status == 1 ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}">
+                                                    <div class="d-inline-block px-3 py-1 rounded-pill {{ $item->status == 1 ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}">
                                                         <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
-                                                        {{ $guia->status == 1 ? 'Activo' : 'Inactivo' }}
+                                                        {{ $item->status == 1 ? 'Activo' : 'Inactivo' }}
                                                     </div>
                                                 </td>
                                                 <td class="px-4 text-center">
-                                                    @if($guia->resultadosAprendizaje && $guia->resultadosAprendizaje->count() > 0)
-                                                        <span class="badge badge-primary">{{ $guia->resultadosAprendizaje->count() }}</span>
-                                                    @else
-                                                        <span class="badge badge-secondary">0</span>
-                                                    @endif
-                                                </td>
-                                                <td class="px-4 text-center">
-                                                    @if($guia->actividades && $guia->actividades->count() > 0)
-                                                        <span class="badge badge-warning">{{ $guia->actividades->count() }}</span>
-                                                    @else
-                                                        <span class="badge badge-secondary">0</span>
-                                                    @endif
-                                                </td>
-                                                <td class="px-4 text-center">
                                                     <div class="btn-group">
-                                                        @can('VER GUIA APRENDIZAJE')
-                                                            <a href="{{ route('guias-aprendizaje.show', $guia) }}" 
+                                                        @can('VER {permission-prefix}')
+                                                            <a href="{{ route('{module}.show', $item) }}" 
                                                                 class="btn btn-light btn-sm" data-toggle="tooltip" title="Ver detalles">
                                                                 <i class="fas fa-eye text-warning"></i>
                                                             </a>
                                                         @endcan
-                                                        @can('EDITAR GUIA APRENDIZAJE')
-                                                            <a href="{{ route('guias-aprendizaje.edit', $guia) }}" 
+                                                        @can('EDITAR {permission-prefix}')
+                                                            <a href="{{ route('{module}.edit', $item) }}" 
                                                                 class="btn btn-light btn-sm" data-toggle="tooltip" title="Editar">
                                                                 <i class="fas fa-pencil-alt text-info"></i>
                                                             </a>
                                                         @endcan
-                                                        @can('ELIMINAR GUIA APRENDIZAJE')
+                                                        @can('ELIMINAR {permission-prefix}')
                                                             <button type="button" class="btn btn-light btn-sm" 
-                                                                data-guia="{{ $guia->codigo }}" 
-                                                                data-url="{{ route('guias-aprendizaje.destroy', $guia) }}"
-                                                                onclick="confirmarEliminacion(this.dataset.guia, this.dataset.url)"
+                                                                data-nombre="{{ $item->nombre }}" 
+                                                                data-url="{{ route('{module}.destroy', $item) }}"
+                                                                onclick="confirmarEliminacion(this.dataset.nombre, this.dataset.url)"
                                                                 data-toggle="tooltip" title="Eliminar">
                                                                 <i class="fas fa-trash text-danger"></i>
                                                             </button>
@@ -232,10 +187,10 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="7" class="text-center py-5">
+                                                <td colspan="4" class="text-center py-5">
                                                     <img src="{{ asset('img/no-data.svg') }}" alt="No data" 
                                                         style="width: 120px" class="mb-3">
-                                                    <p class="text-muted">No hay guías de aprendizaje registradas</p>
+                                                    <p class="text-muted">No hay {module}s registrados</p>
                                                 </td>
                                             </tr>
                                         @endforelse
@@ -246,7 +201,7 @@
 
                         <div class="card-footer bg-white">
                             <div class="float-right">
-                                {{ $guiasAprendizaje->links() }}
+                                {{ $items->links() }}
                             </div>
                         </div>
                     </div>
@@ -275,7 +230,7 @@
         }, 5000);
 
         // Búsqueda en tiempo real con debounce
-        $('#searchGuia').on('input', function() {
+        $('#searchInput').on('input', function() {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(function() {
                 performSearch();
@@ -289,32 +244,32 @@
 
         // Limpiar filtros
         $('#btnClearFilters').on('click', function() {
-            $('#searchGuia').val('');
+            $('#searchInput').val('');
             $('#filterPrograma').val('');
-            $('#filterCompetencia').val('');
+            $('#filterCategoria').val('');
             $('#filterStatus').val('');
-            window.location.href = '{{ route("guias-aprendizaje.index") }}';
+            window.location.href = '{{ route("{module}.index") }}';
         });
 
         // Cambios en filtros
-        $('#filterPrograma, #filterCompetencia, #filterStatus').on('change', function() {
+        $('#filterPrograma, #filterCategoria, #filterStatus').on('change', function() {
             performSearch();
         });
 
         // Función para realizar búsqueda
         function performSearch() {
-            const searchTerm = $('#searchGuia').val();
+            const searchTerm = $('#searchInput').val();
             const programaId = $('#filterPrograma').val();
-            const competenciaId = $('#filterCompetencia').val();
+            const categoriaId = $('#filterCategoria').val();
             const status = $('#filterStatus').val();
 
             // Construir URL con parámetros
-            let url = '{{ route("guias-aprendizaje.index") }}?';
+            let url = '{{ route("{module}.index") }}?';
             const params = [];
 
             if (searchTerm) params.push(`search=${encodeURIComponent(searchTerm)}`);
             if (programaId) params.push(`programa_id=${programaId}`);
-            if (competenciaId) params.push(`competencia_id=${competenciaId}`);
+            if (categoriaId) params.push(`categoria_id=${categoriaId}`);
             if (status !== '') params.push(`status=${status}`);
 
             if (params.length > 0) {
@@ -325,9 +280,9 @@
 
         // Restaurar valores de filtros desde URL
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('search')) $('#searchGuia').val(urlParams.get('search'));
+        if (urlParams.has('search')) $('#searchInput').val(urlParams.get('search'));
         if (urlParams.has('programa_id')) $('#filterPrograma').val(urlParams.get('programa_id'));
-        if (urlParams.has('competencia_id')) $('#filterCompetencia').val(urlParams.get('competencia_id'));
+        if (urlParams.has('categoria_id')) $('#filterCategoria').val(urlParams.get('categoria_id'));
         if (urlParams.has('status')) $('#filterStatus').val(urlParams.get('status'));
     });
 
@@ -335,7 +290,7 @@
     function confirmarEliminacion(nombre, url) {
         Swal.fire({
             title: '¿Estás seguro?',
-            text: `¿Deseas eliminar la guía "${nombre}"? Esta acción no se puede deshacer.`,
+            text: `¿Deseas eliminar "${nombre}"? Esta acción no se puede deshacer.`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
@@ -367,3 +322,4 @@
     }
 </script>
 @endsection
+

@@ -10,6 +10,7 @@ export default defineConfig({
                 'temas_css': 'resources/css/temas.css',
                 'parametros_css': 'resources/css/parametros.css',
                 'instructores_css': 'resources/css/instructores.css',
+                'guias_aprendizaje_css': 'resources/css/guias_aprendizaje.css',
                 'dashboard_superadmin': 'resources/css/dashboards/dashboard-superadmin.css',
                 'caracter_selecter': 'resources/css/Asistencia/caracter_selecter.css',
                 

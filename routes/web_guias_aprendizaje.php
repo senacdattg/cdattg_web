@@ -14,7 +14,8 @@ use App\Http\Controllers\GuiaAprendizajeController;
 */
 
 // Rutas resource para CRUD completo
-Route::resource('guias-aprendizaje', GuiaAprendizajeController::class);
+Route::resource('guias-aprendizaje', GuiaAprendizajeController::class)
+    ->parameters(['guias-aprendizaje' => 'guia_aprendizaje']);
 
 // Búsqueda AJAX
 Route::get('/guias-aprendizaje-search', [GuiaAprendizajeController::class, 'search'])->name('guias-aprendizaje.search');

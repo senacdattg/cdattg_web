@@ -64,6 +64,12 @@ class GuiaAprendizajeController extends Controller
                 $query->where('nivel_dificultad', $request->nivel_dificultad);
             }
             
+            if ($request->filled('programa_id')) {
+                $query->whereHas('resultadosAprendizaje.competencias.programas', function($q) use ($request) {
+                    $q->where('programa_formacion.id', $request->programa_id);
+                });
+            }
+            
             if ($request->filled('competencia_id')) {
                 $query->whereHas('resultadosAprendizaje.competencias', function($q) use ($request) {
                     $q->where('competencias.id', $request->competencia_id);
