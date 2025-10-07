@@ -29,6 +29,7 @@ class ResultadosAprendizajeController extends Controller
         try {
             $query = ResultadosAprendizaje::with(['competencias', 'userCreate', 'userEdit']);
             
+            // Filtro de búsqueda por código o nombre
             if ($request->filled('search')) {
                 $searchTerm = $request->search;
                 $query->where(function($q) use ($searchTerm) {
@@ -37,21 +38,44 @@ class ResultadosAprendizajeController extends Controller
                 });
             }
             
+            // Filtro por competencia
             if ($request->filled('competencia_id')) {
                 $query->whereHas('competencias', function($q) use ($request) {
                     $q->where('competencias.id', $request->competencia_id);
                 });
             }
             
+            // Filtro por estado
             if ($request->filled('status')) {
                 $query->where('status', $request->status);
+            }
+            
+            // Filtro por rango de fechas
+            if ($request->filled('fecha_inicio')) {
+                $query->whereDate('fecha_inicio', '>=', $request->fecha_inicio);
+            }
+            
+            if ($request->filled('fecha_fin')) {
+                $query->whereDate('fecha_fin', '<=', $request->fecha_fin);
+            }
+            
+            // Filtro por duración
+            if ($request->filled('duracion_min')) {
+                $query->where('duracion', '>=', $request->duracion_min);
+            }
+            
+            if ($request->filled('duracion_max')) {
+                $query->where('duracion', '<=', $request->duracion_max);
             }
             
             $query->orderBy('codigo', 'asc');
             
             $resultadosAprendizaje = $query->paginate(10)->withQueryString();
             
-            return view('resultados_aprendizaje.index', compact('resultadosAprendizaje'));
+            // Obtener todas las competencias para el filtro
+            $competencias = Competencia::orderBy('nombre')->get();
+            
+            return view('resultados_aprendizaje.index', compact('resultadosAprendizaje', 'competencias'));
             
         } catch (Exception $e) {
             Log::error('Error al obtener lista de resultados de aprendizaje: ' . $e->getMessage());
@@ -229,6 +253,7 @@ class ResultadosAprendizajeController extends Controller
         try {
             $query = ResultadosAprendizaje::with(['competencias', 'userCreate', 'userEdit']);
             
+            // Búsqueda general por código o nombre
             if ($request->filled('q')) {
                 $searchTerm = $request->q;
                 $query->where(function($q) use ($searchTerm) {
@@ -237,23 +262,75 @@ class ResultadosAprendizajeController extends Controller
                 });
             }
             
+            // Filtro específico por código
+            if ($request->filled('codigo')) {
+                $query->where('codigo', 'LIKE', "%{$request->codigo}%");
+            }
+            
+            // Filtro específico por nombre
+            if ($request->filled('nombre')) {
+                $query->where('nombre', 'LIKE', "%{$request->nombre}%");
+            }
+            
+            // Filtro por competencia
             if ($request->filled('competencia_id')) {
                 $query->whereHas('competencias', function($q) use ($request) {
                     $q->where('competencias.id', $request->competencia_id);
                 });
             }
             
+            // Filtro por estado
             if ($request->filled('status')) {
                 $query->where('status', $request->status);
             }
             
-            $query->orderBy('codigo', 'asc');
+            // Filtro por rango de fechas de inicio
+            if ($request->filled('fecha_inicio_desde')) {
+                $query->whereDate('fecha_inicio', '>=', $request->fecha_inicio_desde);
+            }
             
-            $resultadosAprendizaje = $query->paginate(10);
+            if ($request->filled('fecha_inicio_hasta')) {
+                $query->whereDate('fecha_inicio', '<=', $request->fecha_inicio_hasta);
+            }
+            
+            // Filtro por rango de fechas de fin
+            if ($request->filled('fecha_fin_desde')) {
+                $query->whereDate('fecha_fin', '>=', $request->fecha_fin_desde);
+            }
+            
+            if ($request->filled('fecha_fin_hasta')) {
+                $query->whereDate('fecha_fin', '<=', $request->fecha_fin_hasta);
+            }
+            
+            // Filtro por duración
+            if ($request->filled('duracion_min')) {
+                $query->where('duracion', '>=', $request->duracion_min);
+            }
+            
+            if ($request->filled('duracion_max')) {
+                $query->where('duracion', '<=', $request->duracion_max);
+            }
+            
+            // Orden
+            $orderBy = $request->get('order_by', 'codigo');
+            $orderDirection = $request->get('order_direction', 'asc');
+            $query->orderBy($orderBy, $orderDirection);
+            
+            $perPage = $request->get('per_page', 10);
+            $resultadosAprendizaje = $query->paginate($perPage);
             
             return response()->json([
                 'success' => true,
-                'data' => $resultadosAprendizaje
+                'data' => $resultadosAprendizaje->items(),
+                'pagination' => [
+                    'total' => $resultadosAprendizaje->total(),
+                    'per_page' => $resultadosAprendizaje->perPage(),
+                    'current_page' => $resultadosAprendizaje->currentPage(),
+                    'last_page' => $resultadosAprendizaje->lastPage(),
+                    'from' => $resultadosAprendizaje->firstItem(),
+                    'to' => $resultadosAprendizaje->lastItem(),
+                ],
+                'filters' => $request->except(['page', 'per_page'])
             ]);
             
         } catch (Exception $e) {
