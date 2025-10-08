@@ -77,7 +77,7 @@ class ComplementarioController extends Controller
         return view('complementarios.ver_programa_publico', compact('programaData'));
     }
 
-    private function getIconoForPrograma($nombre)
+    public function getIconoForPrograma($nombre)
     {
         $iconos = [
             'Auxiliar de Cocina' => 'fas fa-utensils',
@@ -93,7 +93,11 @@ class ComplementarioController extends Controller
 
     public function programasPublicos()
     {
-        return view('complementarios.programas_publicos');
+        $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion'])->where('estado', 1)->get();
+        $programas->each(function($programa) {
+            $programa->icono = $this->getIconoForPrograma($programa->nombre);
+        });
+        return view('complementarios.programas_publicos', compact('programas'));
     }
 
     public function store(Request $request)
