@@ -174,6 +174,87 @@
         </div>
     </div>
 
+    <!-- Edit Program Modal -->
+    <div class="modal fade" id="editProgramModal" tabindex="-1" aria-labelledby="editProgramModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editProgramModalLabel">
+                        <i class="fas fa-edit me-3"></i>Editar Programa de Formación
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Modifique los datos del programa de formación</p>
+                    <form id="editProgramForm">
+                        <input type="hidden" id="edit_programa_id" name="programa_id">
+                        <div class="mb-3">
+                            <label for="edit_nombre" class="form-label">Nombre del Programa</label>
+                            <input type="text" class="form-control" id="edit_nombre" name="nombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_codigo" class="form-label">Código del Programa</label>
+                            <input type="text" class="form-control" id="edit_codigo" name="codigo" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_descripcion" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="edit_descripcion" name="descripcion" rows="3" required></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit_duracion" class="form-label">Duración (horas)</label>
+                                    <input type="number" class="form-control" id="edit_duracion"
+                                        name="duracion" required min="1">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="edit_cupos" class="form-label">Cupos</label>
+                                    <input type="number" class="form-control" id="edit_cupos"
+                                        name="cupos" required min="1">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_modalidad_id" class="form-label">Modalidad</label>
+                            <select class="form-select" id="edit_modalidad_id" name="modalidad_id" required>
+                                @foreach($modalidades as $mod)
+                                <option value="{{ $mod->id }}">{{ $mod->parametro->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_jornada_id" class="form-label">Jornada</label>
+                            <select class="form-select" id="edit_jornada_id" name="jornada_id" required>
+                                @foreach($jornadas as $jor)
+                                <option value="{{ $jor->id }}">{{ $jor->jornada }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_estado" class="form-label">Estado</label>
+                            <select class="form-select" id="edit_estado" name="estado" required>
+                                <option value="0">Activo</option>
+                                <option value="1">Próximo a iniciar</option>
+                                <option value="2">Inactivo</option>
+                            </select>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                Cancelar
+                            </button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Actualizar Programa
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- View Program Modal -->
     <div class="modal fade" id="viewProgramModal" tabindex="-1" aria-labelledby="viewProgramModalLabel"
         aria-hidden="true">
@@ -395,9 +476,67 @@
                 });
             }
 
-            // Function to edit program (placeholder)
+            // Handle edit form submission
+            const editProgramForm = document.getElementById('editProgramForm');
+            if (editProgramForm) {
+                editProgramForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+
+                    const programaId = document.getElementById('edit_programa_id').value;
+                    const formData = new FormData(editProgramForm);
+                    fetch('{{ route("complementarios-ofertados.update", ":id") }}'.replace(':id', programaId), {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'X-HTTP-Method-Override': 'PUT'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert(data.message);
+                            location.reload(); // Reload to show updated program
+                        } else {
+                            alert('Error: ' + (data.message || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while updating the program.');
+                    });
+                });
+            }
+
+            // Function to edit program
             window.editPrograma = function(id) {
-                alert('Edit functionality for program ' + id + ' not implemented yet.');
+                fetch('{{ route("complementarios-ofertados.edit", ":id") }}'.replace(':id', id), {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Populate the edit modal with data
+                    document.getElementById('edit_programa_id').value = data.id;
+                    document.getElementById('edit_nombre').value = data.nombre;
+                    document.getElementById('edit_codigo').value = data.codigo;
+                    document.getElementById('edit_descripcion').value = data.descripcion;
+                    document.getElementById('edit_duracion').value = data.duracion;
+                    document.getElementById('edit_cupos').value = data.cupos;
+                    document.getElementById('edit_modalidad_id').value = data.modalidad_id;
+                    document.getElementById('edit_jornada_id').value = data.jornada_id;
+                    document.getElementById('edit_estado').value = data.estado;
+
+                    // Show the edit modal
+                    const editModal = new bootstrap.Modal(document.getElementById('editProgramModal'));
+                    editModal.show();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while loading the program data.');
+                });
             };
 
             // Function to delete program
