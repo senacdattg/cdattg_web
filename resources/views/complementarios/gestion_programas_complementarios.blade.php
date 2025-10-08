@@ -71,11 +71,8 @@
                 </div>
                 <div class="card-footer bg-transparent border-0">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <button class="btn btn-sm btn-outline-primary me-md-2 mr-2">
-                            <a href="{{ route('programa_complementario.ver', $programa->id) }}"
-                                class="btn btn-primary w-100">
-                                <i class="fas fa-eye"></i> Ver
-                            </a>
+                        <button class="btn btn-sm btn-outline-primary me-md-2 mr-2" onclick="viewPrograma({{ $programa->id }})">
+                            <i class="fas fa-eye"></i> Ver
                         </button>
                         <button class="btn btn-sm btn-outline-warning me-md-2 mr-2" onclick="editPrograma({{ $programa->id }})">
                             <i class="fas fa-edit"></i> Editar
@@ -250,6 +247,80 @@
                             </button>
                         </div>
                     </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- View Program Modal -->
+    <div class="modal fade" id="viewProgramModal" tabindex="-1" aria-labelledby="viewProgramModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="viewProgramModalLabel">
+                        <i class="fas fa-eye me-3"></i>Detalles del Programa de Formación
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Nombre del Programa</label>
+                                <p id="view_nombre" class="form-control-plaintext"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Código del Programa</label>
+                                <p id="view_codigo" class="form-control-plaintext"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Descripción</label>
+                        <p id="view_descripcion" class="form-control-plaintext"></p>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Duración (horas)</label>
+                                <p id="view_duracion" class="form-control-plaintext"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Cupos</label>
+                                <p id="view_cupos" class="form-control-plaintext"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Modalidad</label>
+                                <p id="view_modalidad" class="form-control-plaintext"></p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Jornada</label>
+                                <p id="view_jornada" class="form-control-plaintext"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Estado</label>
+                        <p id="view_estado" class="form-control-plaintext"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Días de Formación</label>
+                        <p id="view_dias" class="form-control-plaintext"></p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
@@ -507,6 +578,58 @@
                     });
                 });
             }
+
+            // Function to view program
+            window.viewPrograma = function(id) {
+                fetch('{{ route("complementarios-ofertados.edit", ":id") }}'.replace(':id', id), {
+                    method: 'GET',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Populate the view modal with data
+                    document.getElementById('view_nombre').textContent = data.nombre;
+                    document.getElementById('view_codigo').textContent = data.codigo;
+                    document.getElementById('view_descripcion').textContent = data.descripcion;
+                    document.getElementById('view_duracion').textContent = data.duracion;
+                    document.getElementById('view_cupos').textContent = data.cupos;
+
+                    // Get modality name
+                    const modalidades = @json($modalidades);
+                    const modalidad = modalidades.find(m => m.id == data.modalidad_id);
+                    document.getElementById('view_modalidad').textContent = modalidad ? modalidad.parametro.name : 'N/A';
+
+                    // Get jornada name
+                    const jornadas = @json($jornadas);
+                    const jornada = jornadas.find(j => j.id == data.jornada_id);
+                    document.getElementById('view_jornada').textContent = jornada ? jornada.jornada : 'N/A';
+
+                    // Estado
+                    const estados = {0: 'Activo', 1: 'Próximo a iniciar', 2: 'Inactivo'};
+                    document.getElementById('view_estado').textContent = estados[data.estado] || 'N/A';
+
+                    // Dias
+                    if (data.dias && data.dias.length > 0) {
+                        const diasText = data.dias.map(dia => {
+                            const diaName = modalidades.find(m => m.id == dia.dia_id)?.parametro.name || 'N/A';
+                            return `${diaName} (${dia.hora_inicio} - ${dia.hora_fin})`;
+                        }).join(', ');
+                        document.getElementById('view_dias').textContent = diasText;
+                    } else {
+                        document.getElementById('view_dias').textContent = 'No especificado';
+                    }
+
+                    // Show the view modal
+                    const viewModal = new bootstrap.Modal(document.getElementById('viewProgramModal'));
+                    viewModal.show();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while loading the program data.');
+                });
+            };
 
             // Function to edit program
             window.editPrograma = function(id) {
