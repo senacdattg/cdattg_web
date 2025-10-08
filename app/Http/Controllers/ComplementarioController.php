@@ -100,6 +100,32 @@ class ComplementarioController extends Controller
         return view('complementarios.programas_publicos', compact('programas'));
     }
 
+    public function edit($id)
+    {
+        $programa = ComplementarioOfertado::with(['modalidad', 'jornada', 'diasFormacion'])->findOrFail($id);
+
+        $dias = $programa->diasFormacion->map(function ($dia) {
+            return [
+                'dia_id' => $dia->id,
+                'hora_inicio' => $dia->pivot->hora_inicio,
+                'hora_fin' => $dia->pivot->hora_fin,
+            ];
+        });
+
+        return response()->json([
+            'id' => $programa->id,
+            'codigo' => $programa->codigo,
+            'nombre' => $programa->nombre,
+            'descripcion' => $programa->descripcion,
+            'duracion' => $programa->duracion,
+            'cupos' => $programa->cupos,
+            'estado' => $programa->estado,
+            'modalidad_id' => $programa->modalidad_id,
+            'jornada_id' => $programa->jornada_id,
+            'dias' => $dias,
+        ]);
+    }
+
     public function store(Request $request)
     {
         $request->validate([

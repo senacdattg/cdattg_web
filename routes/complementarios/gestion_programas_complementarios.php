@@ -7,6 +7,10 @@ Route::get('/gestion-programas-complementarios', [ComplementarioController::clas
     ->name('gestion-programas-complementarios')
     ->middleware('auth');
 
+Route::get('/complementarios-ofertados/{id}/edit', [ComplementarioController::class, 'edit'])
+    ->name('complementarios-ofertados.edit')
+    ->middleware('auth');
+
 Route::post('/complementarios-ofertados', [ComplementarioController::class, 'store'])
     ->name('complementarios-ofertados.store')
     ->middleware('auth');
