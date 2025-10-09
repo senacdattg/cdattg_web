@@ -51,8 +51,8 @@
                     <div class="card-body text-center">
                         <h5>Inscripción</h5>
                         <p class="small text-muted">Si estás interesado, realiza tu inscripción.</p>
-                        <a href="mailto:info@sena.edu.co" class="btn btn-outline-secondary w-100">
-                            <i class="fas fa-envelope me-1"></i> Consultar
+                        <a href="{{ route('programas-complementarios.inscripcion', $programaData['id'] ?? '') }}" class="btn btn-primary w-100">
+                            <i class="fas fa-user-plus me-1"></i> Inscribirse
                         </a>
                     </div>
                 </div>

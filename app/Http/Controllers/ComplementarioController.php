@@ -8,6 +8,8 @@ use App\Models\Municipio;
 use App\Models\ComplementarioOfertado;
 use App\Models\Parametro;
 use App\Models\JornadaFormacion;
+use App\Models\CategoriaCaracterizacionComplementario;
+use App\Models\Pais;
 
 class ComplementarioController extends Controller
 {
@@ -61,6 +63,7 @@ class ComplementarioController extends Controller
         $programa = ComplementarioOfertado::with(['modalidad', 'jornada', 'diasFormacion'])->findOrFail($id);
 
         $programaData = [
+            'id' => $programa->id,
             'nombre' => $programa->nombre,
             'descripcion' => $programa->descripcion,
             'duracion' => $programa->duracion . ' horas',
@@ -98,6 +101,26 @@ class ComplementarioController extends Controller
             $programa->icono = $this->getIconoForPrograma($programa->nombre);
         });
         return view('complementarios.programas_publicos', compact('programas'));
+    }
+
+    public function formularioInscripcion($id)
+    {
+        $programa = ComplementarioOfertado::with(['modalidad.parametro', 'jornada'])->findOrFail($id);
+        
+        // Obtener categorías de caracterización principales con sus hijos
+        $categorias = CategoriaCaracterizacionComplementario::getMainCategories();
+        $categoriasConHijos = $categorias->map(function($categoria) {
+            return [
+                'id' => $categoria->id,
+                'nombre' => $categoria->nombre,
+                'hijos' => $categoria->getActiveChildren()
+            ];
+        });
+
+        $paises = Pais::all();
+        $departamentos = Departamento::all();
+
+        return view('complementarios.formulario_inscripcion', compact('programa', 'categoriasConHijos', 'paises', 'departamentos'));
     }
 
     public function edit($id)

@@ -66,5 +66,6 @@ Route::middleware('auth')->group(function () {
 // Route::post('/cambiar-password', [ProfileController::class, 'changePassword'])->name('password.change');
 
 Route::get('/programas-complementarios', [App\Http\Controllers\ComplementarioController::class, 'programasPublicos'])->name('programas-complementarios.publicos');
+Route::get('/programas-complementarios/{id}/inscripcion', [App\Http\Controllers\ComplementarioController::class, 'formularioInscripcion'])->name('programas-complementarios.inscripcion');
 Route::get('/departamentos/{pais}', [DepartamentoController::class, 'getByPais'])->name('departamentos.by.pais');
 Route::get('/municipios/{departamento}', [MunicipioController::class, 'getByDepartamento'])->name('municipios.by.departamento');
