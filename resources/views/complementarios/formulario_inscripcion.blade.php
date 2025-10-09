@@ -236,6 +236,34 @@
             }
         });
 
+        // Convertir nombres y apellidos a mayúsculas
+        const camposTexto = ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido'];
+        camposTexto.forEach(campo => {
+            document.getElementById(campo).addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+        });
+
+        // Validar que solo contengan números
+        function soloNumeros(event) {
+            const key = event.key;
+            // Permitir teclas de control (backspace, delete, tab, etc.)
+            if (event.ctrlKey || event.altKey || event.metaKey) {
+                return true;
+            }
+            // Permitir solo números
+            if (!/^\d$/.test(key)) {
+                event.preventDefault();
+                return false;
+            }
+            return true;
+        }
+
+        // Aplicar validación de solo números a los campos
+        document.getElementById('numero_documento').addEventListener('keypress', soloNumeros);
+        document.getElementById('telefono').addEventListener('keypress', soloNumeros);
+        document.getElementById('celular').addEventListener('keypress', soloNumeros);
+
         // Validación del formulario
         document.getElementById('formInscripcion').addEventListener('submit', function(e) {
             e.preventDefault();
@@ -243,6 +271,27 @@
             // Validar términos y condiciones
             if (!document.getElementById('acepto_terminos').checked) {
                 alert('Debe aceptar los términos y condiciones para continuar.');
+                return;
+            }
+
+            // Validar que el número de documento solo contenga números
+            const numeroDocumento = document.getElementById('numero_documento').value;
+            if (!/^\d+$/.test(numeroDocumento)) {
+                alert('El número de documento solo puede contener números.');
+                return;
+            }
+
+            // Validar que teléfono fijo solo contenga números (si está lleno)
+            const telefono = document.getElementById('telefono').value;
+            if (telefono && !/^\d+$/.test(telefono)) {
+                alert('El teléfono fijo solo puede contener números.');
+                return;
+            }
+
+            // Validar que celular solo contenga números
+            const celular = document.getElementById('celular').value;
+            if (!/^\d+$/.test(celular)) {
+                alert('El celular solo puede contener números.');
                 return;
             }
 
