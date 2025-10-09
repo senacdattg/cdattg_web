@@ -88,6 +88,9 @@ class DatabaseSeeder extends Seeder
             AprobacionSeeder::class, // Crear aprobaciones de ordenes
             // Complementarios ofertados
             ComplementariosOfertadosSeeder::class,
+
+            // Categorias de caracterizacion para complementarios
+            CategoriaCaracterizacionComplementariosSeeder::class,
         ]);
     }
 }
