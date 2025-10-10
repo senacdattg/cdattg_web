@@ -10,6 +10,8 @@ use App\Models\Parametro;
 use App\Models\JornadaFormacion;
 use App\Models\CategoriaCaracterizacionComplementario;
 use App\Models\Pais;
+use App\Models\Persona;
+use App\Models\AspiranteComplementario;
 
 class ComplementarioController extends Controller
 {
@@ -224,5 +226,93 @@ class ComplementarioController extends Controller
         $programa->delete();
 
         return response()->json(['success' => true, 'message' => 'Programa eliminado exitosamente.']);
+    }
+
+    /**
+     * Procesar la inscripción del aspirante
+     */
+    public function procesarInscripcion(Request $request, $id)
+    {
+        // Validar los datos del formulario
+        $request->validate([
+            'tipo_documento' => 'required|integer',
+            'numero_documento' => 'required|string|max:191',
+            'primer_nombre' => 'required|string|max:191',
+            'segundo_nombre' => 'nullable|string|max:191',
+            'primer_apellido' => 'required|string|max:191',
+            'segundo_apellido' => 'nullable|string|max:191',
+            'fecha_nacimiento' => 'required|date',
+            'genero' => 'required|integer',
+            'telefono' => 'nullable|string|max:191',
+            'celular' => 'required|string|max:191',
+            'email' => 'required|email|max:191',
+            'pais_id' => 'required|exists:pais,id',
+            'departamento_id' => 'required|exists:departamentos,id',
+            'municipio_id' => 'required|exists:municipios,id',
+            'direccion' => 'required|string|max:191',
+            'observaciones' => 'nullable|string',
+            'categorias' => 'nullable|array',
+            'categorias.*' => 'exists:categorias_caracterizacion_complementarios,id',
+        ]);
+
+        // Verificar si ya existe una persona con el mismo documento o email
+        $personaExistente = Persona::where('numero_documento', $request->numero_documento)
+            ->orWhere('email', $request->email)
+            ->first();
+
+        if ($personaExistente) {
+            // Si ya existe, usar esa persona
+            $persona = $personaExistente;
+            
+            // Actualizar datos si es necesario
+            $persona->update($request->only([
+                'tipo_documento', 'numero_documento', 'primer_nombre', 'segundo_nombre',
+                'primer_apellido', 'segundo_apellido', 'fecha_nacimiento', 'genero',
+                'telefono', 'celular', 'email', 'pais_id', 'departamento_id', 
+                'municipio_id', 'direccion'
+            ]));
+        } else {
+            // Crear nueva persona
+            $persona = Persona::create($request->only([
+                'tipo_documento', 'numero_documento', 'primer_nombre', 'segundo_nombre',
+                'primer_apellido', 'segundo_apellido', 'fecha_nacimiento', 'genero',
+                'telefono', 'celular', 'email', 'pais_id', 'departamento_id', 
+                'municipio_id', 'direccion', 'status'
+            ]));
+        }
+
+        // Crear o actualizar el registro del aspirante
+        $aspirante = AspiranteComplementario::updateOrCreate(
+            ['persona_id' => $persona->id],
+            [
+                'observaciones' => $request->observaciones,
+                'estado' => 1, // Estado "En proceso"
+            ]
+        );
+
+        // Redirigir a la segunda fase (subida de documentos)
+        return redirect()->route('programas-complementarios.documentos', $id)
+            ->with('success', 'Datos personales registrados correctamente. Ahora debe subir su documento de identidad.')
+            ->with('aspirante_id', $aspirante->id);
+    }
+
+    /**
+     * Mostrar formulario para subir documentos
+     */
+    public function formularioDocumentos($id)
+    {
+        $programa = ComplementarioOfertado::findOrFail($id);
+        
+        return view('complementarios.formulario_documentos', compact('programa'));
+    }
+
+    /**
+     * Mostrar perfil del aspirante
+     */
+    public function perfilAspirante($id)
+    {
+        $aspirante = AspiranteComplementario::with('persona')->findOrFail($id);
+        
+        return view('complementarios.perfil_aspirante', compact('aspirante'));
     }
 }

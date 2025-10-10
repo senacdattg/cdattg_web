@@ -28,7 +28,7 @@
                         <h5 class="mb-0"><i class="fas fa-user me-2"></i>Datos Personales</h5>
                     </div>
                     <div class="card-body">
-                        <form id="formInscripcion" method="POST" action="#">
+                        <form id="formInscripcion" method="POST" action="{{ route('programas-complementarios.procesar-inscripcion', $programa->id) }}">
                             @csrf
                             <input type="hidden" name="programa_id" value="{{ $programa->id }}">
 
@@ -266,11 +266,10 @@
 
         // Validación del formulario
         document.getElementById('formInscripcion').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
             // Validar términos y condiciones
             if (!document.getElementById('acepto_terminos').checked) {
                 alert('Debe aceptar los términos y condiciones para continuar.');
+                e.preventDefault();
                 return;
             }
 
@@ -278,6 +277,7 @@
             const numeroDocumento = document.getElementById('numero_documento').value;
             if (!/^\d+$/.test(numeroDocumento)) {
                 alert('El número de documento solo puede contener números.');
+                e.preventDefault();
                 return;
             }
 
@@ -285,6 +285,7 @@
             const telefono = document.getElementById('telefono').value;
             if (telefono && !/^\d+$/.test(telefono)) {
                 alert('El teléfono fijo solo puede contener números.');
+                e.preventDefault();
                 return;
             }
 
@@ -292,12 +293,11 @@
             const celular = document.getElementById('celular').value;
             if (!/^\d+$/.test(celular)) {
                 alert('El celular solo puede contener números.');
+                e.preventDefault();
                 return;
             }
 
-            // Aquí se enviaría el formulario al servidor
-            alert('Formulario enviado correctamente. En una implementación real, los datos se enviarían al servidor.');
-            // this.submit();
+            // El formulario se enviará al servidor si todas las validaciones pasan
         });
     </script>
 </body>
