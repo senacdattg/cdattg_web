@@ -87,6 +87,10 @@
 @section('content')
     <section class="content mt-4">
         <div class="container-fluid">
+            <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ route('competencias.show', $competencia->id) }}">
+                <i class="fas fa-arrow-left mr-1"></i> Volver
+            </a>
+
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <i class="fas fa-check-circle"></i> {{ session('success') }}
@@ -123,7 +127,7 @@
             <!-- Estadísticas -->
             <div class="row mb-4">
                 <div class="col-lg-3 col-6">
-                    <div class="small-box bg-success">
+                    <div class="small-box bg-primary">
                         <div class="inner">
                             <h3>{{ $totalAsignados }}</h3>
                             <p>Resultados Asignados</p>
@@ -145,7 +149,7 @@
                     </div>
                 </div>
                 <div class="col-lg-3 col-6">
-                    <div class="small-box bg-warning">
+                    <div class="small-box bg-primary">
                         <div class="inner">
                             <h3>{{ number_format($duracionTotal, 0) }}</h3>
                             <p>Horas Totales</p>
@@ -156,7 +160,7 @@
                     </div>
                 </div>
                 <div class="col-lg-3 col-6">
-                    <div class="small-box {{ $competencia->status ? 'bg-primary' : 'bg-secondary' }}">
+                    <div class="small-box bg-info">
                         <div class="inner">
                             <h3>{{ $competencia->status ? 'Activa' : 'Inactiva' }}</h3>
                             <p>Estado Competencia</p>
@@ -173,7 +177,7 @@
                 <div class="col-md-7">
                     <div class="card shadow-sm no-hover">
                         <div class="card-header bg-white py-3">
-                            <h6 class="m-0 font-weight-bold text-success">
+                            <h6 class="m-0 font-weight-bold text-primary">
                                 <i class="fas fa-check-circle"></i> Resultados de Aprendizaje Asignados
                             </h6>
                         </div>
@@ -357,7 +361,7 @@
                 <div class="col-md-12">
                     <div class="card shadow-sm no-hover">
                         <div class="card-header bg-white py-3">
-                            <h6 class="m-0 font-weight-bold text-info">
+                            <h6 class="m-0 font-weight-bold text-primary">
                                 <i class="fas fa-clipboard-list"></i> Información de la Competencia
                             </h6>
                         </div>
