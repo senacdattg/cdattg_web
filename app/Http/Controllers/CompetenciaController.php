@@ -21,6 +21,8 @@ class CompetenciaController extends Controller
         $this->middleware('can:CREAR COMPETENCIA')->only(['create', 'store']);
         $this->middleware('can:EDITAR COMPETENCIA')->only(['edit', 'update']);
         $this->middleware('can:ELIMINAR COMPETENCIA')->only('destroy');
+        $this->middleware('can:CAMBIAR ESTADO COMPETENCIA')->only('cambiarEstado');
+        $this->middleware('can:GESTIONAR RESULTADOS COMPETENCIA')->only(['gestionarResultados', 'asociarResultado', 'desasociarResultado']);
     }
 
     public function index(Request $request)
