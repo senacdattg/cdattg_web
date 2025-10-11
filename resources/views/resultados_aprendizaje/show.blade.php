@@ -134,7 +134,7 @@
                                             <th class="py-3">Duración</th>
                                             <td class="py-3">
                                                 @if($resultadoAprendizaje->duracion)
-                                                    <span class="badge badge-info">{{ $resultadoAprendizaje->duracion }} horas</span>
+                                                    <span class="badge badge-info">{{ formatear_horas($resultadoAprendizaje->duracion) }} horas</span>
                                                 @else
                                                     <span class="text-muted">No especificada</span>
                                                 @endif

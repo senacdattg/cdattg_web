@@ -118,7 +118,7 @@
                                         <tr>
                                             <th class="py-3">Duración</th>
                                             <td class="py-3">
-                                                <span class="badge badge-info">{{ $competencia->duracion }} horas</span>
+                                                <span class="badge badge-info">{{ formatear_horas($competencia->duracion) }} horas</span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -262,7 +262,7 @@
                                                     <td class="px-4">{{ $loop->iteration }}</td>
                                                     <td class="px-4"><span class="badge badge-info">{{ $rap->codigo }}</span></td>
                                                     <td class="px-4">{{ Str::limit($rap->nombre, 50) }}</td>
-                                                    <td class="px-4">{{ $rap->duracion }}h</td>
+                                                    <td class="px-4">{{ formatear_horas($rap->duracion) }}h</td>
                                                     <td class="px-4">
                                                         @if($rap->status)
                                                             <span class="badge badge-success">Activo</span>

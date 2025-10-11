@@ -219,7 +219,7 @@
                                                 <td class="px-4">{{ Str::limit($competencia->nombre, 50) }}</td>
                                                 <td class="px-4">
                                                     @if($competencia->duracion)
-                                                        <span class="badge badge-info">{{ $competencia->duracion }}h</span>
+                                                        <span class="badge badge-info">{{ formatear_horas($competencia->duracion) }}h</span>
                                                     @else
                                                         <span class="text-muted">N/A</span>
                                                     @endif

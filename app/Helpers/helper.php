@@ -13,3 +13,10 @@ if (!function_exists('obtener_numero_evidencia')) {
         } // Retorna null si no coincide el patrón
     }
 }
+
+if (!function_exists('formatear_horas')) {
+    function formatear_horas($duracion) {
+        // Convertir a entero si es decimal y eliminar .00
+        return (int) $duracion;
+    }
+}

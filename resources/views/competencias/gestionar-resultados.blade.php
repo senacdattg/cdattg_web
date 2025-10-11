@@ -151,7 +151,7 @@
                 <div class="col-lg-3 col-6">
                     <div class="small-box bg-primary">
                         <div class="inner">
-                            <h3>{{ number_format($duracionTotal, 0) }}</h3>
+                            <h3>{{ formatear_horas($duracionTotal) }}</h3>
                             <p>Horas Totales</p>
                         </div>
                         <div class="icon">
@@ -217,7 +217,7 @@
                                                 <tr>
                                                     <td class="px-4"><span class="badge badge-info">{{ $resultado->codigo }}</span></td>
                                                     <td class="px-4">{{ $resultado->nombre }}</td>
-                                                    <td class="px-4">{{ $resultado->duracion }} hrs</td>
+                                                    <td class="px-4">{{ formatear_horas($resultado->duracion) }} hrs</td>
                                                     <td class="px-4 text-center">
                                                         <form action="{{ route('competencias.desasociarResultado', [$competencia->id, $resultado->id]) }}" 
                                                               method="POST" 
@@ -244,7 +244,7 @@
                                     <small class="text-muted">
                                         <i class="fas fa-info-circle"></i> 
                                         Total: <strong id="countAsignados">{{ $totalAsignados }}</strong> resultado(s) | 
-                                        Duración total: <strong>{{ number_format($duracionTotal, 0) }}</strong> horas
+                                        Duración total: <strong>{{ formatear_horas($duracionTotal) }}</strong> horas
                                     </small>
                                 </div>
                             @endif
@@ -287,7 +287,7 @@
                                                             data-codigo="{{ $resultado->codigo }}"
                                                             data-duracion="{{ $resultado->duracion }}"
                                                             data-nombre="{{ $resultado->nombre }}">
-                                                        {{ $resultado->codigo }} - {{ $resultado->nombre }} ({{ $resultado->duracion }} hrs)
+                                                        {{ $resultado->codigo }} - {{ $resultado->nombre }} ({{ formatear_horas($resultado->duracion) }} hrs)
                                                     </option>
                                                 @endforeach
                                             </select>
@@ -337,7 +337,7 @@
                                                     <tr>
                                                         <td><span class="badge badge-secondary">{{ $resultado->codigo }}</span></td>
                                                         <td><small>{{ Str::limit($resultado->nombre, 30) }}</small></td>
-                                                        <td><small>{{ $resultado->duracion }}</small></td>
+                                                        <td><small>{{ formatear_horas($resultado->duracion) }}</small></td>
                                                     </tr>
                                                 @endforeach
                                             </tbody>
@@ -382,7 +382,7 @@
                                 </div>
                                 <div class="col-md-2">
                                     <strong><i class="fas fa-clock"></i> Duración:</strong><br>
-                                    {{ $competencia->duracion }} horas
+                                    {{ formatear_horas($competencia->duracion) }} horas
                                 </div>
                                 <div class="col-md-2">
                                     <strong><i class="fas fa-toggle-on"></i> Estado:</strong><br>

@@ -206,7 +206,7 @@
                         </div>
                         <div class="col-md-2">
                             <strong><i class="fas fa-clock"></i> Duración:</strong><br>
-                            {{ $resultadoAprendizaje->duracion }} horas
+                            {{ formatear_horas($resultadoAprendizaje->duracion) }} horas
                         </div>
                         <div class="col-md-2">
                             <strong><i class="fas fa-toggle-on"></i> Estado:</strong><br>

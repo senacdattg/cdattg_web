@@ -172,7 +172,7 @@
                                                 <td class="px-4">{{ $resultado->nombre }}</td>
                                                 <td class="px-4">
                                                     @if($resultado->duracion)
-                                                        <span class="badge badge-info">{{ $resultado->duracion }}h</span>
+                                                        <span class="badge badge-info">{{ formatear_horas($resultado->duracion) }}h</span>
                                                     @else
                                                         <span class="text-muted">N/A</span>
                                                     @endif
