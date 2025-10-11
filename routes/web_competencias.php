@@ -17,12 +17,15 @@ Route::resource('competencias', CompetenciaController::class)
     ->parameters(['competencias' => 'competencia']);
 
 Route::get('/competencias-search', [CompetenciaController::class, 'search'])
-    ->name('competencias.search');
+    ->name('competencias.search')
+    ->middleware('can:VER COMPETENCIA');
 
-Route::middleware('can:EDITAR COMPETENCIA')->group(function () {
+Route::middleware('can:CAMBIAR ESTADO COMPETENCIA')->group(function () {
     Route::put('/competencias/{competencia}/cambiar-estado', [CompetenciaController::class, 'cambiarEstado'])
          ->name('competencias.cambiarEstado');
-    
+});
+
+Route::middleware('can:GESTIONAR RESULTADOS COMPETENCIA')->group(function () {
     Route::get('/competencias/{competencia}/gestionar-resultados', [CompetenciaController::class, 'gestionarResultados'])
          ->name('competencias.gestionarResultados');
     

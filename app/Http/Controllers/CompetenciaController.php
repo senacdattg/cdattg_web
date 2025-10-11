@@ -238,7 +238,7 @@ class CompetenciaController extends Controller
     public function search(Request $request)
     {
         try {
-            $query = Competencia::with(['userCreate', 'userEdit']);
+            $query = Competencia::with(['userCreate', 'userEdit', 'programasFormacion']);
             
             // Búsqueda general por código, nombre o descripción
             if ($request->filled('q')) {
@@ -258,6 +258,13 @@ class CompetenciaController extends Controller
             // Filtro específico por nombre
             if ($request->filled('nombre')) {
                 $query->where('nombre', 'LIKE', "%{$request->nombre}%");
+            }
+            
+            // Filtro por programa de formación
+            if ($request->filled('programa_id')) {
+                $query->whereHas('programasFormacion', function($q) use ($request) {
+                    $q->where('programas_formacion.id', $request->programa_id);
+                });
             }
             
             // Filtro por estado
@@ -292,6 +299,11 @@ class CompetenciaController extends Controller
                 $query->where('duracion', '<=', $request->duracion_max);
             }
             
+            // Solo competencias vigentes
+            if ($request->filled('vigentes') && $request->vigentes == 1) {
+                $query->vigentes();
+            }
+            
             // Orden
             $orderBy = $request->get('order_by', 'codigo');
             $orderDirection = $request->get('order_direction', 'asc');
@@ -300,9 +312,28 @@ class CompetenciaController extends Controller
             $perPage = $request->get('per_page', 10);
             $competencias = $query->paginate($perPage);
             
+            // Formatear datos para respuesta JSON
+            $data = $competencias->map(function($competencia) {
+                return [
+                    'id' => $competencia->id,
+                    'codigo' => $competencia->codigo,
+                    'nombre' => $competencia->nombre,
+                    'descripcion' => $competencia->descripcion,
+                    'duracion' => $competencia->duracion,
+                    'fecha_inicio' => $competencia->fecha_inicio ? $competencia->fecha_inicio->format('d/m/Y') : null,
+                    'fecha_fin' => $competencia->fecha_fin ? $competencia->fecha_fin->format('d/m/Y') : null,
+                    'status' => $competencia->status,
+                    'estado_texto' => $competencia->status ? 'Activa' : 'Inactiva',
+                    'programas_count' => $competencia->programasFormacion->count(),
+                    'resultados_count' => $competencia->resultadosAprendizaje()->count(),
+                    'created_at' => $competencia->created_at->format('d/m/Y H:i'),
+                    'user_create' => $competencia->userCreate ? $competencia->userCreate->name : 'N/A',
+                ];
+            });
+            
             return response()->json([
                 'success' => true,
-                'data' => $competencias->items(),
+                'data' => $data,
                 'pagination' => [
                     'total' => $competencias->total(),
                     'per_page' => $competencias->perPage(),
@@ -359,20 +390,39 @@ class CompetenciaController extends Controller
     public function gestionarResultados(Competencia $competencia)
     {
         try {
-            $resultadosAsignados = $competencia->resultadosAprendizaje()->get();
-            
-            $resultadosDisponibles = ResultadosAprendizaje::whereNotIn('id', $resultadosAsignados->pluck('id'))
+            // Cargar resultados asignados con sus relaciones
+            $resultadosAsignados = $competencia->resultadosAprendizaje()
+                ->with(['userCreate', 'userEdit'])
                 ->orderBy('codigo')
                 ->get();
             
-            return view('competencias.gestionar_resultados', compact(
+            // Obtener IDs de resultados ya asignados
+            $idsAsignados = $resultadosAsignados->pluck('id')->toArray();
+            
+            // Buscar resultados disponibles (no asignados y activos)
+            $resultadosDisponibles = ResultadosAprendizaje::whereNotIn('id', $idsAsignados)
+                ->where('status', 1)
+                ->orderBy('codigo')
+                ->get();
+            
+            // Estadísticas
+            $totalAsignados = $resultadosAsignados->count();
+            $totalDisponibles = $resultadosDisponibles->count();
+            $duracionTotal = $resultadosAsignados->sum('duracion');
+            
+            return view('competencias.gestionar-resultados', compact(
                 'competencia',
                 'resultadosAsignados',
-                'resultadosDisponibles'
+                'resultadosDisponibles',
+                'totalAsignados',
+                'totalDisponibles',
+                'duracionTotal'
             ));
             
         } catch (Exception $e) {
-            Log::error('Error al gestionar resultados de competencia: ' . $e->getMessage());
+            Log::error('Error al gestionar resultados de competencia: ' . $e->getMessage(), [
+                'competencia_id' => $competencia->id
+            ]);
             return redirect()->back()->with('error', 'Error al cargar la gestión de resultados.');
         }
     }
@@ -384,12 +434,28 @@ class CompetenciaController extends Controller
                 'resultado_id' => 'required|exists:resultados_aprendizajes,id',
             ]);
             
+            DB::beginTransaction();
+            
             $resultadoId = $request->resultado_id;
             
+            // Validar que el resultado exista y esté activo
+            $resultado = ResultadosAprendizaje::findOrFail($resultadoId);
+            
+            if (!$resultado->status) {
+                return redirect()->back()->with('error', 'No se puede asociar un Resultado de Aprendizaje inactivo.');
+            }
+            
+            // Validar que la competencia esté activa
+            if (!$competencia->status) {
+                return redirect()->back()->with('error', 'No se pueden asociar resultados a una competencia inactiva.');
+            }
+            
+            // Validar que no esté ya asociado
             if ($competencia->resultadosAprendizaje()->where('resultados_aprendizajes.id', $resultadoId)->exists()) {
                 return redirect()->back()->with('error', 'Este resultado de aprendizaje ya está asignado a la competencia.');
             }
             
+            // Asociar el resultado
             $competencia->resultadosAprendizaje()->attach($resultadoId, [
                 'user_create_id' => Auth::id(),
                 'user_edit_id' => Auth::id(),
@@ -397,10 +463,22 @@ class CompetenciaController extends Controller
                 'updated_at' => now(),
             ]);
             
-            return redirect()->back()->with('success', 'Resultado de aprendizaje asociado exitosamente.');
+            DB::commit();
+            
+            Log::info('Resultado de aprendizaje asociado a competencia', [
+                'competencia_id' => $competencia->id,
+                'resultado_id' => $resultadoId,
+                'user_id' => Auth::id()
+            ]);
+            
+            return redirect()->back()->with('success', "Resultado de aprendizaje '{$resultado->codigo}' asociado exitosamente.");
             
         } catch (Exception $e) {
-            Log::error('Error al asociar resultado: ' . $e->getMessage());
+            DB::rollBack();
+            Log::error('Error al asociar resultado: ' . $e->getMessage(), [
+                'competencia_id' => $competencia->id,
+                'user_id' => Auth::id()
+            ]);
             return redirect()->back()->with('error', 'Error al asociar el resultado de aprendizaje.');
         }
     }
