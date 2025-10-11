@@ -692,6 +692,28 @@ return [
                     ],
                 ],
                 [
+                    'text' => 'Competencias',
+                    'icon' => 'fas fa-fw fa-clipboard-list',
+                    'can' => [
+                        'VER COMPETENCIA',
+                        'CREAR COMPETENCIA',
+                    ],
+                    'submenu' => [
+                        [
+                            'text' => 'Lista de Competencias',
+                            'url' => 'competencias',
+                            'icon' => 'fas fa-fw fa-list',
+                            'can' => 'VER COMPETENCIA',
+                        ],
+                        [
+                            'text' => 'Crear Competencia',
+                            'url' => 'competencias/create',
+                            'icon' => 'fas fa-fw fa-plus-circle',
+                            'can' => 'CREAR COMPETENCIA',
+                        ],
+                    ],
+                ],
+                [
                     'text' => 'Resultados de Aprendizaje',
                     'icon' => 'fas fa-fw fa-graduation-cap',
                     'can' => [

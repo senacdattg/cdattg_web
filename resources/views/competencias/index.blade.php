@@ -1,19 +1,7 @@
 @extends('adminlte::page')
 
-{{-- 
-    PLANTILLA DE INDEX CON FILTROS AVANZADOS
-    Reemplazar:
-    - {module} = nombre del módulo (ej: usuarios, productos)
-    - {Module} = nombre en singular capitalizado (ej: Usuario, Producto)
-    - {icon} = icono FontAwesome (ej: fa-users, fa-box)
-    - {permission-prefix} = prefijo del permiso (ej: USUARIO, PRODUCTO)
-    - $items = colección de elementos
-    - $item = elemento individual
-    - Agregar/quitar filtros según necesites
---}}
-
 @section('css')
-    @vite(['resources/css/{module}.css'])
+    @vite(['resources/css/competencias.css'])
     <style>
         .dashboard-header {
             background: #fff;
@@ -63,11 +51,11 @@
                 <div class="col-12 col-md-6 d-flex align-items-center">
                     <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
                         style="width: 48px; height: 48px;">
-                        <i class="fas {icon} text-white fa-lg"></i>
+                        <i class="fas fa-clipboard-list text-white fa-lg"></i>
                     </div>
                     <div>
-                        <h1 class="h3 mb-0 text-gray-800">{Module}s</h1>
-                        <p class="text-muted mb-0 font-weight-light">Gestión de {module}s del sistema</p>
+                        <h1 class="h3 mb-0 text-gray-800">Competencias</h1>
+                        <p class="text-muted mb-0 font-weight-light">Gestión de competencias del SENA</p>
                     </div>
                 </div>
                 <div class="col-sm-6">
@@ -79,7 +67,7 @@
                                 </a>
                             </li>
                             <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas {icon}"></i> {Module}s
+                                <i class="fas fa-clipboard-list"></i> Competencias
                             </li>
                         </ol>
                     </nav>
@@ -92,7 +80,6 @@
 @section('content')
     <section class="content mt-4">
         <div class="container-fluid">
-            {{-- Alertas --}}
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     <i class="fas fa-check-circle"></i> {{ session('success') }}
@@ -113,18 +100,17 @@
 
             <div class="row">
                 <div class="col-12">
-                    {{-- Botón de Crear --}}
-                    @can('CREAR {permission-prefix}')
+                    @can('CREAR COMPETENCIA')
                         <div class="card shadow-sm mb-4 no-hover">
                             <div class="card-header bg-white py-3 d-flex align-items-center">
-                                <a href="{{ route('{module}.create') }}" class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1 text-decoration-none">
-                                    <i class="fas fa-plus-circle mr-2"></i> Crear {Module}
+                                <a href="{{ route('competencias.create') }}" class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1 text-decoration-none">
+                                    <i class="fas fa-plus-circle mr-2"></i> Crear Competencia
                                 </a>
                             </div>
                         </div>
                     @endcan
 
-                    {{-- Panel de Filtros Colapsable --}}
+                    <!-- Filtros -->
                     <div class="card shadow-sm mb-3 no-hover">
                         <div class="card-header bg-white py-2">
                             <button class="btn btn-link btn-sm text-decoration-none p-0 m-0 w-100 text-left" type="button" data-toggle="collapse" data-target="#filtrosCollapse" aria-expanded="false">
@@ -134,62 +120,66 @@
                         </div>
                         <div class="collapse" id="filtrosCollapse">
                             <div class="card-body">
-                                <form action="{{ route('{module}.index') }}" method="GET">
+                                <form action="{{ route('competencias.index') }}" method="GET">
                                     <div class="row">
-                                        {{-- Búsqueda General --}}
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label for="search" class="font-weight-bold">Búsqueda general</label>
                                                 <input type="text" name="search" id="search" class="form-control form-control-sm" 
                                                     placeholder="Código o nombre..." value="{{ request('search') }}">
-                                                <small class="text-muted">Busca en múltiples campos</small>
+                                                <small class="text-muted">Busca en código, nombre y descripción</small>
                                             </div>
                                         </div>
-
-                                        {{-- Estado --}}
                                         <div class="col-md-3">
                                             <div class="form-group">
                                                 <label for="status" class="font-weight-bold">Estado</label>
                                                 <select name="status" id="status" class="form-control form-control-sm">
                                                     <option value="">Todos</option>
-                                                    <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Activos</option>
-                                                    <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inactivos</option>
+                                                    <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Activas</option>
+                                                    <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inactivas</option>
                                                 </select>
                                             </div>
                                         </div>
-
-                                        {{-- AGREGAR MÁS FILTROS SEGÚN TU MODELO --}}
-                                        {{-- Ejemplo: Filtro por categoría, tipo, etc. --}}
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <label for="filtro_1" class="font-weight-bold">Filtro 1</label>
-                                                <input type="text" name="filtro_1" id="filtro_1" class="form-control form-control-sm" 
-                                                    placeholder="Valor..." value="{{ request('filtro_1') }}">
+                                                <label for="duracion_min" class="font-weight-bold">Duración mínima (hrs)</label>
+                                                <input type="number" name="duracion_min" id="duracion_min" class="form-control form-control-sm" 
+                                                    placeholder="Ej: 48" value="{{ request('duracion_min') }}" min="0">
                                             </div>
                                         </div>
-
                                         <div class="col-md-3">
                                             <div class="form-group">
-                                                <label for="filtro_2" class="font-weight-bold">Filtro 2</label>
-                                                <select name="filtro_2" id="filtro_2" class="form-control form-control-sm">
-                                                    <option value="">Seleccione...</option>
-                                                    {{-- Agrega opciones aquí --}}
-                                                </select>
+                                                <label for="duracion_max" class="font-weight-bold">Duración máxima (hrs)</label>
+                                                <input type="number" name="duracion_max" id="duracion_max" class="form-control form-control-sm" 
+                                                    placeholder="Ej: 500" value="{{ request('duracion_max') }}" min="0">
                                             </div>
                                         </div>
                                     </div>
-
-                                    {{-- Botones de acción --}}
                                     <div class="row">
-                                        <div class="col-md-12">
-                                            <div class="form-group mb-0">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label for="fecha_inicio" class="font-weight-bold">Fecha inicio desde</label>
+                                                <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control form-control-sm" 
+                                                    value="{{ request('fecha_inicio') }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label for="fecha_fin" class="font-weight-bold">Fecha fin hasta</label>
+                                                <input type="date" name="fecha_fin" id="fecha_fin" class="form-control form-control-sm" 
+                                                    value="{{ request('fecha_fin') }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="font-weight-bold d-block">&nbsp;</label>
                                                 <button type="submit" class="btn btn-primary btn-sm">
                                                     <i class="fas fa-search"></i> Buscar
                                                 </button>
-                                                <a href="{{ route('{module}.index') }}" class="btn btn-secondary btn-sm">
+                                                <a href="{{ route('competencias.index') }}" class="btn btn-secondary btn-sm">
                                                     <i class="fas fa-times"></i> Limpiar
                                                 </a>
-                                                @if(request()->hasAny(['search', 'status', 'filtro_1', 'filtro_2']))
+                                                @if(request()->hasAny(['search', 'status', 'duracion_min', 'duracion_max', 'fecha_inicio', 'fecha_fin']))
                                                     <span class="badge badge-info ml-2">
                                                         <i class="fas fa-filter"></i> Filtros activos
                                                     </span>
@@ -202,10 +192,9 @@
                         </div>
                     </div>
 
-                    {{-- Tabla Principal --}}
                     <div class="card shadow-sm no-hover">
                         <div class="card-header bg-white py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Lista de {Module}s</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">Lista de Competencias</h6>
                         </div>
 
                         <div class="card-body p-0">
@@ -214,41 +203,61 @@
                                     <thead class="thead-light">
                                         <tr>
                                             <th class="px-4 py-3" style="width: 5%">#</th>
-                                            <th class="px-4 py-3" style="width: 30%">Nombre</th>
-                                            <th class="px-4 py-3" style="width: 20%">Estado</th>
+                                            <th class="px-4 py-3" style="width: 12%">Código</th>
+                                            <th class="px-4 py-3" style="width: 33%">Nombre</th>
+                                            <th class="px-4 py-3" style="width: 10%">Duración</th>
+                                            <th class="px-4 py-3" style="width: 10%">RAPs</th>
+                                            <th class="px-4 py-3" style="width: 15%">Estado</th>
                                             <th class="px-4 py-3 text-center" style="width: 15%">Acciones</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="tableBody">
-                                        @forelse ($items as $item)
+                                    <tbody>
+                                        @forelse ($competencias as $competencia)
                                             <tr>
                                                 <td class="px-4">{{ $loop->iteration }}</td>
-                                                <td class="px-4 font-weight-medium">{{ $item->nombre }}</td>
+                                                <td class="px-4 font-weight-medium">{{ $competencia->codigo }}</td>
+                                                <td class="px-4">{{ Str::limit($competencia->nombre, 50) }}</td>
                                                 <td class="px-4">
-                                                    <div class="d-inline-block px-3 py-1 rounded-pill {{ $item->status == 1 ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}">
+                                                    @if($competencia->duracion)
+                                                        <span class="badge badge-info">{{ formatear_horas($competencia->duracion) }}h</span>
+                                                    @else
+                                                        <span class="text-muted">N/A</span>
+                                                    @endif
+                                                </td>
+                                                <td class="px-4 text-center">
+                                                    <span class="badge badge-primary">{{ $competencia->resultadosAprendizaje->count() }}</span>
+                                                </td>
+                                                <td class="px-4">
+                                                    <div class="d-inline-block px-3 py-1 rounded-pill {{ $competencia->status == 1 ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}">
                                                         <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
-                                                        {{ $item->status == 1 ? 'Activo' : 'Inactivo' }}
+                                                        {{ $competencia->status == 1 ? 'Activa' : 'Inactiva' }}
                                                     </div>
                                                 </td>
                                                 <td class="px-4 text-center">
                                                     <div class="btn-group">
-                                                        @can('VER {permission-prefix}')
-                                                            <a href="{{ route('{module}.show', $item) }}" 
+                                                        @can('VER COMPETENCIA')
+                                                            <a href="{{ route('competencias.show', $competencia) }}" 
                                                                 class="btn btn-light btn-sm" data-toggle="tooltip" title="Ver detalles">
-                                                                <i class="fas fa-eye text-warning"></i>
+                                                                <i class="fas fa-eye text-info"></i>
                                                             </a>
                                                         @endcan
-                                                        @can('EDITAR {permission-prefix}')
-                                                            <a href="{{ route('{module}.edit', $item) }}" 
+                                                        @can('GESTIONAR RESULTADOS COMPETENCIA')
+                                                            <a href="{{ route('competencias.gestionarResultados', $competencia) }}" 
+                                                                class="btn btn-light btn-sm" data-toggle="tooltip" title="Gestionar Resultados">
+                                                                <i class="fas fa-tasks text-success"></i>
+                                                            </a>
+                                                        @endcan
+                                                        @can('EDITAR COMPETENCIA')
+                                                            <a href="{{ route('competencias.edit', $competencia) }}" 
                                                                 class="btn btn-light btn-sm" data-toggle="tooltip" title="Editar">
-                                                                <i class="fas fa-pencil-alt text-info"></i>
+                                                                <i class="fas fa-pencil-alt text-warning"></i>
                                                             </a>
                                                         @endcan
-                                                        @can('ELIMINAR {permission-prefix}')
+                                                        @can('ELIMINAR COMPETENCIA')
                                                             <button type="button" class="btn btn-light btn-sm" 
-                                                                data-nombre="{{ $item->nombre }}" 
-                                                                data-url="{{ route('{module}.destroy', $item) }}"
-                                                                onclick="confirmarEliminacion(this.dataset.nombre, this.dataset.url)"
+                                                                data-competencia="{{ $competencia->codigo }}" 
+                                                                data-url="{{ route('competencias.destroy', $competencia) }}"
+                                                                onclick="confirmarEliminacion(this.dataset.competencia, this.dataset.url)"
                                                                 data-toggle="tooltip" title="Eliminar">
                                                                 <i class="fas fa-trash text-danger"></i>
                                                             </button>
@@ -258,10 +267,10 @@
                                             </tr>
                                         @empty
                                             <tr>
-                                                <td colspan="4" class="text-center py-5">
+                                                <td colspan="7" class="text-center py-5">
                                                     <img src="{{ asset('img/no-data.svg') }}" alt="No data" 
                                                         style="width: 120px" class="mb-3">
-                                                    <p class="text-muted">No hay {module}s registrados</p>
+                                                    <p class="text-muted">No hay competencias registradas</p>
                                                 </td>
                                             </tr>
                                         @endforelse
@@ -272,7 +281,7 @@
 
                         <div class="card-footer bg-white">
                             <div class="float-right">
-                                {{ $items->links() }}
+                                {{ $competencias->links() }}
                             </div>
                         </div>
                     </div>
@@ -289,35 +298,10 @@
 @section('js')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    $(document).ready(function() {
-        // Inicializar tooltips
-        $('[data-toggle="tooltip"]').tooltip();
-
-        // Auto-hide alerts
-        setTimeout(function() {
-            $('.alert').fadeOut('slow');
-        }, 5000);
-
-        // Abrir filtros automáticamente si hay filtros activos
-        // Reemplaza los nombres de filtros según tu modelo
-        @if(request()->hasAny(['search', 'status', 'filtro_1', 'filtro_2']))
-            $('#filtrosCollapse').collapse('show');
-        @endif
-
-        // Cambiar ícono del chevron al expandir/colapsar
-        $('#filtrosCollapse').on('show.bs.collapse', function () {
-            $('[data-target="#filtrosCollapse"] .fa-chevron-down').removeClass('fa-chevron-down').addClass('fa-chevron-up');
-        });
-        $('#filtrosCollapse').on('hide.bs.collapse', function () {
-            $('[data-target="#filtrosCollapse"] .fa-chevron-up').removeClass('fa-chevron-up').addClass('fa-chevron-down');
-        });
-    });
-
-    // Confirmación de eliminación
     function confirmarEliminacion(nombre, url) {
         Swal.fire({
             title: '¿Estás seguro?',
-            text: `¿Deseas eliminar "${nombre}"? Esta acción no se puede deshacer.`,
+            text: `¿Deseas eliminar la competencia "${nombre}"? Esta acción no se puede deshacer.`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d33',
@@ -347,6 +331,26 @@
             }
         });
     }
+
+    $(document).ready(function() {
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+
+        $('[data-toggle="tooltip"]').tooltip();
+
+        // Abrir filtros automáticamente si hay filtros activos
+        @if(request()->hasAny(['search', 'status', 'duracion_min', 'duracion_max', 'fecha_inicio', 'fecha_fin']))
+            $('#filtrosCollapse').collapse('show');
+        @endif
+
+        // Cambiar ícono del chevron al expandir/colapsar
+        $('#filtrosCollapse').on('show.bs.collapse', function () {
+            $('[data-target="#filtrosCollapse"] .fa-chevron-down').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+        });
+        $('#filtrosCollapse').on('hide.bs.collapse', function () {
+            $('[data-target="#filtrosCollapse"] .fa-chevron-up').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+        });
+    });
 </script>
 @endsection
-

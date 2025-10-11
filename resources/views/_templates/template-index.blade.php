@@ -13,6 +13,46 @@
 
 @section('css')
     @vite(['resources/css/{module}.css'])
+    <style>
+        .dashboard-header {
+            background: #fff;
+            border-bottom: 1px solid rgba(0, 0, 0, .05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .03);
+        }
+        .text-gray-800 {
+            color: #5a5c69 !important;
+        }
+        .link_right_header {
+            color: #4a5568;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .link_right_header:hover {
+            color: #4299e1;
+        }
+        .breadcrumb-item {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+        .breadcrumb-item i {
+            font-size: 0.8rem;
+            margin-right: 0.4rem;
+        }
+        .breadcrumb-item a {
+            color: #4a5568;
+            text-decoration: none;
+        }
+        .breadcrumb-item.active {
+            color: #718096;
+        }
+        .bg-success-light {
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+        .bg-danger-light {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+    </style>
 @endsection
 
 @section('content_header')

@@ -121,6 +121,13 @@ class RolePermissionSeeder extends Seeder
             'ELIMINAR RESULTADO APRENDIZAJE',
             'GESTIONAR COMPETENCIAS RAP',
             'CAMBIAR ESTADO RAP',
+            // Permisos para competencias
+            'VER COMPETENCIA',
+            'CREAR COMPETENCIA',
+            'EDITAR COMPETENCIA',
+            'ELIMINAR COMPETENCIA',
+            'GESTIONAR RESULTADOS COMPETENCIA',
+            'CAMBIAR ESTADO COMPETENCIA',
         ];
 
         // Crear cada permiso si no existe
@@ -216,6 +223,13 @@ class RolePermissionSeeder extends Seeder
             'ELIMINAR RESULTADO APRENDIZAJE',
             'GESTIONAR COMPETENCIAS RAP',
             'CAMBIAR ESTADO RAP',
+            // Permisos para competencias
+            'VER COMPETENCIA',
+            'CREAR COMPETENCIA',
+            'EDITAR COMPETENCIA',
+            'ELIMINAR COMPETENCIA',
+            'GESTIONAR RESULTADOS COMPETENCIA',
+            'CAMBIAR ESTADO COMPETENCIA',
         ]);
 
         // Asignar permisos al rol ADMINISTRADOR
@@ -281,6 +295,8 @@ class RolePermissionSeeder extends Seeder
             'EDITAR RESULTADO APRENDIZAJE',
             'GESTIONAR COMPETENCIAS RAP',
             'CAMBIAR ESTADO RAP',
+            // Permisos para competencias
+            'VER COMPETENCIA',
         ]);
 
         // Asignar permisos al rol APRENDIZ
