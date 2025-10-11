@@ -221,8 +221,9 @@
                                                     <td class="px-4 text-center">
                                                         <form action="{{ route('competencias.desasociarResultado', [$competencia->id, $resultado->id]) }}" 
                                                               method="POST" 
-                                                              class="d-inline"
-                                                              onsubmit="return confirm('¿Está seguro de desasociar este resultado de aprendizaje?');">
+                                                              class="d-inline form-desasociar"
+                                                              data-codigo="{{ $resultado->codigo }}"
+                                                              data-nombre="{{ $resultado->nombre }}">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" 
@@ -266,37 +267,41 @@
                                         <i class="fas fa-exclamation-triangle"></i> No hay más resultados de aprendizaje disponibles para asignar.
                                     </div>
                                 @else
-                                    <form action="{{ route('competencias.asociarResultado', $competencia->id) }}" 
+                                    <form action="{{ route('competencias.asociarResultados', $competencia->id) }}" 
                                           method="POST" 
-                                          id="formAsociarResultado">
+                                          id="formAsociarResultados">
                                         @csrf
                                         
                                         <div class="form-group">
-                                            <label for="resultado_id" class="font-weight-bold">
-                                                Seleccionar Resultado de Aprendizaje <span class="text-danger">*</span>
+                                            <label for="resultado_ids" class="font-weight-bold">
+                                                Seleccionar Resultados de Aprendizaje <span class="text-danger">*</span>
                                             </label>
-                                            <select name="resultado_id" 
-                                                    id="resultado_id" 
+                                            <select name="resultado_ids[]" 
+                                                    id="resultado_ids" 
                                                     class="form-control select2" 
                                                     required
-                                                    data-placeholder="Seleccione un resultado...">
-                                                <option value="">-- Seleccione un resultado --</option>
+                                                    multiple="multiple"
+                                                    data-placeholder="Seleccione uno o más resultados...">
                                                 @foreach($resultadosDisponibles as $resultado)
                                                     <option value="{{ $resultado->id }}" 
                                                             data-codigo="{{ $resultado->codigo }}"
-                                                            data-duracion="{{ $resultado->duracion }}">
+                                                            data-duracion="{{ $resultado->duracion }}"
+                                                            data-nombre="{{ $resultado->nombre }}">
                                                         {{ $resultado->codigo }} - {{ $resultado->nombre }} ({{ $resultado->duracion }} hrs)
                                                     </option>
                                                 @endforeach
                                             </select>
-                                            @error('resultado_id')
+                                            @error('resultado_ids')
                                                 <small class="text-danger">{{ $message }}</small>
                                             @enderror
+                                            <small class="text-muted">
+                                                <i class="fas fa-info-circle"></i> Puede seleccionar múltiples resultados manteniendo presionado Ctrl (Cmd en Mac)
+                                            </small>
                                         </div>
 
                                         <div class="form-group">
                                             <button type="submit" class="btn btn-success btn-block">
-                                                <i class="fas fa-link"></i> Asociar Resultado
+                                                <i class="fas fa-link"></i> Asociar Resultados Seleccionados
                                             </button>
                                         </div>
                                     </form>
@@ -422,15 +427,18 @@
 @endsection
 
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function() {
-            // Inicializar Select2
-            $('.select2').select2({
+            // Inicializar Select2 para selección múltiple
+            $('#resultado_ids').select2({
                 theme: 'bootstrap4',
                 width: '100%',
-                placeholder: 'Seleccione un resultado...',
+                placeholder: 'Seleccione uno o más resultados...',
                 allowClear: true,
+                multiple: true,
+                closeOnSelect: false,
                 language: {
                     noResults: function() {
                         return "No se encontraron resultados";
@@ -474,23 +482,109 @@
                 $('.alert').fadeOut('slow');
             }, 5000);
 
-            // Confirmación antes de asociar
-            $('#formAsociarResultado').on('submit', function(e) {
-                var selectedOption = $('#resultado_id option:selected');
-                var codigo = selectedOption.data('codigo');
-                var duracion = selectedOption.data('duracion');
+            // Confirmación antes de asociar con SweetAlert2
+            $('#formAsociarResultados').on('submit', function(e) {
+                e.preventDefault();
                 
-                if (!codigo) {
-                    e.preventDefault();
-                    alert('Debe seleccionar un resultado de aprendizaje');
+                var selectedOptions = $('#resultado_ids option:selected');
+                
+                if (selectedOptions.length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Selección requerida',
+                        text: 'Debe seleccionar al menos un resultado de aprendizaje',
+                        confirmButtonText: 'Entendido'
+                    });
                     return false;
                 }
                 
-                var confirmMsg = '¿Está seguro de asociar el resultado ' + codigo + ' (' + duracion + ' horas)?';
-                if (!confirm(confirmMsg)) {
-                    e.preventDefault();
-                    return false;
-                }
+                // Construir mensaje con todos los resultados seleccionados
+                var resultadosInfo = [];
+                var duracionTotal = 0;
+                
+                selectedOptions.each(function() {
+                    var option = $(this);
+                    var codigo = option.data('codigo');
+                    var duracion = parseInt(option.data('duracion'));
+                    var nombre = option.data('nombre');
+                    
+                    resultadosInfo.push(codigo + ' - ' + nombre + ' (' + duracion + ' hrs)');
+                    duracionTotal += duracion;
+                });
+                
+                var mensaje = '¿Está seguro de asociar los siguientes resultados de aprendizaje?\n\n';
+                mensaje += resultadosInfo.join('\n');
+                mensaje += '\n\nTotal: ' + selectedOptions.length + ' resultado(s) | Duración total: ' + duracionTotal + ' horas';
+                
+                Swal.fire({
+                    title: 'Confirmar Asociación',
+                    html: '<div class="text-left">' + 
+                          '<strong>Resultados a asociar:</strong><br>' +
+                          resultadosInfo.join('<br>') +
+                          '<br><br><strong>Total:</strong> ' + selectedOptions.length + ' resultado(s)<br>' +
+                          '<strong>Duración total:</strong> ' + duracionTotal + ' horas' +
+                          '</div>',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fas fa-link"></i> Sí, asociar',
+                    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+                    width: '500px'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Enviar formulario
+                        this.submit();
+                    }
+                });
+            });
+
+            // Confirmación para desasociar con SweetAlert2
+            $('.form-desasociar').on('submit', function(e) {
+                e.preventDefault();
+                
+                var form = $(this);
+                var codigo = form.data('codigo');
+                var nombre = form.data('nombre');
+                var url = form.attr('action');
+                
+                Swal.fire({
+                    title: 'Confirmar Desasociación',
+                    html: '<div class="text-left">' +
+                          '<strong>¿Está seguro de desasociar este resultado?</strong><br><br>' +
+                          '<strong>Código:</strong> ' + codigo + '<br>' +
+                          '<strong>Nombre:</strong> ' + nombre +
+                          '</div>',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fas fa-unlink"></i> Sí, desasociar',
+                    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+                    width: '400px'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Crear formulario temporal para envío
+                        var tempForm = document.createElement('form');
+                        tempForm.method = 'POST';
+                        tempForm.action = url;
+                        
+                        var csrfToken = document.createElement('input');
+                        csrfToken.type = 'hidden';
+                        csrfToken.name = '_token';
+                        csrfToken.value = '{{ csrf_token() }}';
+                        
+                        var methodField = document.createElement('input');
+                        methodField.type = 'hidden';
+                        methodField.name = '_method';
+                        methodField.value = 'DELETE';
+                        
+                        tempForm.appendChild(csrfToken);
+                        tempForm.appendChild(methodField);
+                        document.body.appendChild(tempForm);
+                        tempForm.submit();
+                    }
+                });
             });
 
             // Mantener filtros en URL

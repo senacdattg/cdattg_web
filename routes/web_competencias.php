@@ -32,6 +32,9 @@ Route::middleware('can:GESTIONAR RESULTADOS COMPETENCIA')->group(function () {
     Route::post('/competencias/{competencia}/asociar-resultado', [CompetenciaController::class, 'asociarResultado'])
          ->name('competencias.asociarResultado');
     
+    Route::post('/competencias/{competencia}/asociar-resultados', [CompetenciaController::class, 'asociarResultados'])
+         ->name('competencias.asociarResultados');
+    
     Route::delete('/competencias/{competencia}/desasociar-resultado/{resultado}', [CompetenciaController::class, 'desasociarResultado'])
          ->name('competencias.desasociarResultado');
 });

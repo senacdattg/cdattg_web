@@ -22,7 +22,7 @@ class CompetenciaController extends Controller
         $this->middleware('can:EDITAR COMPETENCIA')->only(['edit', 'update']);
         $this->middleware('can:ELIMINAR COMPETENCIA')->only('destroy');
         $this->middleware('can:CAMBIAR ESTADO COMPETENCIA')->only('cambiarEstado');
-        $this->middleware('can:GESTIONAR RESULTADOS COMPETENCIA')->only(['gestionarResultados', 'asociarResultado', 'desasociarResultado']);
+        $this->middleware('can:GESTIONAR RESULTADOS COMPETENCIA')->only(['gestionarResultados', 'asociarResultado', 'asociarResultados', 'desasociarResultado']);
     }
 
     public function index(Request $request)
@@ -482,6 +482,96 @@ class CompetenciaController extends Controller
                 'user_id' => Auth::id()
             ]);
             return redirect()->back()->with('error', 'Error al asociar el resultado de aprendizaje.');
+        }
+    }
+
+    public function asociarResultados(Request $request, Competencia $competencia)
+    {
+        try {
+            $request->validate([
+                'resultado_ids' => 'required|array|min:1',
+                'resultado_ids.*' => 'exists:resultados_aprendizajes,id',
+            ]);
+            
+            DB::beginTransaction();
+            
+            $resultadoIds = $request->resultado_ids;
+            $asociadosExitosamente = [];
+            $errores = [];
+            
+            // Validar que la competencia esté activa
+            if (!$competencia->status) {
+                return redirect()->back()->with('error', 'No se pueden asociar resultados a una competencia inactiva.');
+            }
+            
+            foreach ($resultadoIds as $resultadoId) {
+                try {
+                    // Validar que el resultado exista y esté activo
+                    $resultado = ResultadosAprendizaje::findOrFail($resultadoId);
+                    
+                    if (!$resultado->status) {
+                        $errores[] = "El resultado '{$resultado->codigo}' está inactivo y no se puede asociar.";
+                        continue;
+                    }
+                    
+                    // Validar que no esté ya asociado
+                    if ($competencia->resultadosAprendizaje()->where('resultados_aprendizajes.id', $resultadoId)->exists()) {
+                        $errores[] = "El resultado '{$resultado->codigo}' ya está asignado a la competencia.";
+                        continue;
+                    }
+                    
+                    // Asociar el resultado
+                    $competencia->resultadosAprendizaje()->attach($resultadoId, [
+                        'user_create_id' => Auth::id(),
+                        'user_edit_id' => Auth::id(),
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+                    
+                    $asociadosExitosamente[] = $resultado->codigo;
+                    
+                    Log::info('Resultado de aprendizaje asociado a competencia (múltiple)', [
+                        'competencia_id' => $competencia->id,
+                        'resultado_id' => $resultadoId,
+                        'resultado_codigo' => $resultado->codigo,
+                        'user_id' => Auth::id()
+                    ]);
+                    
+                } catch (Exception $e) {
+                    $errores[] = "Error al asociar resultado ID {$resultadoId}: " . $e->getMessage();
+                }
+            }
+            
+            DB::commit();
+            
+            // Construir mensaje de respuesta
+            $mensaje = '';
+            if (!empty($asociadosExitosamente)) {
+                $mensaje .= "Resultados asociados exitosamente: " . implode(', ', $asociadosExitosamente);
+            }
+            
+            if (!empty($errores)) {
+                if (!empty($mensaje)) {
+                    $mensaje .= "\n\nErrores encontrados:\n" . implode("\n", $errores);
+                } else {
+                    $mensaje = "No se pudieron asociar los resultados:\n" . implode("\n", $errores);
+                }
+                
+                return redirect()->back()
+                    ->with('warning', $mensaje);
+            }
+            
+            return redirect()->back()
+                ->with('success', $mensaje);
+            
+        } catch (Exception $e) {
+            DB::rollBack();
+            Log::error('Error al asociar múltiples resultados: ' . $e->getMessage(), [
+                'competencia_id' => $competencia->id,
+                'resultado_ids' => $request->resultado_ids ?? [],
+                'user_id' => Auth::id()
+            ]);
+            return redirect()->back()->with('error', 'Error al asociar los resultados de aprendizaje.');
         }
     }
 
