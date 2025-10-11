@@ -8,7 +8,7 @@
             <h1><i class="fas fa-graduation-cap me-3"></i>Gestión de Programas de Formación</h1>
             <p>Administre los programas de formación complementaria disponibles</p>
         </div>
-        <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newProgramModal" data-toggle="modal" data-target="#newProgramModal">
+        <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#newProgramModal">
             <i class="fas fa-plus-circle"></i> Nuevo Programa
         </a>
     </div>
@@ -100,7 +100,7 @@
                     <h5 class="modal-title" id="newProgramModalLabel">
                         <i class="fas fa-plus-circle me-3"></i>Nuevo Programa de Formación
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <p>Complete el formulario para registrar un nuevo programa de formación</p>
@@ -158,7 +158,7 @@
                             </select>
                         </div>
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
                                 Cancelar
                             </button>
                             <button type="submit" class="btn btn-primary">
@@ -180,7 +180,7 @@
                     <h5 class="modal-title" id="editProgramModalLabel">
                         <i class="fas fa-edit me-3"></i>Editar Programa de Formación
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <p>Modifique los datos del programa de formación</p>
@@ -239,7 +239,7 @@
                             </select>
                         </div>
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
                                 Cancelar
                             </button>
                             <button type="submit" class="btn btn-primary">
@@ -261,7 +261,7 @@
                     <h5 class="modal-title" id="viewProgramModalLabel">
                         <i class="fas fa-eye me-3"></i>Detalles del Programa de Formación
                     </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -320,34 +320,12 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- View Program Modal -->
-    <div class="modal fade" id="viewProgramModal" tabindex="-1" aria-labelledby="viewProgramModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="viewProgramModalLabel">Detalles del Programa de Formación</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <!-- Modal content goes here -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal"
-                        data-bs-target="#editProgramModal">
-                        <i class="fas fa-edit"></i> Editar Programa
-                    </button>
-                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cerrar</button>
-                </div>
-            </div>
-        </div>
-    </div>
 @stop
 
 @section('css')
@@ -372,18 +350,19 @@
 <<<<<<< HEAD
             console.log("DOM loaded for programs view");
             
-            // Ensure bootstrap JS is loaded (Bootstrap 5)
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            // Ensure jQuery and Bootstrap modal are loaded
+            if (typeof $ !== 'undefined' && $.fn.modal) {
                 console.log("Bootstrap modal available");
             } else {
-                console.warn("Bootstrap modal not available. Bootstrap 5 JS may not be loaded.");
+                console.warn("Bootstrap modal not available.");
             }
 
             // Store reference to the button that opens the modal
             let newProgramButton = null;
+            let previousActiveElement = null;
 
             // Log button click for debugging and store reference
-            const newProgramButtons = document.querySelectorAll('[data-bs-target="#newProgramModal"]');
+            const newProgramButtons = document.querySelectorAll('[data-target="#newProgramModal"]');
             if (newProgramButtons.length > 0) {
                 newProgramButton = newProgramButtons[0];
                 newProgramButton.addEventListener('click', function() {
@@ -392,37 +371,26 @@
             }
 
             // Handle modal focus management
-            const newProgramModalEl = document.getElementById('newProgramModal');
-            if (newProgramModalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                // Store the element that had focus before opening the modal
-                let previousActiveElement = null;
-                
-                newProgramModalEl.addEventListener('show.bs.modal', function() {
-                    previousActiveElement = document.activeElement;
-                });
+            $('#newProgramModal').on('show.bs.modal', function() {
+                previousActiveElement = document.activeElement;
+            }).on('hidden.bs.modal', function() {
+                // Restore focus to the element that opened the modal
+                if (newProgramButton) {
+                    $(newProgramButton).focus();
+                } else if (previousActiveElement) {
+                    $(previousActiveElement).focus();
+                }
 
-                newProgramModalEl.addEventListener('hidden.bs.modal', function() {
-                    // Restore focus to the element that opened the modal
-                    if (newProgramButton && typeof newProgramButton.focus === 'function') {
-                        newProgramButton.focus();
-                    } else if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
-                        previousActiveElement.focus();
-                    }
-                    
-                    // Ensure no element inside the hidden modal retains focus
-                    const focusedElement = document.activeElement;
-                    if (focusedElement && newProgramModalEl.contains(focusedElement)) {
-                        focusedElement.blur();
-                    }
-                });
-
-                // Prevent focus from being trapped in hidden modal
-                newProgramModalEl.addEventListener('keydown', function(e) {
-                    if (e.key === 'Tab' && !newProgramModalEl.classList.contains('show')) {
-                        e.preventDefault();
-                    }
-                });
-            }
+                // Ensure no element inside the hidden modal retains focus
+                const focusedElement = document.activeElement;
+                if (focusedElement && $(this).find(focusedElement).length) {
+                    $(focusedElement).blur();
+                }
+            }).on('keydown', function(e) {
+                if (e.key === 'Tab' && !$(this).hasClass('show')) {
+                    e.preventDefault();
+                }
+            });
 
             // Handle form submission
             const newProgramForm = document.getElementById('newProgramForm');
@@ -622,8 +590,7 @@
                     }
 
                     // Show the view modal
-                    const viewModal = new bootstrap.Modal(document.getElementById('viewProgramModal'));
-                    viewModal.show();
+                    $('#viewProgramModal').modal('show');
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -653,8 +620,7 @@
                     document.getElementById('edit_estado').value = data.estado;
 
                     // Show the edit modal
-                    const editModal = new bootstrap.Modal(document.getElementById('editProgramModal'));
-                    editModal.show();
+                    $('#editProgramModal').modal('show');
                 })
                 .catch(error => {
                     console.error('Error:', error);
@@ -688,5 +654,4 @@
             };
         });
     </script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 @stop
