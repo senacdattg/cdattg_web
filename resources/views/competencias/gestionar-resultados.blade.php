@@ -46,7 +46,7 @@
         <div class="container-fluid">
             <div class="row align-items-center">
                 <div class="col-12 col-md-6 d-flex align-items-center">
-                    <div class="bg-success rounded-circle d-flex align-items-center justify-content-center mr-3"
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
                         style="width: 48px; height: 48px;">
                         <i class="fas fa-tasks text-white fa-lg"></i>
                     </div>
