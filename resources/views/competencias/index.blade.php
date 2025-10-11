@@ -110,20 +110,91 @@
                         </div>
                     @endcan
 
-                    <div class="card shadow-sm no-hover">
-                        <div class="card-header bg-white py-3 d-flex align-items-center">
-                            <h6 class="m-0 font-weight-bold text-primary d-flex flex-grow-1">Lista de Competencias</h6>
-                            <div class="input-group w-25">
-                                <form action="{{ route('competencias.index') }}" method="GET" class="input-group">
-                                    <input type="text" name="search" class="form-control form-control-sm" 
-                                        placeholder="Buscar competencia..." value="{{ request('search') }}" autocomplete="off">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary btn-sm" type="submit">
-                                            <i class="fas fa-search"></i>
-                                        </button>
+                    <!-- Filtros -->
+                    <div class="card shadow-sm mb-3 no-hover">
+                        <div class="card-header bg-white py-2">
+                            <button class="btn btn-link btn-sm text-decoration-none p-0 m-0 w-100 text-left" type="button" data-toggle="collapse" data-target="#filtrosCollapse" aria-expanded="false">
+                                <i class="fas fa-filter text-primary"></i> <strong class="text-primary">Filtros de Búsqueda</strong>
+                                <i class="fas fa-chevron-down float-right mt-1"></i>
+                            </button>
+                        </div>
+                        <div class="collapse" id="filtrosCollapse">
+                            <div class="card-body">
+                                <form action="{{ route('competencias.index') }}" method="GET">
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label for="search" class="font-weight-bold">Búsqueda general</label>
+                                                <input type="text" name="search" id="search" class="form-control form-control-sm" 
+                                                    placeholder="Código o nombre..." value="{{ request('search') }}">
+                                                <small class="text-muted">Busca en código, nombre y descripción</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label for="status" class="font-weight-bold">Estado</label>
+                                                <select name="status" id="status" class="form-control form-control-sm">
+                                                    <option value="">Todos</option>
+                                                    <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Activas</option>
+                                                    <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inactivas</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label for="duracion_min" class="font-weight-bold">Duración mínima (hrs)</label>
+                                                <input type="number" name="duracion_min" id="duracion_min" class="form-control form-control-sm" 
+                                                    placeholder="Ej: 48" value="{{ request('duracion_min') }}" min="0">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label for="duracion_max" class="font-weight-bold">Duración máxima (hrs)</label>
+                                                <input type="number" name="duracion_max" id="duracion_max" class="form-control form-control-sm" 
+                                                    placeholder="Ej: 500" value="{{ request('duracion_max') }}" min="0">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label for="fecha_inicio" class="font-weight-bold">Fecha inicio desde</label>
+                                                <input type="date" name="fecha_inicio" id="fecha_inicio" class="form-control form-control-sm" 
+                                                    value="{{ request('fecha_inicio') }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label for="fecha_fin" class="font-weight-bold">Fecha fin hasta</label>
+                                                <input type="date" name="fecha_fin" id="fecha_fin" class="form-control form-control-sm" 
+                                                    value="{{ request('fecha_fin') }}">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="font-weight-bold d-block">&nbsp;</label>
+                                                <button type="submit" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-search"></i> Buscar
+                                                </button>
+                                                <a href="{{ route('competencias.index') }}" class="btn btn-secondary btn-sm">
+                                                    <i class="fas fa-times"></i> Limpiar
+                                                </a>
+                                                @if(request()->hasAny(['search', 'status', 'duracion_min', 'duracion_max', 'fecha_inicio', 'fecha_fin']))
+                                                    <span class="badge badge-info ml-2">
+                                                        <i class="fas fa-filter"></i> Filtros activos
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
                                 </form>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm no-hover">
+                        <div class="card-header bg-white py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Lista de Competencias</h6>
                         </div>
 
                         <div class="card-body p-0">
@@ -267,6 +338,19 @@
         }, 5000);
 
         $('[data-toggle="tooltip"]').tooltip();
+
+        // Abrir filtros automáticamente si hay filtros activos
+        @if(request()->hasAny(['search', 'status', 'duracion_min', 'duracion_max', 'fecha_inicio', 'fecha_fin']))
+            $('#filtrosCollapse').collapse('show');
+        @endif
+
+        // Cambiar ícono del chevron al expandir/colapsar
+        $('#filtrosCollapse').on('show.bs.collapse', function () {
+            $('[data-target="#filtrosCollapse"] .fa-chevron-down').removeClass('fa-chevron-down').addClass('fa-chevron-up');
+        });
+        $('#filtrosCollapse').on('hide.bs.collapse', function () {
+            $('[data-target="#filtrosCollapse"] .fa-chevron-up').removeClass('fa-chevron-up').addClass('fa-chevron-down');
+        });
     });
 </script>
 @endsection
