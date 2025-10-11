@@ -191,13 +191,19 @@
                                                         @can('VER COMPETENCIA')
                                                             <a href="{{ route('competencias.show', $competencia) }}" 
                                                                 class="btn btn-light btn-sm" data-toggle="tooltip" title="Ver detalles">
-                                                                <i class="fas fa-eye text-warning"></i>
+                                                                <i class="fas fa-eye text-info"></i>
+                                                            </a>
+                                                        @endcan
+                                                        @can('GESTIONAR RESULTADOS COMPETENCIA')
+                                                            <a href="{{ route('competencias.gestionarResultados', $competencia) }}" 
+                                                                class="btn btn-light btn-sm" data-toggle="tooltip" title="Gestionar Resultados">
+                                                                <i class="fas fa-tasks text-success"></i>
                                                             </a>
                                                         @endcan
                                                         @can('EDITAR COMPETENCIA')
                                                             <a href="{{ route('competencias.edit', $competencia) }}" 
                                                                 class="btn btn-light btn-sm" data-toggle="tooltip" title="Editar">
-                                                                <i class="fas fa-pencil-alt text-info"></i>
+                                                                <i class="fas fa-pencil-alt text-warning"></i>
                                                             </a>
                                                         @endcan
                                                         @can('ELIMINAR COMPETENCIA')

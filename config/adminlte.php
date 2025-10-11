@@ -711,12 +711,6 @@ return [
                             'icon' => 'fas fa-fw fa-plus-circle',
                             'can' => 'CREAR COMPETENCIA',
                         ],
-                        [
-                            'text' => 'Gestionar Resultados',
-                            'url' => '#',
-                            'icon' => 'fas fa-fw fa-tasks',
-                            'can' => 'GESTIONAR RESULTADOS COMPETENCIA',
-                        ],
                     ],
                 ],
                 [

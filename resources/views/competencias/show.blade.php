@@ -183,10 +183,27 @@
                             </h3>
                         </div>
                         <div class="card-body">
+                            @can('GESTIONAR RESULTADOS COMPETENCIA')
+                                <a href="{{ route('competencias.gestionarResultados', $competencia) }}" class="btn btn-success btn-block mb-2">
+                                    <i class="fas fa-tasks"></i> Gestionar Resultados
+                                </a>
+                            @endcan
+                            
                             @can('EDITAR COMPETENCIA')
                                 <a href="{{ route('competencias.edit', $competencia) }}" class="btn btn-warning btn-block mb-2">
                                     <i class="fas fa-edit"></i> Editar Competencia
                                 </a>
+                            @endcan
+                            
+                            @can('CAMBIAR ESTADO COMPETENCIA')
+                                <form action="{{ route('competencias.cambiarEstado', $competencia) }}" method="POST" class="mb-2">
+                                    @csrf
+                                    @method('PUT')
+                                    <button type="submit" class="btn btn-{{ $competencia->status ? 'secondary' : 'primary' }} btn-block">
+                                        <i class="fas fa-toggle-{{ $competencia->status ? 'off' : 'on' }}"></i> 
+                                        {{ $competencia->status ? 'Desactivar' : 'Activar' }}
+                                    </button>
+                                </form>
                             @endcan
                             
                             @can('ELIMINAR COMPETENCIA')
