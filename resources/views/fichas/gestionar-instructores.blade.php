@@ -689,10 +689,10 @@
         function agregarInstructorSeleccionado(instructorId) {
             // Buscar el instructor en los datos disponibles
             const instructores = {!! json_encode($instructoresConDisponibilidad) !!};
-            const instructor = instructores[instructorId];
+            const instructorData = instructores.find(item => item.instructor.id == instructorId);
             
-            if (instructor && instructor.disponible) {
-                const nombre = instructor.instructor.persona.primer_nombre + ' ' + instructor.instructor.persona.primer_apellido;
+            if (instructorData && instructorData.disponible) {
+                const nombre = instructorData.instructor.persona.primer_nombre + ' ' + instructorData.instructor.persona.primer_apellido;
                 agregarInstructorRow(instructorId, nombre, '', '', '', false);
             }
         }
@@ -718,8 +718,8 @@
                             <label class="form-label font-weight-bold">Instructor</label>
                             <select name="instructores[${index}][instructor_id]" class="form-control select2 instructor-select" required>
                                 <option value="">Seleccione un instructor</option>
-                                ${Object.keys(instructoresDisponibles).map(id => {
-                                    const data = instructoresDisponibles[id];
+                                ${instructoresDisponibles.map(data => {
+                                    const id = data.instructor.id;
                                     const selected = instructorId == id ? 'selected' : '';
                                     return `<option value="${id}" ${selected}>${data.instructor.persona.primer_nombre} ${data.instructor.persona.primer_apellido}</option>`;
                                 }).join('')}
@@ -1025,6 +1025,11 @@
             const container = document.getElementById('instructores-container');
             const index = container.children.length;
             
+            // Obtener datos de instructores disponibles
+            const instructoresDisponibles = {!! json_encode($instructoresConDisponibilidad) !!};
+            const fechaInicioMin = '{{ $ficha->fecha_inicio ? $ficha->fecha_inicio->format('Y-m-d') : '' }}';
+            const fechaFinMax = '{{ $ficha->fecha_fin ? $ficha->fecha_fin->format('Y-m-d') : '' }}';
+            
             const div = document.createElement('div');
             div.className = 'card mb-3 instructor-card';
             div.innerHTML = `
@@ -1034,8 +1039,8 @@
                             <label class="form-label font-weight-bold">Instructor</label>
                             <select name="instructores[${index}][instructor_id]" class="form-control select2 instructor-select" required>
                                 <option value="">Seleccione un instructor</option>
-                                ${Object.keys(instructoresDisponibles).map(id => {
-                                    const instructorData = instructoresDisponibles[id];
+                                ${instructoresDisponibles.map(instructorData => {
+                                    const id = instructorData.instructor.id;
                                     const selected = data.instructor_id == id ? 'selected' : '';
                                     return `<option value="${id}" ${selected}>${instructorData.instructor.persona.primer_nombre} ${instructorData.instructor.persona.primer_apellido}</option>`;
                                 }).join('')}
@@ -1106,6 +1111,8 @@
             const container = document.querySelector(`.dias-formacion-container[data-index="${index}"]`);
             const diaIndex = container.children.length;
             
+            const diasFormacionFicha = {!! json_encode($diasFormacionFicha) !!};
+            
             const div = document.createElement('div');
             div.className = 'row mt-1 dia-formacion-row';
             div.innerHTML = `
@@ -1160,6 +1167,9 @@
 
         // Función mejorada para agregar instructor seleccionado con validaciones
         function agregarInstructorSeleccionado(instructorId) {
+            // Obtener datos de instructores disponibles
+            const instructoresDisponibles = {!! json_encode($instructoresConDisponibilidad) !!};
+            
             // Verificar si ya está agregado
             const instructoresContainer = document.getElementById('instructores-container');
             const instructoresExistentes = instructoresContainer.querySelectorAll('.instructor-select');
@@ -1177,7 +1187,7 @@
             }
 
             // Buscar datos del instructor en la lista de disponibles
-            const instructorData = instructoresDisponibles[instructorId];
+            const instructorData = instructoresDisponibles.find(item => item.instructor.id == instructorId);
             if (!instructorData) {
                 Swal.fire({
                     icon: 'error',
@@ -1199,14 +1209,17 @@
                 return;
             }
 
-            // Agregar el instructor
-            agregarInstructor(instructorId);
+            // Obtener nombre del instructor
+            const nombre = instructorData.instructor.persona.primer_nombre + ' ' + instructorData.instructor.persona.primer_apellido;
+            
+            // Agregar el instructor con datos básicos
+            agregarInstructorRow(instructorId, nombre, '', '', '', false);
             
             // Mostrar mensaje de éxito
             Swal.fire({
                 icon: 'success',
                 title: 'Instructor agregado',
-                text: `${instructorData.instructor.persona.primer_nombre} ${instructorData.instructor.persona.primer_apellido} ha sido agregado a la lista de asignaciones.`,
+                text: `${nombre} ha sido agregado a la lista de asignaciones.`,
                 timer: 2000,
                 showConfirmButton: false
             });
