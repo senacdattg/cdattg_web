@@ -14,6 +14,46 @@
 
 @section('css')
     @vite(['resources/css/{module}.css'])
+    <style>
+        .dashboard-header {
+            background: #fff;
+            border-bottom: 1px solid rgba(0, 0, 0, .05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, .03);
+        }
+        .text-gray-800 {
+            color: #5a5c69 !important;
+        }
+        .link_right_header {
+            color: #4a5568;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .link_right_header:hover {
+            color: #4299e1;
+        }
+        .breadcrumb-item {
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+        .breadcrumb-item i {
+            font-size: 0.8rem;
+            margin-right: 0.4rem;
+        }
+        .breadcrumb-item a {
+            color: #4a5568;
+            text-decoration: none;
+        }
+        .breadcrumb-item.active {
+            color: #718096;
+        }
+        .bg-success-light {
+            background-color: rgba(40, 167, 69, 0.1);
+        }
+        .bg-danger-light {
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+    </style>
 @endsection
 
 @section('content_header')
@@ -84,57 +124,88 @@
                         </div>
                     @endcan
 
-                    {{-- Tabla Principal con Filtros --}}
+                    {{-- Panel de Filtros Colapsable --}}
+                    <div class="card shadow-sm mb-3 no-hover">
+                        <div class="card-header bg-white py-2">
+                            <button class="btn btn-link btn-sm text-decoration-none p-0 m-0 w-100 text-left" type="button" data-toggle="collapse" data-target="#filtrosCollapse" aria-expanded="false">
+                                <i class="fas fa-filter text-primary"></i> <strong class="text-primary">Filtros de Búsqueda</strong>
+                                <i class="fas fa-chevron-down float-right mt-1"></i>
+                            </button>
+                        </div>
+                        <div class="collapse" id="filtrosCollapse">
+                            <div class="card-body">
+                                <form action="{{ route('{module}.index') }}" method="GET">
+                                    <div class="row">
+                                        {{-- Búsqueda General --}}
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label for="search" class="font-weight-bold">Búsqueda general</label>
+                                                <input type="text" name="search" id="search" class="form-control form-control-sm" 
+                                                    placeholder="Código o nombre..." value="{{ request('search') }}">
+                                                <small class="text-muted">Busca en múltiples campos</small>
+                                            </div>
+                                        </div>
+
+                                        {{-- Estado --}}
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label for="status" class="font-weight-bold">Estado</label>
+                                                <select name="status" id="status" class="form-control form-control-sm">
+                                                    <option value="">Todos</option>
+                                                    <option value="1" {{ request('status') == '1' ? 'selected' : '' }}>Activos</option>
+                                                    <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Inactivos</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        {{-- AGREGAR MÁS FILTROS SEGÚN TU MODELO --}}
+                                        {{-- Ejemplo: Filtro por categoría, tipo, etc. --}}
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label for="filtro_1" class="font-weight-bold">Filtro 1</label>
+                                                <input type="text" name="filtro_1" id="filtro_1" class="form-control form-control-sm" 
+                                                    placeholder="Valor..." value="{{ request('filtro_1') }}">
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-3">
+                                            <div class="form-group">
+                                                <label for="filtro_2" class="font-weight-bold">Filtro 2</label>
+                                                <select name="filtro_2" id="filtro_2" class="form-control form-control-sm">
+                                                    <option value="">Seleccione...</option>
+                                                    {{-- Agrega opciones aquí --}}
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Botones de acción --}}
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group mb-0">
+                                                <button type="submit" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-search"></i> Buscar
+                                                </button>
+                                                <a href="{{ route('{module}.index') }}" class="btn btn-secondary btn-sm">
+                                                    <i class="fas fa-times"></i> Limpiar
+                                                </a>
+                                                @if(request()->hasAny(['search', 'status', 'filtro_1', 'filtro_2']))
+                                                    <span class="badge badge-info ml-2">
+                                                        <i class="fas fa-filter"></i> Filtros activos
+                                                    </span>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Tabla Principal --}}
                     <div class="card shadow-sm no-hover">
                         <div class="card-header bg-white py-3">
-                            <h6 class="m-0 font-weight-bold text-primary mb-3">Lista de {Module}s</h6>
-                            
-                            {{-- Filtros Avanzados --}}
-                            <div class="d-flex flex-wrap align-items-center gap-2">
-                                {{-- EJEMPLO: Filtro por Programa de Formación --}}
-                                <div class="mr-2">
-                                    <select id="filterPrograma" class="form-control form-control-sm" style="width: 200px;">
-                                        <option value="">Todos los programas</option>
-                                        @php
-                                            $programas = \App\Models\ProgramaFormacion::orderBy('nombre')->get();
-                                        @endphp
-                                        @foreach($programas as $programa)
-                                            <option value="{{ $programa->id }}">{{ Str::limit($programa->nombre, 25) }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                {{-- EJEMPLO: Filtro por Categoría/Tipo --}}
-                                <div class="mr-2">
-                                    <select id="filterCategoria" class="form-control form-control-sm" style="width: 180px;">
-                                        <option value="">Todas las categorías</option>
-                                        {{-- Agrega tus opciones aquí --}}
-                                    </select>
-                                </div>
-
-                                {{-- Filtro por Estado --}}
-                                <div class="mr-2">
-                                    <select id="filterStatus" class="form-control form-control-sm" style="width: 100px;">
-                                        <option value="">Todos</option>
-                                        <option value="1">Activos</option>
-                                        <option value="0">Inactivos</option>
-                                    </select>
-                                </div>
-
-                                {{-- Barra de Búsqueda --}}
-                                <div class="input-group" style="width: 250px;">
-                                    <input type="text" id="searchInput" class="form-control form-control-sm" 
-                                           placeholder="Buscar..." autocomplete="off">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary btn-sm" type="button" id="btnSearch">
-                                            <i class="fas fa-search"></i>
-                                        </button>
-                                        <button class="btn btn-secondary btn-sm" type="button" id="btnClearFilters">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
+                            <h6 class="m-0 font-weight-bold text-primary">Lista de {Module}s</h6>
                         </div>
 
                         <div class="card-body p-0">
@@ -219,8 +290,6 @@
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     $(document).ready(function() {
-        let searchTimeout;
-        
         // Inicializar tooltips
         $('[data-toggle="tooltip"]').tooltip();
 
@@ -229,61 +298,19 @@
             $('.alert').fadeOut('slow');
         }, 5000);
 
-        // Búsqueda en tiempo real con debounce
-        $('#searchInput').on('input', function() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(function() {
-                performSearch();
-            }, 500);
+        // Abrir filtros automáticamente si hay filtros activos
+        // Reemplaza los nombres de filtros según tu modelo
+        @if(request()->hasAny(['search', 'status', 'filtro_1', 'filtro_2']))
+            $('#filtrosCollapse').collapse('show');
+        @endif
+
+        // Cambiar ícono del chevron al expandir/colapsar
+        $('#filtrosCollapse').on('show.bs.collapse', function () {
+            $('[data-target="#filtrosCollapse"] .fa-chevron-down').removeClass('fa-chevron-down').addClass('fa-chevron-up');
         });
-
-        // Botón de búsqueda
-        $('#btnSearch').on('click', function() {
-            performSearch();
+        $('#filtrosCollapse').on('hide.bs.collapse', function () {
+            $('[data-target="#filtrosCollapse"] .fa-chevron-up').removeClass('fa-chevron-up').addClass('fa-chevron-down');
         });
-
-        // Limpiar filtros
-        $('#btnClearFilters').on('click', function() {
-            $('#searchInput').val('');
-            $('#filterPrograma').val('');
-            $('#filterCategoria').val('');
-            $('#filterStatus').val('');
-            window.location.href = '{{ route("{module}.index") }}';
-        });
-
-        // Cambios en filtros
-        $('#filterPrograma, #filterCategoria, #filterStatus').on('change', function() {
-            performSearch();
-        });
-
-        // Función para realizar búsqueda
-        function performSearch() {
-            const searchTerm = $('#searchInput').val();
-            const programaId = $('#filterPrograma').val();
-            const categoriaId = $('#filterCategoria').val();
-            const status = $('#filterStatus').val();
-
-            // Construir URL con parámetros
-            let url = '{{ route("{module}.index") }}?';
-            const params = [];
-
-            if (searchTerm) params.push(`search=${encodeURIComponent(searchTerm)}`);
-            if (programaId) params.push(`programa_id=${programaId}`);
-            if (categoriaId) params.push(`categoria_id=${categoriaId}`);
-            if (status !== '') params.push(`status=${status}`);
-
-            if (params.length > 0) {
-                url += params.join('&');
-                window.location.href = url;
-            }
-        }
-
-        // Restaurar valores de filtros desde URL
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('search')) $('#searchInput').val(urlParams.get('search'));
-        if (urlParams.has('programa_id')) $('#filterPrograma').val(urlParams.get('programa_id'));
-        if (urlParams.has('categoria_id')) $('#filterCategoria').val(urlParams.get('categoria_id'));
-        if (urlParams.has('status')) $('#filterStatus').val(urlParams.get('status'));
     });
 
     // Confirmación de eliminación
