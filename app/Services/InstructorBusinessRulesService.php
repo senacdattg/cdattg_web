@@ -63,8 +63,8 @@ class InstructorBusinessRulesService
                 $resultado['disponible'] = false;
                 $resultado['conflictos'] = $conflictos;
                 $ejemploConflicto = $conflictos[0];
-                $programaNombre = $ejemploConflicto->ficha->programaFormacion->nombre ?? 'Sin programa';
-                $resultado['razones'][] = "El instructor tiene fichas con fechas superpuestas. Ejemplo: Ficha {$ejemploConflicto->ficha->ficha} ({$programaNombre}) del {$ejemploConflicto->fecha_inicio->format('d/m/Y')} al {$ejemploConflicto->fecha_fin->format('d/m/Y')}";
+                $programaNombre = $ejemploConflicto['programa'] ?? 'Sin programa';
+                $resultado['razones'][] = "El instructor tiene fichas con fechas superpuestas. Ejemplo: Ficha {$ejemploConflicto['ficha_numero']} ({$programaNombre}) del " . \Carbon\Carbon::parse($ejemploConflicto['fecha_inicio'])->format('d/m/Y') . " al " . \Carbon\Carbon::parse($ejemploConflicto['fecha_fin'])->format('d/m/Y');
             }
 
             // Verificar carga horaria semanal

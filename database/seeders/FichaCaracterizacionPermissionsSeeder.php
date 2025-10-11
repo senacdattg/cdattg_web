@@ -20,8 +20,10 @@ class FichaCaracterizacionPermissionsSeeder extends Seeder
             'VER FICHA CARACTERIZACION',
             'ELIMINAR FICHA CARACTERIZACION',
             'GESTIONAR INSTRUCTORES FICHA',
+            'GESTIONAR INSTRUCTORES',
             'GESTIONAR DIAS FICHA',
             'GESTIONAR APRENDICES FICHA',
+            'GESTIONAR APRENDICES',
             'CAMBIAR ESTADO FICHA',
         ];
 
@@ -55,6 +57,7 @@ class FichaCaracterizacionPermissionsSeeder extends Seeder
                 'EDITAR FICHA CARACTERIZACION',
                 'GESTIONAR DIAS FICHA',
                 'GESTIONAR APRENDICES FICHA',
+                'GESTIONAR APRENDICES',
                 'CAMBIAR ESTADO FICHA',
             ];
             

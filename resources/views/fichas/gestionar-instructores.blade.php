@@ -718,7 +718,7 @@
                             <label class="form-label font-weight-bold">Instructor</label>
                             <select name="instructores[${index}][instructor_id]" class="form-control select2 instructor-select" required>
                                 <option value="">Seleccione un instructor</option>
-                                ${instructoresDisponibles.map(data => {
+                                ${instructoresDisponibles.filter(data => data.disponible).map(data => {
                                     const id = data.instructor.id;
                                     const selected = instructorId == id ? 'selected' : '';
                                     return `<option value="${id}" ${selected}>${data.instructor.persona.primer_nombre} ${data.instructor.persona.primer_apellido}</option>`;
@@ -1039,7 +1039,7 @@
                             <label class="form-label font-weight-bold">Instructor</label>
                             <select name="instructores[${index}][instructor_id]" class="form-control select2 instructor-select" required>
                                 <option value="">Seleccione un instructor</option>
-                                ${instructoresDisponibles.map(instructorData => {
+                                ${instructoresDisponibles.filter(instructorData => instructorData.disponible).map(instructorData => {
                                     const id = instructorData.instructor.id;
                                     const selected = data.instructor_id == id ? 'selected' : '';
                                     return `<option value="${id}" ${selected}>${instructorData.instructor.persona.primer_nombre} ${instructorData.instructor.persona.primer_apellido}</option>`;

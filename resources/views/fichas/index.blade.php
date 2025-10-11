@@ -136,30 +136,50 @@
                                                     @endif
                                                 </td>
                                                 <td class="px-4 text-center">
-                                                    <div class="btn-group">
-                                                        @can('VER PROGRAMA DE CARACTERIZACION')
-                                                            <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}"
-                                                                class="btn btn-light btn-sm" data-toggle="tooltip"
-                                                                title="Ver detalles">
-                                                                <i class="fas fa-eye text-warning"></i>
-                                                            </a>
-                                                        @endcan
-                                                        @can('EDITAR PROGRAMA DE CARACTERIZACION')
-                                                            <a href="{{ route('fichaCaracterizacion.edit', $ficha->id) }}"
-                                                                class="btn btn-light btn-sm" data-toggle="tooltip"
-                                                                title="Editar">
-                                                                <i class="fas fa-pencil-alt text-info"></i>
-                                                            </a>
-                                                        @endcan
-                                                        @can('ELIMINAR PROGRAMA DE CARACTERIZACION')
-                                                            <button type="button" class="btn btn-light btn-sm" 
-                                                                    data-ficha="{{ $ficha->ficha }}" 
-                                                                    data-url="{{ route('fichaCaracterizacion.destroy', $ficha->id) }}"
-                                                                    onclick="confirmarEliminacion(this.dataset.ficha, this.dataset.url)"
-                                                                    data-toggle="tooltip" title="Eliminar">
-                                                                <i class="fas fa-trash text-danger"></i>
-                                                            </button>
-                                                        @endcan
+                                                    <div class="btn-group-vertical btn-group-sm" role="group">
+                                                        <div class="btn-group btn-group-sm mb-1" role="group">
+                                                            @can('VER PROGRAMA DE CARACTERIZACION')
+                                                                <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}"
+                                                                    class="btn btn-light btn-sm" data-toggle="tooltip"
+                                                                    title="Ver detalles">
+                                                                    <i class="fas fa-eye text-warning"></i>
+                                                                </a>
+                                                            @endcan
+                                                            @can('EDITAR PROGRAMA DE CARACTERIZACION')
+                                                                <a href="{{ route('fichaCaracterizacion.edit', $ficha->id) }}"
+                                                                    class="btn btn-light btn-sm" data-toggle="tooltip"
+                                                                    title="Editar">
+                                                                    <i class="fas fa-pencil-alt text-info"></i>
+                                                                </a>
+                                                            @endcan
+                                                        </div>
+                                                        <div class="btn-group btn-group-sm mb-1" role="group">
+                                                            @can('GESTIONAR APRENDICES')
+                                                                <a href="{{ route('fichaCaracterizacion.gestionarAprendices', $ficha->id) }}"
+                                                                    class="btn btn-light btn-sm" data-toggle="tooltip"
+                                                                    title="Gestionar Aprendices">
+                                                                    <i class="fas fa-users text-success"></i>
+                                                                </a>
+                                                            @endcan
+                                                            @can('GESTIONAR INSTRUCTORES')
+                                                                <a href="{{ route('fichaCaracterizacion.gestionarInstructores', $ficha->id) }}"
+                                                                    class="btn btn-light btn-sm" data-toggle="tooltip"
+                                                                    title="Gestionar Instructores">
+                                                                    <i class="fas fa-chalkboard-teacher text-primary"></i>
+                                                                </a>
+                                                            @endcan
+                                                        </div>
+                                                        <div class="btn-group btn-group-sm" role="group">
+                                                            @can('ELIMINAR PROGRAMA DE CARACTERIZACION')
+                                                                <button type="button" class="btn btn-light btn-sm" 
+                                                                        data-ficha="{{ $ficha->ficha }}" 
+                                                                        data-url="{{ route('fichaCaracterizacion.destroy', $ficha->id) }}"
+                                                                        onclick="confirmarEliminacion(this.dataset.ficha, this.dataset.url)"
+                                                                        data-toggle="tooltip" title="Eliminar">
+                                                                    <i class="fas fa-trash text-danger"></i>
+                                                                </button>
+                                                            @endcan
+                                                        </div>
                                                     </div>
                                                 </td>
                                             </tr>

@@ -1746,6 +1746,15 @@ class FichaCaracterizacionController extends Controller
             $asignacionService = app(\App\Services\AsignacionInstructorService::class);
             $instructoresConDisponibilidad = $asignacionService->obtenerInstructoresDisponibles((int)$id);
 
+            // Filtrar instructores ya asignados de la lista de disponibles
+            $instructoresAsignadosIds = $instructoresAsignados->pluck('instructor_id')->toArray();
+            $instructoresConDisponibilidad = array_filter($instructoresConDisponibilidad, function($instructorData) use ($instructoresAsignadosIds) {
+                return !in_array($instructorData['instructor']->id, $instructoresAsignadosIds);
+            });
+            
+            // Reindexar el array para mantener índices numéricos
+            $instructoresConDisponibilidad = array_values($instructoresConDisponibilidad);
+
             // Obtener estadísticas de asignaciones para mostrar en la vista
             $estadisticasAsignaciones = $asignacionService->obtenerEstadisticasAsignaciones();
 
