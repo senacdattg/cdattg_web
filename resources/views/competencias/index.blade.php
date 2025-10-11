@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('css')
-    @vite(['resources/css/guias_aprendizaje.css'])
+    @vite(['resources/css/competencias.css'])
     <style>
         .dashboard-header {
             background: #fff;
@@ -111,42 +111,18 @@
                     @endcan
 
                     <div class="card shadow-sm no-hover">
-                        <div class="card-header bg-white py-3">
-                            <h6 class="m-0 font-weight-bold text-primary mb-3">Lista de Competencias</h6>
-                            
-                            <div class="d-flex flex-wrap align-items-center gap-2">
-                                <div class="mr-2">
-                                    <select id="filterPrograma" class="form-control form-control-sm" style="width: 200px;">
-                                        <option value="">Todos los programas</option>
-                                        @php
-                                            $programas = \App\Models\ProgramaFormacion::orderBy('nombre')->get();
-                                        @endphp
-                                        @foreach($programas as $programa)
-                                            <option value="{{ $programa->id }}">{{ Str::limit($programa->nombre, 25) }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="mr-2">
-                                    <select id="filterStatus" class="form-control form-control-sm" style="width: 100px;">
-                                        <option value="">Todos</option>
-                                        <option value="1">Activas</option>
-                                        <option value="0">Inactivas</option>
-                                    </select>
-                                </div>
-
-                                <div class="input-group" style="width: 250px;">
-                                    <input type="text" id="searchCompetencia" class="form-control form-control-sm" 
-                                           placeholder="Buscar por código, nombre..." autocomplete="off">
+                        <div class="card-header bg-white py-3 d-flex align-items-center">
+                            <h6 class="m-0 font-weight-bold text-primary d-flex flex-grow-1">Lista de Competencias</h6>
+                            <div class="input-group w-25">
+                                <form action="{{ route('competencias.index') }}" method="GET" class="input-group">
+                                    <input type="text" name="search" class="form-control form-control-sm" 
+                                        placeholder="Buscar competencia..." value="{{ request('search') }}" autocomplete="off">
                                     <div class="input-group-append">
-                                        <button class="btn btn-primary btn-sm" type="button" id="btnSearch">
+                                        <button class="btn btn-primary btn-sm" type="submit">
                                             <i class="fas fa-search"></i>
                                         </button>
-                                        <button class="btn btn-secondary btn-sm" type="button" id="btnClearFilters">
-                                            <i class="fas fa-times"></i>
-                                        </button>
                                     </div>
-                                </div>
+                                </form>
                             </div>
                         </div>
 
@@ -156,12 +132,12 @@
                                     <thead class="thead-light">
                                         <tr>
                                             <th class="px-4 py-3" style="width: 5%">#</th>
-                                            <th class="px-4 py-3" style="width: 15%">Código</th>
-                                            <th class="px-4 py-3" style="width: 35%">Nombre</th>
+                                            <th class="px-4 py-3" style="width: 12%">Código</th>
+                                            <th class="px-4 py-3" style="width: 33%">Nombre</th>
                                             <th class="px-4 py-3" style="width: 10%">Duración</th>
-                                            <th class="px-4 py-3" style="width: 15%">Estado</th>
                                             <th class="px-4 py-3" style="width: 10%">RAPs</th>
-                                            <th class="px-4 py-3 text-center" style="width: 10%">Acciones</th>
+                                            <th class="px-4 py-3" style="width: 15%">Estado</th>
+                                            <th class="px-4 py-3 text-center" style="width: 15%">Acciones</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -177,14 +153,14 @@
                                                         <span class="text-muted">N/A</span>
                                                     @endif
                                                 </td>
+                                                <td class="px-4 text-center">
+                                                    <span class="badge badge-primary">{{ $competencia->resultadosAprendizaje->count() }}</span>
+                                                </td>
                                                 <td class="px-4">
                                                     <div class="d-inline-block px-3 py-1 rounded-pill {{ $competencia->status == 1 ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}">
                                                         <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
                                                         {{ $competencia->status == 1 ? 'Activa' : 'Inactiva' }}
                                                     </div>
-                                                </td>
-                                                <td class="px-4 text-center">
-                                                    <span class="badge badge-primary">{{ $competencia->resultadosAprendizaje->count() }}</span>
                                                 </td>
                                                 <td class="px-4 text-center">
                                                     <div class="btn-group">
@@ -251,62 +227,6 @@
 @section('js')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-    $(document).ready(function() {
-        $('[data-toggle="tooltip"]').tooltip();
-
-        // Auto-dismiss de alertas después de 5 segundos
-        setTimeout(function() {
-            $('.alert').fadeOut('slow');
-        }, 5000);
-
-        // Buscar al presionar Enter en el campo de búsqueda
-        $('#searchCompetencia').on('keypress', function(e) {
-            if (e.which === 13) {
-                e.preventDefault();
-                performSearch();
-            }
-        });
-
-        // Buscar al hacer clic en el botón
-        $('#btnSearch').on('click', function() {
-            performSearch();
-        });
-
-        // Limpiar todos los filtros
-        $('#btnClearFilters').on('click', function() {
-            $('#searchCompetencia').val('');
-            $('#filterPrograma').val('');
-            $('#filterStatus').val('');
-            window.location.href = '{{ route("competencias.index") }}';
-        });
-
-        // Función para realizar la búsqueda
-        function performSearch() {
-            const searchTerm = $('#searchCompetencia').val();
-            const programaId = $('#filterPrograma').val();
-            const status = $('#filterStatus').val();
-
-            let url = '{{ route("competencias.index") }}?';
-            const params = [];
-
-            if (searchTerm) params.push(`search=${encodeURIComponent(searchTerm)}`);
-            if (programaId) params.push(`programa_id=${programaId}`);
-            if (status !== '') params.push(`status=${status}`);
-
-            if (params.length > 0) {
-                url += params.join('&');
-            }
-            
-            window.location.href = url;
-        }
-
-        // Mantener los valores de los filtros de la URL
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('search')) $('#searchCompetencia').val(urlParams.get('search'));
-        if (urlParams.has('programa_id')) $('#filterPrograma').val(urlParams.get('programa_id'));
-        if (urlParams.has('status')) $('#filterStatus').val(urlParams.get('status'));
-    });
-
     function confirmarEliminacion(nombre, url) {
         Swal.fire({
             title: '¿Estás seguro?',
@@ -340,6 +260,13 @@
             }
         });
     }
+
+    $(document).ready(function() {
+        setTimeout(function() {
+            $('.alert').fadeOut('slow');
+        }, 5000);
+
+        $('[data-toggle="tooltip"]').tooltip();
+    });
 </script>
 @endsection
-
