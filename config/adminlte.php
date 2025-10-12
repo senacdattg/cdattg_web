@@ -320,7 +320,7 @@ return [
             'submenu' => [
                 [
                     'text' => 'Mi Perfil',
-                    'url' => 'perfil',
+                    'url' => 'mi-perfil',
                     'icon' => 'fas fa-user-circle text-info',
                 ],
                 [
