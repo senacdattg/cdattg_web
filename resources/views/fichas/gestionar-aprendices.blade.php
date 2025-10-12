@@ -360,15 +360,30 @@
                                     
                                     <!-- Filtros para aprendices asignados -->
                                     <div class="row mb-3">
-                                        <div class="col-md-8">
-                                            <input type="text" id="filtro-asignados" class="form-control form-control-sm" placeholder="Buscar por nombre o documento...">
+                                        <div class="col-md-6">
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" id="filtro-asignados" class="form-control" placeholder="Buscar por nombre o documento...">
+                                                <div class="input-group-append">
+                                                    <button type="button" id="btn-buscar-asignados" class="btn btn-primary">
+                                                        <i class="fas fa-search"></i> Buscar
+                                                    </button>
+                                                    <button type="button" id="btn-limpiar-asignados" class="btn btn-secondary">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <select id="filtro-estado-asignados" class="form-control form-control-sm">
                                                 <option value="">Todos los estados</option>
                                                 <option value="1">Activos</option>
                                                 <option value="0">Inactivos</option>
                                             </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <small class="text-muted d-block mt-1">
+                                                Total: <span id="total-asignados-visibles">{{ $ficha->aprendices->count() }}</span> de {{ $ficha->aprendices->count() }}
+                                            </small>
                                         </div>
                                     </div>
                                     
@@ -461,15 +476,30 @@
                                     
                                     <!-- Filtros -->
                                     <div class="row mb-3">
-                                        <div class="col-md-8">
-                                            <input type="text" id="filtro-nombre" class="form-control form-control-sm" placeholder="Buscar por nombre o documento...">
+                                        <div class="col-md-6">
+                                            <div class="input-group input-group-sm">
+                                                <input type="text" id="filtro-nombre" class="form-control" placeholder="Buscar por nombre o documento...">
+                                                <div class="input-group-append">
+                                                    <button type="button" id="btn-buscar-disponibles" class="btn btn-success">
+                                                        <i class="fas fa-search"></i> Buscar
+                                                    </button>
+                                                    <button type="button" id="btn-limpiar-disponibles" class="btn btn-secondary">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <select id="filtro-estado" class="form-control form-control-sm">
                                                 <option value="">Todos los estados</option>
                                                 <option value="1">Activos</option>
                                                 <option value="0">Inactivos</option>
                                             </select>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <small class="text-muted d-block mt-1">
+                                                Total: <span id="total-disponibles-visibles">{{ $personasDisponibles->count() }}</span> de {{ $personasDisponibles->count() }}
+                                            </small>
                                         </div>
                                     </div>
 
@@ -597,54 +627,106 @@ $(document).ready(function() {
         $(selector).prop('checked', totalCheckboxes === checkedCheckboxes);
     });
 
-    // Filtros para aprendices asignados
-    $('#filtro-asignados, #filtro-estado-asignados').on('input change', function() {
+    // Función para filtrar aprendices asignados
+    function filtrarAsignados() {
         const filtroNombre = $('#filtro-asignados').val().toLowerCase();
         const filtroEstado = $('#filtro-estado-asignados').val();
+        let visibles = 0;
         
         $('.fila-asignado').each(function() {
             const nombre = $(this).data('nombre');
-            const documento = $(this).data('documento');
+            const documento = $(this).data('documento').toString();
             const estado = $(this).data('estado').toString();
             
-            const coincideNombre = nombre.includes(filtroNombre) || documento.includes(filtroNombre);
+            const coincideNombre = filtroNombre === '' || nombre.includes(filtroNombre) || documento.includes(filtroNombre);
             const coincideEstado = filtroEstado === '' || estado === filtroEstado;
             
             if (coincideNombre && coincideEstado) {
                 $(this).show();
+                visibles++;
             } else {
                 $(this).hide();
-                // No desmarcar checkboxes al ocultar filas
             }
         });
         
+        $('#total-asignados-visibles').text(visibles);
         actualizarContadores();
         $('#select-all-asignados').prop('checked', false);
-    });
+    }
 
-    // Filtros para aprendices disponibles
-    $('#filtro-nombre, #filtro-estado').on('input change', function() {
+    // Función para filtrar personas disponibles
+    function filtrarDisponibles() {
         const filtroNombre = $('#filtro-nombre').val().toLowerCase();
         const filtroEstado = $('#filtro-estado').val();
+        let visibles = 0;
         
         $('.fila-aprendiz').each(function() {
             const nombre = $(this).data('nombre');
-            const documento = $(this).data('documento');
+            const documento = $(this).data('documento').toString();
             const estado = $(this).data('estado').toString();
             
-            const coincideNombre = nombre.includes(filtroNombre) || documento.includes(filtroNombre);
+            const coincideNombre = filtroNombre === '' || nombre.includes(filtroNombre) || documento.includes(filtroNombre);
             const coincideEstado = filtroEstado === '' || estado === filtroEstado;
             
             if (coincideNombre && coincideEstado) {
                 $(this).show();
+                visibles++;
             } else {
                 $(this).hide();
-                // No desmarcar checkboxes al ocultar filas
             }
         });
         
+        $('#total-disponibles-visibles').text(visibles);
         actualizarContadores();
         $('#select-all-disponibles').prop('checked', false);
+    }
+
+    // Botón buscar asignados
+    $('#btn-buscar-asignados').click(function() {
+        filtrarAsignados();
+    });
+
+    // Botón limpiar asignados
+    $('#btn-limpiar-asignados').click(function() {
+        $('#filtro-asignados').val('');
+        $('#filtro-estado-asignados').val('');
+        filtrarAsignados();
+    });
+
+    // Botón buscar disponibles
+    $('#btn-buscar-disponibles').click(function() {
+        filtrarDisponibles();
+    });
+
+    // Botón limpiar disponibles
+    $('#btn-limpiar-disponibles').click(function() {
+        $('#filtro-nombre').val('');
+        $('#filtro-estado').val('');
+        filtrarDisponibles();
+    });
+
+    // Enter para buscar en inputs
+    $('#filtro-asignados').keypress(function(e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            filtrarAsignados();
+        }
+    });
+
+    $('#filtro-nombre').keypress(function(e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            filtrarDisponibles();
+        }
+    });
+
+    // Filtros en tiempo real (opcional, al cambiar selects)
+    $('#filtro-estado-asignados').change(function() {
+        filtrarAsignados();
+    });
+
+    $('#filtro-estado').change(function() {
+        filtrarDisponibles();
     });
 
     // Botón desasignar

@@ -11,6 +11,7 @@ use App\Http\Requests\AsignarInstructoresRequest;
 use App\Services\FichaCaracterizacionValidationService;
 use App\Traits\ValidacionesSena;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -2734,7 +2735,7 @@ class FichaCaracterizacionController extends Controller
             return redirect()->back()
                 ->withErrors($e->errors())
                 ->withInput()
-                ->with('error', 'Error de validación: ' . implode(', ', array_flatten($e->errors())));
+                ->with('error', 'Error de validación: ' . implode(', ', Arr::flatten($e->errors())));
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             Log::error('=== FICHA NO ENCONTRADA ===', [
