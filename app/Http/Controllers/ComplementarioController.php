@@ -12,6 +12,8 @@ use App\Models\CategoriaCaracterizacionComplementario;
 use App\Models\Pais;
 use App\Models\Persona;
 use App\Models\AspiranteComplementario;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class ComplementarioController extends Controller
 {
@@ -292,6 +294,22 @@ class ComplementarioController extends Controller
                 'estado' => 1, // Estado "En proceso"
             ]
         );
+
+        // Verificar si ya existe un usuario con este email
+        $existingUser = User::where('email', $request->email)->first();
+
+        if (!$existingUser) {
+            // Crear cuenta de usuario automáticamente
+            $user = User::create([
+                'email' => $request->email,
+                'password' => Hash::make($request->numero_documento), // Usar documento como contraseña
+                'status' => 1,
+                'persona_id' => $persona->id,
+            ]);
+
+            // Asignar rol de aspirante
+            $user->assignRole('ASPIRANTE');
+        }
 
         // Redirigir a la segunda fase (subida de documentos)
         return redirect()->route('programas-complementarios.documentos', $id)
