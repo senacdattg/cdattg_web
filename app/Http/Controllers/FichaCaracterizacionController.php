@@ -1748,9 +1748,31 @@ class FichaCaracterizacionController extends Controller
             $instructoresConDisponibilidad = $asignacionService->obtenerInstructoresDisponibles((int)$id);
 
             // Filtrar instructores ya asignados de la lista de disponibles
+            // EXCLUIR: No filtrar al instructor líder (principal) ya que es una asignación separada
+            $instructorLiderId = $ficha->instructor_id; // Instructor líder de la ficha
             $instructoresAsignadosIds = $instructoresAsignados->pluck('instructor_id')->toArray();
-            $instructoresConDisponibilidad = array_filter($instructoresConDisponibilidad, function($instructorData) use ($instructoresAsignadosIds) {
-                return !in_array($instructorData['instructor']->id, $instructoresAsignadosIds);
+            
+            Log::info('🔍 DEBUG FILTRADO INSTRUCTORES', [
+                'instructor_lider_id' => $instructorLiderId,
+                'instructores_asignados_ids' => $instructoresAsignadosIds,
+                'total_disponibles_antes_filtro' => count($instructoresConDisponibilidad)
+            ]);
+            
+            $instructoresConDisponibilidad = array_filter($instructoresConDisponibilidad, function($instructorData) use ($instructoresAsignadosIds, $instructorLiderId) {
+                $instructorId = $instructorData['instructor']->id;
+                
+                // Si es el instructor líder, siempre incluirlo en la lista (puede ser reasignado)
+                if ($instructorId == $instructorLiderId) {
+                    Log::info('🔍 INCLUYENDO INSTRUCTOR LÍDER', ['instructor_id' => $instructorId]);
+                    return true;
+                }
+                
+                // Para otros instructores, excluir si ya están asignados como instructores adicionales
+                $incluir = !in_array($instructorId, $instructoresAsignadosIds);
+                if (!$incluir) {
+                    Log::info('🔍 EXCLUYENDO INSTRUCTOR ASIGNADO', ['instructor_id' => $instructorId]);
+                }
+                return $incluir;
             });
             
             // Reindexar el array para mantener índices numéricos

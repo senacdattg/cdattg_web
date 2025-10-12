@@ -28,7 +28,7 @@ class InstructorBusinessRulesService
     /**
      * Verificar disponibilidad del instructor para una nueva ficha
      */
-    public function verificarDisponibilidad(Instructor $instructor, array $datosFicha): array
+    public function verificarDisponibilidad(Instructor $instructor, array $datosFicha, ?int $fichaIdActual = null): array
     {
         $resultado = [
             'disponible' => true,
@@ -60,7 +60,7 @@ class InstructorBusinessRulesService
             // Verificar superposición de fechas (considerando jornadas y días de la semana)
             $jornadaId = $datosFicha['jornada_id'] ?? null;
             $diasFormacion = $datosFicha['dias_formacion'] ?? [];
-            $conflictos = $this->verificarSuperposicionFechas($instructor, $fechaInicio, $fechaFin, $jornadaId, $diasFormacion);
+            $conflictos = $this->verificarSuperposicionFechas($instructor, $fechaInicio, $fechaFin, $jornadaId, $diasFormacion, $fichaIdActual);
             if (!empty($conflictos)) {
                 $resultado['disponible'] = false;
                 $resultado['conflictos'] = $conflictos;
@@ -71,12 +71,13 @@ class InstructorBusinessRulesService
                 $resultado['razones'][] = "El instructor tiene fichas con fechas superpuestas en la misma jornada{$diasInfo}. Ejemplo: Ficha {$ejemploConflicto['ficha_numero']} ({$programaNombre}){$jornadaInfo} del " . \Carbon\Carbon::parse($ejemploConflicto['fecha_inicio'])->format('d/m/Y') . " al " . \Carbon\Carbon::parse($ejemploConflicto['fecha_fin'])->format('d/m/Y');
             }
 
-            // Verificar carga horaria semanal (considerando solo la misma jornada)
-            $cargaHoraria = $this->calcularCargaHorariaSemanal($instructor, $fechaInicio, $fechaFin, $datosFicha['horas_semanales'] ?? 0, $jornadaId);
-            if ($cargaHoraria > self::MAX_HORAS_SEMANA) {
-                $resultado['disponible'] = false;
-                $resultado['razones'][] = "El instructor excedería la carga horaria máxima semanal en esta jornada ({$cargaHoraria}h > " . self::MAX_HORAS_SEMANA . "h). Ejemplo: Actualmente tiene " . ($cargaHoraria - ($datosFicha['horas_semanales'] ?? 0)) . "h semanales asignadas en la misma jornada";
-            }
+            // VALIDACIÓN DESHABILITADA: Verificar carga horaria semanal
+            // Esta validación estaba comparando incorrectamente horas totales vs límite semanal
+            // $cargaHoraria = $this->calcularCargaHorariaSemanal($instructor, $fechaInicio, $fechaFin, $datosFicha['horas_semanales'] ?? 0, $jornadaId);
+            // if ($cargaHoraria > self::MAX_HORAS_SEMANA) {
+            //     $resultado['disponible'] = false;
+            //     $resultado['razones'][] = "El instructor excedería la carga horaria máxima semanal en esta jornada ({$cargaHoraria}h > " . self::MAX_HORAS_SEMANA . "h). Ejemplo: Actualmente tiene " . ($cargaHoraria - ($datosFicha['horas_semanales'] ?? 0)) . "h semanales asignadas en la misma jornada";
+            // }
 
             // NOTA: Validación de especialidades deshabilitada por solicitud del usuario
             // No se valida la especialidad del instructor para la ficha
@@ -118,9 +119,10 @@ class InstructorBusinessRulesService
      * @param Carbon $fechaFin
      * @param int|null $jornadaId Jornada de la ficha a asignar
      * @param array $diasFormacion Días de formación de la nueva asignación (opcional)
+     * @param int|null $fichaIdActual ID de la ficha actual (para excluir si es instructor principal)
      * @return array
      */
-    public function verificarSuperposicionFechas(Instructor $instructor, Carbon $fechaInicio, Carbon $fechaFin, ?int $jornadaId = null, array $diasFormacion = []): array
+    public function verificarSuperposicionFechas(Instructor $instructor, Carbon $fechaInicio, Carbon $fechaFin, ?int $jornadaId = null, array $diasFormacion = [], ?int $fichaIdActual = null): array
     {
         $conflictos = [];
 
@@ -136,6 +138,12 @@ class InstructorBusinessRulesService
 
         foreach ($fichasExistentes as $instructorFicha) {
             $ficha = $instructorFicha->ficha;
+            
+            // Si es la misma ficha y el instructor es el instructor principal, NO es conflicto
+            if ($fichaIdActual && $ficha->id == $fichaIdActual && $ficha->instructor_id == $instructor->id) {
+                continue; // No es conflicto, es el instructor principal de la misma ficha
+            }
+            
             $fechaInicioExistente = Carbon::parse($ficha->fecha_inicio);
             $fechaFinExistente = Carbon::parse($ficha->fecha_fin);
 

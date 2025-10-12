@@ -633,6 +633,14 @@
                 theme: 'bootstrap4',
                 width: '100%'
             });
+            
+            // Agregar eventos para recalcular horas cuando cambien los días de formación
+            $('select[name*="[dias_formacion]"]').on('change', function() {
+                const instructorRow = $(this).closest('.instructor-row')[0];
+                if (instructorRow) {
+                    recalcularHorasInstructor(instructorRow);
+                }
+            });
 
             // Desplazar automáticamente a los errores si existen
             @if($errors->any())
@@ -680,6 +688,13 @@
                     position: 'top-end'
                 });
             @endif
+            
+            // Calcular horas automáticamente para instructores existentes
+            setTimeout(() => {
+                document.querySelectorAll('.instructor-row').forEach(row => {
+                    recalcularHorasInstructor(row);
+                });
+            }, 500);
 
             // Cargar instructores existentes
             cargarInstructoresExistentes();
@@ -804,6 +819,7 @@
                             <label class="form-label font-weight-bold">Horas</label>
                             <input type="number" name="instructores[${index}][total_horas_instructor]" 
                                    class="form-control" value="${horas}" min="1" required>
+                            <div class="horas-info mt-1"></div>
                         </div>
                         <div class="col-md-1">
                             <label class="form-label font-weight-bold">&nbsp;</label>
@@ -903,6 +919,8 @@
                 }
                 // Validar disponibilidad cuando cambie la fecha de inicio
                 setTimeout(validarDisponibilidadFechas, 500);
+                // Recalcular horas automáticamente
+                recalcularHorasInstructor(div);
             });
             
             fechaFinInput.addEventListener('change', function() {
@@ -912,6 +930,8 @@
                 }
                 // Validar disponibilidad cuando cambie la fecha de fin
                 setTimeout(validarDisponibilidadFechas, 500);
+                // Recalcular horas automáticamente
+                recalcularHorasInstructor(div);
             });
             
             instructorSelect.addEventListener('change', function() {
@@ -996,12 +1016,68 @@
                 theme: 'bootstrap4',
                 width: '100%'
             });
+            
+            // Agregar evento para recalcular cuando cambie el día
+            $(div).find('.select2').on('change', function() {
+                const instructorRow = container.closest('.instructor-row');
+                recalcularHorasInstructor(instructorRow);
+            });
+            
+            // Recalcular horas después de agregar día
+            const instructorRow = container.closest('.instructor-row');
+            setTimeout(() => {
+                recalcularHorasInstructor(instructorRow);
+            }, 100);
         }
 
         // Función para eliminar un día de formación
         function eliminarDiaFormacion(button) {
             const row = button.closest('.dia-formacion-row');
             row.remove();
+            // Recalcular horas después de eliminar día
+            recalcularHorasInstructor(row.closest('.instructor-row'));
+        }
+
+        // Función para calcular automáticamente las horas de un instructor
+        function recalcularHorasInstructor(instructorRow) {
+            const fechaInicioInput = instructorRow.querySelector('input[name*="[fecha_inicio]"]');
+            const fechaFinInput = instructorRow.querySelector('input[name*="[fecha_fin]"]');
+            const horasInput = instructorRow.querySelector('input[name*="[total_horas_instructor]"]');
+            const diasFormacion = instructorRow.querySelectorAll('.dia-formacion-row');
+            
+            if (!fechaInicioInput || !fechaFinInput || !horasInput) return;
+            
+            const fechaInicio = fechaInicioInput.value;
+            const fechaFin = fechaFinInput.value;
+            const diasCount = diasFormacion.length;
+            
+            if (fechaInicio && fechaFin && diasCount > 0) {
+                // Calcular semanas entre fechas
+                const inicio = new Date(fechaInicio);
+                const fin = new Date(fechaFin);
+                const diffTime = Math.abs(fin - inicio);
+                const semanas = Math.ceil(diffTime / (1000 * 60 * 60 * 24 * 7));
+                
+                // Horas por jornada (6.5 horas por defecto, se puede configurar)
+                const horasPorJornada = 6.5;
+                
+                // Calcular horas totales: días × horas por jornada × semanas
+                const horasTotales = diasCount * horasPorJornada * semanas;
+                
+                // Actualizar el campo de horas
+                horasInput.value = Math.round(horasTotales);
+                
+                // Mostrar información de cálculo
+                const infoElement = instructorRow.querySelector('.horas-info');
+                if (infoElement) {
+                    infoElement.innerHTML = `
+                        <small class="text-muted">
+                            <i class="fas fa-calculator mr-1"></i>
+                            Cálculo: ${diasCount} días × ${horasPorJornada}h × ${semanas} semanas = ${Math.round(horasTotales)} horas
+                        </small>
+                    `;
+                }
+            }
         }
 
         // Validación del formulario
@@ -1109,6 +1185,7 @@
                             <label class="form-label font-weight-bold">Horas</label>
                             <input type="number" name="instructores[${index}][total_horas_instructor]" 
                                    class="form-control" value="${data.total_horas_instructor}" min="1" required>
+                            <div class="horas-info mt-1"></div>
                         </div>
                         <div class="col-md-1">
                             <label class="form-label font-weight-bold">&nbsp;</label>
