@@ -283,7 +283,10 @@ class ComplementarioController extends Controller
 
         // Crear o actualizar el registro del aspirante
         $aspirante = AspiranteComplementario::updateOrCreate(
-            ['persona_id' => $persona->id],
+            [
+                'persona_id' => $persona->id,
+                'complementario_id' => $id
+            ],
             [
                 'observaciones' => $request->observaciones,
                 'estado' => 1, // Estado "En proceso"
