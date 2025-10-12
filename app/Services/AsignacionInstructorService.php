@@ -213,6 +213,7 @@ class AsignacionInstructorService
         try {
             $asignacion = InstructorFichaCaracterizacion::where('instructor_id', $instructorId)
                 ->where('ficha_id', $fichaId)
+                ->with('instructorFichaDias.dia')
                 ->firstOrFail();
 
             $instructor = Instructor::find($instructorId);
@@ -224,25 +225,26 @@ class AsignacionInstructorService
                 throw new \Exception('No se puede desasignar el instructor porque ya existen clases o asistencias registradas en el rango de fechas.');
             }
 
-            // Guardar datos anteriores para el log
+            // Guardar datos anteriores para el log (incluyendo días de formación)
+            $diasFormacion = $asignacion->instructorFichaDias->map(function($dia) {
+                return [
+                    'dia_id' => $dia->dia_id,
+                    'dia_nombre' => $dia->dia->name ?? 'Sin nombre'
+                ];
+            })->toArray();
+            
             $datosAnteriores = [
                 'fecha_inicio' => $asignacion->fecha_inicio,
                 'fecha_fin' => $asignacion->fecha_fin,
-                'total_horas' => $asignacion->total_horas_instructor
+                'total_horas' => $asignacion->total_horas_instructor,
+                'dias_formacion' => $diasFormacion
             ];
 
+            // Eliminar primero los días de formación relacionados
+            $asignacion->instructorFichaDias()->delete();
+            
+            // Luego eliminar la asignación
             $asignacion->delete();
-
-            // Actualizar instructor principal si es necesario
-            if ($ficha && $ficha->instructor_id == $instructorId) {
-                $nuevaAsignacion = $ficha->instructorFicha()->first();
-                $nuevoInstructorPrincipal = $nuevaAsignacion ? $nuevaAsignacion->instructor_id : null;
-                
-                $ficha->update([
-                    'instructor_id' => $nuevoInstructorPrincipal,
-                    'user_edit_id' => $userId
-                ]);
-            }
 
             DB::commit();
 
