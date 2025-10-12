@@ -393,3 +393,11 @@
 .container-fluid {
     margin: 0 auto;
 }
+
+
+.card.card-ordenes   {
+    margin-left: auto;
+    margin-bottom: 10px;
+    margin-right: auto;
+    margin-top: 20px;
+}

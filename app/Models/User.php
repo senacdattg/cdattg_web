@@ -45,6 +45,17 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Persona::class, 'persona_id');
     }
 
+    // accesor para obtener el nombre completo del usuario
+    public function getNameAttribute()
+    {
+        if ($this->persona) {
+            $nombre = trim($this->persona->primer_nombre . ' ' . $this->persona->segundo_nombre);
+            $apellido = trim($this->persona->primer_apellido . ' ' . $this->persona->segundo_apellido);
+            return trim($nombre . ' ' . $apellido);
+        }
+        return 'Usuario sin nombre';
+    }
+
     public function entradaSalida()
     {
         return $this->hasMany(EntradaSalida::class);
