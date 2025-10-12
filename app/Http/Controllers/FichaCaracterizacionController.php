@@ -1831,7 +1831,9 @@ class FichaCaracterizacionController extends Controller
                 return redirect()->route('fichaCaracterizacion.show', $id)
                     ->with('success', $resultado['message'] . ' Se asignaron ' . $resultado['total_asignados'] . ' instructores.');
             } else {
-                return back()->withErrors(['error' => $resultado['message']]);
+                return back()
+                    ->withErrors(['error' => $resultado['message']])
+                    ->withInput();
             }
 
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -1840,7 +1842,10 @@ class FichaCaracterizacionController extends Controller
                 'errors' => $e->errors(),
                 'user_id' => Auth::id()
             ]);
-            throw $e;
+            
+            return back()
+                ->withErrors($e->errors())
+                ->withInput();
 
         } catch (\Exception $e) {
             Log::error('Error crítico en asignación de instructores', [
@@ -1850,7 +1855,9 @@ class FichaCaracterizacionController extends Controller
                 'user_id' => Auth::id()
             ]);
 
-            return back()->withErrors(['error' => 'Error crítico al asignar instructores. Por favor, contacte al administrador.']);
+            return back()
+                ->withErrors(['error' => 'Error crítico al asignar instructores. Por favor, contacte al administrador.'])
+                ->withInput();
         }
     }
 

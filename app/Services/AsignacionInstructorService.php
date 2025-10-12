@@ -28,7 +28,7 @@ class AsignacionInstructorService
         DB::beginTransaction();
         
         try {
-            $ficha = FichaCaracterizacion::with(['programaFormacion.redConocimiento', 'diasFormacion'])->findOrFail($fichaId);
+            $ficha = FichaCaracterizacion::with(['programaFormacion.redConocimiento', 'diasFormacion', 'jornadaFormacion'])->findOrFail($fichaId);
             
             // Validar que la ficha esté activa
             if (!$ficha->status) {
@@ -41,16 +41,21 @@ class AsignacionInstructorService
                 'fecha_fin' => $ficha->fecha_fin,
                 'especialidad_requerida' => $ficha->programaFormacion->redConocimiento->nombre ?? null,
                 'regional_id' => $ficha->regional_id,
+                'jornada_id' => $ficha->jornada_id,
                 'horas_semanales' => 0
             ];
 
             // Validar cada instructor antes de la asignación
             $instructoresValidos = [];
+            $instructorIdConError = null; // Para registrar en logs si hay error
+            
             foreach ($instructoresData as $instructorData) {
                 $instructor = Instructor::findOrFail($instructorData['instructor_id']);
+                $instructorIdConError = $instructor->id; // Guardar ID para posibles errores
                 
-                // Actualizar datos de la ficha con horas específicas
+                // Actualizar datos de la ficha con horas específicas y días de formación
                 $datosFicha['horas_semanales'] = $instructorData['total_horas_instructor'];
+                $datosFicha['dias_formacion'] = $instructorData['dias_formacion'] ?? [];
                 
                 // Validar disponibilidad
                 $disponibilidad = $this->businessRulesService->verificarDisponibilidad($instructor, $datosFicha);
@@ -58,49 +63,46 @@ class AsignacionInstructorService
                     throw new \Exception("El instructor {$instructor->nombre_completo} no está disponible: " . implode(', ', $disponibilidad['razones']));
                 }
 
-                // Validar reglas SENA
-                $validacionSENA = $this->businessRulesService->validarReglasSENA($instructor, $datosFicha);
-                if (!$validacionSENA['valido']) {
-                    throw new \Exception("El instructor {$instructor->nombre_completo} no cumple las reglas SENA: " . implode(', ', $validacionSENA['errores']));
-                }
-
                 $instructoresValidos[] = $instructorData;
+                $instructorIdConError = null; // Reset si no hay error
             }
 
-            // Eliminar asignaciones existentes
-            $asignacionesAnteriores = $ficha->instructorFicha()->get();
-            $ficha->instructorFicha()->delete();
+            // Obtener asignaciones existentes
+            $asignacionesExistentes = $ficha->instructorFicha()->get();
 
-            // Crear log de asignaciones anteriores
-            foreach ($asignacionesAnteriores as $asignacion) {
-                AsignacionInstructorLog::crearLog(
-                    $asignacion->instructor_id,
-                    $fichaId,
-                    'desasignar',
-                    'exitoso',
-                    'Asignación eliminada para reasignación',
-                    $userId,
-                    ['motivo' => 'reasignacion_completa'],
-                    [
-                        'fecha_inicio' => $asignacion->fecha_inicio,
-                        'fecha_fin' => $asignacion->fecha_fin,
-                        'total_horas' => $asignacion->total_horas_instructor
-                    ]
-                );
-            }
-
-            // Crear nuevas asignaciones
+            // Crear o actualizar asignaciones (sin eliminar las existentes)
             $asignacionesCreadas = [];
             foreach ($instructoresValidos as $instructorData) {
-                $instructorFicha = $this->crearAsignacion($instructorData, $fichaId, $userId);
-                $asignacionesCreadas[] = $instructorFicha;
+                // Buscar si ya existe una asignación para este instructor
+                $asignacionExistente = $asignacionesExistentes->firstWhere('instructor_id', $instructorData['instructor_id']);
+                
+                if ($asignacionExistente) {
+                    // Actualizar asignación existente
+                    $asignacionExistente->update([
+                        'fecha_inicio' => $instructorData['fecha_inicio'],
+                        'fecha_fin' => $instructorData['fecha_fin'],
+                        'total_horas_instructor' => $instructorData['total_horas_instructor'],
+                        'user_edit_id' => $userId
+                    ]);
+                    
+                    // Actualizar días de formación si están definidos
+                    if (isset($instructorData['dias_formacion'])) {
+                        $asignacionExistente->instructorFichaDias()->delete();
+                        foreach ($instructorData['dias_formacion'] as $diaData) {
+                            $asignacionExistente->instructorFichaDias()->create([
+                                'dia_id' => $diaData['dia_id'],
+                                'user_create_id' => $userId
+                            ]);
+                        }
+                    }
+                    
+                    $asignacionesCreadas[] = $asignacionExistente;
+                } else {
+                    // Crear nueva asignación
+                    $instructorFicha = $this->crearAsignacion($instructorData, $fichaId, $userId);
+                    $asignacionesCreadas[] = $instructorFicha;
+                }
             }
-
-            // Actualizar instructor principal
-            $ficha->update([
-                'instructor_id' => $instructorPrincipalId,
-                'user_edit_id' => $userId
-            ]);
 
             DB::commit();
 
@@ -145,21 +147,26 @@ class AsignacionInstructorService
         } catch (\Exception $e) {
             DB::rollBack();
             
-            // Crear log de error
+            // Crear log de error con el ID del instructor que causó el problema (si existe)
             AsignacionInstructorLog::crearLog(
-                0, // instructor_id temporal para errores generales
+                $instructorIdConError ?? null, // ID del instructor que falló, o null si fue error general
                 $fichaId,
                 'asignar',
                 'error',
                 'Error en asignación de instructores: ' . $e->getMessage(),
                 $userId,
-                ['error' => $e->getMessage(), 'instructores_data' => $instructoresData]
+                [
+                    'error' => $e->getMessage(), 
+                    'instructores_data' => $instructoresData,
+                    'instructor_con_error' => $instructorIdConError
+                ]
             );
 
             Log::error('Error asignando instructores', [
                 'ficha_id' => $fichaId,
                 'error' => $e->getMessage(),
                 'user_id' => $userId,
+                'instructor_id_con_error' => $instructorIdConError,
                 'instructores_data' => $instructoresData
             ]);
 
@@ -318,7 +325,7 @@ class AsignacionInstructorService
     public function obtenerInstructoresDisponibles(int $fichaId): array
     {
         try {
-            $ficha = FichaCaracterizacion::with(['programaFormacion.redConocimiento', 'diasFormacion', 'sede.regional'])->findOrFail($fichaId);
+            $ficha = FichaCaracterizacion::with(['programaFormacion.redConocimiento', 'diasFormacion', 'sede.regional', 'jornadaFormacion'])->findOrFail($fichaId);
             
             $regionalId = $ficha->sede->regional_id ?? null;
             
@@ -327,6 +334,7 @@ class AsignacionInstructorService
                 'fecha_fin' => $ficha->fecha_fin,
                 'especialidad_requerida' => $ficha->programaFormacion->redConocimiento->nombre ?? null,
                 'regional_id' => $regionalId,
+                'jornada_id' => $ficha->jornada_id,
                 'horas_semanales' => 0
             ];
 

@@ -56,9 +56,20 @@ class AsignacionInstructorLog extends Model
 
     /**
      * Crear log de asignación
+     * 
+     * @param int|null $instructorId ID del instructor (null para errores generales)
+     * @param int $fichaId ID de la ficha
+     * @param string $accion Acción realizada (asignar, desasignar, editar)
+     * @param string $resultado Resultado (exitoso, error, advertencia)
+     * @param string $mensaje Mensaje descriptivo
+     * @param int $userId ID del usuario que realizó la acción
+     * @param array $detalles Detalles adicionales
+     * @param array|null $datosAnteriores Datos anteriores a la acción
+     * @param array|null $datosNuevos Datos nuevos después de la acción
+     * @return self
      */
     public static function crearLog(
-        int $instructorId,
+        ?int $instructorId,
         int $fichaId,
         string $accion,
         string $resultado,

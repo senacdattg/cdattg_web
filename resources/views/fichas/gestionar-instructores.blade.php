@@ -21,6 +21,41 @@
             border-radius: 0.375rem;
         }
         
+        /* Estilos para alertas de error mejorados */
+        .alert-danger {
+            border-left: 4px solid #dc3545;
+            animation: slideDown 0.4s ease-out;
+        }
+        
+        .alert-success {
+            border-left: 4px solid #28a745;
+            animation: slideDown 0.4s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-heading {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        
+        .alert ul {
+            padding-left: 1.5rem;
+        }
+        
+        .alert ul li {
+            margin-bottom: 0.5rem;
+        }
+        
         /* Estilos para tabla de instructores */
         .table-responsive {
             border-radius: 0.375rem;
@@ -235,25 +270,68 @@
                         </div>
                     </div>
 
-                    <!-- Asignar Instructores -->
+                    <!-- Asignar Instructores Adicionales -->
                     <div class="card shadow-sm no-hover mb-4">
                         <div class="card-header bg-white py-3">
                             <h5 class="card-title m-0 font-weight-bold text-warning">
-                                <i class="fas fa-user-plus mr-2"></i>Asignar Instructores
+                                <i class="fas fa-user-plus mr-2"></i>Asignar Instructores Adicionales
                             </h5>
                         </div>
                         <div class="card-body">
+                            {{-- Mostrar errores de validación --}}
+                            @if ($errors->any())
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <h5 class="alert-heading"><i class="fas fa-exclamation-triangle mr-2"></i>Error en la asignación</h5>
+                                    <hr>
+                                    <ul class="mb-0">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
+
+                            {{-- Mostrar mensajes de éxito --}}
+                            @if (session('success'))
+                                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                    <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
+                                </div>
+                            @endif
+
                             <form action="{{ route('fichaCaracterizacion.asignarInstructores', $ficha->id) }}" method="POST" id="formAsignarInstructores">
                                 @csrf
                                 
-                                <!-- Información del Instructor Principal -->
+                                {{-- Campo oculto para instructor principal --}}
+                                <input type="hidden" 
+                                       name="instructor_principal_id" 
+                                       id="instructor_principal_id" 
+                                       value="{{ old('instructor_principal_id', $ficha->instructor_id) }}">
+                                
+                                <!-- Información del Instructor Principal (Líder) -->
                                 @if($ficha->instructor)
                                     <div class="alert alert-success">
                                         <i class="fas fa-star text-warning mr-1"></i>
-                                        <strong>Instructor Principal Asignado:</strong>
+                                        <strong>Instructor Líder de la Ficha:</strong>
                                         {{ $ficha->instructor->persona->primer_nombre }} 
                                         {{ $ficha->instructor->persona->primer_apellido }}
                                         <small class="text-muted">({{ $ficha->instructor->persona->numero_documento }})</small>
+                                        <br>
+                                        <small class="text-info">
+                                            <i class="fas fa-info-circle mr-1"></i>
+                                            El instructor líder fue asignado en la creación de la ficha y no necesita estar en la lista de instructores adicionales.
+                                        </small>
+                                    </div>
+                                @else
+                                    <div class="alert alert-warning">
+                                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                                        <strong>Advertencia:</strong> Esta ficha no tiene un instructor líder asignado. 
+                                        Se recomienda asignar un instructor líder desde la edición de la ficha.
                                     </div>
                                 @endif
 
@@ -556,13 +634,78 @@
                 width: '100%'
             });
 
+            // Desplazar automáticamente a los errores si existen
+            @if($errors->any())
+                setTimeout(function() {
+                    $('html, body').animate({
+                        scrollTop: $('.alert-danger').offset().top - 100
+                    }, 600);
+                    
+                    // Mostrar notificación sonora visual
+                    @if($errors->has('error'))
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error en la asignación',
+                            text: '{{ $errors->first('error') }}',
+                            confirmButtonText: 'Entendido',
+                            confirmButtonColor: '#dc3545'
+                        });
+                    @endif
+                }, 300);
+            @endif
+
+            // Mostrar mensaje de éxito si existe
+            @if(session('success'))
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: '{{ session('success') }}',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+            @endif
+
             // Cargar instructores existentes
             cargarInstructoresExistentes();
         });
 
-        // Función para cargar instructores ya asignados
+        // Función para cargar instructores ya asignados o desde old input
         function cargarInstructoresExistentes() {
-            @if($instructoresAsignados->count() > 0)
+            @php
+                // Verificar si hay datos old (error de validación)
+                $instructoresOld = old('instructores');
+            @endphp
+            
+            @if($instructoresOld)
+                // Cargar datos desde old() después de un error de validación
+                @foreach($instructoresOld as $index => $instructorData)
+                    @php
+                        // Buscar el nombre del instructor
+                        $instructor = \App\Models\Instructor::find($instructorData['instructor_id'] ?? null);
+                        $nombreInstructor = $instructor ? 
+                            $instructor->persona->primer_nombre . ' ' . $instructor->persona->primer_apellido : 
+                            '';
+                        
+                        // Obtener días de formación
+                        $diasFormacion = isset($instructorData['dias_formacion']) ? 
+                            array_map(function($dia) {
+                                return ['dia_id' => $dia['dia_id'] ?? null];
+                            }, $instructorData['dias_formacion']) : [];
+                    @endphp
+                    agregarInstructorRow(
+                        {{ $instructorData['instructor_id'] ?? 'null' }},
+                        '{{ addslashes($nombreInstructor) }}',
+                        '{{ $instructorData['fecha_inicio'] ?? '' }}',
+                        '{{ $instructorData['fecha_fin'] ?? '' }}',
+                        {{ $instructorData['total_horas_instructor'] ?? '0' }},
+                        false,
+                        {!! json_encode($diasFormacion) !!}
+                    );
+                @endforeach
+            @elseif($instructoresAsignados->count() > 0)
+                // Cargar instructores ya asignados (caso normal)
                 @foreach($instructoresAsignados as $asignacion)
                     @php
                         $diasFormacion = $asignacion->instructorFichaDias->map(function($dia) {
@@ -849,32 +992,16 @@
 
         // Validación del formulario
         document.getElementById('formAsignarInstructores').addEventListener('submit', function(e) {
-            const instructorPrincipal = document.getElementById('instructor_principal_id').value;
             const instructoresAsignados = document.querySelectorAll('.instructor-select');
-            
-            if (!instructorPrincipal) {
-                e.preventDefault();
-                alert('Debe seleccionar un instructor principal.');
-                return;
-            }
             
             if (instructoresAsignados.length === 0) {
                 e.preventDefault();
-                alert('Debe asignar al menos un instructor.');
-                return;
-            }
-            
-            // Verificar que el instructor principal esté en la lista
-            let instructorPrincipalEnLista = false;
-            instructoresAsignados.forEach(select => {
-                if (select.value === instructorPrincipal) {
-                    instructorPrincipalEnLista = true;
-                }
-            });
-            
-            if (!instructorPrincipalEnLista) {
-                e.preventDefault();
-                alert('El instructor principal debe estar en la lista de instructores asignados.');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Sin instructores',
+                    text: 'Debe asignar al menos un instructor adicional a la ficha.',
+                    confirmButtonText: 'Entendido'
+                });
                 return;
             }
             
