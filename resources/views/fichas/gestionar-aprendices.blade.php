@@ -614,7 +614,7 @@ $(document).ready(function() {
                 $(this).show();
             } else {
                 $(this).hide();
-                $(this).find('.checkbox-asignado').prop('checked', false);
+                // No desmarcar checkboxes al ocultar filas
             }
         });
         
@@ -639,7 +639,7 @@ $(document).ready(function() {
                 $(this).show();
             } else {
                 $(this).hide();
-                $(this).find('.checkbox-disponible').prop('checked', false);
+                // No desmarcar checkboxes al ocultar filas
             }
         });
         
