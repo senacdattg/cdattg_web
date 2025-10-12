@@ -14,6 +14,7 @@ use App\Models\Persona;
 use App\Models\AspiranteComplementario;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 
 class ComplementarioController extends Controller
 {
@@ -329,12 +330,29 @@ class ComplementarioController extends Controller
 
 
     /**
-     * Mostrar perfil del aspirante
-     */
+      * Mostrar perfil del aspirante
+      */
     public function perfilAspirante($id)
     {
         $aspirante = AspiranteComplementario::with('persona')->findOrFail($id);
-        
+
         return view('complementarios.perfil_aspirante', compact('aspirante'));
+    }
+
+    /**
+     * Mostrar perfil propio del aspirante autenticado
+     */
+    public function miPerfil()
+    {
+        $user = Auth::user();
+        $aspirante = AspiranteComplementario::with(['persona', 'complementario'])
+            ->where('persona_id', $user->persona_id)
+            ->first();
+
+        if (!$aspirante) {
+            return redirect()->route('home')->with('error', 'No se encontró información de aspirante para este usuario.');
+        }
+
+        return view('complementarios.mi_perfil', compact('aspirante'));
     }
 }
