@@ -322,7 +322,7 @@
                                         {{ $ficha->instructor->persona->primer_apellido }}
                                         <small class="text-muted">({{ $ficha->instructor->persona->numero_documento }})</small>
                                         <br>
-                                        <small class="text-info">
+                                        <small class="text-light">
                                             <i class="fas fa-info-circle mr-1"></i>
                                             El instructor líder fue asignado en la creación de la ficha y no necesita estar en la lista de instructores adicionales.
                                         </small>
@@ -651,7 +651,21 @@
                             confirmButtonColor: '#dc3545'
                         });
                     @endif
+                    
                 }, 300);
+                
+                // Auto-dismiss del mensaje de error después de 10 segundos (independiente del scroll)
+                setTimeout(function() {
+                    const errorAlert = $('.alert-danger');
+                    console.log('Auto-dismiss ejecutándose, alertas encontradas:', errorAlert.length);
+                    if (errorAlert.length > 0) {
+                        console.log('Iniciando fadeOut del mensaje de error');
+                        errorAlert.fadeOut(500, function() {
+                            $(this).remove();
+                            console.log('Mensaje de error eliminado');
+                        });
+                    }
+                }, 10000);
             @endif
 
             // Mostrar mensaje de éxito si existe

@@ -1828,7 +1828,7 @@ class FichaCaracterizacionController extends Controller
             );
 
             if ($resultado['success']) {
-                return redirect()->route('fichaCaracterizacion.show', $id)
+                return redirect()->route('fichaCaracterizacion.gestionarInstructores', $id)
                     ->with('success', $resultado['message'] . ' Se asignaron ' . $resultado['total_asignados'] . ' instructores.');
             } else {
                 return back()
