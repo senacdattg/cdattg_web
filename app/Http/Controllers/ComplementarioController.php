@@ -302,9 +302,10 @@ class ComplementarioController extends Controller
     public function formularioDocumentos($id)
     {
         $programa = ComplementarioOfertado::findOrFail($id);
-        
+
         return view('complementarios.formulario_documentos', compact('programa'));
     }
+
 
     /**
      * Mostrar perfil del aspirante

@@ -152,9 +152,9 @@
                         <div class="mb-3">
                             <label for="estado" class="form-label">Estado</label>
                             <select class="form-select" id="estado" name="estado" required>
-                                <option value="0">Activo</option>
-                                <option value="1">Próximo a iniciar</option>
-                                <option value="2">Inactivo</option>
+                                <option value="0">Sin Oferta</option>
+                                <option value="1">Con Oferta</option>
+                                <option value="2">Cupos Llenos</option>
                             </select>
                         </div>
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -233,9 +233,9 @@
                         <div class="mb-3">
                             <label for="edit_estado" class="form-label">Estado</label>
                             <select class="form-select" id="edit_estado" name="estado" required>
-                                <option value="0">Activo</option>
-                                <option value="1">Próximo a iniciar</option>
-                                <option value="2">Inactivo</option>
+                                <option value="0">Sin Oferta</option>
+                                <option value="1">Con Oferta</option>
+                                <option value="2">Cupos Llenos</option>
                             </select>
                         </div>
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -575,7 +575,7 @@
                     document.getElementById('view_jornada').textContent = jornada ? jornada.jornada : 'N/A';
 
                     // Estado
-                    const estados = {0: 'Activo', 1: 'Próximo a iniciar', 2: 'Inactivo'};
+                    const estados = {0: 'Sin Oferta', 1: 'Con Oferta', 2: 'Cupos Llenos'};
                     document.getElementById('view_estado').textContent = estados[data.estado] || 'N/A';
 
                     // Dias

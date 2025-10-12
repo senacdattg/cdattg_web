@@ -29,6 +29,7 @@
             </div>
         @endif
 
+
         <div class="row">
             <div class="col-md-8">
                 <div class="card shadow-sm">
@@ -161,25 +162,21 @@
 
         // Validación del formulario
         document.getElementById('formDocumentos').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
             // Validar que se haya seleccionado un archivo
             if (!documentoInput.files.length) {
+                e.preventDefault();
                 alert('Debe seleccionar un archivo PDF.');
                 return;
             }
 
             // Validar privacidad
             if (!privacidadCheckbox.checked) {
+                e.preventDefault();
                 alert('Debe aceptar la política de privacidad para continuar.');
                 return;
             }
 
-            // Mostrar mensaje de éxito (en una implementación real, se enviaría al servidor)
-            alert('Documento enviado correctamente. Su inscripción ha sido completada y está en proceso de revisión.');
-            
-            // En una implementación real, aquí se enviaría el formulario al servidor
-            // this.submit();
+            // El formulario se enviará al servidor
         });
     </script>
 </body>
