@@ -23,6 +23,7 @@ class AspiranteComplementario extends Model
      */
     protected $fillable = [
         'persona_id',
+        'complementario_id',
         'observaciones',
         'estado',
     ];
@@ -42,6 +43,14 @@ class AspiranteComplementario extends Model
     public function persona()
     {
         return $this->belongsTo(Persona::class);
+    }
+
+    /**
+     * Get the complementario associated with the aspirant.
+     */
+    public function complementario()
+    {
+        return $this->belongsTo(ComplementarioOfertado::class, 'complementario_id');
     }
 
     /**
