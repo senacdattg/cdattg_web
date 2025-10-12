@@ -11,6 +11,7 @@ use App\Http\Requests\AsignarInstructoresRequest;
 use App\Services\FichaCaracterizacionValidationService;
 use App\Traits\ValidacionesSena;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -1746,6 +1747,37 @@ class FichaCaracterizacionController extends Controller
             $asignacionService = app(\App\Services\AsignacionInstructorService::class);
             $instructoresConDisponibilidad = $asignacionService->obtenerInstructoresDisponibles((int)$id);
 
+            // Filtrar instructores ya asignados de la lista de disponibles
+            // EXCLUIR: No filtrar al instructor líder (principal) ya que es una asignación separada
+            $instructorLiderId = $ficha->instructor_id; // Instructor líder de la ficha
+            $instructoresAsignadosIds = $instructoresAsignados->pluck('instructor_id')->toArray();
+            
+            Log::info('🔍 DEBUG FILTRADO INSTRUCTORES', [
+                'instructor_lider_id' => $instructorLiderId,
+                'instructores_asignados_ids' => $instructoresAsignadosIds,
+                'total_disponibles_antes_filtro' => count($instructoresConDisponibilidad)
+            ]);
+            
+            $instructoresConDisponibilidad = array_filter($instructoresConDisponibilidad, function($instructorData) use ($instructoresAsignadosIds, $instructorLiderId) {
+                $instructorId = $instructorData['instructor']->id;
+                
+                // Si es el instructor líder, siempre incluirlo en la lista (puede ser reasignado)
+                if ($instructorId == $instructorLiderId) {
+                    Log::info('🔍 INCLUYENDO INSTRUCTOR LÍDER', ['instructor_id' => $instructorId]);
+                    return true;
+                }
+                
+                // Para otros instructores, excluir si ya están asignados como instructores adicionales
+                $incluir = !in_array($instructorId, $instructoresAsignadosIds);
+                if (!$incluir) {
+                    Log::info('🔍 EXCLUYENDO INSTRUCTOR ASIGNADO', ['instructor_id' => $instructorId]);
+                }
+                return $incluir;
+            });
+            
+            // Reindexar el array para mantener índices numéricos
+            $instructoresConDisponibilidad = array_values($instructoresConDisponibilidad);
+
             // Obtener estadísticas de asignaciones para mostrar en la vista
             $estadisticasAsignaciones = $asignacionService->obtenerEstadisticasAsignaciones();
 
@@ -1818,10 +1850,12 @@ class FichaCaracterizacionController extends Controller
             );
 
             if ($resultado['success']) {
-                return redirect()->route('fichaCaracterizacion.show', $id)
+                return redirect()->route('fichaCaracterizacion.gestionarInstructores', $id)
                     ->with('success', $resultado['message'] . ' Se asignaron ' . $resultado['total_asignados'] . ' instructores.');
             } else {
-                return back()->withErrors(['error' => $resultado['message']]);
+                return back()
+                    ->withErrors(['error' => $resultado['message']])
+                    ->withInput();
             }
 
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -1830,7 +1864,10 @@ class FichaCaracterizacionController extends Controller
                 'errors' => $e->errors(),
                 'user_id' => Auth::id()
             ]);
-            throw $e;
+            
+            return back()
+                ->withErrors($e->errors())
+                ->withInput();
 
         } catch (\Exception $e) {
             Log::error('Error crítico en asignación de instructores', [
@@ -1840,7 +1877,9 @@ class FichaCaracterizacionController extends Controller
                 'user_id' => Auth::id()
             ]);
 
-            return back()->withErrors(['error' => 'Error crítico al asignar instructores. Por favor, contacte al administrador.']);
+            return back()
+                ->withErrors(['error' => 'Error crítico al asignar instructores. Por favor, contacte al administrador.'])
+                ->withInput();
         }
     }
 
@@ -2557,100 +2596,203 @@ class FichaCaracterizacionController extends Controller
      */
     public function desasignarAprendices(Request $request, $id)
     {
-        try {
+        try { 
+            Log::info('=== INICIO DESASIGNACIÓN APRENDICES ===', [
+                'ficha_id' => $id,
+                'request_data' => $request->all(),
+                'user_id' => Auth::id(),
+                'timestamp' => now()
+            ]);
+
+            // Validación de entrada
             $request->validate([
                 'personas' => 'required|array|min:1',
                 'personas.*' => 'exists:personas,id'
             ]);
 
-            Log::info('Iniciando desasignación de personas como aprendices', [
+            $personasIds = $request->input('personas');
+            
+            Log::info('Validación exitosa, procesando personas', [
                 'ficha_id' => $id,
-                'personas_ids' => $request->input('personas'),
+                'personas_ids' => $personasIds,
+                'total_personas' => count($personasIds),
                 'user_id' => Auth::id()
             ]);
 
+            // Buscar la ficha
             $ficha = FichaCaracterizacion::findOrFail($id);
-            $personasIds = $request->input('personas');
+            
+            Log::info('Ficha encontrada', [
+                'ficha_id' => $ficha->id,
+                'numero_ficha' => $ficha->ficha,
+                'user_id' => Auth::id()
+            ]);
 
             DB::beginTransaction();
 
-            // Obtener los aprendices correspondientes a las personas
-            $aprendicesIds = \App\Models\Aprendiz::whereIn('persona_id', $personasIds)->pluck('id');
-            
-            if ($aprendicesIds->count() !== count($personasIds)) {
-                DB::rollBack();
-                return redirect()->back()
-                    ->with('error', 'Algunas personas no tienen registro de aprendiz.');
-            }
-
-            // Verificar que los aprendices estén asignados a la ficha
-            $aprendicesAsignados = $ficha->aprendices()->whereIn('aprendices.id', $aprendicesIds)->pluck('aprendices.id');
-            
-            if ($aprendicesAsignados->count() !== count($aprendicesIds)) {
-                DB::rollBack();
-                return redirect()->back()
-                    ->with('error', 'Algunos aprendices no están asignados a esta ficha.');
-            }
-
-            // Desasignar aprendices de la ficha
-            $ficha->aprendices()->detach($aprendicesIds);
-
-            // Actualizar registros de aprendiz: limpiar ficha_caracterizacion_id y desactivar
-            foreach ($aprendicesIds as $aprendizId) {
-                $aprendiz = \App\Models\Aprendiz::find($aprendizId);
-                if ($aprendiz) {
-                    $aprendiz->update([
-                        'ficha_caracterizacion_id' => null, // Limpiar la ficha asignada
-                        'estado' => 0, // Desactivar pero mantener registro
-                        'user_edit_id' => Auth::id(),
-                    ]);
-                    
-                    Log::info('Aprendiz desactivado', [
-                        'aprendiz_id' => $aprendiz->id,
-                        'persona_id' => $aprendiz->persona_id,
-                        'estado_anterior' => 1,
-                        'estado_nuevo' => 0,
-                        'ficha_caracterizacion_id' => null,
+            try {
+                // Obtener los aprendices asignados a esta ficha específica que corresponden a las personas seleccionadas
+                // Usamos la tabla pivot para obtener solo los aprendices asignados a ESTA ficha
+                $aprendicesAsignados = $ficha->aprendices()
+                    ->whereHas('persona', function($query) use ($personasIds) {
+                        $query->whereIn('id', $personasIds);
+                    })
+                    ->get();
+                
+                Log::info('Aprendices asignados a esta ficha encontrados', [
+                    'ficha_id' => $id,
+                    'personas_solicitadas' => count($personasIds),
+                    'personas_ids' => $personasIds,
+                    'aprendices_encontrados' => $aprendicesAsignados->count(),
+                    'aprendices_ids' => $aprendicesAsignados->pluck('id')->toArray(),
+                    'aprendices_persona_ids' => $aprendicesAsignados->pluck('persona_id')->toArray(),
+                    'user_id' => Auth::id()
+                ]);
+                
+                // Verificar que todas las personas seleccionadas tengan un aprendiz asignado a esta ficha
+                $personasEncontradas = $aprendicesAsignados->pluck('persona_id')->toArray();
+                $personasNoEncontradas = array_diff($personasIds, $personasEncontradas);
+                
+                if (count($personasNoEncontradas) > 0) {
+                    Log::warning('Personas no encontradas como aprendices en esta ficha', [
+                        'ficha_id' => $id,
+                        'personas_no_encontradas' => $personasNoEncontradas,
+                        'personas_solicitadas' => $personasIds,
                         'user_id' => Auth::id()
                     ]);
+                    
+                    DB::rollBack();
+                    return redirect()->back()
+                        ->with('error', 'Algunas personas no están asignadas como aprendices a esta ficha. Personas ID: ' . implode(', ', $personasNoEncontradas));
                 }
+                
+                // Obtener los IDs de los aprendices a desasignar
+                $aprendicesIds = $aprendicesAsignados->pluck('id');
+                
+                Log::info('IDs de aprendices a desasignar', [
+                    'ficha_id' => $id,
+                    'aprendices_ids' => $aprendicesIds->toArray(),
+                    'total' => $aprendicesIds->count(),
+                    'user_id' => Auth::id()
+                ]);
+
+                // Desasignar aprendices de la ficha
+                $resultadoDetach = $ficha->aprendices()->detach($aprendicesIds);
+                
+                Log::info('Desasignación de ficha completada', [
+                    'ficha_id' => $id,
+                    'aprendices_desasignados' => $aprendicesIds->toArray(),
+                    'resultado_detach' => $resultadoDetach,
+                    'user_id' => Auth::id()
+                ]);
+
+                // Actualizar registros de aprendiz: limpiar ficha_caracterizacion_id y desactivar
+                $aprendicesActualizados = [];
+                foreach ($aprendicesIds as $aprendizId) {
+                    try {
+                        $aprendiz = \App\Models\Aprendiz::find($aprendizId);
+                        if ($aprendiz) {
+                            $estadoAnterior = $aprendiz->estado;
+                            $fichaAnterior = $aprendiz->ficha_caracterizacion_id;
+                            
+                            $aprendiz->update([
+                                'ficha_caracterizacion_id' => null, // Limpiar la ficha asignada
+                                'estado' => 0, // Desactivar pero mantener registro
+                                'user_edit_id' => Auth::id(),
+                            ]);
+                            
+                            $aprendicesActualizados[] = [
+                                'aprendiz_id' => $aprendiz->id,
+                                'persona_id' => $aprendiz->persona_id,
+                                'estado_anterior' => $estadoAnterior,
+                                'ficha_anterior' => $fichaAnterior
+                            ];
+                            
+                            Log::info('Aprendiz desactivado exitosamente', [
+                                'aprendiz_id' => $aprendiz->id,
+                                'persona_id' => $aprendiz->persona_id,
+                                'estado_anterior' => $estadoAnterior,
+                                'estado_nuevo' => 0,
+                                'ficha_anterior' => $fichaAnterior,
+                                'ficha_caracterizacion_id_nuevo' => null,
+                                'user_id' => Auth::id()
+                            ]);
+                        } else {
+                            Log::warning('Aprendiz no encontrado durante actualización', [
+                                'aprendiz_id' => $aprendizId,
+                                'user_id' => Auth::id()
+                            ]);
+                        }
+                    } catch (\Exception $e) {
+                        Log::error('Error al actualizar aprendiz individual', [
+                            'aprendiz_id' => $aprendizId,
+                            'error' => $e->getMessage(),
+                            'file' => $e->getFile(),
+                            'line' => $e->getLine(),
+                            'user_id' => Auth::id()
+                        ]);
+                        throw $e; // Re-lanzar para que se maneje en el catch principal
+                    }
+                }
+
+                DB::commit();
+
+                Log::info('=== DESASIGNACIÓN COMPLETADA EXITOSAMENTE ===', [
+                    'ficha_id' => $id,
+                    'personas_desasignadas' => count($personasIds),
+                    'aprendices_actualizados' => $aprendicesActualizados,
+                    'user_id' => Auth::id()
+                ]);
+
+                return redirect()->route('fichaCaracterizacion.gestionarAprendices', $id)
+                    ->with('success', 'Personas desasignadas como aprendices exitosamente de la ficha. Total: ' . count($personasIds));
+
+            } catch (\Exception $e) {
+                DB::rollBack();
+                throw $e; // Re-lanzar para que se maneje en el catch principal
             }
 
-            DB::commit();
-
-            Log::info('Personas desasignadas como aprendices exitosamente', [
-                'ficha_id' => $id,
-                'personas_desasignadas' => count($personasIds),
-                'user_id' => Auth::id()
-            ]);
-
-            return redirect()->route('fichaCaracterizacion.gestionarAprendices', $id)
-                ->with('success', 'Personas desasignadas como aprendices exitosamente de la ficha.');
-
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::warning('Error de validación al desasignar personas como aprendices', [
+            Log::warning('=== ERROR DE VALIDACIÓN EN DESASIGNACIÓN ===', [
                 'ficha_id' => $id,
-                'errors' => $e->errors(),
-                'user_id' => Auth::id()
+                'request_data' => $request->all(),
+                'validation_errors' => $e->errors(),
+                'user_id' => Auth::id(),
+                'timestamp' => now()
             ]);
 
             return redirect()->back()
                 ->withErrors($e->errors())
-                ->withInput();
+                ->withInput()
+                ->with('error', 'Error de validación: ' . implode(', ', Arr::flatten($e->errors())));
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error('=== FICHA NO ENCONTRADA ===', [
+                'ficha_id' => $id,
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'timestamp' => now()
+            ]);
+
+            return redirect()->route('fichaCaracterizacion.index')
+                ->with('error', 'La ficha de caracterización no existe.');
 
         } catch (\Exception $e) {
             DB::rollBack();
             
-            Log::error('Error al desasignar personas como aprendices', [
+            Log::error('=== ERROR CRÍTICO EN DESASIGNACIÓN APRENDICES ===', [
                 'ficha_id' => $id,
-                'error' => $e->getMessage(),
-                'file' => $e->getFile(),
-                'line' => $e->getLine(),
-                'user_id' => Auth::id()
+                'request_data' => $request->all(),
+                'error_message' => $e->getMessage(),
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine(),
+                'error_trace' => $e->getTraceAsString(),
+                'user_id' => Auth::id(),
+                'timestamp' => now()
             ]);
 
             return redirect()->back()
-                ->with('error', 'Error al desasignar personas como aprendices. Por favor, intente nuevamente.');
+                ->with('error', 'Error crítico al desasignar aprendices: ' . $e->getMessage() . '. Revisar logs para más detalles.');
         }
     }
 

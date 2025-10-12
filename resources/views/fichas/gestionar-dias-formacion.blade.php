@@ -2,62 +2,124 @@
 
 @section('title', 'Gestionar Días de Formación - Ficha ' . $ficha->ficha)
 
+@section('meta')
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+@endsection
+
+@section('css')
+    @vite(['dias_formacion_css'])
+@endsection
+
 @section('content_header')
-    <div class="d-flex justify-content-between align-items-center">
-        <h1>
-            <i class="fas fa-calendar-week text-primary"></i>
-            Gestionar Días de Formación - Ficha {{ $ficha->ficha }}
-        </h1>
+    <section class="content-header dashboard-header py-4" style="background: #fff !important; border-bottom: 1px solid rgba(0, 0, 0, .05) !important; box-shadow: 0 2px 4px rgba(0, 0, 0, .03) !important;">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-12 col-md-6 d-flex align-items-center">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
+                        style="width: 48px; height: 48px;">
+                        <i class="fas fa-calendar-week text-white fa-lg"></i>
+                    </div>
         <div>
-            <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Volver a la Ficha
-            </a>
+                        <h1 class="h3 mb-0 text-gray-800">Gestionar Días de Formación</h1>
+                        <p class="text-muted mb-0 font-weight-light">Ficha {{ $ficha->ficha }}</p>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
+                                    <i class="fas fa-home"></i> Inicio
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('fichaCaracterizacion.index') }}" class="link_right_header">
+                                    <i class="fas fa-list"></i> Fichas de Caracterización
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}" class="link_right_header">
+                                    <i class="fas fa-eye"></i> Ficha {{ $ficha->ficha }}
+                                </a>
+                            </li>
+                            <li class="breadcrumb-item active" aria-current="page">
+                                <i class="fas fa-calendar-week"></i> Días de Formación
+                            </li>
+                        </ol>
+                    </nav>
         </div>
     </div>
-@stop
+        </div>
+    </section>
+@endsection
 
 @section('content')
-    <!-- Información de la Ficha -->
-    <div class="row mb-4">
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <div class="row">
         <div class="col-12">
-            <div class="card card-outline card-info">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-info-circle"></i>
-                        Información de la Ficha
-                    </h3>
+                    <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ route('fichaCaracterizacion.show', $ficha->id) }}">
+                        <i class="fas fa-arrow-left mr-1"></i> Volver a la Ficha
+                    </a>
+
+                    <!-- Información de la Ficha -->
+                    <div class="card shadow-sm mb-4 no-hover">
+                        <div class="card-header bg-white py-3 d-flex align-items-center">
+                            <h5 class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1">
+                                <i class="fas fa-info-circle mr-2"></i> Información de la Ficha
+                            </h5>
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="collapse"
+                                data-target="#fichaInfo" aria-expanded="true">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
                 </div>
+
+                        <div class="collapse show" id="fichaInfo">
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3">
-                            <strong>Programa:</strong><br>
-                            <span class="text-muted">{{ $ficha->programaFormacion->nombre ?? 'No asignado' }}</span>
+                                        <div class="info-item">
+                                            <strong class="text-muted">Programa:</strong><br>
+                                            <span class="text-dark font-weight-medium">{{ $ficha->programaFormacion->nombre ?? 'No asignado' }}</span>
+                                        </div>
                         </div>
                         <div class="col-md-3">
-                            <strong>Jornada:</strong><br>
-                            <span class="text-muted">{{ $ficha->jornadaFormacion->jornada ?? 'No asignada' }}</span>
+                                        <div class="info-item">
+                                            <strong class="text-muted">Jornada:</strong><br>
+                                            <span class="text-dark font-weight-medium">{{ $ficha->jornadaFormacion->jornada ?? 'No asignada' }}</span>
+                                        </div>
                         </div>
                         <div class="col-md-3">
-                            <strong>Fecha Inicio:</strong><br>
-                            <span class="text-muted">{{ $ficha->fecha_inicio ? $ficha->fecha_inicio->format('d/m/Y') : 'No definida' }}</span>
+                                        <div class="info-item">
+                                            <strong class="text-muted">Fecha Inicio:</strong><br>
+                                            <span class="text-dark font-weight-medium">{{ $ficha->fecha_inicio ? $ficha->fecha_inicio->format('d/m/Y') : 'No definida' }}</span>
+                                        </div>
                         </div>
                         <div class="col-md-3">
-                            <strong>Fecha Fin:</strong><br>
-                            <span class="text-muted">{{ $ficha->fecha_fin ? $ficha->fecha_fin->format('d/m/Y') : 'No definida' }}</span>
+                                        <div class="info-item">
+                                            <strong class="text-muted">Fecha Fin:</strong><br>
+                                            <span class="text-dark font-weight-medium">{{ $ficha->fecha_fin ? $ficha->fecha_fin->format('d/m/Y') : 'No definida' }}</span>
                         </div>
                     </div>
-                    <div class="row mt-3">
+                                </div>
+                                <hr class="my-3">
+                                <div class="row">
                         <div class="col-md-4">
-                            <strong>Duración:</strong><br>
-                            <span class="text-muted">{{ $ficha->duracionEnDias() }} días</span>
+                                        <div class="info-item">
+                                            <strong class="text-muted">Duración:</strong><br>
+                                            <span class="text-dark font-weight-medium">{{ $ficha->duracionEnDias() }} días</span>
+                                        </div>
                         </div>
                         <div class="col-md-4">
-                            <strong>Horas Totales Actuales:</strong><br>
+                                        <div class="info-item">
+                                            <strong class="text-muted">Horas Totales Actuales:</strong><br>
                             <span class="text-primary font-weight-bold">{{ $horasTotalesActuales }} horas</span>
+                                        </div>
                         </div>
                         <div class="col-md-4">
-                            <strong>Días Asignados:</strong><br>
-                            <span class="text-muted">{{ $diasAsignados->count() }} días</span>
+                                        <div class="info-item">
+                                            <strong class="text-muted">Días Asignados:</strong><br>
+                                            <span class="text-dark font-weight-medium">{{ $diasAsignados->count() }} días</span>
                         </div>
                     </div>
                 </div>
@@ -65,24 +127,30 @@
         </div>
     </div>
 
-    <!-- Configurar Horarios y Agregar Días -->
-    <div class="row mb-4">
-        <div class="col-12">
-            <div class="card card-outline card-primary">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-calendar-plus text-primary"></i>
-                        Configurar Horarios y Agregar Días de Formación
-                    </h3>
-                </div>
-                <div class="card-body">
                     @if($ficha->jornadaFormacion)
+    <!-- Configurar Horarios y Agregar Días -->
+                        <div class="card shadow-sm mb-4 no-hover">
+                            <div class="card-header bg-white py-3 d-flex align-items-center">
+                                <h5 class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1">
+                                    <i class="fas fa-calendar-plus mr-2"></i> Configurar Horarios y Agregar Días
+                                </h5>
+                                <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="collapse"
+                                    data-target="#configurarHorarios" aria-expanded="true">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                </div>
+
+                            <div class="collapse show" id="configurarHorarios">
+                <div class="card-body">
                         <!-- Configuración de Horarios -->
-                        <div class="row mb-4">
+                                    <div class="mb-4">
+                                        <h6 class="text-dark mb-3">
+                                            <i class="fas fa-clock mr-2"></i>Configuración de Horarios
+                                        </h6>
+                                        <div class="row">
                             <div class="col-md-4">
-                                <label class="form-label">
-                                    <i class="fas fa-play-circle"></i> Hora de Inicio
-                                </label>
+                                                <div class="form-group">
+                                                    <label class="text-muted small">Hora de Inicio</label>
                                 <input type="time" id="hora_inicio_global" class="form-control" 
                                        value="{{ $ficha->jornadaFormacion->hora_inicio }}"
                                        @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
@@ -94,11 +162,11 @@
                                        @elseif($ficha->jornadaFormacion->jornada == 'FINES DE SEMANA')
                                            min="08:00" max="16:59" step="3600"
                                        @endif>
+                                                </div>
                             </div>
                             <div class="col-md-4">
-                                <label class="form-label">
-                                    <i class="fas fa-stop-circle"></i> Hora de Fin
-                                </label>
+                                                <div class="form-group">
+                                                    <label class="text-muted small">Hora de Fin</label>
                                 <input type="time" id="hora_fin_global" class="form-control" 
                                        value="{{ $ficha->jornadaFormacion->hora_fin }}"
                                        @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
@@ -110,11 +178,23 @@
                                        @elseif($ficha->jornadaFormacion->jornada == 'FINES DE SEMANA')
                                            min="08:00" max="16:59" step="3600"
                                        @endif>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label class="text-muted small">&nbsp;</label>
+                                                    <button type="button" class="btn btn-primary btn-block" onclick="aplicarHorarioGlobal()">
+                                                        <i class="fas fa-sync-alt mr-1"></i>Aplicar a Todos
+                                                    </button>
+                                                </div>
+                                            </div>
                             </div>
                         </div>
                         
                         <div class="alert alert-info mb-4">
-                            <i class="fas fa-info-circle"></i>
+                                        <div class="d-flex align-items-center">
+                                            <i class="fas fa-info-circle mr-2"></i>
+                                            <div>
                             <strong>Jornada:</strong> {{ $ficha->jornadaFormacion->jornada }}<br>
                             <strong>Restricciones de horarios:</strong><br>
                             @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
@@ -127,38 +207,23 @@
                                 • <strong>FINES DE SEMANA:</strong> 08:00 - 16:59 horas (solo horas completas)
                             @endif
                             <br><strong>Nota:</strong> Los horarios deben respetar las restricciones de la jornada seleccionada.
+                                            </div>
+                                        </div>
                         </div>
 
                         <!-- Días Seleccionados -->
                         <div id="dias-seleccionados" class="mb-4" style="display: none;">
-                            <h6>
-                                <i class="fas fa-list"></i> Días Seleccionados
+                                        <h6 class="text-dark mb-3">
+                                            <i class="fas fa-list mr-2"></i>Días Seleccionados
                             </h6>
                             <div id="lista-dias-seleccionados"></div>
                         </div>
 
-                        <!-- Formulario Oculto para Envío -->
-                        <form action="{{ route('fichaCaracterizacion.guardarDiasFormacion', $ficha->id) }}" method="POST" id="formDiasFormacion">
-                            @csrf
-                            <div id="dias-container" style="display: none;">
-                                <!-- Los días se agregarán dinámicamente aquí -->
-                            </div>
-                            
-                            <div class="form-group">
-                                <button type="button" class="btn btn-success" onclick="guardarDiasSeleccionados()" id="btn-guardar-dias" style="display: none;">
-                                    <i class="fas fa-save"></i> Guardar Días Seleccionados
-                                </button>
-                                <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}" class="btn btn-secondary">
-                                    <i class="fas fa-times"></i> Cancelar
-                                </a>
-                            </div>
-                        </form>
-
                         <!-- Selección de Días con Cuadros -->
                         <div class="mb-4">
-                            <h5 class="mb-3">
-                                <i class="fas fa-calendar-week"></i> Seleccionar Días de Formación
-                            </h5>
+                                        <h6 class="text-dark mb-3">
+                                            <i class="fas fa-calendar-week mr-2"></i>Seleccionar Días de Formación
+                                        </h6>
                             <div class="row">
                                 @foreach($diasSemana as $dia)
                                     @php
@@ -190,85 +255,122 @@
                                         </div>
                                     </div>
                                 @endforeach
+                                        </div>
+                                    </div>
+
+                                    <!-- Formulario Oculto para Envío -->
+                                    <form action="{{ route('fichaCaracterizacion.guardarDiasFormacion', $ficha->id) }}" method="POST" id="formDiasFormacion">
+                                        @csrf
+                                        <div id="dias-container" style="display: none;">
+                                            <!-- Los días se agregarán dinámicamente aquí -->
+                                        </div>
+                                        
+                                        <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                                            <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}" class="btn btn-outline-secondary">
+                                                <i class="fas fa-arrow-left mr-1"></i> Volver
+                                            </a>
+                                            <button type="button" class="btn btn-success" onclick="guardarDiasSeleccionados()" id="btn-guardar-dias" style="display: none;">
+                                                <i class="fas fa-check mr-1"></i> Guardar Días Seleccionados
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     @else
+                        <div class="card shadow-sm mb-4 no-hover">
+                            <div class="card-body">
                         <div class="alert alert-warning">
-                            <i class="fas fa-exclamation-triangle"></i>
+                                    <i class="fas fa-exclamation-triangle mr-2"></i>
                             <strong>Atención:</strong> No se ha asignado una jornada a esta ficha. Por favor, configure primero la jornada en la información general de la ficha.
                         </div>
-                    @endif
                 </div>
             </div>
-        </div>
-    </div>
+                    @endif
 
     <!-- Días Asignados -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card card-outline card-info">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-calendar-check text-info"></i>
-                        Días de Formación Asignados
-                        <span class="badge badge-primary ml-2">{{ $diasAsignados->count() }} días</span>
-                    </h3>
+                    <div class="card shadow-sm no-hover">
+                        <div class="card-header bg-white py-3 d-flex align-items-center">
+                            <h6 class="m-0 font-weight-bold text-primary d-flex flex-grow-1">
+                                <i class="fas fa-calendar-check mr-2"></i>Días de Formación Asignados
+                            </h6>
+                            <div class="badge badge-primary">{{ $diasAsignados->count() }} días</div>
                 </div>
-                <div class="card-body">
+                        <div class="card-body p-0">
                     @if($diasAsignados->count() > 0)
-                        <div class="row">
+                                <div class="table-responsive">
+                                    <table class="table table-borderless table-striped mb-0">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th class="px-4 py-3" style="width: 20%">Día</th>
+                                                <th class="px-4 py-3" style="width: 25%">Horario</th>
+                                                <th class="px-4 py-3" style="width: 20%">Duración</th>
+                                                <th class="px-4 py-3 text-center" style="width: 35%">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
                         @foreach($diasAsignados as $diaAsignado)
-                                <div class="col-md-6 mb-3">
-                                    <div class="card border-success">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start">
-                                        <div>
-                                            <h5 class="mb-1">
-                                                        <i class="fas fa-calendar-day text-success"></i>
-                                                {{ $diaAsignado->dia->name }}
-                                            </h5>
-                                            <p class="text-muted mb-1">
-                                                <i class="fas fa-clock"></i>
+                                                <tr>
+                                                    <td class="px-4">
+                                                        <div class="d-flex align-items-center">
+                                                            <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-2"
+                                                                style="width: 32px; height: 32px;">
+                                                                <i class="fas fa-calendar-day text-white" style="font-size: 12px;"></i>
+                                                            </div>
+                                                            <span class="font-weight-medium">{{ $diaAsignado->dia->name }}</span>
+                                                        </div>
+                                                    </td>
+                                                    <td class="px-4">
+                                                        <span class="text-muted">
+                                                            <i class="fas fa-clock mr-1"></i>
                                                 {{ $diaAsignado->hora_inicio }} - {{ $diaAsignado->hora_fin }}
-                                            </p>
-                                            <p class="text-muted mb-0">
-                                                <i class="fas fa-hourglass-half"></i>
+                                                        </span>
+                                                    </td>
+                                                    <td class="px-4">
+                                                        <span class="text-muted">
+                                                            <i class="fas fa-hourglass-half mr-1"></i>
                                                 {{ $diaAsignado->calcularHorasDia() }}
-                                            </p>
-                                        </div>
-                                        <div>
-                                            <button type="button" class="btn btn-sm btn-warning" 
-                                                    onclick="editarDia({{ $diaAsignado->id }}, '{{ $diaAsignado->hora_inicio }}', '{{ $diaAsignado->hora_fin }}')">
-                                                <i class="fas fa-edit"></i>
+                                                        </span>
+                                                    </td>
+                                                    <td class="px-4 text-center">
+                                                        <div class="btn-group">
+                                                            <button type="button" class="btn btn-light btn-sm" 
+                                                                    onclick="editarDia({{ $diaAsignado->id }}, '{{ $diaAsignado->hora_inicio }}', '{{ $diaAsignado->hora_fin }}')"
+                                                                    data-toggle="tooltip" title="Editar horarios">
+                                                                <i class="fas fa-pencil-alt text-info"></i>
                                             </button>
                                             <form action="{{ route('fichaCaracterizacion.eliminarDiaFormacion', [$ficha->id, $diaAsignado->id]) }}" 
-                                                  method="POST" style="display: inline;">
+                                                                  method="POST" class="d-inline">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-danger" 
-                                                        onclick="return confirm('¿Está seguro de eliminar este día de formación?')">
-                                                    <i class="fas fa-trash"></i>
+                                                                <button type="submit" class="btn btn-light btn-sm" 
+                                                                        onclick="return confirm('¿Está seguro de eliminar este día de formación?')"
+                                                                        data-toggle="tooltip" title="Eliminar día">
+                                                                    <i class="fas fa-trash text-danger"></i>
                                                 </button>
                                             </form>
                                                 </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                                    </td>
+                                                </tr>
                         @endforeach
+                                        </tbody>
+                                    </table>
                         </div>
                     @else
-                        <div class="text-center text-muted py-4">
-                            <i class="fas fa-calendar-times fa-3x mb-3"></i>
-                            <h5>No hay días de formación asignados</h5>
-                            <p>Use la sección superior para agregar días de formación a esta ficha.</p>
+                                <div class="text-center py-5">
+                                    <div class="mb-3">
+                                        <i class="fas fa-calendar-times text-muted" style="font-size: 3rem;"></i>
+                                    </div>
+                                    <h5 class="text-muted">No hay días de formación asignados</h5>
+                                    <p class="text-muted">Use la sección superior para agregar días de formación a esta ficha.</p>
                         </div>
                     @endif
                 </div>
             </div>
         </div>
     </div>
-
+        </div>
+    </section>
 
     <!-- Modal para Editar Día -->
     <div class="modal fade" id="modalEditarDia" tabindex="-1" role="dialog">
@@ -276,7 +378,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        <i class="fas fa-edit"></i> Editar Día de Formación
+                        <i class="fas fa-edit mr-2"></i>Editar Día de Formación
                     </h5>
                     <button type="button" class="close" data-dismiss="modal">
                         <span>&times;</span>
@@ -303,108 +405,7 @@
             </div>
         </div>
     </div>
-
-@stop
-
-@section('css')
-    <style>
-        .card.border-success {
-            border-color: #28a745 !important;
-        }
-        .card.border-primary {
-            border-color: #007bff !important;
-        }
-        .card.border-secondary {
-            border-color: #6c757d !important;
-        }
-
-        /* Estilos para cuadros de días */
-        .dia-cuadro {
-            border: 2px solid #dee2e6;
-            border-radius: 8px;
-            padding: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            background: #ffffff;
-            min-height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .dia-cuadro:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-
-        .dia-cuadro.disponible {
-            border-color: #007bff;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        }
-
-        .dia-cuadro.disponible:hover {
-            border-color: #0056b3;
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-        }
-
-        .dia-cuadro.seleccionado {
-            border-color: #28a745;
-            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
-        }
-
-        .dia-cuadro.asignado {
-            border-color: #6c757d;
-            background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-
-        .dia-cuadro.no-permitido {
-            border-color: #dc3545;
-            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        .dia-nombre {
-            font-weight: bold;
-            font-size: 12px;
-            margin-bottom: 3px;
-            color: #495057;
-        }
-
-        .dia-cuadro.seleccionado .dia-nombre {
-            color: #155724;
-        }
-
-        .dia-cuadro.asignado .dia-nombre {
-            color: #6c757d;
-        }
-
-        .dia-cuadro.no-permitido .dia-nombre {
-            color: #721c24;
-        }
-
-        /* Lista de días seleccionados */
-        .dia-seleccionado-item {
-            background: #e8f5e8;
-            border: 1px solid #c3e6cb;
-            border-radius: 5px;
-            padding: 8px 12px;
-            margin: 5px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .dia-seleccionado-item .btn-remover {
-            padding: 2px 6px;
-            font-size: 12px;
-        }
-    </style>
-@stop
+@endsection
 
 @section('js')
     <script>
@@ -412,6 +413,9 @@
             // Cargar días existentes
             cargarDiasExistentes();
         });
+
+        // Variables globales para días seleccionados
+        let diasSeleccionados = [];
 
         // Función para cargar días ya asignados
         function cargarDiasExistentes() {
@@ -508,76 +512,133 @@
             $('#modalEditarDia').modal('show');
         }
 
-        // Validación del formulario
-        document.getElementById('formDiasFormacion').addEventListener('submit', function(e) {
-            const diasSeleccionados = document.querySelectorAll('.dia-select');
+        // Función para seleccionar un día
+        function seleccionarDia(elemento) {
+            const diaId = elemento.getAttribute('data-dia-id');
+            const diaNombre = elemento.getAttribute('data-dia-nombre');
+            
+            if (!diasSeleccionados.includes(diaId)) {
+                diasSeleccionados.push(diaId);
+                elemento.classList.remove('disponible');
+                elemento.classList.add('seleccionado');
+                
+                // Actualizar texto del cuadro
+                elemento.querySelector('small').innerHTML = '<i class="fas fa-check"></i> Seleccionado';
+                elemento.querySelector('small').className = 'text-success';
+                
+                actualizarListaDiasSeleccionados();
+                mostrarBotonGuardar();
+            }
+        }
+
+        // Función para remover un día de la selección
+        function removerDiaSeleccionado(diaId, diaNombre) {
+            diasSeleccionados = diasSeleccionados.filter(id => id !== diaId);
+            
+            // Actualizar cuadro
+            const cuadro = document.querySelector(`[data-dia-id="${diaId}"]`);
+            if (cuadro) {
+                cuadro.classList.remove('seleccionado');
+                cuadro.classList.add('disponible');
+                cuadro.querySelector('small').innerHTML = 'Click para seleccionar';
+                cuadro.querySelector('small').className = 'text-muted';
+            }
+            
+            actualizarListaDiasSeleccionados();
+            mostrarBotonGuardar();
+        }
+
+        // Función para actualizar la lista de días seleccionados
+        function actualizarListaDiasSeleccionados() {
+            const container = document.getElementById('lista-dias-seleccionados');
+            const seccion = document.getElementById('dias-seleccionados');
             
             if (diasSeleccionados.length === 0) {
-                e.preventDefault();
-                alert('Debe agregar al menos un día de formación.');
-                return;
-            }
-            
-            // Verificar que no haya días duplicados
-            const diasIds = Array.from(diasSeleccionados).map(select => select.value);
-            const diasUnicos = [...new Set(diasIds)];
-            
-            if (diasIds.length !== diasUnicos.length) {
-                e.preventDefault();
-                alert('No puede asignar el mismo día más de una vez.');
-                return;
-            }
-            
-            // Verificar que todos los días tengan horarios válidos
-            const horasInicio = document.querySelectorAll('input[name*="[hora_inicio]"]');
-            const horasFin = document.querySelectorAll('input[name*="[hora_fin]"]');
-            
-            for (let i = 0; i < horasInicio.length; i++) {
-                if (horasInicio[i].value >= horasFin[i].value) {
-                    e.preventDefault();
-                    alert('La hora de fin debe ser posterior a la hora de inicio.');
+                seccion.style.display = 'none';
                     return;
                 }
-            }
-        });
-
-        // Cálculo automático de horas totales
-        function calcularHorasTotales() {
-            const diasRows = document.querySelectorAll('.dia-row');
-            let horasTotales = 0;
             
-            diasRows.forEach(row => {
-                const horaInicio = row.querySelector('input[name*="[hora_inicio]"]').value;
-                const horaFin = row.querySelector('input[name*="[hora_fin]"]').value;
+            seccion.style.display = 'block';
+            container.innerHTML = '';
+            
+            diasSeleccionados.forEach(diaId => {
+                const cuadro = document.querySelector(`[data-dia-id="${diaId}"]`);
+                const diaNombre = cuadro.getAttribute('data-dia-nombre');
                 
-                if (horaInicio && horaFin) {
-                    const inicio = new Date('2000-01-01 ' + horaInicio);
-                    const fin = new Date('2000-01-01 ' + horaFin);
-                    const horas = (fin - inicio) / (1000 * 60 * 60);
-                    horasTotales += horas;
-                }
+                const item = document.createElement('div');
+                item.className = 'dia-seleccionado-item';
+                item.innerHTML = `
+                    <span>
+                        <i class="fas fa-calendar-day"></i> ${diaNombre}
+                    </span>
+                    <button type="button" class="btn btn-sm btn-outline-danger btn-remover" 
+                            onclick="removerDiaSeleccionado('${diaId}', '${diaNombre}')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Función para mostrar/ocultar botón de guardar
+        function mostrarBotonGuardar() {
+            const boton = document.getElementById('btn-guardar-dias');
+            if (diasSeleccionados.length > 0) {
+                boton.style.display = 'inline-block';
+            } else {
+                boton.style.display = 'none';
+            }
+        }
+
+        // Función para guardar días seleccionados
+        function guardarDiasSeleccionados() {
+            const horaInicio = document.getElementById('hora_inicio_global').value;
+            const horaFin = document.getElementById('hora_fin_global').value;
+            
+            if (!horaInicio || !horaFin) {
+                alert('Por favor, configure primero las horas de inicio y fin.');
+                return;
+            }
+            
+            if (diasSeleccionados.length === 0) {
+                alert('Por favor, seleccione al menos un día.');
+                return;
+            }
+            
+            // Validar horarios según jornada
+            const validacion = validarHorariosSegunJornada(horaInicio, horaFin);
+            if (!validacion.valido) {
+                alert(validacion.mensaje);
+                return;
+            }
+            
+            // Crear campos ocultos para el formulario
+            const container = document.getElementById('dias-container');
+            container.innerHTML = '';
+            
+            diasSeleccionados.forEach((diaId, index) => {
+                const inputDiaId = document.createElement('input');
+                inputDiaId.type = 'hidden';
+                inputDiaId.name = `dias[${index}][dia_id]`;
+                inputDiaId.value = diaId;
+                
+                const inputHoraInicio = document.createElement('input');
+                inputHoraInicio.type = 'hidden';
+                inputHoraInicio.name = `dias[${index}][hora_inicio]`;
+                inputHoraInicio.value = horaInicio;
+                
+                const inputHoraFin = document.createElement('input');
+                inputHoraFin.type = 'hidden';
+                inputHoraFin.name = `dias[${index}][hora_fin]`;
+                inputHoraFin.value = horaFin;
+                
+                container.appendChild(inputDiaId);
+                container.appendChild(inputHoraInicio);
+                container.appendChild(inputHoraFin);
             });
             
-            // Mostrar horas totales estimadas
-            if (horasTotales > 0) {
-                const duracionDias = {{ $ficha->duracionEnDias() }};
-                const horasEstimadas = horasTotales * duracionDias;
-                
-                // Crear o actualizar indicador de horas estimadas
-                let indicador = document.getElementById('horas-estimadas');
-                if (!indicador) {
-                    indicador = document.createElement('div');
-                    indicador.id = 'horas-estimadas';
-                    indicador.className = 'alert alert-info mt-3';
-                    document.getElementById('formDiasFormacion').appendChild(indicador);
-                }
-                
-                indicador.innerHTML = `
-                    <i class="fas fa-calculator"></i>
-                    <strong>Horas estimadas totales:</strong> ${Math.round(horasEstimadas)} horas 
-                    (${horasTotales.toFixed(1)} horas/día × ${duracionDias} días)
-                `;
-            }
+            // Enviar formulario
+            document.getElementById('formDiasFormacion').submit();
         }
 
         // Función para validar horarios según jornada
@@ -682,9 +743,6 @@
                 campo.value = horaFin;
             });
             
-            // Recalcular horas totales
-            calcularHorasTotales();
-            
             // Mostrar mensaje de éxito
             alert(`Horario aplicado exitosamente:\nInicio: ${horaInicio}\nFin: ${horaFin}\n\nSe aplicó a ${camposHoraInicio.length} días.`);
         }
@@ -756,6 +814,39 @@
             });
         }
 
+        // Validación del formulario
+        document.getElementById('formDiasFormacion').addEventListener('submit', function(e) {
+            const diasSeleccionados = document.querySelectorAll('.dia-select');
+            
+            if (diasSeleccionados.length === 0) {
+                e.preventDefault();
+                alert('Debe agregar al menos un día de formación.');
+                return;
+            }
+            
+            // Verificar que no haya días duplicados
+            const diasIds = Array.from(diasSeleccionados).map(select => select.value);
+            const diasUnicos = [...new Set(diasIds)];
+            
+            if (diasIds.length !== diasUnicos.length) {
+                e.preventDefault();
+                alert('No puede asignar el mismo día más de una vez.');
+                return;
+            }
+            
+            // Verificar que todos los días tengan horarios válidos
+            const horasInicio = document.querySelectorAll('input[name*="[hora_inicio]"]');
+            const horasFin = document.querySelectorAll('input[name*="[hora_fin]"]');
+            
+            for (let i = 0; i < horasInicio.length; i++) {
+                if (horasInicio[i].value >= horasFin[i].value) {
+                    e.preventDefault();
+                    alert('La hora de fin debe ser posterior a la hora de inicio.');
+                    return;
+                }
+            }
+        });
+
         // Agregar event listeners para el cálculo automático y validación en tiempo real
         document.addEventListener('change', function(e) {
             if (e.target.matches('input[name*="[hora_inicio]"], input[name*="[hora_fin]"]')) {
@@ -768,136 +859,43 @@
             }
         });
 
-        // Variables globales para días seleccionados
-        let diasSeleccionados = [];
-
-        // Función para seleccionar un día
-        function seleccionarDia(elemento) {
-            const diaId = elemento.getAttribute('data-dia-id');
-            const diaNombre = elemento.getAttribute('data-dia-nombre');
+        // Cálculo automático de horas totales
+        function calcularHorasTotales() {
+            const diasRows = document.querySelectorAll('.dia-row');
+            let horasTotales = 0;
             
-            if (!diasSeleccionados.includes(diaId)) {
-                diasSeleccionados.push(diaId);
-                elemento.classList.remove('disponible');
-                elemento.classList.add('seleccionado');
+            diasRows.forEach(row => {
+                const horaInicio = row.querySelector('input[name*="[hora_inicio]"]').value;
+                const horaFin = row.querySelector('input[name*="[hora_fin]"]').value;
                 
-                // Actualizar texto del cuadro
-                elemento.querySelector('small').innerHTML = '<i class="fas fa-check"></i> Seleccionado';
-                elemento.querySelector('small').className = 'text-success';
+                if (horaInicio && horaFin) {
+                    const inicio = new Date('2000-01-01 ' + horaInicio);
+                    const fin = new Date('2000-01-01 ' + horaFin);
+                    const horas = (fin - inicio) / (1000 * 60 * 60);
+                    horasTotales += horas;
+                }
+            });
+            
+            // Mostrar horas totales estimadas
+            if (horasTotales > 0) {
+                const duracionDias = {{ $ficha->duracionEnDias() }};
+                const horasEstimadas = horasTotales * duracionDias;
                 
-                actualizarListaDiasSeleccionados();
-                mostrarBotonGuardar();
-            }
-        }
-
-        // Función para remover un día de la selección
-        function removerDiaSeleccionado(diaId, diaNombre) {
-            diasSeleccionados = diasSeleccionados.filter(id => id !== diaId);
-            
-            // Actualizar cuadro
-            const cuadro = document.querySelector(`[data-dia-id="${diaId}"]`);
-            if (cuadro) {
-                cuadro.classList.remove('seleccionado');
-                cuadro.classList.add('disponible');
-                cuadro.querySelector('small').innerHTML = 'Click para seleccionar';
-                cuadro.querySelector('small').className = 'text-muted';
-            }
-            
-            actualizarListaDiasSeleccionados();
-            mostrarBotonGuardar();
-        }
-
-        // Función para actualizar la lista de días seleccionados
-        function actualizarListaDiasSeleccionados() {
-            const container = document.getElementById('lista-dias-seleccionados');
-            const seccion = document.getElementById('dias-seleccionados');
-            
-            if (diasSeleccionados.length === 0) {
-                seccion.style.display = 'none';
-                return;
-            }
-            
-            seccion.style.display = 'block';
-            container.innerHTML = '';
-            
-            diasSeleccionados.forEach(diaId => {
-                const cuadro = document.querySelector(`[data-dia-id="${diaId}"]`);
-                const diaNombre = cuadro.getAttribute('data-dia-nombre');
+                // Crear o actualizar indicador de horas estimadas
+                let indicador = document.getElementById('horas-estimadas');
+                if (!indicador) {
+                    indicador = document.createElement('div');
+                    indicador.id = 'horas-estimadas';
+                    indicador.className = 'alert alert-info mt-3';
+                    document.getElementById('formDiasFormacion').appendChild(indicador);
+                }
                 
-                const item = document.createElement('div');
-                item.className = 'dia-seleccionado-item';
-                item.innerHTML = `
-                    <span>
-                        <i class="fas fa-calendar-day"></i> ${diaNombre}
-                    </span>
-                    <button type="button" class="btn btn-sm btn-outline-danger btn-remover" 
-                            onclick="removerDiaSeleccionado('${diaId}', '${diaNombre}')">
-                        <i class="fas fa-times"></i>
-                    </button>
+                indicador.innerHTML = `
+                    <i class="fas fa-calculator"></i>
+                    <strong>Horas estimadas totales:</strong> ${Math.round(horasEstimadas)} horas 
+                    (${horasTotales.toFixed(1)} horas/día × ${duracionDias} días)
                 `;
-                container.appendChild(item);
-            });
-        }
-
-        // Función para mostrar/ocultar botón de guardar
-        function mostrarBotonGuardar() {
-            const boton = document.getElementById('btn-guardar-dias');
-            if (diasSeleccionados.length > 0) {
-                boton.style.display = 'inline-block';
-            } else {
-                boton.style.display = 'none';
             }
-        }
-
-        // Función para guardar días seleccionados
-        function guardarDiasSeleccionados() {
-            const horaInicio = document.getElementById('hora_inicio_global').value;
-            const horaFin = document.getElementById('hora_fin_global').value;
-            
-            if (!horaInicio || !horaFin) {
-                alert('Por favor, configure primero las horas de inicio y fin.');
-                return;
-            }
-            
-            if (diasSeleccionados.length === 0) {
-                alert('Por favor, seleccione al menos un día.');
-                return;
-            }
-            
-            // Validar horarios según jornada
-            const validacion = validarHorariosSegunJornada(horaInicio, horaFin);
-            if (!validacion.valido) {
-                alert(validacion.mensaje);
-                return;
-            }
-            
-            // Crear campos ocultos para el formulario
-            const container = document.getElementById('dias-container');
-            container.innerHTML = '';
-            
-            diasSeleccionados.forEach((diaId, index) => {
-                const inputDiaId = document.createElement('input');
-                inputDiaId.type = 'hidden';
-                inputDiaId.name = `dias[${index}][dia_id]`;
-                inputDiaId.value = diaId;
-                
-                const inputHoraInicio = document.createElement('input');
-                inputHoraInicio.type = 'hidden';
-                inputHoraInicio.name = `dias[${index}][hora_inicio]`;
-                inputHoraInicio.value = horaInicio;
-                
-                const inputHoraFin = document.createElement('input');
-                inputHoraFin.type = 'hidden';
-                inputHoraFin.name = `dias[${index}][hora_fin]`;
-                inputHoraFin.value = horaFin;
-                
-                container.appendChild(inputDiaId);
-                container.appendChild(inputHoraInicio);
-                container.appendChild(inputHoraFin);
-            });
-            
-            // Enviar formulario
-            document.getElementById('formDiasFormacion').submit();
         }
 
         // Inicializar restricciones dinámicas cuando se carga la página
@@ -905,4 +903,8 @@
             actualizarRestriccionesHorarios();
         });
     </script>
-@stop
+@endsection
+
+@section('footer')
+    @include('layout.footer')
+@endsection

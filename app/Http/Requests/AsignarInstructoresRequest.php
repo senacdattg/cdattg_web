@@ -7,6 +7,7 @@ use Illuminate\Validation\Rule;
 use App\Models\Instructor;
 use App\Models\FichaCaracterizacion;
 use App\Models\InstructorFichaCaracterizacion;
+use App\Models\Parametro;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -18,6 +19,24 @@ class AsignarInstructoresRequest extends FormRequest
     public function authorize(): bool
     {
         return $this->user()->can('EDITAR INSTRUCTOR') || $this->user()->can('CREAR INSTRUCTOR');
+    }
+
+    /**
+     * Preparar datos antes de validación
+     */
+    protected function prepareForValidation(): void
+    {
+        // Si no se proporciona instructor_principal_id, obtenerlo de la ficha
+        if (!$this->has('instructor_principal_id') || !$this->input('instructor_principal_id')) {
+            $fichaId = $this->route('id');
+            $ficha = FichaCaracterizacion::find($fichaId);
+            
+            if ($ficha && $ficha->instructor_id) {
+                $this->merge([
+                    'instructor_principal_id' => $ficha->instructor_id
+                ]);
+            }
+        }
     }
 
     /**
@@ -53,15 +72,12 @@ class AsignarInstructoresRequest extends FormRequest
                 }
             ],
             'instructores.*.total_horas_instructor' => 'required|integer|min:1|max:1000',
-            'instructores.*.dias_formacion' => 'sometimes|array|max:7',
-            'instructores.*.dias_formacion.*.dia_id' => 'required_with:instructores.*.dias_formacion|exists:parametros_temas,id',
+            'instructores.*.dias_formacion' => 'required|array|min:1|max:7',
+            'instructores.*.dias_formacion.*.dia_id' => 'required|exists:parametros_temas,id',
             'instructor_principal_id' => [
-                'required',
+                'nullable',
                 'integer',
-                'exists:instructors,id',
-                function ($attribute, $value, $fail) {
-                    $this->validarInstructorPrincipalEnLista($value, $fail);
-                }
+                'exists:instructors,id'
             ]
         ];
     }
@@ -87,12 +103,14 @@ class AsignarInstructoresRequest extends FormRequest
             'instructores.*.total_horas_instructor.integer' => 'Las horas totales deben ser un número entero.',
             'instructores.*.total_horas_instructor.min' => 'Las horas totales deben ser al menos 1.',
             'instructores.*.total_horas_instructor.max' => 'Las horas totales no pueden exceder 1000.',
+            'instructores.*.dias_formacion.required' => 'Debe seleccionar al menos un día de formación.',
             'instructores.*.dias_formacion.array' => 'Los días de formación deben ser una lista válida.',
+            'instructores.*.dias_formacion.min' => 'Debe seleccionar al menos un día de formación.',
             'instructores.*.dias_formacion.max' => 'No se pueden asignar más de 7 días de formación.',
-            'instructores.*.dias_formacion.*.dia_id.required_with' => 'Debe seleccionar un día válido.',
+            'instructores.*.dias_formacion.*.dia_id.required' => 'Debe seleccionar un día válido.',
             'instructores.*.dias_formacion.*.dia_id.exists' => 'El día seleccionado no existe.',
-            'instructor_principal_id.required' => 'Debe seleccionar un instructor principal.',
-            'instructor_principal_id.exists' => 'El instructor principal seleccionado no existe.'
+            'instructor_principal_id.exists' => 'El instructor líder seleccionado no existe en el sistema.',
+            'instructor_principal_id.integer' => 'El instructor líder debe ser un identificador válido.'
         ];
     }
 
@@ -107,10 +125,7 @@ class AsignarInstructoresRequest extends FormRequest
             $this->validarDisponibilidadHoraria($validator);
             $this->validarReglasSENA($validator);
             
-            // Si hay errores, mostrar sugerencias
-            if ($validator->errors()->any()) {
-                $this->mostrarSugerenciasInstructores($validator);
-            }
+            // Las sugerencias han sido removidas por solicitud del usuario
         });
     }
 
@@ -183,30 +198,56 @@ class AsignarInstructoresRequest extends FormRequest
 
     /**
      * Validar que el instructor principal esté en la lista de instructores
+     * NOTA: Esta validación está deshabilitada porque el instructor principal
+     * es el líder de la ficha asignado en la creación, no necesariamente
+     * tiene que estar en la lista de instructores adicionales.
      */
     private function validarInstructorPrincipalEnLista($instructorPrincipalId, $fail): void
     {
-        $instructores = $this->input('instructores', []);
-        $instructorIds = collect($instructores)->pluck('instructor_id')->toArray();
+        // Validación deshabilitada - El instructor principal puede ser independiente
+        // de los instructores adicionales asignados
+        return;
     }
 
     /**
-     * Validar conflictos de fechas entre instructores
+     * Validar conflictos de fechas entre instructores (considerando jornadas y días)
      */
     private function validarConflictosFechas($validator): void
     {
         $instructores = $this->input('instructores', []);
-        $conflictos = [];
+        $fichaId = $this->route('id');
+        $ficha = FichaCaracterizacion::find($fichaId);
+        $jornadaIdFicha = $ficha ? $ficha->jornada_id : null;
 
         foreach ($instructores as $index => $instructorData) {
             $instructorId = $instructorData['instructor_id'];
             $fechaInicio = Carbon::parse($instructorData['fecha_inicio']);
             $fechaFin = Carbon::parse($instructorData['fecha_fin']);
+            $diasNuevos = isset($instructorData['dias_formacion']) 
+                ? collect($instructorData['dias_formacion'])->pluck('dia_id')->filter()->toArray() 
+                : [];
 
-            // Verificar conflictos con otras fichas del mismo instructor
-            $conflictosExistentes = InstructorFichaCaracterizacion::where('instructor_id', $instructorId)
-                ->whereHas('ficha', function($q) {
+            // 1. Verificar conflictos con otras fichas del mismo instructor
+            $this->validarConflictosOtrosInstructor($validator, $instructorId, $fechaInicio, $fechaFin, $diasNuevos, $jornadaIdFicha, $index);
+
+            // 2. Verificar conflictos con otros instructores en la MISMA ficha
+            $this->validarConflictosMismaFicha($validator, $instructores, $index, $instructorId, $fechaInicio, $fechaFin, $diasNuevos);
+        }
+    }
+
+    /**
+     * Validar conflictos con otras fichas del mismo instructor
+     */
+    private function validarConflictosOtrosInstructor($validator, $instructorId, $fechaInicio, $fechaFin, $diasNuevos, $jornadaIdFicha, $index): void
+    {
+        $conflictosQuery = InstructorFichaCaracterizacion::where('instructor_id', $instructorId)
+            ->whereHas('ficha', function($q) use ($jornadaIdFicha) {
                     $q->where('status', true);
+                
+                // Solo validar conflictos en la misma jornada
+                if ($jornadaIdFicha) {
+                    $q->where('jornada_id', $jornadaIdFicha);
+                }
                 })
                 ->where(function($q) use ($fechaInicio, $fechaFin) {
                     $q->whereBetween('fecha_inicio', [$fechaInicio, $fechaFin])
@@ -216,22 +257,202 @@ class AsignarInstructoresRequest extends FormRequest
                                ->where('fecha_fin', '>=', $fechaFin);
                       });
                 })
-                ->with('ficha')
-                ->get();
+            ->with(['ficha.jornadaFormacion', 'instructorFichaDias.dia']);
+
+        $conflictosExistentes = $conflictosQuery->get();
+
+        // Filtrar conflictos por días de la semana si se especifican
+        if (!empty($diasNuevos)) {
+            $conflictosExistentes = $conflictosExistentes->filter(function($conflicto) use ($diasNuevos) {
+                $diasExistentes = $conflicto->instructorFichaDias->pluck('dia_id')->toArray();
+                $diasEnComun = array_intersect($diasNuevos, $diasExistentes);
+                return !empty($diasEnComun); // Solo es conflicto si hay días en común
+            });
+        }
 
             if ($conflictosExistentes->isNotEmpty()) {
                 $instructor = Instructor::find($instructorId);
-                $conflictosText = $conflictosExistentes->map(function($conflicto) {
+            $conflictosText = $conflictosExistentes->map(function($conflicto) use ($diasNuevos) {
                     $programaNombre = $conflicto->ficha->programaFormacion->nombre ?? 'Sin programa';
-                    return "Ficha {$conflicto->ficha->ficha} ({$programaNombre}) del {$conflicto->fecha_inicio->format('d/m/Y')} al {$conflicto->fecha_fin->format('d/m/Y')}";
+                $jornada = $conflicto->ficha->jornadaFormacion->jornada ?? 'Sin jornada';
+                
+                // Mostrar días en conflicto
+                $diasExistentes = $conflicto->instructorFichaDias->pluck('dia_id')->toArray();
+                $diasEnComun = array_intersect($diasNuevos, $diasExistentes);
+                $diasNombres = $conflicto->instructorFichaDias
+                    ->whereIn('dia_id', $diasEnComun)
+                    ->pluck('dia.name')
+                    ->filter()
+                    ->implode(', ');
+                
+                $diasInfo = $diasNombres ? " - Días en conflicto: {$diasNombres}" : '';
+                return "Ficha {$conflicto->ficha->ficha} ({$programaNombre}) - Jornada: {$jornada}{$diasInfo} del " . Carbon::parse($conflicto->fecha_inicio)->format('d/m/Y') . " al " . Carbon::parse($conflicto->fecha_fin)->format('d/m/Y');
                 })->implode(', ');
 
                 $validator->errors()->add(
                     "instructores.{$index}.fecha_inicio",
-                    "📅 El instructor {$instructor->nombre_completo} ya tiene fichas con fechas superpuestas: {$conflictosText}. Ajuste las fechas para evitar conflictos."
-                );
+                "📅 El instructor {$instructor->nombre_completo} ya tiene fichas con fechas superpuestas en la misma jornada y días: {$conflictosText}. Ajuste las fechas, jornada o días para evitar conflictos."
+            );
+        }
+    }
+
+    /**
+     * Validar conflictos entre instructores en la misma ficha
+     */
+    private function validarConflictosMismaFicha($validator, $instructores, $indexActual, $instructorIdActual, $fechaInicioActual, $fechaFinActual, $diasActuales): void
+    {
+        $fichaId = $this->route('id');
+        
+        \Log::info('🔍 VALIDACIÓN MISMA FICHA', [
+            'instructores_total' => count($instructores),
+            'index_actual' => $indexActual,
+            'instructor_actual' => $instructorIdActual,
+            'fecha_actual' => $fechaInicioActual->format('Y-m-d') . ' a ' . $fechaFinActual->format('Y-m-d'),
+            'dias_actuales' => $diasActuales,
+            'ficha_id' => $fichaId
+        ]);
+
+        // 1. Verificar conflictos con otros instructores en el mismo formulario
+        foreach ($instructores as $indexOtro => $instructorOtro) {
+            // No comparar consigo mismo
+            if ($indexActual === $indexOtro) continue;
+
+            $instructorIdOtro = $instructorOtro['instructor_id'];
+            $fechaInicioOtro = Carbon::parse($instructorOtro['fecha_inicio']);
+            $fechaFinOtro = Carbon::parse($instructorOtro['fecha_fin']);
+            $diasOtros = isset($instructorOtro['dias_formacion']) 
+                ? collect($instructorOtro['dias_formacion'])->pluck('dia_id')->filter()->toArray() 
+                : [];
+
+            \Log::info('🔍 COMPARANDO CON INSTRUCTOR EN FORMULARIO', [
+                'index_otro' => $indexOtro,
+                'instructor_otro' => $instructorIdOtro,
+                'fecha_otro' => $fechaInicioOtro->format('Y-m-d') . ' a ' . $fechaFinOtro->format('Y-m-d'),
+                'dias_otros' => $diasOtros
+            ]);
+
+            // Verificar si hay superposición de fechas
+            $haySuperposicion = $this->haySuperposicionFechas($fechaInicioActual, $fechaFinActual, $fechaInicioOtro, $fechaFinOtro);
+            
+            \Log::info('🔍 SUPERPOSICIÓN DE FECHAS', [
+                'hay_superposicion' => $haySuperposicion
+            ]);
+            
+            if ($haySuperposicion) {
+                // Verificar si hay días en común
+                $diasEnComun = array_intersect($diasActuales, $diasOtros);
+                
+                \Log::info('🔍 DÍAS EN COMÚN', [
+                    'dias_en_comun' => $diasEnComun,
+                    'hay_conflicto' => !empty($diasEnComun)
+                ]);
+                
+                if (!empty($diasEnComun)) {
+                    $instructorActual = Instructor::find($instructorIdActual);
+                    $instructorOtro = Instructor::find($instructorIdOtro);
+                    
+                    // Obtener nombres de los días en común desde Parametro
+                    $diasNombres = Parametro::whereIn('id', $diasEnComun)->pluck('name')->implode(', ');
+                    
+                    \Log::error('❌ CONFLICTO DETECTADO EN FORMULARIO', [
+                        'instructor_actual' => $instructorActual->nombre_completo,
+                        'instructor_otro' => $instructorOtro->nombre_completo,
+                        'dias_conflicto' => $diasNombres
+                    ]);
+                    
+                    $validator->errors()->add(
+                        "instructores.{$indexActual}.fecha_inicio",
+                        "⚠️ CONFLICTO EN LA MISMA FICHA: El instructor {$instructorActual->nombre_completo} no puede ser asignado en las mismas fechas y días ({$diasNombres}) que el instructor {$instructorOtro->nombre_completo}. Ajuste las fechas o días para evitar el conflicto."
+                    );
+                }
             }
         }
+
+        // 2. Verificar conflictos con instructores ya asignados en la ficha
+        $this->validarConflictosConAsignacionesExistentes($validator, $instructorIdActual, $fechaInicioActual, $fechaFinActual, $diasActuales, $indexActual, $fichaId);
+    }
+
+    /**
+     * Validar conflictos con instructores ya asignados en la ficha
+     */
+    private function validarConflictosConAsignacionesExistentes($validator, $instructorIdActual, $fechaInicioActual, $fechaFinActual, $diasActuales, $indexActual, $fichaId): void
+    {
+        // Obtener asignaciones existentes en la ficha (excluyendo el instructor actual si ya está asignado)
+        $asignacionesExistentes = InstructorFichaCaracterizacion::where('ficha_id', $fichaId)
+            ->where('instructor_id', '!=', $instructorIdActual) // Excluir el instructor actual
+            ->with(['instructor.persona', 'instructorFichaDias.dia'])
+            ->get();
+
+        \Log::info('🔍 ASIGNACIONES EXISTENTES EN FICHA', [
+            'ficha_id' => $fichaId,
+            'total_existentes' => $asignacionesExistentes->count(),
+            'asignaciones' => $asignacionesExistentes->map(function($a) {
+                return [
+                    'instructor_id' => $a->instructor_id,
+                    'instructor_nombre' => $a->instructor->nombre_completo ?? 'Sin nombre',
+                    'fecha_inicio' => $a->fecha_inicio,
+                    'fecha_fin' => $a->fecha_fin,
+                    'dias' => $a->instructorFichaDias->pluck('dia_id')->toArray()
+                ];
+            })->toArray()
+        ]);
+
+        foreach ($asignacionesExistentes as $asignacionExistente) {
+            $instructorIdExistente = $asignacionExistente->instructor_id;
+            $fechaInicioExistente = Carbon::parse($asignacionExistente->fecha_inicio);
+            $fechaFinExistente = Carbon::parse($asignacionExistente->fecha_fin);
+            $diasExistentes = $asignacionExistente->instructorFichaDias->pluck('dia_id')->toArray();
+
+            \Log::info('🔍 COMPARANDO CON ASIGNACIÓN EXISTENTE', [
+                'instructor_existente' => $instructorIdExistente,
+                'fecha_existente' => $fechaInicioExistente->format('Y-m-d') . ' a ' . $fechaFinExistente->format('Y-m-d'),
+                'dias_existentes' => $diasExistentes
+            ]);
+
+            // Verificar si hay superposición de fechas
+            $haySuperposicion = $this->haySuperposicionFechas($fechaInicioActual, $fechaFinActual, $fechaInicioExistente, $fechaFinExistente);
+            
+            \Log::info('🔍 SUPERPOSICIÓN CON EXISTENTE', [
+                'hay_superposicion' => $haySuperposicion
+            ]);
+            
+            if ($haySuperposicion) {
+                // Verificar si hay días en común
+                $diasEnComun = array_intersect($diasActuales, $diasExistentes);
+                
+                \Log::info('🔍 DÍAS EN COMÚN CON EXISTENTE', [
+                    'dias_en_comun' => $diasEnComun,
+                    'hay_conflicto' => !empty($diasEnComun)
+                ]);
+                
+                if (!empty($diasEnComun)) {
+                    $instructorActual = Instructor::find($instructorIdActual);
+                    $instructorExistente = Instructor::find($instructorIdExistente);
+                    
+                    // Obtener nombres de los días en común desde Parametro
+                    $diasNombres = Parametro::whereIn('id', $diasEnComun)->pluck('name')->implode(', ');
+                    
+                    \Log::error('❌ CONFLICTO CON ASIGNACIÓN EXISTENTE', [
+                        'instructor_actual' => $instructorActual->nombre_completo,
+                        'instructor_existente' => $instructorExistente->nombre_completo,
+                        'dias_conflicto' => $diasNombres
+                    ]);
+                    
+                    $validator->errors()->add(
+                        "instructores.{$indexActual}.fecha_inicio",
+                        "⚠️ CONFLICTO CON INSTRUCTOR YA ASIGNADO: El instructor {$instructorActual->nombre_completo} no puede ser asignado en las mismas fechas y días ({$diasNombres}) que el instructor {$instructorExistente->nombre_completo} que ya está asignado a esta ficha. Ajuste las fechas o días para evitar el conflicto."
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * Verificar si dos rangos de fechas se superponen
+     */
+    private function haySuperposicionFechas($fechaInicio1, $fechaFin1, $fechaInicio2, $fechaFin2): bool
+    {
+        return $fechaInicio1->lte($fechaFin2) && $fechaFin1->gte($fechaInicio2);
     }
 
     /**
@@ -246,51 +467,14 @@ class AsignarInstructoresRequest extends FormRequest
     }
 
     /**
-     * Validar disponibilidad horaria
+     * Validar disponibilidad horaria (considerando jornadas y días de la semana)
+     * NOTA: Esta validación ahora se maneja en validarConflictosFechas() para evitar duplicados
      */
     private function validarDisponibilidadHoraria($validator): void
     {
-        $instructores = $this->input('instructores', []);
-        $fichaId = $this->route('id');
-        $ficha = FichaCaracterizacion::with('diasFormacion')->find($fichaId);
-
-        if (!$ficha || !$ficha->diasFormacion) {
+        // La validación de días y jornadas se maneja en validarConflictosFechas()
+        // para evitar duplicados y tener una lógica centralizada
             return;
-        }
-
-        foreach ($instructores as $index => $instructorData) {
-            if (!isset($instructorData['dias_formacion']) || empty($instructorData['dias_formacion'])) {
-                continue;
-            }
-
-            $instructorId = $instructorData['instructor_id'];
-            $fechaInicio = Carbon::parse($instructorData['fecha_inicio']);
-            $fechaFin = Carbon::parse($instructorData['fecha_fin']);
-
-            // Verificar conflictos de días de formación
-            $conflictosDias = InstructorFichaCaracterizacion::where('instructor_id', $instructorId)
-                ->whereHas('ficha', function($q) {
-                    $q->where('status', true);
-                })
-                ->where(function($q) use ($fechaInicio, $fechaFin) {
-                    $q->whereBetween('fecha_inicio', [$fechaInicio, $fechaFin])
-                      ->orWhereBetween('fecha_fin', [$fechaInicio, $fechaFin]);
-                })
-                ->whereHas('instructorFichaDias', function($q) use ($instructorData) {
-                    $diaIds = collect($instructorData['dias_formacion'])->pluck('dia_id');
-                    $q->whereIn('dia_id', $diaIds);
-                })
-                ->with('ficha')
-                ->get();
-
-            if ($conflictosDias->isNotEmpty()) {
-                $instructor = Instructor::find($instructorId);
-                $validator->errors()->add(
-                    "instructores.{$index}.dias_formacion",
-                    "⚠️ El instructor {$instructor->nombre_completo} ya tiene clases en los días seleccionados. Seleccione otros días o fechas diferentes."
-                );
-            }
-        }
     }
 
     /**
@@ -326,34 +510,4 @@ class AsignarInstructoresRequest extends FormRequest
         }
     }
 
-    /**
-     * Mostrar sugerencias de instructores disponibles
-     */
-    private function mostrarSugerenciasInstructores($validator): void
-    {
-        $fichaId = $this->route('id');
-        $ficha = FichaCaracterizacion::with(['sede.regional', 'programaFormacion.redConocimiento'])->find($fichaId);
-        
-        if (!$ficha) return;
-
-        // Obtener instructores disponibles para esta ficha
-        $instructoresDisponibles = Instructor::where('status', true)
-            ->whereHas('persona.user')
-            ->when($ficha->sede && $ficha->sede->regional_id, function($query) use ($ficha) {
-                return $query->where('regional_id', $ficha->sede->regional_id);
-            })
-            ->with('persona')
-            ->get();
-
-        if ($instructoresDisponibles->isNotEmpty()) {
-            $sugerencias = $instructoresDisponibles->take(3)->map(function($instructor) {
-                return "• {$instructor->nombre_completo} (Doc: {$instructor->persona->numero_documento})";
-            })->implode("\n");
-
-            $validator->errors()->add(
-                'sugerencias',
-                "💡 <strong>Sugerencias de instructores disponibles:</strong>\n\n{$sugerencias}\n\n💡 <em>Vaya a 'Gestión de Instructores' para ver más opciones disponibles.</em>"
-            );
-        }
-    }
 }

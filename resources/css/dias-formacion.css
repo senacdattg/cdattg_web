@@ -1,0 +1,430 @@
+/* Estilos para el header - igual que parámetros */
+.content-header.dashboard-header {
+    background: #fff !important;
+    border-bottom: 1px solid rgba(0, 0, 0, .05) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .03) !important;
+}
+
+.dashboard-header {
+    background: #fff !important;
+    border-bottom: 1px solid rgba(0, 0, 0, .05) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .03) !important;
+} color: #343a40;
+}
+
+.horario-config .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.horario-config .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+/* Estilos para alertas de jornada */
+.jornada-alert {
+    background-color: #e9f7ef;
+    border-color: #d4edda;
+    color: #155724;
+}
+
+.jornada-alert strong {
+    color: #0f5132;
+}
+
+/* Estilos para cuadros de días */
+.dia-cuadro {
+    border: 2px solid #dee2e6;
+    border-radius: 12px;
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #ffffff;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.dia-cuadro:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+.dia-cuadro.disponible {
+    border-color: #007bff;
+    background: linear-gradient(135deg, #e0f2f7 0%, #ccecf7 100%);
+    color: #0056b3;
+}
+
+.dia-cuadro.disponible:hover {
+    border-color: #0056b3;
+    background: linear-gradient(135deg, #ccecf7 0%, #99d9ed 100%);
+}
+
+.dia-cuadro.seleccionado {
+    border-color: #28a745;
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+    color: #155724;
+}
+
+.dia-cuadro.asignado {
+    border-color: #6c757d;
+    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    cursor: not-allowed;
+    opacity: 0.8;
+    color: #6c757d;
+}
+
+.dia-cuadro.no-permitido {
+    border-color: #dc3545;
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    cursor: not-allowed;
+    opacity: 0.7;
+    color: #721c24;
+}
+
+.dia-nombre {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 5px;
+    color: inherit; /* Hereda el color del padre */
+}
+
+.dia-cuadro small {
+    font-size: 0.85em;
+}
+
+/* Iconos en los cuadros de días */
+.dia-cuadro .fas {
+    font-size: 1.5em;
+    margin-bottom: 8px;
+}
+
+/* Lista de días seleccionados */
+#dias-seleccionados {
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #e9ecef;
+}
+
+#dias-seleccionados h6 {
+    color: #343a40;
+    margin-bottom: 15px;
+}
+
+.dia-seleccionado-item {
+    background: #e8f5e8;
+    border: 1px solid #c3e6cb;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95em;
+    color: #155724;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.dia-seleccionado-item .btn-remover {
+    padding: 5px 10px;
+    font-size: 0.8em;
+    border-radius: 5px;
+}
+
+/* Días asignados (tarjetas individuales) */
+.dia-asignado-card {
+    background-color: #ffffff;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 15px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.dia-asignado-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.dia-asignado-card h6 {
+    color: #343a40;
+    font-weight: 600;
+}
+
+.dia-asignado-card .text-muted {
+    font-size: 0.9em;
+}
+
+.dia-asignado-card .btn-sm {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+    border-radius: 0.3rem;
+}
+
+/* Modal de edición */
+.modal-dia-edicion .modal-header {
+    border-bottom: none;
+}
+
+.modal-dia-edicion .modal-footer {
+    border-top: none;
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animated-card {
+    animation: fadeInUp 0.5s ease-out forwards;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .dia-cuadro {
+        min-height: 80px;
+        padding: 10px;
+    }
+    .dia-nombre {
+        font-size: 1em;
+    }
+    .dia-cuadro .fas {
+        font-size: 1.2em;
+    }
+    .dia-seleccionado-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    .dia-seleccionado-item .btn-remover {
+        margin-top: 5px;
+    }
+}
+
+/* Estilos para las tarjetas principales (basado en parámetros) */
+.content .card {
+    border: 1px solid #e3e6f0;
+    border-radius: 0.35rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.content .card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+}
+
+.content .card-title {
+    color: #5a5c69;
+    font-weight: 600;
+}
+
+/* Estilos para botones - solo en el contenido */
+.content .btn {
+    border-radius: 0.35rem;
+    font-weight: 500;
+}
+
+.content .btn-primary {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+.content .btn-primary:hover {
+    background-color: #2e59d9;
+    border-color: #2653d4;
+}
+
+.content .btn-success {
+    background-color: #1cc88a;
+    border-color: #1cc88a;
+}
+
+.content .btn-success:hover {
+    background-color: #17a673;
+    border-color: #169b6b;
+}
+
+.content .btn-outline-secondary {
+    color: #858796;
+    border-color: #d1d3e2;
+}
+
+.content .btn-outline-secondary:hover {
+    color: #fff;
+    background-color: #858796;
+    border-color: #858796;
+}
+
+/* Estilos para la tabla - solo en el contenido */
+.content .table {
+    color: #858796;
+}
+
+.content .table thead th {
+    background-color: #eaecf4;
+    border-bottom: 2px solid #e3e6f0;
+    color: #5a5c69;
+    font-weight: 600;
+}
+
+.content .table tbody tr:hover {
+    background-color: #f8f9fc;
+}
+
+/* Estilos para badges - solo en el contenido */
+.content .badge {
+    font-weight: 500;
+    border-radius: 0.35rem;
+}
+
+.content .badge-primary {
+    background-color: #4e73df;
+}
+
+/* Estilos para formularios - solo en el contenido */
+.content .form-control {
+    border: 1px solid #d1d3e2;
+    border-radius: 0.35rem;
+}
+
+.content .form-control:focus {
+    border-color: #bac8f3;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+.content .form-label {
+    color: #5a5c69;
+    font-weight: 600;
+}
+
+/* Estilos para alertas - solo en el contenido */
+.content .alert {
+    border-radius: 0.35rem;
+    border: none;
+}
+
+.content .alert-info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+}
+
+.content .alert-warning {
+    background-color: #fff3cd;
+    color: #856404;
+}
+
+.content .alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.content .alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+/* Estilos para iconos y colores - solo en el contenido */
+.content .text-primary {
+    color: #4e73df !important;
+}
+
+.content .text-success {
+    color: #1cc88a !important;
+}
+
+.content .text-warning {
+    color: #f6c23e !important;
+}
+
+.content .text-danger {
+    color: #e74a3b !important;
+}
+
+.content .text-info {
+    color: #36b9cc !important;
+}
+
+/* Estilos para breadcrumb - se manejan desde AdminLTE */
+
+/* Estilos para tooltips */
+[data-toggle="tooltip"] {
+    cursor: pointer;
+}
+
+/* Estilos para modales - solo en el contenido */
+.content ~ .modal .modal-content {
+    border: none;
+    border-radius: 0.35rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.content ~ .modal .modal-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+    border-radius: 0.35rem 0.35rem 0 0;
+}
+
+.content ~ .modal .modal-footer {
+    background-color: #f8f9fc;
+    border-top: 1px solid #e3e6f0;
+    border-radius: 0 0 0.35rem 0.35rem;
+}
+
+/* Estilos para collapse - solo en el contenido */
+.content .collapse {
+    transition: all 0.3s ease;
+}
+
+/* Estilos para info items */
+.info-item {
+    margin-bottom: 1rem;
+}
+
+.info-item strong {
+    color: #5a5c69;
+    font-weight: 600;
+}
+
+/* Estilos para botones de acción - solo en el contenido */
+.content .btn-group .btn {
+    border-radius: 0.25rem;
+    margin-right: 2px;
+}
+
+.content .btn-group .btn:last-child {
+    margin-right: 0;
+}
+
+/* Estilos para el contenido vacío */
+.text-center.py-5 {
+    color: #858796;
+}
+
+/* Estilos para el header - igual que parámetros */
+.content-header.dashboard-header {
+    background: #fff !important;
+    border-bottom: 1px solid rgba(0, 0, 0, .05) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .03) !important;
+}
+
+.dashboard-header {
+    background: #fff !important;
+    border-bottom: 1px solid rgba(0, 0, 0, .05) !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .03) !important;
+}

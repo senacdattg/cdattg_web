@@ -12,6 +12,7 @@ export default defineConfig({
                 'instructores_css': 'resources/css/instructores.css',
                 'guias_aprendizaje_css': 'resources/css/guias_aprendizaje.css',
                 'resultados_aprendizaje_css': 'resources/css/resultados-aprendizaje.css',
+                'dias_formacion_css': 'resources/css/dias-formacion.css',
                 'dashboard_superadmin': 'resources/css/dashboards/dashboard-superadmin.css',
                 'caracter_selecter': 'resources/css/Asistencia/caracter_selecter.css',
                 
@@ -33,7 +34,7 @@ export default defineConfig({
         port: 5173,
         strictPort: true,
         hmr: {
-            host: '127.0.0.1',  // Tu IP de red local
+            host: '192.168.101.71',  // Tu IP de red local
         },
         cors: true,  // Habilita CORS para permitir peticiones cross-origin
     },

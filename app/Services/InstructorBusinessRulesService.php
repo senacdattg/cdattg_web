@@ -28,7 +28,7 @@ class InstructorBusinessRulesService
     /**
      * Verificar disponibilidad del instructor para una nueva ficha
      */
-    public function verificarDisponibilidad(Instructor $instructor, array $datosFicha): array
+    public function verificarDisponibilidad(Instructor $instructor, array $datosFicha, ?int $fichaIdActual = null): array
     {
         $resultado = [
             'disponible' => true,
@@ -57,30 +57,30 @@ class InstructorBusinessRulesService
                 $resultado['razones'][] = "El instructor excede el límite máximo de fichas activas (" . count($fichasActivas) . "/" . self::MAX_FICHAS_ACTIVAS . "). Ejemplo: {$ejemploFichas}";
             }
 
-            // Verificar superposición de fechas
-            $conflictos = $this->verificarSuperposicionFechas($instructor, $fechaInicio, $fechaFin);
+            // Verificar superposición de fechas (considerando jornadas y días de la semana)
+            $jornadaId = $datosFicha['jornada_id'] ?? null;
+            $diasFormacion = $datosFicha['dias_formacion'] ?? [];
+            $conflictos = $this->verificarSuperposicionFechas($instructor, $fechaInicio, $fechaFin, $jornadaId, $diasFormacion, $fichaIdActual);
             if (!empty($conflictos)) {
                 $resultado['disponible'] = false;
                 $resultado['conflictos'] = $conflictos;
                 $ejemploConflicto = $conflictos[0];
-                $programaNombre = $ejemploConflicto->ficha->programaFormacion->nombre ?? 'Sin programa';
-                $resultado['razones'][] = "El instructor tiene fichas con fechas superpuestas. Ejemplo: Ficha {$ejemploConflicto->ficha->ficha} ({$programaNombre}) del {$ejemploConflicto->fecha_inicio->format('d/m/Y')} al {$ejemploConflicto->fecha_fin->format('d/m/Y')}";
+                $programaNombre = $ejemploConflicto['programa'] ?? 'Sin programa';
+                $jornadaInfo = isset($ejemploConflicto['jornada']) ? " (Jornada: {$ejemploConflicto['jornada']})" : '';
+                $diasInfo = isset($ejemploConflicto['dias_conflicto']) ? " en los días: {$ejemploConflicto['dias_conflicto']}" : '';
+                $resultado['razones'][] = "El instructor tiene fichas con fechas superpuestas en la misma jornada{$diasInfo}. Ejemplo: Ficha {$ejemploConflicto['ficha_numero']} ({$programaNombre}){$jornadaInfo} del " . \Carbon\Carbon::parse($ejemploConflicto['fecha_inicio'])->format('d/m/Y') . " al " . \Carbon\Carbon::parse($ejemploConflicto['fecha_fin'])->format('d/m/Y');
             }
 
-            // Verificar carga horaria semanal
-            $cargaHoraria = $this->calcularCargaHorariaSemanal($instructor, $fechaInicio, $fechaFin, $datosFicha['horas_semanales'] ?? 0);
-            if ($cargaHoraria > self::MAX_HORAS_SEMANA) {
-                $resultado['disponible'] = false;
-                $resultado['razones'][] = "El instructor excedería la carga horaria máxima semanal ({$cargaHoraria}h > " . self::MAX_HORAS_SEMANA . "h). Ejemplo: Actualmente tiene " . ($cargaHoraria - ($datosFicha['horas_semanales'] ?? 0)) . "h semanales asignadas";
-            }
+            // VALIDACIÓN DESHABILITADA: Verificar carga horaria semanal
+            // Esta validación estaba comparando incorrectamente horas totales vs límite semanal
+            // $cargaHoraria = $this->calcularCargaHorariaSemanal($instructor, $fechaInicio, $fechaFin, $datosFicha['horas_semanales'] ?? 0, $jornadaId);
+            // if ($cargaHoraria > self::MAX_HORAS_SEMANA) {
+            //     $resultado['disponible'] = false;
+            //     $resultado['razones'][] = "El instructor excedería la carga horaria máxima semanal en esta jornada ({$cargaHoraria}h > " . self::MAX_HORAS_SEMANA . "h). Ejemplo: Actualmente tiene " . ($cargaHoraria - ($datosFicha['horas_semanales'] ?? 0)) . "h semanales asignadas en la misma jornada";
+            // }
 
-            // Verificar especialidades requeridas
-            if (!$this->tieneEspecialidadesRequeridas($instructor, $datosFicha['especialidad_requerida'] ?? null)) {
-                $resultado['disponible'] = false;
-                $especialidadRequerida = $datosFicha['especialidad_requerida'] ?? 'No especificada';
-                $especialidadesInstructor = $this->obtenerEspecialidadesInstructor($instructor);
-                $resultado['razones'][] = "El instructor no tiene las especialidades requeridas para esta ficha. Requerida: {$especialidadRequerida}. Instructor tiene: {$especialidadesInstructor}";
-            }
+            // NOTA: Validación de especialidades deshabilitada por solicitud del usuario
+            // No se valida la especialidad del instructor para la ficha
 
         } catch (\Exception $e) {
             Log::error('Error verificando disponibilidad del instructor', [
@@ -112,33 +112,87 @@ class InstructorBusinessRulesService
     }
 
     /**
-     * Verificar superposición de fechas con fichas existentes
+     * Verificar superposición de fechas con fichas existentes considerando jornada y días de la semana
+     * 
+     * @param Instructor $instructor
+     * @param Carbon $fechaInicio
+     * @param Carbon $fechaFin
+     * @param int|null $jornadaId Jornada de la ficha a asignar
+     * @param array $diasFormacion Días de formación de la nueva asignación (opcional)
+     * @param int|null $fichaIdActual ID de la ficha actual (para excluir si es instructor principal)
+     * @return array
      */
-    public function verificarSuperposicionFechas(Instructor $instructor, Carbon $fechaInicio, Carbon $fechaFin): array
+    public function verificarSuperposicionFechas(Instructor $instructor, Carbon $fechaInicio, Carbon $fechaFin, ?int $jornadaId = null, array $diasFormacion = [], ?int $fichaIdActual = null): array
     {
         $conflictos = [];
 
         $fichasExistentes = $instructor->instructorFichas()
-            ->with('ficha')
+            ->with(['ficha.jornadaFormacion', 'instructorFichaDias.dia'])
             ->whereHas('ficha', function($q) {
                 $q->where('status', true);
             })
             ->get();
 
+        // Obtener IDs de los días de formación de la nueva asignación
+        $diasNuevos = collect($diasFormacion)->pluck('dia_id')->filter()->toArray();
+
         foreach ($fichasExistentes as $instructorFicha) {
             $ficha = $instructorFicha->ficha;
+            
+            // Si es la misma ficha y el instructor es el instructor principal, NO es conflicto
+            if ($fichaIdActual && $ficha->id == $fichaIdActual && $ficha->instructor_id == $instructor->id) {
+                continue; // No es conflicto, es el instructor principal de la misma ficha
+            }
+            
             $fechaInicioExistente = Carbon::parse($ficha->fecha_inicio);
             $fechaFinExistente = Carbon::parse($ficha->fecha_fin);
 
-            // Verificar si hay superposición
+            // Verificar si hay superposición de fechas
             if ($this->haySuperposicion($fechaInicio, $fechaFin, $fechaInicioExistente, $fechaFinExistente)) {
-                $conflictos[] = [
-                    'ficha_id' => $ficha->id,
-                    'ficha_numero' => $ficha->ficha,
-                    'fecha_inicio' => $ficha->fecha_inicio,
-                    'fecha_fin' => $ficha->fecha_fin,
-                    'programa' => $ficha->programaFormacion->nombre ?? 'Sin programa'
-                ];
+                // Si las jornadas son diferentes, NO hay conflicto (puede estar en mañana y tarde el mismo día)
+                if ($jornadaId && $ficha->jornada_id && $jornadaId !== $ficha->jornada_id) {
+                    continue; // No es conflicto, diferente jornada
+                }
+                
+                // Si hay días de formación, verificar si se solapan
+                if (!empty($diasNuevos)) {
+                    $diasExistentes = $instructorFicha->instructorFichaDias->pluck('dia_id')->toArray();
+                    
+                    // Verificar si hay días en común
+                    $diasEnComun = array_intersect($diasNuevos, $diasExistentes);
+                    
+                    // Si NO hay días en común, NO es conflicto
+                    if (empty($diasEnComun)) {
+                        continue;
+                    }
+                    
+                    // Si hay días en común, registrar conflicto con detalle
+                    $diasNombres = $instructorFicha->instructorFichaDias
+                        ->whereIn('dia_id', $diasEnComun)
+                        ->pluck('dia.name')
+                        ->filter()
+                        ->implode(', ');
+                        
+                    $conflictos[] = [
+                        'ficha_id' => $ficha->id,
+                        'ficha_numero' => $ficha->ficha,
+                        'fecha_inicio' => $ficha->fecha_inicio,
+                        'fecha_fin' => $ficha->fecha_fin,
+                        'programa' => $ficha->programaFormacion->nombre ?? 'Sin programa',
+                        'jornada' => $ficha->jornadaFormacion->jornada ?? 'Sin jornada',
+                        'dias_conflicto' => $diasNombres
+                    ];
+                } else {
+                    // Si no se especifican días, validar solo por fechas y jornada
+                    $conflictos[] = [
+                        'ficha_id' => $ficha->id,
+                        'ficha_numero' => $ficha->ficha,
+                        'fecha_inicio' => $ficha->fecha_inicio,
+                        'fecha_fin' => $ficha->fecha_fin,
+                        'programa' => $ficha->programaFormacion->nombre ?? 'Sin programa',
+                        'jornada' => $ficha->jornadaFormacion->jornada ?? 'Sin jornada'
+                    ];
+                }
             }
         }
 
@@ -155,12 +209,19 @@ class InstructorBusinessRulesService
 
     /**
      * Calcular carga horaria semanal del instructor
+     * 
+     * @param Instructor $instructor
+     * @param Carbon $fechaInicio
+     * @param Carbon $fechaFin
+     * @param int $horasNuevaFicha Horas de la nueva ficha
+     * @param int|null $jornadaId Jornada de la nueva ficha (para filtrar solo misma jornada)
+     * @return int Total de horas semanales
      */
-    public function calcularCargaHorariaSemanal(Instructor $instructor, Carbon $fechaInicio, Carbon $fechaFin, int $horasNuevaFicha = 0): int
+    public function calcularCargaHorariaSemanal(Instructor $instructor, Carbon $fechaInicio, Carbon $fechaFin, int $horasNuevaFicha = 0, ?int $jornadaId = null): int
     {
         // Obtener fichas activas en el período
         $fichasActivas = $instructor->instructorFichas()
-            ->whereHas('ficha', function($q) use ($fechaInicio, $fechaFin) {
+            ->whereHas('ficha', function($q) use ($fechaInicio, $fechaFin, $jornadaId) {
                 $q->where('status', true)
                   ->where(function($query) use ($fechaInicio, $fechaFin) {
                       $query->whereBetween('fecha_inicio', [$fechaInicio, $fechaFin])
@@ -170,12 +231,17 @@ class InstructorBusinessRulesService
                                          ->where('fecha_fin', '>=', $fechaFin);
                             });
                   });
+                
+                // Filtrar solo por la misma jornada si se proporciona
+                if ($jornadaId) {
+                    $q->where('jornada_id', $jornadaId);
+                }
             })
             ->get();
 
         $totalHoras = 0;
         
-        // Sumar horas de fichas existentes
+        // Sumar horas de fichas existentes en la misma jornada
         foreach ($fichasActivas as $instructorFicha) {
             $totalHoras += $this->calcularHorasSemanalesFicha($instructorFicha->ficha);
         }
