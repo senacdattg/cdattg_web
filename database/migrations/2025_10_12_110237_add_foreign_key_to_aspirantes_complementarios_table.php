@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('aspirantes_complementarios', function (Blueprint $table) {
-            $table->foreign('complementario_id')
-                ->references('id')
-                ->on('complementarios_ofertados')
-                ->onDelete('cascade');
+            $table->foreignId('complementario_id')
+                ->nullable()
+                ->constrained('complementarios_ofertados')
+                ->cascadeOnDelete();
         });
     }
 
