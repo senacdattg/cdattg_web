@@ -33,12 +33,11 @@ Route::middleware('auth')->group(function () {
         'caracterizacion',
         'entrada_salida',
         'infraestructura',
+        'inventario',
         'jornada_carnet',
         'personas',
         'tema_parametro',
-        'ubicacion',
-        'actividades',
-        'inventario'
+        'ubicacion'
     ];
 
     foreach ($protectedFolders as $folder) {

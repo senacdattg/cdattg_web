@@ -1,0 +1,145 @@
+/* Estilos del header */
+.header-container {
+    background-color: #f8f9fa;
+    margin: -1rem -1rem 1rem -1rem;
+    padding: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+.header-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0.5rem 1rem;
+}
+
+.user-welcome {
+    margin-bottom: 0.5rem;
+}
+
+.welcome-text h1 {
+    font-size: 1.8rem;
+    color: #2c3e50;
+    margin: 0;
+    font-weight: 600;
+}
+
+.user-name {
+    color: #007bff;
+    font-weight: 700;
+    position: relative;
+    display: inline-block;
+}
+
+.date-text {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin: 0.3rem 0 0 0;
+}
+
+.date-text i {
+    margin-right: 0.5rem;
+}
+
+.navigation-breadcrumb {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.home-link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.home-link:hover {
+    text-decoration: underline;
+}
+
+.separator {
+    margin: 0 0.5rem;
+    color: #6c757d;
+}
+
+.current-page {
+    color: #6c757d;
+}
+
+/* Estilos para las tarjetas */
+.small-box {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.small-box > .inner {
+    padding: 20px;
+}
+
+.small-box h3 {
+    font-size: 2.2rem;
+    font-weight: bold;
+    margin: 0 0 10px 0;
+    white-space: nowrap;
+    padding: 0;
+}
+
+.small-box p {
+    font-size: 1rem;
+}
+
+.small-box .icon {
+    color: rgba(0, 0, 0, 0.15);
+    z-index: 0;
+}
+
+.small-box .icon > i {
+    font-size: 70px;
+    position: absolute;
+    right: 15px;
+    top: 15px;
+    transition: transform 0.3s linear;
+}
+
+.small-box:hover .icon > i {
+    transform: scale(1.1);
+}
+
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.card-header {
+    background-color: rgba(0, 0, 0, 0.03);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    padding: 0.75rem 1.25rem;
+}
+
+.table-responsive {
+    border-radius: 0 0 8px 8px;
+}
+
+.badge {
+    padding: 0.5em 0.75em;
+    border-radius: 30px;
+}
+
+/* Estilos para el gráfico */
+.chart-container {
+    position: relative;
+    margin: auto;
+    height: 300px;
+}
+
+/* Responsive */
+@media (max-width: 767.98px) {
+    .small-box {
+        text-align: center;
+    }
+    
+    .small-box .icon {
+        display: none;
+    }
+    
+    .small-box p {
+        font-size: 0.9rem;
+    }
+}

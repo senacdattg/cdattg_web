@@ -24,13 +24,13 @@
                     <i class="fas fa-times"></i>
                 </button>
             </div>
-            <a href="{{ route('carrito.index') }}" class="btn-lg carrito-icon-btn" title="Ver Carrito">
+            <a href="{{ route('inventario.carrito.index') }}" class="btn-lg carrito-icon-btn" title="Ver Carrito">
                 <i class="fas fa-shopping-cart"></i>
             </a>
         </div>
         
         <div class="header-buttons">
-            <a href="{{ route('productos.create') }}" class="btn btn-primary btn-lg">
+            <a href="{{ route('inventario.productos.create') }}" class="btn btn-primary btn-lg">
                 <i class="fas fa-plus"></i> Nuevo Producto
             </a>
         </div>
@@ -66,17 +66,17 @@
                 <div class="product-info">
                     <h3 class="product-title">{{ $producto->producto }}</h3>
                     <div class="product-actions">
-                        <a href="{{ route('productos.show', $producto->id) }}" 
+                        <a href="{{ route('inventario.productos.show', $producto->id) }}" 
                             class="btn btn-sm btn-info action-btn" 
                             title="Ver detalles">
                             <i class="fas fa-eye"></i>
                         </a>
-                        <a href="{{ route('productos.edit', $producto->id) }}" 
+                        <a href="{{ route('inventario.productos.edit', $producto->id) }}" 
                             class="btn btn-sm btn-warning action-btn" 
                             title="Editar">
                             <i class="fas fa-edit"></i>
                         </a>
-                        <form action="{{ route('productos.destroy', $producto->id) }}" 
+                        <form action="{{ route('inventario.productos.destroy', $producto->id) }}" 
                                 method="POST" 
                                 class="d-inline">
                             @csrf

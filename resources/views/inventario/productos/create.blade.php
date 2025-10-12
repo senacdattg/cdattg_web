@@ -31,7 +31,7 @@
 
         <div class="acciones_carrito">
             <!-- Formulario único -->
-            <form action="{{ route('productos.store') }}" method="POST" enctype="multipart/form-data" class="form_flex">
+            <form action="{{ route('inventario.productos.store') }}" method="POST" enctype="multipart/form-data" class="form_flex">
                 @csrf
                 <div class="container_form">
                     <div class="form_header">
