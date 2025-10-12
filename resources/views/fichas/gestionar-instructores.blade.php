@@ -202,13 +202,13 @@
                             <div class="d-flex align-items-center">
                                 <div class="bg-primary rounded-circle p-2 me-3">
                                     <i class="fas fa-users text-white"></i>
-                                </div>
-                                <div>
+                        </div>
+                                                <div>
                                     <h4 class="mb-0 text-dark">Asignar Instructores</h4>
                                     <small class="text-muted">Agregue instructores adicionales a esta ficha</small>
-                                </div>
-                            </div>
-                        </div>
+                                                </div>
+                                                </div>
+                                            </div>
                         <div class="card-body p-4">
                             {{-- Mostrar errores de validación --}}
                             @if ($errors->any())
@@ -221,7 +221,7 @@
                                     <ul class="mb-0">
                                         @foreach ($errors->all() as $error)
                                             <li>{{ $error }}</li>
-                                        @endforeach
+                                @endforeach
                                     </ul>
                                 </div>
                             @endif
@@ -233,7 +233,7 @@
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                     <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
-                                </div>
+                        </div>
                             @endif
 
                             <form action="{{ route('fichaCaracterizacion.asignarInstructores', $ficha->id) }}" method="POST" id="formAsignarInstructores">
@@ -316,7 +316,7 @@
                                         </a>
                                         <button type="submit" class="btn btn-success btn-lg px-4">
                                             <i class="fas fa-check me-2"></i> Asignar Instructores
-                                        </button>
+                                    </button>
                                     </div>
                                 </div>
                             </form>
@@ -327,24 +327,24 @@
                     <!-- Instructores Asignados -->
                     <div class="card border-0 shadow-lg mb-4">
                         <div class="card-header bg-white border-0 py-4">
-                            <div class="d-flex align-items-center">
+                                                    <div class="d-flex align-items-center">
                                 <div class="bg-success rounded-circle p-2 me-3">
                                     <i class="fas fa-user-check text-white"></i>
-                                </div>
-                                <div>
+                                                        </div>
+                                                        <div>
                                     <h4 class="mb-0 text-dark">Instructores Asignados</h4>
                                     <small class="text-muted">Instructores ya asignados a esta ficha</small>
-                                </div>
-                            </div>
-                        </div>
+                                                        </div>
+                                                    </div>
+                                                                </div>
                         <div class="card-body p-4">
                             @if($instructoresAsignados->count() > 0)
                                 <div class="row g-3">
                                     @foreach($instructoresAsignados as $asignacion)
                                         <div class="col-md-6">
                                             <div class="bg-light border rounded p-3">
-                                                <div class="d-flex justify-content-between align-items-start">
-                                                    <div>
+                                                        <div class="d-flex justify-content-between align-items-start">
+                                                            <div>
                                                         <h6 class="mb-1 text-dark">
                                                             {{ $asignacion->instructor->persona->primer_nombre }} 
                                                             {{ $asignacion->instructor->persona->primer_apellido }}
@@ -353,7 +353,7 @@
                                                             @else
                                                                 <span class="badge bg-secondary ms-2">Auxiliar</span>
                                                             @endif
-                                                        </h6>
+                                                                </h6>
                                                         <p class="text-muted mb-1 small">
                                                             <i class="fas fa-calendar me-1"></i>
                                                             {{ $asignacion->fecha_inicio->format('d/m/Y') }} - 
@@ -399,8 +399,8 @@
                                 <div class="text-center text-muted py-4">
                                     <i class="fas fa-user-slash fa-3x mb-3"></i>
                                     <p>No hay instructores adicionales asignados a esta ficha.</p>
-                                </div>
-                            @endif
+                        </div>
+                    @endif
                         </div>
                     </div>
 
@@ -601,7 +601,7 @@
                                    min="${fechaInicioMin}"
                                    max="${fechaFinMax}" required>
                         </div>
-                    </div>
+                        </div>
                     
                     <div class="row g-3 mt-2">
                         <div class="col-md-6">
@@ -609,9 +609,9 @@
                             <div class="bg-light border rounded p-3 text-center">
                                 <div class="h5 mb-0 text-primary horas-calculadas">${horas}</div>
                                 <small class="text-muted">horas</small>
-                            </div>
-                            <input type="hidden" name="instructores[${index}][total_horas_instructor]" value="${horas}">
                         </div>
+                            <input type="hidden" name="instructores[${index}][total_horas_instructor]" value="${horas}">
+                    </div>
                         <div class="col-md-6">
                             <label class="form-label text-muted small">Días de Formación</label>
                             <div class="dias-formacion-container" data-index="${index}">
@@ -621,8 +621,8 @@
                                 <i class="fas fa-plus me-1"></i> Agregar Día
                             </button>
                         </div>
+                        </div>
                     </div>
-                </div>
                 </div>
             `;
             

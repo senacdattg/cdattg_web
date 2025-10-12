@@ -12,6 +12,7 @@ export default defineConfig({
                 'instructores_css': 'resources/css/instructores.css',
                 'guias_aprendizaje_css': 'resources/css/guias_aprendizaje.css',
                 'resultados_aprendizaje_css': 'resources/css/resultados-aprendizaje.css',
+                'dias_formacion_css': 'resources/css/dias-formacion.css',
                 'dashboard_superadmin': 'resources/css/dashboards/dashboard-superadmin.css',
                 'caracter_selecter': 'resources/css/Asistencia/caracter_selecter.css',
                 
