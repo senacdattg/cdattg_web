@@ -38,8 +38,8 @@ class ComplementarioOfertado extends Model
     public function getEstadoLabelAttribute()
     {
         return match ($this->estado) {
-            0 => 'Con Oferta',
-            1 => 'Sin Oferta',
+            0 => 'Sin Oferta',
+            1 => 'Con Oferta',
             2 => 'Cupos Llenos',
             default => 'Desconocido',
         };
