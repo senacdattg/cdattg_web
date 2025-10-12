@@ -11,42 +11,6 @@
     <link rel="stylesheet" href="{{ asset('vendor/adminlte/plugins/select2/css/select2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('vendor/adminlte/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css') }}">
     <style>
-        /* Estilos para timeline de logs */
-        .timeline {
-            position: relative;
-            padding-left: 30px;
-        }
-        
-        .timeline-item {
-            position: relative;
-            margin-bottom: 20px;
-        }
-        
-        .timeline-marker {
-            position: absolute;
-            left: -35px;
-            top: 15px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            border: 2px solid #fff;
-            box-shadow: 0 0 0 2px #dee2e6;
-        }
-        
-        .timeline-item:not(:last-child)::before {
-            content: '';
-            position: absolute;
-            left: -29px;
-            top: 27px;
-            width: 2px;
-            height: calc(100% + 10px);
-            background-color: #dee2e6;
-        }
-        
-        .timeline-content {
-            margin-left: 0;
-        }
-        
         /* Estilos para badges de estado */
         .badge {
             font-size: 0.75rem;
@@ -571,66 +535,6 @@
                         </div>
                     </div>
 
-                    <!-- Logs Recientes de Asignaciones -->
-                    @if(isset($logsRecientes) && $logsRecientes->count() > 0)
-                        <div class="card shadow-sm no-hover mt-4">
-                            <div class="card-header bg-white py-3">
-                                <h5 class="card-title m-0 font-weight-bold text-secondary">
-                                    <i class="fas fa-history mr-2"></i>Historial de Asignaciones
-                                </h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="timeline">
-                                    @foreach($logsRecientes as $log)
-                                        <div class="timeline-item mb-3">
-                                            <div class="timeline-marker bg-{{ $log->resultado === 'exitoso' ? 'success' : ($log->resultado === 'error' ? 'danger' : 'warning') }}"></div>
-                                            <div class="timeline-content">
-                                                <div class="card border-left-{{ $log->resultado === 'exitoso' ? 'success' : ($log->resultado === 'error' ? 'danger' : 'warning') }} shadow-sm">
-                                                    <div class="card-body py-2">
-                                                        <div class="d-flex justify-content-between align-items-start">
-                                                            <div>
-                                                                <h6 class="mb-1">
-                                                                    <i class="fas fa-{{ $log->accion === 'asignar' ? 'plus' : ($log->accion === 'desasignar' ? 'minus' : 'edit') }} mr-1"></i>
-                                                                    {{ ucfirst($log->accion) }} Instructor
-                                                                </h6>
-                                                                <p class="mb-1 text-muted small">
-                                                                    <strong>Instructor:</strong> {{ $log->nombre_instructor }}
-                                                                    <br>
-                                                                    <strong>Resultado:</strong> 
-                                                                    <span class="badge badge-{{ $log->resultado === 'exitoso' ? 'success' : ($log->resultado === 'error' ? 'danger' : 'warning') }}">
-                                                                        {{ ucfirst($log->resultado) }}
-                                                                    </span>
-                                                                    <br>
-                                                                    <strong>Usuario:</strong> {{ $log->nombre_usuario }}
-                                                                </p>
-                                                                <p class="mb-0 small text-muted">
-                                                                    {{ $log->fecha_accion_formateada }}
-                                                                </p>
-                                                            </div>
-                                                            @if($log->resultado === 'error' && $log->mensaje)
-                                                                <button type="button" class="btn btn-sm btn-outline-secondary" 
-                                                                        onclick="mostrarDetallesError({{ $log->id }})"
-                                                                        title="Ver detalles del error">
-                                                                    <i class="fas fa-info-circle"></i>
-                                                                </button>
-                                                            @endif
-                                                        </div>
-                                                        @if($log->resultado === 'error' && $log->mensaje)
-                                                            <div id="detalles-error-{{ $log->id }}" class="mt-2" style="display: none;">
-                                                                <div class="alert alert-danger mb-0">
-                                                                    <strong>Error:</strong> {{ $log->mensaje }}
-                                                                </div>
-                                                            </div>
-                                                        @endif
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                </div>
-                            </div>
-                        </div>
-                    @endif
                 </div>
             </div>
         </div>
@@ -1149,18 +1053,6 @@
                     row.style.display = 'table-row';
                 } else {
                     row.style.display = 'none';
-                }
-            }
-        }
-
-        // Función para mostrar detalles de errores en logs
-        function mostrarDetallesError(logId) {
-            const detalles = document.getElementById(`detalles-error-${logId}`);
-            if (detalles) {
-                if (detalles.style.display === 'none') {
-                    detalles.style.display = 'block';
-                } else {
-                    detalles.style.display = 'none';
                 }
             }
         }
