@@ -64,88 +64,38 @@ class AsistenceQrController extends Controller
      * @param int $id El ID de la caracterización.
      * @return \Illuminate\View\View La vista de selección de caracterización.
      */
-    public function caracterSelected(InstructorFichaCaracterizacion $caracterizacion,Evidencias $evidencia)
+    public function caracterSelected(InstructorFichaCaracterizacion $caracterizacion, Evidencias $evidencia)
     {
-        $guiaAprendizajeActual = $this->registroActividadesService->getGuiasAprendizaje($caracterizacion);
+        try {
+            $guiaAprendizajeActual = $this->registroActividadesService->getGuiasAprendizaje($caracterizacion);
+            $actividades = $this->registroActividadesService->getActividades($caracterizacion);
 
-        $actividades = $this->registroActividadesService->getActividades($caracterizacion);
+            // Delegar al servicio
+            $datosCaracterizacion = $this->asistenceQrService->obtenerDatosCaracterizacion(
+                $caracterizacion->id, 
+                Auth::user()
+            );
 
-        $fichaCaracterizacion = FichaCaracterizacion::with([
-            'diasFormacion.dia',
-            'programaFormacion',
-            'instructor.persona',
-            'jornadaFormacion'
-        ])->find($caracterizacion->id);
-
-        // Obtener el día de hoy (1 = Lunes, 7 = Domingo)
-        $diaHoy = now()->dayOfWeek; // 0 = Domingo, 1 = Lunes, etc.
-
-        $diaId = ($diaHoy == 0) ? 18 : $diaHoy + 11; // Si Domingo es 0, lo mapeo al ID 18, si no, sumo 11 (Lunes 1->12, etc)
-
-        // Obtener el horario del día de hoy
-        $horarioHoy = null;
-        if ($fichaCaracterizacion && $fichaCaracterizacion->diasFormacion) {
-            $horarioHoy = $fichaCaracterizacion->diasFormacion
-                ->where('dia_id', $diaId)
-                ->first();
-
-            if ($horarioHoy) {
-                $horarioHoy->hora_inicio = Carbon::parse($horarioHoy->hora_inicio)->format('h:i A');
-                $horarioHoy->hora_fin = Carbon::parse($horarioHoy->hora_fin)->format('h:i A');
+            if (!$datosCaracterizacion['fichaCaracterizacion']) {
+                return redirect()->back()->with('error', 'Ficha de caracterización no encontrada.');
             }
+
+            $rapActual = $caracterizacion->ficha->programaFormacion->competenciaActual()->rapActual();
+
+            return view('qr_asistence.index', [
+                'caracterizacion' => $caracterizacion,
+                'fichaCaracterizacion' => $datosCaracterizacion['fichaCaracterizacion'],
+                'aprendizPersonaConAsistencia' => $datosCaracterizacion['aprendices'],
+                'horarioHoy' => $datosCaracterizacion['horarioHoy'],
+                'evidencia' => $evidencia,
+                'guiaAprendizajeActual' => $guiaAprendizajeActual,
+                'rapActual' => $rapActual,
+                'actividades' => $actividades,
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error en caracterSelected: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al cargar caracterización.');
         }
-
-        // Si fichaCaracterizacion es null, el resto de la ejecución dará un error.
-        // Agrega una verificación para manejar el caso si no se encuentra la ficha.
-        if (!$fichaCaracterizacion) {
-            return redirect()->back()->with('error', 'Ficha de caracterización no encontrada.');
-        }
-
-        // Obtener el ID del instructor actual (logueado) y su ficha
-        $user = Auth::user();
-        $instructorFichaId = null;
-        if ($user && $user->persona && $user->persona->instructor) {
-            $instructor = $user->persona->instructor;
-            $instructorFicha = InstructorFichaCaracterizacion::where('instructor_id', $instructor->id)
-                ->where('ficha_id', $fichaCaracterizacion->id)
-                ->first();
-            if ($instructorFicha) {
-                $instructorFichaId = $instructorFicha->id;
-            }
-        }
-
-        // Obtener los aprendices de la ficha y sus datos de asistencia para hoy
-        $aprendicesFicha = AprendizFicha::where('ficha_id', $fichaCaracterizacion->id)->get();
-        $aprendizPersonaConAsistencia = collect();
-        $fechaActual = Carbon::now()->format('Y-m-d');
-
-        foreach ($aprendicesFicha as $af) {
-            $aprendiz = Aprendiz::find($af->aprendiz_id);
-            if ($aprendiz && $aprendiz->persona) {
-                $persona = $aprendiz->persona;
-
-                $asistenciaHoy = null;
-                if ($instructorFichaId) {
-                    $asistenciaHoy = AsistenciaAprendiz::where('aprendiz_ficha_id', $af->id)
-                        ->where('instructor_ficha_id', $instructorFichaId)
-                        ->whereDate('created_at', $fechaActual)
-                        ->first();
-                }
-
-                $persona->asistenciaHoy = $asistenciaHoy;
-
-                if ($persona->asistenciaHoy) {
-                    $persona->asistenciaHoy->formatted_hora_ingreso = Carbon::parse($persona->asistenciaHoy->hora_ingreso)->format('h:i A');
-                    $persona->asistenciaHoy->formatted_hora_salida = $persona->asistenciaHoy->hora_salida ? Carbon::parse($persona->asistenciaHoy->hora_salida)->format('h:i A') : null;
-                }
-
-                $aprendizPersonaConAsistencia->push($persona);
-            }
-        }
-
-        $rapActual = $caracterizacion->ficha->programaFormacion->competenciaActual()->rapActual();
-
-        return view('qr_asistence.index', compact('caracterizacion', 'fichaCaracterizacion', 'aprendizPersonaConAsistencia', 'horarioHoy', 'evidencia', 'guiaAprendizajeActual', 'rapActual', 'actividades'));
     }
 
 
