@@ -45,16 +45,37 @@ async function validarCedula(cedula) {
     const texto = await dialog.innerText();
     console.log(`💬 Respuesta del servidor:\n${texto}`);
 
-    // Determinar resultado
-    if (texto.toLowerCase().includes("ya existe") ||
-        texto.toLowerCase().includes("ya cuentas con un registro")) {
-      return "YA_EXISTE";
-    } else if (texto.toLowerCase().includes("creado") ||
-               texto.toLowerCase().includes("actualizar tu documento")) {
+    // Determinar resultado basado en el texto del diálogo
+    const textoLower = texto.toLowerCase();
+
+    // Caso 1: Usuario ya existe y requiere cambio de documento (mensaje específico)
+    if ((textoLower.includes("ya existe") || textoLower.includes("ya cuentas con un registro")) &&
+        (textoLower.includes("actualizar tu documento") ||
+         textoLower.includes("requiere_cambio") ||
+         textoLower.includes("cambiar tu documento") ||
+         textoLower.includes("tarjeta de identidad"))) {
       return "REQUIERE_CAMBIO";
-    } else if (texto.toLowerCase().includes("creado")) {
-      return "CUENTA_CREADA";
-    } else {
+    }
+
+    // Caso 2: Usuario ya existe y está registrado correctamente
+    else if (textoLower.includes("ya existe") ||
+             textoLower.includes("ya cuentas con un registro")) {
+      return "YA_EXISTE";
+    }
+
+    // Caso 3: Usuario no existe y puede registrarse
+    else if (textoLower.includes("continuar") ||
+             textoLower.includes("siguiente") ||
+             textoLower.includes("registro exitoso") ||
+             textoLower.includes("cuenta creada") ||
+             texto.trim() === "" ||
+             textoLower.includes("bienvenido")) {
+      return "NO_REGISTRADO";
+    }
+
+    // Caso 4: Cualquier otro mensaje
+    else {
+      console.log(`⚠️ Respuesta no reconocida: ${texto}`);
       return "DESCONOCIDO";
     }
 
