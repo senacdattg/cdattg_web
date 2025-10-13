@@ -4,23 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreAprendizRequest;
 use App\Http\Requests\UpdateAprendizRequest;
-use App\Models\Aprendiz;
+use App\Services\AprendizService;
 use App\Models\FichaCaracterizacion;
 use App\Models\Persona;
-use App\Events\AprendizAsignadoAFicha;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 
 class AprendizController extends Controller
 {
-    public function __construct()
+    protected AprendizService $aprendizService;
+
+    public function __construct(AprendizService $aprendizService)
     {
         $this->middleware('auth');
+        $this->aprendizService = $aprendizService;
 
         $this->middleware('can:VER APRENDIZ')->only(['index', 'show']);
         $this->middleware('can:CREAR APRENDIZ')->only(['create', 'store']);
@@ -37,38 +35,10 @@ class AprendizController extends Controller
     public function index(Request $request)
     {
         try {
-            // Consulta para obtener solo el aprendiz más reciente por persona
-            $query = Aprendiz::with(['persona', 'fichaCaracterizacion'])
-                ->whereIn('id', function($subquery) {
-                    $subquery->select(DB::raw('MAX(id)'))
-                        ->from('aprendices')
-                        ->groupBy('persona_id');
-                });
+            $filtros = $request->only(['search', 'ficha_id']);
+            $filtros['per_page'] = 15;
 
-            // Filtro por búsqueda de nombre o documento
-            if ($request->filled('search')) {
-                $search = $request->search;
-                $query->whereHas('persona', function ($q) use ($search) {
-                    $q->where('primer_nombre', 'LIKE', "%{$search}%")
-                        ->orWhere('primer_apellido', 'LIKE', "%{$search}%")
-                        ->orWhere('numero_documento', 'LIKE', "%{$search}%");
-                });
-            }
-
-            // Filtro por ficha
-            if ($request->filled('ficha_id')) {
-                $query->where('ficha_caracterizacion_id', $request->ficha_id);
-            }
-
-            $aprendices = $query->orderBy('id', 'desc')->paginate(10)->withQueryString();
-            
-            // Debug: Verificar que las personas estén cargadas
-            Log::info('Aprendices cargados en index', [
-                'total' => $aprendices->count(),
-                'con_persona' => $aprendices->filter(fn($a) => !is_null($a->persona))->count(),
-                'sin_persona' => $aprendices->filter(fn($a) => is_null($a->persona))->count(),
-            ]);
-            
+            $aprendices = $this->aprendizService->listarConFiltros($filtros);
             $fichas = FichaCaracterizacion::where('status', 1)->get();
 
             return view('aprendices.index', compact('aprendices', 'fichas'));
@@ -109,37 +79,16 @@ class AprendizController extends Controller
     public function store(StoreAprendizRequest $request)
     {
         try {
-            DB::transaction(function () use ($request) {
-                $data = $request->validated();
-
-                // Crear el aprendiz
-                // El observer se encargará de asignar el rol automáticamente
-                $aprendiz = Aprendiz::create($data);
-
-                // Disparar evento de asignación a ficha
-                if ($data['ficha_caracterizacion_id']) {
-                    event(new AprendizAsignadoAFicha($aprendiz, $data['ficha_caracterizacion_id']));
-                }
-
-                Log::info('Aprendiz creado exitosamente', [
-                    'aprendiz_id' => $aprendiz->id,
-                    'persona_id' => $data['persona_id'],
-                    'ficha_id' => $data['ficha_caracterizacion_id'],
-                    'user_id' => Auth::id()
-                ]);
-            });
+            $this->aprendizService->crear($request->validated());
 
             return redirect()->route('aprendices.index')
                 ->with('success', '¡Aprendiz registrado exitosamente!');
         } catch (\Exception $e) {
-            Log::error('Error al crear aprendiz: ' . $e->getMessage(), [
-                'request_data' => $request->all(),
-                'user_id' => Auth::id()
-            ]);
+            Log::error('Error al crear aprendiz: ' . $e->getMessage());
 
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Error al registrar el aprendiz. Por favor, inténtelo de nuevo.');
+                ->with('error', $e->getMessage());
         }
     }
 
@@ -152,44 +101,24 @@ class AprendizController extends Controller
     public function show($id)
     {
         try {
-            // Cargar el aprendiz con sus relaciones
-            $aprendiz = Aprendiz::with([
-                'persona.tipoDocumento',
-                'fichaCaracterizacion.programaFormacion',
-                'fichaCaracterizacion.jornadaFormacion',
-                'asistencias' => function ($query) {
-                    $query->latest()->take(10);
-                }
-            ])->findOrFail($id);
+            $aprendiz = $this->aprendizService->obtener($id);
 
-            // Log de debug
-            Log::info('Mostrando aprendiz', [
-                'aprendiz_id' => $aprendiz->id,
-                'persona_id' => $aprendiz->persona_id,
-                'tiene_persona' => !is_null($aprendiz->persona),
-            ]);
-
-            // Verificar si el aprendiz tiene una persona asociada
-            if (!$aprendiz->persona) {
-                Log::warning('Aprendiz sin persona asociada', [
-                    'aprendiz_id' => $aprendiz->id,
-                    'persona_id' => $aprendiz->persona_id
-                ]);
-                
+            if (!$aprendiz) {
                 return redirect()->route('aprendices.index')
-                    ->with('warning', 'Este aprendiz no tiene información de persona asociada. Por favor, edite el registro para asignar una persona válida.');
+                    ->with('error', 'Aprendiz no encontrado.');
+            }
+
+            if (!$aprendiz->persona) {
+                return redirect()->route('aprendices.index')
+                    ->with('warning', 'Este aprendiz no tiene información de persona asociada.');
             }
 
             return view('aprendices.show', compact('aprendiz'));
         } catch (\Exception $e) {
-            Log::error('Error al mostrar aprendiz', [
-                'id_recibido' => $id,
-                'mensaje' => $e->getMessage(),
-                'linea' => $e->getLine()
-            ]);
+            Log::error('Error al mostrar aprendiz: ' . $e->getMessage());
 
             return redirect()->route('aprendices.index')
-                ->with('error', 'Error al cargar la información del aprendiz: ' . $e->getMessage());
+                ->with('error', 'Error al cargar la información del aprendiz.');
         }
     }
 
@@ -202,18 +131,21 @@ class AprendizController extends Controller
     public function edit($id)
     {
         try {
-            // Cargar el aprendiz con sus relaciones
-            $aprendiz = Aprendiz::with(['persona', 'fichaCaracterizacion'])->findOrFail($id);
+            $aprendiz = $this->aprendizService->obtener($id);
             
+            if (!$aprendiz) {
+                return redirect()->route('aprendices.index')
+                    ->with('error', 'Aprendiz no encontrado.');
+            }
+
             $fichas = FichaCaracterizacion::where('status', 1)->get();
 
             return view('aprendices.edit', compact('aprendiz', 'fichas'));
         } catch (\Exception $e) {
-            Log::error('Error al cargar formulario de edición de aprendiz: ' . $e->getMessage(), [
-                'id_recibido' => $id
-            ]);
+            Log::error('Error al cargar formulario de edición: ' . $e->getMessage());
 
-            return redirect()->route('aprendices.index')->with('error', 'Error al cargar el formulario.');
+            return redirect()->route('aprendices.index')
+                ->with('error', 'Error al cargar el formulario.');
         }
     }
 
@@ -227,40 +159,16 @@ class AprendizController extends Controller
     public function update(UpdateAprendizRequest $request, $id)
     {
         try {
-            $aprendiz = Aprendiz::findOrFail($id);
-            
-            DB::transaction(function () use ($request, $aprendiz) {
-                $data = $request->validated();
-                $fichaAnterior = $aprendiz->ficha_caracterizacion_id;
+            $this->aprendizService->actualizar($id, $request->validated());
 
-                // Actualizar el aprendiz
-                $aprendiz->update($data);
-
-                // Disparar evento si cambió la ficha
-                if ($data['ficha_caracterizacion_id'] && $data['ficha_caracterizacion_id'] != $fichaAnterior) {
-                    event(new AprendizAsignadoAFicha($aprendiz, $data['ficha_caracterizacion_id']));
-                }
-
-                Log::info('Aprendiz actualizado exitosamente', [
-                    'aprendiz_id' => $aprendiz->id,
-                    'ficha_anterior' => $fichaAnterior,
-                    'ficha_nueva' => $data['ficha_caracterizacion_id'],
-                    'user_id' => Auth::id()
-                ]);
-            });
-
-            return redirect()->route('aprendices.show', $aprendiz->id)
+            return redirect()->route('aprendices.show', $id)
                 ->with('success', 'Información del aprendiz actualizada exitosamente.');
         } catch (\Exception $e) {
-            Log::error('Error al actualizar aprendiz: ' . $e->getMessage(), [
-                'id_recibido' => $id,
-                'request_data' => $request->all(),
-                'user_id' => Auth::id()
-            ]);
+            Log::error('Error al actualizar aprendiz: ' . $e->getMessage());
 
             return redirect()->back()
                 ->withInput()
-                ->with('error', 'Error al actualizar el aprendiz. Por favor, inténtelo de nuevo.');
+                ->with('error', $e->getMessage());
         }
     }
 
@@ -273,34 +181,20 @@ class AprendizController extends Controller
     public function destroy($id)
     {
         try {
-            $aprendiz = Aprendiz::findOrFail($id);
-            
-            DB::transaction(function () use ($aprendiz) {
-                // Eliminar el aprendiz (soft delete)
-                $aprendiz->delete();
-
-                Log::info('Aprendiz eliminado exitosamente', [
-                    'aprendiz_id' => $aprendiz->id,
-                    'user_id' => Auth::id()
-                ]);
-            });
+            $this->aprendizService->eliminar($id);
 
             return redirect()->route('aprendices.index')
                 ->with('success', 'Aprendiz eliminado exitosamente.');
         } catch (QueryException $e) {
-            Log::error('Error de base de datos al eliminar aprendiz: ' . $e->getMessage(), [
-                'id_recibido' => $id
-            ]);
+            Log::error('Error de base de datos al eliminar aprendiz: ' . $e->getMessage());
 
             return redirect()->back()
-                ->with('error', 'No se puede eliminar el aprendiz porque tiene registros de asistencia asociados.');
+                ->with('error', 'No se puede eliminar el aprendiz porque tiene registros asociados.');
         } catch (\Exception $e) {
-            Log::error('Error al eliminar aprendiz: ' . $e->getMessage(), [
-                'id_recibido' => $id
-            ]);
+            Log::error('Error al eliminar aprendiz: ' . $e->getMessage());
 
             return redirect()->back()
-                ->with('error', 'Error al eliminar el aprendiz. Por favor, inténtelo de nuevo.');
+                ->with('error', $e->getMessage());
         }
     }
 
@@ -313,29 +207,18 @@ class AprendizController extends Controller
     public function getAprendicesByFicha($fichaId)
     {
         try {
-            $ficha = FichaCaracterizacion::findOrFail($fichaId);
+            $aprendices = $this->aprendizService->obtenerPorFicha($fichaId);
 
-            $aprendices = $ficha->aprendices()
-                ->with('aprendiz.persona')
-                ->get()
-                ->map(function ($aprendizFicha) {
-                    return [
-                        'id' => $aprendizFicha->aprendiz->id,
-                        'persona_id' => $aprendizFicha->aprendiz->persona_id,
-                        'nombre_completo' => $aprendizFicha->aprendiz->persona->nombre_completo,
-                        'numero_documento' => $aprendizFicha->aprendiz->persona->numero_documento,
-                        'email' => $aprendizFicha->aprendiz->persona->email,
-                    ];
-                });
+            $datos = $aprendices->map(function ($aprendiz) {
+                return $this->aprendizService->formatearParaApi($aprendiz);
+            });
 
             return response()->json([
                 'success' => true,
-                'aprendices' => $aprendices
+                'aprendices' => $datos
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error al obtener aprendices por ficha: ' . $e->getMessage(), [
-                'ficha_id' => $fichaId
-            ]);
+            Log::error('Error al obtener aprendices por ficha: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -352,11 +235,15 @@ class AprendizController extends Controller
     public function apiIndex()
     {
         try {
-            $aprendices = Aprendiz::with('persona')->get();
+            $aprendices = $this->aprendizService->listarConFiltros(['per_page' => 1000]);
+
+            $datos = $aprendices->map(function ($aprendiz) {
+                return $this->aprendizService->formatearParaApi($aprendiz);
+            });
 
             return response()->json([
                 'success' => true,
-                'aprendices' => $aprendices
+                'aprendices' => $datos
             ], 200);
         } catch (\Exception $e) {
             Log::error('Error en API de aprendices: ' . $e->getMessage());
@@ -377,33 +264,19 @@ class AprendizController extends Controller
     public function search(Request $request)
     {
         try {
-            $search = $request->input('q', '');
+            $termino = $request->input('q', '');
+            $aprendices = $this->aprendizService->buscar($termino, 10);
 
-            $aprendices = Aprendiz::with('persona')
-                ->whereHas('persona', function ($query) use ($search) {
-                    $query->where('primer_nombre', 'LIKE', "%{$search}%")
-                        ->orWhere('primer_apellido', 'LIKE', "%{$search}%")
-                        ->orWhere('numero_documento', 'LIKE', "%{$search}%");
-                })
-                ->limit(10)
-                ->get()
-                ->map(function ($aprendiz) {
-                    return [
-                        'id' => $aprendiz->id,
-                        'nombre_completo' => $aprendiz->persona->nombre_completo,
-                        'numero_documento' => $aprendiz->persona->numero_documento,
-                        'email' => $aprendiz->persona->email,
-                    ];
-                });
+            $datos = $aprendices->map(function ($aprendiz) {
+                return $this->aprendizService->formatearParaApi($aprendiz);
+            });
 
             return response()->json([
                 'success' => true,
-                'aprendices' => $aprendices
+                'aprendices' => $datos
             ], 200);
         } catch (\Exception $e) {
-            Log::error('Error al buscar aprendices: ' . $e->getMessage(), [
-                'search_term' => $request->input('q')
-            ]);
+            Log::error('Error al buscar aprendices: ' . $e->getMessage());
 
             return response()->json([
                 'success' => false,
@@ -421,54 +294,14 @@ class AprendizController extends Controller
     public function cambiarEstado($id)
     {
         try {
-            $aprendiz = Aprendiz::findOrFail($id);
-            $nuevoEstado = !$aprendiz->estado;
-            $aprendiz->update(['estado' => $nuevoEstado]);
-
-            Log::info('Estado de aprendiz cambiado', [
-                'aprendiz_id' => $aprendiz->id,
-                'nuevo_estado' => $nuevoEstado,
-                'user_id' => Auth::id()
-            ]);
+            $this->aprendizService->cambiarEstado($id);
 
             return redirect()->back()->with('success', 'Estado cambiado exitosamente.');
         } catch (\Exception $e) {
-            Log::error('Error al cambiar estado del aprendiz: ' . $e->getMessage(), [
-                'id_recibido' => $id
-            ]);
+            Log::error('Error al cambiar estado del aprendiz: ' . $e->getMessage());
 
-            return redirect()->back()->with('error', 'Error al cambiar el estado del aprendiz.');
+            return redirect()->back()->with('error', $e->getMessage());
         }
-    }
-
-
-    /**
-     * Método de test para verificar la carga de datos
-     * TEMPORAL - ELIMINAR DESPUÉS
-     */
-    public function testData()
-    {
-        $query = Aprendiz::with(['persona', 'fichaCaracterizacion']);
-        $aprendices = $query->paginate(10);
-        
-        $data = [];
-        foreach ($aprendices as $aprendiz) {
-            $data[] = [
-                'id' => $aprendiz->id,
-                'persona_id' => $aprendiz->persona_id,
-                'persona_cargada' => !is_null($aprendiz->persona),
-                'nombre' => $aprendiz->persona?->nombre_completo ?? 'NULL',
-                'documento' => $aprendiz->persona?->numero_documento ?? 'NULL',
-                'email' => $aprendiz->persona?->email ?? 'NULL',
-                'relaciones_cargadas' => array_keys($aprendiz->getRelations()),
-            ];
-        }
-        
-        return response()->json([
-            'success' => true,
-            'total' => $aprendices->total(),
-            'data' => $data,
-        ]);
     }
 }
 
