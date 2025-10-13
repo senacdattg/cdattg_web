@@ -74,6 +74,7 @@ Route::post('/programas-complementarios/{id}/inscripcion', [App\Http\Controllers
 Route::get('/programas-complementarios/{id}/documentos', [App\Http\Controllers\ComplementarioController::class, 'formularioDocumentos'])->name('programas-complementarios.documentos');
 Route::get('/programas-complementarios/aspirante/{id}', [App\Http\Controllers\ComplementarioController::class, 'perfilAspirante'])->name('programas-complementarios.perfil-aspirante');
 Route::post('/programas-complementarios/{id}/validar-sofia', [App\Http\Controllers\ComplementarioController::class, 'validarSofia'])->name('programas-complementarios.validar-sofia');
+Route::get('/sofia-validation-progress/{progressId}', [App\Http\Controllers\ComplementarioController::class, 'getValidationProgress'])->name('sofia-validation.progress');
 
 Route::middleware('auth')->group(function () {
     Route::get('/mi-perfil', [App\Http\Controllers\ComplementarioController::class, 'miPerfil'])->name('aspirantes.mi-perfil');
