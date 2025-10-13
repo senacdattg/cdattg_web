@@ -133,9 +133,9 @@ class ValidarSofiaJob implements ShouldQueue
     {
         $resultadoLower = strtolower($resultado);
 
-        // PRIMERO: Verificar si requiere cambio de documento (más específico)
-        if (str_contains($resultadoLower, 'actualizar tu documento') ||
-            str_contains($resultadoLower, 'requiere_cambio') ||
+        // PRIMERO: Verificar si requiere cambio de documento
+        if (str_contains($resultadoLower, 'requiere_cambio') ||
+            str_contains($resultadoLower, 'actualizar tu documento') ||
             str_contains($resultadoLower, 'cambiar tu documento')) {
             return 2; // Requiere cambio de cédula
         }
@@ -146,16 +146,21 @@ class ValidarSofiaJob implements ShouldQueue
             return 1; // Registrado
         }
 
-        // TERCERO: Verificar si se pudo crear cuenta
-        elseif (str_contains($resultadoLower, 'creado') ||
-                str_contains($resultadoLower, 'cuenta_creada') ||
-                str_contains($resultadoLower, 'registro exitoso')) {
-            return 0; // No registrado (pudo crear cuenta)
+        // TERCERO: Verificar si NO está registrado (puede registrarse)
+        elseif (str_contains($resultadoLower, 'no_registrado') ||
+                str_contains($resultadoLower, 'continuar') ||
+                str_contains($resultadoLower, 'siguiente') ||
+                str_contains($resultadoLower, 'registro exitoso') ||
+                str_contains($resultadoLower, 'cuenta creada') ||
+                str_contains($resultadoLower, 'bienvenido') ||
+                trim($resultado) === '') {
+            return 0; // No registrado - puede crear cuenta
         }
 
         // CUARTO: Error o respuesta desconocida
         else {
-            return 2; // Error o desconocido -> requiere cambio por defecto
+            Log::warning("Respuesta no reconocida de SenaSofiaPlus: '{$resultado}'");
+            return 0; // Por defecto, asumir no registrado
         }
     }
 
