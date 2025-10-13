@@ -28,24 +28,13 @@ class ComplementarioController extends Controller
         return view('complementarios.gestion_aspirantes');
     }
 
-    /**
-     * Display the procesamiento documentos view.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function procesarDocumentos() 
+    public function procesarDcoumentos() 
     {
         return view('complementarios.procesamiento_documentos');
     }
-
-    /**
-     * Display the gestion programas complementarios view.
-     *
-     * @return \Illuminate\View\View
-     */
+    
     public function gestionProgramasComplementarios()
     {
-
         $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion'])->get();
         $modalidades = \App\Models\ParametroTema::where('tema_id', 5)->with('parametro')->get();
         $jornadas = \App\Models\JornadaFormacion::all();
@@ -296,6 +285,10 @@ class ComplementarioController extends Controller
             ]
         );
 
+        // Redirigir a la segunda fase (subida de documentos) con el aspirante_id como parรกmetro
+        return redirect()->route('programas-complementarios.documentos', ['id' => $id, 'aspirante_id' => $aspirante->id])
+            ->with('success', 'Datos personales registrados correctamente. Ahora debe subir su documento de identidad.');
+
         // Verificar si ya existe un usuario con este email
         $existingUser = User::where('email', $request->email)->first();
 
@@ -312,10 +305,12 @@ class ComplementarioController extends Controller
             $user->assignRole('ASPIRANTE');
         }
 
+
         // Redirigir a la segunda fase (subida de documentos)
         return redirect()->route('programas-complementarios.documentos', $id)
             ->with('success', 'Datos personales registrados correctamente. Ahora debe subir su documento de identidad.')
             ->with('aspirante_id', $aspirante->id);
+
     }
 
     /**
@@ -325,7 +320,70 @@ class ComplementarioController extends Controller
     {
         $programa = ComplementarioOfertado::findOrFail($id);
 
+        // Obtener aspirante_id de la URL
+        $aspirante_id = $request->query('aspirante_id');
+        
+        return view('complementarios.formulario_documentos', compact('programa', 'aspirante_id'));
+    }
+
+    /**
+     * Procesar la subida de documentos
+     */
+    public function subirDocumento(Request $request, $id)
+    {
+        Log::info('subirDocumento method reached', [
+            'request_data' => $request->all(),
+            'files' => $request->files->all()
+        ]);
+
+        // Validar el archivo
+        $request->validate([
+            'documento_identidad' => 'required|file|mimes:pdf|max:5120', // 5MB mรกximo
+            'aspirante_id' => 'required|exists:aspirantes_complementarios,id',
+            'acepto_privacidad' => 'required|accepted',
+        ]);
+
+        try {
+            // Obtener el aspirante
+            $aspirante = AspiranteComplementario::findOrFail($request->aspirante_id);
+            
+            // Procesar el archivo y subirlo a Google Drive
+            if ($request->hasFile('documento_identidad')) {
+                $file = $request->file('documento_identidad');
+                $fileName = 'documento_identidad_' . $aspirante->persona->numero_documento . '_' . time() . '.' . $file->getClientOriginalExtension();
+
+                Log::info('Attempting to upload file to Google Drive', [
+                    'file_name' => $fileName,
+                    'file_size' => $file->getSize(),
+                    'disk_config' => config('filesystems.disks.google')
+                ]);
+
+                // Subir a Google Drive
+                $path = Storage::disk('google')->putFileAs('documentos_aspirantes', $file, $fileName);
+
+                Log::info('File uploaded successfully', ['path' => $path]);
+
+                // Actualizar el registro del aspirante con la informaciรณn del documento
+                $aspirante->update([
+                    'documento_identidad_path' => $path,
+                    'documento_identidad_nombre' => $fileName,
+                    'estado' => 2, // Estado "Documento subido"
+                ]);
+            }
+
+            return redirect()->route('programas-complementarios.perfil-aspirante', ['id' => $aspirante->id])
+                ->with('success', 'Documento subido exitosamente. Su inscripción está en proceso de revisión.');
+
+        } catch (\Exception $e) {
+            Log::error('Error al subir documento: ' . $e->getMessage(), [
+                'exception' => $e,
+                'trace' => $e->getTraceAsString()
+            ]);
+            return back()->with('error', 'Error al subir el documento. Por favor intente nuevamente.');
+        }
+
         return view('complementarios.formulario_documentos', compact('programa'));
+
     }
 
 
