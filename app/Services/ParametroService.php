@@ -37,8 +37,6 @@ class ParametroService
     {
         return DB::transaction(function () use ($datos) {
             $parametro = Parametro::create($datos);
-            
-            $this->repository->invalidarCache();
 
             Log::info('Parámetro creado', ['parametro_id' => $parametro->id]);
 
@@ -50,10 +48,6 @@ class ParametroService
     {
         return DB::transaction(function () use ($id, $datos) {
             $actualizado = Parametro::where('id', $id)->update($datos);
-            
-            if ($actualizado) {
-                $this->repository->invalidarCache();
-            }
 
             return $actualizado;
         });
@@ -63,10 +57,6 @@ class ParametroService
     {
         return DB::transaction(function () use ($id) {
             $eliminado = Parametro::where('id', $id)->delete();
-            
-            if ($eliminado) {
-                $this->repository->invalidarCache();
-            }
 
             return $eliminado;
         });

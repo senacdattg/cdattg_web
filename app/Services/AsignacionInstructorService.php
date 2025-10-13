@@ -223,8 +223,8 @@ class AsignacionInstructorService
             $ficha = FichaCaracterizacion::with('diasFormacion')->findOrFail($fichaId);
             
             // 1. Obtener fechas
-            $fechaInicio = \Carbon\Carbon::parse($instructorData['fecha_inicio']);
-            $fechaFin = \Carbon\Carbon::parse($instructorData['fecha_fin']);
+            $fechaInicio = Carbon::parse($instructorData['fecha_inicio']);
+            $fechaFin = Carbon::parse($instructorData['fecha_fin']);
             
             // 2. Calcular número de semanas
             $semanas = $fechaInicio->diffInWeeks($fechaFin);
@@ -304,8 +304,8 @@ class AsignacionInstructorService
         }
         
         try {
-            $inicio = \Carbon\Carbon::parse($horaInicio);
-            $fin = \Carbon\Carbon::parse($horaFin);
+            $inicio = Carbon::parse($horaInicio);
+            $fin = Carbon::parse($horaFin);
             
             $diferenciaMinutos = $inicio->diffInMinutes($fin);
             $horas = $diferenciaMinutos / 60;

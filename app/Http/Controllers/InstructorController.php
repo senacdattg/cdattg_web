@@ -140,7 +140,7 @@ class InstructorController extends Controller
                 return response()->json([
                     'success' => true,
                     'html' => view('Instructores.partials.instructores-table', compact('instructores'))->render(),
-                    'pagination' => $instructores->links()->render()
+                    'pagination' => $instructores->links()->toHtml()
                 ]);
             }
 

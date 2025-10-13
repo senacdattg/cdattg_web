@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\ParametroService;
 use App\Models\Parametro;
+use App\Models\Tema;
 use App\Http\Requests\StoreParametroRequest;
 use App\Http\Requests\UpdateParametroRequest;
 use Illuminate\Http\Request;

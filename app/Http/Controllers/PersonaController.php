@@ -7,10 +7,17 @@ use App\Services\PersonaService;
 use App\Services\UbicacionService;
 use App\Repositories\TemaRepository;
 use App\Models\Persona;
+use App\Models\Tema;
+use App\Models\Pais;
+use App\Models\Departamento;
+use App\Models\Municipio;
 use App\Http\Requests\StorePersonaRequest;
 use App\Http\Requests\UpdatePersonaRequest;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class PersonaController extends Controller
 {

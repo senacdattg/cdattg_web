@@ -8,10 +8,12 @@ use App\Repositories\ResultadosAprendizajeRepository;
 use App\Http\Requests\StoreCompetenciaRequest;
 use App\Http\Requests\UpdateCompetenciaRequest;
 use App\Models\Competencia;
+use App\Models\ResultadosAprendizaje;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Exception;
 
 class CompetenciaController extends Controller
 {

@@ -71,7 +71,7 @@ class BusquedaService
      */
     public function busquedaAvanzadaAprendices(array $criterios): Collection
     {
-        return $this->aprendizRepo->obtenerAprendicesConFiltros($criterios)->getCollection();
+        return collect($this->aprendizRepo->obtenerAprendicesConFiltros($criterios)->items());
     }
 
     /**

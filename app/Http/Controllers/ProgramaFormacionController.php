@@ -233,7 +233,7 @@ class ProgramaFormacionController extends Controller
      * cuyo nombre coincida con el término de búsqueda.
      *
      * @param \Illuminate\Http\Request $request La solicitud HTTP que contiene el término de búsqueda.
-     * @return \Illuminate\View\View La vista que muestra los programas de formación encontrados.
+     * @return \Illuminate\View\View|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse La vista que muestra los programas de formación encontrados o respuesta JSON/redirección.
      */
     public function search(Request $request)
     {

@@ -30,7 +30,7 @@ class AprendizController extends Controller
      * Muestra un listado de aprendices con búsqueda y filtros.
      *
      * @param Request $request
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function index(Request $request)
     {
@@ -51,7 +51,7 @@ class AprendizController extends Controller
     /**
      * Muestra el formulario para crear un nuevo aprendiz.
      *
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function create()
     {
@@ -100,7 +100,7 @@ class AprendizController extends Controller
      * Muestra la información de un aprendiz específico.
      *
      * @param int $id
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function show($id)
     {
@@ -130,7 +130,7 @@ class AprendizController extends Controller
      * Muestra el formulario para editar un aprendiz.
      *
      * @param int $id
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function edit($id)
     {
@@ -241,7 +241,7 @@ class AprendizController extends Controller
         try {
             $aprendices = $this->aprendizService->listarConFiltros(['per_page' => 1000]);
 
-            $datos = $aprendices->map(function ($aprendiz) {
+            $datos = collect($aprendices->items())->map(function ($aprendiz) {
                 return $this->aprendizService->formatearParaApi($aprendiz);
             });
 

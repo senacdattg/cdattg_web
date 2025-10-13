@@ -6,11 +6,16 @@ use App\Services\FichaService;
 use App\Services\FichaCaracterizacionValidationService;
 use App\Repositories\ConfiguracionRepository;
 use App\Models\FichaCaracterizacion;
+use App\Models\ProgramaFormacion;
+use App\Models\InstructorFichaCaracterizacion;
 use App\Http\Requests\StoreFichaCaracterizacionRequest;
 use App\Http\Requests\UpdateFichaCaracterizacionRequest;
 use App\Http\Requests\AsignarInstructoresRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Arr;
 
 class FichaCaracterizacionController extends Controller
 {
@@ -45,7 +50,7 @@ class FichaCaracterizacionController extends Controller
      * necesarios para los filtros avanzados.
      *
      * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\View\View La vista que muestra la lista de fichas de caracterización.
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse La vista que muestra la lista de fichas de caracterización.
      */
     public function index(Request $request)
     {
@@ -67,17 +72,16 @@ class FichaCaracterizacionController extends Controller
 
             return view('fichas.index', compact('fichas', 'programas', 'instructores', 'ambientes', 'sedes', 'modalidades', 'jornadas'))
                 ->with('filters', $request->all());
-        // } catch (\Exception $e) {
-        //     Log::error('Error al cargar fichas de caracterización', [
-        //         'error' => $e->getMessage(),
-        //         'user_id' => Auth::id(),
-        //         'file' => $e->getFile(),
-        //         'line' => $e->getLine()
-        //     ]);
+        } catch (\Exception $e) {
+            Log::error('Error al cargar fichas de caracterización', [
+                'error' => $e->getMessage(),
+                'user_id' => Auth::id(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine()
+            ]);
 
-        //     return redirect()->back()->with('error', 'Error al cargar las fichas de caracterización. Por favor, intente nuevamente.');
-        // }
-        
+            return redirect()->back()->with('error', 'Error al cargar las fichas de caracterización. Por favor, intente nuevamente.');
+        }
     }
 
 
@@ -87,7 +91,12 @@ class FichaCaracterizacionController extends Controller
      * Obtiene una lista de programas de formación ordenados alfabéticamente por nombre
      * y los pasa a la vista 'fichas.create'.
      *
-     * @return \Illuminate\View\View La vista para crear una nueva ficha de caracterización con los programas de formación.
+     * Muestra el formulario para crear una nueva ficha de caracterización.
+     *
+     * Obtiene una lista de programas de formación ordenados alfabéticamente por nombre
+     * y los pasa a la vista 'fichas.create'.
+     *
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse La vista para crear una nueva ficha de caracterización con los programas de formación.
      */
     public function create()
     {
@@ -135,7 +144,7 @@ class FichaCaracterizacionController extends Controller
     /**
      * Almacena una nueva ficha de caracterización en la base de datos.
      *
-     * @param \App\Http\Requests\StoreFichaCaracterizacionRequest $request La solicitud HTTP que contiene los datos de la ficha.
+     * @param StoreFichaCaracterizacionRequest $request La solicitud HTTP que contiene los datos de la ficha.
      *
      * @return \Illuminate\Http\RedirectResponse Redirige a la ruta 'fichaCaracterizacion.index' con un mensaje de éxito.
      */
@@ -222,7 +231,7 @@ class FichaCaracterizacionController extends Controller
      * Muestra el formulario de edición para una ficha de caracterización específica.
      *
      * @param string $id El ID de la ficha de caracterización a editar.
-     * @return \Illuminate\View\View La vista del formulario de edición con la ficha de caracterización y los programas de formación.
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse La vista del formulario de edición con la ficha de caracterización y los programas de formación.
      */
     public function edit(string $id)
     {
@@ -286,7 +295,7 @@ class FichaCaracterizacionController extends Controller
     /**
      * Actualiza una ficha de caracterización existente.
      *
-     * @param \App\Http\Requests\UpdateFichaCaracterizacionRequest $request La solicitud HTTP que contiene los datos de la ficha a actualizar.
+     * @param UpdateFichaCaracterizacionRequest $request La solicitud HTTP que contiene los datos de la ficha a actualizar.
      * @param string $id El ID de la ficha de caracterización que se va a actualizar.
      * @return \Illuminate\Http\RedirectResponse Redirige a la lista de fichas de caracterización con un mensaje de éxito.
      */
@@ -444,7 +453,7 @@ class FichaCaracterizacionController extends Controller
      * Búsqueda avanzada de fichas de caracterización con múltiples filtros.
      *
      * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\View\View|\Illuminate\Http\JsonResponse
+     * @return \Illuminate\View\View|\Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function search(Request $request)
     {
@@ -657,7 +666,7 @@ class FichaCaracterizacionController extends Controller
      * Muestra una ficha de caracterización específica.
      *
      * @param string $id El ID de la ficha de caracterización a mostrar.
-     * @return \Illuminate\View\View La vista que muestra los detalles de la ficha de caracterización.
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse La vista que muestra los detalles de la ficha de caracterización.
      */
     public function show(string $id)
     {
@@ -1545,13 +1554,28 @@ class FichaCaracterizacionController extends Controller
                 'excluir_ficha_id' => 'nullable|integer'
             ]);
 
-            // Usar el trait directamente desde el controlador
-            $resultado = $this->validarDisponibilidadAmbiente(
-                $request->ambiente_id,
-                $request->fecha_inicio,
-                $request->fecha_fin,
-                $request->excluir_ficha_id
-            );
+            // Validar disponibilidad del ambiente directamente
+            $ambientesOcupados = FichaCaracterizacion::where('ambiente_id', $request->ambiente_id)
+                ->where('status', 1)
+                ->where(function($query) use ($request) {
+                    $query->whereBetween('fecha_inicio', [$request->fecha_inicio, $request->fecha_fin])
+                          ->orWhereBetween('fecha_fin', [$request->fecha_inicio, $request->fecha_fin])
+                          ->orWhere(function($subQuery) use ($request) {
+                              $subQuery->where('fecha_inicio', '<=', $request->fecha_inicio)
+                                       ->where('fecha_fin', '>=', $request->fecha_fin);
+                          });
+                });
+            
+            if ($request->excluir_ficha_id) {
+                $ambientesOcupados->where('id', '!=', $request->excluir_ficha_id);
+            }
+            
+            $resultado = [
+                'valido' => !$ambientesOcupados->exists(),
+                'mensaje' => $ambientesOcupados->exists() 
+                    ? 'El ambiente no está disponible en el rango de fechas especificado'
+                    : 'El ambiente está disponible'
+            ];
             
             return response()->json($resultado);
 
@@ -1590,13 +1614,27 @@ class FichaCaracterizacionController extends Controller
                 'excluir_ficha_id' => 'nullable|integer'
             ]);
 
-            // Usar el trait directamente desde el controlador
-            $resultado = $this->validarDisponibilidadInstructor(
-                $request->instructor_id,
-                $request->fecha_inicio,
-                $request->fecha_fin,
-                $request->excluir_ficha_id
-            );
+            // Validar disponibilidad del instructor directamente
+            $instructoresOcupados = InstructorFichaCaracterizacion::where('instructor_id', $request->instructor_id)
+                ->where(function($query) use ($request) {
+                    $query->whereBetween('fecha_inicio', [$request->fecha_inicio, $request->fecha_fin])
+                          ->orWhereBetween('fecha_fin', [$request->fecha_inicio, $request->fecha_fin])
+                          ->orWhere(function($subQuery) use ($request) {
+                              $subQuery->where('fecha_inicio', '<=', $request->fecha_inicio)
+                                       ->where('fecha_fin', '>=', $request->fecha_fin);
+                          });
+                });
+            
+            if ($request->excluir_ficha_id) {
+                $instructoresOcupados->where('ficha_id', '!=', $request->excluir_ficha_id);
+            }
+            
+            $resultado = [
+                'valido' => !$instructoresOcupados->exists(),
+                'mensaje' => $instructoresOcupados->exists() 
+                    ? 'El instructor no está disponible en el rango de fechas especificado'
+                    : 'El instructor está disponible'
+            ];
             
             return response()->json($resultado);
 
@@ -1798,7 +1836,7 @@ class FichaCaracterizacionController extends Controller
     /**
      * Asigna instructores a una ficha.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param AsignarInstructoresRequest $request
      * @param string $id El ID de la ficha.
      * @return \Illuminate\Http\RedirectResponse
      */
@@ -2785,7 +2823,7 @@ class FichaCaracterizacionController extends Controller
     public function verificarConflictosFechasInstructor($instructorId, $fechaInicio, $fechaFin, $excludeInstructorFichaId = null)
     {
         try {
-            $query = \App\Models\InstructorFichaCaracterizacion::where('instructor_id', $instructorId)
+            $query = InstructorFichaCaracterizacion::where('instructor_id', $instructorId)
                 ->where(function($q) use ($fechaInicio, $fechaFin) {
                     // Verificar superposición de rangos de fechas
                     $q->where(function($subQ) use ($fechaInicio, $fechaFin) {
@@ -2815,8 +2853,8 @@ class FichaCaracterizacionController extends Controller
                 'conflictos' => $conflictos->map(function($conflicto) {
                     return [
                         'id' => $conflicto->id,
-                        'fecha_inicio' => $conflicto->fecha_inicio->format('d/m/Y'),
-                        'fecha_fin' => $conflicto->fecha_fin->format('d/m/Y'),
+                        'fecha_inicio' => $conflicto->fecha_inicio ? \Carbon\Carbon::parse($conflicto->fecha_inicio)->format('d/m/Y') : 'N/A',
+                        'fecha_fin' => $conflicto->fecha_fin ? \Carbon\Carbon::parse($conflicto->fecha_fin)->format('d/m/Y') : 'N/A',
                         'ficha' => $conflicto->fichaCaracterizacion->ficha,
                         'programa' => $conflicto->fichaCaracterizacion->programaFormacion->nombre ?? 'Sin programa',
                         'total_horas' => $conflicto->total_horas_instructor

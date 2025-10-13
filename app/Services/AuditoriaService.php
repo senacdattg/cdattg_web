@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Repositories\LoginRepository;
 use App\Repositories\AsignacionInstructorLogRepository;
+use App\Models\Login;
 use Illuminate\Support\Facades\Log;
 
 class AuditoriaService

@@ -266,4 +266,3 @@ class UpdateFichaCaracterizacionRequest extends FormRequest
         });
     }
 }
-}

@@ -179,7 +179,7 @@ class Competencia extends Model
 
     public function getDuracionFormateadaAttribute()
     {
-        return number_format($this->duracion, 0) . ' horas';
+        return number_format($this->duracion ?? 0, 0) . ' horas';
     }
 
     public function getFechaInicioFormateadaAttribute()

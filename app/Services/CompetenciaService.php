@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Repositories\CompetenciaRepository;
 use App\Repositories\ResultadosAprendizajeRepository;
 use App\Repositories\ResultadosCompetenciaRepository;
+use App\Models\Competencia;
 use Illuminate\Database\Eloquent\Collection;
 
 class CompetenciaService
@@ -31,7 +32,9 @@ class CompetenciaService
      */
     public function obtenerPorPrograma(int $programaId): Collection
     {
-        return $this->competenciaRepo->obtenerPorPrograma($programaId);
+        return Competencia::whereHas('programaFormacion', function($query) use ($programaId) {
+            $query->where('id', $programaId);
+        })->get();
     }
 
     /**
@@ -42,13 +45,13 @@ class CompetenciaService
      */
     public function obtenerConResultados(int $competenciaId): array
     {
-        $competencia = $this->competenciaRepo->obtenerConRelaciones($competenciaId);
+        $competencia = Competencia::with(['resultadosAprendizaje', 'resultadosCompetencia'])->find($competenciaId);
         
         if (!$competencia) {
             throw new \Exception('Competencia no encontrada.');
         }
 
-        $resultados = $this->resultadosCompetenciaRepo->obtenerPorCompetencia($competenciaId);
+        $resultados = $competencia->resultadosAprendizaje;
 
         return [
             'competencia' => $competencia,
@@ -65,12 +68,12 @@ class CompetenciaService
      */
     public function obtenerArbolCompetencias(int $programaId): array
     {
-        $competencias = $this->competenciaRepo->obtenerPorPrograma($programaId);
+        $competencias = $this->obtenerPorPrograma($programaId);
 
         $arbol = [];
 
         foreach ($competencias as $competencia) {
-            $resultados = $this->resultadosCompetenciaRepo->obtenerPorCompetencia($competencia->id);
+            $resultados = $competencia->resultadosAprendizaje;
 
             $arbol[] = [
                 'competencia' => [
@@ -80,9 +83,9 @@ class CompetenciaService
                 ],
                 'resultados_aprendizaje' => $resultados->map(function ($resultado) {
                     return [
-                        'id' => $resultado->resultadoAprendizaje->id ?? null,
-                        'nombre' => $resultado->resultadoAprendizaje->nombre ?? 'N/A',
-                        'codigo' => $resultado->resultadoAprendizaje->codigo ?? 'N/A',
+                        'id' => $resultado->id ?? null,
+                        'nombre' => $resultado->nombre ?? 'N/A',
+                        'codigo' => $resultado->codigo ?? 'N/A',
                     ];
                 }),
             ];

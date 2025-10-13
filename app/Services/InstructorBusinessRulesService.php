@@ -68,7 +68,7 @@ class InstructorBusinessRulesService
                 $programaNombre = $ejemploConflicto['programa'] ?? 'Sin programa';
                 $jornadaInfo = isset($ejemploConflicto['jornada']) ? " (Jornada: {$ejemploConflicto['jornada']})" : '';
                 $diasInfo = isset($ejemploConflicto['dias_conflicto']) ? " en los días: {$ejemploConflicto['dias_conflicto']}" : '';
-                $resultado['razones'][] = "El instructor tiene fichas con fechas superpuestas en la misma jornada{$diasInfo}. Ejemplo: Ficha {$ejemploConflicto['ficha_numero']} ({$programaNombre}){$jornadaInfo} del " . \Carbon\Carbon::parse($ejemploConflicto['fecha_inicio'])->format('d/m/Y') . " al " . \Carbon\Carbon::parse($ejemploConflicto['fecha_fin'])->format('d/m/Y');
+                $resultado['razones'][] = "El instructor tiene fichas con fechas superpuestas en la misma jornada{$diasInfo}. Ejemplo: Ficha {$ejemploConflicto['ficha_numero']} ({$programaNombre}){$jornadaInfo} del " . Carbon::parse($ejemploConflicto['fecha_inicio'])->format('d/m/Y') . " al " . \Carbon\Carbon::parse($ejemploConflicto['fecha_fin'])->format('d/m/Y');
             }
 
             // VALIDACIÓN DESHABILITADA: Verificar carga horaria semanal
@@ -275,7 +275,9 @@ class InstructorBusinessRulesService
             return true; // Si no hay especialidad requerida, cualquier instructor puede tomar la ficha
         }
 
-        $especialidades = $instructor->especialidades ?? [];
+        $especialidades = is_array($instructor->especialidades) 
+            ? $instructor->especialidades 
+            : (is_string($instructor->especialidades) ? json_decode($instructor->especialidades, true) : []);
         $especialidadPrincipal = $especialidades['principal'] ?? null;
         $especialidadesSecundarias = $especialidades['secundarias'] ?? [];
 
@@ -460,9 +462,9 @@ class InstructorBusinessRulesService
         $especialidades = [];
         
         if ($instructor->especialidades) {
-            $data = is_string($instructor->especialidades) 
-                ? json_decode($instructor->especialidades, true) 
-                : $instructor->especialidades;
+            $data = is_array($instructor->especialidades) 
+                ? $instructor->especialidades
+                : (is_string($instructor->especialidades) ? json_decode($instructor->especialidades, true) : []);
             
             if (isset($data['principal']) && $data['principal']) {
                 $especialidades[] = $data['principal'] . ' (Principal)';

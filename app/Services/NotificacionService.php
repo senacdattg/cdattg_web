@@ -8,6 +8,7 @@ use App\Models\Aprendiz;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Collection;
+use Carbon\Carbon;
 
 class NotificacionService
 {

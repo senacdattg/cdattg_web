@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Services\UbicacionService;
+use App\Models\Departamento;
 use Illuminate\Http\Request;
 
 class DepartamentoController extends Controller

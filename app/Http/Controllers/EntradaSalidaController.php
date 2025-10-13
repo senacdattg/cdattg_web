@@ -6,14 +6,16 @@ use App\Services\EntradaSalidaService;
 use App\Services\ExportService;
 use App\Models\EntradaSalida;
 use App\Models\FichaCaracterizacion;
+use App\Models\Ambiente;
 use App\Http\Requests\StoreEntradaSalidaRequest;
-use App\Http\Requests\UpdateEntradaSalidaRequest;
+// use App\Http\Requests\UpdateEntradaSalidaRequest; // Request no existe
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class EntradaSalidaController extends Controller
 {
@@ -359,7 +361,7 @@ class EntradaSalidaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateEntradaSalidaRequest $request, EntradaSalida $entradaSalida)
+    public function update(Request $request, EntradaSalida $entradaSalida)
     {
         //
     }

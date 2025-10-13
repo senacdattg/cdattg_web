@@ -7,9 +7,12 @@ use App\Repositories\GuiasAprendizajeRepository;
 use App\Http\Requests\StoreGuiasAprendizajeRequest;
 use App\Http\Requests\UpdateGuiasAprendizajeRequest;
 use App\Models\GuiasAprendizaje;
+use App\Models\ResultadosAprendizaje;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Exception;
 
 class GuiaAprendizajeController extends Controller
 {
@@ -37,7 +40,7 @@ class GuiaAprendizajeController extends Controller
     /**
      * Display a listing of the resource.
      * 
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function index(Request $request)
     {
@@ -208,7 +211,7 @@ class GuiaAprendizajeController extends Controller
     /**
      * Show the form for creating a new resource.
      * 
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function create()
     {
@@ -271,7 +274,7 @@ class GuiaAprendizajeController extends Controller
      * Display the specified resource.
      * 
      * @param GuiasAprendizaje $guiaAprendizaje
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function show(GuiasAprendizaje $guiaAprendizaje)
     {
@@ -293,7 +296,7 @@ class GuiaAprendizajeController extends Controller
      * Show the form for editing the specified resource.
      * 
      * @param GuiasAprendizaje $guiaAprendizaje
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function edit(GuiasAprendizaje $guiaAprendizaje)
     {
@@ -468,7 +471,7 @@ class GuiaAprendizajeController extends Controller
      * Gestionar resultados de aprendizaje de una guía.
      * 
      * @param GuiasAprendizaje $guiaAprendizaje
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function gestionarResultados(GuiasAprendizaje $guiaAprendizaje)
     {
