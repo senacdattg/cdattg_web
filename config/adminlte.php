@@ -341,8 +341,9 @@ return [
             'submenu' => [
                 [
                     'text' => 'Mi Perfil',
-                    'url' => 'mi-perfil',
+                    'url' => '/mi-perfil',
                     'icon' => 'fas fa-user-circle text-info',
+                    'can' => 'VER MI PERFIL',
                 ],
                 [
                     'text' => 'Cambiar Contraseña',
