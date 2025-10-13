@@ -2,49 +2,50 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\PisoService;
 use App\Models\Piso;
+use App\Models\Regional;
 use App\Http\Requests\StorePisoRequest;
 use App\Http\Requests\UpdatePisoRequest;
-use App\Models\Bloque;
-use App\Models\Regional;
-use App\Models\Sede;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class PisoController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth'); // Middleware de autenticación para todos los métodos del controlador
+    protected PisoService $pisoService;
 
-        // Middleware específico para métodos individuales
+    public function __construct(PisoService $pisoService)
+    {
+        $this->middleware('auth');
+        $this->pisoService = $pisoService;
+
         $this->middleware('can:VER PISO')->only('index');
         $this->middleware('can:VER PISO')->only('show');
         $this->middleware('can:CREAR PISO')->only(['create', 'store']);
         $this->middleware('can:EDITAR PISO')->only(['edit', 'update']);
         $this->middleware('can:ELIMINAR PISO')->only('destroy');
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $pisos = Piso::paginate(10);
+        $pisos = $this->pisoService->listar(10);
         return view('piso.index', compact('pisos'));
     }
+
     public function cargarPisos($bloque_id)
     {
-        $pisos = Piso::where('bloque_id', $bloque_id)->get();
+        $pisos = $this->pisoService->obtenerPorBloque($bloque_id);
         return response()->json(['success' => true, 'pisos' => $pisos]);
     }
 
     public function apiCargarPisos(Request $request)
     {
-        $bloque_id = $request->bloque_id;
-        $pisos = Piso::where('bloque_id', $bloque_id)->get();
+        $pisos = $this->pisoService->obtenerPorBloque($request->bloque_id);
         return response()->json($pisos, 200);
     }
 
@@ -63,23 +64,19 @@ class PisoController extends Controller
     public function store(StorePisoRequest $request)
     {
         try {
-            DB::beginTransaction();
-            $piso = Piso::create([
+            $datos = [
                 'piso' => $request->input('piso'),
                 'bloque_id' => $request->input('bloque_id'),
-                'user_create_id' => Auth::user()->id,
-                'user_edit_id' => Auth::user()->id,
-            ]);
-            DB::commit();
+                'user_create_id' => Auth::id(),
+                'user_edit_id' => Auth::id(),
+            ];
+
+            $this->pisoService->crear($datos);
+
             return redirect()->route('piso.index')->with('success', '¡Registro Exitoso!');
-        } catch (QueryException $e) {
-            // Manejar excepciones de la base de datos
-            DB::rollBack();
-            return redirect()->back()->with('error', 'Error de base de datos. Por favor, inténtelo de nuevo.');
         } catch (\Exception $e) {
-            // Manejar otras excepciones
-            DB::rollBack();
-            return redirect()->back()->with('error', 'Se produjo un error. Por favor, inténtelo de nuevo.');
+            Log::error('Error al crear piso: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al crear piso.');
         }
     }
 
@@ -106,17 +103,18 @@ class PisoController extends Controller
     public function update(UpdatePisoRequest $request, Piso $piso)
     {
         try {
-            DB::beginTransaction();
-            $piso->update([
+            $datos = [
                 'piso' => $request->piso,
                 'bloque_id' => $request->bloque_id,
                 'status' => $request->status,
-            ]);
-            DB::commit();
-            return redirect()->route('piso.show', ['piso' => $piso->id])->with('success', 'Piso Actualizado con éxito!');
-        } catch (QueryException $e) {
-            DB::rollBack();
-            return redirect()->back()->withInput()->with('error', 'Ha ocurrido un error al actualizar el piso.' . $e->getMessage());
+            ];
+
+            $this->pisoService->actualizar($piso->id, $datos);
+
+            return redirect()->route('piso.show', $piso->id)->with('success', 'Piso actualizado con éxito!');
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar piso: ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Error al actualizar piso.');
         }
     }
 
@@ -126,39 +124,26 @@ class PisoController extends Controller
     public function destroy(Piso $piso)
     {
         try {
-            DB::beginTransaction();
-            $piso->delete();
-            DB::commit();
-            return redirect()->back()->with('success', 'Piso Eliminado exitosamente');
+            $this->pisoService->eliminar($piso->id);
+
+            return redirect()->back()->with('success', 'Piso eliminado exitosamente');
         } catch (QueryException $e) {
-            DB::rollBack();
-
             if ($e->getCode() == 23000) {
-                return redirect()->back()->with('error', 'El piso esta siendo usado y no puede ser eliminado. ');
+                return redirect()->back()->with('error', 'El piso está en uso, no se puede eliminar.');
             }
+            return redirect()->back()->with('error', 'Error al eliminar piso.');
         }
-
-        return redirect()->route('piso.index')->with('success', 'Piso eliminado exitosamente');
     }
 
     public function cambiarEstado(Piso $piso)
     {
         try {
-            DB::beginTransaction();
-            if ($piso->status == 1) {
-                $piso->update([
-                    'status' => 0,
-                ]);
-            } else {
-                $piso->update([
-                    'status' => 1,
-                ]);
-            }
-            DB::commit();
-            return redirect()->back();
-        } catch (QueryException $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'Ha ocurrido un error al actualizar el estado del bloque');
+            $this->pisoService->cambiarEstado($piso->id);
+
+            return redirect()->back()->with('success', 'Estado cambiado exitosamente.');
+        } catch (\Exception $e) {
+            Log::error('Error al cambiar estado: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al actualizar estado.');
         }
     }
 }

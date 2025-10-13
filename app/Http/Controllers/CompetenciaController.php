@@ -2,21 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\CompetenciaService;
+use App\Repositories\CompetenciaRepository;
+use App\Repositories\ResultadosAprendizajeRepository;
 use App\Http\Requests\StoreCompetenciaRequest;
 use App\Http\Requests\UpdateCompetenciaRequest;
 use App\Models\Competencia;
-use App\Models\ResultadosAprendizaje;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Exception;
 
 class CompetenciaController extends Controller
 {
-    public function __construct()
-    {
+    protected CompetenciaService $competenciaService;
+    protected CompetenciaRepository $competenciaRepo;
+    protected ResultadosAprendizajeRepository $resultadosRepo;
+
+    public function __construct(
+        CompetenciaService $competenciaService,
+        CompetenciaRepository $competenciaRepo,
+        ResultadosAprendizajeRepository $resultadosRepo
+    ) {
         $this->middleware('auth');
+        $this->competenciaService = $competenciaService;
+        $this->competenciaRepo = $competenciaRepo;
+        $this->resultadosRepo = $resultadosRepo;
+
         $this->middleware('can:VER COMPETENCIA')->only(['index', 'show']);
         $this->middleware('can:CREAR COMPETENCIA')->only(['create', 'store']);
         $this->middleware('can:EDITAR COMPETENCIA')->only(['edit', 'update']);

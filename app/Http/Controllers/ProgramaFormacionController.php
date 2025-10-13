@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ProgramaFormacionService;
 use App\Models\ProgramaFormacion;
 use App\Models\RedConocimiento;
 use App\Models\Parametro;
@@ -13,9 +14,13 @@ use Illuminate\Support\Facades\Auth;
 
 class ProgramaFormacionController extends Controller
 {
-    public function __construct()
+    protected ProgramaFormacionService $programaService;
+
+    public function __construct(ProgramaFormacionService $programaService)
     {
         $this->middleware('auth');
+        $this->programaService = $programaService;
+        
         $this->middleware('permission:programa.index')->only('index');
         $this->middleware('permission:programa.show')->only('show');
         $this->middleware('permission:programa.create')->only('create', 'store');
@@ -35,7 +40,7 @@ class ProgramaFormacionController extends Controller
      */
     public function index()
     {
-        $programas = ProgramaFormacion::with(['redConocimiento', 'nivelFormacion'])->orderBy('id', 'desc')->paginate(6);
+        $programas = $this->programaService->listar(15);
 
         return view('programas.index', compact('programas'));
     }
@@ -87,39 +92,22 @@ class ProgramaFormacionController extends Controller
     public function store(StoreProgramaFormacionRequest $request)
     {
         try {
-            // Validaciones de negocio adicionales
-            $validationErrors = $this->validateBusinessRules($request);
-            if (!empty($validationErrors)) {
-                return redirect()->back()->withInput()->withErrors($validationErrors);
-            }
+            $datos = [
+                'codigo' => $request->input('codigo'),
+                'nombre' => $request->input('nombre'),
+                'red_conocimiento_id' => $request->input('red_conocimiento_id'),
+                'nivel_formacion_id' => $request->input('nivel_formacion_id'),
+                'user_create_id' => Auth::id(),
+                'user_edit_id' => Auth::id(),
+                'status' => true,
+            ];
 
-        $programaFormacion = new ProgramaFormacion();
-            $programaFormacion->codigo = $request->input('codigo');
-            $programaFormacion->nombre = $request->input('nombre');
-            $programaFormacion->red_conocimiento_id = $request->input('red_conocimiento_id');
-            $programaFormacion->nivel_formacion_id = $request->input('nivel_formacion_id');
-            $programaFormacion->user_create_id = Auth::id();
-            $programaFormacion->user_edit_id = Auth::id();
-            $programaFormacion->status = true;
+            $this->programaService->crear($datos);
 
-        if ($programaFormacion->save()) {
-                Log::info('Programa de formación creado exitosamente', [
-                    'programa_id' => $programaFormacion->id,
-                    'codigo' => $programaFormacion->codigo,
-                    'nombre' => $programaFormacion->nombre,
-                    'usuario_id' => Auth::id()
-                ]);
-            return redirect()->route('programa.index')->with('success', 'Programa de formación creado exitosamente.');
-        } else {
-            return redirect()->back()->with('error', 'Error al crear el programa de formación.');
-            }
+            return redirect()->route('programa.index')->with('success', 'Programa creado exitosamente.');
         } catch (\Exception $e) {
-            Log::error('Error al crear programa de formación', [
-                'error' => $e->getMessage(),
-                'usuario_id' => Auth::id(),
-                'request_data' => $request->all()
-            ]);
-            return redirect()->back()->with('error', 'Error interno al crear el programa de formación.');
+            Log::error('Error al crear programa: ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Error al crear programa.');
         }
     }
 
