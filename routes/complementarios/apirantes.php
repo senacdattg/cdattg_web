@@ -7,6 +7,4 @@ Route::get('/aspirantes/{curso}', [ComplementarioController::class, 'verAspirant
     ->name('aspirantes.ver')
     ->middleware('auth');
 
-Route::get('/mi-perfil', [ComplementarioController::class, 'miPerfil'])
-    ->name('aspirantes.mi-perfil')
-    ->middleware('auth');
+// Route moved to web.php for proper middleware handling

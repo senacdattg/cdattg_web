@@ -57,7 +57,11 @@
                             </p>
                         </li>
                         <li class="user-footer">
-                            <a href="{{ route('personas.show', ['persona' => $persona->id]) }}" class="btn btn-default btn-flat">Perfil</a>
+                            @if($user && $user->hasRole('ASPIRANTE'))
+                                <a href="/mi-perfil" class="btn btn-default btn-flat">Mi Perfil</a>
+                            @else
+                                <a href="{{ route('personas.show', ['persona' => $persona->id]) }}" class="btn btn-default btn-flat">Perfil</a>
+                            @endif
                             @include('logout')
                         </li>
                     </ul>
