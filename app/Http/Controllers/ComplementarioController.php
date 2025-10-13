@@ -15,6 +15,8 @@ use App\Models\AspiranteComplementario;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use App\Jobs\ValidarSofiaJob;
+use App\Models\SofiaValidationProgress;
 
 class ComplementarioController extends Controller
 {
@@ -329,13 +331,13 @@ class ComplementarioController extends Controller
     /**
      * Mostrar formulario para subir documentos
      */
-    public function formularioDocumentos($id)
+    public function formularioDocumentos(Request $request, $id)
     {
         $programa = ComplementarioOfertado::findOrFail($id);
 
         // Obtener aspirante_id de la URL
         $aspirante_id = $request->query('aspirante_id');
-        
+
         return view('complementarios.formulario_documentos', compact('programa', 'aspirante_id'));
     }
 
@@ -414,31 +416,82 @@ class ComplementarioController extends Controller
     public function validarSofia($complementarioId)
     {
         try {
-            // Ejecutar el comando Artisan
-            $exitCode = \Artisan::call('sofia:validar', [
-                'complementario_id' => $complementarioId
-            ]);
+            // Verificar que el programa existe
+            $programa = ComplementarioOfertado::findOrFail($complementarioId);
 
-            $output = \Artisan::output();
+            // Contar aspirantes que necesitan validación
+            $aspirantesCount = AspiranteComplementario::with('persona')
+                ->where('complementario_id', $complementarioId)
+                ->whereHas('persona', function($query) {
+                    $query->whereIn('estado_sofia', [0, 2]);
+                })
+                ->count();
 
-            if ($exitCode === 0) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Validación completada exitosamente',
-                    'output' => $output
-                ]);
-            } else {
+            if ($aspirantesCount === 0) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Error durante la validación',
-                    'output' => $output
-                ], 500);
+                    'message' => 'No hay aspirantes que necesiten validación en este programa.'
+                ]);
             }
+
+            // Crear registro de progreso
+            $progress = SofiaValidationProgress::create([
+                'complementario_id' => $complementarioId,
+                'user_id' => auth()->id(),
+                'status' => 'pending',
+                'total_aspirantes' => $aspirantesCount,
+                'processed_aspirantes' => 0,
+                'successful_validations' => 0,
+                'failed_validations' => 0,
+            ]);
+
+            // Dispatch el job a la queue
+            ValidarSofiaJob::dispatch($complementarioId, auth()->id(), $progress->id);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Validación iniciada para {$aspirantesCount} aspirantes. El proceso se ejecutará en segundo plano.",
+                'aspirantes_count' => $aspirantesCount,
+                'progress_id' => $progress->id
+            ]);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Error interno del servidor: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtener el progreso de una validación
+     */
+    public function getValidationProgress($progressId)
+    {
+        try {
+            $progress = SofiaValidationProgress::with('complementario')->findOrFail($progressId);
+
+            return response()->json([
+                'success' => true,
+                'progress' => [
+                    'id' => $progress->id,
+                    'status' => $progress->status,
+                    'status_label' => $progress->status_label,
+                    'total_aspirantes' => $progress->total_aspirantes,
+                    'processed_aspirantes' => $progress->processed_aspirantes,
+                    'successful_validations' => $progress->successful_validations,
+                    'failed_validations' => $progress->failed_validations,
+                    'progress_percentage' => $progress->progress_percentage,
+                    'started_at' => $progress->started_at?->format('d/m/Y H:i:s'),
+                    'completed_at' => $progress->completed_at?->format('d/m/Y H:i:s'),
+                    'errors' => $progress->errors,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener el progreso: ' . $e->getMessage()
             ], 500);
         }
     }
