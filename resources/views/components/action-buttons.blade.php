@@ -1,49 +1,111 @@
 @props([
-    'actions' => [],
-    'size' => 'sm',
-    'groupClass' => 'btn-group',
-    'vertical' => false
+    'show' => false,
+    'edit' => false,
+    'delete' => false,
+    'custom' => [],
+    'showUrl' => '',
+    'editUrl' => '',
+    'deleteUrl' => '',
+    'showTitle' => 'Ver detalles',
+    'editTitle' => 'Editar',
+    'deleteTitle' => 'Eliminar',
+    'showPermission' => '',
+    'editPermission' => '',
+    'deletePermission' => '',
+    'modelName' => '',
+    'modelId' => ''
 ])
 
-@php
-    $groupClass = $vertical ? 'btn-group-vertical btn-group-' . $size : $groupClass . ' btn-group-' . $size;
-@endphp
-
-<div class="{{ $groupClass }}" role="group">
-    @foreach($actions as $action)
-        @if($action['type'] === 'link')
-            <a href="{{ $action['url'] }}" 
-               class="btn {{ $action['class'] ?? 'btn-light' }} btn-{{ $size }}" 
+<div class="btn-group">
+    @if($show && $showUrl)
+        @if($showPermission)
+            @can($showPermission)
+                <a href="{{ $showUrl }}" 
+                   class="btn btn-light btn-sm" 
+                   data-toggle="tooltip" 
+                   title="{{ $showTitle }}">
+                    <i class="fas fa-eye text-warning"></i>
+                </a>
+            @endcan
+        @else
+            <a href="{{ $showUrl }}" 
+               class="btn btn-light btn-sm" 
                data-toggle="tooltip" 
-               title="{{ $action['title'] ?? '' }}"
-               @if(isset($action['onclick'])) onclick="{{ $action['onclick'] }}" @endif
-               @if(isset($action['disabled']) && $action['disabled']) disabled @endif>
-                <i class="{{ $action['icon'] }}"></i>
+               title="{{ $showTitle }}">
+                <i class="fas fa-eye text-warning"></i>
             </a>
-        @elseif($action['type'] === 'form')
-            <form action="{{ $action['url'] }}" method="POST" class="d-inline">
+        @endif
+    @endif
+
+    @if($edit && $editUrl)
+        @if($editPermission)
+            @can($editPermission)
+                <a href="{{ $editUrl }}" 
+                   class="btn btn-light btn-sm" 
+                   data-toggle="tooltip" 
+                   title="{{ $editTitle }}">
+                    <i class="fas fa-pencil-alt text-info"></i>
+                </a>
+            @endcan
+        @else
+            <a href="{{ $editUrl }}" 
+               class="btn btn-light btn-sm" 
+               data-toggle="tooltip" 
+               title="{{ $editTitle }}">
+                <i class="fas fa-pencil-alt text-info"></i>
+            </a>
+        @endif
+    @endif
+
+    @if($delete && $deleteUrl)
+        @if($deletePermission)
+            @can($deletePermission)
+                <form action="{{ $deleteUrl }}" 
+                      method="POST" 
+                      class="d-inline formulario-eliminar">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" 
+                            class="btn btn-light btn-sm" 
+                            data-toggle="tooltip" 
+                            title="{{ $deleteTitle }}">
+                        <i class="fas fa-trash text-danger"></i>
+                    </button>
+                </form>
+            @endcan
+        @else
+            <form action="{{ $deleteUrl }}" 
+                  method="POST" 
+                  class="d-inline formulario-eliminar">
                 @csrf
-                @if(isset($action['method']) && $action['method'] !== 'POST')
-                    @method($action['method'])
-                @endif
+                @method('DELETE')
                 <button type="submit" 
-                        class="btn {{ $action['class'] ?? 'btn-light' }} btn-{{ $size }}" 
+                        class="btn btn-light btn-sm" 
                         data-toggle="tooltip" 
-                        title="{{ $action['title'] ?? '' }}"
-                        @if(isset($action['onclick'])) onclick="{{ $action['onclick'] }}" @endif
-                        @if(isset($action['disabled']) && $action['disabled']) disabled @endif>
-                    <i class="{{ $action['icon'] }}"></i>
+                        title="{{ $deleteTitle }}">
+                    <i class="fas fa-trash text-danger"></i>
                 </button>
             </form>
-        @elseif($action['type'] === 'button')
-            <button type="button" 
-                    class="btn {{ $action['class'] ?? 'btn-light' }} btn-{{ $size }}" 
-                    data-toggle="tooltip" 
-                    title="{{ $action['title'] ?? '' }}"
-                    @if(isset($action['onclick'])) onclick="{{ $action['onclick'] }}" @endif
-                    @if(isset($action['disabled']) && $action['disabled']) disabled @endif>
-                <i class="{{ $action['icon'] }}"></i>
-            </button>
+        @endif
+    @endif
+
+    @foreach($custom as $button)
+        @if(isset($button['permission']))
+            @can($button['permission'])
+                <a href="{{ $button['url'] }}" 
+                   class="btn btn-light btn-sm" 
+                   data-toggle="tooltip" 
+                   title="{{ $button['title'] }}">
+                    <i class="{{ $button['icon'] }} {{ $button['color'] ?? 'text-primary' }}"></i>
+                </a>
+            @endcan
+        @else
+            <a href="{{ $button['url'] }}" 
+               class="btn btn-light btn-sm" 
+               data-toggle="tooltip" 
+               title="{{ $button['title'] }}">
+                <i class="{{ $button['icon'] }} {{ $button['color'] ?? 'text-primary' }}"></i>
+            </a>
         @endif
     @endforeach
 </div>

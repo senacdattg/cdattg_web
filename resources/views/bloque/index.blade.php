@@ -1,27 +1,15 @@
 @extends('adminlte::page')
+
+@section('content_header')
+    <x-page-header 
+        icon="fa-cube" 
+        title="Bloques"
+        subtitle="Gestión de bloques del sistema"
+        :breadcrumb="[['label' => 'Inicio', 'url' => route('home.index'), 'icon' => 'fa-home'], ['label' => 'Bloques', 'active' => true, 'icon' => 'fa-cube']]"
+    />
+@endsection
+
 @section('content')
-
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Bloques
-
-
-                        </h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('home.index') }}">Inicio</a>
-                            </li>
-                            <li class="breadcrumb-item active">Bloques
-                            </li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <section class="content">
             <div class="card">

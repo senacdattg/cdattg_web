@@ -41,85 +41,63 @@
                     </div>
                 @endif
                 
-                <!-- Card de Filtros -->
-                <div class="card shadow-sm mb-4 no-hover">
-                    <div class="card-header bg-white py-3 d-flex align-items-center">
-                        <h5 class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1">
-                            <i class="fas fa-filter mr-2"></i> Filtros de Búsqueda
-                        </h5>
-                        <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="collapse"
-                            data-target="#filtrosForm" aria-expanded="true">
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                    </div>
-
-                    <div class="collapse show" id="filtrosForm">
-                        <div class="card-body">
-                            <form action="{{ route('aprendices.index') }}" method="GET">
-                                <div class="row">
-                                    <div class="col-md-5">
-                                        <div class="form-group">
-                                            <label for="search" class="form-label">Buscar por nombre o documento</label>
-                                            <input type="text" name="search" id="search" class="form-control" 
-                                                placeholder="Ingrese nombre o número de documento" 
-                                                value="{{ request('search') }}" autocomplete="off">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-5">
-                                        <div class="form-group">
-                                            <label for="ficha_id" class="form-label">Filtrar por ficha</label>
-                                            <select name="ficha_id" id="ficha_id" class="form-control">
-                                                <option value="">Todas las fichas</option>
-                                                @foreach($fichas as $ficha)
-                                                    <option value="{{ $ficha->id }}" 
-                                                        {{ request('ficha_id') == $ficha->id ? 'selected' : '' }}>
-                                                        {{ $ficha->ficha }} - {{ $ficha->programaFormacion->nombre ?? 'N/A' }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-2">
-                                        <div class="form-group">
-                                            <label>&nbsp;</label>
-                                            <button type="submit" class="btn btn-primary btn-block">
-                                                <i class="fas fa-search"></i> Buscar
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </form>
+                <!-- Filtros -->
+                <x-table-filters 
+                    action="{{ route('aprendices.index') }}"
+                    method="GET"
+                    title="Filtros de Búsqueda"
+                    icon="fa-filter"
+                >
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="search" class="form-label">Buscar por nombre o documento</label>
+                                <input type="text" name="search" id="search" class="form-control" 
+                                    placeholder="Ingrese nombre o número de documento" 
+                                    value="{{ request('search') }}" autocomplete="off">
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="form-group">
+                                <label for="ficha_id" class="form-label">Filtrar por ficha</label>
+                                <select name="ficha_id" id="ficha_id" class="form-control">
+                                    <option value="">Todas las fichas</option>
+                                    @foreach($fichas as $ficha)
+                                        <option value="{{ $ficha->id }}" 
+                                            {{ request('ficha_id') == $ficha->id ? 'selected' : '' }}>
+                                            {{ $ficha->ficha }} - {{ $ficha->programaFormacion->nombre ?? 'N/A' }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <div class="form-group">
+                                <label>&nbsp;</label>
+                                <button type="submit" class="btn btn-primary btn-block">
+                                    <i class="fas fa-search"></i> Buscar
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </x-table-filters>
 
-                <!-- Card de Lista -->
-                <div class="card shadow-sm mb-4 no-hover">
-                    <div class="card-header bg-white py-3">
-                        <h3 class="card-title font-weight-bold text-primary">Lista de Aprendices</h3>
-                        <div class="card-tools">
-                            @can('CREAR APRENDIZ')
-                                <a href="{{ route('aprendices.create') }}" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-plus"></i> Crear Aprendiz
-                                </a>
-                            @endcan
-                        </div>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-borderless table-striped mb-0">
-                                <thead class="thead-light">
-                                    <tr>
-                                        <th class="px-3 py-3" style="width: 3%">#</th>
-                                        <th class="px-3 py-3" style="width: 18%">Nombre y Apellido</th>
-                                        <th class="px-3 py-3" style="width: 10%">Documento</th>
-                                        <th class="px-3 py-3" style="width: 10%">Ficha Principal</th>
-                                        <th class="px-3 py-3" style="width: 20%">Correo Electrónico</th>
-                                        <th class="px-3 py-3" style="width: 10%">Estado</th>
-                                        <th class="px-3 py-3 text-center" style="width: 29%; min-width: 200px;">Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+                <!-- Tabla de Aprendices -->
+                <x-data-table 
+                    title="Lista de Aprendices"
+                    searchable="false"
+                    :columns="[
+                        ['label' => '#', 'width' => '3%'],
+                        ['label' => 'Nombre y Apellido', 'width' => '18%'],
+                        ['label' => 'Documento', 'width' => '10%'],
+                        ['label' => 'Ficha Principal', 'width' => '10%'],
+                        ['label' => 'Correo Electrónico', 'width' => '20%'],
+                        ['label' => 'Estado', 'width' => '10%'],
+                        ['label' => 'Acciones', 'width' => '29%', 'class' => 'text-center']
+                    ]"
+                    :pagination="$aprendices->links()"
+                    :actionsSlot="'<a href=\'' . route('aprendices.create') . '\' class=\'btn btn-primary btn-sm\'><i class=\'fas fa-plus\'></i> Crear Aprendiz</a>'"
+                >
                                     @forelse ($aprendices as $aprendiz)
                                         <tr class="{{ !$aprendiz->persona ? 'table-danger' : '' }}">
                                             <td class="px-3">
@@ -209,16 +187,7 @@
                                             </td>
                                         </tr>
                                     @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="card-footer bg-white">
-                        <div class="float-right">
-                            {{ $aprendices->links() }}
-                        </div>
-                    </div>
-                </div>
+                </x-data-table>
             </div>
         </div>
     </div>

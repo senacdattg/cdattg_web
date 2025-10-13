@@ -19,103 +19,63 @@
 @section('content')
     <section class="content mt-4">
         <div class="container-fluid">
-            @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle"></i> {{ session('success') }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            @endif
-            @if (session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            @endif
+            <x-session-alerts />
             
             <div class="row">
                 <div class="col-12">
                     @can('programa.create')
-                        <div class="card shadow-sm mb-4 no-hover">
-                            <div class="card-header bg-white py-3 d-flex align-items-center">
-                                <h5 class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1">
-                                    <i class="fas fa-plus-circle mr-2"></i> Crear Programa de Formación
-                                </h5>
-                                <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="collapse"
-                                    data-target="#createProgramaForm" aria-expanded="true">
-                                    <i class="fas fa-chevron-down"></i>
-                                </button>
-                            </div>
-
-                            <div class="collapse show" id="createProgramaForm">
-                                <div class="card-body">
-                                    @include('programas.create')
-                                </div>
-                            </div>
-                        </div>
+                        <x-table-filters 
+                            action="{{ route('programas.store') }}"
+                            method="POST"
+                            title="Crear Programa de Formación"
+                            icon="fa-plus-circle"
+                        >
+                            @include('programas.create')
+                        </x-table-filters>
                     @endcan
 
-                    <div class="card shadow-sm no-hover">
-                        <div class="card-header bg-white py-3 d-flex align-items-center">
-                            <h6 class="m-0 font-weight-bold text-primary d-flex flex-grow-1">Lista de Programas de Formación</h6>
-                            <div class="d-flex align-items-center">
-                                <!-- Filtros avanzados -->
-                                <div class="mr-3">
-                                    <select id="filterRedConocimiento" class="form-control form-control-sm" style="width: 150px;">
-                                        <option value="">Todas las redes</option>
-                                        @foreach(\App\Models\RedConocimiento::all() as $red)
-                                            <option value="{{ $red->id }}">{{ $red->nombre }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="mr-3">
-                                    <select id="filterNivelFormacion" class="form-control form-control-sm" style="width: 120px;">
-                                        <option value="">Todos los niveles</option>
-                                        @foreach(\App\Models\Parametro::whereHas('temas', function($query) { $query->where('temas.id', 6); })->get() as $nivel)
-                                            <option value="{{ $nivel->id }}">{{ $nivel->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div class="mr-3">
-                                    <select id="filterStatus" class="form-control form-control-sm" style="width: 100px;">
-                                        <option value="">Todos</option>
-                                        <option value="1">Activos</option>
-                                        <option value="0">Inactivos</option>
-                                    </select>
-                                </div>
-                                <!-- Barra de búsqueda -->
-                                <div class="input-group" style="width: 250px;">
-                                    <input type="text" id="searchPrograma" class="form-control form-control-sm" 
-                                           placeholder="Buscar por código, nombre..." autocomplete="off">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary btn-sm" type="button" id="btnSearch">
-                                            <i class="fas fa-search"></i>
-                                        </button>
-                                        <button class="btn btn-secondary btn-sm" type="button" id="btnClearFilters">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                    <x-data-table 
+                        title="Lista de Programas de Formación"
+                        searchable="true"
+                        searchAction="{{ route('programas.index') }}"
+                        searchPlaceholder="Buscar por código, nombre..."
+                        searchValue="{{ request('search') }}"
+                        :columns="[
+                            ['label' => '#', 'width' => '5%'],
+                            ['label' => 'Código', 'width' => '10%'],
+                            ['label' => 'Nombre', 'width' => '30%'],
+                            ['label' => 'Red de Conocimiento', 'width' => '20%'],
+                            ['label' => 'Nivel', 'width' => '15%'],
+                            ['label' => 'Estado', 'width' => '10%'],
+                            ['label' => 'Acciones', 'width' => '10%', 'class' => 'text-center']
+                        ]"
+                        :pagination="$programas->links()"
+                        :actionsSlot="'
+                            <div class=\"mr-3\">
+                                <select id=\"filterRedConocimiento\" class=\"form-control form-control-sm\" style=\"width: 150px;\">
+                                    <option value=\"\">Todas las redes</option>
+                                    @foreach(\\App\\Models\\RedConocimiento::all() as \$red)
+                                        <option value=\"{{ \$red->id }}\">{{ \$red->nombre }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-borderless table-striped mb-0">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th class="px-4 py-3" style="width: 5%">#</th>
-                                            <th class="px-4 py-3" style="width: 10%">Código</th>
-                                            <th class="px-4 py-3" style="width: 30%">Nombre</th>
-                                            <th class="px-4 py-3" style="width: 20%">Red de Conocimiento</th>
-                                            <th class="px-4 py-3" style="width: 15%">Nivel</th>
-                                            <th class="px-4 py-3" style="width: 10%">Estado</th>
-                                            <th class="px-4 py-3 text-center" style="width: 10%">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="programasTableBody">
+                            <div class=\"mr-3\">
+                                <select id=\"filterNivelFormacion\" class=\"form-control form-control-sm\" style=\"width: 120px;\">
+                                    <option value=\"\">Todos los niveles</option>
+                                    @foreach(\\App\\Models\\Parametro::whereHas(\'temas\', function(\$query) { \$query->where(\'temas.id\', 6); })->get() as \$nivel)
+                                        <option value=\"{{ \$nivel->id }}\">{{ \$nivel->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class=\"mr-3\">
+                                <select id=\"filterStatus\" class=\"form-control form-control-sm\" style=\"width: 100px;\">
+                                    <option value=\"\">Todos</option>
+                                    <option value=\"1\">Activos</option>
+                                    <option value=\"0\">Inactivos</option>
+                                </select>
+                            </div>
+                        '"
+                    >
                                         @forelse ($programas as $programa)
                                             <tr>
                                                 <td class="px-4">{{ $loop->iteration }}</td>
@@ -190,16 +150,7 @@
                                                 </td>
                                             </tr>
                                         @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="card-footer bg-white">
-                            <div class="float-right">
-                                {{ $programas->links() }}
-                            </div>
-                        </div>
+                    </x-data-table>
                     </div>
                 </div>
             </div>

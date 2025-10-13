@@ -56,91 +56,54 @@
 @section('content')
     <section class="content mt-4">
         <div class="container-fluid">
-            @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle"></i> {{ session('success') }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            @endif
-
-            @if (session('error'))
-                <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                    <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-            @endif
+            <x-session-alerts />
 
             <div class="row">
                 <div class="col-12">
-                    @can('CREAR RESULTADO APRENDIZAJE')
-                        <div class="card shadow-sm mb-4 no-hover">
-                            <div class="card-header bg-white py-3 d-flex align-items-center">
-                                <a href="{{ route('resultados-aprendizaje.create') }}" class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1 text-decoration-none">
-                                    <i class="fas fa-plus-circle mr-2"></i> Crear Resultado de Aprendizaje
-                                </a>
+                    <x-create-card 
+                        url="{{ route('resultados-aprendizaje.create') }}"
+                        title="Crear Resultado de Aprendizaje"
+                        icon="fa-plus-circle"
+                        permission="CREAR RESULTADO APRENDIZAJE"
+                    />
+
+                    <x-data-table 
+                        title="Lista de Resultados de Aprendizaje"
+                        searchable="true"
+                        searchAction="{{ route('resultados-aprendizaje.index') }}"
+                        searchPlaceholder="Buscar por código, nombre..."
+                        searchValue="{{ request('search') }}"
+                        :columns="[
+                            ['label' => '#', 'width' => '5%'],
+                            ['label' => 'Código', 'width' => '15%'],
+                            ['label' => 'Nombre', 'width' => '35%'],
+                            ['label' => 'Duración', 'width' => '10%'],
+                            ['label' => 'Estado', 'width' => '15%'],
+                            ['label' => 'Guías', 'width' => '10%'],
+                            ['label' => 'Acciones', 'width' => '10%', 'class' => 'text-center']
+                        ]"
+                        :pagination="$resultadosAprendizaje->links()"
+                        :actionsSlot="'
+                            <div class=\"mr-2\">
+                                <select id=\"filterCompetencia\" class=\"form-control form-control-sm\" style=\"width: 200px;\">
+                                    <option value=\"\">Todas las competencias</option>
+                                    @php
+                                        \$competencias = \\App\\Models\\Competencia::orderBy(\'nombre\')->get();
+                                    @endphp
+                                    @foreach(\$competencias as \$competencia)
+                                        <option value=\"{{ \$competencia->id }}\">{{ Str::limit(\$competencia->nombre, 25) }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-                        </div>
-                    @endcan
-
-                    <div class="card shadow-sm no-hover">
-                        <div class="card-header bg-white py-3">
-                            <h6 class="m-0 font-weight-bold text-primary mb-3">Lista de Resultados de Aprendizaje</h6>
-                            
-                            <div class="d-flex flex-wrap align-items-center gap-2">
-                                <div class="mr-2">
-                                    <select id="filterCompetencia" class="form-control form-control-sm" style="width: 200px;">
-                                        <option value="">Todas las competencias</option>
-                                        @php
-                                            $competencias = \App\Models\Competencia::orderBy('nombre')->get();
-                                        @endphp
-                                        @foreach($competencias as $competencia)
-                                            <option value="{{ $competencia->id }}">{{ Str::limit($competencia->nombre, 25) }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
-                                <div class="mr-2">
-                                    <select id="filterStatus" class="form-control form-control-sm" style="width: 100px;">
-                                        <option value="">Todos</option>
-                                        <option value="1">Activos</option>
-                                        <option value="0">Inactivos</option>
-                                    </select>
-                                </div>
-
-                                <div class="input-group" style="width: 250px;">
-                                    <input type="text" id="searchRAP" class="form-control form-control-sm" 
-                                           placeholder="Buscar por código, nombre..." autocomplete="off">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary btn-sm" type="button" id="btnSearch">
-                                            <i class="fas fa-search"></i>
-                                        </button>
-                                        <button class="btn btn-secondary btn-sm" type="button" id="btnClearFilters">
-                                            <i class="fas fa-times"></i>
-                                        </button>
-                                    </div>
-                                </div>
+                            <div class=\"mr-2\">
+                                <select id=\"filterStatus\" class=\"form-control form-control-sm\" style=\"width: 100px;\">
+                                    <option value=\"\">Todos</option>
+                                    <option value=\"1\">Activos</option>
+                                    <option value=\"0\">Inactivos</option>
+                                </select>
                             </div>
-                        </div>
-
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-borderless table-striped mb-0">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th class="px-4 py-3" style="width: 5%">#</th>
-                                            <th class="px-4 py-3" style="width: 15%">Código</th>
-                                            <th class="px-4 py-3" style="width: 35%">Nombre</th>
-                                            <th class="px-4 py-3" style="width: 10%">Duración</th>
-                                            <th class="px-4 py-3" style="width: 15%">Estado</th>
-                                            <th class="px-4 py-3" style="width: 10%">Guías</th>
-                                            <th class="px-4 py-3 text-center" style="width: 10%">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+                        '"
+                    >
                                         @forelse ($resultadosAprendizaje as $resultado)
                                             <tr>
                                                 <td class="px-4">{{ $loop->iteration }}</td>
@@ -197,16 +160,7 @@
                                                 </td>
                                             </tr>
                                         @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="card-footer bg-white">
-                            <div class="float-right">
-                                {{ $resultadosAprendizaje->links() }}
-                            </div>
-                        </div>
+                    </x-data-table>
                     </div>
                 </div>
             </div>

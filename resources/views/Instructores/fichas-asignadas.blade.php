@@ -293,18 +293,5 @@
 @endsection
 
 @section('js')
-    <script>
-        $(document).ready(function() {
-            // Tooltips para elementos interactivos
-            $('[data-toggle="tooltip"]').tooltip();
-
-            // Animación de barras de progreso
-            $('.progress-fill').each(function() {
-                const width = $(this).data('width');
-                $(this).css('width', '0%').animate({
-                    width: width
-                }, 1000);
-            });
-        });
-    </script>
+    @vite(['resources/js/pages/resources-views\Instructores\fichas-asignadas.js'])
 @endsection

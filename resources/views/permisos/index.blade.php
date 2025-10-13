@@ -1,58 +1,39 @@
 @extends('adminlte::page')
 
+@section('content_header')
+    <x-page-header 
+        icon="fa-shield-alt" 
+        title="Permisos"
+        subtitle="Gestión de permisos del sistema"
+        :breadcrumb="[['label' => 'Inicio', 'url' => route('home.index'), 'icon' => 'fa-home'], ['label' => 'Permisos', 'active' => true, 'icon' => 'fa-shield-alt']]"
+    />
+@endsection
+
 @section('content')
-        <!-- Encabezado de la Página -->
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Permisos</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="{{ route('home.index') }}">Inicio</a></li>
-                            <li class="breadcrumb-item active">Permisos</li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </section>
 
-        <!-- Contenido Principal -->
-        <section class="content">
-            <div class="container-fluid">
-                <div class="card">
-                    <!-- Buscador -->
-                    <div class="card-header">
-                        <form method="GET" action="{{ route('permiso.index') }}">
-                            <div class="input-group input-group-sm">
-                                <input type="text" name="search" class="form-control"
-                                    placeholder="Buscar por nombre o documento" value="{{ request()->input('search') }}">
-                                <div class="input-group-append">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-search"></i> Buscar
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- Tabla de Usuarios -->
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-striped table-bordered">
-                                <thead>
-                                    <tr class="text-center">
-                                        <th>#</th>
-                                        <th>Nombre y Apellido</th>
-                                        <th>Número de Documento</th>
-                                        <th>Correo Electrónico</th>
-                                        <th>Roles Asignados</th>
-                                        <th>Estado</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <x-session-alerts />
+            
+            <div class="row">
+                <div class="col-12">
+                    <x-data-table 
+                        title="Lista de Permisos"
+                        searchable="true"
+                        searchAction="{{ route('permiso.index') }}"
+                        searchPlaceholder="Buscar por nombre o documento..."
+                        searchValue="{{ request('search') }}"
+                        :columns="[
+                            ['label' => '#', 'width' => '5%'],
+                            ['label' => 'Nombre y Apellido', 'width' => '20%'],
+                            ['label' => 'Número de Documento', 'width' => '15%'],
+                            ['label' => 'Correo Electrónico', 'width' => '20%'],
+                            ['label' => 'Roles Asignados', 'width' => '20%'],
+                            ['label' => 'Estado', 'width' => '10%'],
+                            ['label' => 'Acciones', 'width' => '10%', 'class' => 'text-center']
+                        ]"
+                        :pagination="$users->links()"
+                    >
                                     @forelse ($users as $user)
                                         @if ($user->id != Auth::user()->id)
                                             <tr class="text-center">
@@ -83,19 +64,10 @@
                                             <td colspan="7" class="text-center">No hay usuarios registrados</td>
                                         </tr>
                                     @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Paginación -->
-                    <div class="card-footer">
-                        <div class="float-right">
-                            {{ $users->links() }}
-                        </div>
-                    </div>
+                    </x-data-table>
                 </div>
             </div>
-        </section>
+        </div>
+    </section>
     </div>
 @endsection

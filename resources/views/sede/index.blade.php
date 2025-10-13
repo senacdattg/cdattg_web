@@ -1,53 +1,37 @@
 @extends('adminlte::page')
+
+@section('content_header')
+    <x-page-header 
+        icon="fa-building" 
+        title="Sedes"
+        subtitle="Gestión de sedes del sistema"
+        :breadcrumb="[['label' => 'Inicio', 'url' => route('home.index'), 'icon' => 'fa-home'], ['label' => 'Sedes', 'active' => true, 'icon' => 'fa-building']]"
+    />
+@endsection
+
 @section('content')
 
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Sedes
-
-
-                        </h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('home.index') }}">Inicio</a>
-                            </li>
-                            <li class="breadcrumb-item active">Sedes
-                            </li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="content">
-            <div class="card">
-
-                <div class="card-body p-0">
-                    <table class="table table-responsive">
-                        <thead>
-                            <tr>
-                                <th style="width: 1%">
-                                    #
-                                </th>
-                                <th style="width: 20%">
-                                    Sede
-                                </th>
-                                <th style="width: 30%">
-                                    Direccion
-                                </th>
-                                <th style="width: 40%">
-                                    Municipio
-                                </th>
-                                <th style="width: 50%">
-                                    Estado
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <x-session-alerts />
+            
+            <div class="row">
+                <div class="col-12">
+                    <x-data-table 
+                        title="Lista de Sedes"
+                        searchable="true"
+                        searchAction="{{ route('sede.index') }}"
+                        searchPlaceholder="Buscar sede..."
+                        searchValue="{{ request('search') }}"
+                        :columns="[
+                            ['label' => '#', 'width' => '5%'],
+                            ['label' => 'Sede', 'width' => '20%'],
+                            ['label' => 'Dirección', 'width' => '30%'],
+                            ['label' => 'Municipio', 'width' => '25%'],
+                            ['label' => 'Estado', 'width' => '20%']
+                        ]"
+                        :pagination="$sedes->links()"
+                    >
                             <?php
                             $i = 1;
                             ?>
@@ -131,15 +115,10 @@
                                     <td colspan="4">No hay sedes registradas</td>
                                 </tr>
                             @endforelse
-                        </tbody>
-                    </table>
+                    </x-data-table>
                 </div>
             </div>
-    </div>
-
-    <div class="card-footer">
-        <div class="float-right">
-            {{ $sedes->links() }}
         </div>
-    </div>
+    </section>
 @endsection
+

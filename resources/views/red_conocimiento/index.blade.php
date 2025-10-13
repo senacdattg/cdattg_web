@@ -11,7 +11,7 @@
         icon="fa-network-wired" 
         title="Redes de Conocimiento"
         subtitle="Gestión de redes de conocimiento"
-        :breadcrumb="[['label' => 'Inicio', 'url' => '{{ route('verificarLogin') }}', 'icon' => 'fa-home'], ['label' => 'Redes de Conocimiento', 'icon' => 'fa-network-wired', 'active' => true]]"
+        :breadcrumb="[['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'], ['label' => 'Redes de Conocimiento', 'icon' => 'fa-network-wired', 'active' => true]]"
     />
 @endsection
 
@@ -20,23 +20,14 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <div class="card shadow-sm mb-4 no-hover">
-                    <div class="card-header bg-white py-3 d-flex align-items-center">
-                        <h5 class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1">
-                            <i class="fas fa-plus-circle mr-2"></i> Crear Red de Conocimiento
-                        </h5>
-                        <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="collapse"
-                            data-target="#createRedConocimientoForm" aria-expanded="true">
-                            <i class="fas fa-chevron-down"></i>
-                        </button>
-                    </div>
-
-                    <div class="collapse show" id="createRedConocimientoForm">
-                        <div class="card-body">
-                            @include('red_conocimiento.create')
-                        </div>
-                    </div>
-                </div>
+                <x-table-filters 
+                    action="{{ route('red-conocimiento.store') }}"
+                    method="POST"
+                    title="Crear Red de Conocimiento"
+                    icon="fa-plus-circle"
+                >
+                    @include('red_conocimiento.create')
+                </x-table-filters>
 
                 <x-data-table 
                         title="Lista de Redes de Conocimiento"

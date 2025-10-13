@@ -171,26 +171,23 @@
                         </div>
                     </div>
 
-                    <div class="card shadow-sm no-hover">
-                        <div class="card-header bg-white py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Lista de Competencias</h6>
-                        </div>
-
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-borderless table-striped mb-0">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th class="px-4 py-3" style="width: 5%">#</th>
-                                            <th class="px-4 py-3" style="width: 12%">Código</th>
-                                            <th class="px-4 py-3" style="width: 33%">Nombre</th>
-                                            <th class="px-4 py-3" style="width: 10%">Duración</th>
-                                            <th class="px-4 py-3" style="width: 10%">RAPs</th>
-                                            <th class="px-4 py-3" style="width: 15%">Estado</th>
-                                            <th class="px-4 py-3 text-center" style="width: 15%">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+                    <x-data-table 
+                        title="Lista de Competencias"
+                        searchable="true"
+                        searchAction="{{ route('competencias.index') }}"
+                        searchPlaceholder="Buscar competencia..."
+                        searchValue="{{ request('search') }}"
+                        :columns="[
+                            ['label' => '#', 'width' => '5%'],
+                            ['label' => 'Código', 'width' => '12%'],
+                            ['label' => 'Nombre', 'width' => '33%'],
+                            ['label' => 'Duración', 'width' => '10%'],
+                            ['label' => 'RAPs', 'width' => '10%'],
+                            ['label' => 'Estado', 'width' => '15%'],
+                            ['label' => 'Acciones', 'width' => '15%', 'class' => 'text-center']
+                        ]"
+                        :pagination="$competencias->links()"
+                    >
                                         @forelse ($competencias as $competencia)
                                             <tr>
                                                 <td class="px-4">{{ $loop->iteration }}</td>
@@ -253,16 +250,7 @@
                                                 </td>
                                             </tr>
                                         @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="card-footer bg-white">
-                            <div class="float-right">
-                                {{ $competencias->links() }}
-                            </div>
-                        </div>
+                    </x-data-table>
                     </div>
                 </div>
             </div>

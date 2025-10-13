@@ -11,7 +11,7 @@
         icon="fa-cogs" 
         title="Municipios"
         subtitle="Gestión de municipios"
-        :breadcrumb="[['label' => 'Inicio', 'url' => '{{ route('verificarLogin') }}', 'icon' => 'fa-home'], ['label' => 'Municipios', 'icon' => 'fa-cog', 'active' => true]]"
+        :breadcrumb="[['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'], ['label' => 'Municipios', 'icon' => 'fa-cog', 'active' => true]]"
     />
 @endsection
 
@@ -20,23 +20,14 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                    <div class="card shadow-sm mb-4 no-hover">
-                        <div class="card-header bg-white py-3 d-flex align-items-center">
-                            <h5 class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1">
-                                <i class="fas fa-plus-circle mr-2"></i> Crear Municipio
-                            </h5>
-                            <button type="button" class="btn btn-outline-primary btn-sm" data-toggle="collapse"
-                                data-target="#createParameterForm" aria-expanded="true">
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                        </div>
-
-                        <div class="collapse show" id="createParameterForm">
-                            <div class="card-body">
-                                @include('municipios.create')
-                            </div>
-                        </div>
-                    </div>
+                    <x-table-filters 
+                        action="{{ route('municipio.store') }}"
+                        method="POST"
+                        title="Crear Municipio"
+                        icon="fa-plus-circle"
+                    >
+                        @include('municipios.create')
+                    </x-table-filters>
 
                     <x-data-table 
                         title="Lista de Municipios"

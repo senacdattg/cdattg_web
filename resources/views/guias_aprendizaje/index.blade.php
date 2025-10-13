@@ -140,21 +140,23 @@
                             </div>
                         </div>
 
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-borderless table-striped mb-0">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th class="px-4 py-3" style="width: 5%">#</th>
-                                            <th class="px-4 py-3" style="width: 15%">Código</th>
-                                            <th class="px-4 py-3" style="width: 30%">Nombre</th>
-                                            <th class="px-4 py-3" style="width: 15%">Estado</th>
-                                            <th class="px-4 py-3" style="width: 10%">Resultados</th>
-                                            <th class="px-4 py-3" style="width: 10%">Actividades</th>
-                                            <th class="px-4 py-3 text-center" style="width: 15%">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="guiasTableBody">
+                        <x-data-table 
+                            title="Lista de Guías de Aprendizaje"
+                            searchable="true"
+                            searchAction="{{ route('guiasAprendizaje.index') }}"
+                            searchPlaceholder="Buscar por código, nombre..."
+                            searchValue="{{ request('search') }}"
+                            :columns="[
+                                ['label' => '#', 'width' => '5%'],
+                                ['label' => 'Código', 'width' => '15%'],
+                                ['label' => 'Nombre', 'width' => '30%'],
+                                ['label' => 'Estado', 'width' => '15%'],
+                                ['label' => 'Resultados', 'width' => '10%'],
+                                ['label' => 'Actividades', 'width' => '10%'],
+                                ['label' => 'Acciones', 'width' => '15%', 'class' => 'text-center']
+                            ]"
+                            :pagination="$guiasAprendizaje->links()"
+                        >
                                         @forelse ($guiasAprendizaje as $guia)
                                             <tr>
                                                 <td class="px-4">{{ $loop->iteration }}</td>
@@ -215,16 +217,7 @@
                                                 </td>
                                             </tr>
                                         @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="card-footer bg-white">
-                            <div class="float-right">
-                                {{ $guiasAprendizaje->links() }}
-                            </div>
-                        </div>
+                        </x-data-table>
                     </div>
                 </div>
             </div>

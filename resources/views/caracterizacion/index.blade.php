@@ -1,33 +1,18 @@
-@extends('layout.master-layout')
+@extends('adminlte::page')
+
+@section('content_header')
+    <x-page-header 
+        icon="fa-file-alt" 
+        title="Consultar Caracterizaciones"
+        subtitle="Gestión de caracterizaciones de programas"
+        :breadcrumb="[['label' => 'Inicio', 'url' => route('home.index'), 'icon' => 'fa-home'], ['label' => 'Caracterización de Programas', 'active' => true, 'icon' => 'fa-file-alt']]"
+    />
+@endsection
+
 @section('content')
-        <section class="content-header mt-3">
-            <div class="container-fluid mt-3">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Cosultar Caracterizaciones</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item">
-                                <a href="">Inicio</a>
-                            </li>
-                            <li class="breadcrumb-item active">Caracterizacion de Programas
-                            </li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </section>
-        @if (session('success'))
-            <div class="alert alert-success" id="success-message">
-                {{ session('success') }}
-            </div>
-            <script>
-                setTimeout(function() {
-                    document.getElementById('success-message').style.display = 'none';
-                }, 3000);
-            </script>
-        @endif
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <x-session-alerts />
         @if (session('error'))
             <div class="alert alert-danger" id="error-message">
                 {{ session('error') }}

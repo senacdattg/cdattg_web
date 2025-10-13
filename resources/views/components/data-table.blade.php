@@ -12,42 +12,60 @@
     'cardClass' => 'shadow-sm no-hover',
     'headerClass' => 'bg-white py-3',
     'tableClass' => 'table table-borderless table-striped mb-0',
-    'showHeader' => true
+    'showHeader' => true,
+    'showFilters' => false,
+    'filtersSlot' => null,
+    'actionsSlot' => null,
+    'emptyMessage' => 'No hay registros disponibles',
+    'emptyIcon' => 'fa-inbox',
+    'emptyImage' => null,
+    'colspan' => null
 ])
 
 <div class="card {{ $cardClass }}">
     @if($showHeader)
         <div class="card-header {{ $headerClass }} d-flex align-items-center">
             <h6 class="m-0 font-weight-bold text-primary flex-grow-1">{{ $title }}</h6>
-            @if($searchable)
-                <div class="input-group w-25">
-                    @if($searchAction)
-                        <form action="{{ $searchAction }}" method="{{ $searchMethod }}" class="input-group w-100">
+            <div class="d-flex align-items-center gap-2">
+                @if($actionsSlot)
+                    {{ $actionsSlot }}
+                @endif
+                @if($searchable)
+                    <div class="input-group" style="width: 250px;">
+                        @if($searchAction)
+                            <form action="{{ $searchAction }}" method="{{ $searchMethod }}" class="input-group w-100">
+                                <input type="text" 
+                                       name="{{ $searchName }}" 
+                                       class="form-control form-control-sm" 
+                                       placeholder="{{ $searchPlaceholder }}" 
+                                       value="{{ $searchValue }}" 
+                                       autocomplete="off">
+                                <div class="input-group-append">
+                                    <button class="btn btn-primary btn-sm" type="submit">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </form>
+                        @else
                             <input type="text" 
-                                   name="{{ $searchName }}" 
                                    class="form-control form-control-sm" 
                                    placeholder="{{ $searchPlaceholder }}" 
-                                   value="{{ $searchValue }}" 
                                    autocomplete="off">
                             <div class="input-group-append">
-                                <button class="btn btn-primary btn-sm" type="submit">
+                                <button class="btn btn-primary btn-sm" type="button">
                                     <i class="fas fa-search"></i>
                                 </button>
                             </div>
-                        </form>
-                    @else
-                        <input type="text" 
-                               class="form-control form-control-sm" 
-                               placeholder="{{ $searchPlaceholder }}" 
-                               autocomplete="off">
-                        <div class="input-group-append">
-                            <button class="btn btn-primary btn-sm" type="button">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    @endif
-                </div>
-            @endif
+                        @endif
+                    </div>
+                @endif
+            </div>
+        </div>
+    @endif
+    
+    @if($showFilters && $filtersSlot)
+        <div class="card-body border-bottom">
+            {{ $filtersSlot }}
         </div>
     @endif
     

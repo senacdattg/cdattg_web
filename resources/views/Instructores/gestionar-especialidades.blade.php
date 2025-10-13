@@ -437,38 +437,5 @@
 @endsection
 
 @section('js')
-    <script>
-        $(document).ready(function() {
-            // Tooltips para elementos interactivos
-            $('[data-toggle="tooltip"]').tooltip();
-
-            // Animación de entrada para las cards
-            $('.specialty-card').each(function(index) {
-                $(this).css('opacity', '0').delay(index * 100).animate({
-                    opacity: 1
-                }, 500);
-            });
-
-            // Confirmación para acciones de remover especialidad
-            $('form[action*="removerEspecialidad"]').on('submit', function(e) {
-                e.preventDefault();
-                const form = this;
-                
-                Swal.fire({
-                    title: '¿Remover Especialidad?',
-                    text: 'Esta acción removerá la especialidad del instructor. ¿Está seguro?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#dc3545',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Sí, remover',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
-            });
-        });
-    </script>
+    @vite(['resources/js/pages/resources-views\Instructores\gestionar-especialidades.js'])
 @endsection

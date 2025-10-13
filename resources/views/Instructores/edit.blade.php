@@ -258,36 +258,5 @@
 @endsection
 
 @section('js')
-    <script>
-        $(document).ready(function() {
-            // Actualizar display de especialidades seleccionadas
-            function updateSelectedSpecialties() {
-                const selectedOptions = $('#especialidades option:selected');
-                const display = $('#selected-specialties-display');
-                
-                if (selectedOptions.length > 0) {
-                    let html = '';
-                    selectedOptions.each(function() {
-                        const specialtyName = $(this).text();
-                        html += `
-                            <span class="badge badge-primary mr-1 mb-1">
-                                ${specialtyName}
-                            </span>
-                        `;
-                    });
-                    display.html(html);
-                } else {
-                    display.html('<span class="text-muted">Ninguna especialidad seleccionada</span>');
-                }
-            }
-
-            // Event listener para cambios en especialidades
-            $('#especialidades').on('change', function() {
-                updateSelectedSpecialties();
-            });
-
-            // Inicializar display
-            updateSelectedSpecialties();
-        });
-    </script>
+    @vite(['resources/js/pages/table-page.js'])
 @endsection
