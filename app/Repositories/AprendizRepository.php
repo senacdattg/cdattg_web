@@ -3,12 +3,17 @@
 namespace App\Repositories;
 
 use App\Models\Aprendiz;
+use App\Core\Traits\HasCache;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class AprendizRepository
 {
+    use HasCache;
+
+    protected $cacheType = 'aprendices';
+    protected $cacheTags = ['aprendices', 'personas'];
     /**
      * Obtiene el aprendiz más reciente por persona con relaciones
      *
@@ -166,23 +171,35 @@ class AprendizRepository
     }
 
     /**
-     * Obtiene estadísticas de aprendices
+     * Obtiene estadísticas de aprendices (con caché)
      *
      * @return array
      */
     public function obtenerEstadisticas(): array
     {
-        return [
-            'total' => Aprendiz::count(),
-            'activos' => Aprendiz::where('estado', true)->count(),
-            'inactivos' => Aprendiz::where('estado', false)->count(),
-            'por_ficha' => Aprendiz::select('ficha_caracterizacion_id', DB::raw('count(*) as total'))
-                ->where('estado', true)
-                ->groupBy('ficha_caracterizacion_id')
-                ->get()
-                ->pluck('total', 'ficha_caracterizacion_id')
-                ->toArray(),
-        ];
+        return $this->cache('estadisticas', function () {
+            return [
+                'total' => Aprendiz::count(),
+                'activos' => Aprendiz::where('estado', true)->count(),
+                'inactivos' => Aprendiz::where('estado', false)->count(),
+                'por_ficha' => Aprendiz::select('ficha_caracterizacion_id', DB::raw('count(*) as total'))
+                    ->where('estado', true)
+                    ->groupBy('ficha_caracterizacion_id')
+                    ->get()
+                    ->pluck('total', 'ficha_caracterizacion_id')
+                    ->toArray(),
+            ];
+        }, 15); // 15 minutos
+    }
+
+    /**
+     * Invalida caché al crear, actualizar o eliminar
+     *
+     * @return void
+     */
+    public function invalidarCache(): void
+    {
+        $this->flushCache();
     }
 }
 

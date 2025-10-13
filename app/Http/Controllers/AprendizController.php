@@ -84,7 +84,11 @@ class AprendizController extends Controller
             return redirect()->route('aprendices.index')
                 ->with('success', '¡Aprendiz registrado exitosamente!');
         } catch (\Exception $e) {
-            Log::error('Error al crear aprendiz: ' . $e->getMessage());
+            Log::error('Error al crear aprendiz', [
+                'mensaje' => $e->getMessage(),
+                'archivo' => $e->getFile(),
+                'linea' => $e->getLine()
+            ]);
 
             return redirect()->back()
                 ->withInput()
@@ -301,6 +305,90 @@ class AprendizController extends Controller
             Log::error('Error al cambiar estado del aprendiz: ' . $e->getMessage());
 
             return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * DataTable server-side para aprendices
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function datatable(Request $request)
+    {
+        try {
+            $query = \App\Models\Aprendiz::with(['persona.tipoDocumento', 'fichaCaracterizacion.programaFormacion'])
+                ->whereIn('id', function($subquery) {
+                    $subquery->select(\DB::raw('MAX(id)'))
+                        ->from('aprendices')
+                        ->groupBy('persona_id');
+                });
+
+            // Búsqueda global
+            if ($search = $request->input('search.value')) {
+                $query->whereHas('persona', function ($q) use ($search) {
+                    $q->where('primer_nombre', 'LIKE', "%{$search}%")
+                        ->orWhere('segundo_nombre', 'LIKE', "%{$search}%")
+                        ->orWhere('primer_apellido', 'LIKE', "%{$search}%")
+                        ->orWhere('segundo_apellido', 'LIKE', "%{$search}%")
+                        ->orWhere('numero_documento', 'LIKE', "%{$search}%");
+                });
+            }
+
+            $totalRecords = $query->count();
+            
+            // Ordenamiento
+            if ($request->has('order')) {
+                $orderColumn = $request->input('order.0.column');
+                $orderDir = $request->input('order.0.dir');
+                
+                $columns = ['id', 'persona.numero_documento', 'persona.primer_nombre', 'fichaCaracterizacion.ficha', 'estado'];
+                if (isset($columns[$orderColumn])) {
+                    if (str_contains($columns[$orderColumn], '.')) {
+                        [$relation, $column] = explode('.', $columns[$orderColumn]);
+                        $query->join($relation === 'persona' ? 'personas' : 'ficha_caracterizacions', 
+                            'aprendices.' . $relation . '_id', '=', $relation === 'persona' ? 'personas.id' : 'ficha_caracterizacions.id')
+                            ->orderBy($column, $orderDir);
+                    } else {
+                        $query->orderBy($columns[$orderColumn], $orderDir);
+                    }
+                }
+            }
+
+            // Paginación
+            $start = $request->input('start', 0);
+            $length = $request->input('length', 10);
+            
+            $aprendices = $query->skip($start)->take($length)->get();
+
+            $data = $aprendices->map(function ($aprendiz) {
+                return [
+                    'id' => $aprendiz->id,
+                    'documento' => $aprendiz->persona->numero_documento ?? 'N/A',
+                    'nombre' => $aprendiz->persona->nombre_completo ?? 'N/A',
+                    'ficha' => $aprendiz->fichaCaracterizacion->ficha ?? 'N/A',
+                    'programa' => $aprendiz->fichaCaracterizacion->programaFormacion->nombre ?? 'N/A',
+                    'estado' => $aprendiz->estado ? 'Activo' : 'Inactivo',
+                    'acciones' => $aprendiz->id,
+                ];
+            });
+
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => $totalRecords,
+                'recordsFiltered' => $totalRecords,
+                'data' => $data
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error en DataTable de aprendices: ' . $e->getMessage());
+            
+            return response()->json([
+                'draw' => intval($request->input('draw')),
+                'recordsTotal' => 0,
+                'recordsFiltered' => 0,
+                'data' => [],
+                'error' => 'Error al cargar los datos'
+            ], 500);
         }
     }
 }

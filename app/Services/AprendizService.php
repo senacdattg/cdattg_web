@@ -59,6 +59,9 @@ class AprendizService
             // Crear el aprendiz
             $aprendiz = $this->repository->crear($datos);
 
+            // Invalidar caché
+            $this->repository->invalidarCache();
+
             // Disparar evento si tiene ficha asignada
             if (!empty($datos['ficha_caracterizacion_id'])) {
                 event(new AprendizAsignadoAFicha($aprendiz, $datos['ficha_caracterizacion_id']));
@@ -96,6 +99,9 @@ class AprendizService
             // Actualizar el aprendiz
             $actualizado = $this->repository->actualizar($id, $datos);
 
+            // Invalidar caché
+            $this->repository->invalidarCache();
+
             // Disparar evento si cambió la ficha
             if (!empty($datos['ficha_caracterizacion_id']) && $datos['ficha_caracterizacion_id'] != $fichaAnterior) {
                 event(new AprendizAsignadoAFicha($aprendiz->fresh(), $datos['ficha_caracterizacion_id']));
@@ -124,6 +130,9 @@ class AprendizService
             $eliminado = $this->repository->eliminar($id);
 
             if ($eliminado) {
+                // Invalidar caché
+                $this->repository->invalidarCache();
+                
                 Log::info('Aprendiz eliminado exitosamente', [
                     'aprendiz_id' => $id,
                 ]);
