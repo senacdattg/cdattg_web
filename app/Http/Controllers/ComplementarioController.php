@@ -301,10 +301,6 @@ class ComplementarioController extends Controller
             ]
         );
 
-        // Redirigir a la segunda fase (subida de documentos) con el aspirante_id como parรกmetro
-        return redirect()->route('programas-complementarios.documentos', ['id' => $id, 'aspirante_id' => $aspirante->id])
-            ->with('success', 'Datos personales registrados correctamente. Ahora debe subir su documento de identidad.');
-
         // Verificar si ya existe un usuario con este email
         $existingUser = User::where('email', $request->email)->first();
 
@@ -322,9 +318,8 @@ class ComplementarioController extends Controller
         }
 
         // Redirigir a la segunda fase (subida de documentos)
-        return redirect()->route('programas-complementarios.documentos', $id)
-            ->with('success', 'Datos personales registrados correctamente. Ahora debe subir su documento de identidad.')
-            ->with('aspirante_id', $aspirante->id);
+        return redirect()->route('programas-complementarios.documentos', ['id' => $id, 'aspirante_id' => $aspirante->id])
+            ->with('success', 'Datos personales registrados correctamente. Ahora debe subir su documento de identidad.');
 
     }
 
