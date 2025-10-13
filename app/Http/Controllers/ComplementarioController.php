@@ -319,7 +319,6 @@ class ComplementarioController extends Controller
             $user->assignRole('ASPIRANTE');
         }
 
-
         // Redirigir a la segunda fase (subida de documentos)
         return redirect()->route('programas-complementarios.documentos', $id)
             ->with('success', 'Datos personales registrados correctamente. Ahora debe subir su documento de identidad.')
@@ -339,6 +338,7 @@ class ComplementarioController extends Controller
         
         return view('complementarios.formulario_documentos', compact('programa', 'aspirante_id'));
     }
+
 
     /**
      * Procesar la subida de documentos
