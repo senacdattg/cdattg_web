@@ -510,43 +510,5 @@
 @endsection
 
 @section('js')
-<script>
-    $(document).ready(function() {
-        // Manejar el click en el botón de cancelar actividad
-        $('button[data-target="#cancelarActividadModal"]').on('click', function() {
-            var actividadId = $(this).data('actividad-id');
-            var actividadNombre = $(this).data('actividad-nombre');
-            var caracterizacionId = $(this).data('caracterizacion-id');
-            
-            // Actualizar el nombre de la actividad en el modal
-            $('#actividad-nombre-modal').text(actividadNombre);
-            
-            // Actualizar la acción del formulario
-            var actionUrl = '{{ route("registro-actividades.destroy", [":caracterizacion", ":actividad"]) }}';
-            actionUrl = actionUrl.replace(':caracterizacion', caracterizacionId);
-            actionUrl = actionUrl.replace(':actividad', actividadId);
-            
-            $('#form-cancelar-actividad').attr('action', actionUrl);
-            
-            // Mostrar el modal con animación
-            $('#cancelarActividadModal').modal('show');
-        });
-        
-        // Animación de entrada para el modal
-        $('#cancelarActividadModal').on('show.bs.modal', function () {
-            $(this).find('.modal-content').addClass('animate__animated animate__fadeInDown');
-        });
-        
-        // Limpiar animación al cerrar
-        $('#cancelarActividadModal').on('hidden.bs.modal', function () {
-            $(this).find('.modal-content').removeClass('animate__animated animate__fadeInDown');
-        });
-        
-        // Mostrar loading al enviar el formulario
-        $('#form-cancelar-actividad').on('submit', function(e) {
-            // Mostrar loading en el botón
-            $(this).find('button[type="submit"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i> Cancelando...');
-        });
-    });
-</script>
+    @vite(['resources/js/pages/registro-actividades-index.js'])
 @endsection

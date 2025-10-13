@@ -119,6 +119,6 @@
     var sedeDepartamentoId = {{ $sede->municipio->departamento->id ?? 'null' }};
     var sedeMunicipioId = {{ $sede->municipio_id ?? 'null' }};
 </script> --}}
-    <script src="{{ asset('js/jquery-selectDinamico.js') }}"></script>
+    @vite(['resources/js/pages/formularios-select-dinamico.js'])
 @endsection
 

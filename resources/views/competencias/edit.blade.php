@@ -210,27 +210,5 @@
 @endsection
 
 @section('js')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    $(document).ready(function() {
-        setTimeout(function() {
-            $('.alert').fadeOut('slow');
-        }, 5000);
-
-        // Validación de fechas
-        $('#fecha_inicio, #fecha_fin').on('change', function() {
-            const fechaInicio = $('#fecha_inicio').val();
-            const fechaFin = $('#fecha_fin').val();
-            
-            if (fechaInicio && fechaFin && fechaInicio > fechaFin) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Fechas inválidas',
-                    text: 'La fecha de inicio debe ser anterior o igual a la fecha de fin.',
-                    confirmButtonText: 'Entendido'
-                });
-            }
-        });
-    });
-</script>
+    @vite(['resources/js/pages/competencias-form.js'])
 @endsection

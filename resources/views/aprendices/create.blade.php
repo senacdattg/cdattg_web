@@ -138,17 +138,6 @@
 @endsection
 
 @section('js')
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Inicializar Select2
-            $('.select2').select2({
-                theme: 'bootstrap4',
-                width: '100%',
-                placeholder: 'Seleccione una opción',
-                allowClear: true
-            });
-        });
-    </script>
+    @vite(['resources/js/pages/formularios-generico.js'])
 @endsection
 

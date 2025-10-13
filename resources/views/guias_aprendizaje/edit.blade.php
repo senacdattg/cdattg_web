@@ -215,26 +215,5 @@
 @endsection
 
 @section('js')
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            $('#resultados_aprendizaje').select2({
-                placeholder: 'Seleccione los resultados de aprendizaje',
-                allowClear: true,
-                width: '100%',
-                language: {
-                    noResults: function() {
-                        return "No se encontraron resultados";
-                    },
-                    searching: function() {
-                        return "Buscando...";
-                    }
-                }
-            });
-
-            setTimeout(function() {
-                $('.alert').fadeOut('slow');
-            }, 5000);
-        });
-    </script>
+    @vite(['resources/js/pages/guias-aprendizaje-form.js'])
 @endsection
