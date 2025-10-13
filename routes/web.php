@@ -73,5 +73,9 @@ Route::get('/programas-complementarios/{id}/inscripcion', [App\Http\Controllers\
 Route::post('/programas-complementarios/{id}/inscripcion', [App\Http\Controllers\ComplementarioController::class, 'procesarInscripcion'])->name('programas-complementarios.procesar-inscripcion');
 Route::get('/programas-complementarios/{id}/documentos', [App\Http\Controllers\ComplementarioController::class, 'formularioDocumentos'])->name('programas-complementarios.documentos');
 Route::get('/programas-complementarios/aspirante/{id}', [App\Http\Controllers\ComplementarioController::class, 'perfilAspirante'])->name('programas-complementarios.perfil-aspirante');
+
+Route::middleware('auth')->group(function () {
+    Route::get('/mi-perfil', [App\Http\Controllers\ComplementarioController::class, 'miPerfil'])->name('aspirantes.mi-perfil');
+});
 Route::get('/departamentos/{pais}', [DepartamentoController::class, 'getByPais'])->name('departamentos.by.pais');
 Route::get('/municipios/{departamento}', [MunicipioController::class, 'getByDepartamento'])->name('municipios.by.departamento');
