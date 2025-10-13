@@ -292,7 +292,7 @@
                                         @if ($actividad['id_estado'] == 'PENDIENTE' || $actividad['id_estado'] == 'EN CURSO')
                                             @if ($fechaActividad == $hoy)
                                                 <a class="btn btn-success btn-block mb-1"
-                                                    href="{{ route('asistence.caracterSelected', [$caracterizacion, $actividad]); }}">
+                                                    href="{{ route('asistence.caracterSelected', [$caracterizacion, $actividad]) }}">
                                                     <i class="fas fa-clipboard-check"></i> Tomar Asistencia
                                                 </a>
                                             @else

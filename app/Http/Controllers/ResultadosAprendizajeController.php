@@ -2,21 +2,34 @@
 
 namespace App\Http\Controllers;
 
+// use App\Services\ResultadosAprendizajeService; // Servicio no existe
+use App\Repositories\ResultadosAprendizajeRepository;
+use App\Repositories\CompetenciaRepository;
 use App\Http\Requests\StoreResultadosAprendizajeRequest;
 use App\Http\Requests\UpdateResultadosAprendizajeRequest;
 use App\Models\ResultadosAprendizaje;
 use App\Models\Competencia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Exception;
 
 class ResultadosAprendizajeController extends Controller
 {
-    public function __construct()
-    {
+    // protected ResultadosAprendizajeService $resultadoService; // Servicio no existe
+    protected ResultadosAprendizajeRepository $resultadoRepo;
+    protected CompetenciaRepository $competenciaRepo;
+
+    public function __construct(
+        // ResultadosAprendizajeService $resultadoService, // Servicio no existe
+        ResultadosAprendizajeRepository $resultadoRepo,
+        CompetenciaRepository $competenciaRepo
+    ) {
         $this->middleware('auth');
+        // $this->resultadoService = $resultadoService; // Servicio no existe
+        $this->resultadoRepo = $resultadoRepo;
+        $this->competenciaRepo = $competenciaRepo;
         
         $this->middleware('can:VER RESULTADO APRENDIZAJE')->only(['index', 'show']);
         $this->middleware('can:CREAR RESULTADO APRENDIZAJE')->only(['create', 'store']);

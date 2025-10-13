@@ -2,24 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\TemaService;
 use App\Models\Tema;
+use App\Models\Parametro;
 use App\Http\Requests\StoreTemaRequest;
 use App\Http\Requests\UpdateTemaRequest;
-use App\Models\Parametro;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class TemaController extends Controller
 {
+    protected TemaService $temaService;
+
     /**
      * Display a listing of the resource.
      */
-    public function __construct()
+    public function __construct(TemaService $temaService)
     {
-        $this->middleware('auth'); // Middleware de autenticación para todos los métodos del controlador
+        $this->middleware('auth');
+        $this->temaService = $temaService;
 
         $this->middleware('can:VER TEMA')->only(['index', 'show']);
         $this->middleware('can:CREAR TEMA')->only(['create', 'store']);
@@ -29,22 +33,23 @@ class TemaController extends Controller
 
     public function index()
     {
-        $temas = Tema::paginate(10);
+        $temas = $this->temaService->listar(10);
         return view('temas.index', compact('temas'));
     }
 
     public function store(StoreTemaRequest $request)
     {
-        $data = $request->validated();
-        $data['user_create_id'] = Auth::id();
-        $data['user_edit_id'] = Auth::id();
-
         try {
-            Tema::create($data);
+            $datos = $request->validated();
+            $datos['user_create_id'] = Auth::id();
+            $datos['user_edit_id'] = Auth::id();
+
+            $this->temaService->crear($datos);
+
             return redirect()->back()->with('success', '¡Tema creado exitosamente!');
         } catch (\Exception $e) {
             Log::error('Error al crear tema: ' . $e->getMessage());
-            return redirect()->back()->withInput()->withErrors(['error' => 'Error al crear el tema: ' . $e->getMessage()]);
+            return redirect()->back()->withInput()->with('error', 'Error al crear el tema.');
         }
     }
 
@@ -71,60 +76,42 @@ class TemaController extends Controller
     public function update(UpdateTemaRequest $request, Tema $tema)
     {
         try {
-            DB::beginTransaction();
+            $datos = $request->validated();
+            $datos['user_edit_id'] = Auth::id();
 
-            // Obtener los datos validados del request
-            $data = $request->validated();
+            $this->temaService->actualizar($tema->id, $datos);
 
-            // Si el usuario que actualizó anteriormente es distinto al usuario actual, actualiza el campo
-            if ($tema->user_edit_id !== Auth::id()) {
-                $data['user_edit_id'] = Auth::id();
-            }
-
-            // Actualizar el tema con los nuevos datos
-            $tema->update($data);
-
-            DB::commit();
-            return redirect()->route('tema.show', $tema->id)
-                ->with('success', 'Tema actualizado exitosamente');
+            return redirect()->route('tema.show', $tema->id)->with('success', 'Tema actualizado exitosamente');
         } catch (QueryException $e) {
-            DB::rollBack();
             Log::error('Error al actualizar tema: ' . $e->getMessage());
+            
             if ($e->getCode() == 23000) {
-                return redirect()->back()->withErrors(['error' => 'El nombre asignado al tema ya existe.']);
+                return redirect()->back()->with('error', 'El nombre del tema ya existe.');
             }
-            return redirect()->back()->withErrors(['error' => 'Ocurrió un error al actualizar el tema.']);
+            return redirect()->back()->with('error', 'Error al actualizar el tema.');
         }
     }
 
     public function updateParametrosTemas(Request $request)
     {
-        // Validar los datos del request
-        $data = $request->validate([
-            'tema_id'      => 'required|integer|exists:temas,id',
-            'parametros'   => 'nullable|array',
-            'parametros.*' => 'integer|exists:parametros,id',
-        ]);
+        try {
+            $data = $request->validate([
+                'tema_id' => 'required|integer|exists:temas,id',
+                'parametros' => 'nullable|array',
+                'parametros.*' => 'integer|exists:parametros,id',
+                'estados' => 'nullable|array',
+            ]);
 
-        // Obtener el tema; findOrFail lanzará una excepción si no se encuentra
-        $tema = Tema::findOrFail($data['tema_id']);
+            $parametros = $data['parametros'] ?? [];
+            $estados = $data['estados'] ?? array_fill(0, count($parametros), 1);
 
-        // Si no se han seleccionado parámetros, sincronizamos con un arreglo vacío
-        $parametros = $data['parametros'] ?? [];
+            $this->temaService->actualizarParametros($data['tema_id'], $parametros, $estados);
 
-        // Crear un array para sincronizar los parámetros con valores específicos
-        $dataToSync = [];
-        foreach ($parametros as $parametro_id) {
-            $dataToSync[$parametro_id] = [
-                'user_create_id' => Auth::id(),
-                'user_edit_id'   => Auth::id(),
-            ];
+            return redirect()->back()->with('success', 'Parámetros actualizados exitosamente');
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar parámetros: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al actualizar parámetros.');
         }
-
-        // Sincronizar los parámetros en la tabla pivote
-        $tema->parametros()->sync($dataToSync);
-
-        return redirect()->back()->with('success', 'Parámetros actualizados exitosamente');
     }
 
     /**
@@ -133,19 +120,16 @@ class TemaController extends Controller
     public function destroy(Tema $tema)
     {
         try {
-            DB::transaction(function () use ($tema) {
-                // Desvincular todos los parámetros asociados
-                $tema->parametros()->sync([]);
-                // Ahora eliminar el tema
-                $tema->delete();
-            });
+            $this->temaService->eliminar($tema->id);
+
             return redirect()->route('tema.index')->with('success', 'Tema eliminado exitosamente');
         } catch (QueryException $e) {
             Log::error('Error al eliminar tema: ' . $e->getMessage());
+            
             if ($e->getCode() == 23000) {
-                return redirect()->back()->with('error', 'El tema se encuentra en uso y no se puede eliminar');
+                return redirect()->back()->with('error', 'El tema está en uso, no se puede eliminar');
             }
-            return redirect()->back()->with('error', 'Ocurrió un error al eliminar el tema');
+            return redirect()->back()->with('error', 'Error al eliminar tema.');
         }
     }
 

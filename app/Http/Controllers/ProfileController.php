@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ProfileService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use App\Models\User;
+use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
 {
+    protected ProfileService $profileService;
+
+    public function __construct(ProfileService $profileService)
+    {
+        $this->profileService = $profileService;
+    }
+
     public function index()
     {
         $user = auth()->user();
@@ -16,46 +23,43 @@ class ProfileController extends Controller
 
     public function update(Request $request)
     {
-        $user = auth()->user();
-        
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,'.$user->id,
-            'current_password' => 'nullable|required_with:password',
-            'password' => 'nullable|min:8|confirmed',
-        ]);
+        try {
+            $user = auth()->user();
+            
+            $datos = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email,'.$user->id,
+                'current_password' => 'nullable|required_with:password',
+                'password' => 'nullable|min:8|confirmed',
+            ]);
 
-        $user->name = $request->name;
-        $user->email = $request->email;
+            $this->profileService->actualizarPerfil($user, $datos);
 
-        if ($request->filled('password')) {
-            if (!Hash::check($request->current_password, $user->password)) {
-                return back()->withErrors(['current_password' => 'La contraseña actual no es correcta']);
-            }
-            $user->password = Hash::make($request->password);
+            return redirect()->route('profile.index')->with('success', 'Perfil actualizado correctamente');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => $e->getMessage()]);
         }
-
-        $user->save();
-
-        return redirect()->route('profile.index')->with('success', 'Perfil actualizado correctamente');
     }
 
     public function changePassword(Request $request)
     {
-        $request->validate([
-            'current_password' => 'required',
-            'password' => 'required|min:8|confirmed|different:current_password',
-        ]);
+        try {
+            $datos = $request->validate([
+                'current_password' => 'required',
+                'password' => 'required|min:8|confirmed|different:current_password',
+            ]);
 
-        $user = auth()->user();
+            $user = auth()->user();
 
-        if (!Hash::check($request->current_password, $user->password)) {
-            return back()->with('error', 'La contraseña actual no es correcta');
+            $this->profileService->cambiarContrasena(
+                $user,
+                $datos['current_password'],
+                $datos['password']
+            );
+
+            return back()->with('success', 'Contraseña actualizada correctamente');
+        } catch (\Exception $e) {
+            return back()->with('error', $e->getMessage());
         }
-
-        $user->password = Hash::make($request->password);
-        $user->save();
-
-        return back()->with('success', 'Contraseña actualizada correctamente');
     }
 }

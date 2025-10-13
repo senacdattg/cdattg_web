@@ -2,25 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\GuiaAprendizajeService;
+use App\Repositories\GuiasAprendizajeRepository;
 use App\Http\Requests\StoreGuiasAprendizajeRequest;
 use App\Http\Requests\UpdateGuiasAprendizajeRequest;
 use App\Models\GuiasAprendizaje;
 use App\Models\ResultadosAprendizaje;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Exception;
 
 class GuiaAprendizajeController extends Controller
 {
+    protected GuiaAprendizajeService $guiaService;
+    protected GuiasAprendizajeRepository $guiaRepo;
+
     /**
      * Constructor del controlador.
      * Aplica middleware de autenticación y permisos específicos.
      */
-    public function __construct()
-    {
+    public function __construct(
+        GuiaAprendizajeService $guiaService,
+        GuiasAprendizajeRepository $guiaRepo
+    ) {
         $this->middleware('auth');
+        $this->guiaService = $guiaService;
+        $this->guiaRepo = $guiaRepo;
         
         $this->middleware('can:VER GUIA APRENDIZAJE')->only(['index', 'show']);
         $this->middleware('can:CREAR GUIA APRENDIZAJE')->only(['create', 'store']);
@@ -31,7 +40,7 @@ class GuiaAprendizajeController extends Controller
     /**
      * Display a listing of the resource.
      * 
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function index(Request $request)
     {
@@ -202,7 +211,7 @@ class GuiaAprendizajeController extends Controller
     /**
      * Show the form for creating a new resource.
      * 
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function create()
     {
@@ -265,7 +274,7 @@ class GuiaAprendizajeController extends Controller
      * Display the specified resource.
      * 
      * @param GuiasAprendizaje $guiaAprendizaje
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function show(GuiasAprendizaje $guiaAprendizaje)
     {
@@ -287,7 +296,7 @@ class GuiaAprendizajeController extends Controller
      * Show the form for editing the specified resource.
      * 
      * @param GuiasAprendizaje $guiaAprendizaje
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function edit(GuiasAprendizaje $guiaAprendizaje)
     {
@@ -462,7 +471,7 @@ class GuiaAprendizajeController extends Controller
      * Gestionar resultados de aprendizaje de una guía.
      * 
      * @param GuiasAprendizaje $guiaAprendizaje
-     * @return \Illuminate\View\View
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
      */
     public function gestionarResultados(GuiasAprendizaje $guiaAprendizaje)
     {

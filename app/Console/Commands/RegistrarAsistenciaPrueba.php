@@ -54,8 +54,8 @@ class RegistrarAsistenciaPrueba extends Command
                 return 1;
             }
 
-            // Obtener instructor_ficha con ID 2
-            $instructorFicha = InstructorFichaCaracterizacion::find(2);
+            // Obtener cualquier instructor_ficha disponible
+            $instructorFicha = InstructorFichaCaracterizacion::inRandomOrder()->first();
             
             if (!$instructorFicha) {
                 $this->error('❌ No se encontró ningún instructor asignado a una ficha.');

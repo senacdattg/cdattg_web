@@ -25,11 +25,15 @@ use Illuminate\Support\Facades\Auth;
 class InstructorController extends Controller
 {
     protected $businessRulesService;
+    protected $instructorService;
 
-    public function __construct(InstructorBusinessRulesService $businessRulesService)
-    {
+    public function __construct(
+        InstructorBusinessRulesService $businessRulesService,
+        \App\Services\InstructorService $instructorService
+    ) {
         $this->middleware('auth'); // Middleware de autenticación para todos los métodos del controlador
         $this->businessRulesService = $businessRulesService;
+        $this->instructorService = $instructorService;
 
         // Middleware específico para métodos individuales usando permisos de Instructor
         // Temporalmente comentado para debuggear
@@ -46,109 +50,35 @@ class InstructorController extends Controller
      */
     public function index(Request $request)
     {
-        // Debug temporal
-        Log::info('Método index ejecutado', [
-            'url' => $request->url(),
-            'method' => $request->method(),
-            'user_id' => auth()->id()
-        ]);
-        
         try {
-            $search = $request->input('search');
-            $filtroEstado = $request->input('estado', 'todos');
-            $filtroEspecialidad = $request->input('especialidad');
-            $filtroRegional = $request->input('regional');
+            $filtros = [
+                'search' => $request->input('search'),
+                'estado' => $request->input('estado', 'todos'),
+                'especialidad' => $request->input('especialidad'),
+                'regional' => $request->input('regional'),
+                'per_page' => 15
+            ];
 
-            // Construir query base con relaciones
-            $query = Instructor::with([
-                'persona',
-                'regional',
-                'instructorFichas' => function($q) {
-                    $q->with('ficha.programaFormacion');
-                }
-            ]);
-
-            // Aplicar filtro de búsqueda por nombre o documento
-            if ($search) {
-                $query->where(function($q) use ($search) {
-                    $q->whereHas('persona', function($personaQuery) use ($search) {
-                        $personaQuery->where('primer_nombre', 'like', "%{$search}%")
-                            ->orWhere('segundo_nombre', 'like', "%{$search}%")
-                            ->orWhere('primer_apellido', 'like', "%{$search}%")
-                            ->orWhere('segundo_apellido', 'like', "%{$search}%")
-                            ->orWhere('numero_documento', 'like', "%{$search}%")
-                            ->orWhere('email', 'like', "%{$search}%");
-                    });
-                });
-            }
-
-            // Aplicar filtro por estado
-            if ($filtroEstado !== 'todos') {
-                if ($filtroEstado === 'activos') {
-                    $query->where('status', true);
-                } elseif ($filtroEstado === 'inactivos') {
-                    $query->where('status', false);
-                }
-            }
-
-            // Aplicar filtro por especialidad
-            if ($filtroEspecialidad) {
-                $query->whereJsonContains('especialidades', $filtroEspecialidad);
-            }
-
-            // Aplicar filtro por regional
-            if ($filtroRegional) {
-                $query->where('regional_id', $filtroRegional);
-            }
-
-            // Ordenar y paginar
-            $instructores = $query->orderBy('id', 'desc')->paginate(15)->withQueryString();
-
+            $instructores = $this->instructorService->listarConFiltros($filtros);
+            
             // Obtener datos para filtros
             $regionales = \App\Models\Regional::where('status', true)->orderBy('nombre')->get();
             $especialidades = \App\Models\RedConocimiento::where('status', true)->orderBy('nombre')->get();
 
             // Estadísticas
-            $estadisticas = [
-                'total' => Instructor::count(),
-                'activos' => Instructor::where('status', true)->count(),
-                'inactivos' => Instructor::where('status', false)->count(),
-                'con_fichas' => Instructor::whereHas('instructorFichas')->count()
-            ];
-
-            // Verificar instructores sin usuario - TEMPORALMENTE COMENTADO
-            // $instructoresSinUsuario = Instructor::whereDoesntHave('persona.user')
-            //     ->with('persona:id,primer_nombre,primer_apellido,numero_documento,email')
-            //     ->get();
-
-            // Debug temporal
-            // Log::info('Instructores sin usuario:', [
-            //     'count' => $instructoresSinUsuario->count(),
-            //     'instructores' => $instructoresSinUsuario->toArray()
-            // ]);
-
-            // if ($instructoresSinUsuario->count() > 0) {
-            //     Log::info('Redirigiendo a vista de error');
-            //     return view('Instructores.error', compact('instructoresSinUsuario'))->with('error', 'Existen instructores sin usuario asociado. Por favor, cree un usuario para cada instructor.');
-            // }
+            $estadisticas = $this->instructorService->obtenerEstadisticas();
 
             return view('Instructores.index', compact(
                 'instructores', 
                 'regionales', 
                 'especialidades', 
                 'estadisticas',
-                'search',
-                'filtroEstado',
-                'filtroEspecialidad',
-                'filtroRegional'
+                'filtros'
             ));
             
         } catch (Exception $e) {
-            Log::error('Error al listar instructores', [
-                'error' => $e->getMessage(),
-                'search' => $request->input('search')
-            ]);
-            return redirect()->back()->with('error', 'Error al cargar la lista de instructores. Por favor, inténtelo de nuevo.');
+            Log::error('Error al listar instructores: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al cargar la lista de instructores.');
         }
     }
 
@@ -210,7 +140,7 @@ class InstructorController extends Controller
                 return response()->json([
                     'success' => true,
                     'html' => view('Instructores.partials.instructores-table', compact('instructores'))->render(),
-                    'pagination' => $instructores->links()->render()
+                    'pagination' => $instructores->links()->toHtml()
                 ]);
             }
 
@@ -300,114 +230,24 @@ class InstructorController extends Controller
     public function store(CreateInstructorRequest $request)
     {
         try {
-            DB::beginTransaction();
+            $datos = $request->validated();
             
-            // Validar que la persona existe
-            $persona = \App\Models\Persona::with(['instructor', 'user'])
-                ->findOrFail($request->input('persona_id'));
-
-            // Validaciones de negocio
-            if ($persona->instructor) {
-                return redirect()->back()->withInput()->with('error', 'Esta persona ya es instructor.');
-            }
-
-            if (!$persona->user) {
-                return redirect()->back()->withInput()->with('error', 'Esta persona no tiene un usuario asociado.');
-            }
-
-            // Crear Instructor
-            $instructor = new Instructor();
-            $instructor->persona_id = $persona->id;
-            $instructor->regional_id = $request->input('regional_id');
-            $instructor->anos_experiencia = $request->input('anos_experiencia');
-            $instructor->experiencia_laboral = $request->input('experiencia_laboral');
-            $instructor->status = true;
-            $instructor->save();
-
-            // Asignar especialidades si se proporcionan
+            // Preparar especialidades
             if ($request->has('especialidades')) {
                 $especialidades = $request->input('especialidades');
-                
-                // Log para debugging
-                Log::info('Especialidades recibidas:', [
-                    'especialidades_raw' => $especialidades,
-                    'es_array' => is_array($especialidades),
-                    'is_json' => is_string($especialidades),
-                    'empty' => empty($especialidades)
-                ]);
-                
-                // Si es string JSON, decodificar
                 if (is_string($especialidades)) {
                     $especialidades = json_decode($especialidades, true);
                 }
-                
-                // Si es array y no está vacío, guardar
-                if (is_array($especialidades) && !empty($especialidades)) {
-                    // Convertir array simple a formato esperado por la vista
-                    $especialidadesFormateadas = [
-                        'principal' => null,
-                        'secundarias' => []
-                    ];
-                    
-                    // Obtener nombres de especialidades desde la base de datos
-                    $especialidadesDB = \App\Models\RedConocimiento::whereIn('id', $especialidades)->get();
-                    $nombresEspecialidades = $especialidadesDB->pluck('nombre', 'id')->toArray();
-                    
-                    // Asignar la primera como principal y las demás como secundarias
-                    if (count($especialidades) > 0) {
-                        $primeraEspecialidad = $especialidades[0];
-                        $especialidadesFormateadas['principal'] = $nombresEspecialidades[$primeraEspecialidad] ?? null;
-                        
-                        // Las demás como secundarias
-                        for ($i = 1; $i < count($especialidades); $i++) {
-                            if (isset($nombresEspecialidades[$especialidades[$i]])) {
-                                $especialidadesFormateadas['secundarias'][] = $nombresEspecialidades[$especialidades[$i]];
-                            }
-                        }
-                    }
-                    
-                    $instructor->especialidades = $especialidadesFormateadas;
-                    $instructor->save();
-                    
-                    Log::info('Especialidades guardadas:', [
-                        'instructor_id' => $instructor->id,
-                        'especialidades_raw' => $especialidades,
-                        'especialidades_formateadas' => $especialidadesFormateadas
-                    ]);
-                }
+                $datos['especialidades'] = $especialidades;
             }
 
-            // Asignar rol de instructor al usuario existente
-            $user = $persona->user;
-            $user->assignRole('INSTRUCTOR');
-
-            DB::commit();
-            
-            Log::info('Instructor creado exitosamente', [
-                'instructor_id' => $instructor->id,
-                'persona_id' => $persona->id,
-                'user_id' => $user->id,
-                'email' => $user->email,
-                'especialidades' => $instructor->especialidades
-            ]);
+            $instructor = $this->instructorService->crear($datos);
             
             return redirect()->route('instructor.index')->with('success', '¡Instructor asignado exitosamente!');
             
-        } catch (QueryException $e) {
-            DB::rollBack();
-            Log::error('Error al crear instructor - QueryException', [
-                'error' => $e->getMessage(),
-                'request_data' => $request->except(['password'])
-            ]);
-            return redirect()->back()->withInput()->with('error', 'Error de base de datos. Por favor, inténtelo de nuevo.');
-            
         } catch (Exception $e) {
-            DB::rollBack();
-            Log::error('Error al crear instructor - Exception', [
-                'error' => $e->getMessage(),
-                'request_data' => $request->except(['password'])
-            ]);
-            return redirect()->back()->withInput()->with('error', 'Error inesperado. Por favor, inténtelo de nuevo.');
+            Log::error('Error al crear instructor: ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
     }
 
@@ -587,58 +427,23 @@ class InstructorController extends Controller
     public function destroy(Instructor $instructor)
     {
         try {
-            DB::beginTransaction();
+            $this->instructorService->eliminar($instructor->id);
             
-            // Obtener información del instructor antes de eliminarlo
-            $instructorId = $instructor->id;
-            $personaId = $instructor->persona_id;
-            
-            // Obtener el usuario asociado para remover el rol
-            $user = User::where('persona_id', $personaId)->first();
-            
-            // Remover el rol de instructor del usuario (si existe)
-            if ($user && $user->hasRole('INSTRUCTOR')) {
-                $user->removeRole('INSTRUCTOR');
-            }
-            
-            // Eliminar solo el registro de instructor
-            $instructor->delete();
-            
-            DB::commit();
-            
-            Log::info('Instructor eliminado exitosamente', [
-                'instructor_id' => $instructorId,
-                'persona_id' => $personaId,
-                'user_id' => $user ? $user->id : null,
-                'rol_removido' => $user ? 'INSTRUCTOR' : null
-            ]);
-            
-            return redirect()->route('instructor.index')->with('success', 'Instructor eliminado exitosamente. La persona y usuario se mantienen intactos.');
+            return redirect()->route('instructor.index')->with('success', 'Instructor eliminado exitosamente.');
             
         } catch (QueryException $e) {
-            DB::rollBack();
-            
-            Log::error('Error al eliminar instructor - QueryException', [
-                'instructor_id' => $instructor->id,
-                'error' => $e->getMessage(),
-                'error_code' => $e->getCode()
-            ]);
+            Log::error('Error al eliminar instructor: ' . $e->getMessage());
             
             if ($e->getCode() == 23000) {
-                return redirect()->back()->with('error', 'El instructor se encuentra en uso en estos momentos, no se puede eliminar');
+                return redirect()->back()->with('error', 'El instructor se encuentra en uso, no se puede eliminar');
             }
             
-            return redirect()->back()->with('error', 'Error de base de datos al eliminar el instructor. Por favor, inténtelo de nuevo.');
+            return redirect()->back()->with('error', 'Error de base de datos al eliminar el instructor.');
             
         } catch (Exception $e) {
-            DB::rollBack();
+            Log::error('Error al eliminar instructor: ' . $e->getMessage());
             
-            Log::error('Error al eliminar instructor - Exception', [
-                'instructor_id' => $instructor->id,
-                'error' => $e->getMessage()
-            ]);
-            
-            return redirect()->back()->with('error', 'Error inesperado al eliminar el instructor. Por favor, inténtelo de nuevo.');
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
     public function createImportarCSV()
