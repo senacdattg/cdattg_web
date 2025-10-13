@@ -2,23 +2,26 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\RedConocimientoService;
 use App\Http\Requests\StoreRedConocimientoRequest;
 use App\Http\Requests\UpdateRedConocimientoRequest;
 use App\Models\RedConocimiento;
 use App\Models\Regional;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
 
 class RedConocimientoController extends Controller
 {
+    protected RedConocimientoService $redService;
+
     /**
      * Constructor: aplica middleware de autenticación y permisos.
      */
-    public function __construct()
+    public function __construct(RedConocimientoService $redService)
     {
         $this->middleware('auth');
+        $this->redService = $redService;
 
         $this->middleware('can:VER RED CONOCIMIENTO')->only(['index', 'show']);
         $this->middleware('can:CREAR RED CONOCIMIENTO')->only(['create', 'store']);
@@ -32,12 +35,12 @@ class RedConocimientoController extends Controller
     public function index()
     {
         try {
-            $redesConocimiento = RedConocimiento::with('regional')->paginate(10);
+            $redesConocimiento = $this->redService->listar(10);
             $regionales = Regional::where('status', 1)->get();
             return view('red_conocimiento.index', compact('redesConocimiento', 'regionales'));
         } catch (\Exception $e) {
             Log::error('Error al listar redes de conocimiento: ' . $e->getMessage());
-            return redirect()->back()->withErrors(['error' => 'Ocurrió un error al cargar las redes de conocimiento.']);
+            return redirect()->back()->with('error', 'Error al cargar redes de conocimiento.');
         }
     }
 
@@ -62,38 +65,24 @@ class RedConocimientoController extends Controller
     public function store(StoreRedConocimientoRequest $request)
     {
         try {
-            DB::beginTransaction();
+            $datos = $request->validated();
+            $datos['user_create_id'] = Auth::id();
+            $datos['user_edit_id'] = Auth::id();
 
-            $data = $request->validated();
-            $data['user_create_id'] = Auth::id();
-            $data['user_edit_id'] = Auth::id();
-
-            RedConocimiento::create($data);
-
-            DB::commit();
+            $this->redService->crear($datos);
             
             return redirect()->route('red-conocimiento.index')
                 ->with('success', '¡Red de conocimiento creada exitosamente!');
         } catch (QueryException $e) {
-            DB::rollBack();
             Log::error('Error al crear red de conocimiento: ' . $e->getMessage());
             
             if ($e->getCode() == 23000) {
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(['error' => 'Ya existe una red de conocimiento con este nombre.']);
+                return redirect()->back()->withInput()
+                    ->with('error', 'Ya existe una red con este nombre.');
             }
             
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['error' => 'Ocurrió un error al crear la red de conocimiento.']);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error inesperado al crear red de conocimiento: ' . $e->getMessage());
-            
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['error' => 'Ocurrió un error inesperado al crear la red de conocimiento.']);
+            return redirect()->back()->withInput()
+                ->with('error', 'Error al crear red de conocimiento.');
         }
     }
 
@@ -133,40 +122,23 @@ class RedConocimientoController extends Controller
     public function update(UpdateRedConocimientoRequest $request, RedConocimiento $redConocimiento)
     {
         try {
-            DB::beginTransaction();
+            $datos = $request->validated();
+            $datos['user_edit_id'] = Auth::id();
 
-            $data = $request->validated();
-
-            if ($redConocimiento->user_edit_id !== Auth::id()) {
-                $data['user_edit_id'] = Auth::id();
-            }
-
-            $redConocimiento->update($data);
-
-            DB::commit();
+            $this->redService->actualizar($redConocimiento->id, $datos);
             
             return redirect()->route('red-conocimiento.show', $redConocimiento->id)
                 ->with('success', 'Red de conocimiento actualizada exitosamente.');
         } catch (QueryException $e) {
-            DB::rollBack();
             Log::error('Error al actualizar red de conocimiento: ' . $e->getMessage());
             
             if ($e->getCode() == 23000) {
-                return redirect()->back()
-                    ->withInput()
-                    ->withErrors(['error' => 'Ya existe una red de conocimiento con este nombre.']);
+                return redirect()->back()->withInput()
+                    ->with('error', 'Ya existe una red con este nombre.');
             }
             
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['error' => 'Ocurrió un error al actualizar la red de conocimiento.']);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error inesperado al actualizar red de conocimiento: ' . $e->getMessage());
-            
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['error' => 'Ocurrió un error inesperado al actualizar la red de conocimiento.']);
+            return redirect()->back()->withInput()
+                ->with('error', 'Error al actualizar red de conocimiento.');
         }
     }
 
@@ -176,31 +148,19 @@ class RedConocimientoController extends Controller
     public function destroy(RedConocimiento $redConocimiento)
     {
         try {
-            DB::beginTransaction();
-            
-            $redConocimiento->delete();
-            
-            DB::commit();
+            $this->redService->eliminar($redConocimiento->id);
             
             return redirect()->route('red-conocimiento.index')
                 ->with('success', 'Red de conocimiento eliminada exitosamente.');
         } catch (QueryException $e) {
-            DB::rollBack();
             Log::error('Error al eliminar red de conocimiento: ' . $e->getMessage());
             
             if ($e->getCode() == 23000) {
                 return redirect()->back()
-                    ->withErrors(['error' => 'La red de conocimiento está siendo usada y no es posible eliminarla.']);
+                    ->with('error', 'La red está en uso, no se puede eliminar.');
             }
             
-            return redirect()->back()
-                ->withErrors(['error' => 'Ocurrió un error al eliminar la red de conocimiento.']);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error inesperado al eliminar red de conocimiento: ' . $e->getMessage());
-            
-            return redirect()->back()
-                ->withErrors(['error' => 'Ocurrió un error inesperado al eliminar la red de conocimiento.']);
+            return redirect()->back()->with('error', 'Error al eliminar red.');
         }
     }
 
@@ -210,37 +170,17 @@ class RedConocimientoController extends Controller
     public function cambiarEstado(RedConocimiento $redConocimiento)
     {
         try {
-            DB::beginTransaction();
+            $this->redService->cambiarEstado($redConocimiento->id);
             
-            // Cambiar el estado (1 -> 0 o 0 -> 1)
-            $nuevoEstado = $redConocimiento->status === 1 ? 0 : 1;
-            
-            $redConocimiento->update([
-                'status' => $nuevoEstado,
-                'user_edit_id' => Auth::id(),
-            ]);
-            
-            DB::commit();
-            
-            $mensaje = $nuevoEstado === 1 
+            $mensaje = $redConocimiento->status === 0 
                 ? 'Red de conocimiento activada exitosamente.' 
                 : 'Red de conocimiento desactivada exitosamente.';
                 
-            return redirect()->back()
-                ->with('success', $mensaje);
-                
-        } catch (QueryException $e) {
-            DB::rollBack();
-            Log::error('Error al cambiar estado de red de conocimiento: ' . $e->getMessage());
-            
-            return redirect()->back()
-                ->withErrors(['error' => 'Ocurrió un error al cambiar el estado de la red de conocimiento.']);
+            return redirect()->back()->with('success', $mensaje);
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error inesperado al cambiar estado de red de conocimiento: ' . $e->getMessage());
+            Log::error('Error al cambiar estado: ' . $e->getMessage());
             
-            return redirect()->back()
-                ->withErrors(['error' => 'Ocurrió un error inesperado al cambiar el estado.']);
+            return redirect()->back()->with('error', 'Error al cambiar estado.');
         }
     }
 }

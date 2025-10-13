@@ -2,25 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\GuiaAprendizajeService;
+use App\Repositories\GuiasAprendizajeRepository;
 use App\Http\Requests\StoreGuiasAprendizajeRequest;
 use App\Http\Requests\UpdateGuiasAprendizajeRequest;
 use App\Models\GuiasAprendizaje;
-use App\Models\ResultadosAprendizaje;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Exception;
 
 class GuiaAprendizajeController extends Controller
 {
+    protected GuiaAprendizajeService $guiaService;
+    protected GuiasAprendizajeRepository $guiaRepo;
+
     /**
      * Constructor del controlador.
      * Aplica middleware de autenticación y permisos específicos.
      */
-    public function __construct()
-    {
+    public function __construct(
+        GuiaAprendizajeService $guiaService,
+        GuiasAprendizajeRepository $guiaRepo
+    ) {
         $this->middleware('auth');
+        $this->guiaService = $guiaService;
+        $this->guiaRepo = $guiaRepo;
         
         $this->middleware('can:VER GUIA APRENDIZAJE')->only(['index', 'show']);
         $this->middleware('can:CREAR GUIA APRENDIZAJE')->only(['create', 'store']);
