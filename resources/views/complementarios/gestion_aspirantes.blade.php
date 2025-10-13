@@ -119,96 +119,30 @@
     <!-- Main Content -->
     <div class="container-fluid px-4 py-4">
         <div class="row">
-            <!-- Ejemplo de tarjeta -->
+            @forelse($programas as $programa)
             <div class="col-md-4 mb-4">
                 <div class="course-card">
                     <div class="card-icon">
-                        <i class="fas fa-utensils"></i>
+                        <i class="{{ $programa->icono }}"></i>
                     </div>
-                    <div class="card-title">Auxiliar de Cocina</div>
-                    <span class="badge badge-aceptado mb-2">Activo</span>
-                    <p>Fundamentos de cocina, manipulación de alimentos y técnicas básicas de preparación.</p>
-                    <p><strong>Aspirantes:</strong> 15</p>
-                    <a href="{{ route('aspirantes.ver', ['curso' => 'auxiliar-cocina']) }}" class="btn btn-primary w-100">
+                    <div class="card-title">{{ $programa->nombre }}</div>
+                    <span class="badge {{ $programa->badge_class }} mb-2">{{ $programa->estado_label }}</span>
+                    <p>{{ $programa->descripcion }}</p>
+                    <p><strong>Aspirantes:</strong> {{ $programa->aspirantes_count }}</p>
+                    <a href="{{ route('aspirantes.ver', ['curso' => str_replace(' ', '-', strtolower($programa->nombre))]) }}" class="btn btn-primary w-100">
                         <i class="fas fa-users"></i> Ver Aspirantes
                     </a>
                 </div>
             </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="course-card">
-                    <div class="card-icon">
-                        <i class="fas fa-hammer"></i>
-                    </div>
-                    <div class="card-title">Acabados en Madera</div>
-                    <span class="badge badge-aceptado mb-2">Activo</span>
-                    <p>Técnicas de acabado, barnizado y restauración de muebles de madera.</p>
-                    <p><strong>Aspirantes:</strong> 8</p>
-                    <a href="{{ route('aspirantes.ver', ['curso' => 'acabados-madera']) }}" class="btn btn-primary w-100">
-                        <i class="fas fa-users"></i> Ver Aspirantes
-                    </a>
+            @empty
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <i class="fas fa-info-circle fa-2x mb-3"></i>
+                    <h5>No hay programas complementarios disponibles</h5>
+                    <p>No se encontraron programas complementarios en el sistema.</p>
                 </div>
             </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="course-card">
-                    <div class="card-icon">
-                        <i class="fas fa-cut"></i>
-                    </div>
-                    <div class="card-title">Confección de Prendas</div>
-                    <span class="badge badge-aceptado mb-2">Activo</span>
-                    <p>Técnicas básicas de corte, confección y terminado de prendas de vestir.</p>
-                    <p><strong>Aspirantes:</strong> 12</p>
-                    <a href="{{ route('aspirantes.ver', ['curso' => 'confeccion-prendas']) }}" class="btn btn-primary w-100">
-                        <i class="fas fa-users"></i> Ver Aspirantes
-                    </a>
-                </div>
-            </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="course-card">
-                    <div class="card-icon">
-                        <i class="fas fa-car"></i>
-                    </div>
-                    <div class="card-title">Mecánica Básica Automotriz</div>
-                    <span class="badge badge-aceptado mb-2">Activo</span>
-                    <p>Mantenimiento preventivo y diagnóstico básico de vehículos.</p>
-                    <p><strong>Aspirantes:</strong> 20</p>
-                    <a href="{{ route('aspirantes.ver', ['curso' => 'mecanica-basica-automotriz']) }}" class="btn btn-primary w-100">
-                        <i class="fas fa-users"></i> Ver Aspirantes
-                    </a>
-                </div>
-            </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="course-card">
-                    <div class="card-icon">
-                        <i class="fas fa-leaf"></i>
-                    </div>
-                    <div class="card-title">Cultivo de Huertas Urbanas</div>
-                    <span class="badge badge-aceptado mb-2">Activo</span>
-                    <p>Técnicas de cultivo y mantenimiento de huertas en espacios urbanos.</p>
-                    <p><strong>Aspirantes:</strong> 10</p>
-                    <a href="{{ route('aspirantes.ver', ['curso' => 'cultivo-huertas-urbanas']) }}" class="btn btn-primary w-100">
-                        <i class="fas fa-users"></i> Ver Aspirantes
-                    </a>
-                </div>
-            </div>
-
-            <div class="col-md-4 mb-4">
-                <div class="course-card">
-                    <div class="card-icon">
-                        <i class="fas fa-gavel"></i>
-                    </div>
-                    <div class="card-title">Normatividad Laboral</div>
-                    <span class="badge badge-aceptado mb-2">Activo</span>
-                    <p>Actualización en normatividad laboral y seguridad social.</p>
-                    <p><strong>Aspirantes:</strong> 5</p>
-                    <a href="{{ route('aspirantes.ver', ['curso' => 'normatividad-laboral']) }}" class="btn btn-primary w-100">
-                        <i class="fas fa-users"></i> Ver Aspirantes
-                    </a>
-                </div>
-            </div>
+            @endforelse
         </div>
     </div>
 

@@ -25,7 +25,14 @@ class ComplementarioController extends Controller
      */
     public function gestionAspirantes()
     {
-        return view('complementarios.gestion_aspirantes');
+        $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion'])->get();
+
+        // Add aspirantes count for each program
+        $programas->each(function($programa) {
+            $programa->aspirantes_count = AspiranteComplementario::where('complementario_id', $programa->id)->count();
+        });
+
+        return view('complementarios.gestion_aspirantes', compact('programas'));
     }
 
     public function procesarDcoumentos() 
@@ -49,8 +56,15 @@ class ComplementarioController extends Controller
     }
     public function verAspirantes($curso)
     {
+        // Find program by name (assuming curso is the program name)
+        $programa = ComplementarioOfertado::where('nombre', str_replace('-', ' ', $curso))->firstOrFail();
 
-        return view('complementarios.ver_aspirantes', compact('curso'));
+        // Get aspirantes for this program
+        $aspirantes = AspiranteComplementario::with(['persona', 'complementario'])
+            ->where('complementario_id', $programa->id)
+            ->get();
+
+        return view('complementarios.ver_aspirantes', compact('programa', 'aspirantes'));
     }
     public function verPrograma($id)
     {

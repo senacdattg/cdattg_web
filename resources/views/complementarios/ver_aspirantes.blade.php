@@ -5,11 +5,11 @@
 @section('content_header')
     <div class="d-flex justify-content-between align-items-center mb-2">
         <div>
-            <h1 class="mb-0"><i class="fas fa-users me-2"></i>Gestión de Aspirantes</h1>
+            <h1 class="mb-0"><i class="fas fa-users me-2"></i>Aspirantes - {{ $programa->nombre }}</h1>
             <p class="text-muted mb-0">Administre los aspirantes a programas de formación complementaria</p>
         </div>
-        <a href="#" class="btn btn-primary">
-            <i class="fas fa-plus"></i> Nuevo Aspirante
+        <a href="{{ route('gestion-aspirantes') }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Volver
         </a>
     </div>
 @stop
@@ -26,12 +26,7 @@
                 </div>
                 <div class="col-md-2">
                     <select class="form-select">
-                        <option selected>Todos los programas</option>
-                        <option>Desarrollo de Software</option>
-                        <option>Análisis de Datos</option>
-                        <option>Diseño Gráfico</option>
-                        <option>Gestión de Redes</option>
-                        <option>Administración de Empresas</option>
+                        <option selected>{{ $programa->nombre }}</option>
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -67,71 +62,40 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @forelse($aspirantes as $index => $aspirante)
                         <tr>
-                            <td>1</td>
-                            <td>Carlos Andrés Martínez</td>
-                            <td>1098765432</td>
-                            <td>Desarrollo de Software</td>
-                            <td>15/03/2025</td>
-                            <td><span class="badge bg-warning text-dark">EN PROCESO</span></td>
+                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $aspirante->persona->primer_nombre }} {{ $aspirante->persona->segundo_nombre ?? '' }} {{ $aspirante->persona->primer_apellido }} {{ $aspirante->persona->segundo_apellido ?? '' }}</td>
+                            <td>{{ $aspirante->persona->numero_documento }}</td>
+                            <td>{{ $aspirante->complementario->nombre }}</td>
+                            <td>{{ $aspirante->created_at->format('d/m/Y') }}</td>
                             <td>
-                                <a href="#" class="btn btn-info btn-sm me-1" title="Ver"><i class="fas fa-eye"></i></a>
+                                @if($aspirante->estado == 1)
+                                    <span class="badge bg-warning text-dark">EN PROCESO</span>
+                                @elseif($aspirante->estado == 2)
+                                    <span class="badge bg-danger">RECHAZADO</span>
+                                @elseif($aspirante->estado == 3)
+                                    <span class="badge bg-success">ACEPTADO</span>
+                                @else
+                                    <span class="badge bg-secondary">DESCONOCIDO</span>
+                                @endif
+                            </td>
+                            <td>
+                                <a href="{{ route('programas-complementarios.perfil-aspirante', $aspirante->id) }}" class="btn btn-info btn-sm me-1" title="Ver"><i class="fas fa-eye"></i></a>
                                 <a href="#" class="btn btn-warning btn-sm me-1" title="Editar"><i class="fas fa-edit"></i></a>
                                 <a href="#" class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash"></i></a>
                             </td>
                         </tr>
+                        @empty
                         <tr>
-                            <td>2</td>
-                            <td>Ana María López</td>
-                            <td>1087654321</td>
-                            <td>Análisis de Datos</td>
-                            <td>10/02/2025</td>
-                            <td><span class="badge bg-success">ACEPTADO</span></td>
-                            <td>
-                                <a href="#" class="btn btn-info btn-sm me-1" title="Ver"><i class="fas fa-eye"></i></a>
-                                <a href="#" class="btn btn-warning btn-sm me-1" title="Editar"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash"></i></a>
+                            <td colspan="7" class="text-center">
+                                <div class="alert alert-info mb-0">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    No hay aspirantes registrados para este programa.
+                                </div>
                             </td>
                         </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Juan Pablo Rodríguez</td>
-                            <td>1076543210</td>
-                            <td>Diseño Gráfico</td>
-                            <td>05/04/2025</td>
-                            <td><span class="badge bg-danger">RECHAZADO</span></td>
-                            <td>
-                                <a href="#" class="btn btn-info btn-sm me-1" title="Ver"><i class="fas fa-eye"></i></a>
-                                <a href="#" class="btn btn-warning btn-sm me-1" title="Editar"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>Luisa Fernanda Gómez</td>
-                            <td>1054321098</td>
-                            <td>Gestión de Redes</td>
-                            <td>20/01/2025</td>
-                            <td><span class="badge bg-success">ACEPTADO</span></td>
-                            <td>
-                                <a href="#" class="btn btn-info btn-sm me-1" title="Ver"><i class="fas fa-eye"></i></a>
-                                <a href="#" class="btn btn-warning btn-sm me-1" title="Editar"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash"></i></a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td>Pedro José Ramírez</td>
-                            <td>1054321098</td>
-                            <td>Administración de Empresas</td>
-                            <td>12/03/2025</td>
-                            <td><span class="badge bg-warning text-dark">EN PROCESO</span></td>
-                            <td>
-                                <a href="#" class="btn btn-info btn-sm me-1" title="Ver"><i class="fas fa-eye"></i></a>
-                                <a href="#" class="btn btn-warning btn-sm me-1" title="Editar"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash"></i></a>
-                            </td>
-                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
