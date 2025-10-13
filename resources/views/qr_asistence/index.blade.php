@@ -262,12 +262,6 @@
         window.csrfToken = '{{ csrf_token() }}';
         window.apiVerifyDocumentRoute = '{{ route('api.verifyDocument') }}';
         window.horarioHoy = @json($horarioHoy);
-
-        // Mostrar el div del escáner si hay clases programadas
-        const qrScannerCard = document.getElementById('qr-scanner-card');
-        if (qrScannerCard) {
-            qrScannerCard.style.display = 'block';
-        }
     </script>
     @vite(['resources/js/Asistencia/index-qr.js'])
 @endsection

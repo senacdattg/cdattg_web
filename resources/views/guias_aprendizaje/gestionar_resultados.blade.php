@@ -218,13 +218,5 @@
 @endsection
 
 @section('js')
-    <script>
-        $(function () {
-            $('[data-toggle="tooltip"]').tooltip();
-
-            setTimeout(function() {
-                $('.alert').fadeOut('slow');
-            }, 5000);
-        });
-    </script>
+    @vite(['resources/js/pages/gestion-especializada.js'])
 @endsection

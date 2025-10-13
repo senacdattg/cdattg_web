@@ -78,42 +78,7 @@
         </div>
     </section>
 </div>
-<script>
-    $(document).ready(function() {
-        $('.select2').select2({
-            tags: true,
-            placeholder: 'Selecciona o escribe un nombre',
-            allowClear: true,
-            dropdownParent: $('.content-wrapper'), // Especifica el contenedor del dropdown
-            createTag: function(params) {
-                var term = $.trim(params.term);
-                if (term === '') {
-                    return null;
-                }
-                return {
-                    id: term,
-                    text: term,
-                    newTag: true // add additional parameters
-                };
-            }
-        });
-
-        $('#persona_id').on('keypress', function(e) {
-            if (e.which == 13) { 
-                var newPerson = $(this).val();
-                if (newPerson) {
-                    var select = $('#persona_id');
-                    if (select.find("option[value='" + newPerson + "']").length) {
-                        select.val(newPerson).trigger('change');
-                    } else {
-                        var newOption = new Option(newPerson, newPerson, true, true);
-                        select.append(newOption).trigger('change');
-                    }
-                    $(this).val(''); 
-                }
-                e.preventDefault(); 
-            }
-        });
-    });
-</script>
+@section('js')
+    @vite(['resources/js/pages/formularios-generico.js'])
+@endsection
 @endsection 

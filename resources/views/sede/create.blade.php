@@ -114,11 +114,7 @@
         </section>
     </div>
 @endsection
-@section('script')
-{{-- <script>
-    var sedeDepartamentoId = {{ $sede->municipio->departamento->id ?? 'null' }};
-    var sedeMunicipioId = {{ $sede->municipio_id ?? 'null' }};
-</script> --}}
+@section('js')
     @vite(['resources/js/pages/formularios-select-dinamico.js'])
 @endsection
 

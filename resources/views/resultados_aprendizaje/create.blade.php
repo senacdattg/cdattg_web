@@ -222,28 +222,6 @@
 @endsection
 
 @section('js')
-    <script>
-        $(document).ready(function() {
-            setTimeout(function() {
-                $('.alert').fadeOut('slow');
-            }, 5000);
-
-            // Validar que fecha_fin sea mayor o igual a fecha_inicio
-            $('#fecha_fin').on('change', function() {
-                const fechaInicio = $('#fecha_inicio').val();
-                const fechaFin = $(this).val();
-
-                if (fechaInicio && fechaFin && fechaFin < fechaInicio) {
-                    $(this).addClass('is-invalid');
-                    if (!$(this).siblings('.invalid-feedback').length) {
-                        $(this).after('<div class="invalid-feedback">La fecha fin debe ser igual o posterior a la fecha de inicio.</div>');
-                    }
-                } else {
-                    $(this).removeClass('is-invalid');
-                    $(this).siblings('.invalid-feedback').remove();
-                }
-            });
-        });
-    </script>
+    @vite(['resources/js/pages/competencias-form.js'])
 @endsection
 

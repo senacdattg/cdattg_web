@@ -194,12 +194,6 @@
 @endsection
 
 @section('js')
-    <script>
-        $(document).ready(function() {
-            setTimeout(function() {
-                $('.alert').fadeOut('slow');
-            }, 5000);
-        });
-    </script>
+    @vite(['resources/js/pages/formularios-generico.js'])
 @endsection
 

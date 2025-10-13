@@ -61,10 +61,4 @@
 
 @section('js')
     <script src="{{ asset('js/websocket-handler.js') }}"></script>
-    <script>
-        // Configuración adicional específica para esta página
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Página de asistencias cargada con WebSocket habilitado');
-        });
-    </script>
 @endsection

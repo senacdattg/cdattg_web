@@ -17,11 +17,6 @@
             <div class="alert alert-danger" id="error-message">
                 {{ session('error') }}
             </div>
-            <script>
-                setTimeout(function() {
-                    document.getElementById('error-message').style.display = 'none';
-                }, 3000);
-            </script>
         @endif
         <section class="content">
             <div class="card">

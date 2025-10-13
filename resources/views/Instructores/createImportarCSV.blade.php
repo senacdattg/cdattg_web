@@ -15,29 +15,16 @@
         }
     </style>
 @endsection
-@section('content')
+@section('content_header')
+    <x-page-header 
+        icon="fa-file-csv" 
+        title="Importar Instructores CSV"
+        subtitle="Importar instructores desde archivo CSV"
+        :breadcrumb="[['label' => 'Inicio', 'url' => route('home.index'), 'icon' => 'fa-home'], ['label' => 'Instructores', 'url' => route('instructor.index'), 'icon' => 'fa-chalkboard-teacher'], ['label' => 'Importar CSV', 'icon' => 'fa-file-csv', 'active' => true]]"
+    />
+@endsection
 
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Crear Instructor</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('home.index') }}">Inicio</a>
-                            </li>
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('instructor.index') }}">Instructores</a>
-                            </li>
-                            <li class="breadcrumb-item active">Importar CSV
-                            </li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </section>
+@section('content')
 
         <section class="content">
             <div class="card">
@@ -77,35 +64,6 @@
         </div>
     </div>
 @endsection
-@section('script')
-    <script>
-    // Asegúrate de que el DOM esté completamente cargado antes de añadir los listeners
-    document.addEventListener('DOMContentLoaded', (event) => {
-        // Obtén el botón por su ID
-        let btn_importar = document.getElementById('btn-importar');
-
-        // Añade un evento click al botón para ejecutar la función showSpinner
-        btn_importar.addEventListener('click', function() {
-            showSpinner();
-        });
-    });
-
-    // La función showSpinner que muestra el spinner
-    function showSpinner() {
-        document.getElementById('overlay').style.display = 'flex';
-    }
-</script>
-
-    {{-- <script>
-        let mensaje =  `Recuerde que el archivo CSV debe tener el title, que es el nombre completo del instructor, el
-                            id_personal, que es el número de documento del instructor y el correo institucional.`
-        document.addEventListener('DOMContentLoaded', function() {
-                Swal.fire({
-                    icon: 'info',
-                    title: 'Importante',
-                    text: mensaje
-                });
-
-        })
-    </script> --}}
+@section('js')
+    @vite(['resources/js/pages/formularios-generico.js'])
 @endsection

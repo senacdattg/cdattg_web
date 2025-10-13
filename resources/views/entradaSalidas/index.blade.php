@@ -140,23 +140,6 @@
         </section>
     </div>
 @endsection
-@section('script')
-    <script>
-        $(document).ready(function() {
-            var btnGenerarCSV = $('#btn-generarCSV');
-
-            btnGenerarCSV.click(function() {
-                // Simular un formulario oculto y realizar la descarga
-                var iframe = $('<iframe style="display: none;"></iframe>');
-                $('body').append(iframe);
-
-                iframe.attr('src', '{{ route('entradaSalida.generarCSV', ['ficha' => $ficha]) }}');
-
-                // Redirigir después de la descarga
-                setTimeout(function() {
-                    window.location.href = '{{ route('fichaCaracterizacion.index') }}';
-                }, 1000); // 2000 milisegundos (2 segundos) de retraso
-            });
-        });
-    </script>
+@section('js')
+    @vite(['resources/js/pages/formularios-generico.js'])
 @endsection

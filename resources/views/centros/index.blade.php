@@ -112,18 +112,6 @@
     @include('components.confirm-delete-modal')
 @endsection
 
-@section('script')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const forms = document.querySelectorAll('.eliminar-centro-form');
-            forms.forEach(form => {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    const nombre = form.closest('tr').querySelector('td:nth-child(2)').textContent.trim();
-                    confirmDelete(nombre, form.action, form);
-                });
-            });
-        });
-    </script>
+@section('js')
+    @vite(['resources/js/pages/formularios-generico.js'])
 @endsection

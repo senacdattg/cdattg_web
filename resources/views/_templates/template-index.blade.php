@@ -218,49 +218,6 @@
 @endsection
 
 @section('js')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    function confirmarEliminacion(nombre, url) {
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: `¿Deseas eliminar "${nombre}"? Esta acción no se puede deshacer.`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = url;
-                
-                const csrfToken = document.createElement('input');
-                csrfToken.type = 'hidden';
-                csrfToken.name = '_token';
-                csrfToken.value = '{{ csrf_token() }}';
-                
-                const methodField = document.createElement('input');
-                methodField.type = 'hidden';
-                methodField.name = '_method';
-                methodField.value = 'DELETE';
-                
-                form.appendChild(csrfToken);
-                form.appendChild(methodField);
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    }
-
-    $(document).ready(function() {
-        setTimeout(function() {
-            $('.alert').fadeOut('slow');
-        }, 5000);
-
-        $('[data-toggle="tooltip"]').tooltip();
-    });
-</script>
+    @vite(['resources/js/pages/formularios-generico.js'])
 @endsection
 
