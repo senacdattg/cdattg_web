@@ -2,21 +2,23 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\ParametroService;
 use App\Models\Parametro;
 use App\Http\Requests\StoreParametroRequest;
 use App\Http\Requests\UpdateParametroRequest;
-use App\Models\Tema;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
 
 class ParametroController extends Controller
 {
-    public function __construct()
+    protected ParametroService $parametroService;
+
+    public function __construct(ParametroService $parametroService)
     {
         $this->middleware('auth');
+        $this->parametroService = $parametroService;
 
         $this->middleware('can:VER PARAMETRO')->only(['index', 'show']);
         $this->middleware('can:CREAR PARAMETRO')->only(['create', 'store']);
@@ -26,35 +28,40 @@ class ParametroController extends Controller
 
     public function index()
     {
-        $parametros = Parametro::paginate(10);
+        $parametros = $this->parametroService->listar(10);
         return view('parametros.index', compact('parametros'));
     }
 
     public function apiIndex()
     {
-        $parametros = Parametro::all();
+        $parametros = $this->parametroService->obtenerTodos();
         return response()->json($parametros);
     }
 
     public function cambiarEstado(Parametro $parametro)
     {
-        $nuevoEstado = $parametro->status === 1 ? 0 : 1;
-        $parametro->update(['status' => $nuevoEstado]);
-        return redirect()->back()->with('success', 'Estado cambiado exitosamente');
+        try {
+            $this->parametroService->cambiarEstado($parametro->id);
+            return redirect()->back()->with('success', 'Estado cambiado exitosamente');
+        } catch (\Exception $e) {
+            Log::error('Error al cambiar estado: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al cambiar estado.');
+        }
     }
 
     public function store(StoreParametroRequest $request)
     {
-        $data = $request->validated();
-        $data['user_create_id'] = Auth::id();
-        $data['user_edit_id'] = Auth::id();
-
         try {
-            Parametro::create($data);
+            $datos = $request->validated();
+            $datos['user_create_id'] = Auth::id();
+            $datos['user_edit_id'] = Auth::id();
+
+            $this->parametroService->crear($datos);
+
             return redirect()->back()->with('success', '¡Parámetro creado exitosamente!');
         } catch (\Exception $e) {
             Log::error('Error al crear parámetro: ' . $e->getMessage());
-            return redirect()->back()->withInput()->withErrors(['error' => 'Ocurrió un error al crear el parámetro.']);
+            return redirect()->back()->withInput()->with('error', 'Error al crear parámetro.');
         }
     }
 
@@ -71,46 +78,36 @@ class ParametroController extends Controller
     public function update(UpdateParametroRequest $request, Parametro $parametro)
     {
         try {
-            DB::beginTransaction();
+            $datos = $request->validated();
+            $datos['user_edit_id'] = Auth::id();
 
-            // Obtener los datos validados del request
-            $data = $request->validated();
+            $this->parametroService->actualizar($parametro->id, $datos);
 
-            // Si el usuario que actualizó anteriormente es distinto al usuario actual, actualiza el campo
-            if ($parametro->user_edit_id !== Auth::id()) {
-                $data['user_edit_id'] = Auth::id();
-            }
-
-            // Actualizar el parámetro con los nuevos datos
-            $parametro->update($data);
-
-            DB::commit();
             return redirect()->route('parametro.show', $parametro->id)
                 ->with('success', 'Parámetro actualizado exitosamente');
         } catch (QueryException $e) {
-            DB::rollBack();
             Log::error('Error al actualizar parámetro: ' . $e->getMessage());
+            
             if ($e->getCode() == 23000) {
-                return redirect()->back()->withErrors(['error' => 'El nombre asignado al parámetro ya existe.']);
+                return redirect()->back()->withInput()->with('error', 'El nombre del parámetro ya existe.');
             }
-            return redirect()->back()->withErrors(['error' => 'Ocurrió un error al actualizar el parámetro.']);
+            return redirect()->back()->withInput()->with('error', 'Error al actualizar parámetro.');
         }
     }
 
     public function destroy(Parametro $parametro)
     {
         try {
-            DB::beginTransaction();
-            $parametro->delete();
-            DB::commit();
+            $this->parametroService->eliminar($parametro->id);
+
             return redirect()->route('parametro.index')->with('success', 'Parámetro eliminado exitosamente');
         } catch (QueryException $e) {
-            DB::rollBack();
             Log::error('Error al eliminar parámetro: ' . $e->getMessage());
+            
             if ($e->getCode() == 23000) {
-                return redirect()->back()->withErrors(['error' => 'El parámetro está siendo usado y no es posible eliminarlo.']);
+                return redirect()->back()->with('error', 'El parámetro está en uso, no se puede eliminar.');
             }
-            return redirect()->back()->withErrors(['error' => 'Ocurrió un error al eliminar el parámetro.']);
+            return redirect()->back()->with('error', 'Error al eliminar parámetro.');
         }
     }
 
