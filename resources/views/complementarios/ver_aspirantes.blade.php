@@ -42,7 +42,7 @@
                 <button class="btn btn-outline-warning btn-sm me-2">En Proceso</button>
                 <button class="btn btn-outline-success btn-sm me-2">Aceptados</button>
                 <button class="btn btn-outline-danger btn-sm me-2">Rechazados</button>
-                <button class="btn btn-outline-primary btn-sm" id="btn-validar-sofia">
+                <button class="btn btn-outline-primary btn-sm" id="btn-validar-sofia" data-programa-id="{{ $programa->id }}">
                     <i class="fas fa-search me-1"></i>Validar SenaSofiaPlus
                 </button>
             </div>
@@ -178,6 +178,10 @@
     <script>
         console.log('Módulo de gestión de aspirantes cargado');
 
+        // Variables globales para el progreso
+        let progressInterval = null;
+        let currentProgressId = null;
+
         // Botón de validación SenaSofiaPlus
         document.getElementById('btn-validar-sofia').addEventListener('click', async function() {
             const button = this;
@@ -185,12 +189,11 @@
 
             // Deshabilitar botón y mostrar loading
             button.disabled = true;
-            button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Validando...';
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Iniciando validación...';
 
             try {
-                // Obtener el ID del programa desde la URL
-                const urlParts = window.location.pathname.split('/');
-                const programaId = urlParts[urlParts.length - 1];
+                // Obtener el ID del programa desde el data attribute
+                const programaId = button.dataset.programaId;
 
                 // Hacer la petición AJAX
                 const response = await fetch(`/programas-complementarios/${programaId}/validar-sofia`, {
@@ -204,27 +207,137 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    // Mostrar mensaje de éxito
-                    showAlert('success', 'Validación completada exitosamente');
+                    currentProgressId = data.progress_id;
+                    showAlert('success', data.message);
 
-                    // Recargar la página para mostrar los cambios
-                    setTimeout(() => {
-                        location.reload();
-                    }, 2000);
+                    // Iniciar monitoreo del progreso
+                    startProgressMonitoring(currentProgressId);
+
+                    // Cambiar texto del botón
+                    button.innerHTML = '<i class="fas fa-clock me-1"></i>Procesando...';
+
                 } else {
                     // Mostrar mensaje de error
                     showAlert('error', data.message || 'Error durante la validación');
+                    // Restaurar botón
+                    button.disabled = false;
+                    button.innerHTML = originalText;
                 }
 
             } catch (error) {
                 console.error('Error:', error);
                 showAlert('error', 'Error de conexión. Intente nuevamente.');
-            } finally {
                 // Restaurar botón
                 button.disabled = false;
                 button.innerHTML = originalText;
             }
         });
+
+        // Función para monitorear el progreso
+        function startProgressMonitoring(progressId) {
+            // Actualizar cada 3 segundos
+            progressInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/sofia-validation-progress/${progressId}`);
+                    const data = await response.json();
+
+                    if (data.success) {
+                        const progress = data.progress;
+
+                        // Actualizar barra de progreso si existe
+                        updateProgressDisplay(progress);
+
+                        // Si está completado o fallido, detener monitoreo
+                        if (progress.status === 'completed' || progress.status === 'failed') {
+                            clearInterval(progressInterval);
+                            handleValidationComplete(progress);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error monitoreando progreso:', error);
+                }
+            }, 3000);
+        }
+
+        // Función para actualizar la visualización del progreso
+        function updateProgressDisplay(progress) {
+            // Buscar o crear contenedor de progreso
+            let progressContainer = document.getElementById('sofia-progress-container');
+            if (!progressContainer) {
+                progressContainer = document.createElement('div');
+                progressContainer.id = 'sofia-progress-container';
+                progressContainer.className = 'mt-3';
+
+                // Insertar después del botón de filtros
+                const buttonContainer = document.querySelector('.mt-3');
+                buttonContainer.appendChild(progressContainer);
+            }
+
+            progressContainer.innerHTML = `
+                <div class="card border-info">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h6 class="mb-0">
+                                <i class="fas fa-cog fa-spin me-2"></i>
+                                Validación SenaSofiaPlus - ${progress.status_label}
+                            </h6>
+                            <small class="text-muted">${progress.progress_percentage}%</small>
+                        </div>
+                        <div class="progress">
+                            <div class="progress-bar bg-info" role="progressbar"
+                                 style="width: ${progress.progress_percentage}%"
+                                 aria-valuenow="${progress.progress_percentage}"
+                                 aria-valuemin="0" aria-valuemax="100">
+                            </div>
+                        </div>
+                        <div class="row text-center mt-2">
+                            <div class="col">
+                                <small class="text-muted">Total: ${progress.total_aspirantes}</small>
+                            </div>
+                            <div class="col">
+                                <small class="text-success">Exitosos: ${progress.successful_validations}</small>
+                            </div>
+                            <div class="col">
+                                <small class="text-danger">Errores: ${progress.failed_validations}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Función para manejar cuando la validación se completa
+        function handleValidationComplete(progress) {
+            const button = document.getElementById('btn-validar-sofia');
+            const progressContainer = document.getElementById('sofia-progress-container');
+
+            if (progress.status === 'completed') {
+                showAlert('success', `Validación completada. ${progress.successful_validations} aspirantes validados exitosamente.`);
+
+                // Cambiar botón a completado
+                button.innerHTML = '<i class="fas fa-check-circle me-1"></i>Completado';
+                button.className = 'btn btn-success btn-sm';
+
+                // Recargar página después de 3 segundos
+                setTimeout(() => {
+                    location.reload();
+                }, 3000);
+
+            } else if (progress.status === 'failed') {
+                showAlert('error', 'La validación falló. Revisa los logs para más detalles.');
+
+                // Restaurar botón
+                button.disabled = false;
+                button.innerHTML = '<i class="fas fa-search me-1"></i>Validar SenaSofiaPlus';
+            }
+
+            // Ocultar contenedor de progreso después de 5 segundos
+            if (progressContainer) {
+                setTimeout(() => {
+                    progressContainer.remove();
+                }, 5000);
+            }
+        }
 
         // Función para mostrar alertas
         function showAlert(type, message) {
