@@ -133,17 +133,29 @@ class ValidarSofiaJob implements ShouldQueue
     {
         $resultadoLower = strtolower($resultado);
 
-        if (str_contains($resultadoLower, 'ya existe') ||
-            str_contains($resultadoLower, 'ya cuentas con un registro')) {
-            return 1; // Registrado
-        } elseif (str_contains($resultadoLower, 'actualizar tu documento') ||
-                  str_contains($resultadoLower, 'requiere_cambio')) {
+        // PRIMERO: Verificar si requiere cambio de documento (más específico)
+        if (str_contains($resultadoLower, 'actualizar tu documento') ||
+            str_contains($resultadoLower, 'requiere_cambio') ||
+            str_contains($resultadoLower, 'cambiar tu documento')) {
             return 2; // Requiere cambio de cédula
-        } elseif (str_contains($resultadoLower, 'creado') ||
-                  str_contains($resultadoLower, 'cuenta_creada')) {
+        }
+
+        // SEGUNDO: Verificar si está registrado correctamente
+        elseif (str_contains($resultadoLower, 'ya existe') ||
+                str_contains($resultadoLower, 'ya cuentas con un registro')) {
+            return 1; // Registrado
+        }
+
+        // TERCERO: Verificar si se pudo crear cuenta
+        elseif (str_contains($resultadoLower, 'creado') ||
+                str_contains($resultadoLower, 'cuenta_creada') ||
+                str_contains($resultadoLower, 'registro exitoso')) {
             return 0; // No registrado (pudo crear cuenta)
-        } else {
-            return 2; // Error o desconocido -> requiere cambio
+        }
+
+        // CUARTO: Error o respuesta desconocida
+        else {
+            return 2; // Error o desconocido -> requiere cambio por defecto
         }
     }
 
