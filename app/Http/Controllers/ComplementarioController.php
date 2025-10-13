@@ -411,6 +411,38 @@ class ComplementarioController extends Controller
         return view('complementarios.perfil_aspirante', compact('aspirante'));
     }
 
+    public function validarSofia($complementarioId)
+    {
+        try {
+            // Ejecutar el comando Artisan
+            $exitCode = \Artisan::call('sofia:validar', [
+                'complementario_id' => $complementarioId
+            ]);
+
+            $output = \Artisan::output();
+
+            if ($exitCode === 0) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Validación completada exitosamente',
+                    'output' => $output
+                ]);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error durante la validación',
+                    'output' => $output
+                ], 500);
+            }
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error interno del servidor: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     /**
      * Mostrar perfil propio del aspirante autenticado
      */
