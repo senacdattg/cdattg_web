@@ -41,7 +41,10 @@
                 <button class="btn btn-outline-secondary btn-sm me-2">Todos</button>
                 <button class="btn btn-outline-warning btn-sm me-2">En Proceso</button>
                 <button class="btn btn-outline-success btn-sm me-2">Aceptados</button>
-                <button class="btn btn-outline-danger btn-sm">Rechazados</button>
+                <button class="btn btn-outline-danger btn-sm me-2">Rechazados</button>
+                <button class="btn btn-outline-primary btn-sm" id="btn-validar-sofia">
+                    <i class="fas fa-search me-1"></i>Validar SenaSofiaPlus
+                </button>
             </div>
         </div>
     </div>
@@ -169,4 +172,19 @@
             background: #fff;
         }
     </style>
+@stop
+
+@section('js')
+    <script>
+        console.log('Módulo de gestión de aspirantes cargado');
+
+        // Botón de validación SenaSofiaPlus
+        document.getElementById('btn-validar-sofia').addEventListener('click', function() {
+            // Aquí irá el script de validación cuando lo proporciones
+            console.log('Iniciando validación SenaSofiaPlus...');
+
+            // Por ahora, mostrar un mensaje de ejemplo
+            alert('Funcionalidad de validación SenaSofiaPlus - Script pendiente de implementar');
+        });
+    </script>
 @stop
