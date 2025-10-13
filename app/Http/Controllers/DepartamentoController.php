@@ -2,11 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Departamento;
+use App\Services\UbicacionService;
 use Illuminate\Http\Request;
 
 class DepartamentoController extends Controller
 {
+    protected UbicacionService $ubicacionService;
+
+    public function __construct(UbicacionService $ubicacionService)
+    {
+        $this->ubicacionService = $ubicacionService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -16,21 +23,18 @@ class DepartamentoController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Carga departamentos activos
      */
     public function cargarDepartamentos()
     {
-        // DB::enableQueryLog();
-        $departamentos = Departamento::where('status', 1)->get();
+        $departamentos = \App\Models\Departamento::where('status', 1)->get();
         return response()->json(['success' => true, 'departamentos' => $departamentos], 200);
-        // dd(DB::getQueryLog());
     }
+
     public function apiCargarDepartamentos()
     {
-        // DB::enableQueryLog();
-        $departamentos = Departamento::where('status', 1)->get();
+        $departamentos = \App\Models\Departamento::where('status', 1)->get();
         return response()->json($departamentos, 200);
-        // dd(DB::getQueryLog());
     }
     public function create()
     {
@@ -79,9 +83,7 @@ class DepartamentoController extends Controller
 
     public function getByPais($paisId)
     {
-        $departamentos = Departamento::where('pais_id', $paisId)
-            ->where('status', 1)
-            ->get();
+        $departamentos = $this->ubicacionService->obtenerDepartamentosPorPais($paisId);
         return response()->json($departamentos);
     }
 }

@@ -2,30 +2,35 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\FichaService;
+use App\Services\FichaCaracterizacionValidationService;
+use App\Repositories\ConfiguracionRepository;
 use App\Models\FichaCaracterizacion;
-use App\Models\ProgramaFormacion;
-use App\Models\InstructorFichaCaracterizacion;
 use App\Http\Requests\StoreFichaCaracterizacionRequest;
 use App\Http\Requests\UpdateFichaCaracterizacionRequest;
 use App\Http\Requests\AsignarInstructoresRequest;
-use App\Services\FichaCaracterizacionValidationService;
-use App\Traits\ValidacionesSena;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 
 class FichaCaracterizacionController extends Controller
 {
-    use ValidacionesSena;
+    protected FichaService $fichaService;
+    protected FichaCaracterizacionValidationService $validationService;
+    protected ConfiguracionRepository $configuracionRepo;
+
     /**
      * Constructor del controlador.
-     * Aplica middleware de autenticación y permisos.
      */
-    public function __construct()
-    {
+    public function __construct(
+        FichaService $fichaService,
+        FichaCaracterizacionValidationService $validationService,
+        ConfiguracionRepository $configuracionRepo
+    ) {
         $this->middleware('auth');
+        $this->fichaService = $fichaService;
+        $this->validationService = $validationService;
+        $this->configuracionRepo = $configuracionRepo;
+
         $this->middleware('can:VER PROGRAMA DE CARACTERIZACION')->only(['index', 'show', 'create', 'edit']);
         $this->middleware('can:CREAR PROGRAMA DE CARACTERIZACION')->only(['store']);
         $this->middleware('can:EDITAR PROGRAMA DE CARACTERIZACION')->only(['update']);
@@ -44,49 +49,21 @@ class FichaCaracterizacionController extends Controller
      */
     public function index(Request $request)
     {
-        // try {
-            Log::info('Acceso al índice de fichas de caracterización', [
-                'user_id' => Auth::id(),
-                'filters' => $request->all(),
-                'timestamp' => now()
-            ]);
+        try {
+            $filtros = $request->only(['search', 'estado', 'programa_id', 'jornada_id', 'regional_id']);
+            $filtros['per_page'] = 10;
 
-            $query = FichaCaracterizacion::with([
-                'programaFormacion',
-                'instructor.persona',
-                'ambiente.piso.bloque',
-                'modalidadFormacion',
-                'sede',
-                'jornadaFormacion',
-                'aprendices'
-            ]);
+            $fichas = $this->fichaService->listarConFiltros($filtros);
 
-            // Aplicar filtros básicos si están presentes
-            if ($request->filled('search')) {
-                $searchTerm = $request->input('search');
-                $query->where('ficha', 'LIKE', "%{$searchTerm}%");
-            }
-
-            if ($request->filled('estado')) {
-                $query->where('status', $request->input('estado'));
-            }
-
-            $fichas = $query->orderBy('id', 'desc')->paginate(10);
-
-            // Obtener datos para filtros avanzados
-            $programas = ProgramaFormacion::orderBy('nombre', 'asc')->get();
+            // Obtener datos para filtros (con caché)
+            $programas = $this->configuracionRepo->obtenerProgramasActivos();
             $instructores = \App\Models\Instructor::with('persona')->orderBy('id', 'desc')->get();
             $ambientes = \App\Models\Ambiente::with('piso.bloque')->orderBy('title', 'asc')->get();
             $sedes = \App\Models\Sede::orderBy('sede', 'asc')->get();
             $modalidades = \App\Models\Parametro::whereHas('parametrosTemas', function($query) {
                 $query->where('tema_id', 5);
-            })->orderBy('name', 'asc')->get(); // MODALIDADES DE FORMACION (tema_id = 5)
+            })->orderBy('name', 'asc')->get();
             $jornadas = \App\Models\JornadaFormacion::orderBy('jornada', 'asc')->get();
-
-            Log::info('Fichas de caracterización cargadas exitosamente', [
-                'total_fichas' => $fichas->total(),
-                'user_id' => Auth::id()
-            ]);
 
             return view('fichas.index', compact('fichas', 'programas', 'instructores', 'ambientes', 'sedes', 'modalidades', 'jornadas'))
                 ->with('filters', $request->all());
