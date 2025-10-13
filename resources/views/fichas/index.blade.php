@@ -5,36 +5,15 @@
 @endsection
 
 @section('content_header')
-    <section class="content-header dashboard-header py-4">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 d-flex align-items-center">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="fas fa-file-alt text-white fa-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-0 text-gray-800">Fichas de Caracterización</h1>
-                        <p class="text-muted mb-0 font-weight-light">Gestión de fichas de caracterización del SENA</p>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
-                                <a href="{{ url('/') }}" class="link_right_header">
-                                    <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-file-alt"></i> Fichas de Caracterización
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header 
+        icon="fa-file-alt" 
+        title="Fichas de Caracterización"
+        subtitle="Gestión de fichas de caracterización del SENA"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => url('/'), 'icon' => 'fa-home'],
+            ['label' => 'Fichas de Caracterización', 'active' => true, 'icon' => 'fa-file-alt']
+        ]"
+    />
 @endsection
 
 @section('content')
@@ -70,38 +49,24 @@
                         </div>
                     @endcan
 
-                    <div class="card shadow-sm no-hover">
-                        <div class="card-header bg-white py-3 d-flex align-items-center">
-                            <h6 class="m-0 font-weight-bold text-primary d-flex flex-grow-1">Lista de Fichas de Caracterización</h6>
-                            <div class="input-group w-25">
-                                <form action="{{ route('fichaCaracterizacion.index') }}" method="GET" class="input-group">
-                                    <input type="text" name="search" id="searchFicha"
-                                        class="form-control form-control-sm" placeholder="Buscar ficha..."
-                                        value="{{ request('search') }}" autocomplete="off">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary btn-sm" type="submit">
-                                            <i class="fas fa-search"></i>
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-borderless table-striped mb-0">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th class="px-4 py-3" style="width: 5%">#</th>
-                                            <th class="px-4 py-3" style="width: 15%">Ficha</th>
-                                            <th class="px-4 py-3" style="width: 25%">Programa</th>
-                                            <th class="px-4 py-3" style="width: 20%">Instructor Líder</th>
-                                            <th class="px-4 py-3" style="width: 15%">Sede</th>
-                                            <th class="px-4 py-3" style="width: 10%">Estado</th>
-                                            <th class="px-4 py-3" style="width: 10%">Aprendices</th>
-                                            <th class="px-4 py-3 text-center" style="width: 10%">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="fichasTableBody">
+                    <x-data-table 
+                        title="Lista de Fichas de Caracterización"
+                        searchable="true"
+                        searchAction="{{ route('fichaCaracterizacion.index') }}"
+                        searchPlaceholder="Buscar ficha..."
+                        searchValue="{{ request('search') }}"
+                        :columns="[
+                            ['label' => '#', 'width' => '5%'],
+                            ['label' => 'Ficha', 'width' => '15%'],
+                            ['label' => 'Programa', 'width' => '25%'],
+                            ['label' => 'Instructor Líder', 'width' => '20%'],
+                            ['label' => 'Sede', 'width' => '15%'],
+                            ['label' => 'Estado', 'width' => '10%'],
+                            ['label' => 'Aprendices', 'width' => '10%'],
+                            ['label' => 'Acciones', 'width' => '10%', 'class' => 'text-center']
+                        ]"
+                        :pagination="$fichas->links()"
+                    >
                                         @forelse ($fichas as $ficha)
                                             <tr>
                                                 <td class="px-4">{{ $loop->iteration }}</td>
@@ -192,17 +157,7 @@
                                                 </td>
                                             </tr>
                                         @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="card-footer bg-white">
-                            <div class="float-right">
-                                {{ $fichas->links() }}
-                            </div>
-                        </div>
-                    </div>
+                    </x-data-table>
                 </div>
             </div>
         </div>

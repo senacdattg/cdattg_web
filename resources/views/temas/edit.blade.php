@@ -5,41 +5,12 @@
 @endsection
 
 @section('content_header')
-    <section class="content-header dashboard-header py-4">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 d-flex align-items-center">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="fas fa-cogs text-white fa-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-0 text-gray-800">Tema</h1>
-                        <p class="text-muted mb-0 font-weight-light">Edición del tema</p>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
-                                    <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('tema.index') }}" class="link_right_header">
-                                    <i class="fas fa-fw fa-paint-brush"></i> Tema
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-edit"></i> Editar tema
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header 
+        icon="fa-cogs" 
+        title="Tema"
+        subtitle="Edición del tema"
+        :breadcrumb="[['label' => 'Tema', 'url' => '{{ route('tema.index') }}', 'icon' => 'fa-fw fa-paint-brush'], ['label' => 'Editar tema', 'icon' => 'fa-edit', 'active' => true]]"
+    />
 @endsection
 
 @section('content')

@@ -42,46 +42,12 @@
 @endsection
 
 @section('content_header')
-    <section class="content-header dashboard-header py-4">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 d-flex align-items-center">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="fas fa-tasks text-white fa-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-0 text-gray-800">Gestionar Resultados</h1>
-                        <p class="text-muted mb-0 font-weight-light">{{ $competencia->codigo }} - {{ Str::limit($competencia->nombre, 50) }}</p>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
-                                <a href="{{ url('/') }}" class="link_right_header">
-                                    <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('competencias.index') }}" class="link_right_header">
-                                    <i class="fas fa-clipboard-list"></i> Competencias
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('competencias.show', $competencia->id) }}" class="link_right_header">
-                                    <i class="fas fa-info-circle"></i> Detalle
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-tasks"></i> Gestionar Resultados
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header 
+        icon="fa-tasks" 
+        title="Gestionar Resultados"
+        subtitle="{{ $competencia->codigo }} - {{ Str::limit($competencia->nombre, 50) }}"
+        :breadcrumb="[['label' => 'Detalle', 'url' => '{{ route('competencias.show', $competencia->id) }}', 'icon' => 'fa-info-circle'], ['label' => 'Gestionar Resultados', 'icon' => 'fa-tasks', 'active' => true]]"
+    />
 @endsection
 
 @section('content')

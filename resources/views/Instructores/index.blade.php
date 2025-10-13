@@ -5,36 +5,15 @@
 @endsection
 
 @section('content_header')
-    <section class="content-header dashboard-header py-4">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 d-flex align-items-center">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="fas fa-chalkboard-teacher text-white fa-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-0 text-gray-800">Instructores</h1>
-                        <p class="text-muted mb-0 font-weight-light">Gestión de instructores del sistema</p>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
-                                    <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-chalkboard-teacher"></i> Instructores
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header 
+        icon="fa-chalkboard-teacher" 
+        title="Instructores"
+        subtitle="Gestión de instructores del sistema"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'],
+            ['label' => 'Instructores', 'active' => true, 'icon' => 'fa-chalkboard-teacher']
+        ]"
+    />
 @endsection
 
 @section('content')
@@ -54,36 +33,22 @@
                         </a>
                     @endcan
 
-                    <div class="card shadow-sm no-hover">
-                        <div class="card-header bg-white py-3 d-flex align-items-center">
-                            <h6 class="m-0 font-weight-bold text-primary d-flex flex-grow-1">Lista de Instructores</h6>
-                            <div class="input-group w-25">
-                                <form action="{{ route('instructor.index') }}" method="GET" class="input-group">
-                                    <input type="text" name="search" id="searchInstructor"
-                                        class="form-control form-control-sm" placeholder="Buscar instructor..."
-                                        value="{{ request('search') }}" autocomplete="off">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary btn-sm" type="submit">
-                                            <i class="fas fa-search"></i>
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-borderless table-striped mb-0">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th class="px-4 py-3" style="width: 5%">#</th>
-                                            <th class="px-4 py-3" style="width: 25%">Nombre</th>
-                                            <th class="px-4 py-3" style="width: 15%">Documento</th>
-                                            <th class="px-4 py-3" style="width: 20%">Especialidades</th>
-                                            <th class="px-4 py-3" style="width: 10%">Estado</th>
-                                            <th class="px-4 py-3 text-center" style="width: 25%">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+                    <x-data-table 
+                        title="Lista de Instructores"
+                        searchable="true"
+                        searchAction="{{ route('instructor.index') }}"
+                        searchPlaceholder="Buscar instructor..."
+                        searchValue="{{ request('search') }}"
+                        :columns="[
+                            ['label' => '#', 'width' => '5%'],
+                            ['label' => 'Nombre', 'width' => '25%'],
+                            ['label' => 'Documento', 'width' => '15%'],
+                            ['label' => 'Especialidades', 'width' => '20%'],
+                            ['label' => 'Estado', 'width' => '10%'],
+                            ['label' => 'Acciones', 'width' => '25%', 'class' => 'text-center']
+                        ]"
+                        :pagination="$instructores->links()"
+                    >
                                         @forelse ($instructores as $instructor)
                                             <tr>
                                                 <td class="px-4">{{ $loop->iteration }}</td>
@@ -179,17 +144,7 @@
                                                 </td>
                                             </tr>
                                         @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="card-footer bg-white">
-                            <div class="float-right">
-                                {{ $instructores->links() }}
-                            </div>
-                        </div>
-                    </div>
+                    </x-data-table>
                 </div>
             </div>
         </div>

@@ -39,36 +39,12 @@
 @endsection
 
 @section('content_header')
-    <section class="content-header dashboard-header py-4">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 d-flex align-items-center">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="fas fa-book-open text-white fa-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-0 text-gray-800">Guías de Aprendizaje</h1>
-                        <p class="text-muted mb-0 font-weight-light">Gestión de guías de aprendizaje del SENA</p>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
-                                <a href="{{ url('/') }}" class="link_right_header">
-                                    <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-book-open"></i> Guías de Aprendizaje
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header 
+        icon="fa-book-open" 
+        title="Guías de Aprendizaje"
+        subtitle="Gestión de guías de aprendizaje del SENA"
+        :breadcrumb="[['label' => 'Inicio', 'url' => '{{ url('/') }}', 'icon' => 'fa-home'], ['label' => 'Guías de Aprendizaje', 'icon' => 'fa-book-open', 'active' => true]]"
+    />
 @endsection
 
 @section('content')

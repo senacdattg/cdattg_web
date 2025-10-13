@@ -31,41 +31,12 @@
 @endsection
 
 @section('content_header')
-<section class="content-header dashboard-header py-4">
-    <div class="container-fluid">
-        <div class="row align-items-center">
-            <div class="col-12 col-md-6 d-flex align-items-center">
-                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                    style="width: 48px; height: 48px;">
-                    <i class="fas fa-user-plus text-white fa-lg"></i>
-                </div>
-                <div>
-                    <h1 class="h3 mb-0 text-gray-800">Crear Aprendiz</h1>
-                    <p class="text-muted mb-0 font-weight-light">Registrar nuevo aprendiz</p>
-                </div>    
-            </div>
-            <div class="col-sm-6">
-                <nav aria-label="breadcrumb">
-                    <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                        <li class="breadcrumb-item">
-                            <a href="{{ route('verificarLogin') }}" class="link_right_header">
-                                <i class="fas fa-home"></i> Inicio
-                            </a>
-                        </li>
-                        <li class="breadcrumb-item">
-                            <a href="{{ route('aprendices.index') }}" class="link_right_header">
-                                <i class="fas fa-user-graduate"></i> Aprendices
-                            </a>
-                        </li>
-                        <li class="breadcrumb-item active" aria-current="page">
-                            Crear
-                        </li>
-                    </ol>
-                </nav>
-            </div>
-        </div>
-    </div>
-</section>
+    <x-page-header 
+        icon="fa-user-plus" 
+        title="Crear Aprendiz"
+        subtitle="Registrar nuevo aprendiz"
+        :breadcrumb="[]"
+    />
 @endsection
 
 @section('content')

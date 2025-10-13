@@ -5,36 +5,12 @@
 @endsection
 
 @section('content_header')
-    <section class="content-header dashboard-header py-4">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 d-flex align-items-center">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="fas fa-fw fa-paint-brush text-white"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-0 text-gray-800">Fichas de formación</h1>
-                        <p class="text-muted mb-0 font-weight-light">Gestión de fichas de formación</p>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
-                                    <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-fw fa-paint-brush"></i> Fichas de formación
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header 
+        icon="fa-home" 
+        title="Fichas de formación"
+        subtitle="Gestión de fichas de formación"
+        :breadcrumb="[['label' => 'Inicio', 'url' => '{{ route('verificarLogin') }}', 'icon' => 'fa-home'], ['label' => 'Fichas de formación', 'icon' => 'fa-fw fa-paint-brush', 'active' => true]]"
+    />
 @endsection
 
 @section('content')
