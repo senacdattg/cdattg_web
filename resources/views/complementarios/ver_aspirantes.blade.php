@@ -58,6 +58,7 @@
                             <th>Programa de Formación</th>
                             <th>Fecha Solicitud</th>
                             <th>Estado</th>
+                            <th>SenaSofiaPlus</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -80,6 +81,7 @@
                                     <span class="badge bg-secondary">DESCONOCIDO</span>
                                 @endif
                             </td>
+                            <td><span class="badge {{ $aspirante->persona->estado_sofia_badge_class }}">{{ $aspirante->persona->estado_sofia_label }}</span></td>
                             <td>
                                 <a href="{{ route('programas-complementarios.perfil-aspirante', $aspirante->id) }}" class="btn btn-info btn-sm me-1" title="Ver"><i class="fas fa-eye"></i></a>
                                 <a href="#" class="btn btn-warning btn-sm me-1" title="Editar"><i class="fas fa-edit"></i></a>
@@ -88,7 +90,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="text-center">
+                            <td colspan="8" class="text-center">
                                 <div class="alert alert-info mb-0">
                                     <i class="fas fa-info-circle me-2"></i>
                                     No hay aspirantes registrados para este programa.

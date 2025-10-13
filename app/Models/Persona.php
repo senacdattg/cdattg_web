@@ -34,6 +34,7 @@ class Persona extends Model
         'municipio_id',
         'direccion',
         'status',
+        'estado_sofia',
         'user_create_id',
         'user_edit_id',
     ];
@@ -198,6 +199,36 @@ class Persona extends Model
     public function getEmailAttribute($value)
     {
         return strtoupper($value);
+    }
+
+    /**
+     * Accesor para obtener la etiqueta del estado de SenaSofiaPlus.
+     *
+     * @return string
+     */
+    public function getEstadoSofiaLabelAttribute()
+    {
+        return match($this->estado_sofia) {
+            0 => 'No registrado',
+            1 => 'Registrado',
+            2 => 'Requiere cambio de cédula',
+            default => 'Desconocido'
+        };
+    }
+
+    /**
+     * Accesor para obtener la clase CSS del badge del estado de SenaSofiaPlus.
+     *
+     * @return string
+     */
+    public function getEstadoSofiaBadgeClassAttribute()
+    {
+        return match($this->estado_sofia) {
+            0 => 'bg-secondary',
+            1 => 'bg-success',
+            2 => 'bg-warning',
+            default => 'bg-dark'
+        };
     }
 
     public function userCreatedBy()
