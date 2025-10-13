@@ -29,7 +29,6 @@
             </div>
         @endif
 
-
         <div class="row">
             <div class="col-md-8">
                 <div class="card shadow-sm">
@@ -162,21 +161,25 @@
 
         // Validación del formulario
         document.getElementById('formDocumentos').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
             // Validar que se haya seleccionado un archivo
             if (!documentoInput.files.length) {
-                e.preventDefault();
                 alert('Debe seleccionar un archivo PDF.');
                 return;
             }
 
             // Validar privacidad
             if (!privacidadCheckbox.checked) {
-                e.preventDefault();
                 alert('Debe aceptar la política de privacidad para continuar.');
                 return;
             }
 
-            // El formulario se enviará al servidor
+            // Deshabilitar botón y mostrar estado mientras se envía
+            btnEnviar.disabled = true;
+            btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Enviando...';
+            // No llamar preventDefault: permitir el envío al backend
+
         });
     </script>
 </body>

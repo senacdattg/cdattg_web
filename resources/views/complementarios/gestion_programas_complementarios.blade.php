@@ -337,17 +337,6 @@
     <script>
         console.log("AdminLTE programs: bootstrapping");
         document.addEventListener('DOMContentLoaded', function() {
-<<<<<<< HEAD
-            console.log("DOM loaded for programs view");
-            
-            // Ensure bootstrap JS is loaded (Bootstrap 5)
-            if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                console.log("Bootstrap modal available");
-            } else {@section('js')
-    <script>
-        console.log("AdminLTE programs: bootstrapping");
-        document.addEventListener('DOMContentLoaded', function() {
-<<<<<<< HEAD
             console.log("DOM loaded for programs view");
             
             // Ensure jQuery and Bootstrap modal are loaded
@@ -405,98 +394,6 @@
                         headers: {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                         }
-<<<<<<< HEAD
-                    }
-                    newProgramForm.reset();
-=======
-            const newProgramForm = document.getElementById('newProgramForm');
-
-            if (newProgramForm) {
-                newProgramForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-
-                    // Aquí iría la lógica para guardar el programa
-                    // Por ahora, mostramos un mensaje de éxito y cerramos la modal
-                    alert('Programa guardado exitosamente');
-
-                    // Cerrar la modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('newProgramModal'));
-                    modal.hide();
-
-                    // Limpiar el formulario
-                    newProgramForm.reset();
-
-                    // Aquí podrías recargar la página o actualizar la lista de programas
-                    // window.location.reload();
-                });
-            }
-                console.warn("Bootstrap modal not available. Bootstrap 5 JS may not be loaded.");
-            }
-
-            // Store reference to the button that opens the modal
-            let newProgramButton = null;
-
-            // Log button click for debugging and store reference
-            const newProgramButtons = document.querySelectorAll('[data-bs-target="#newProgramModal"]');
-            if (newProgramButtons.length > 0) {
-                newProgramButton = newProgramButtons[0];
-                newProgramButton.addEventListener('click', function() {
-                    console.log('Nuevo Programa button clicked');
-                });
-            }
-
-            // Handle modal focus management
-            const newProgramModalEl = document.getElementById('newProgramModal');
-            if (newProgramModalEl && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                // Store the element that had focus before opening the modal
-                let previousActiveElement = null;
-                
-                newProgramModalEl.addEventListener('show.bs.modal', function() {
-                    previousActiveElement = document.activeElement;
-                });
-
-                newProgramModalEl.addEventListener('hidden.bs.modal', function() {
-                    // Restore focus to the element that opened the modal
-                    if (newProgramButton && typeof newProgramButton.focus === 'function') {
-                        newProgramButton.focus();
-                    } else if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
-                        previousActiveElement.focus();
-                    }
-                    
-                    // Ensure no element inside the hidden modal retains focus
-                    const focusedElement = document.activeElement;
-                    if (focusedElement && newProgramModalEl.contains(focusedElement)) {
-                        focusedElement.blur();
-                    }
-                });
-
-                // Prevent focus from being trapped in hidden modal
-                newProgramModalEl.addEventListener('keydown', function(e) {
-                    if (e.key === 'Tab' && !newProgramModalEl.classList.contains('show')) {
-                        e.preventDefault();
-                    }
-                });
-            }
-
-            // Handle form submission
-            const newProgramForm = document.getElementById('newProgramForm');
-            if (newProgramForm) {
-                newProgramForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    
-                    alert('Programa guardado exitosamente');
-                    
-                    // Close modal and handle focus properly
-                    if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-                        const modal = bootstrap.Modal.getInstance(document.getElementById('newProgramModal'));
-                        if (modal) {
-                            modal.hide();
-                            // Focus will be handled by the hidden.bs.modal event
-                        }
-                    }
-                    newProgramForm.reset();
-
-=======
                     })
                     .then(response => response.json())
                     .then(data => {
@@ -511,7 +408,6 @@
                         console.error('Error:', error);
                         alert('An error occurred while saving the program.');
                     });
->>>>>>> ac5de14 (Configurar vista de complementarios ofertados y conectarla con database)
                 });
             }
 
