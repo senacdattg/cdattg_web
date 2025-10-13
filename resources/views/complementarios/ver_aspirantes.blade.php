@@ -179,12 +179,77 @@
         console.log('Módulo de gestión de aspirantes cargado');
 
         // Botón de validación SenaSofiaPlus
-        document.getElementById('btn-validar-sofia').addEventListener('click', function() {
-            // Aquí irá el script de validación cuando lo proporciones
-            console.log('Iniciando validación SenaSofiaPlus...');
+        document.getElementById('btn-validar-sofia').addEventListener('click', async function() {
+            const button = this;
+            const originalText = button.innerHTML;
 
-            // Por ahora, mostrar un mensaje de ejemplo
-            alert('Funcionalidad de validación SenaSofiaPlus - Script pendiente de implementar');
+            // Deshabilitar botón y mostrar loading
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Validando...';
+
+            try {
+                // Obtener el ID del programa desde la URL
+                const urlParts = window.location.pathname.split('/');
+                const programaId = urlParts[urlParts.length - 1];
+
+                // Hacer la petición AJAX
+                const response = await fetch(`/programas-complementarios/${programaId}/validar-sofia`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Mostrar mensaje de éxito
+                    showAlert('success', 'Validación completada exitosamente');
+
+                    // Recargar la página para mostrar los cambios
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    // Mostrar mensaje de error
+                    showAlert('error', data.message || 'Error durante la validación');
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('error', 'Error de conexión. Intente nuevamente.');
+            } finally {
+                // Restaurar botón
+                button.disabled = false;
+                button.innerHTML = originalText;
+            }
         });
+
+        // Función para mostrar alertas
+        function showAlert(type, message) {
+            // Crear elemento de alerta
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+            alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            alertDiv.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            // Agregar al DOM
+            document.body.appendChild(alertDiv);
+
+            // Auto-remover después de 5 segundos
+            setTimeout(() => {
+                if (alertDiv.parentNode) {
+                    alertDiv.remove();
+                }
+            }, 5000);
+        }
     </script>
+
+    <!-- CSRF Token para AJAX -->
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 @stop
