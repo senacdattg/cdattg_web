@@ -74,8 +74,9 @@
         }
     </style>
     
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
+@section('js')
+    @vite(['resources/js/pages/gestion-especializada.js'])
+@endsection
         // Función para confirmar asignación de especialidad principal
         function confirmarAsignacionPrincipal(especialidadNombre) {
             return Swal.fire({
@@ -437,5 +438,5 @@
 @endsection
 
 @section('js')
-    @vite(['resources/js/pages/resources-views\Instructores\gestionar-especialidades.js'])
+    @vite(['resources/js/pages/gestion-especializada.js'])
 @endsection

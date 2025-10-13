@@ -86,19 +86,7 @@
     </div>
 
     @push('js')
-    <script>
-        // Función para mostrar/ocultar detalles de errores en logs
-        function toggleDetallesError(logId) {
-            const detalles = document.getElementById(`detalles-error-${logId}`);
-            if (detalles) {
-                if (detalles.style.display === 'none') {
-                    detalles.style.display = 'block';
-                } else {
-                    detalles.style.display = 'none';
-                }
-            }
-        }
-    </script>
+        @vite(['resources/js/modules/historial-asignaciones.js'])
     @endpush
 @endif
 

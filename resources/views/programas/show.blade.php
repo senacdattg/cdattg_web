@@ -159,17 +159,5 @@
 @endsection
 
 @section('js')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    $(document).ready(function() {
-        // Confirmar eliminación con diseño unificado
-        $('.formulario-eliminar').on('submit', function(e) {
-            e.preventDefault();
-            const form = $(this);
-            const nombre = '{{ $programa->nombre }}';
-            
-            confirmDelete(nombre, form.attr('action'), form[0]);
-        });
-    });
-</script>
+    @vite(['resources/js/pages/detalle-generico.js'])
 @endsection
