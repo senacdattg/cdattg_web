@@ -344,21 +344,28 @@ class ComplementarioController extends Controller
      */
     public function subirDocumento(Request $request, $id)
     {
-        Log::info('subirDocumento method reached', [
+        Log::info('=== INICIO SUBIR DOCUMENTO ===', [
             'request_data' => $request->all(),
-            'files' => $request->files->all()
+            'files' => $request->files->all(),
+            'aspirante_id_from_request' => $request->aspirante_id,
+            'has_file' => $request->hasFile('documento_identidad'),
+            'all_inputs' => $request->all()
         ]);
 
         // Validar el archivo
+        Log::info('Antes de validación - campos recibidos:', $request->all());
         $request->validate([
-            'documento_identidad' => 'required|file|mimes:pdf|max:5120', // 5MB mรกximo
+            'documento_identidad' => 'required|file|mimes:pdf|max:5120', // 5MB máximo
             'aspirante_id' => 'required|exists:aspirantes_complementarios,id',
-            'acepto_privacidad' => 'required|accepted',
+            'acepto_privacidad' => 'required',
         ]);
+        Log::info('Después de validación - validación pasó');
 
         try {
             // Obtener el aspirante
+            Log::info('Buscando aspirante con ID: ' . $request->aspirante_id);
             $aspirante = AspiranteComplementario::findOrFail($request->aspirante_id);
+            Log::info('Aspirante encontrado: ' . $aspirante->id);
             
             // Procesar el archivo y subirlo a Google Drive
             if ($request->hasFile('documento_identidad')) {
