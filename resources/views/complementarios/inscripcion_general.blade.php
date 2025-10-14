@@ -1,259 +1,334 @@
 @extends('layout.master-layout-registro')
 @section('content')
-    <div class="register-box">
-        <div class="card card-outline card-primary">
-            <div class="card-header text-center">
-                <h1><b>Inscripción General</b></h1>
-                <p class="text-muted">Registro de datos personales y caracterización</p>
+<style>
+    .form-section {
+        margin-bottom: 2rem;
+    }
+    .section-title {
+        color: #007bff;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 2px solid #e9ecef;
+    }
+    .mobile-form-group {
+        margin-bottom: 1.5rem;
+    }
+    .mobile-label {
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+        display: block;
+    }
+    .mobile-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+        font-size: 1rem;
+        background-color: #fff;
+    }
+    .mobile-input:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    .mobile-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: 0.375rem;
+        font-size: 1rem;
+        background-color: #fff;
+        cursor: pointer;
+    }
+    .mobile-select:focus {
+        outline: none;
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    .input-icon {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        z-index: 5;
+    }
+    .input-wrapper {
+        position: relative;
+    }
+    .checkbox-group {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+    }
+    .checkbox-group input[type="checkbox"] {
+        margin-top: 0.2rem;
+        transform: scale(1.2);
+    }
+    .checkbox-group label {
+        font-size: 0.85rem;
+        line-height: 1.4;
+        margin-bottom: 0;
+        flex: 1;
+    }
+    .submit-btn {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+        color: white;
+        border: none;
+        border-radius: 0.5rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+    }
+    .alert-mobile {
+        border-radius: 0.5rem;
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.95rem;
+    }
+    @media (max-width: 768px) {
+        .container {
+            padding-left: 15px;
+            padding-right: 15px;
+        }
+        .mobile-form-group {
+            margin-bottom: 1.2rem;
+        }
+        .section-title {
+            font-size: 1.2rem;
+        }
+    }
+</style>
+
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <!-- Header -->
+            <div class="text-center mb-4">
+                <h2 class="text-primary font-weight-bold mb-2">
+                    <i class="fas fa-user-plus mr-2"></i>Inscripción General
+                </h2>
+                <p class="text-muted mb-0">Registro de datos personales y caracterización</p>
             </div>
-            <div class="card-body">
-                @if(session('success'))
-                    <div class="alert alert-success alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        <h5><i class="icon fas fa-check"></i> ¡Éxito!</h5>
-                        {{ session('success') }}
-                    </div>
-                @endif
 
-                @if(session('error'))
-                    <div class="alert alert-danger alert-dismissible">
-                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
-                        <h5><i class="icon fas fa-ban"></i> Error!</h5>
-                        {{ session('error') }}
-                    </div>
-                @endif
+            <!-- Alertas -->
+            @if(session('success'))
+                <div class="alert alert-success alert-mobile">
+                    <i class="fas fa-check-circle mr-2"></i>{{ session('success') }}
+                </div>
+            @endif
 
-                <form action="{{ route('inscripcion.procesar') }}" method="post">
-                    @csrf
+            @if(session('error'))
+                <div class="alert alert-danger alert-mobile">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>{{ session('error') }}
+                </div>
+            @endif
 
-                    {{-- Tipo y número de documento --}}
+            <form action="{{ route('inscripcion.procesar') }}" method="post" id="inscripcionForm">
+                @csrf
+
+                <!-- Documento de Identidad -->
+                <div class="form-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-id-card mr-2"></i>Documento de Identidad
+                    </h4>
                     <div class="row">
-                        <div class="col-md-6">
-                            <label for="tipo_documento">Tipo de Documento *</label>
-                            <div class="input-group mb-3">
-                                <select class="form-control" name="tipo_documento" required>
+                        <div class="col-12 col-md-6 mobile-form-group">
+                            <label class="mobile-label">Tipo de Documento *</label>
+                            <div class="input-wrapper">
+                                <select class="mobile-select" name="tipo_documento" required>
                                     <option value="">Seleccione...</option>
                                     <option value="1" {{ old('tipo_documento') == '1' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
                                     <option value="2" {{ old('tipo_documento') == '2' ? 'selected' : '' }}>Tarjeta de Identidad</option>
                                     <option value="3" {{ old('tipo_documento') == '3' ? 'selected' : '' }}>Cédula de Extranjería</option>
                                     <option value="4" {{ old('tipo_documento') == '4' ? 'selected' : '' }}>Pasaporte</option>
                                 </select>
-                                <div class="input-group-append">
-                                    <div class="input-group-text">
-                                        <span class="fas fa-id-card"></span>
-                                    </div>
-                                </div>
+                                <i class="fas fa-chevron-down input-icon"></i>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <label for="numero_documento">Número de Documento *</label>
-                            <div class="input-group mb-3">
-                                <input type="text" class="form-control" value="{{ old('numero_documento') }}" name="numero_documento" placeholder="Número de documento" required>
-                                <div class="input-group-append">
-                                    <div class="input-group-text">
-                                        <span class="fas fa-hashtag"></span>
-                                    </div>
-                                </div>
+                        <div class="col-12 col-md-6 mobile-form-group">
+                            <label class="mobile-label">Número de Documento *</label>
+                            <div class="input-wrapper">
+                                <input type="text" class="mobile-input" value="{{ old('numero_documento') }}" name="numero_documento" placeholder="Número de documento" required inputmode="numeric">
+                                <i class="fas fa-hashtag input-icon"></i>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    {{-- Nombres --}}
+                <!-- Nombres y Apellidos -->
+                <div class="form-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-user mr-2"></i>Nombres y Apellidos
+                    </h4>
                     <div class="row">
-                        <div class="col-md-6">
-                            <label for="primer_nombre">Primer Nombre *</label>
-                            <div class="input-group mb-3">
-                                <input type="text" class="form-control" value="{{ old('primer_nombre') }}" placeholder="Primer Nombre" name="primer_nombre" required>
-                                <div class="input-group-append">
-                                    <div class="input-group-text">
-                                        <span class="fas fa-user"></span>
-                                    </div>
-                                </div>
+                        <div class="col-12 col-md-6 mobile-form-group">
+                            <label class="mobile-label">Primer Nombre *</label>
+                            <div class="input-wrapper">
+                                <input type="text" class="mobile-input" value="{{ old('primer_nombre') }}" placeholder="Primer Nombre" name="primer_nombre" required>
+                                <i class="fas fa-user input-icon"></i>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <label for="segundo_nombre">Segundo Nombre</label>
-                            <div class="input-group mb-3">
-                                <input type="text" class="form-control" value="{{ old('segundo_nombre') }}" placeholder="Segundo Nombre" name="segundo_nombre">
-                                <div class="input-group-append">
-                                    <div class="input-group-text">
-                                        <span class="fas fa-user"></span>
-                                    </div>
-                                </div>
+                        <div class="col-12 col-md-6 mobile-form-group">
+                            <label class="mobile-label">Segundo Nombre</label>
+                            <div class="input-wrapper">
+                                <input type="text" class="mobile-input" value="{{ old('segundo_nombre') }}" placeholder="Segundo Nombre" name="segundo_nombre">
+                                <i class="fas fa-user input-icon"></i>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 mobile-form-group">
+                            <label class="mobile-label">Primer Apellido *</label>
+                            <div class="input-wrapper">
+                                <input type="text" class="mobile-input" value="{{ old('primer_apellido') }}" placeholder="Primer Apellido" name="primer_apellido" required>
+                                <i class="fas fa-user input-icon"></i>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6 mobile-form-group">
+                            <label class="mobile-label">Segundo Apellido</label>
+                            <div class="input-wrapper">
+                                <input type="text" class="mobile-input" value="{{ old('segundo_apellido') }}" placeholder="Segundo Apellido" name="segundo_apellido">
+                                <i class="fas fa-user input-icon"></i>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    {{-- Apellidos --}}
+                <!-- Información Personal -->
+                <div class="form-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-info-circle mr-2"></i>Información Personal
+                    </h4>
                     <div class="row">
-                        <div class="col-md-6">
-                            <label for="primer_apellido">Primer Apellido *</label>
-                            <div class="input-group mb-3">
-                                <input type="text" class="form-control" value="{{ old('primer_apellido') }}" placeholder="Primer Apellido" name="primer_apellido" required>
-                                <div class="input-group-append">
-                                    <div class="input-group-text">
-                                        <span class="fas fa-user"></span>
-                                    </div>
-                                </div>
+                        <div class="col-12 col-md-6 mobile-form-group">
+                            <label class="mobile-label">Fecha de Nacimiento *</label>
+                            <div class="input-wrapper">
+                                <input type="date" class="mobile-input" value="{{ old('fecha_nacimiento') }}" name="fecha_nacimiento" required>
+                                <i class="fas fa-calendar input-icon"></i>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <label for="segundo_apellido">Segundo Apellido</label>
-                            <div class="input-group mb-3">
-                                <input type="text" class="form-control" value="{{ old('segundo_apellido') }}" placeholder="Segundo Apellido" name="segundo_apellido">
-                                <div class="input-group-append">
-                                    <div class="input-group-text">
-                                        <span class="fas fa-user"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Fecha nacimiento y género --}}
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label for="fecha_nacimiento">Fecha de Nacimiento *</label>
-                            <div class="input-group mb-3">
-                                <input type="date" class="form-control" value="{{ old('fecha_nacimiento') }}" name="fecha_nacimiento" required>
-                                <div class="input-group-append">
-                                    <div class="input-group-text">
-                                        <span class="fas fa-calendar"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <label for="genero">Género *</label>
-                            <div class="input-group mb-3">
-                                <select class="form-control" name="genero" required>
+                        <div class="col-12 col-md-6 mobile-form-group">
+                            <label class="mobile-label">Género *</label>
+                            <div class="input-wrapper">
+                                <select class="mobile-select" name="genero" required>
                                     <option value="">Seleccione...</option>
                                     <option value="1" {{ old('genero') == '1' ? 'selected' : '' }}>Masculino</option>
                                     <option value="2" {{ old('genero') == '2' ? 'selected' : '' }}>Femenino</option>
                                     <option value="3" {{ old('genero') == '3' ? 'selected' : '' }}>Otro</option>
                                     <option value="4" {{ old('genero') == '4' ? 'selected' : '' }}>Prefiero no decir</option>
                                 </select>
-                                <div class="input-group-append">
-                                    <div class="input-group-text">
-                                        <span class="fas fa-venus-mars"></span>
-                                    </div>
-                                </div>
+                                <i class="fas fa-chevron-down input-icon"></i>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    {{-- Teléfonos --}}
+                <!-- Contacto -->
+                <div class="form-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-phone mr-2"></i>Información de Contacto
+                    </h4>
                     <div class="row">
-                        <div class="col-md-6">
-                            <label for="telefono">Teléfono Fijo</label>
-                            <div class="input-group mb-3">
-                                <input type="tel" class="form-control" value="{{ old('telefono') }}" name="telefono" placeholder="Teléfono fijo">
-                                <div class="input-group-append">
-                                    <div class="input-group-text">
-                                        <span class="fas fa-phone"></span>
-                                    </div>
-                                </div>
+                        <div class="col-12 col-md-6 mobile-form-group">
+                            <label class="mobile-label">Teléfono Fijo</label>
+                            <div class="input-wrapper">
+                                <input type="tel" class="mobile-input" value="{{ old('telefono') }}" name="telefono" placeholder="Teléfono fijo" inputmode="tel">
+                                <i class="fas fa-phone input-icon"></i>
                             </div>
                         </div>
-                        <div class="col-md-6">
-                            <label for="celular">Celular *</label>
-                            <div class="input-group mb-3">
-                                <input type="tel" class="form-control" value="{{ old('celular') }}" name="celular" placeholder="Número de celular" required>
-                                <div class="input-group-append">
-                                    <div class="input-group-text">
-                                        <span class="fas fa-mobile-alt"></span>
-                                    </div>
-                                </div>
+                        <div class="col-12 col-md-6 mobile-form-group">
+                            <label class="mobile-label">Celular *</label>
+                            <div class="input-wrapper">
+                                <input type="tel" class="mobile-input" value="{{ old('celular') }}" name="celular" placeholder="Número de celular" required inputmode="tel">
+                                <i class="fas fa-mobile-alt input-icon"></i>
                             </div>
                         </div>
-                    </div>
-
-                    {{-- Email --}}
-                    <label for="email">Correo Electrónico *</label>
-                    <div class="input-group mb-3">
-                        <input type="email" class="form-control" value="{{ old('email') }}" placeholder="Correo electrónico" name="email" required>
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-envelope"></span>
+                        <div class="col-12 mobile-form-group">
+                            <label class="mobile-label">Correo Electrónico *</label>
+                            <div class="input-wrapper">
+                                <input type="email" class="mobile-input" value="{{ old('email') }}" placeholder="Correo electrónico" name="email" required inputmode="email">
+                                <i class="fas fa-envelope input-icon"></i>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    {{-- Ubicación --}}
+                <!-- Ubicación -->
+                <div class="form-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-map-marker-alt mr-2"></i>Ubicación
+                    </h4>
                     <div class="row">
-                        <div class="col-md-4">
-                            <label for="pais_id">País *</label>
-                            <div class="input-group mb-3">
-                                <select class="form-control" name="pais_id" id="pais_id" required>
+                        <div class="col-12 col-md-4 mobile-form-group">
+                            <label class="mobile-label">País *</label>
+                            <div class="input-wrapper">
+                                <select class="mobile-select" name="pais_id" id="pais_id" required>
                                     <option value="">Seleccione...</option>
                                     @foreach($paises as $pais)
                                         <option value="{{ $pais->id }}" {{ old('pais_id') == $pais->id ? 'selected' : '' }}>{{ $pais->pais }}</option>
                                     @endforeach
                                 </select>
-                                <div class="input-group-append">
-                                    <div class="input-group-text">
-                                        <span class="fas fa-globe"></span>
-                                    </div>
-                                </div>
+                                <i class="fas fa-chevron-down input-icon"></i>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <label for="departamento_id">Departamento *</label>
-                            <div class="input-group mb-3">
-                                <select class="form-control" name="departamento_id" id="departamento_id" required>
+                        <div class="col-12 col-md-4 mobile-form-group">
+                            <label class="mobile-label">Departamento *</label>
+                            <div class="input-wrapper">
+                                <select class="mobile-select" name="departamento_id" id="departamento_id" required>
                                     <option value="">Seleccione...</option>
                                     @foreach($departamentos as $departamento)
                                         <option value="{{ $departamento->id }}" {{ old('departamento_id') == $departamento->id ? 'selected' : '' }}>{{ $departamento->departamento }}</option>
                                     @endforeach
                                 </select>
-                                <div class="input-group-append">
-                                    <div class="input-group-text">
-                                        <span class="fas fa-map-marker"></span>
-                                    </div>
-                                </div>
+                                <i class="fas fa-chevron-down input-icon"></i>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <label for="municipio_id">Municipio *</label>
-                            <div class="input-group mb-3">
-                                <select class="form-control" name="municipio_id" id="municipio_id" required>
+                        <div class="col-12 col-md-4 mobile-form-group">
+                            <label class="mobile-label">Municipio *</label>
+                            <div class="input-wrapper">
+                                <select class="mobile-select" name="municipio_id" id="municipio_id" required>
                                     <option value="">Seleccione...</option>
                                 </select>
-                                <div class="input-group-append">
-                                    <div class="input-group-text">
-                                        <span class="fas fa-city"></span>
-                                    </div>
-                                </div>
+                                <i class="fas fa-chevron-down input-icon"></i>
+                            </div>
+                        </div>
+                        <div class="col-12 mobile-form-group">
+                            <label class="mobile-label">Dirección *</label>
+                            <div class="input-wrapper">
+                                <input type="text" class="mobile-input" value="{{ old('direccion') }}" name="direccion" placeholder="Dirección completa" required>
+                                <i class="fas fa-home input-icon"></i>
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    {{-- Dirección --}}
-                    <label for="direccion">Dirección *</label>
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" value="{{ old('direccion') }}" name="direccion" placeholder="Dirección completa" required>
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-home"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Caracterización --}}
-                    <hr>
-                    <h5><i class="fas fa-tags"></i> Caracterización</h5>
-                    <p class="text-muted">Seleccione las categorías que correspondan a su situación (opcional):</p>
+                <!-- Caracterización -->
+                <div class="form-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-tags mr-2"></i>Caracterización
+                    </h4>
+                    <p class="text-muted mb-3">Seleccione las categorías que correspondan a su situación (opcional):</p>
 
                     @foreach($categoriasConHijos as $categoria)
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h6 class="mb-0">{{ $categoria['nombre'] }}</h6>
+                        <div class="card mb-3 border-0 shadow-sm">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0 text-primary">{{ $categoria['nombre'] }}</h6>
                             </div>
                             <div class="card-body">
                                 <div class="row">
                                     @foreach($categoria['hijos'] as $hijo)
-                                        <div class="col-md-6 mb-2">
-                                            <div class="form-check">
+                                        <div class="col-12 col-md-6 mb-2">
+                                            <div class="checkbox-group">
                                                 <input class="form-check-input" type="checkbox" name="categorias[]" value="{{ $hijo->id }}" id="categoria_{{ $hijo->id }}"
                                                        {{ in_array($hijo->id, old('categorias', [])) ? 'checked' : '' }}>
                                                 <label class="form-check-label" for="categoria_{{ $hijo->id }}">
@@ -266,23 +341,28 @@
                             </div>
                         </div>
                     @endforeach
+                </div>
 
-                    {{-- Observaciones --}}
-                    <label for="observaciones">Observaciones</label>
-                    <div class="input-group mb-3">
-                        <textarea class="form-control" name="observaciones" rows="3" placeholder="Información adicional que considere relevante...">{{ old('observaciones') }}</textarea>
-                        <div class="input-group-append">
-                            <div class="input-group-text">
-                                <span class="fas fa-comment"></span>
-                            </div>
+                <!-- Observaciones -->
+                <div class="form-section">
+                    <h4 class="section-title">
+                        <i class="fas fa-comment mr-2"></i>Observaciones
+                    </h4>
+                    <div class="mobile-form-group">
+                        <label class="mobile-label">Información Adicional</label>
+                        <div class="input-wrapper">
+                            <textarea class="mobile-input" name="observaciones" rows="3" placeholder="Información adicional que considere relevante..." style="resize: vertical; min-height: 80px;">{{ old('observaciones') }}</textarea>
+                            <i class="fas fa-comment input-icon" style="top: 20px;"></i>
                         </div>
                     </div>
+                </div>
 
-                    <div class="row justify-content-center">
-                        <div class="col-6">
-                            <button type="submit" class="btn btn-primary btn-block">Registrar Datos</button>
-                        </div>
-                    </div>
+                <!-- Submit Button -->
+                <div class="form-section text-center">
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-save mr-2"></i>Registrar Datos
+                    </button>
+                </div>
                 </form>
             </div>
         </div>
