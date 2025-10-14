@@ -74,6 +74,9 @@
         line-height: 1.4;
         margin-bottom: 0;
         flex: 1;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
     }
     .submit-btn {
         width: 100%;
@@ -98,22 +101,70 @@
         font-size: 0.95rem;
     }
     @media (max-width: 768px) {
-        .container {
-            padding-left: 15px;
-            padding-right: 15px;
+        .container-fluid {
+            padding-left: 10px !important;
+            padding-right: 10px !important;
         }
         .mobile-form-group {
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
         }
         .section-title {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem !important;
+            padding-bottom: 0.25rem !important;
+        }
+        .checkbox-group label {
+            font-size: 0.8rem !important;
+            line-height: 1.3 !important;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            hyphens: auto;
+            max-width: 100%;
+        }
+        .card-body {
+            padding: 0.75rem !important;
+        }
+        .form-section {
+            margin-bottom: 1.5rem !important;
+        }
+        .mobile-input, .mobile-select {
+            font-size: 16px !important; /* Previene zoom en iOS */
+        }
+        .input-icon {
+            right: 8px !important;
+        }
+        .submit-btn {
+            font-size: 1rem !important;
+            padding: 0.875rem 2rem !important;
+            width: 100% !important;
+            max-width: 300px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .container-fluid {
+            padding-left: 8px !important;
+            padding-right: 8px !important;
+        }
+        .section-title {
+            font-size: 1rem;
+        }
+        .checkbox-group label {
+            font-size: 0.75rem !important;
+        }
+        .mobile-label {
+            font-size: 0.8rem !important;
+        }
+        .submit-btn {
+            padding: 0.75rem 1.5rem !important;
+            font-size: 0.95rem !important;
         }
     }
 </style>
 
-<div class="container-fluid py-4">
+<div class="container-fluid py-3 px-2 px-md-4">
     <div class="row justify-content-center">
-        <div class="col-12 col-md-8 col-lg-6">
+        <div class="col-12 col-sm-11 col-md-10 col-lg-8 col-xl-6">
             <!-- Header -->
             <div class="text-center mb-4">
                 <h2 class="text-primary font-weight-bold mb-2">
@@ -327,7 +378,7 @@
                             <div class="card-body">
                                 <div class="row">
                                     @foreach($categoria['hijos'] as $hijo)
-                                        <div class="col-12 col-md-6 mb-2">
+                                        <div class="col-12 mb-2">
                                             <div class="checkbox-group">
                                                 <input class="form-check-input" type="checkbox" name="categorias[]" value="{{ $hijo->id }}" id="categoria_{{ $hijo->id }}"
                                                        {{ in_array($hijo->id, old('categorias', [])) ? 'checked' : '' }}>
