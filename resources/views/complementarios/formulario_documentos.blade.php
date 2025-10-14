@@ -43,7 +43,8 @@
                             El archivo debe ser legible y no debe superar los 5MB.
                         </div>
 
-                        <form id="formDocumentos" method="POST" action="{{ route('programas-complementarios.subir-documentos', $programa->id) }}" enctype="multipart/form-data">
+
+                        <form id="formDocumentos" method="POST" action="{{ route('programas-complementarios.subir-documentos', ['id' => $programa->id]) }}" enctype="multipart/form-data">
                             @csrf
                             <input type="hidden" name="aspirante_id" value="{{ $aspirante_id }}">
 
@@ -188,19 +189,21 @@
                 return;
             }
 
-            // Asegurar que el valor del checkbox se envíe correctamente
-            document.getElementById('acepto_privacidad_hidden').value = privacidadCheckbox.checked ? '1' : '0';
-            console.log('Valor final de acepto_privacidad:', document.getElementById('acepto_privacidad_hidden').value);
 
-            // Mostrar información del archivo
-            const file = documentoInput.files[0];
-            console.log('Archivo seleccionado:', {
-                nombre: file.name,
-                tamaño: file.size,
-                tipo: file.type,
-                últimaModificación: file.lastModified
-            });
-
+            // Logs para debugging
+            console.log('=== FORM SUBMIT DEBUG ===');
+            console.log('aspirante_id:', document.querySelector('input[name="aspirante_id"]').value);
+            console.log('documento_identidad files:', documentoInput.files);
+            console.log('File selected:', documentoInput.files[0]);
+            if (documentoInput.files[0]) {
+                console.log('File name:', documentoInput.files[0].name);
+                console.log('File size:', documentoInput.files[0].size);
+                console.log('File type:', documentoInput.files[0].type);
+            }
+            console.log('Form action:', this.action);
+            console.log('Form method:', this.method);
+            console.log('Form enctype:', this.enctype);
+            console.log('=======================');
             // Deshabilitar botón y mostrar estado mientras se envía
             btnEnviar.disabled = true;
             btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Enviando...';
