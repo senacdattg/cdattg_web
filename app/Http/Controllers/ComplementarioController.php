@@ -106,6 +106,32 @@ class ComplementarioController extends Controller
         return $iconos[$nombre] ?? 'fas fa-graduation-cap';
     }
 
+    /**
+     * Mostrar formulario general de inscripción a programas complementarios
+     */
+    public function inscripcionGeneral()
+    {
+        $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion'])->where('estado', 1)->get();
+        $programas->each(function($programa) {
+            $programa->icono = $this->getIconoForPrograma($programa->nombre);
+        });
+
+        // Obtener categorías de caracterización principales con sus hijos
+        $categorias = CategoriaCaracterizacionComplementario::getMainCategories();
+        $categoriasConHijos = $categorias->map(function($categoria) {
+            return [
+                'id' => $categoria->id,
+                'nombre' => $categoria->nombre,
+                'hijos' => $categoria->getActiveChildren()
+            ];
+        });
+
+        $paises = Pais::all();
+        $departamentos = Departamento::all();
+
+        return view('complementarios.inscripcion_general', compact('programas', 'categoriasConHijos', 'paises', 'departamentos'));
+    }
+
     public function programasPublicos()
     {
         $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion'])->where('estado', 1)->get();
