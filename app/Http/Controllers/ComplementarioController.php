@@ -344,12 +344,17 @@ class ComplementarioController extends Controller
      */
     public function subirDocumento(Request $request, $id)
     {
-        Log::info('=== INICIO SUBIR DOCUMENTO ===', [
+
+        Log::info('=== subirDocumento method reached ===', [
             'request_data' => $request->all(),
             'files' => $request->files->all(),
-            'aspirante_id_from_request' => $request->aspirante_id,
+            'aspirante_id' => $request->aspirante_id,
             'has_file' => $request->hasFile('documento_identidad'),
-            'all_inputs' => $request->all()
+            'file_info' => $request->hasFile('documento_identidad') ? [
+                'name' => $request->file('documento_identidad')->getClientOriginalName(),
+                'size' => $request->file('documento_identidad')->getSize(),
+                'mime' => $request->file('documento_identidad')->getMimeType()
+            ] : null
         ]);
 
         // Validar el archivo
@@ -365,8 +370,14 @@ class ComplementarioController extends Controller
             // Obtener el aspirante
             Log::info('Buscando aspirante con ID: ' . $request->aspirante_id);
             $aspirante = AspiranteComplementario::findOrFail($request->aspirante_id);
-            Log::info('Aspirante encontrado: ' . $aspirante->id);
-            
+
+
+            Log::info('Aspirante found', [
+                'aspirante_id' => $aspirante->id,
+                'persona_id' => $aspirante->persona_id,
+                'numero_documento' => $aspirante->persona->numero_documento
+            ]);
+
             // Procesar el archivo y subirlo a Google Drive
             if ($request->hasFile('documento_identidad')) {
                 $file = $request->file('documento_identidad');
@@ -375,7 +386,17 @@ class ComplementarioController extends Controller
                 Log::info('Attempting to upload file to Google Drive', [
                     'file_name' => $fileName,
                     'file_size' => $file->getSize(),
-                    'disk_config' => config('filesystems.disks.google')
+                    'disk_config' => config('filesystems.disks.google'),
+                    'google_credentials_path' => storage_path('app/google-credentials.json'),
+                    'credentials_exist' => file_exists(storage_path('app/google-credentials.json'))
+                ]);
+
+                // Verificar configuración de Google Drive
+                Log::info('Google Drive config check', [
+                    'client_id' => env('GOOGLE_DRIVE_CLIENT_ID') ? 'SET' : 'NOT SET',
+                    'client_secret' => env('GOOGLE_DRIVE_CLIENT_SECRET') ? 'SET' : 'NOT SET',
+                    'refresh_token' => env('GOOGLE_DRIVE_REFRESH_TOKEN') ? 'SET' : 'NOT SET',
+                    'folder_id' => env('GOOGLE_DRIVE_FOLDER_ID') ? 'SET' : 'NOT SET'
                 ]);
 
                 // Subir a Google Drive
