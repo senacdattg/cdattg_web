@@ -24,6 +24,7 @@ foreach (glob(routes_path('autenticacion/public') . '/*.php') as $routeFile) {
 }
 
 Route::get('/inscripcion', [App\Http\Controllers\ComplementarioController::class, 'inscripcionGeneral'])->name('inscripcion.general');
+Route::post('/inscripcion', [App\Http\Controllers\ComplementarioController::class, 'procesarInscripcionGeneral'])->name('inscripcion.procesar');
 Route::get('/programas/{id}', [App\Http\Controllers\ComplementarioController::class, 'verPrograma'])->name('programa_complementario.ver');
 
 // Rutas protegidas
