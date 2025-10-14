@@ -1,6 +1,19 @@
 @extends('layout.master-layout-registro')
 @section('content')
 <style>
+    /* Fix for mobile scrolling issues */
+    body, html {
+        height: auto !important;
+        overflow: visible !important;
+    }
+    .hold-transition.register-page {
+        height: auto !important;
+        overflow: visible !important;
+    }
+    .main-content {
+        min-height: auto !important;
+        height: auto !important;
+    }
     .form-section {
         margin-bottom: 2rem;
     }
@@ -101,9 +114,14 @@
         font-size: 0.95rem;
     }
     @media (max-width: 768px) {
+        body, html {
+            height: auto !important;
+            overflow-y: auto !important;
+        }
         .container-fluid {
             padding-left: 10px !important;
             padding-right: 10px !important;
+            min-height: auto !important;
         }
         .mobile-form-group {
             margin-bottom: 1rem;
