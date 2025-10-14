@@ -23,6 +23,7 @@ foreach (glob(routes_path('autenticacion/public') . '/*.php') as $routeFile) {
     include_once $routeFile;
 }
 
+Route::get('/inscripcion', [App\Http\Controllers\ComplementarioController::class, 'inscripcionGeneral'])->name('inscripcion.general');
 Route::get('/programas/{id}', [App\Http\Controllers\ComplementarioController::class, 'verPrograma'])->name('programa_complementario.ver');
 
 // Rutas protegidas
