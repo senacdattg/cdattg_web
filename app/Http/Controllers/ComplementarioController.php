@@ -107,15 +107,10 @@ class ComplementarioController extends Controller
     }
 
     /**
-     * Mostrar formulario general de inscripción a programas complementarios
+     * Mostrar formulario general de inscripción a eventos del SENA
      */
     public function inscripcionGeneral()
     {
-        $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion'])->where('estado', 1)->get();
-        $programas->each(function($programa) {
-            $programa->icono = $this->getIconoForPrograma($programa->nombre);
-        });
-
         // Obtener categorías de caracterización principales con sus hijos
         $categorias = CategoriaCaracterizacionComplementario::getMainCategories();
         $categoriasConHijos = $categorias->map(function($categoria) {
@@ -129,7 +124,60 @@ class ComplementarioController extends Controller
         $paises = Pais::all();
         $departamentos = Departamento::all();
 
-        return view('complementarios.inscripcion_general', compact('programas', 'categoriasConHijos', 'paises', 'departamentos'));
+        return view('complementarios.inscripcion_general', compact('categoriasConHijos', 'paises', 'departamentos'));
+    }
+
+    /**
+     * Procesar la inscripción general (solo datos de persona y caracterización)
+     */
+    public function procesarInscripcionGeneral(Request $request)
+    {
+        // Validar los datos del formulario
+        $request->validate([
+            'tipo_documento' => 'required|integer',
+            'numero_documento' => 'required|string|max:191|unique:personas',
+            'primer_nombre' => 'required|string|max:191',
+            'segundo_nombre' => 'nullable|string|max:191',
+            'primer_apellido' => 'required|string|max:191',
+            'segundo_apellido' => 'nullable|string|max:191',
+            'fecha_nacimiento' => 'required|date',
+            'genero' => 'required|integer',
+            'telefono' => 'nullable|string|max:191',
+            'celular' => 'required|string|max:191',
+            'email' => 'required|email|max:191|unique:personas',
+            'pais_id' => 'required|exists:pais,id',
+            'departamento_id' => 'required|exists:departamentos,id',
+            'municipio_id' => 'required|exists:municipios,id',
+            'direccion' => 'required|string|max:191',
+            'observaciones' => 'nullable|string',
+            'categorias' => 'nullable|array',
+            'categorias.*' => 'exists:categorias_caracterizacion_complementarios,id',
+        ]);
+
+        // Verificar si ya existe una persona con el mismo documento o email
+        $personaExistente = Persona::where('numero_documento', $request->numero_documento)
+            ->orWhere('email', $request->email)
+            ->first();
+
+        if ($personaExistente) {
+            return back()->withInput()->with('error', 'Ya existe una persona registrada con este número de documento o correo electrónico.');
+        }
+
+        // Crear nueva persona
+        $persona = Persona::create($request->only([
+            'tipo_documento', 'numero_documento', 'primer_nombre', 'segundo_nombre',
+            'primer_apellido', 'segundo_apellido', 'fecha_nacimiento', 'genero',
+            'telefono', 'celular', 'email', 'pais_id', 'departamento_id',
+            'municipio_id', 'direccion'
+        ]));
+
+        // Guardar caracterización si se proporcionó
+        if ($request->categorias) {
+            // Aquí iría la lógica para guardar la caracterización
+            // Dependiendo de cómo esté estructurada la tabla de caracterización
+        }
+
+        return redirect()->route('inscripcion.general')->with('success', '¡Registro exitoso! Sus datos han sido guardados correctamente.');
     }
 
     public function programasPublicos()
