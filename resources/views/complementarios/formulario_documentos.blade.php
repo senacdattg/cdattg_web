@@ -29,6 +29,7 @@
             </div>
         @endif
 
+
         <div class="row">
             <div class="col-md-8">
                 <div class="card shadow-sm">
@@ -42,9 +43,9 @@
                             El archivo debe ser legible y no debe superar los 5MB.
                         </div>
 
-                        <form id="formDocumentos" method="POST" action="#">
+                        <form id="formDocumentos" method="POST" action="{{ route('programas-complementarios.subir-documentos', $programa->id) }}" enctype="multipart/form-data">
                             @csrf
-                            <input type="hidden" name="aspirante_id" value="{{ session('aspirante_id') }}">
+                            <input type="hidden" name="aspirante_id" value="{{ $aspirante_id }}">
 
                             <div class="mb-4">
                                 <label for="documento_identidad" class="form-label">Documento de Identidad (PDF) *</label>
@@ -60,6 +61,7 @@
                                     Autorizo el tratamiento de mis datos personales de acuerdo con la política de privacidad *
                                 </label>
                             </div>
+                            <input type="hidden" name="acepto_privacidad" id="acepto_privacidad_hidden" value="0">
 
                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                 <a href="{{ route('programas-complementarios.inscripcion', $programa->id) }}" class="btn btn-outline-secondary me-md-2">
@@ -159,28 +161,66 @@
             }
         });
 
+        // Actualizar el valor del campo hidden cuando cambia el checkbox
+        privacidadCheckbox.addEventListener('change', function() {
+            document.getElementById('acepto_privacidad_hidden').value = this.checked ? '1' : '0';
+            console.log('Checkbox cambiado, valor hidden:', document.getElementById('acepto_privacidad_hidden').value);
+        });
+
         // Validación del formulario
         document.getElementById('formDocumentos').addEventListener('submit', function(e) {
-            e.preventDefault();
+            console.log('=== INICIO SUBIDA DOCUMENTO ===');
+            console.log('Formulario enviado - Evento capturado');
             
             // Validar que se haya seleccionado un archivo
             if (!documentoInput.files.length) {
+                console.log('ERROR: No se seleccionó archivo');
+                e.preventDefault();
                 alert('Debe seleccionar un archivo PDF.');
                 return;
             }
 
             // Validar privacidad
             if (!privacidadCheckbox.checked) {
+                console.log('ERROR: No se aceptó la privacidad');
+                e.preventDefault();
                 alert('Debe aceptar la política de privacidad para continuar.');
                 return;
             }
 
+            // Asegurar que el valor del checkbox se envíe correctamente
+            document.getElementById('acepto_privacidad_hidden').value = privacidadCheckbox.checked ? '1' : '0';
+            console.log('Valor final de acepto_privacidad:', document.getElementById('acepto_privacidad_hidden').value);
+
+            // Mostrar información del archivo
+            const file = documentoInput.files[0];
+            console.log('Archivo seleccionado:', {
+                nombre: file.name,
+                tamaño: file.size,
+                tipo: file.type,
+                últimaModificación: file.lastModified
+            });
+
             // Deshabilitar botón y mostrar estado mientras se envía
             btnEnviar.disabled = true;
             btnEnviar.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Enviando...';
+            
+            console.log('Botón deshabilitado, enviando formulario...');
+            console.log('Aspirante ID:', document.querySelector('input[name="aspirante_id"]').value);
+            console.log('URL de envío:', this.action);
+            
             // No llamar preventDefault: permitir el envío al backend
-
+            console.log('=== FIN SUBIDA DOCUMENTO - PERMITIENDO ENVÍO ===');
         });
+
+        // Log adicional para verificar que el event listener está funcionando
+        console.log('Event listener del formulario registrado correctamente');
+
+        // Log cuando se carga la página
+        console.log('=== PÁGINA DE SUBIDA DE DOCUMENTOS CARGADA ===');
+        console.log('Programa ID:', {{ $programa->id }});
+        console.log('Aspirante ID:', {{ $aspirante_id }});
+        console.log('URL de envío:', '{{ route('programas-complementarios.subir-documentos', $programa->id) }}');
     </script>
 </body>
 </html>

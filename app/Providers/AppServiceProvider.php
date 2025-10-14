@@ -7,12 +7,9 @@ use Illuminate\Pagination\Paginator as PaginationPaginator;
 use Illuminate\Support\Facades\Schema;
 // use Illuminate\Support\Facades\URL;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Storage;
 use App\Models\AsistenciaAprendiz;
-use App\Models\Aprendiz;
-use App\Models\Instructor;
 use App\Observers\AsistenciaAprendizObserver;
-use App\Observers\AprendizObserver;
-use App\Observers\InstructorObserver;
 // \Illuminate\Support\Facades\URL::forceScheme('https');
 
 class AppServiceProvider extends ServiceProvider
@@ -36,31 +33,35 @@ class AppServiceProvider extends ServiceProvider
         Schema::defaultStringLength(191);
         PaginationPaginator::useBootstrap();
 
-        // Configurar reglas de pluralización para evitar problemas con tablas
-        $this->configureInflector();
-
         // if ($this->app->environment('production')) {
         //     URL::forceScheme('https');
         // }
 
         // Registrar observadores
         AsistenciaAprendiz::observe(AsistenciaAprendizObserver::class);
-        Aprendiz::observe(AprendizObserver::class);
-        Instructor::observe(InstructorObserver::class);
-    }
 
-    /**
-     * Configurar reglas de pluralización personalizadas
-     */
-    protected function configureInflector()
-    {
-        // Registrar reglas de pluralización para evitar que Laravel
-        // pluralice 'instructor' como 'instructores' en español
-        \Illuminate\Support\Str::macro('plural', function ($value, $count = 2) {
-            if ($value === 'instructor') {
-                return $count === 1 ? 'instructor' : 'instructors';
-            }
-            return \Illuminate\Support\Str::plural($value, $count);
-        });
+        // Registrar driver de Google Drive
+        try {
+            Storage::extend('google', function ($app, $config) {
+                $options = [];
+
+                if (!empty($config['teamDriveId'] ?? null)) {
+                    $options['teamDriveId'] = $config['teamDriveId'];
+                }
+
+                $client = new \Google\Client();
+                $client->setClientId($config['clientId']);
+                $client->setClientSecret($config['clientSecret']);
+                $client->refreshToken($config['refreshToken']);
+                
+                $service = new \Google\Service\Drive($client);
+                $adapter = new \Masbug\Flysystem\GoogleDriveAdapter($service, $config['folderId'] ?? '/', $options);
+                $driver = new \League\Flysystem\Filesystem($adapter);
+
+                return new \Illuminate\Filesystem\FilesystemAdapter($driver, $adapter);
+            });
+        } catch (\Exception $e) {
+            \Log::error('Error al registrar driver de Google Drive: ' . $e->getMessage());
+        }
     }
 }
