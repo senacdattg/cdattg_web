@@ -273,37 +273,98 @@
                 buttonContainer.appendChild(progressContainer);
             }
 
+            // Calcular estadísticas adicionales
+            const remaining = progress.total_aspirantes - progress.processed_aspirantes;
+            const successRate = progress.processed_aspirantes > 0 ?
+                Math.round((progress.successful_validations / progress.processed_aspirantes) * 100) : 0;
+            const estimatedTimeRemaining = calculateEstimatedTime(progress);
+
+            // Determinar color de la barra basado en el estado
+            const progressBarClass = progress.status === 'failed' ? 'bg-danger' :
+                                   progress.status === 'completed' ? 'bg-success' : 'bg-info';
+
             progressContainer.innerHTML = `
                 <div class="card border-info">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-2">
                             <h6 class="mb-0">
-                                <i class="fas fa-cog fa-spin me-2"></i>
+                                <i class="fas fa-cog ${progress.status === 'processing' ? 'fa-spin' : ''} me-2"></i>
                                 Validación SenaSofiaPlus - ${progress.status_label}
                             </h6>
                             <small class="text-muted">${progress.progress_percentage}%</small>
                         </div>
-                        <div class="progress">
-                            <div class="progress-bar bg-info" role="progressbar"
-                                 style="width: ${progress.progress_percentage}%"
-                                 aria-valuenow="${progress.progress_percentage}"
-                                 aria-valuemin="0" aria-valuemax="100">
+                        <div class="progress mb-2">
+                            <div class="progress-bar ${progressBarClass}" role="progressbar"
+                                  style="width: ${progress.progress_percentage}%"
+                                  aria-valuenow="${progress.progress_percentage}"
+                                  aria-valuemin="0" aria-valuemax="100">
                             </div>
                         </div>
-                        <div class="row text-center mt-2">
-                            <div class="col">
-                                <small class="text-muted">Total: ${progress.total_aspirantes}</small>
+                        <div class="row text-center mb-2">
+                            <div class="col-6 col-md-3">
+                                <small class="text-muted d-block">Total</small>
+                                <strong>${progress.total_aspirantes}</strong>
                             </div>
-                            <div class="col">
-                                <small class="text-success">Exitosos: ${progress.successful_validations}</small>
+                            <div class="col-6 col-md-3">
+                                <small class="text-success d-block">Exitosos</small>
+                                <strong class="text-success">${progress.successful_validations}</strong>
                             </div>
-                            <div class="col">
-                                <small class="text-danger">Errores: ${progress.failed_validations}</small>
+                            <div class="col-6 col-md-3">
+                                <small class="text-danger d-block">Errores</small>
+                                <strong class="text-danger">${progress.failed_validations}</strong>
+                            </div>
+                            <div class="col-6 col-md-3">
+                                <small class="text-info d-block">Pendientes</small>
+                                <strong class="text-info">${remaining}</strong>
                             </div>
                         </div>
+                        ${progress.status === 'processing' ? `
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <small class="text-muted">
+                                        <i class="fas fa-chart-line me-1"></i>
+                                        Tasa de éxito: ${successRate}%
+                                    </small>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                    <small class="text-muted">
+                                        <i class="fas fa-clock me-1"></i>
+                                        ${estimatedTimeRemaining}
+                                    </small>
+                                </div>
+                            </div>
+                        ` : ''}
+                        ${progress.started_at ? `
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Iniciado: ${new Date(progress.started_at).toLocaleString('es-CO')}
+                                </small>
+                            </div>
+                        ` : ''}
                     </div>
                 </div>
             `;
+        }
+
+        // Función para calcular tiempo estimado restante
+        function calculateEstimatedTime(progress) {
+            if (progress.status !== 'processing' || progress.processed_aspirantes === 0) {
+                return 'Calculando...';
+            }
+
+            const elapsed = (new Date() - new Date(progress.started_at)) / 1000; // segundos
+            const avgTimePerAspirante = elapsed / progress.processed_aspirantes;
+            const remaining = progress.total_aspirantes - progress.processed_aspirantes;
+            const estimatedSeconds = avgTimePerAspirante * remaining;
+
+            if (estimatedSeconds < 60) {
+                return `~${Math.round(estimatedSeconds)}s restantes`;
+            } else if (estimatedSeconds < 3600) {
+                return `~${Math.round(estimatedSeconds / 60)}min restantes`;
+            } else {
+                return `~${Math.round(estimatedSeconds / 3600)}h restantes`;
+            }
         }
 
         // Función para manejar cuando la validación se completa
@@ -312,7 +373,12 @@
             const progressContainer = document.getElementById('sofia-progress-container');
 
             if (progress.status === 'completed') {
-                showAlert('success', `Validación completada. ${progress.successful_validations} aspirantes validados exitosamente.`);
+                const successRate = progress.total_aspirantes > 0 ?
+                    Math.round((progress.successful_validations / progress.total_aspirantes) * 100) : 0;
+
+                showAlert('success',
+                    `Validación completada. ${progress.successful_validations}/${progress.total_aspirantes} aspirantes validados exitosamente (${successRate}%).`
+                );
 
                 // Cambiar botón a completado
                 button.innerHTML = '<i class="fas fa-check-circle me-1"></i>Completado';
@@ -324,7 +390,20 @@
                 }, 3000);
 
             } else if (progress.status === 'failed') {
-                showAlert('error', 'La validación falló. Revisa los logs para más detalles.');
+                let errorMessage = 'La validación falló. ';
+                if (progress.errors && progress.errors.length > 0) {
+                    errorMessage += `Errores encontrados: ${progress.errors.length}. `;
+                    errorMessage += 'Revisa los logs del servidor para más detalles.';
+                } else {
+                    errorMessage += 'Revisa los logs del servidor para más detalles.';
+                }
+
+                showAlert('error', errorMessage);
+
+                // Mostrar detalles de errores si existen
+                if (progress.errors && progress.errors.length > 0) {
+                    showErrorDetails(progress.errors);
+                }
 
                 // Restaurar botón
                 button.disabled = false;
@@ -336,6 +415,26 @@
                 setTimeout(() => {
                     progressContainer.remove();
                 }, 5000);
+            }
+        }
+
+        // Función para mostrar detalles de errores
+        function showErrorDetails(errors) {
+            const errorContainer = document.createElement('div');
+            errorContainer.className = 'mt-3 alert alert-danger';
+            errorContainer.innerHTML = `
+                <h6><i class="fas fa-exclamation-triangle me-2"></i>Detalles de Errores:</h6>
+                <div style="max-height: 200px; overflow-y: auto;">
+                    <ul class="mb-0">
+                        ${errors.slice(0, 10).map(error => `<li style="font-size: 0.875rem;">${error}</li>`).join('')}
+                        ${errors.length > 10 ? `<li style="font-size: 0.875rem;">... y ${errors.length - 10} errores más</li>` : ''}
+                    </ul>
+                </div>
+            `;
+
+            const progressContainer = document.getElementById('sofia-progress-container');
+            if (progressContainer) {
+                progressContainer.appendChild(errorContainer);
             }
         }
 
