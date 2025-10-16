@@ -33,7 +33,7 @@ class ValidarSofiaJob implements ShouldQueue
      */
     public function handle(): void
     {
-        Log::info("Iniciando validación SenaSofiaPlus para programa: {$this->complementarioId}");
+        Log::info("🚀 Iniciando validación SenaSofiaPlus para programa: {$this->complementarioId}");
 
         // Obtener registro de progreso si existe
         $progress = null;
@@ -41,6 +41,7 @@ class ValidarSofiaJob implements ShouldQueue
             $progress = \App\Models\SofiaValidationProgress::find($this->progressId);
             if ($progress) {
                 $progress->markAsStarted();
+                Log::info("📊 Progreso inicializado con ID: {$this->progressId}");
             }
         }
 
@@ -53,80 +54,173 @@ class ValidarSofiaJob implements ShouldQueue
             ->get();
 
         if ($aspirantes->isEmpty()) {
-            Log::info('No hay aspirantes que necesiten validación.');
+            Log::info('ℹ️ No hay aspirantes que necesiten validación.');
             if ($progress) {
                 $progress->markAsCompleted();
             }
             return;
         }
 
-        Log::info("Validando {$aspirantes->count()} aspirantes...");
+        $totalAspirantes = $aspirantes->count();
+        Log::info("📋 Iniciando validación de {$totalAspirantes} aspirantes...");
 
         $exitosos = 0;
         $errores = 0;
         $errores_detalle = [];
+        $procesados = 0;
 
-        foreach ($aspirantes as $aspirante) {
-            try {
-                $resultado = $this->validarAspirante($aspirante->persona->numero_documento);
+        // Procesar en lotes para mejor control de memoria y rate limiting
+        $batchSize = 5; // Procesar de 5 en 5 para optimizar
+        $batches = $aspirantes->chunk($batchSize);
 
-                // Actualizar estado basado en resultado
-                $nuevoEstado = $this->determinarEstadoSofia($resultado);
-                $aspirante->persona->update(['estado_sofia' => $nuevoEstado]);
+        foreach ($batches as $batchIndex => $batch) {
+            Log::info("🔄 Procesando lote " . ($batchIndex + 1) . "/" . $batches->count() . " ({$batch->count()} aspirantes)");
 
-                Log::info("Cédula {$aspirante->persona->numero_documento}: {$resultado} -> Estado: {$nuevoEstado}");
+            foreach ($batch as $aspirante) {
+                $procesados++;
+                $cedula = $aspirante->persona->numero_documento;
 
-                if ($nuevoEstado === 1) {
-                    $exitosos++;
+                try {
+                    Log::info("🔍 Validando cédula {$cedula} ({$procesados}/{$totalAspirantes})");
+
+                    $startTime = microtime(true);
+                    $resultado = $this->validarAspirante($cedula);
+                    $endTime = microtime(true);
+                    $duration = round($endTime - $startTime, 2);
+
+                    // Actualizar estado basado en resultado
+                    $nuevoEstado = $this->determinarEstadoSofia($resultado);
+                    $aspirante->persona->update(['estado_sofia' => $nuevoEstado]);
+
+                    $estadoLabel = $this->getEstadoLabel($nuevoEstado);
+                    Log::info("✅ Cédula {$cedula}: {$resultado} -> Estado: {$estadoLabel} (Tiempo: {$duration}s)");
+
+                    if ($nuevoEstado === 1) {
+                        $exitosos++;
+                    }
+
+                    // Actualizar progreso
+                    if ($progress) {
+                        $progress->incrementProcessed($nuevoEstado === 1);
+                    }
+
+                } catch (\Exception $e) {
+                    $errorMsg = "❌ Error con cédula {$cedula}: {$e->getMessage()}";
+                    Log::error($errorMsg, [
+                        'aspirante_id' => $aspirante->id,
+                        'persona_id' => $aspirante->persona_id,
+                        'complementario_id' => $this->complementarioId,
+                        'exception' => $e->getTraceAsString()
+                    ]);
+
+                    $errores++;
+                    $errores_detalle[] = $errorMsg;
+
+                    // Actualizar progreso con error
+                    if ($progress) {
+                        $progress->incrementProcessed(false);
+                    }
                 }
 
-                // Actualizar progreso
-                if ($progress) {
-                    $progress->incrementProcessed($nuevoEstado === 1);
-                }
-
-            } catch (\Exception $e) {
-                $errorMsg = "Error con cédula {$aspirante->persona->numero_documento}: {$e->getMessage()}";
-                Log::error($errorMsg);
-                $errores++;
-                $errores_detalle[] = $errorMsg;
-
-                // Actualizar progreso con error
-                if ($progress) {
-                    $progress->incrementProcessed(false);
+                // Delay optimizado entre validaciones para evitar rate limiting
+                $delay = $this->calculateDelay($procesados, $totalAspirantes);
+                if ($delay > 0) {
+                    Log::debug("⏳ Esperando {$delay}ms antes de siguiente validación...");
+                    usleep($delay * 1000); // usleep usa microsegundos
                 }
             }
 
-            // Delay para evitar rate limiting
-            sleep(2);
+            // Delay adicional entre lotes
+            if ($batches->count() > 1 && !$batches->last()->is($batch)) {
+                Log::info("🔄 Cambio de lote - Esperando 3 segundos...");
+                sleep(3);
+            }
         }
 
         // Marcar como completado
         if ($progress) {
             if ($errores > 0) {
+                Log::warning("⚠️ Validación completada con {$errores} errores");
                 $progress->markAsFailed($errores_detalle);
             } else {
+                Log::info("🎉 Validación completada exitosamente");
                 $progress->markAsCompleted();
             }
         }
 
-        Log::info("Validación completada - Exitosos: {$exitosos}, Errores: {$errores}");
+        Log::info("📊 Resumen final - Total: {$totalAspirantes}, Exitosos: {$exitosos}, Errores: {$errores}, Tasa de éxito: " . round(($exitosos / $totalAspirantes) * 100, 1) . "%");
+    }
+
+    /**
+     * Calcular delay dinámico basado en el progreso
+     */
+    private function calculateDelay($procesados, $total)
+    {
+        $progress = $procesados / $total;
+
+        // Delay inicial alto, luego se reduce
+        if ($progress < 0.2) {
+            return 3000; // 3 segundos al inicio
+        } elseif ($progress < 0.5) {
+            return 2000; // 2 segundos en la mitad
+        } else {
+            return 1000; // 1 segundo al final
+        }
+    }
+
+    /**
+     * Obtener etiqueta legible del estado
+     */
+    private function getEstadoLabel($estado)
+    {
+        return match($estado) {
+            0 => 'No registrado',
+            1 => 'Registrado',
+            2 => 'Requiere cambio',
+            default => 'Desconocido'
+        };
     }
 
     private function validarAspirante($cedula)
     {
-        // Ejecutar script de Node.js
+        // Ejecutar script de Node.js con mejor manejo de errores
         $scriptPath = base_path('resources/js/sofia-validator.js');
 
+        Log::debug("Ejecutando script Node.js para cédula: {$cedula}");
+
         $process = new Process(['node', $scriptPath, $cedula]);
-        $process->setTimeout(30000); // 30 segundos timeout
-        $process->run();
+        $process->setTimeout(60000); // Aumentar timeout a 60 segundos
+        $process->setWorkingDirectory(base_path());
 
-        if (!$process->isSuccessful()) {
-            throw new ProcessFailedException($process);
+        try {
+            $process->run();
+
+            if (!$process->isSuccessful()) {
+                $errorOutput = $process->getErrorOutput();
+                $exitCode = $process->getExitCode();
+
+                Log::error("Script Node.js falló para cédula {$cedula}", [
+                    'exit_code' => $exitCode,
+                    'error_output' => $errorOutput,
+                    'command' => $process->getCommandLine()
+                ]);
+
+                throw new ProcessFailedException($process);
+            }
+
+            $output = trim($process->getOutput());
+            Log::debug("Script Node.js completado para cédula {$cedula}: {$output}");
+
+            return $output;
+
+        } catch (ProcessFailedException $e) {
+            Log::error("ProcessFailedException para cédula {$cedula}: " . $e->getMessage(), [
+                'exit_code' => $e->getExitCode(),
+                'error_output' => $e->getErrorOutput(),
+                'output' => $e->getOutput()
+            ]);
+            throw $e;
         }
-
-        return trim($process->getOutput());
     }
 
     private function determinarEstadoSofia($resultado)
