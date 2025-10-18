@@ -577,7 +577,7 @@ class ComplementarioController extends Controller
 
             // Dispatch el job a la queue con configuración optimizada
             ValidarSofiaJob::dispatch($complementarioId, auth()->id(), $progress->id)
-                ->onQueue('default') // Usar cola por defecto hasta configurar la específica
+                ->onQueue('sofia-validation') // Usar cola específica para validaciones Sofia
                 ->delay(now()->addSeconds(2)); // Pequeño delay para asegurar que el registro esté guardado
 
             \Log::info("Job despachado a la cola", [
