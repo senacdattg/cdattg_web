@@ -42,6 +42,14 @@ return [
             'after_commit' => false,
         ],
 
+        'sofia-validation' => [
+            'driver' => 'database',
+            'table' => 'jobs',
+            'queue' => 'sofia-validation',
+            'retry_after' => 90,
+            'after_commit' => false,
+        ],
+
         'beanstalkd' => [
             'driver' => 'beanstalkd',
             'host' => 'localhost',
