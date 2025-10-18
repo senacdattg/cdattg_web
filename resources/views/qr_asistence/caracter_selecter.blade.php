@@ -9,7 +9,7 @@
         icon="fa-home" 
         title="Fichas de formación"
         subtitle="Gestión de fichas de formación"
-        :breadcrumb="[['label' => 'Inicio', 'url' => '{{ route('verificarLogin') }}', 'icon' => 'fa-home'], ['label' => 'Fichas de formación', 'icon' => 'fa-fw fa-paint-brush', 'active' => true]]"
+        :breadcrumb="[['label' => 'Inicio', 'url' => route('verificarLogin') , 'icon' => 'fa-home'], ['label' => 'Fichas de formación', 'icon' => 'fa-fw fa-paint-brush', 'active' => true]]"
     />
 @endsection
 

@@ -36,9 +36,42 @@
                         searchPlaceholder="Buscar red de conocimiento..."
                         searchValue="{{ request('search') }}"
                         :columns="[['label' => '#', 'width' => '5%'], ['label' => 'Red de Conocimiento', 'width' => '40%'], ['label' => 'Regional', 'width' => '25%'], ['label' => 'Estado', 'width' => '15%'], ['label' => 'Acciones', 'width' => '35%', 'class' => 'text-center']]"
-                        :pagination="$listaderedesdeconocimiento->links()"
+                        :pagination="$redesConocimiento->links()"
                     >
-GET
+                        @forelse($redesConocimiento as $index => $red)
+                            <tr>
+                                <td>{{ $redesConocimiento->firstItem() + $index }}</td>
+                                <td>{{ $red->nombre }}</td>
+                                <td>{{ $red->regional->nombre ?? 'N/A' }}</td>
+                                <td>
+                                    @if($red->status)
+                                        <span class="badge badge-success">Activo</span>
+                                    @else
+                                        <span class="badge badge-danger">Inactivo</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <x-action-buttons 
+                                        :show="true"
+                                        :edit="true"
+                                        :delete="true"
+                                        showUrl="{{ route('red-conocimiento.show', $red->id) }}"
+                                        editUrl="{{ route('red-conocimiento.edit', $red->id) }}"
+                                        deleteUrl="{{ route('red-conocimiento.destroy', $red->id) }}"
+                                        showTitle="Ver detalles de {{ $red->nombre }}"
+                                        editTitle="Editar {{ $red->nombre }}"
+                                        deleteTitle="Eliminar {{ $red->nombre }}"
+                                        showPermission="VER RED CONOCIMIENTO"
+                                        editPermission="EDITAR RED CONOCIMIENTO"
+                                        deletePermission="ELIMINAR RED CONOCIMIENTO"
+                                    />
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center">No hay redes de conocimiento registradas</td>
+                            </tr>
+                        @endforelse
                     </x-data-table>
             </div>
         </div>

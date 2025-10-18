@@ -145,6 +145,123 @@ document.addEventListener('DOMContentLoaded', () => {
     // Establecer fecha mínima como hoy
     $('#fecha_inicio').attr('min', new Date().toISOString().split('T')[0]);
 
+    // Manejo de días de formación
+    function manejarDiasFormacion() {
+        const diasCheckboxes = $('.dia-formacion-checkbox');
+        const horariosContainer = $('#horarios-container');
+        const horariosDias = $('#horarios-dias');
+        
+        // Objeto para almacenar los valores de horarios
+        const valoresHorarios = {};
+        
+        // Función para guardar valores actuales antes de regenerar
+        function guardarValoresActuales() {
+            horariosDias.find('.card').each(function() {
+                const cardId = $(this).parent().attr('id');
+                if (cardId) {
+                    const diaId = cardId.replace('horario-dia-', '');
+                    const horaInicio = $(this).find('input[name*="hora_inicio"]').val();
+                    const horaFin = $(this).find('input[name*="hora_fin"]').val();
+                    
+                    if (horaInicio && horaFin) {
+                        valoresHorarios[diaId] = {
+                            hora_inicio: horaInicio,
+                            hora_fin: horaFin
+                        };
+                    }
+                }
+            });
+        }
+        
+        // Función para generar horarios para un día específico
+        function generarHorariosDia(diaId, diaNombre) {
+            // Usar valores guardados o valores por defecto
+            const horaInicio = valoresHorarios[diaId]?.hora_inicio || '08:00';
+            const horaFin = valoresHorarios[diaId]?.hora_fin || '16:00';
+            
+            return `
+                <div class="col-md-6 col-lg-4 mb-3" id="horario-dia-${diaId}">
+                    <div class="card border-primary">
+                        <div class="card-header bg-primary text-white py-2">
+                            <h6 class="mb-0"><i class="fas fa-calendar-day"></i> ${diaNombre}</h6>
+                        </div>
+                        <div class="card-body p-3">
+                            <div class="row">
+                                <div class="col-6">
+                                    <label class="form-label small">Hora Inicio</label>
+                                    <input type="time" class="form-control form-control-sm hora-inicio-input" 
+                                           name="horarios[${diaId}][hora_inicio]" 
+                                           value="${horaInicio}" required>
+                                </div>
+                                <div class="col-6">
+                                    <label class="form-label small">Hora Fin</label>
+                                    <input type="time" class="form-control form-control-sm hora-fin-input" 
+                                           name="horarios[${diaId}][hora_fin]" 
+                                           value="${horaFin}" required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Función para actualizar horarios
+        function actualizarHorarios() {
+            // Guardar valores actuales antes de regenerar
+            guardarValoresActuales();
+            
+            const diasSeleccionados = diasCheckboxes.filter(':checked');
+            
+            if (diasSeleccionados.length > 0) {
+                horariosContainer.show();
+                horariosDias.empty();
+                
+                diasSeleccionados.each(function() {
+                    const diaId = $(this).val();
+                    const diaNombre = $(this).next('label').text().trim();
+                    const horarioHTML = generarHorariosDia(diaId, diaNombre);
+                    horariosDias.append(horarioHTML);
+                });
+            } else {
+                horariosContainer.hide();
+                horariosDias.empty();
+            }
+        }
+        
+        // Event listener para cambios en checkboxes
+        diasCheckboxes.on('change', function() {
+            actualizarHorarios();
+        });
+        
+        // Guardar valores cuando el usuario los cambia
+        $(document).on('change', '.hora-inicio-input, .hora-fin-input', function() {
+            guardarValoresActuales();
+        });
+        
+        // Validación de horarios
+        $(document).on('change', 'input[name*="[hora_inicio]"], input[name*="[hora_fin]"]', function() {
+            const horaInicio = $(this).closest('.card-body').find('input[name*="[hora_inicio]"]').val();
+            const horaFin = $(this).closest('.card-body').find('input[name*="[hora_fin]"]').val();
+            
+            if (horaInicio && horaFin) {
+                if (horaInicio >= horaFin) {
+                    $(this)[0].setCustomValidity('La hora de fin debe ser posterior a la hora de inicio');
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this)[0].setCustomValidity('');
+                    $(this).removeClass('is-invalid');
+                }
+            }
+        });
+        
+        // Inicializar horarios si hay días preseleccionados
+        actualizarHorarios();
+    }
+    
+    // Inicializar manejo de días de formación
+    manejarDiasFormacion();
+
     // Validación de formulario
     const form = document.querySelector('form');
     if (form) {
@@ -154,6 +271,21 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Validar fechas
             validateDates();
+            
+            // Recopilar información de horarios para debugging
+            const horariosData = {};
+            document.querySelectorAll('input[name*="horarios"]').forEach(input => {
+                console.log('Input horario:', input.name, '=', input.value);
+                horariosData[input.name] = input.value;
+            });
+            console.log('Datos de horarios:', horariosData);
+            
+            // Recopilar días de formación
+            const diasFormacion = [];
+            document.querySelectorAll('input[name="dias_formacion[]"]:checked').forEach(checkbox => {
+                diasFormacion.push(checkbox.value);
+            });
+            console.log('Días de formación seleccionados:', diasFormacion);
             
             const isValid = this.checkValidity();
             

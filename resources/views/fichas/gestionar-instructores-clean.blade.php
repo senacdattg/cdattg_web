@@ -112,7 +112,7 @@
         icon="fa-chalkboard-teacher" 
         title="Gestionar Instructores"
         subtitle="Ficha {{ $ficha->ficha }}"
-        :breadcrumb="[['label' => 'Ficha {{ $ficha->ficha }}', 'url' => '{{ route('fichaCaracterizacion.show', $ficha->id) }}', 'icon' => 'fa-eye'], ['label' => 'Gestionar Instructores', 'icon' => 'fa-chalkboard-teacher', 'active' => true]]"
+        :breadcrumb="[['label' => 'Ficha {{ $ficha->ficha }}', 'url' => route('fichaCaracterizacion.show', $ficha->id) , 'icon' => 'fa-eye'], ['label' => 'Gestionar Instructores', 'icon' => 'fa-chalkboard-teacher', 'active' => true]]"
     />
 @endsection
 

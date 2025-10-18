@@ -639,6 +639,17 @@ return [
                     ],
                 ],
                 [
+                    'text' => 'Redes de Conocimiento',
+                    'url' => 'red-conocimiento',
+                    'icon' => 'fas fa-fw fa-network-wired',
+                    'can' => [
+                        'VER RED CONOCIMIENTO',
+                        'CREAR RED CONOCIMIENTO',
+                        'EDITAR RED CONOCIMIENTO',
+                        'ELIMINAR RED CONOCIMIENTO',
+                    ],
+                ],
+                [
                     'text' => 'Fichas de Caracterización',
                     'url' => 'fichaCaracterizacion',
                     'icon' => 'fas fa-fw fa-file-alt',

@@ -9,7 +9,7 @@
         icon="fa-user-graduate" 
         title="Aprendiz"
         subtitle="Detalles del aprendiz"
-        :breadcrumb="[['label' => 'Aprendices', 'url' => '{{ route('aprendices.index') }}', 'icon' => 'fa-user-graduate'], ['label' => 'Detalles del aprendiz', 'icon' => 'fa-info-circle', 'active' => true]]"
+        :breadcrumb="[['label' => 'Aprendices', 'url' => route('aprendices.index') , 'icon' => 'fa-user-graduate'], ['label' => 'Detalles del aprendiz', 'icon' => 'fa-info-circle', 'active' => true]]"
     />
 @endsection
 

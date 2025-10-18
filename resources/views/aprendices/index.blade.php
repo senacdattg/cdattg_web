@@ -96,8 +96,12 @@
                         ['label' => 'Acciones', 'width' => '29%', 'class' => 'text-center']
                     ]"
                     :pagination="$aprendices->links()"
-                    :actionsSlot="'<a href=\'' . route('aprendices.create') . '\' class=\'btn btn-primary btn-sm\'><i class=\'fas fa-plus\'></i> Crear Aprendiz</a>'"
                 >
+                    <x-slot name="actions">
+                        <a href="{{ route('aprendices.create') }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-plus"></i> Crear Aprendiz
+                        </a>
+                    </x-slot>
                                     @forelse ($aprendices as $aprendiz)
                                         <tr class="{{ !$aprendiz->persona ? 'table-danger' : '' }}">
                                             <td class="px-3">

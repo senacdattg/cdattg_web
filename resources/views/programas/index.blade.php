@@ -1,7 +1,70 @@
 @extends('adminlte::page')
 
+@section('title', 'Programas de Formación')
+
 @section('css')
     @vite(['resources/css/parametros.css'])
+    <style>
+        /* Asegurar que el footer no interfiera con el sidebar de AdminLTE */
+        .footer {
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+            position: relative !important;
+            z-index: 1 !important;
+        }
+        
+        /* Asegurar que el contenido principal respete el sidebar */
+        .content-wrapper {
+            margin-left: 250px !important;
+        }
+        
+        .main-sidebar {
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            height: 100vh !important;
+            overflow-y: auto !important;
+            z-index: 1000 !important;
+        }
+        
+        /* Responsive para móviles */
+        @media (max-width: 768px) {
+            .content-wrapper {
+                margin-left: 0 !important;
+            }
+            
+            .main-sidebar {
+                transform: translateX(-100%) !important;
+                transition: transform 0.3s ease !important;
+            }
+            
+            .main-sidebar.sidebar-open {
+                transform: translateX(0) !important;
+            }
+        }
+        
+        /* Estilos específicos para el footer */
+        .footer {
+            background-color: #f8f9fa !important;
+            border-top: 1px solid #dee2e6 !important;
+            margin-top: 2rem !important;
+        }
+        
+        .footer-logo {
+            max-height: 50px !important;
+            width: auto !important;
+        }
+        
+        .social-links a {
+            color: #6c757d !important;
+            font-size: 1.2rem !important;
+            transition: color 0.3s ease !important;
+        }
+        
+        .social-links a:hover {
+            color: #007bff !important;
+        }
+    </style>
 @endsection
 
 @section('content_header')
@@ -25,7 +88,7 @@
                 <div class="col-12">
                     @can('programa.create')
                         <x-table-filters 
-                            action="{{ route('programas.store') }}"
+                            action="{{ route('programa.store') }}"
                             method="POST"
                             title="Crear Programa de Formación"
                             icon="fa-plus-circle"
@@ -37,7 +100,7 @@
                     <x-data-table 
                         title="Lista de Programas de Formación"
                         searchable="true"
-                        searchAction="{{ route('programas.index') }}"
+                        searchAction="{{ route('programa.index') }}"
                         searchPlaceholder="Buscar por código, nombre..."
                         searchValue="{{ request('search') }}"
                         :columns="[
@@ -50,32 +113,32 @@
                             ['label' => 'Acciones', 'width' => '10%', 'class' => 'text-center']
                         ]"
                         :pagination="$programas->links()"
-                        :actionsSlot="'
-                            <div class=\"mr-3\">
-                                <select id=\"filterRedConocimiento\" class=\"form-control form-control-sm\" style=\"width: 150px;\">
-                                    <option value=\"\">Todas las redes</option>
-                                    @foreach(\\App\\Models\\RedConocimiento::all() as \$red)
-                                        <option value=\"{{ \$red->id }}\">{{ \$red->nombre }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class=\"mr-3\">
-                                <select id=\"filterNivelFormacion\" class=\"form-control form-control-sm\" style=\"width: 120px;\">
-                                    <option value=\"\">Todos los niveles</option>
-                                    @foreach(\\App\\Models\\Parametro::whereHas(\'temas\', function(\$query) { \$query->where(\'temas.id\', 6); })->get() as \$nivel)
-                                        <option value=\"{{ \$nivel->id }}\">{{ \$nivel->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class=\"mr-3\">
-                                <select id=\"filterStatus\" class=\"form-control form-control-sm\" style=\"width: 100px;\">
-                                    <option value=\"\">Todos</option>
-                                    <option value=\"1\">Activos</option>
-                                    <option value=\"0\">Inactivos</option>
-                                </select>
-                            </div>
-                        '"
                     >
+                        <x-slot name="actions">
+                            <div class="mr-3">
+                                <select id="filterRedConocimiento" class="form-control form-control-sm" style="width: 150px;">
+                                    <option value="">Todas las redes</option>
+                                    @foreach(\App\Models\RedConocimiento::all() as $red)
+                                        <option value="{{ $red->id }}">{{ $red->nombre }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mr-3">
+                                <select id="filterNivelFormacion" class="form-control form-control-sm" style="width: 120px;">
+                                    <option value="">Todos los niveles</option>
+                                    @foreach(\App\Models\Parametro::whereHas('temas', function($query) { $query->where('temas.id', 6); })->get() as $nivel)
+                                        <option value="{{ $nivel->id }}">{{ $nivel->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mr-3">
+                                <select id="filterStatus" class="form-control form-control-sm" style="width: 100px;">
+                                    <option value="">Todos</option>
+                                    <option value="1">Activos</option>
+                                    <option value="0">Inactivos</option>
+                                </select>
+                            </div>
+                        </x-slot>
                                         @forelse ($programas as $programa)
                                             <tr>
                                                 <td class="px-4">{{ $loop->iteration }}</td>
@@ -158,6 +221,11 @@
     </section>
 
     @include('components.confirm-delete-modal')
+@endsection
+
+@section('footer')
+    @include('layout.footer')
+    @include('layout.alertas')
 @endsection
 
 @section('js')

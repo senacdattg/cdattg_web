@@ -5,7 +5,7 @@ use App\Http\Controllers\FichaCaracterizacionController;
 
 // Rutas para FichasCaracterizacionController
 Route::resource('fichaCaracterizacion', FichaCaracterizacionController::class);
-route::middleware('can:VER PROGRAMA DE CARACTERIZACION')->group(function () {
+route::middleware('can:VER FICHA CARACTERIZACION')->group(function () {
     Route::get('/ficha/index', [FichaCaracterizacionController::class, 'index'])->name('ficha.index');
     Route::get('/ficha/search', [FichaCaracterizacionController::class, 'search'])->name('ficha.search');
     Route::post('/ficha/search-ajax', [FichaCaracterizacionController::class, 'search'])->name('ficha.search.ajax');

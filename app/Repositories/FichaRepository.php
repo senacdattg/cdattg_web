@@ -25,7 +25,7 @@ class FichaRepository
     {
         return $this->cache('activas', function () {
             return FichaCaracterizacion::where('status', 1)
-                ->with(['programaFormacion', 'jornadaFormacion', 'modalidadFormacion', 'ambiente.sede'])
+                ->with(['programaFormacion', 'jornadaFormacion', 'modalidadFormacion', 'ambiente.piso.bloque.sede'])
                 ->orderBy('ficha')
                 ->get();
         }, 60); // 1 hora
@@ -43,7 +43,7 @@ class FichaRepository
             'programaFormacion.redConocimiento',
             'jornadaFormacion',
             'modalidadFormacion',
-            'ambiente.sede',
+            'ambiente.piso.bloque.sede',
             'regional'
         ]);
 
@@ -91,7 +91,7 @@ class FichaRepository
                 'programaFormacion.redConocimiento',
                 'jornadaFormacion',
                 'modalidadFormacion',
-                'ambiente.sede',
+                'ambiente.piso.bloque.sede',
                 'regional',
                 'diasFormacion'
             ])->find($id);

@@ -9,7 +9,7 @@
         icon="fa-user-edit" 
         title="Persona"
         subtitle="Edición de datos personales"
-        :breadcrumb="[['label' => 'Personas', 'url' => '{{ route('personas.index') }}', 'icon' => 'fa-users'], ['label' => 'Editar persona', 'icon' => 'fa-edit', 'active' => true]]"
+        :breadcrumb="[['label' => 'Personas', 'url' => route('personas.index') , 'icon' => 'fa-users'], ['label' => 'Editar persona', 'icon' => 'fa-edit', 'active' => true]]"
     />
 @endsection
 

@@ -43,7 +43,7 @@
         icon="fa-book-open" 
         title="Guías de Aprendizaje"
         subtitle="Gestión de guías de aprendizaje del SENA"
-        :breadcrumb="[['label' => 'Inicio', 'url' => '{{ url('/') }}', 'icon' => 'fa-home'], ['label' => 'Guías de Aprendizaje', 'icon' => 'fa-book-open', 'active' => true]]"
+        :breadcrumb="[['label' => 'Inicio', 'url' => url('/') , 'icon' => 'fa-home'], ['label' => 'Guías de Aprendizaje', 'icon' => 'fa-book-open', 'active' => true]]"
     />
 @endsection
 

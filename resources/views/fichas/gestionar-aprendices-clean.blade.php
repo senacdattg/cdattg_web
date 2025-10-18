@@ -296,7 +296,7 @@
         icon="fa-users" 
         title="Gestionar Aprendices"
         subtitle="Ficha: {{ $ficha->ficha }} - {{ $ficha->programaFormacion->nombre ?? 'N/A' }}"
-        :breadcrumb="[['label' => '{{ $ficha->ficha }}', 'url' => '{{ route('fichaCaracterizacion.show', $ficha->id) }}', 'icon' => 'fa-eye'], ['label' => 'Gestionar Aprendices', 'icon' => 'fa-users', 'active' => true]]"
+        :breadcrumb="[['label' => '{{ $ficha->ficha }}', 'url' => route('fichaCaracterizacion.show', $ficha->id) , 'icon' => 'fa-eye'], ['label' => 'Gestionar Aprendices', 'icon' => 'fa-users', 'active' => true]]"
     />
 @endsection
 

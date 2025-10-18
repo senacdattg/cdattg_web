@@ -49,7 +49,7 @@
         icon="fa-graduation-cap" 
         title="Resultados de Aprendizaje"
         subtitle="Gestión de resultados de aprendizaje del SENA"
-        :breadcrumb="[['label' => 'Inicio', 'url' => '{{ url('/') }}', 'icon' => 'fa-home'], ['label' => 'Resultados de Aprendizaje', 'icon' => 'fa-graduation-cap', 'active' => true]]"
+        :breadcrumb="[['label' => 'Inicio', 'url' => url('/') , 'icon' => 'fa-home'], ['label' => 'Resultados de Aprendizaje', 'icon' => 'fa-graduation-cap', 'active' => true]]"
     />
 @endsection
 
@@ -83,27 +83,27 @@
                             ['label' => 'Acciones', 'width' => '10%', 'class' => 'text-center']
                         ]"
                         :pagination="$resultadosAprendizaje->links()"
-                        :actionsSlot="'
-                            <div class=\"mr-2\">
-                                <select id=\"filterCompetencia\" class=\"form-control form-control-sm\" style=\"width: 200px;\">
-                                    <option value=\"\">Todas las competencias</option>
+                    >
+                        <x-slot name="actions">
+                            <div class="mr-2">
+                                <select id="filterCompetencia" class="form-control form-control-sm" style="width: 200px;">
+                                    <option value="">Todas las competencias</option>
                                     @php
-                                        \$competencias = \\App\\Models\\Competencia::orderBy(\'nombre\')->get();
+                                        $competencias = \App\Models\Competencia::orderBy('nombre')->get();
                                     @endphp
-                                    @foreach(\$competencias as \$competencia)
-                                        <option value=\"{{ \$competencia->id }}\">{{ Str::limit(\$competencia->nombre, 25) }}</option>
+                                    @foreach($competencias as $competencia)
+                                        <option value="{{ $competencia->id }}">{{ Str::limit($competencia->nombre, 25) }}</option>
                                     @endforeach
                                 </select>
                             </div>
-                            <div class=\"mr-2\">
-                                <select id=\"filterStatus\" class=\"form-control form-control-sm\" style=\"width: 100px;\">
-                                    <option value=\"\">Todos</option>
-                                    <option value=\"1\">Activos</option>
-                                    <option value=\"0\">Inactivos</option>
+                            <div class="mr-2">
+                                <select id="filterStatus" class="form-control form-control-sm" style="width: 100px;">
+                                    <option value="">Todos</option>
+                                    <option value="1">Activos</option>
+                                    <option value="0">Inactivos</option>
                                 </select>
                             </div>
-                        '"
-                    >
+                        </x-slot>
                                         @forelse ($resultadosAprendizaje as $resultado)
                                             <tr>
                                                 <td class="px-4">{{ $loop->iteration }}</td>

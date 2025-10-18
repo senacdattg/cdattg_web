@@ -108,6 +108,37 @@ class StoreFichaCaracterizacionRequest extends FormRequest
             'status' => [
                 'nullable',
                 'boolean'
+            ],
+
+            // Validación de días de formación
+            'dias_formacion' => [
+                'required',
+                'array',
+                'min:1'
+            ],
+            'dias_formacion.*' => [
+                'required',
+                'integer',
+                'in:12,13,14,15,16,17,18' // IDs de los días de la semana
+            ],
+
+            // Validación de horarios (opcional)
+            'horarios' => [
+                'nullable',
+                'array'
+            ],
+            'horarios.*' => [
+                'nullable',
+                'array'
+            ],
+            'horarios.*.hora_inicio' => [
+                'nullable',
+                'date_format:H:i'
+            ],
+            'horarios.*.hora_fin' => [
+                'nullable',
+                'date_format:H:i',
+                'after:horarios.*.hora_inicio'
             ]
         ];
     }
@@ -165,7 +196,22 @@ class StoreFichaCaracterizacionRequest extends FormRequest
             'total_horas.max' => 'El total de horas no puede exceder 9999.',
 
             // Mensajes para estado
-            'status.boolean' => 'El estado debe ser verdadero o falso.'
+            'status.boolean' => 'El estado debe ser verdadero o falso.',
+
+            // Mensajes para días de formación
+            'dias_formacion.required' => 'Debe seleccionar al menos un día de formación.',
+            'dias_formacion.array' => 'Los días de formación deben ser una lista.',
+            'dias_formacion.min' => 'Debe seleccionar al menos un día de formación.',
+            'dias_formacion.*.required' => 'Cada día de formación es obligatorio.',
+            'dias_formacion.*.integer' => 'El día de formación debe ser un número entero.',
+            'dias_formacion.*.in' => 'El día de formación seleccionado no es válido.',
+
+            // Mensajes para horarios
+            'horarios.array' => 'Los horarios deben ser una lista.',
+            'horarios.*.array' => 'Cada horario debe ser una lista.',
+            'horarios.*.hora_inicio.date_format' => 'La hora de inicio debe tener el formato HH:MM.',
+            'horarios.*.hora_fin.date_format' => 'La hora de fin debe tener el formato HH:MM.',
+            'horarios.*.hora_fin.after' => 'La hora de fin debe ser posterior a la hora de inicio.'
         ];
     }
 
@@ -187,7 +233,12 @@ class StoreFichaCaracterizacionRequest extends FormRequest
             'sede_id' => 'sede',
             'jornada_id' => 'jornada',
             'total_horas' => 'total de horas',
-            'status' => 'estado'
+            'status' => 'estado',
+            'dias_formacion' => 'días de formación',
+            'dias_formacion.*' => 'día de formación',
+            'horarios' => 'horarios',
+            'horarios.*.hora_inicio' => 'hora de inicio',
+            'horarios.*.hora_fin' => 'hora de fin'
         ];
     }
 

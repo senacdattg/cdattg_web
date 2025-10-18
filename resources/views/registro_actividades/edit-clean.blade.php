@@ -96,7 +96,7 @@
         icon="fa-calendar-alt" 
         title="Actividad"
         subtitle="Edición de la actividad"
-        :breadcrumb="[['label' => 'Actividades', 'url' => '{{ route('registro-actividades.index', $caracterizacion) }}', 'icon' => 'fa-calendar-check'], ['label' => 'Editar actividad', 'icon' => 'fa-edit', 'active' => true]]"
+        :breadcrumb="[['label' => 'Actividades', 'url' => route('registro-actividades.index', $caracterizacion) , 'icon' => 'fa-calendar-check'], ['label' => 'Editar actividad', 'icon' => 'fa-edit', 'active' => true]]"
     />
 @endsection
 

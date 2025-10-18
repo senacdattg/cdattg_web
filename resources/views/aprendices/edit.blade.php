@@ -11,7 +11,7 @@
         icon="fa-user-graduate" 
         title="Aprendiz"
         subtitle="Edición del aprendiz"
-        :breadcrumb="[['label' => 'Aprendices', 'url' => '{{ route('aprendices.index') }}', 'icon' => 'fa-user-graduate'], ['label' => 'Editar aprendiz', 'icon' => 'fa-edit', 'active' => true]]"
+        :breadcrumb="[['label' => 'Aprendices', 'url' => route('aprendices.index') , 'icon' => 'fa-user-graduate'], ['label' => 'Editar aprendiz', 'icon' => 'fa-edit', 'active' => true]]"
     />
 @endsection
 

@@ -9,7 +9,7 @@
         icon="fa-cogs" 
         title="Municipio"
         subtitle="Detalles del municipio"
-        :breadcrumb="[['label' => 'Municipios', 'url' => '{{ route('municipio.index') }}', 'icon' => 'fa-cog'], ['label' => 'Detalles del municipio', 'icon' => 'fa-info-circle', 'active' => true]]"
+        :breadcrumb="[['label' => 'Municipios', 'url' => route('municipio.index') , 'icon' => 'fa-cog'], ['label' => 'Detalles del municipio', 'icon' => 'fa-info-circle', 'active' => true]]"
     />
 @endsection
 

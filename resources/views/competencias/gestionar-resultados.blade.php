@@ -46,7 +46,7 @@
         icon="fa-tasks" 
         title="Gestionar Resultados"
         subtitle="{{ $competencia->codigo }} - {{ Str::limit($competencia->nombre, 50) }}"
-        :breadcrumb="[['label' => 'Detalle', 'url' => '{{ route('competencias.show', $competencia->id) }}', 'icon' => 'fa-info-circle'], ['label' => 'Gestionar Resultados', 'icon' => 'fa-tasks', 'active' => true]]"
+        :breadcrumb="[['label' => 'Detalle', 'url' => route('competencias.show', $competencia->id) , 'icon' => 'fa-info-circle'], ['label' => 'Gestionar Resultados', 'icon' => 'fa-tasks', 'active' => true]]"
     />
 @endsection
 

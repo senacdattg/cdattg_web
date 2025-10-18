@@ -23,7 +23,7 @@
 
             <div class="row">
                 <div class="col-12">
-                    @can('CREAR PROGRAMA DE CARACTERIZACION')
+                    @can('CREAR FICHA CARACTERIZACION')
                         <div class="card shadow-sm mb-4 no-hover">
                             <div class="card-header bg-white py-3 d-flex align-items-center">
                                 <a href="{{ route('fichaCaracterizacion.create') }}" class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1 text-decoration-none">
@@ -70,7 +70,7 @@
                                                         <span class="text-muted">Sin asignar</span>
                                                     @endif
                                                 </td>
-                                                <td class="px-4">{{ $ficha->sede->sede ?? 'N/A' }}</td>
+                                                <td class="px-4">{{ $ficha->sede->nombre ?? 'N/A' }}</td>
                                                 <td class="px-4">
                                                     <div class="d-inline-block px-3 py-1 rounded-pill {{ $ficha->status ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}">
                                                         <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
@@ -87,14 +87,14 @@
                                                 <td class="px-4 text-center">
                                                     <div class="btn-group-vertical btn-group-sm" role="group">
                                                         <div class="btn-group btn-group-sm mb-1" role="group">
-                                                            @can('VER PROGRAMA DE CARACTERIZACION')
+                                                            @can('VER FICHA CARACTERIZACION')
                                                                 <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}"
                                                                     class="btn btn-light btn-sm" data-toggle="tooltip"
                                                                     title="Ver detalles">
                                                                     <i class="fas fa-eye text-warning"></i>
                                                                 </a>
                                                             @endcan
-                                                            @can('EDITAR PROGRAMA DE CARACTERIZACION')
+                                                            @can('EDITAR FICHA CARACTERIZACION')
                                                                 <a href="{{ route('fichaCaracterizacion.edit', $ficha->id) }}"
                                                                     class="btn btn-light btn-sm" data-toggle="tooltip"
                                                                     title="Editar">
@@ -119,7 +119,7 @@
                                                             @endcan
                                                         </div>
                                                         <div class="btn-group btn-group-sm" role="group">
-                                                            @can('ELIMINAR PROGRAMA DE CARACTERIZACION')
+                                                            @can('ELIMINAR FICHA CARACTERIZACION')
                                                                 <button type="button" class="btn btn-light btn-sm" 
                                                                         data-ficha="{{ $ficha->ficha }}" 
                                                                         data-url="{{ route('fichaCaracterizacion.destroy', $ficha->id) }}"

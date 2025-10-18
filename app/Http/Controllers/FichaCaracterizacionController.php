@@ -36,10 +36,10 @@ class FichaCaracterizacionController extends Controller
         $this->validationService = $validationService;
         $this->configuracionRepo = $configuracionRepo;
 
-        $this->middleware('can:VER PROGRAMA DE CARACTERIZACION')->only(['index', 'show', 'create', 'edit']);
-        $this->middleware('can:CREAR PROGRAMA DE CARACTERIZACION')->only(['store']);
-        $this->middleware('can:EDITAR PROGRAMA DE CARACTERIZACION')->only(['update']);
-        $this->middleware('can:ELIMINAR PROGRAMA DE CARACTERIZACION')->only(['destroy']);
+        $this->middleware('can:VER FICHA CARACTERIZACION')->only(['index', 'show', 'create', 'edit']);
+        $this->middleware('can:CREAR FICHA CARACTERIZACION')->only(['store']);
+        $this->middleware('can:EDITAR FICHA CARACTERIZACION')->only(['update']);
+        $this->middleware('can:ELIMINAR FICHA CARACTERIZACION')->only(['destroy']);
     }
 
     /**
@@ -194,12 +194,49 @@ class FichaCaracterizacionController extends Controller
             $ficha->user_edit_id = Auth::id(); // Agregar user_edit_id para creación
 
             if ($ficha->save()) {
+                // Guardar días de formación si se proporcionaron
+                if ($request->has('dias_formacion') && is_array($request->dias_formacion)) {
+                    Log::info('Guardando días de formación', [
+                        'dias_formacion' => $request->dias_formacion,
+                        'horarios_completos' => $request->horarios,
+                        'all_request' => $request->all()
+                    ]);
+                    
+                    foreach ($request->dias_formacion as $diaId) {
+                        $fichaDia = new \App\Models\FichaDiasFormacion();
+                        $fichaDia->ficha_id = $ficha->id;
+                        $fichaDia->dia_id = $diaId;
+                        
+                        // Obtener horarios desde el array
+                        $horarios = $request->input('horarios', []);
+                        
+                        if (isset($horarios[$diaId])) {
+                            $fichaDia->hora_inicio = $horarios[$diaId]['hora_inicio'] ?? '08:00:00';
+                            $fichaDia->hora_fin = $horarios[$diaId]['hora_fin'] ?? '16:00:00';
+                            
+                            Log::info("Horario para día {$diaId}", [
+                                'hora_inicio' => $fichaDia->hora_inicio,
+                                'hora_fin' => $fichaDia->hora_fin
+                            ]);
+                        } else {
+                            // Horarios por defecto
+                            $fichaDia->hora_inicio = '08:00:00';
+                            $fichaDia->hora_fin = '16:00:00';
+                            
+                            Log::warning("No se encontraron horarios para día {$diaId}, usando valores por defecto");
+                        }
+                        
+                        $fichaDia->save();
+                    }
+                }
+                
                 DB::commit();
                 
                 Log::info('Ficha de caracterización creada exitosamente', [
                     'ficha_id' => $ficha->id,
                     'numero_ficha' => $ficha->ficha,
                     'programa_id' => $ficha->programa_formacion_id,
+                    'dias_formacion' => $request->dias_formacion ?? [],
                     'user_id' => Auth::id()
                 ]);
 
@@ -378,25 +415,98 @@ class FichaCaracterizacionController extends Controller
     public function destroy(string $id)
     {
         try {
-            Log::info('Inicio de eliminación de ficha de caracterización', [
+            $user = Auth::user();
+            
+            Log::info('═══════════════════════════════════════════════════════════');
+            Log::info('INICIO: Intento de eliminación de ficha de caracterización', [
                 'ficha_id' => $id,
-                'user_id' => Auth::id(),
-                'timestamp' => now()
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'user_email' => $user->email,
+                'user_roles' => $user->roles->pluck('name')->toArray(),
+                'user_permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
+                'timestamp' => now()->format('Y-m-d H:i:s'),
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent()
             ]);
 
+            // Buscar la ficha
             $ficha = FichaCaracterizacion::findOrFail($id);
+            
+            Log::info('Ficha encontrada', [
+                'ficha_id' => $ficha->id,
+                'numero_ficha' => $ficha->ficha,
+                'programa_formacion_id' => $ficha->programa_formacion_id,
+                'programa_nombre' => $ficha->programaFormacion->nombre ?? 'N/A',
+                'instructor_id' => $ficha->instructor_id,
+                'sede_id' => $ficha->sede_id,
+                'status' => $ficha->status ? 'Activa' : 'Inactiva',
+                'fecha_inicio' => $ficha->fecha_inicio ? $ficha->fecha_inicio->format('Y-m-d') : null,
+                'fecha_fin' => $ficha->fecha_fin ? $ficha->fecha_fin->format('Y-m-d') : null
+            ]);
+
+            // Verificar autorización
+            try {
+                $this->authorize('delete', $ficha);
+                Log::info('✓ Autorización verificada: Usuario autorizado para eliminar la ficha');
+            } catch (\Illuminate\Auth\Access\AuthorizationException $authException) {
+                Log::error('✗ Autorización denegada', [
+                    'user_id' => $user->id,
+                    'ficha_id' => $id,
+                    'error' => 'El usuario no tiene permiso para eliminar esta ficha',
+                    'user_roles' => $user->roles->pluck('name')->toArray(),
+                    'required_permission' => 'ELIMINAR FICHA CARACTERIZACION'
+                ]);
+                throw $authException;
+            }
 
             // Verificar si la ficha tiene aprendices asignados
+            $aprendicesCount = $ficha->contarAprendices();
+            Log::info('Verificando aprendices asignados', [
+                'tiene_aprendices' => $ficha->tieneAprendices(),
+                'cantidad_aprendices' => $aprendicesCount
+            ]);
+
             if ($ficha->tieneAprendices()) {
-                Log::warning('Intento de eliminar ficha con aprendices asignados', [
+                Log::warning('✗ VALIDACIÓN FALLIDA: Ficha con aprendices asignados', [
                     'ficha_id' => $id,
                     'numero_ficha' => $ficha->ficha,
-                    'aprendices_count' => $ficha->contarAprendices(),
-                    'user_id' => Auth::id()
+                    'aprendices_count' => $aprendicesCount,
+                    'user_id' => $user->id,
+                    'razon' => 'No se puede eliminar una ficha que tiene aprendices asignados'
                 ]);
 
                 return redirect()->route('fichaCaracterizacion.index')
-                    ->with('error', 'No se puede eliminar la ficha porque tiene aprendices asignados.');
+                    ->with('error', 'No se puede eliminar la ficha porque tiene ' . $aprendicesCount . ' aprendice(s) asignado(s).');
+            }
+
+            Log::info('✓ Validación de aprendices pasada: La ficha no tiene aprendices asignados');
+
+            // Verificar si tiene instructores asignados
+            $instructoresCount = $ficha->instructorFicha()->count();
+            Log::info('Verificando instructores asignados', [
+                'cantidad_instructores' => $instructoresCount
+            ]);
+
+            // Verificar si tiene asistencias
+            $tieneAsistencias = DB::table('asistencia_aprendices')
+                ->join('aprendiz_fichas_caracterizacion', 'asistencia_aprendices.aprendiz_id', '=', 'aprendiz_fichas_caracterizacion.aprendiz_id')
+                ->where('aprendiz_fichas_caracterizacion.ficha_id', $id)
+                ->exists();
+            
+            Log::info('Verificando asistencias registradas', [
+                'tiene_asistencias' => $tieneAsistencias
+            ]);
+
+            if ($tieneAsistencias) {
+                Log::warning('✗ VALIDACIÓN FALLIDA: Ficha con asistencias registradas', [
+                    'ficha_id' => $id,
+                    'numero_ficha' => $ficha->ficha,
+                    'razon' => 'No se puede eliminar una ficha que tiene asistencias registradas'
+                ]);
+
+                return redirect()->route('fichaCaracterizacion.index')
+                    ->with('error', 'No se puede eliminar la ficha porque tiene asistencias registradas.');
             }
 
             // Guardar información de la ficha antes de eliminar para el log
@@ -404,48 +514,97 @@ class FichaCaracterizacionController extends Controller
                 'id' => $ficha->id,
                 'numero_ficha' => $ficha->ficha,
                 'programa_formacion_id' => $ficha->programa_formacion_id,
+                'programa_nombre' => $ficha->programaFormacion->nombre ?? 'N/A',
+                'instructor_id' => $ficha->instructor_id,
+                'sede_id' => $ficha->sede_id,
+                'sede_nombre' => $ficha->sede->nombre ?? 'N/A',
+                'fecha_inicio' => $ficha->fecha_inicio ? $ficha->fecha_inicio->format('Y-m-d') : null,
+                'fecha_fin' => $ficha->fecha_fin ? $ficha->fecha_fin->format('Y-m-d') : null,
+                'created_at' => $ficha->created_at ? $ficha->created_at->format('Y-m-d H:i:s') : null,
+                'updated_at' => $ficha->updated_at ? $ficha->updated_at->format('Y-m-d H:i:s') : null
             ];
 
+            Log::info('Iniciando transacción de base de datos para eliminar la ficha');
             DB::beginTransaction();
 
-            if ($ficha->delete()) {
+            try {
+                $ficha->delete();
+                
                 DB::commit();
                 
-                Log::info('Ficha de caracterización eliminada exitosamente', [
+                Log::info('═══════════════════════════════════════════════════════════');
+                Log::info('✓ ÉXITO: Ficha de caracterización eliminada correctamente', [
                     'ficha_eliminada' => $fichaInfo,
-                    'user_id' => Auth::id()
+                    'eliminada_por_user_id' => $user->id,
+                    'eliminada_por_user_name' => $user->name,
+                    'timestamp' => now()->format('Y-m-d H:i:s')
                 ]);
+                Log::info('═══════════════════════════════════════════════════════════');
 
                 return redirect()->route('fichaCaracterizacion.index')
-                    ->with('success', 'Ficha de caracterización eliminada exitosamente.');
+                    ->with('success', 'Ficha de caracterización #' . $fichaInfo['numero_ficha'] . ' eliminada exitosamente.');
+                    
+            } catch (\Exception $dbException) {
+                DB::rollBack();
+                
+                Log::error('✗ ERROR en la base de datos al eliminar la ficha', [
+                    'ficha_id' => $id,
+                    'error' => $dbException->getMessage(),
+                    'file' => $dbException->getFile(),
+                    'line' => $dbException->getLine(),
+                    'trace' => $dbException->getTraceAsString()
+                ]);
+                
+                throw new \Exception('Error al eliminar la ficha de la base de datos: ' . $dbException->getMessage());
             }
 
-            DB::rollBack();
-            throw new \Exception('Error al eliminar la ficha de la base de datos.');
-
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::warning('Intento de eliminar ficha de caracterización inexistente', [
+            Log::error('═══════════════════════════════════════════════════════════');
+            Log::error('✗ ERROR: Ficha de caracterización no encontrada', [
                 'ficha_id' => $id,
                 'user_id' => Auth::id(),
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
+                'timestamp' => now()->format('Y-m-d H:i:s')
             ]);
+            Log::error('═══════════════════════════════════════════════════════════');
 
             return redirect()->route('fichaCaracterizacion.index')
                 ->with('error', 'La ficha de caracterización solicitada no existe.');
 
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            Log::error('═══════════════════════════════════════════════════════════');
+            Log::error('✗ ERROR: Acceso denegado - Sin autorización para eliminar', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id(),
+                'user_email' => Auth::user()->email ?? 'N/A',
+                'user_roles' => Auth::user()->roles->pluck('name')->toArray() ?? [],
+                'error' => 'El usuario no tiene los permisos necesarios para eliminar fichas',
+                'required_permission' => 'ELIMINAR FICHA CARACTERIZACION',
+                'timestamp' => now()->format('Y-m-d H:i:s')
+            ]);
+            Log::error('═══════════════════════════════════════════════════════════');
+
+            return redirect()->route('fichaCaracterizacion.index')
+                ->with('error', 'No tienes permisos para eliminar fichas de caracterización.');
+
         } catch (\Exception $e) {
             DB::rollBack();
             
-            Log::error('Error al eliminar ficha de caracterización', [
+            Log::error('═══════════════════════════════════════════════════════════');
+            Log::error('✗ ERROR GENERAL al eliminar ficha de caracterización', [
                 'ficha_id' => $id,
-                'error' => $e->getMessage(),
+                'error_message' => $e->getMessage(),
+                'error_type' => get_class($e),
                 'user_id' => Auth::id(),
                 'file' => $e->getFile(),
-                'line' => $e->getLine()
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'timestamp' => now()->format('Y-m-d H:i:s')
             ]);
+            Log::error('═══════════════════════════════════════════════════════════');
 
             return redirect()->route('fichaCaracterizacion.index')
-                ->with('error', 'Ocurrió un error al eliminar la ficha de caracterización. Por favor, intente nuevamente.');
+                ->with('error', 'Ocurrió un error al eliminar la ficha de caracterización. Por favor, intente nuevamente. Error: ' . $e->getMessage());
         }
     }
 

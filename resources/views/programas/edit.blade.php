@@ -9,7 +9,7 @@
         icon="fa-graduation-cap" 
         title="Programa de Formación"
         subtitle="Edición del programa de formación"
-        :breadcrumb="[['label' => 'Programas de Formación', 'url' => '{{ route('programa.index') }}', 'icon' => 'fa-graduation-cap'], ['label' => 'Editar programa', 'icon' => 'fa-edit', 'active' => true]]"
+        :breadcrumb="[['label' => 'Programas de Formación', 'url' => route('programa.index') , 'icon' => 'fa-graduation-cap'], ['label' => 'Editar programa', 'icon' => 'fa-edit', 'active' => true]]"
     />
 @endsection
 

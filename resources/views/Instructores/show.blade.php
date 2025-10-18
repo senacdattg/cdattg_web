@@ -97,7 +97,7 @@
         icon="fa-chalkboard-teacher" 
         title="Detalles del Instructor"
         subtitle="Información completa del instructor"
-        :breadcrumb="[['label' => 'Instructores', 'url' => '{{ route('instructor.index') }}', 'icon' => 'fa-chalkboard-teacher'], ['label' => '{{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}', 'icon' => 'fa-user', 'active' => true]]"
+        :breadcrumb="[['label' => 'Instructores', 'url' => route('instructor.index') , 'icon' => 'fa-chalkboard-teacher'], ['label' => '{{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}', 'icon' => 'fa-user', 'active' => true]]"
     />
 @endsection
 

@@ -69,7 +69,7 @@
         icon="fa-chalkboard-teacher" 
         title="Instructor"
         subtitle="Edición del instructor"
-        :breadcrumb="[['label' => 'Instructores', 'url' => '{{ route('instructor.index') }}', 'icon' => 'fa-chalkboard-teacher'], ['label' => 'Editar instructor', 'icon' => 'fa-edit', 'active' => true]]"
+        :breadcrumb="[['label' => 'Instructores', 'url' => route('instructor.index') , 'icon' => 'fa-chalkboard-teacher'], ['label' => 'Editar instructor', 'icon' => 'fa-edit', 'active' => true]]"
     />
 @endsection
 

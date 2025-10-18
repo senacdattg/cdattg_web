@@ -29,7 +29,7 @@
         icon="fa-clipboard-list" 
         title="Competencias"
         subtitle="Gestión de competencias del SENA"
-        :breadcrumb="[['label' => 'Competencias', 'url' => '{{ route('competencias.index') }}', 'icon' => 'fa-clipboard-list'], ['label' => 'Crear', 'icon' => 'fa-plus', 'active' => true]]"
+        :breadcrumb="[['label' => 'Competencias', 'url' => route('competencias.index') , 'icon' => 'fa-clipboard-list'], ['label' => 'Crear', 'icon' => 'fa-plus', 'active' => true]]"
     />
 @endsection
 

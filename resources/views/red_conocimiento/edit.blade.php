@@ -9,7 +9,7 @@
         icon="fa-network-wired" 
         title="Red de Conocimiento"
         subtitle="Edición de la red de conocimiento"
-        :breadcrumb="[['label' => 'Redes de Conocimiento', 'url' => '{{ route('red-conocimiento.index') }}', 'icon' => 'fa-network-wired'], ['label' => 'Editar red de conocimiento', 'icon' => 'fa-edit', 'active' => true]]"
+        :breadcrumb="[['label' => 'Redes de Conocimiento', 'url' => route('red-conocimiento.index') , 'icon' => 'fa-network-wired'], ['label' => 'Editar red de conocimiento', 'icon' => 'fa-edit', 'active' => true]]"
     />
 @endsection
 

@@ -9,7 +9,7 @@
         icon="fa-cogs" 
         title="Parámetro"
         subtitle="Edición del parámetro"
-        :breadcrumb="[['label' => 'Parámetros', 'url' => '{{ route('parametro.index') }}', 'icon' => 'fa-cog'], ['label' => 'Editar parámetro', 'icon' => 'fa-edit', 'active' => true]]"
+        :breadcrumb="[['label' => 'Parámetros', 'url' => route('parametro.index') , 'icon' => 'fa-cog'], ['label' => 'Editar parámetro', 'icon' => 'fa-edit', 'active' => true]]"
     />
 @endsection
 

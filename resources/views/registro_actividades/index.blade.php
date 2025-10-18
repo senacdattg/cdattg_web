@@ -11,7 +11,7 @@
         icon="fa-home" 
         title="Registro de actividades"
         subtitle="Gestión de actividades"
-        :breadcrumb="[['label' => 'Inicio', 'url' => '{{ route('verificarLogin') }}', 'icon' => 'fa-home'], ['label' => 'Registro de actividades', 'icon' => 'fa-fw fa-paint-brush', 'active' => true]]"
+        :breadcrumb="[['label' => 'Inicio', 'url' => route('verificarLogin') , 'icon' => 'fa-home'], ['label' => 'Registro de actividades', 'icon' => 'fa-fw fa-paint-brush', 'active' => true]]"
     />
 @endsection
 

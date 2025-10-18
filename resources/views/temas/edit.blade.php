@@ -9,7 +9,7 @@
         icon="fa-cogs" 
         title="Tema"
         subtitle="Edición del tema"
-        :breadcrumb="[['label' => 'Tema', 'url' => '{{ route('tema.index') }}', 'icon' => 'fa-fw fa-paint-brush'], ['label' => 'Editar tema', 'icon' => 'fa-edit', 'active' => true]]"
+        :breadcrumb="[['label' => 'Tema', 'url' => route('tema.index') , 'icon' => 'fa-fw fa-paint-brush'], ['label' => 'Editar tema', 'icon' => 'fa-edit', 'active' => true]]"
     />
 @endsection
 

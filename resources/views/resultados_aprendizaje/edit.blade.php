@@ -47,7 +47,7 @@
         icon="fa-graduation-cap" 
         title="Resultados de Aprendizaje"
         subtitle="Gestión de resultados de aprendizaje del SENA"
-        :breadcrumb="[['label' => 'Resultados de Aprendizaje', 'url' => '{{ route('resultados-aprendizaje.index') }}', 'icon' => 'fa-graduation-cap'], ['label' => 'Editar', 'icon' => 'fa-edit', 'active' => true]]"
+        :breadcrumb="[['label' => 'Resultados de Aprendizaje', 'url' => route('resultados-aprendizaje.index') , 'icon' => 'fa-graduation-cap'], ['label' => 'Editar', 'icon' => 'fa-edit', 'active' => true]]"
     />
 @endsection
 

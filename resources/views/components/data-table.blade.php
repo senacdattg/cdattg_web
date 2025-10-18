@@ -92,7 +92,7 @@
     @if($paginated && $pagination)
         <div class="card-footer bg-white">
             <div class="float-right">
-                {{ $pagination }}
+                {!! $pagination !!}
             </div>
         </div>
     @endif

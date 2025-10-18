@@ -19,6 +19,7 @@ class ProgramaFormacion extends Model
         'nombre', 
         'red_conocimiento_id', 
         'nivel_formacion_id',
+        'tipo_programa_id',
         'user_create_id',
         'user_edit_id',
         'status'
@@ -62,6 +63,11 @@ class ProgramaFormacion extends Model
     public function nivelFormacion(): BelongsTo
     {
         return $this->belongsTo(Parametro::class, 'nivel_formacion_id');
+    }
+
+    public function tipoPrograma(): BelongsTo
+    {
+        return $this->belongsTo(TipoPrograma::class, 'tipo_programa_id');
     }
 
     // Relación indirecta con Regional a través de RedConocimiento

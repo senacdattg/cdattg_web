@@ -89,7 +89,7 @@
         icon="fa-chalkboard-teacher" 
         title="Instructor"
         subtitle="Asignar rol de instructor a persona existente"
-        :breadcrumb="[['label' => 'Instructores', 'url' => '{{ route('instructor.index') }}', 'icon' => 'fa-chalkboard-teacher'], ['label' => 'Crear instructor', 'icon' => 'fa-plus-circle', 'active' => true]]"
+        :breadcrumb="[['label' => 'Instructores', 'url' => route('instructor.index') , 'icon' => 'fa-chalkboard-teacher'], ['label' => 'Crear instructor', 'icon' => 'fa-plus-circle', 'active' => true]]"
     />
 @endsection
 

@@ -9,7 +9,7 @@
         icon="fa-edit" 
         title="Editar Ficha de Caracterización"
         subtitle="Modificar información de la ficha"
-        :breadcrumb="[['label' => 'Fichas de Caracterización', 'url' => '{{ route('fichaCaracterizacion.index') }}', 'icon' => 'fa-file-alt'], ['label' => 'Editar', 'icon' => 'fa-edit', 'active' => true]]"
+        :breadcrumb="[['label' => 'Fichas de Caracterización', 'url' => route('fichaCaracterizacion.index') , 'icon' => 'fa-file-alt'], ['label' => 'Editar', 'icon' => 'fa-edit', 'active' => true]]"
     />
 @endsection
 

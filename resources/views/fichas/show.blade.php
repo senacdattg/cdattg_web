@@ -9,7 +9,7 @@
         icon="fa-eye" 
         title="Detalles de Ficha de Caracterización"
         subtitle="Información detallada de la ficha"
-        :breadcrumb="[['label' => 'Fichas de Caracterización', 'url' => '{{ route('fichaCaracterizacion.index') }}', 'icon' => 'fa-file-alt'], ['label' => 'Detalles', 'icon' => 'fa-eye', 'active' => true]]"
+        :breadcrumb="[['label' => 'Fichas de Caracterización', 'url' => route('fichaCaracterizacion.index') , 'icon' => 'fa-file-alt'], ['label' => 'Detalles', 'icon' => 'fa-eye', 'active' => true]]"
     />
 @endsection
 
