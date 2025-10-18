@@ -15,13 +15,12 @@ class DashboardService
     protected EstadisticasService $estadisticasService;
     protected AsistenciaService $asistenciaService;
     protected FichaRepository $fichaRepo;
-    protected $cacheType = 'estadisticas';
-
     public function __construct(
         EstadisticasService $estadisticasService,
         AsistenciaService $asistenciaService,
         FichaRepository $fichaRepo
     ) {
+        $this->cacheType = 'estadisticas';
         $this->estadisticasService = $estadisticasService;
         $this->asistenciaService = $asistenciaService;
         $this->fichaRepo = $fichaRepo;

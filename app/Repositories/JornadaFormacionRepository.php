@@ -10,10 +10,12 @@ class JornadaFormacionRepository
 {
     use HasCache;
 
-    protected $cacheType = 'parametros';
-    protected $cacheTags = ['jornadas', 'configuracion'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'parametros';
+        $this->cacheTags = ['jornadas', 'configuracion'];
+    }    /**
      * Obtiene todas las jornadas activas
      *
      * @return Collection

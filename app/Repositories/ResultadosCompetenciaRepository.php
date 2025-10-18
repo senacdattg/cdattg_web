@@ -10,10 +10,12 @@ class ResultadosCompetenciaRepository
 {
     use HasCache;
 
-    protected $cacheType = 'programas';
-    protected $cacheTags = ['resultados_competencia', 'competencias'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'programas';
+        $this->cacheTags = ['resultados_competencia', 'competencias'];
+    }    /**
      * Obtiene resultados por competencia
      *
      * @param int $competenciaId

@@ -10,10 +10,12 @@ class AmbienteRepository
 {
     use HasCache;
 
-    protected $cacheType = 'programas';
-    protected $cacheTags = ['ambientes', 'infraestructura'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'programas';
+        $this->cacheTags = ['ambientes', 'infraestructura'];
+    }    /**
      * Obtiene todos los ambientes activos
      *
      * @return Collection

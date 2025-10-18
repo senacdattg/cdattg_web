@@ -11,10 +11,12 @@ class FichaRepository
 {
     use HasCache;
 
-    protected $cacheType = 'fichas';
-    protected $cacheTags = ['fichas', 'caracterizacion'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'fichas';
+        $this->cacheTags = ['fichas', 'caracterizacion'];
+    }    /**
      * Obtiene todas las fichas activas con relaciones
      *
      * @return Collection

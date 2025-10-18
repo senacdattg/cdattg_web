@@ -12,9 +12,12 @@ class AprendizRepository
 {
     use HasCache;
 
-    protected $cacheType = 'aprendices';
-    protected $cacheTags = ['aprendices', 'personas'];
-    /**
+
+    public function __construct()
+    {
+        $this->cacheType = 'aprendices';
+        $this->cacheTags = ['aprendices', 'personas'];
+    }    /**
      * Obtiene el aprendiz más reciente por persona con relaciones
      *
      * @param array $filtros

@@ -10,10 +10,12 @@ class DiasFormacionRepository
 {
     use HasCache;
 
-    protected $cacheType = 'parametros';
-    protected $cacheTags = ['dias_formacion', 'configuracion'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'parametros';
+        $this->cacheTags = ['dias_formacion', 'configuracion'];
+    }    /**
      * Obtiene todos los días de formación
      *
      * @return Collection

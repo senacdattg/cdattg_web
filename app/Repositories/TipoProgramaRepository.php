@@ -10,10 +10,12 @@ class TipoProgramaRepository
 {
     use HasCache;
 
-    protected $cacheType = 'parametros';
-    protected $cacheTags = ['tipos_programa', 'configuracion'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'parametros';
+        $this->cacheTags = ['tipos_programa', 'configuracion'];
+    }    /**
      * Obtiene todos los tipos de programa activos
      *
      * @return Collection

@@ -10,10 +10,12 @@ class TemaRepository
 {
     use HasCache;
 
-    protected $cacheType = 'temas';
-    protected $cacheTags = ['temas', 'configuracion'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'temas';
+        $this->cacheTags = ['temas', 'configuracion'];
+    }    /**
      * Obtiene todos los temas con parámetros activos
      *
      * @return Collection

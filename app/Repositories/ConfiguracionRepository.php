@@ -17,10 +17,12 @@ class ConfiguracionRepository
 {
     use HasCache;
 
-    protected $cacheType = 'parametros';
-    protected $cacheTags = ['configuracion', 'sistema'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'parametros';
+        $this->cacheTags = ['configuracion', 'sistema'];
+    }    /**
      * Obtiene todas las fichas activas (con caché)
      *
      * @return Collection

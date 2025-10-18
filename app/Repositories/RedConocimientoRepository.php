@@ -10,10 +10,12 @@ class RedConocimientoRepository
 {
     use HasCache;
 
-    protected $cacheType = 'parametros';
-    protected $cacheTags = ['redes_conocimiento', 'configuracion'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'parametros';
+        $this->cacheTags = ['redes_conocimiento', 'configuracion'];
+    }    /**
      * Obtiene todas las redes de conocimiento activas
      *
      * @return Collection

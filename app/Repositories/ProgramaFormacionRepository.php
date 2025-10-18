@@ -10,10 +10,12 @@ class ProgramaFormacionRepository
 {
     use HasCache;
 
-    protected $cacheType = 'programas';
-    protected $cacheTags = ['programas', 'configuracion'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'programas';
+        $this->cacheTags = ['programas', 'configuracion'];
+    }    /**
      * Obtiene todos los programas activos con relaciones
      *
      * @return Collection

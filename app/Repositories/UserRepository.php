@@ -10,10 +10,12 @@ class UserRepository
 {
     use HasCache;
 
-    protected $cacheType = 'parametros';
-    protected $cacheTags = ['usuarios', 'auth'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'parametros';
+        $this->cacheTags = ['usuarios', 'auth'];
+    }    /**
      * Encuentra usuario por email
      *
      * @param string $email

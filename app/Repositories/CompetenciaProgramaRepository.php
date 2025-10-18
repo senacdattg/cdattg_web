@@ -10,10 +10,12 @@ class CompetenciaProgramaRepository
 {
     use HasCache;
 
-    protected $cacheType = 'programas';
-    protected $cacheTags = ['competencias_programa', 'programas'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'programas';
+        $this->cacheTags = ['competencias_programa', 'programas'];
+    }    /**
      * Obtiene competencias por programa
      *
      * @param int $programaId

@@ -10,10 +10,12 @@ class PisoRepository
 {
     use HasCache;
 
-    protected $cacheType = 'parametros';
-    protected $cacheTags = ['pisos', 'infraestructura'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'parametros';
+        $this->cacheTags = ['pisos', 'infraestructura'];
+    }    /**
      * Obtiene pisos por sede
      *
      * @param int $sedeId
