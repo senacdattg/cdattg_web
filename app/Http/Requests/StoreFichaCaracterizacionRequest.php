@@ -57,7 +57,7 @@ class StoreFichaCaracterizacionRequest extends FormRequest
                 'exists:programas_formacion,id'
             ],
 
-            // Validación de fechas
+            // Validación de fechas (al crear debe ser fecha futura)
             'fecha_inicio' => [
                 'required',
                 'date',

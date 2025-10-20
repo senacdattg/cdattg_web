@@ -318,6 +318,15 @@
                                                             @else
                                                                 <span class="badge bg-secondary ms-2">Auxiliar</span>
                                                             @endif
+                                                            @if($asignacion->instructorFichaDias && $asignacion->instructorFichaDias->count() > 0)
+                                                                <span class="badge bg-success ms-2" title="Tiene días asignados">
+                                                                    <i class="fas fa-check-circle"></i> Días configurados
+                                                                </span>
+                                                            @else
+                                                                <span class="badge bg-warning text-dark ms-2" title="Sin días asignados">
+                                                                    <i class="fas fa-exclamation-triangle"></i> Sin días
+                                                                </span>
+                                                            @endif
                                                         </h6>
                                                         <p class="text-muted mb-1 small">
                                                             <i class="fas fa-calendar me-1"></i>
@@ -343,13 +352,28 @@
                                                             @endif
                                                         @endif
                                                     </div>
-                                                    <div>
+                                                    <div class="btn-group-vertical btn-group-sm" role="group">
+                                                        <!-- Botón para gestionar días de formación -->
+                                                        <button type="button"
+                                                           class="btn btn-sm {{ $asignacion->instructorFichaDias && $asignacion->instructorFichaDias->count() > 0 ? 'btn-info' : 'btn-outline-info' }} mb-1 btn-gestionar-dias" 
+                                                           data-instructor-ficha-id="{{ $asignacion->id }}"
+                                                           data-instructor-nombre="{{ $asignacion->instructor->persona->primer_nombre }} {{ $asignacion->instructor->persona->primer_apellido }}"
+                                                           data-toggle="tooltip" 
+                                                           data-placement="top"
+                                                           title="Gestionar días de formación"
+                                                           onclick="abrirModalDias({{ $asignacion->id }}, '{{ $asignacion->instructor->persona->primer_nombre }} {{ $asignacion->instructor->persona->primer_apellido }}')">
+                                                            <i class="fas fa-calendar-week"></i>
+                                                        </button>
+                                                        
+                                                        <!-- Botón para desasignar instructor -->
                                                         <form action="{{ route('fichaCaracterizacion.desasignarInstructor', [$ficha->id, $asignacion->instructor_id]) }}" 
                                                               method="POST" style="display: inline;">
                                                             @csrf
                                                             @method('DELETE')
                                                             <button type="submit" class="btn btn-sm btn-outline-danger" 
-                                                                    onclick="return confirm('¿Está seguro de desasignar este instructor?' )"
+                                                                    data-toggle="tooltip"
+                                                                    data-placement="top"
+                                                                    onclick="return confirm('¿Está seguro de desasignar este instructor?')"
                                                                     title="Desasignar instructor">
                                                                 <i class="fas fa-times"></i>
                                                             </button>
@@ -373,6 +397,102 @@
             </div>
         </div>
     </section>
+
+    <!-- Modal para Gestionar Días de Formación -->
+    <div class="modal fade" id="modalDiasFormacion" tabindex="-1" role="dialog" aria-labelledby="modalDiasFormacionLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="modalDiasFormacionLabel">
+                        <i class="fas fa-calendar-week mr-2"></i>Gestionar Días de Formación
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <!-- Información del instructor -->
+                    <div class="alert alert-info">
+                        <h6><i class="fas fa-info-circle mr-2"></i>Información</h6>
+                        <p class="mb-1"><strong>Instructor:</strong> <span id="modal-instructor-nombre"></span></p>
+                        <p class="mb-1"><strong>Ficha:</strong> {{ $ficha->ficha }}</p>
+                        <p class="mb-0"><strong>Programa:</strong> {{ $ficha->programaFormacion->nombre ?? 'N/A' }}</p>
+                    </div>
+
+                    <!-- Formulario de días -->
+                    <form id="form-asignar-dias-modal">
+                        <input type="hidden" id="modal-instructor-ficha-id">
+                        
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th width="10%" class="text-center">
+                                            <input type="checkbox" id="select-all-modal" title="Seleccionar todos">
+                                        </th>
+                                        <th width="25%">Día de la Semana</th>
+                                        <th width="30%">Hora Inicio</th>
+                                        <th width="30%">Hora Fin</th>
+                                        <th width="5%" class="text-center"><i class="fas fa-info-circle"></i></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dias-tbody">
+                                    @if(isset($diasSemana) && $diasSemana->count() > 0)
+                                        @foreach($diasSemana as $dia)
+                                        <tr class="dia-row-modal" data-dia-id="{{ $dia->id }}">
+                                            <td class="text-center align-middle">
+                                                <input type="checkbox" class="dia-checkbox-modal" value="{{ $dia->id }}" name="dias_selected[]">
+                                            </td>
+                                            <td class="align-middle">
+                                                <strong><i class="far fa-calendar mr-1"></i>{{ $dia->name }}</strong>
+                                            </td>
+                                            <td>
+                                                <input type="time" class="form-control hora-inicio-modal" name="hora_inicio_{{ $dia->id }}" data-dia="{{ $dia->id }}" disabled>
+                                            </td>
+                                            <td>
+                                                <input type="time" class="form-control hora-fin-modal" name="hora_fin_{{ $dia->id }}" data-dia="{{ $dia->id }}" disabled>
+                                            </td>
+                                            <td class="text-center align-middle">
+                                                <i class="fas fa-check-circle text-success dia-status-modal" style="display:none;"></i>
+                                            </td>
+                                        </tr>
+                                        @endforeach
+                                    @else
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">No se encontraron días de la semana configurados</td>
+                                        </tr>
+                                    @endif
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Preview de fechas -->
+                        <div id="preview-fechas-modal" class="card card-success mt-3" style="display: none;">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-calendar-check mr-2"></i>Fechas Efectivas de Formación
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="fechas-container-modal"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-info" id="btn-preview-modal">
+                        <i class="fas fa-eye mr-1"></i>Vista Previa
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="fas fa-times mr-1"></i>Cancelar
+                    </button>
+                    <button type="button" class="btn btn-success" id="btn-guardar-dias-modal">
+                        <i class="fas fa-save mr-1"></i>Guardar Días
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @section('footer')
@@ -380,5 +500,285 @@
 @endsection
 
 @section('js')
+    <script>
+        // Pasar datos al contexto de JavaScript
+        window.fichaId = {{ $ficha->id }};
+        
+        window.diasSemana = @json($diasSemana->map(function($dia) {
+            return ['id' => $dia->id, 'nombre' => $dia->name];
+        })->values());
+    </script>
     @vite(['resources/js/pages/gestion-especializada.js'])
+    <script>
+        const fichaId = {{ $ficha->id }};
+        let instructorFichaIdActual = null;
+
+        $(document).ready(function() {
+            // Inicializar tooltips de Bootstrap
+            $('[data-toggle="tooltip"]').tooltip();
+            
+            // Seleccionar/deseleccionar todos en modal
+            $('#select-all-modal').change(function() {
+                const isChecked = $(this).is(':checked');
+                $('.dia-checkbox-modal').prop('checked', isChecked).trigger('change');
+            });
+
+            // Habilitar/deshabilitar campos de hora según checkbox en modal
+            $('.dia-checkbox-modal').change(function() {
+                const diaId = $(this).val();
+                const isChecked = $(this).is(':checked');
+                const $row = $(this).closest('tr');
+                
+                $(`input[name="hora_inicio_${diaId}"]`).prop('disabled', !isChecked);
+                $(`input[name="hora_fin_${diaId}"]`).prop('disabled', !isChecked);
+                
+                $row.find('.dia-status-modal').toggle(isChecked);
+                
+                if (isChecked) {
+                    $row.addClass('table-active');
+                } else {
+                    $row.removeClass('table-active');
+                    $(`input[name="hora_inicio_${diaId}"]`).val('');
+                    $(`input[name="hora_fin_${diaId}"]`).val('');
+                }
+            });
+
+            // Preview de fechas en modal
+            $('#btn-preview-modal').click(function() {
+                const diasSeleccionados = obtenerDiasSeleccionadosModal();
+                
+                if (diasSeleccionados.length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Sin días seleccionados',
+                        text: 'Debe seleccionar al menos un día para ver las fechas efectivas'
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    title: 'Generando fechas...',
+                    allowOutsideClick: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                $.ajax({
+                    url: `/fichaCaracterizacion/${fichaId}/instructor/${instructorFichaIdActual}/preview-fechas`,
+                    method: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        dias: diasSeleccionados
+                    },
+                    success: function(response) {
+                        Swal.close();
+                        if (response.success) {
+                            mostrarPreviewFechasModal(response.fechas_efectivas, response.total_sesiones);
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'No se pudieron generar las fechas'
+                        });
+                    }
+                });
+            });
+
+            // Guardar días en modal
+            $('#btn-guardar-dias-modal').click(function() {
+                const diasSeleccionados = obtenerDiasSeleccionadosModal();
+                
+                if (diasSeleccionados.length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Sin días seleccionados',
+                        text: 'Debe seleccionar al menos un día de formación'
+                    });
+                    return;
+                }
+
+                Swal.fire({
+                    title: '¿Confirmar asignación?',
+                    text: `Se asignarán ${diasSeleccionados.length} días de formación`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, asignar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        guardarAsignacionModal(diasSeleccionados);
+                    }
+                });
+            });
+            
+            console.log('✅ Gestión de días de formación inicializada');
+        });
+
+        // Función para abrir el modal
+        function abrirModalDias(instructorFichaId, instructorNombre) {
+            instructorFichaIdActual = instructorFichaId;
+            
+            // Establecer información del instructor
+            $('#modal-instructor-nombre').text(instructorNombre);
+            $('#modal-instructor-ficha-id').val(instructorFichaId);
+            
+            // Limpiar formulario
+            limpiarFormularioModal();
+            
+            // Cargar días asignados
+            cargarDiasAsignados(instructorFichaId);
+            
+            // Mostrar modal
+            $('#modalDiasFormacion').modal('show');
+        }
+
+        // Limpiar formulario del modal
+        function limpiarFormularioModal() {
+            $('.dia-checkbox-modal').prop('checked', false);
+            $('.hora-inicio-modal, .hora-fin-modal').val('').prop('disabled', true);
+            $('.dia-row-modal').removeClass('table-active');
+            $('.dia-status-modal').hide();
+            $('#preview-fechas-modal').hide();
+            $('#select-all-modal').prop('checked', false);
+        }
+
+        // Cargar días ya asignados
+        function cargarDiasAsignados(instructorFichaId) {
+            $.ajax({
+                url: `/fichaCaracterizacion/${fichaId}/instructor/${instructorFichaId}/obtener-dias`,
+                method: 'GET',
+                success: function(response) {
+                    if (response.success && response.dias.length > 0) {
+                        response.dias.forEach(function(dia) {
+                            const $checkbox = $(`.dia-checkbox-modal[value="${dia.dia_id}"]`);
+                            $checkbox.prop('checked', true).trigger('change');
+                            
+                            if (dia.hora_inicio) {
+                                $(`input[name="hora_inicio_${dia.dia_id}"]`).val(dia.hora_inicio);
+                            }
+                            if (dia.hora_fin) {
+                                $(`input[name="hora_fin_${dia.dia_id}"]`).val(dia.hora_fin);
+                            }
+                        });
+                    }
+                },
+                error: function() {
+                    console.log('No se pudieron cargar los días asignados');
+                }
+            });
+        }
+
+        // Obtener días seleccionados del modal
+        function obtenerDiasSeleccionadosModal() {
+            const dias = [];
+            $('.dia-checkbox-modal:checked').each(function() {
+                const diaId = $(this).val();
+                const horaInicio = $(`input[name="hora_inicio_${diaId}"]`).val();
+                const horaFin = $(`input[name="hora_fin_${diaId}"]`).val();
+                
+                dias.push({
+                    dia_id: parseInt(diaId),
+                    hora_inicio: horaInicio || null,
+                    hora_fin: horaFin || null
+                });
+            });
+            return dias;
+        }
+
+        // Mostrar preview de fechas en modal
+        function mostrarPreviewFechasModal(fechas, total) {
+            let html = `<div class="alert alert-info"><strong><i class="fas fa-calendar-check"></i> Se generarán ${total} sesiones de formación</strong></div>`;
+            html += '<div class="table-responsive"><table class="table table-sm table-striped table-bordered">';
+            html += '<thead class="thead-light"><tr><th width="5%">#</th><th width="20%">Fecha</th><th width="25%">Día</th><th width="25%">Horario</th></tr></thead><tbody>';
+            
+            fechas.forEach((fecha, index) => {
+                const horario = fecha.hora_inicio && fecha.hora_fin 
+                    ? `${fecha.hora_inicio} - ${fecha.hora_fin}` 
+                    : '<span class="text-muted">Sin horario</span>';
+                
+                html += `<tr>
+                    <td class="text-center">${index + 1}</td>
+                    <td><strong>${fecha.fecha}</strong></td>
+                    <td>${fecha.dia_semana}</td>
+                    <td>${horario}</td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table></div>';
+            
+            $('#fechas-container-modal').html(html);
+            $('#preview-fechas-modal').slideDown();
+        }
+
+        // Guardar asignación desde el modal
+        function guardarAsignacionModal(diasSeleccionados) {
+            Swal.fire({
+                title: 'Guardando...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            $.ajax({
+                url: `/fichaCaracterizacion/${fichaId}/instructor/${instructorFichaIdActual}/asignar-dias`,
+                method: 'POST',
+                data: {
+                    _token: '{{ csrf_token() }}',
+                    dias: diasSeleccionados
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Éxito!',
+                            html: `
+                                <p>${response.message}</p>
+                                <p class="mb-0"><strong>Total de sesiones programadas:</strong> ${response.total_sesiones || 0}</p>
+                            `,
+                            confirmButtonText: 'Entendido'
+                        }).then(() => {
+                            $('#modalDiasFormacion').modal('hide');
+                            location.reload(); // Recargar para mostrar los días actualizados
+                        });
+                    } else {
+                        mostrarErrorConflictosModal(response);
+                    }
+                },
+                error: function(xhr) {
+                    let errorMsg = 'Error al guardar los días de formación';
+                    if (xhr.responseJSON && xhr.responseJSON.errors) {
+                        errorMsg = Object.values(xhr.responseJSON.errors).flat().join('<br>');
+                    }
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        html: errorMsg
+                    });
+                }
+            });
+        }
+
+        // Mostrar errores de conflictos
+        function mostrarErrorConflictosModal(response) {
+            let html = `<p>${response.message}</p>`;
+            
+            if (response.conflictos && response.conflictos.length > 0) {
+                html += '<hr><p><strong>Conflictos detectados:</strong></p><ul class="text-left">';
+                response.conflictos.forEach(conflicto => {
+                    html += `<li>${conflicto.dia_nombre}: Ficha ${conflicto.ficha_conflicto} (${conflicto.horario_conflicto})</li>`;
+                });
+                html += '</ul>';
+            }
+            
+            Swal.fire({
+                icon: 'error',
+                title: 'No se pudo asignar',
+                html: html
+            });
+        }
+    </script>
 @endsection

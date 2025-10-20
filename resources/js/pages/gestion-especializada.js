@@ -39,13 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
         elementosSeleccionadosAsignados = $('.checkbox-asignado:checked').length;
         elementosSeleccionadosDisponibles = $('.checkbox-disponible:checked').length;
         
-        // Actualizar botones de acción
-        $('.btn-asignar').prop('disabled', elementosSeleccionadosDisponibles === 0);
-        $('.btn-desasignar').prop('disabled', elementosSeleccionadosAsignados === 0);
+        // Actualizar botones de acción (usar IDs y clases)
+        $('#btn-asignar, .btn-asignar').prop('disabled', elementosSeleccionadosDisponibles === 0);
+        $('#btn-desasignar, .btn-desasignar').prop('disabled', elementosSeleccionadosAsignados === 0);
         
-        // Actualizar contadores en la UI si existen
-        $('.contador-asignados').text(elementosSeleccionadosAsignados);
-        $('.contador-disponibles').text(elementosSeleccionadosDisponibles);
+        // Actualizar contadores en la UI si existen (usar IDs y clases)
+        $('#contador-seleccionados, .contador-asignados').text(elementosSeleccionadosAsignados);
+        $('#contador-disponibles, .contador-disponibles').text(elementosSeleccionadosDisponibles);
     }
 
     // Eventos para checkboxes
@@ -167,15 +167,33 @@ document.addEventListener('DOMContentLoaded', () => {
         $(form).find('button[type="submit"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i> Procesando...');
     });
 
-    // Función para seleccionar/deseleccionar todos
-    $('.select-all-asignados').on('change', function() {
+    // Función para seleccionar/deseleccionar todos (usar IDs y clases)
+    $('#select-all-asignados, .select-all-asignados').on('change', function() {
         $('.checkbox-asignado').prop('checked', $(this).is(':checked'));
         actualizarContadores();
     });
 
-    $('.select-all-disponibles').on('change', function() {
+    $('#select-all-disponibles, .select-all-disponibles').on('change', function() {
         $('.checkbox-disponible').prop('checked', $(this).is(':checked'));
         actualizarContadores();
+    });
+
+    // Evento click para botón asignar
+    $('#btn-asignar').on('click', function() {
+        const seleccionados = $('.checkbox-disponible:checked').length;
+        if (seleccionados > 0) {
+            $('#form-asignar').submit();
+        }
+    });
+
+    // Evento click para botón desasignar
+    $('#btn-desasignar').on('click', function() {
+        const seleccionados = $('.checkbox-asignado:checked').length;
+        if (seleccionados > 0) {
+            if (confirm(`¿Está seguro de desasignar ${seleccionados} aprendiz(es)?`)) {
+                $('#form-desasignar').submit();
+            }
+        }
     });
 
     // Función para agregar instructor dinámicamente
@@ -190,47 +208,81 @@ document.addEventListener('DOMContentLoaded', () => {
         const instructoresExistentes = container.querySelectorAll('.instructor-row').length;
         const nuevoIndice = instructoresExistentes;
 
+        // Obtener días de la semana del DOM (deben estar disponibles en la vista)
+        const diasSemanaDisponibles = window.diasSemana || [
+            {id: 12, nombre: 'LUNES'},
+            {id: 13, nombre: 'MARTES'},
+            {id: 14, nombre: 'MIÉRCOLES'},
+            {id: 15, nombre: 'JUEVES'},
+            {id: 16, nombre: 'VIERNES'},
+            {id: 17, nombre: 'SÁBADO'},
+            {id: 18, nombre: 'DOMINGO'}
+        ];
+
+        // Crear HTML para los días de la semana (solo checkboxes)
+        let diasHTML = '';
+        diasSemanaDisponibles.forEach(dia => {
+            diasHTML += `
+                <div class="col-md-4 col-sm-6 mb-2">
+                    <div class="form-check">
+                        <input class="form-check-input dia-check" type="checkbox" 
+                               name="instructores[${nuevoIndice}][dias_semana][]" 
+                               value="${dia.id}" 
+                               id="dia_${nuevoIndice}_${dia.id}">
+                        <label class="form-check-label fw-bold" for="dia_${nuevoIndice}_${dia.id}">
+                            <i class="far fa-calendar-alt mr-1"></i> ${dia.nombre}
+                        </label>
+                    </div>
+                </div>
+            `;
+        });
+
         // Crear HTML para el nuevo instructor
         const instructorHTML = `
-            <div class="instructor-row border rounded p-3 mb-3 bg-light" data-index="${nuevoIndice}">
+            <div class="instructor-row border rounded p-3 mb-3 bg-light position-relative" data-index="${nuevoIndice}">
+                <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" onclick="eliminarInstructor(this)">
+                    <i class="fas fa-times"></i>
+                </button>
+                
                 <div class="row">
-                    <div class="col-md-4">
-                        <label class="form-label font-weight-bold">Instructor</label>
+                    <div class="col-md-6">
+                        <label class="form-label font-weight-bold">
+                            <i class="fas fa-user-tie mr-1"></i> Instructor <span class="text-danger">*</span>
+                        </label>
                         <select name="instructores[${nuevoIndice}][instructor_id]" class="form-control instructor-select" required>
                             <option value="">Seleccionar instructor...</option>
                         </select>
                     </div>
-                    <div class="col-md-2">
-                        <label class="form-label font-weight-bold">Días de Formación</label>
-                        <input type="number" name="instructores[${nuevoIndice}][dias_formacion]" 
-                               class="form-control dias-formacion" min="1" max="7" value="5" required>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label font-weight-bold">Horas por Día</label>
-                        <input type="number" name="instructores[${nuevoIndice}][horas_dia]" 
-                               class="form-control horas-dia" min="1" max="12" value="8" required>
-                    </div>
-                    <div class="col-md-2">
-                        <label class="form-label font-weight-bold">Total Horas</label>
-                        <input type="number" name="instructores[${nuevoIndice}][total_horas]" 
-                               class="form-control total-horas" readonly value="40">
-                    </div>
-                    <div class="col-md-2 d-flex align-items-end">
-                        <button type="button" class="btn btn-danger btn-sm" onclick="eliminarInstructor(this)">
-                            <i class="fas fa-trash"></i> Eliminar
-                        </button>
-                    </div>
-                </div>
-                <div class="row mt-2">
-                    <div class="col-md-6">
-                        <label class="form-label font-weight-bold">Fecha Inicio</label>
+                    <div class="col-md-3">
+                        <label class="form-label font-weight-bold">
+                            <i class="fas fa-calendar-alt mr-1"></i> Fecha Inicio <span class="text-danger">*</span>
+                        </label>
                         <input type="date" name="instructores[${nuevoIndice}][fecha_inicio]" 
                                class="form-control fecha-inicio" required>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label font-weight-bold">Fecha Fin</label>
+                    <div class="col-md-3">
+                        <label class="form-label font-weight-bold">
+                            <i class="fas fa-calendar-check mr-1"></i> Fecha Fin <span class="text-danger">*</span>
+                        </label>
                         <input type="date" name="instructores[${nuevoIndice}][fecha_fin]" 
                                class="form-control fecha-fin" required>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <label class="form-label font-weight-bold">
+                            <i class="fas fa-calendar-week mr-1"></i> Días de Formación <span class="text-danger">*</span>
+                            <small class="text-muted">(Seleccione los días - Los horarios se tomarán de la configuración de la ficha)</small>
+                        </label>
+                        <div class="border rounded p-3 bg-white">
+                            <div class="row">
+                                ${diasHTML}
+                            </div>
+                            <div class="mt-2 text-center">
+                                <span class="badge badge-secondary dias-count-${nuevoIndice}">0 días seleccionados</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -251,9 +303,36 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Función para cargar instructores disponibles
     function cargarInstructoresDisponibles(indice) {
-        fetch('/instructor/disponibles-para-ficha')
-            .then(response => response.json())
+        // Obtener el ID de la ficha desde la URL o variable global
+        let fichaId = null;
+        
+        // Intentar obtener de variable global primero
+        if (typeof window.fichaId !== 'undefined') {
+            fichaId = window.fichaId;
+        } else {
+            // Obtener desde la URL: /fichaCaracterizacion/{id}/gestionar-instructores
+            const urlParts = window.location.pathname.split('/');
+            const gestionarIndex = urlParts.indexOf('gestionar-instructores');
+            if (gestionarIndex > 0) {
+                fichaId = urlParts[gestionarIndex - 1];
+            } else {
+                // Fallback: buscar el número en la URL
+                fichaId = urlParts.find(part => !isNaN(part) && part !== '');
+            }
+        }
+        
+        console.log('Cargando instructores para ficha ID:', fichaId);
+        
+        fetch(`/fichaCaracterizacion/${fichaId}/instructores-disponibles`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Respuesta del servidor:', data);
+                
                 if (data.success && data.instructores) {
                     const select = document.querySelector(`.instructor-row[data-index="${indice}"] .instructor-select`);
                     if (select) {
@@ -277,13 +356,27 @@ document.addEventListener('DOMContentLoaded', () => {
                                 allowClear: true
                             });
                         }
+                        
+                        console.log(`Cargados ${data.instructores.length} instructores en el select`);
                     }
                 } else {
-                    console.error('Error al cargar instructores:', data.message);
+                    console.error('Error al cargar instructores:', data.message || 'No hay instructores disponibles');
+                    
+                    // Mostrar mensaje de error al usuario
+                    const select = document.querySelector(`.instructor-row[data-index="${indice}"] .instructor-select`);
+                    if (select) {
+                        select.innerHTML = '<option value="">No hay instructores disponibles</option>';
+                    }
                 }
             })
             .catch(error => {
                 console.error('Error en la petición:', error);
+                
+                // Mostrar mensaje de error al usuario
+                const select = document.querySelector(`.instructor-row[data-index="${indice}"] .instructor-select`);
+                if (select) {
+                    select.innerHTML = '<option value="">Error al cargar instructores</option>';
+                }
             });
     }
 
@@ -298,46 +391,55 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Función para configurar eventos de un instructor
     function configurarEventosInstructor(instructorRow) {
-        const diasFormacion = instructorRow.querySelector('.dias-formacion');
-        const horasDia = instructorRow.querySelector('.horas-dia');
-        const totalHoras = instructorRow.querySelector('.total-horas');
         const fechaInicio = instructorRow.querySelector('.fecha-inicio');
         const fechaFin = instructorRow.querySelector('.fecha-fin');
+        const indice = instructorRow.dataset.index;
 
-        // Recalcular horas cuando cambien días o horas por día
-        function recalcularHoras() {
-            const dias = parseInt(diasFormacion.value) || 0;
-            const horas = parseInt(horasDia.value) || 0;
-            const total = dias * horas;
-            totalHoras.value = total;
-        }
+        // Configurar fechas por defecto (sin restricción de fecha mínima)
+        // Dejar vacías para que el usuario las seleccione libremente
+        // fechaInicio.value = '';
+        // fechaFin.value = '';
 
-        diasFormacion.addEventListener('input', recalcularHoras);
-        horasDia.addEventListener('input', recalcularHoras);
-
-        // Configurar fechas por defecto
-        const hoy = new Date();
-        const fechaInicioDefault = new Date(hoy);
-        fechaInicioDefault.setDate(hoy.getDate() + 1);
-        
-        const fechaFinDefault = new Date(fechaInicioDefault);
-        fechaFinDefault.setDate(fechaInicioDefault.getDate() + 30);
-
-        fechaInicio.value = fechaInicioDefault.toISOString().split('T')[0];
-        fechaFin.value = fechaFinDefault.toISOString().split('T')[0];
-
-        // Validar que fecha fin sea posterior a fecha inicio
+        // Validar que fecha fin sea posterior a fecha inicio (solo validación, sin auto-ajuste)
         fechaInicio.addEventListener('change', function() {
-            if (fechaFin.value && fechaFin.value <= fechaInicio.value) {
-                const nuevaFechaFin = new Date(fechaInicio.value);
-                nuevaFechaFin.setDate(nuevaFechaFin.getDate() + 30);
-                fechaFin.value = nuevaFechaFin.toISOString().split('T')[0];
+            if (fechaFin.value && fechaFin.value < fechaInicio.value) {
+                // Solo mostrar advertencia, no auto-ajustar
+                console.warn('La fecha de fin debe ser posterior o igual a la fecha de inicio');
             }
+        });
+
+        // Configurar eventos para los checkboxes de días (solo contador)
+        const diasCheckboxes = instructorRow.querySelectorAll('.dia-check');
+        diasCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                actualizarContadorDias(indice);
+            });
         });
     }
 
-    // Inicializar contadores
+    // Función para actualizar contador de días seleccionados
+    function actualizarContadorDias(indice) {
+        const container = document.querySelector(`.instructor-row[data-index="${indice}"]`);
+        if (!container) return;
+        
+        const diasChecked = container.querySelectorAll('.dia-check:checked').length;
+        const contadorSpan = container.querySelector(`.dias-count-${indice}`);
+        
+        if (contadorSpan) {
+            const texto = diasChecked > 0 ? `${diasChecked} día${diasChecked > 1 ? 's' : ''} seleccionado${diasChecked > 1 ? 's' : ''}` : '0 días seleccionados';
+            contadorSpan.textContent = texto;
+            contadorSpan.className = diasChecked > 0 ? 'badge badge-success' : 'badge badge-secondary';
+        }
+    }
+
+    // Inicializar contadores al cargar la página
     actualizarContadores();
+    
+    // Log de inicialización
+    console.log('Contadores inicializados:', {
+        asignados: elementosSeleccionadosAsignados,
+        disponibles: elementosSeleccionadosDisponibles
+    });
 
     // Auto-focus en el primer campo de búsqueda si existe
     const searchInput = document.querySelector('input[type="search"], input[placeholder*="buscar" i]');

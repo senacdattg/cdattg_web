@@ -90,6 +90,7 @@ class SuperAdminSeeder extends Seeder
             'VER FICHA CARACTERIZACION',
             'ELIMINAR FICHA CARACTERIZACION',
             'GESTIONAR INSTRUCTORES FICHA',
+            'GESTIONAR APRENDICES FICHA',
             'GESTIONAR DIAS FICHA',
             'CAMBIAR ESTADO FICHA',
             

@@ -142,8 +142,8 @@ document.addEventListener('DOMContentLoaded', () => {
         validateDates();
     });
 
-    // Establecer fecha mínima como hoy
-    $('#fecha_inicio').attr('min', new Date().toISOString().split('T')[0]);
+    // Permitir cualquier fecha de inicio (sin restricción de fecha mínima)
+    // $('#fecha_inicio').attr('min', new Date().toISOString().split('T')[0]);
 
     // Manejo de días de formación
     function manejarDiasFormacion() {

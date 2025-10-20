@@ -52,10 +52,13 @@ Route::middleware(['auth'])->group(function () {
             ->name('fichaCaracterizacion.validarEliminacion');
     });
 
-    // Gestión de instructores (funcionalidad futura)
+    // Gestión de instructores
     Route::middleware('can:EDITAR FICHA CARACTERIZACION')->group(function () {
         Route::get('/fichaCaracterizacion/{id}/instructores', [FichaCaracterizacionController::class, 'gestionarInstructores'])
             ->name('fichaCaracterizacion.gestionarInstructores');
+        
+        Route::get('/fichaCaracterizacion/{id}/instructores-disponibles', [FichaCaracterizacionController::class, 'obtenerInstructoresDisponiblesParaFicha'])
+            ->name('fichaCaracterizacion.instructoresDisponibles');
         
         Route::post('/fichaCaracterizacion/{id}/instructores', [FichaCaracterizacionController::class, 'asignarInstructores'])
             ->name('fichaCaracterizacion.asignarInstructores');

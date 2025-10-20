@@ -71,9 +71,17 @@ class AsignarInstructoresRequest extends FormRequest
                     $this->validarFechaFinFicha($value, $fail);
                 }
             ],
-            'instructores.*.total_horas_instructor' => 'required|integer|min:1|max:1000',
-            'instructores.*.dias_formacion' => 'required|array|min:1|max:7',
-            'instructores.*.dias_formacion.*.dia_id' => 'required|exists:parametros_temas,id',
+            'instructores.*.total_horas_instructor' => 'nullable|integer|min:1|max:1000',
+            // Validación principal: array simple de IDs de días
+            'instructores.*.dias_semana' => 'required|array|min:1|max:7',
+            'instructores.*.dias_semana.*' => 'required|integer|exists:parametros_temas,id',
+            // Validación de días con horarios específicos (formato alternativo para modal)
+            'instructores.*.dias' => 'nullable|array',
+            'instructores.*.dias.*.hora_inicio' => 'required_with:instructores.*.dias|date_format:H:i',
+            'instructores.*.dias.*.hora_fin' => 'required_with:instructores.*.dias|date_format:H:i|after:instructores.*.dias.*.hora_inicio',
+            // Soporte para formato antiguo
+            'instructores.*.dias_formacion' => 'nullable|array|min:1|max:7',
+            'instructores.*.dias_formacion.*.dia_id' => 'exists:parametros_temas,id',
             'instructor_principal_id' => [
                 'nullable',
                 'integer',
@@ -99,15 +107,26 @@ class AsignarInstructoresRequest extends FormRequest
             'instructores.*.fecha_fin.required' => 'La fecha de fin es obligatoria.',
             'instructores.*.fecha_fin.date' => 'La fecha de fin debe ser una fecha válida.',
             'instructores.*.fecha_fin.after_or_equal' => 'La fecha de fin debe ser posterior o igual a la fecha de inicio.',
-            'instructores.*.total_horas_instructor.required' => 'Las horas totales son obligatorias.',
             'instructores.*.total_horas_instructor.integer' => 'Las horas totales deben ser un número entero.',
             'instructores.*.total_horas_instructor.min' => 'Las horas totales deben ser al menos 1.',
             'instructores.*.total_horas_instructor.max' => 'Las horas totales no pueden exceder 1000.',
-            'instructores.*.dias_formacion.required' => 'Debe seleccionar al menos un día de formación.',
-            'instructores.*.dias_formacion.array' => 'Los días de formación deben ser una lista válida.',
+            // Mensajes para días_semana (formato principal)
+            'instructores.*.dias_semana.required' => 'Debe seleccionar al menos un día de formación.',
+            'instructores.*.dias_semana.array' => 'Los días de formación deben ser una lista válida.',
+            'instructores.*.dias_semana.min' => 'Debe seleccionar al menos un día de formación.',
+            'instructores.*.dias_semana.max' => 'No se pueden asignar más de 7 días de formación.',
+            'instructores.*.dias_semana.*.required' => 'El día seleccionado no es válido.',
+            'instructores.*.dias_semana.*.integer' => 'El ID del día debe ser un número.',
+            'instructores.*.dias_semana.*.exists' => 'El día seleccionado no existe en el sistema.',
+            // Mensajes para días con horarios (formato alternativo)
+            'instructores.*.dias.*.hora_inicio.required_with' => 'La hora de inicio es obligatoria cuando se selecciona un día.',
+            'instructores.*.dias.*.hora_inicio.date_format' => 'El formato de la hora de inicio debe ser HH:MM.',
+            'instructores.*.dias.*.hora_fin.required_with' => 'La hora de fin es obligatoria cuando se selecciona un día.',
+            'instructores.*.dias.*.hora_fin.date_format' => 'El formato de la hora de fin debe ser HH:MM.',
+            'instructores.*.dias.*.hora_fin.after' => 'La hora de fin debe ser posterior a la hora de inicio.',
+            // Mensajes para formato antiguo
             'instructores.*.dias_formacion.min' => 'Debe seleccionar al menos un día de formación.',
             'instructores.*.dias_formacion.max' => 'No se pueden asignar más de 7 días de formación.',
-            'instructores.*.dias_formacion.*.dia_id.required' => 'Debe seleccionar un día válido.',
             'instructores.*.dias_formacion.*.dia_id.exists' => 'El día seleccionado no existe.',
             'instructor_principal_id.exists' => 'El instructor líder seleccionado no existe en el sistema.',
             'instructor_principal_id.integer' => 'El instructor líder debe ser un identificador válido.'
@@ -223,9 +242,16 @@ class AsignarInstructoresRequest extends FormRequest
             $instructorId = $instructorData['instructor_id'];
             $fechaInicio = Carbon::parse($instructorData['fecha_inicio']);
             $fechaFin = Carbon::parse($instructorData['fecha_fin']);
-            $diasNuevos = isset($instructorData['dias_formacion']) 
-                ? collect($instructorData['dias_formacion'])->pluck('dia_id')->filter()->toArray() 
-                : [];
+            
+            // Extraer IDs de días según el formato proporcionado
+            $diasNuevos = [];
+            if (isset($instructorData['dias']) && is_array($instructorData['dias'])) {
+                $diasNuevos = array_keys($instructorData['dias']); // Nuevo formato: ['12' => ['hora_inicio' => '08:00', ...]]
+            } elseif (isset($instructorData['dias_semana']) && is_array($instructorData['dias_semana'])) {
+                $diasNuevos = $instructorData['dias_semana']; // Array simple de IDs
+            } elseif (isset($instructorData['dias_formacion']) && is_array($instructorData['dias_formacion'])) {
+                $diasNuevos = collect($instructorData['dias_formacion'])->pluck('dia_id')->filter()->toArray(); // Formato antiguo
+            }
 
             // 1. Verificar conflictos con otras fichas del mismo instructor
             $this->validarConflictosOtrosInstructor($validator, $instructorId, $fechaInicio, $fechaFin, $diasNuevos, $jornadaIdFicha, $index);
@@ -320,9 +346,16 @@ class AsignarInstructoresRequest extends FormRequest
             $instructorIdOtro = $instructorOtro['instructor_id'];
             $fechaInicioOtro = Carbon::parse($instructorOtro['fecha_inicio']);
             $fechaFinOtro = Carbon::parse($instructorOtro['fecha_fin']);
-            $diasOtros = isset($instructorOtro['dias_formacion']) 
-                ? collect($instructorOtro['dias_formacion'])->pluck('dia_id')->filter()->toArray() 
-                : [];
+            
+            // Extraer IDs de días del otro instructor
+            $diasOtros = [];
+            if (isset($instructorOtro['dias']) && is_array($instructorOtro['dias'])) {
+                $diasOtros = array_keys($instructorOtro['dias']);
+            } elseif (isset($instructorOtro['dias_semana']) && is_array($instructorOtro['dias_semana'])) {
+                $diasOtros = $instructorOtro['dias_semana'];
+            } elseif (isset($instructorOtro['dias_formacion']) && is_array($instructorOtro['dias_formacion'])) {
+                $diasOtros = collect($instructorOtro['dias_formacion'])->pluck('dia_id')->filter()->toArray();
+            }
 
             \Log::info('🔍 COMPARANDO CON INSTRUCTOR EN FORMULARIO', [
                 'index_otro' => $indexOtro,

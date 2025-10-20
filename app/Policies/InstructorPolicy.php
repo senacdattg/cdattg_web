@@ -20,7 +20,7 @@ class InstructorPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -44,7 +44,7 @@ class InstructorPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -63,7 +63,7 @@ class InstructorPolicy
     public function create(User $user): bool
     {
         return $user->can('CREAR INSTRUCTOR') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -78,7 +78,7 @@ class InstructorPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -107,7 +107,7 @@ class InstructorPolicy
         }
 
         // Solo super administradores y administradores pueden eliminar
-        return $user->hasRole(['SUPERADMIN', 'ADMIN']);
+        return $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -116,7 +116,7 @@ class InstructorPolicy
     public function restore(User $user, Instructor $instructor): bool
     {
         return $user->can('CREAR INSTRUCTOR') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -125,7 +125,7 @@ class InstructorPolicy
     public function forceDelete(User $user, Instructor $instructor): bool
     {
         return $user->can('ELIMINAR INSTRUCTOR') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -140,7 +140,7 @@ class InstructorPolicy
         }
 
         // Solo super administradores y administradores pueden cambiar estado
-        return $user->hasRole(['SUPERADMIN', 'ADMIN']);
+        return $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -155,7 +155,7 @@ class InstructorPolicy
         }
 
         // Solo super administradores y administradores pueden cambiar estado
-        return $user->hasRole(['SUPERADMIN', 'ADMIN']);
+        return $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -170,7 +170,7 @@ class InstructorPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -210,7 +210,7 @@ class InstructorPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -250,7 +250,7 @@ class InstructorPolicy
         }
 
         // Solo super administradores y administradores pueden asignar fichas
-        return $user->hasRole(['SUPERADMIN', 'ADMIN']);
+        return $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -268,7 +268,7 @@ class InstructorPolicy
     public function importarInstructores(User $user): bool
     {
         return $user->can('CREAR INSTRUCTOR') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -285,7 +285,7 @@ class InstructorPolicy
     public function reportePorRegional(User $user): bool
     {
         return $user->can('VER INSTRUCTOR') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -310,7 +310,7 @@ class InstructorPolicy
     public function exportar(User $user): bool
     {
         return $user->can('VER INSTRUCTOR') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -349,7 +349,7 @@ class InstructorPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -381,7 +381,7 @@ class InstructorPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -421,7 +421,7 @@ class InstructorPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -444,7 +444,7 @@ class InstructorPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -476,7 +476,7 @@ class InstructorPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -515,7 +515,7 @@ class InstructorPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -547,7 +547,7 @@ class InstructorPolicy
         }
 
         // Solo super administradores y administradores pueden gestionar evaluaciones
-        return $user->hasRole(['SUPERADMIN', 'ADMIN']);
+        return $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -578,7 +578,7 @@ class InstructorPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -618,7 +618,7 @@ class InstructorPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -650,7 +650,7 @@ class InstructorPolicy
         }
 
         // Solo super administradores y administradores pueden resetear contraseñas
-        return $user->hasRole(['SUPERADMIN', 'ADMIN']);
+        return $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -665,7 +665,7 @@ class InstructorPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -713,7 +713,7 @@ class InstructorPolicy
         }
 
         // Solo super administradores y administradores pueden gestionar backups
-        return $user->hasRole(['SUPERADMIN', 'ADMIN']);
+        return $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -792,7 +792,7 @@ class InstructorPolicy
     public function before(User $user, string $ability): ?bool
     {
         // Super administradores tienen acceso total
-        if ($user->hasRole('SUPERADMIN')) {
+        if ($user->hasRole('SUPER ADMINISTRADOR')) {
             return true;
         }
 

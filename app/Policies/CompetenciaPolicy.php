@@ -17,7 +17,7 @@ class CompetenciaPolicy
             return false;
         }
 
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -37,7 +37,7 @@ class CompetenciaPolicy
             return false;
         }
 
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -54,7 +54,7 @@ class CompetenciaPolicy
     public function create(User $user): bool
     {
         return $user->can('CREAR COMPETENCIA') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN', 'INSTRUCTOR']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR', 'INSTRUCTOR']);
     }
 
     /**
@@ -66,7 +66,7 @@ class CompetenciaPolicy
             return false;
         }
 
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -90,7 +90,7 @@ class CompetenciaPolicy
             return false;
         }
 
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -103,7 +103,7 @@ class CompetenciaPolicy
     public function restore(User $user, Competencia $competencia): bool
     {
         return $user->can('CREAR COMPETENCIA') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -112,7 +112,7 @@ class CompetenciaPolicy
     public function forceDelete(User $user, Competencia $competencia): bool
     {
         return $user->can('ELIMINAR COMPETENCIA') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -124,7 +124,7 @@ class CompetenciaPolicy
             return false;
         }
 
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -144,7 +144,7 @@ class CompetenciaPolicy
             return false;
         }
 
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -161,7 +161,7 @@ class CompetenciaPolicy
     public function asociarPrograma(User $user, Competencia $competencia): bool
     {
         return $user->can('EDITAR COMPETENCIA') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN', 'INSTRUCTOR']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR', 'INSTRUCTOR']);
     }
 
     /**
@@ -170,6 +170,6 @@ class CompetenciaPolicy
     public function exportar(User $user): bool
     {
         return $user->can('VER COMPETENCIA') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 }

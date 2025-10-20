@@ -22,7 +22,7 @@ class GuiaAprendizajePolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -46,7 +46,7 @@ class GuiaAprendizajePolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -65,7 +65,7 @@ class GuiaAprendizajePolicy
     public function create(User $user): bool
     {
         return $user->can('CREAR GUIA APRENDIZAJE') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN', 'INSTRUCTOR']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR', 'INSTRUCTOR']);
     }
 
     /**
@@ -80,7 +80,7 @@ class GuiaAprendizajePolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -109,7 +109,7 @@ class GuiaAprendizajePolicy
         }
 
         // Solo super administradores y administradores pueden eliminar
-        return $user->hasRole(['SUPERADMIN', 'ADMIN']);
+        return $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -118,7 +118,7 @@ class GuiaAprendizajePolicy
     public function restore(User $user, GuiasAprendizaje $guiaAprendizaje): bool
     {
         return $user->can('CREAR GUIA APRENDIZAJE') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -127,7 +127,7 @@ class GuiaAprendizajePolicy
     public function forceDelete(User $user, GuiasAprendizaje $guiaAprendizaje): bool
     {
         return $user->can('ELIMINAR GUIA APRENDIZAJE') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -142,7 +142,7 @@ class GuiaAprendizajePolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -166,7 +166,7 @@ class GuiaAprendizajePolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -206,7 +206,7 @@ class GuiaAprendizajePolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -264,7 +264,7 @@ class GuiaAprendizajePolicy
     public function exportarExcel(User $user): bool
     {
         return $user->can('VER GUIA APRENDIZAJE') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -314,7 +314,7 @@ class GuiaAprendizajePolicy
     public function gestionarPlantillas(User $user): bool
     {
         return $user->can('CREAR GUIA APRENDIZAJE') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -369,7 +369,7 @@ class GuiaAprendizajePolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -412,7 +412,7 @@ class GuiaAprendizajePolicy
     public function gestionarVersiones(User $user, GuiasAprendizaje $guiaAprendizaje): bool
     {
         return $user->can('EDITAR GUIA APRENDIZAJE') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -501,7 +501,7 @@ class GuiaAprendizajePolicy
     public function before(User $user, string $ability): ?bool
     {
         // Super administradores tienen acceso total
-        if ($user->hasRole('SUPERADMIN')) {
+        if ($user->hasRole('SUPER ADMINISTRADOR')) {
             return true;
         }
 

@@ -65,7 +65,9 @@
                                                 </td>
                                                 <td class="px-4">
                                                     @if($ficha->instructor && $ficha->instructor->persona)
-                                                        {{ $ficha->instructor->persona->primer_nombre }} {{ $ficha->instructor->persona->primer_apellido }}
+                                                        <strong>{{ $ficha->instructor->persona->primer_nombre ?? '' }} {{ $ficha->instructor->persona->segundo_nombre ?? '' }}</strong>
+                                                        <br>
+                                                        <small class="text-muted">{{ $ficha->instructor->persona->primer_apellido ?? '' }} {{ $ficha->instructor->persona->segundo_apellido ?? '' }}</small>
                                                     @else
                                                         <span class="text-muted">Sin asignar</span>
                                                     @endif
@@ -103,14 +105,14 @@
                                                             @endcan
                                                         </div>
                                                         <div class="btn-group btn-group-sm mb-1" role="group">
-                                                            @can('GESTIONAR APRENDICES')
+                                                            @can('GESTIONAR APRENDICES FICHA')
                                                                 <a href="{{ route('fichaCaracterizacion.gestionarAprendices', $ficha->id) }}"
                                                                     class="btn btn-light btn-sm" data-toggle="tooltip"
                                                                     title="Gestionar Aprendices">
                                                                     <i class="fas fa-users text-success"></i>
                                                                 </a>
                                                             @endcan
-                                                            @can('GESTIONAR INSTRUCTORES')
+                                                            @can('GESTIONAR INSTRUCTORES FICHA')
                                                                 <a href="{{ route('fichaCaracterizacion.gestionarInstructores', $ficha->id) }}"
                                                                     class="btn btn-light btn-sm" data-toggle="tooltip"
                                                                     title="Gestionar Instructores">
