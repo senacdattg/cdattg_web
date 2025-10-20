@@ -1,6 +1,7 @@
 @extends('adminlte::page')
 
 @section('css')
+    @vite(['resources/css/parametros.css'])
     <style>
         .dual-list-container {
             display: flex;
@@ -97,36 +98,22 @@
     </style>
 @endsection
 
-@section('content')
-    <!-- Encabezado de la Página -->
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>Usuarios</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item">
-                            <a href="{{ route('home.index') }}">Inicio</a>
-                        </li>
-                        <li class="breadcrumb-item">
-                            <a href="{{ route('permiso.index') }}">Usuarios</a>
-                        </li>
-                        <li class="breadcrumb-item active">Permisos</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </section>
+@section('content_header')
+    <x-page-header 
+        icon="fa-cogs" 
+        title="Permisos"
+        subtitle="Gestión de permisos del sistema"
+        :breadcrumb="[['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'], ['label' => 'Permisos', 'icon' => 'fa-cog', 'active' => true]]"
+    />
+@endsection
 
-    <!-- Contenido Principal -->
-    <section class="content">
+@section('content')
+    <section class="content mt-4">
         <div class="container-fluid">
             <!-- Botón Volver -->
             <div class="mb-3">
-                <a class="btn btn-outline-secondary btn-sm" href="{{ route('permiso.index') }}" title="Volver">
-                    <i class="fas fa-arrow-left"></i> Volver
+                <a class="btn btn-sm btn-light" href="{{ route('permiso.index') }}" title="Volver">
+                    <i class="fas fa-arrow-left text-secondary"></i> Volver
                 </a>
             </div>
 
@@ -192,12 +179,12 @@
                                     style="display:inline;">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="btn btn-sm btn-outline-primary"
+                                    <button type="submit" class="btn btn-sm btn-light"
                                         title="Cambiar estado de usuario">
                                         @if ($user->persona->user->status === 1)
-                                            <i class="fas fa-user-slash"></i> Inactivar usuario
+                                            <i class="fas fa-user-slash text-danger"></i> Inactivar usuario
                                         @else
-                                            <i class="fas fa-user-check"></i> Activar usuario
+                                            <i class="fas fa-user-check text-success"></i> Activar usuario
                                         @endif
                                     </button>
                                 </form>
@@ -224,8 +211,8 @@
                                             <h5 class="list-title">Permisos Disponibles</h5>
                                             <div class="list-actions">
                                                 <button type="button" id="select-all-available-permissions"
-                                                    class="btn btn-sm btn-outline-primary select-all-available">
-                                                    <i class="fas fa-check-double"></i>
+                                                    class="btn btn-sm btn-light">
+                                                    <i class="fas fa-check-double text-primary"></i>
                                                 </button>
                                             </div>
                                         </div>
@@ -264,8 +251,8 @@
                                             <h5 class="list-title">Permisos Asignados</h5>
                                             <div class="list-actions">
                                                 <button type="button" id="select-all-assigned-permissions"
-                                                    class="btn btn-sm btn-outline-primary select-all-assigned">
-                                                    <i class="fas fa-check-double"></i>
+                                                    class="btn btn-sm btn-light">
+                                                    <i class="fas fa-check-double text-primary"></i>
                                                 </button>
                                             </div>
                                         </div>
@@ -290,8 +277,8 @@
                                 </div>
 
                                 <div class="text-center mt-3">
-                                    <button type="submit" class="btn btn-success">
-                                        <i class="fas fa-save"></i> Guardar Cambios
+                                    <button type="submit" class="btn btn-sm btn-light">
+                                        <i class="fas fa-save text-success"></i> Guardar Cambios
                                     </button>
                                 </div>
                             </form>
@@ -316,8 +303,8 @@
                                                 <h5 class="list-title">Roles Disponibles</h5>
                                                 <div class="list-actions">
                                                     <button type="button" id="select-all-available-roles"
-                                                        class="btn btn-sm btn-outline-primary select-all-available-roles">
-                                                        <i class="fas fa-check-double"></i>
+                                                        class="btn btn-sm btn-light">
+                                                        <i class="fas fa-check-double text-primary"></i>
                                                     </button>
                                                 </div>
                                             </div>
@@ -356,8 +343,8 @@
                                                 <h5 class="list-title">Roles Asignados</h5>
                                                 <div class="list-actions">
                                                     <button type="button" id="select-all-assigned-roles"
-                                                        class="btn btn-sm btn-outline-primary select-all-assigned-roles">
-                                                        <i class="fas fa-check-double"></i>
+                                                        class="btn btn-sm btn-light">
+                                                        <i class="fas fa-check-double text-primary"></i>
                                                     </button>
                                                 </div>
                                             </div>
@@ -380,8 +367,8 @@
                                     </div>
 
                                     <div class="text-center mt-3">
-                                        <button type="submit" class="btn btn-success">
-                                            <i class="fas fa-save"></i> Guardar Cambios
+                                        <button type="submit" class="btn btn-sm btn-light">
+                                            <i class="fas fa-save text-success"></i> Guardar Cambios
                                         </button>
                                     </div>
                                 </form>
@@ -392,9 +379,14 @@
             </div> <!-- Fin de row -->
         </div>
     </section>
-    </div>
+@endsection
+
+@section('footer')
+    @include('layout.footer')
 @endsection
 
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @vite(['resources/js/parametros.js'])
     @vite(['resources/js/pages/gestion-especializada.js'])
 @endsection

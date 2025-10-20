@@ -36,9 +36,59 @@
                         searchPlaceholder="Buscar parámetro..."
                         searchValue="{{ request('search') }}"
                         :columns="[['label' => '#', 'width' => '5%'], ['label' => 'Nombre', 'width' => '40%'], ['label' => 'Estado', 'width' => '20%'], ['label' => 'Acciones', 'width' => '35%', 'class' => 'text-center']]"
-                        :pagination="$listadeparámetros->links()"
+                        :pagination="$parametros->links()"
                     >
-GET
+                        @forelse($parametros as $key => $parametro)
+                            <tr>
+                                <td>{{ $parametros->firstItem() + $key }}</td>
+                                <td>{{ $parametro->name }}</td>
+                                <td class="text-center">
+                                    @if($parametro->status)
+                                        <span class="badge badge-success">Activo</span>
+                                    @else
+                                        <span class="badge badge-danger">Inactivo</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        @can('VER PARAMETRO')
+                                            <a href="{{ route('parametro.show', $parametro->id) }}" 
+                                               class="btn btn-sm btn-light" 
+                                               title="Ver detalles"
+                                               style="margin-right: 2px;">
+                                                <i class="fas fa-eye text-warning"></i>
+                                            </a>
+                                        @endcan
+                                        @can('EDITAR PARAMETRO')
+                                            <a href="{{ route('parametro.edit', $parametro->id) }}" 
+                                               class="btn btn-sm btn-light" 
+                                               title="Editar"
+                                               style="margin-right: 2px;">
+                                                <i class="fas fa-pencil-alt text-primary"></i>
+                                            </a>
+                                        @endcan
+                                        @can('ELIMINAR PARAMETRO')
+                                            <form action="{{ route('parametro.destroy', $parametro->id) }}" 
+                                                  method="POST" 
+                                                  style="display: inline-block;"
+                                                  onsubmit="return confirm('¿Está seguro de eliminar este parámetro?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" 
+                                                        class="btn btn-sm btn-light" 
+                                                        title="Eliminar">
+                                                    <i class="fas fa-trash-alt text-danger"></i>
+                                                </button>
+                                            </form>
+                                        @endcan
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="text-center">No hay parámetros registrados</td>
+                            </tr>
+                        @endforelse
                     </x-data-table>
                 </div>
             </div>

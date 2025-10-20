@@ -1,20 +1,21 @@
 @extends('adminlte::page')
 
+@section('css')
+    @vite(['resources/css/parametros.css'])
+@endsection
+
 @section('content_header')
     <x-page-header 
-        icon="fa-shield-alt" 
+        icon="fa-cogs" 
         title="Permisos"
         subtitle="Gestión de permisos del sistema"
-        :breadcrumb="[['label' => 'Inicio', 'url' => route('home.index'), 'icon' => 'fa-home'], ['label' => 'Permisos', 'active' => true, 'icon' => 'fa-shield-alt']]"
+        :breadcrumb="[['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'], ['label' => 'Permisos', 'icon' => 'fa-cog', 'active' => true]]"
     />
 @endsection
 
 @section('content')
-
     <section class="content mt-4">
         <div class="container-fluid">
-            <x-session-alerts />
-            
             <div class="row">
                 <div class="col-12">
                     <x-data-table 
@@ -34,40 +35,50 @@
                         ]"
                         :pagination="$users->links()"
                     >
-                                    @forelse ($users as $user)
-                                        @if ($user->id != Auth::user()->id)
-                                            <tr class="text-center">
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $user->persona->nombre_completo }}</td>
-                                                <td>{{ $user->persona->numero_documento }}</td>
-                                                <td>{{ $user->persona->email }}</td>
-                                                <td>
-                                                    {{ $user->getRoleNames()->implode(', ') }}
-                                                </td>
-                                                <td>
-                                                    <span
-                                                        class="badge badge-{{ $user->persona->user->status === 1 ? 'success' : 'danger' }}">
-                                                        {{ $user->persona->user->status === 1 ? 'ACTIVO' : 'INACTIVO' }}
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <a class="btn btn-warning btn-sm"
-                                                        href="{{ route('permiso.show', ['user' => $user->id]) }}"
-                                                        title="Ver Permisos">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                </td>
-                                            </tr>
-                                        @endif
-                                    @empty
-                                        <tr>
-                                            <td colspan="7" class="text-center">No hay usuarios registrados</td>
-                                        </tr>
-                                    @endforelse
+                        @forelse ($users as $user)
+                            @if ($user->id != Auth::user()->id)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $user->persona->nombre_completo }}</td>
+                                    <td>{{ $user->persona->numero_documento }}</td>
+                                    <td>{{ $user->persona->email }}</td>
+                                    <td>
+                                        {{ $user->getRoleNames()->implode(', ') }}
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge badge-{{ $user->persona->user->status === 1 ? 'success' : 'danger' }}">
+                                            {{ $user->persona->user->status === 1 ? 'ACTIVO' : 'INACTIVO' }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <a class="btn btn-sm btn-light"
+                                                href="{{ route('permiso.show', ['user' => $user->id]) }}"
+                                                title="Ver Permisos"
+                                                style="margin-right: 2px;">
+                                                <i class="fas fa-eye text-warning"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endif
+                        @empty
+                            <tr>
+                                <td colspan="7" class="text-center">No hay usuarios registrados</td>
+                            </tr>
+                        @endforelse
                     </x-data-table>
                 </div>
             </div>
         </div>
     </section>
-    </div>
+@endsection
+
+@section('footer')
+    @include('layout.footer')
+@endsection
+
+@section('js')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @vite(['resources/js/parametros.js'])
 @endsection

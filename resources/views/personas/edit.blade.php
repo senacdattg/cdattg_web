@@ -1,15 +1,15 @@
 @extends('adminlte::page')
 
 @section('css')
-    @vite(['resources/css/personas.css'])
+    @vite(['resources/css/parametros.css'])
 @endsection
 
 @section('content_header')
     <x-page-header 
-        icon="fa-user-edit" 
-        title="Persona"
-        subtitle="Edición de datos personales"
-        :breadcrumb="[['label' => 'Personas', 'url' => route('personas.index') , 'icon' => 'fa-users'], ['label' => 'Editar persona', 'icon' => 'fa-edit', 'active' => true]]"
+        icon="fa-cogs" 
+        title="Personas"
+        subtitle="Gestión de personas del sistema"
+        :breadcrumb="[['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'], ['label' => 'Personas', 'url' => route('personas.index'), 'icon' => 'fa-cog'], ['label' => 'Editar Persona', 'icon' => 'fa-edit', 'active' => true]]"
     />
 @endsection
 
@@ -18,8 +18,8 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ route('personas.show', $persona->id) }}">
-                        <i class="fas fa-arrow-left mr-1"></i> Volver
+                    <a class="btn btn-sm btn-light mb-3" href="{{ route('personas.show', $persona->id) }}">
+                        <i class="fas fa-arrow-left text-secondary mr-1"></i> Volver
                     </a>
 
                     <div class="card shadow-sm no-hover">
@@ -266,11 +266,11 @@
                                 <div class="col-12">
                                     <hr class="mt-4">
                                     <div class="d-flex justify-content-end">
-                                        <a href="{{ route('personas.show', $persona->id) }}" class="btn btn-light mr-2">
-                                            Cancelar
+                                        <a href="{{ route('personas.show', $persona->id) }}" class="btn btn-sm btn-light mr-2">
+                                            <i class="fas fa-times text-secondary"></i> Cancelar
                                         </a>
-                                        <button type="submit" class="btn btn-primary">
-                                            <i class="fas fa-save mr-1"></i>Guardar Cambios
+                                        <button type="submit" class="btn btn-sm btn-light">
+                                            <i class="fas fa-save text-success mr-1"></i>Guardar Cambios
                                         </button>
                                     </div>
                                 </div>
@@ -288,5 +288,7 @@
 @endsection
 
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @vite(['resources/js/parametros.js'])
     @vite(['resources/js/pages/formularios-select-dinamico.js'])
 @endsection
