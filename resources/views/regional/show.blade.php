@@ -1,121 +1,139 @@
 @extends('adminlte::page')
 
+@section('css')
+    @vite(['resources/css/parametros.css'])
+@endsection
+
+@section('content_header')
+    <x-page-header 
+        icon="fa-cogs" 
+        title="Regionales"
+        subtitle="Gestión de regionales"
+        :breadcrumb="[['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'], ['label' => 'Regionales', 'url' => route('regional.index'), 'icon' => 'fa-cog'], ['label' => 'Detalles', 'icon' => 'fa-info-circle', 'active' => true]]"
+    />
+@endsection
+
 @section('content')
-        <!-- Encabezado de la Página -->
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Ver Regional</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('home.index') }}">Inicio</a>
-                            </li>
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('regional.index') }}">Regionales</a>
-                            </li>
-                            <li class="breadcrumb-item active">{{ $regional->nombre }}</li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contenido Principal -->
-        <section class="content">
-            <div class="container-fluid">
-                <!-- Botón Volver -->
-                <div class="mb-3">
-                    <a class="btn btn-outline-secondary btn-sm" href="{{ route('regional.index') }}" title="Volver">
-                        <i class="fas fa-arrow-left"></i> Volver
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ route('regional.index') }}">
+                        <i class="fas fa-arrow-left mr-1"></i> Volver
                     </a>
-                </div>
 
-                <!-- Card de Detalles de Regional -->
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Detalles de la Regional</h3>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-striped">
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">Regional:</th>
-                                        <td>{{ $regional->nombre }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Creado Por:</th>
-                                        <td>
-                                            @if ($regional->userCreated)
-                                                {{ $regional->userCreated->persona->primer_nombre }}
-                                                {{ $regional->userCreated->persona->primer_apellido }}
-                                            @else
-                                                Usuario no disponible
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th>Actualizado Por:</th>
-                                        <td>
-                                            @if ($regional->userEdited)
-                                                {{ $regional->userEdited->persona->primer_nombre }}
-                                                {{ $regional->userEdited->persona->primer_apellido }}
-                                            @else
-                                                Usuario no disponible
-                                            @endif
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Estado:</th>
-                                        <td>
-                                            <span class="badge badge-{{ $regional->status === 1 ? 'success' : 'danger' }}">
-                                                {{ $regional->status === 1 ? 'ACTIVO' : 'INACTIVO' }}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Creado en:</th>
-                                        <td>{{ $regional->created_at }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Actualizado en:</th>
-                                        <td>{{ $regional->updated_at }}</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                    <div class="card detail-card no-hover">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                                <i class="fas fa-info-circle mr-2"></i>Detalle de la Regional
+                            </h5>
+                        </div>
+
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table detail-table mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <th class="py-3">Regional</th>
+                                            <td class="py-3">{{ $regional->regional }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Departamento</th>
+                                            <td class="py-3">{{ $regional->departamento->departamento ?? 'N/A' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Estado</th>
+                                            <td class="py-3">
+                                                <span class="status-badge {{ $regional->status === 1 ? 'text-success' : 'text-danger' }}">
+                                                    <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
+                                                    {{ $regional->status === 1 ? 'Activo' : 'Inactivo' }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Usuario que crea</th>
+                                            <td class="py-3 user-info">
+                                                @if ($regional->userCreated)
+                                                    <i class="fas fa-user mr-1"></i>
+                                                    {{ $regional->userCreated->persona->primer_nombre }}
+                                                    {{ $regional->userCreated->persona->primer_apellido }}
+                                                @else
+                                                    <span class="text-muted">Usuario no disponible</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Fecha de creación</th>
+                                            <td class="py-3 timestamp">
+                                                <i class="far fa-calendar-alt mr-1"></i>
+                                                {{ $regional->created_at->diffForHumans() }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Usuario que modifica</th>
+                                            <td class="py-3 user-info">
+                                                @if ($regional->userEdited)
+                                                    <i class="fas fa-user mr-1"></i>
+                                                    {{ $regional->userEdited->persona->primer_nombre }}
+                                                    {{ $regional->userEdited->persona->primer_apellido }}
+                                                @else
+                                                    <span class="text-muted">Usuario no disponible</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Fecha de modificación</th>
+                                            <td class="py-3 timestamp">
+                                                <i class="far fa-calendar-alt mr-1"></i>
+                                                {{ $regional->updated_at->diffForHumans() }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-white py-3">
+                            <div class="d-flex justify-content-center gap-2">
+                                @can('EDITAR REGIONAL')
+                                    <form action="{{ route('regional.cambiarEstado', $regional->id) }}"
+                                        method="POST" class="d-inline mx-1">
+                                        @csrf
+                                        @method('PUT')
+                                        <button type="submit" class="btn btn-outline-success btn-sm">
+                                            <i class="fas fa-sync mr-1"></i> Cambiar Estado
+                                        </button>
+                                    </form>
+                                    <a href="{{ route('regional.edit', $regional->id) }}"
+                                        class="btn btn-outline-info btn-sm mx-1">
+                                        <i class="fas fa-pencil-alt mr-1"></i> Editar
+                                    </a>
+                                @endcan
+                                @can('ELIMINAR REGIONAL')
+                                    <form action="{{ route('regional.destroy', $regional->id) }}"
+                                        method="POST" class="d-inline mx-1"
+                                        onsubmit="return confirm('¿Está seguro de eliminar esta regional?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-outline-danger btn-sm">
+                                            <i class="fas fa-trash mr-1"></i> Eliminar
+                                        </button>
+                                    </form>
+                                @endcan
+                            </div>
                         </div>
                     </div>
-                    <!-- Bloque de Acciones -->
-                    <div class="card-footer text-center">
-                        @can('EDITAR REGIONAL')
-                            <form class="d-inline" action="{{ route('regional.cambiarEstado', $regional->id) }}"
-                                method="POST">
-                                @csrf
-                                @method('PUT')
-                                <button type="submit" class="btn btn-success btn-sm" title="Cambiar Estado">
-                                    <i class="fas fa-sync"></i> Cambiar Estado
-                                </button>
-                            </form>
-                            <a class="btn btn-info btn-sm" href="{{ route('regional.edit', $regional->id) }}" title="Editar">
-                                <i class="fas fa-pencil-alt"></i> Editar
-                            </a>
-                        @endcan
-                        @can('ELIMINAR REGIONAL')
-                            <form class="d-inline" action="{{ route('regional.destroy', $regional->id) }}" method="POST"
-                                onsubmit="return confirm('¿Está seguro de eliminar esta regional?');">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger btn-sm" title="Eliminar">
-                                    <i class="fas fa-trash"></i> Eliminar
-                                </button>
-                            </form>
-                        @endcan
-                    </div>
                 </div>
             </div>
-        </section>
-    </div>
+        </div>
+    </section>
+@endsection
+
+@section('footer')
+    @include('layout.footer')
+@endsection
+
+@section('js')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @vite(['resources/js/parametros.js'])
 @endsection

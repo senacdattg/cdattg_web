@@ -35,10 +35,66 @@
                         searchAction="{{ route('regional.index') }}"
                         searchPlaceholder="Buscar regional..."
                         searchValue="{{ request('search') }}"
-                        :columns="[['label' => '#', 'width' => '5%'], ['label' => 'Regional', 'width' => '40%'], ['label' => 'Departamento', 'width' => '40%'], ['label' => 'Estado', 'width' => '20%'], ['label' => 'Acciones', 'width' => '35%', 'class' => 'text-center']]"
-                        :pagination="$listaderegionales->links()"
+                        :columns="[['label' => '#', 'width' => '5%'], ['label' => 'Regional', 'width' => '30%'], ['label' => 'Departamento', 'width' => '30%'], ['label' => 'Estado', 'width' => '15%', 'class' => 'text-center'], ['label' => 'Acciones', 'width' => '20%', 'class' => 'text-center']]"
+                        :pagination="$regionales->links()"
                     >
-GET
+                        @forelse($regionales as $key => $regional)
+                            <tr>
+                                <td>{{ $regionales->firstItem() + $key }}</td>
+                                <td>{{ $regional->regional }}</td>
+                                <td>{{ $regional->departamento->departamento ?? 'N/A' }}</td>
+                                <td class="text-center">
+                                    @if($regional->status)
+                                        <span class="badge badge-success">Activo</span>
+                                    @else
+                                        <span class="badge badge-danger">Inactivo</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        @can('EDITAR REGIONAL')
+                                            <form action="{{ route('regional.cambiarEstado', $regional->id) }}"
+                                                method="POST" style="display: inline-block; margin-right: 2px;">
+                                                @csrf
+                                                @method('PUT')
+                                                <button type="submit" class="btn btn-sm btn-light" title="Cambiar Estado">
+                                                    <i class="fas fa-sync text-success"></i>
+                                                </button>
+                                            </form>
+                                        @endcan
+                                        @can('VER REGIONAL')
+                                            <a href="{{ route('regional.show', $regional->id) }}"
+                                                class="btn btn-sm btn-light" title="Ver"
+                                                style="margin-right: 2px;">
+                                                <i class="fas fa-eye text-warning"></i>
+                                            </a>
+                                        @endcan
+                                        @can('EDITAR REGIONAL')
+                                            <a href="{{ route('regional.edit', $regional->id) }}"
+                                                class="btn btn-sm btn-light" title="Editar"
+                                                style="margin-right: 2px;">
+                                                <i class="fas fa-pencil-alt text-primary"></i>
+                                            </a>
+                                        @endcan
+                                        @can('ELIMINAR REGIONAL')
+                                            <form action="{{ route('regional.destroy', $regional->id) }}"
+                                                method="POST" style="display: inline-block;"
+                                                onsubmit="return confirm('¿Está seguro de eliminar esta regional?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-light" title="Eliminar">
+                                                    <i class="fas fa-trash-alt text-danger"></i>
+                                                </button>
+                                            </form>
+                                        @endcan
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center">No hay regionales registradas</td>
+                            </tr>
+                        @endforelse
                     </x-data-table>
             </div>
         </div>
