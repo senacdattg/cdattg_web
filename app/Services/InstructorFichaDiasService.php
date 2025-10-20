@@ -22,10 +22,17 @@ class InstructorFichaDiasService
     public function asignarDiasInstructor(int $instructorFichaId, array $diasData): array
     {
         try {
+            \Log::info('Iniciando asignación de días', [
+                'instructor_ficha_id' => $instructorFichaId,
+                'dias_data' => $diasData
+            ]);
+
             DB::beginTransaction();
 
             // Obtener la relación instructor-ficha
             $instructorFicha = InstructorFichaCaracterizacion::with(['instructor', 'ficha'])->findOrFail($instructorFichaId);
+            
+            \Log::info('Instructor-ficha encontrado', ['instructor_ficha' => $instructorFicha]);
             
             // Validar disponibilidad del instructor
             $validacion = $this->validarDisponibilidadInstructor($instructorFicha, $diasData);
@@ -154,17 +161,17 @@ class InstructorFichaDiasService
     /**
      * Genera las fechas efectivas de formación dentro del rango de la ficha.
      *
-     * @param InstructorFichaCaracterizacion $instructorFicha
+     * @param InstructorFichaCaracterizacion|object $instructorFicha
      * @param array $diasData
      * @return array
      */
-    public function generarFechasEfectivas(InstructorFichaCaracterizacion $instructorFicha, array $diasData): array
+    public function generarFechasEfectivas($instructorFicha, array $diasData): array
     {
         $fechasEfectivas = [];
         
-        // Obtener el rango de fechas de la ficha
-        $fechaInicio = $instructorFicha->fecha_inicio ?? $instructorFicha->ficha->fecha_inicio;
-        $fechaFin = $instructorFicha->fecha_fin ?? $instructorFicha->ficha->fecha_fin;
+        // Obtener el rango de fechas de la ficha (soporta tanto modelo como objeto)
+        $fechaInicio = $instructorFicha->fecha_inicio ?? ($instructorFicha->ficha->fecha_inicio ?? null);
+        $fechaFin = $instructorFicha->fecha_fin ?? ($instructorFicha->ficha->fecha_fin ?? null);
 
         if (!$fechaInicio || !$fechaFin) {
             return [];

@@ -239,11 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Crear HTML para el nuevo instructor
         const instructorHTML = `
-            <div class="instructor-row border rounded p-3 mb-3 bg-light position-relative" data-index="${nuevoIndice}">
-                <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 m-2" onclick="eliminarInstructor(this)">
-                    <i class="fas fa-times"></i>
-                </button>
-                
+            <div class="instructor-row border rounded p-3 mb-3 bg-light position-relative" data-index="${nuevoIndice}">                
                 <div class="row">
                     <div class="col-md-6">
                         <label class="form-label font-weight-bold">
@@ -448,4 +444,288 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     console.log('Vista de gestión especializada inicializada correctamente');
+
+    // ===== FUNCIONALIDAD DEL MODAL DE DÍAS DE FORMACIÓN =====
+    
+    // Variables globales para el modal
+    let instructorFichaIdActual = null;
+    let fichaIdActual = null;
+    let guardandoDias = false; // Flag para prevenir múltiples guardados
+
+    // Abrir modal de días de formación
+    $(document).on('click', '.btn-gestionar-dias', function() {
+        const instructorFichaId = $(this).data('instructor-ficha-id');
+        const instructorNombre = $(this).data('instructor-nombre');
+        
+        instructorFichaIdActual = instructorFichaId;
+        fichaIdActual = window.fichaId || obtenerFichaIdDeUrl();
+        
+        // Llenar información del instructor
+        $('#modal-instructor-nombre').text(instructorNombre);
+        $('#modal-instructor-ficha-id').val(instructorFichaId);
+        
+        // Cargar días existentes
+        cargarDiasExistentes();
+        
+        // Mostrar modal
+        $('#modalDiasFormacion').modal('show');
+    });
+
+    // Cargar días existentes del instructor
+    function cargarDiasExistentes() {
+        if (!instructorFichaIdActual || !fichaIdActual) return;
+        
+        $.ajax({
+            url: `/fichaCaracterizacion/${fichaIdActual}/instructor/${instructorFichaIdActual}/obtener-dias`,
+            method: 'GET',
+            success: function(response) {
+                if (response.success && response.data) {
+                    // Limpiar selecciones previas
+                    $('.dia-checkbox-modal').prop('checked', false);
+                    $('.hora-inicio-modal, .hora-fin-modal').val('').prop('disabled', true);
+                    $('.dia-status-modal').hide();
+                    
+                    // Marcar días existentes
+                    response.data.forEach(dia => {
+                        const checkbox = $(`.dia-checkbox-modal[value="${dia.dia_id}"]`);
+                        const horaInicio = $(`.hora-inicio-modal[data-dia="${dia.dia_id}"]`);
+                        const horaFin = $(`.hora-fin-modal[data-dia="${dia.dia_id}"]`);
+                        const status = $(`.dia-row-modal[data-dia-id="${dia.dia_id}"] .dia-status-modal`);
+                        
+                        checkbox.prop('checked', true);
+                        horaInicio.val(dia.hora_inicio).prop('disabled', false);
+                        horaFin.val(dia.hora_fin).prop('disabled', false);
+                        status.show();
+                    });
+                }
+            },
+            error: function(xhr) {
+                console.error('Error al cargar días existentes:', xhr);
+            }
+        });
+    }
+
+    // Manejar cambio en checkboxes del modal
+    $(document).on('change', '.dia-checkbox-modal', function() {
+        const diaId = $(this).val();
+        const horaInicio = $(`.hora-inicio-modal[data-dia="${diaId}"]`);
+        const horaFin = $(`.hora-fin-modal[data-dia="${diaId}"]`);
+        const status = $(`.dia-row-modal[data-dia-id="${diaId}"] .dia-status-modal`);
+        
+        if ($(this).is(':checked')) {
+            horaInicio.prop('disabled', false);
+            horaFin.prop('disabled', false);
+            // Cargar horas por defecto de la ficha si están disponibles
+            cargarHorasPorDefecto(diaId);
+        } else {
+            horaInicio.prop('disabled', true).val('');
+            horaFin.prop('disabled', true).val('');
+            status.hide();
+        }
+    });
+
+    // Cargar horas por defecto de la ficha
+    function cargarHorasPorDefecto(diaId) {
+        // Si hay datos de días de la semana disponibles, usarlos
+        if (window.diasSemanaData && window.diasSemanaData[diaId]) {
+            const diaData = window.diasSemanaData[diaId];
+            // Remover segundos de las horas por defecto
+            const horaInicio = diaData.hora_inicio ? diaData.hora_inicio.substring(0, 5) : '';
+            const horaFin = diaData.hora_fin ? diaData.hora_fin.substring(0, 5) : '';
+            $(`.hora-inicio-modal[data-dia="${diaId}"]`).val(horaInicio);
+            $(`.hora-fin-modal[data-dia="${diaId}"]`).val(horaFin);
+        }
+    }
+
+    // Seleccionar todos los días
+    $(document).on('change', '#select-all-modal', function() {
+        const isChecked = $(this).is(':checked');
+        $('.dia-checkbox-modal').prop('checked', isChecked).trigger('change');
+    });
+
+    // Vista previa de fechas
+    $(document).on('click', '#btn-preview-modal', function() {
+        const diasSeleccionados = obtenerDiasSeleccionadosModal();
+        
+        if (diasSeleccionados.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Sin días seleccionados',
+                text: 'Por favor selecciona al menos un día de la semana.'
+            });
+            return;
+        }
+        
+        $.ajax({
+            url: `/fichaCaracterizacion/${fichaIdActual}/instructor/${instructorFichaIdActual}/preview-fechas`,
+            method: 'POST',
+            data: {
+                dias: diasSeleccionados,
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                if (response.success && response.data) {
+                    mostrarPreviewFechas(response.data);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message || 'No se pudieron generar las fechas'
+                    });
+                }
+            },
+            error: function(xhr) {
+                console.error('Error en vista previa:', xhr);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error al generar la vista previa de fechas'
+                });
+            }
+        });
+    });
+
+    // Obtener días seleccionados del modal
+    function obtenerDiasSeleccionadosModal() {
+        const dias = [];
+        $('.dia-checkbox-modal:checked').each(function() {
+            const diaId = $(this).val();
+            const horaInicio = $(`.hora-inicio-modal[data-dia="${diaId}"]`).val();
+            const horaFin = $(`.hora-fin-modal[data-dia="${diaId}"]`).val();
+            
+            dias.push({
+                dia_id: parseInt(diaId),
+                hora_inicio: horaInicio ? horaInicio.substring(0, 5) : null, // Remover segundos
+                hora_fin: horaFin ? horaFin.substring(0, 5) : null // Remover segundos
+            });
+        });
+        return dias;
+    }
+
+    // Mostrar preview de fechas
+    function mostrarPreviewFechas(fechas) {
+        let html = '<div class="row">';
+        
+        fechas.forEach(fecha => {
+            html += `
+                <div class="col-md-6 col-lg-4 mb-2">
+                    <div class="badge badge-info p-2">
+                        <i class="fas fa-calendar-day mr-1"></i>
+                        ${fecha.fecha} - ${fecha.dia_semana}
+                        ${fecha.hora_inicio ? `<br><small>${fecha.hora_inicio} - ${fecha.hora_fin}</small>` : ''}
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        
+        $('#fechas-container-modal').html(html);
+        $('#preview-fechas-modal').show();
+    }
+
+    // Guardar días de formación
+    $(document).on('click', '#btn-guardar-dias-modal', function() {
+        const btnGuardar = $(this);
+        
+        // Prevenir doble clic y múltiples guardados
+        if (btnGuardar.prop('disabled') || guardandoDias) {
+            return;
+        }
+        
+        guardandoDias = true;
+        
+        const diasSeleccionados = obtenerDiasSeleccionadosModal();
+        
+        console.log('Días seleccionados:', diasSeleccionados);
+        console.log('Ficha ID:', fichaIdActual);
+        console.log('Instructor Ficha ID:', instructorFichaIdActual);
+        
+        if (diasSeleccionados.length === 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Sin días seleccionados',
+                text: 'Por favor selecciona al menos un día de la semana.'
+            });
+            return;
+        }
+        
+        // Validar que todos los días tengan horas si es requerido
+        const diasSinHoras = diasSeleccionados.filter(dia => !dia.hora_inicio || !dia.hora_fin);
+        if (diasSinHoras.length > 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Horas incompletas',
+                text: 'Algunos días seleccionados no tienen horas de inicio y fin configuradas.'
+            });
+            return;
+        }
+        
+        // Mostrar loading
+        const textoOriginal = btnGuardar.html();
+        btnGuardar.html('<i class="fas fa-spinner fa-spin mr-1"></i>Guardando...').prop('disabled', true);
+        
+        $.ajax({
+            url: `/fichaCaracterizacion/${fichaIdActual}/instructor/${instructorFichaIdActual}/asignar-dias`,
+            method: 'POST',
+            data: {
+                dias: diasSeleccionados,
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Éxito!',
+                        text: 'Los días de formación han sido guardados correctamente.'
+                    }).then(() => {
+                        $('#modalDiasFormacion').modal('hide');
+                        // Recargar la página para mostrar los cambios
+                        location.reload();
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message || 'Error al guardar los días de formación'
+                    });
+                }
+            },
+            error: function(xhr) {
+                console.error('Error al guardar días:', xhr);
+                let mensaje = 'Error al guardar los días de formación';
+                
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    mensaje = xhr.responseJSON.message;
+                } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                    const errores = Object.values(xhr.responseJSON.errors).flat();
+                    mensaje = errores.join(', ');
+                }
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: mensaje
+                });
+            },
+            complete: function() {
+                btnGuardar.html(textoOriginal).prop('disabled', false);
+                guardandoDias = false; // Resetear flag
+            }
+        });
+    });
+
+    // Limpiar modal al cerrar
+    $('#modalDiasFormacion').on('hidden.bs.modal', function() {
+        $('#form-asignar-dias-modal')[0].reset();
+        $('.dia-checkbox-modal').prop('checked', false);
+        $('.hora-inicio-modal, .hora-fin-modal').val('').prop('disabled', true);
+        $('.dia-status-modal').hide();
+        $('#preview-fechas-modal').hide();
+        $('#fechas-container-modal').empty();
+        instructorFichaIdActual = null;
+        fichaIdActual = null;
+        guardandoDias = false; // Resetear flag
+    });
+
 });

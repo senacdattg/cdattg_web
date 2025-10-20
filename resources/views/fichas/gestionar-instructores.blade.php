@@ -210,28 +210,6 @@
                                        name="instructor_principal_id" 
                                        id="instructor_principal_id" 
                                        value="{{ old('instructor_principal_id', $ficha->instructor_id) }}">
-                                
-                                <!-- Información del Instructor Principal (Líder) -->
-                                @if($ficha->instructor)
-                                    <div class="alert alert-success">
-                                        <i class="fas fa-star text-warning mr-1"></i>
-                                        <strong>Instructor Líder de la Ficha:</strong>
-                                        {{ $ficha->instructor->persona->primer_nombre }} 
-                                        {{ $ficha->instructor->persona->primer_apellido }}
-                                        <small class="text-muted">({{ $ficha->instructor->persona->numero_documento }})</small>
-                                        <br>
-                                        <small class="text-light">
-                                            <i class="fas fa-info-circle mr-1"></i>
-                                            El instructor líder fue asignado en la creación de la ficha y no necesita estar en la lista de instructores adicionales.
-                                        </small>
-                                    </div>
-                                @else
-                                    <div class="alert alert-warning">
-                                        <i class="fas fa-exclamation-triangle mr-1"></i>
-                                        <strong>Advertencia:</strong> Esta ficha no tiene un instructor líder asignado. 
-                                        Se recomienda asignar un instructor líder desde la edición de la ficha.
-                                    </div>
-                                @endif
 
                                 <!-- Información de fechas permitidas -->
                                 <div class="alert alert-info">
@@ -267,7 +245,7 @@
                                         <i class="fas fa-users mr-1"></i>
                                         Instructores Asignados <span class="text-danger">*</span>
                                     </label>
-                                    <div id="instructores-container">
+                                    <div id="instructores-container">   
                                         <!-- Los instructores se agregarán dinámicamente aquí -->
                                     </div>
                                     <button type="button" class="btn btn-primary btn-lg mt-4" onclick="agregarInstructor()">
@@ -507,6 +485,19 @@
         window.diasSemana = @json($diasSemana->map(function($dia) {
             return ['id' => $dia->id, 'nombre' => $dia->name];
         })->values());
+        
+        // Crear objeto de días de la semana con horas por defecto
+        window.diasSemanaData = {};
+        @if(isset($diasSemana) && $diasSemana->count() > 0)
+            @foreach($diasSemana as $dia)
+                window.diasSemanaData[{{ $dia->id }}] = {
+                    id: {{ $dia->id }},
+                    name: '{{ $dia->name }}',
+                    hora_inicio: '{{ $dia->hora_inicio ?? $ficha->hora_inicio ?? "06:30" }}',
+                    hora_fin: '{{ $dia->hora_fin ?? $ficha->hora_fin ?? "13:00" }}'
+                };
+            @endforeach
+        @endif
     </script>
     @vite(['resources/js/pages/gestion-especializada.js'])
     <script>
