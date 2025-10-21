@@ -48,6 +48,7 @@ class SuperAdminSeeder extends Seeder
             // Permisos para centros de formación
             'CREAR CENTRO DE FORMACION',
             'EDITAR CENTRO DE FORMACION',
+            'VER CENTRO DE FORMACION',
             'VER CENTROS DE FORMACION',
             'ELIMINAR CENTRO DE FORMACION',
             

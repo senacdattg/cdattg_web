@@ -37,7 +37,7 @@
                                     <label for="nombre" class="form-label font-weight-bold">Nombre de la Regional</label>
                                     <input type="text" name="nombre" id="nombre"
                                         class="form-control @error('nombre') is-invalid @enderror"
-                                        value="{{ old('nombre', $regional->regional) }}" required autofocus>
+                                        value="{{ old('nombre', $regional->nombre) }}" required autofocus>
                                     @error('nombre')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -48,7 +48,7 @@
                                     <select name="departamento_id" id="departamento_id" 
                                         class="form-control @error('departamento_id') is-invalid @enderror" required>
                                         <option value="">Seleccione un departamento</option>
-                                        @foreach($regional->departamento->pais->departamentos ?? [] as $departamento)
+                                        @foreach($departamentos as $departamento)
                                             <option value="{{ $departamento->id }}" 
                                                 {{ old('departamento_id', $regional->departamento_id) == $departamento->id ? 'selected' : '' }}>
                                                 {{ $departamento->departamento }}

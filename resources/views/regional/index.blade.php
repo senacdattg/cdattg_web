@@ -41,7 +41,7 @@
                         @forelse($regionales as $key => $regional)
                             <tr>
                                 <td>{{ $regionales->firstItem() + $key }}</td>
-                                <td>{{ $regional->regional }}</td>
+                                <td>{{ $regional->nombre }}</td>
                                 <td>{{ $regional->departamento->departamento ?? 'N/A' }}</td>
                                 <td class="text-center">
                                     @if($regional->status)
