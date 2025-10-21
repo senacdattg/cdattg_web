@@ -60,7 +60,9 @@ class SedeController extends Controller
     public function create()
     {
         $regionales = Regional::where('status', 1)->get();
-        return view('sede.create', compact('regionales'));
+        $departamentos = \App\Models\Departamento::all();
+        $municipios = \App\Models\Municipio::all();
+        return view('sede.create', compact('regionales', 'departamentos', 'municipios'));
     }
 
     /**
@@ -101,7 +103,9 @@ class SedeController extends Controller
     public function edit(Sede $sede)
     {
         $regionales = Regional::where('status', 1)->get();
-        return view('sede.edit', ['sede' => $sede], compact('regionales'));
+        $departamentos = \App\Models\Departamento::all();
+        $municipios = \App\Models\Municipio::all();
+        return view('sede.edit', compact('sede', 'regionales', 'departamentos', 'municipios'));
     }
 
     /**
