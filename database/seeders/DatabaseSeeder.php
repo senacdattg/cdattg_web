@@ -89,6 +89,9 @@ class DatabaseSeeder extends Seeder
             // Complementarios ofertados
             ComplementariosOfertadosSeeder::class,
 
+            // Aspirantes complementarios
+            AspirantesComplementariosSeeder::class,
+
             // Categorias de caracterizacion para complementarios
             CategoriaCaracterizacionComplementariosSeeder::class,
         ]);
