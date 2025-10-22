@@ -20,7 +20,7 @@ class ComplementariosOfertadosSeeder extends Seeder
                 'descripcion' => 'Fundamentos de cocina, manipulación de alimentos y técnicas básicas de preparación.',
                 'duracion' => 40,
                 'cupos' => 20,
-                'estado' => 0,
+                'estado' => 1, // Offered
                 'modalidad_id' => 18, // PRESENCIAL
                 'jornada_id' => 1, // MAÑANA
             ],
@@ -30,7 +30,7 @@ class ComplementariosOfertadosSeeder extends Seeder
                 'descripcion' => 'Técnicas de acabado, barnizado y restauración de muebles de madera.',
                 'duracion' => 60,
                 'cupos' => 15,
-                'estado' => 0,
+                'estado' => 1, // Offered
                 'modalidad_id' => 19, // VIRTUAL
                 'jornada_id' => 2, // TARDE
             ],
@@ -40,7 +40,7 @@ class ComplementariosOfertadosSeeder extends Seeder
                 'descripcion' => 'Técnicas básicas de corte, confección y terminado de prendas de vestir.',
                 'duracion' => 50,
                 'cupos' => 10,
-                'estado' => 0,
+                'estado' => 0, // Not offered
                 'modalidad_id' => 20, // MIXTA
                 'jornada_id' => 3, // NOCHE
             ],
