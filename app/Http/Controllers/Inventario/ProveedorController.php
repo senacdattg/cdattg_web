@@ -2,17 +2,11 @@
 
 namespace App\Http\Controllers\Inventario;
 
-use App\Http\Controllers\Controller;
 use App\Models\Inventario\Proveedor;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class ProveedorController extends Controller
+class ProveedorController extends InventarioController
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
 
     public function index()
     {
@@ -33,11 +27,10 @@ class ProveedorController extends Controller
         $validated = $request->validate([
             'proveedor' => 'required|unique:proveedores,proveedor'
         ]);
-        
-        $validated['user_create_id'] = Auth::id();
-        $validated['user_update_id'] = Auth::id();
 
-        Proveedor::create($validated);
+        $proveedor = new Proveedor($validated);
+        $this->setUserIds($proveedor);
+        $proveedor->save();
 
         return redirect()->route('inventario.proveedores.index')
             ->with('success', 'Proveedor creado exitosamente.');
@@ -63,9 +56,9 @@ class ProveedorController extends Controller
             'email' => 'nullable|email|unique:proveedores,email,' . $proveedor->id
         ]);
 
-        $validated['user_update_id'] = Auth::id();
-
-        $proveedor->update($validated);
+        $proveedor->fill($validated);
+        $this->setUserIds($proveedor, true);
+        $proveedor->save();
 
         return redirect()->route('inventario.proveedores.index')
             ->with('success', 'Proveedor actualizado exitosamente.');

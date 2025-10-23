@@ -2,15 +2,15 @@
 
 namespace App\Models\Inventario;
 
+use App\Traits\Seguimiento;
 use App\Models\Ambiente;
 use App\Models\ParametroTema;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Producto extends Model
 {
-    use HasFactory;
+    use HasFactory, Seguimiento;
 
     protected $table = 'productos';
 
@@ -53,16 +53,6 @@ class Producto extends Model
     {
         return $this->belongsTo(ParametroTema::class, 'estado_producto_id');
     }
-    
-    public function creador()
-    {
-        return $this->belongsTo(User::class, 'user_create_id');
-    }
-
-    public function actualizador()
-    {
-        return $this->belongsTo(User::class, 'user_update_id');
-    }
 
     public function categoria()
     {
@@ -82,5 +72,93 @@ class Producto extends Model
     public function ambiente()
     {
         return $this->belongsTo(Ambiente::class);
+    }
+
+    
+    // Relación con detalles de órdenes
+    public function detalleOrdenes()
+    {
+        return $this->hasMany(DetalleOrden::class, 'producto_id');
+    }
+
+  
+    // Verificar si hay stock disponible
+    public function StockDisponible($cantidadRequerida)
+    {
+        return $this->cantidad >= $cantidadRequerida;
+    }
+
+
+    // Descontar stock del producto
+    public function descontarStock($cantidad)
+    {
+        if (!$this->StockDisponible($cantidad)) {
+            throw new \Exception("Stock insuficiente. Disponible: {$this->cantidad}, Requerido: {$cantidad}");
+        }
+
+        $this->cantidad -= $cantidad;
+        $this->save();
+
+        return $this;
+    }
+
+   
+    // Devolver stock al producto
+    public function devolverStock($cantidad)
+    {
+        $this->cantidad += $cantidad;
+        $this->save();
+
+        return $this;
+    }
+
+    // Obtener el porcentaje de stock actual
+    public function getPorcentajeStock()
+    {
+        if ($this->cantidad <= 0) {
+            return 0;
+        }
+        return ($this->cantidad / 100) * 100;
+    }
+
+ 
+    // Obtener estado del stock (crítico, bajo, medio, normal)
+    public function getEstadoStock()
+    {
+        $cantidad = $this->cantidad;
+
+        if ($cantidad <= 5) {
+            return 'critico';
+        } elseif ($cantidad <= 10) {
+            return 'bajo';
+        } elseif ($cantidad <= 20) {
+            return 'medio';
+        }
+
+        return 'normal';
+    }
+
+    // Obtener badge HTML para mostrar estado de stock
+    public function getBadgeStock()
+    {
+        $estado = $this->getEstadoStock();
+        $clases = [
+            'critico' => 'badge-danger',
+            'bajo' => 'badge-warning',
+            'medio' => 'badge-info',
+            'normal' => 'badge-success'
+        ];
+
+        $textos = [
+            'critico' => 'CRÍTICO',
+            'bajo' => 'BAJO',
+            'medio' => 'MEDIO',
+            'normal' => 'NORMAL'
+        ];
+
+        $clase = $clases[$estado] ?? 'badge-secondary';
+        $texto = $textos[$estado] ?? 'N/A';
+
+        return "<span class='badge {$clase}'>{$texto}: {$this->cantidad}</span>";
     }
 }

@@ -2,20 +2,14 @@
 
 namespace App\Http\Controllers\Inventario;
 
-use App\Http\Controllers\Controller;
 use App\Models\Inventario\ContratoConvenio;
 use App\Models\Inventario\Proveedor;
 use App\Models\ParametroTema;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
-class ContratoConvenioController extends Controller
+class ContratoConvenioController extends InventarioController
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
 
     public function index()
     {
@@ -62,10 +56,9 @@ class ContratoConvenioController extends Controller
             $validated['archivo'] = $request->file('archivo')->store('contratos_convenios', 'public');
         }
 
-        $validated['user_create_id'] = Auth::id();
-        $validated['user_update_id'] = Auth::id();
-
-        $contrato = ContratoConvenio::create($validated);
+        $contrato = new ContratoConvenio($validated);
+        $this->setUserIds($contrato);
+        $contrato->save();
 
         return redirect()->route('inventario.contratos-convenios.show', $contrato)
             ->with('success', 'Contrato/Convenio creado exitosamente.');
@@ -107,9 +100,9 @@ class ContratoConvenioController extends Controller
             $validated['archivo'] = $request->file('archivo')->store('contratos_convenios', 'public');
         }
 
-        $validated['user_update_id'] = Auth::id();
-
-        $contratoConvenio->update($validated);
+        $contratoConvenio->fill($validated);
+        $this->setUserIds($contratoConvenio, true);
+        $contratoConvenio->save();
 
         return redirect()->route('inventario.contratos-convenios.show', $contratoConvenio)
             ->with('success', 'Contrato/Convenio actualizado exitosamente.');

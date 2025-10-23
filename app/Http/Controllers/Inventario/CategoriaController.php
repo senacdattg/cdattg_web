@@ -2,17 +2,11 @@
 
 namespace App\Http\Controllers\Inventario;
 
-use App\Http\Controllers\Controller;
 use App\Models\Inventario\Categoria;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class CategoriaController extends Controller
+class CategoriaController extends InventarioController
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
 
     public function index()
     {
@@ -33,11 +27,10 @@ class CategoriaController extends Controller
         $validated = $request->validate([
             'nombre' => 'required|unique:categorias,nombre'
         ]);
-        
-        $validated['user_create_id'] = Auth::id();
-        $validated['user_update_id'] = Auth::id();
 
-        Categoria::create($validated);
+        $categoria = new Categoria($validated);
+        $this->setUserIds($categoria);
+        $categoria->save();
 
         return redirect()->route('inventario.categorias.index')
             ->with('success', 'Categoría creada exitosamente.');
@@ -61,9 +54,9 @@ class CategoriaController extends Controller
             'nombre' => 'required|unique:categorias,nombre,' . $categoria->id
         ]);
 
-        $validated['user_update_id'] = Auth::id();
-
-        $categoria->update($validated);
+        $categoria->fill($validated);
+        $this->setUserIds($categoria, true);
+        $categoria->save();
 
         return redirect()->route('inventario.categorias.index')
             ->with('success', 'Categoría actualizada exitosamente.');
