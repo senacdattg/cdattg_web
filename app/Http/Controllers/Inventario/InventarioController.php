@@ -12,10 +12,6 @@ abstract class InventarioController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
-        $this->middleware('can:inventario.index')->only('index');
-        $this->middleware('can:inventario.store')->only(['create', 'store']);
-        $this->middleware('can:inventario.update')->only(['edit', 'update']);
-        $this->middleware('can:inventario.destroy')->only('destroy');
     }
 
     

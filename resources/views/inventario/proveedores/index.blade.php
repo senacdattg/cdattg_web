@@ -1,38 +1,27 @@
-@extends('adminlte::page')
+@extends('inventario.layouts.base')
+
+@push('styles')
+    @vite(['resources/css/inventario/inventario_listas.css'])
+@endpush
 
 @section('title', 'Proveedores')
-@section('css')
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    @vite(['resources/css/inventario/inventario_listas.css', 'resources/css/inventario/shared/base.css'])
-@stop
 
 @section('content_header')
-    <div class="proveedores-header">
-        <div class="d-flex justify-content-between align-items-center flex-wrap">
-            <div>
-                <h1 class="mb-1">
-                    <i></i>Gestión de Proveedores
-                </h1>
-                <p class="subtitle mb-0">Administra los proveedores del inventario</p>
-            </div>
-            <button type="button" class="btn_crear" data-toggle="modal" data-target="#createProveedorModal">
-                <i class="fas fa-plus me-2"></i>Nuevo Proveedor
-            </button>
-        </div>
-    </div>
-@stop
+    @include('inventario._components.modal-header', [
+        'title' => 'Gestión de Proveedores',
+        'subtitle' => 'Administra los proveedores del inventario',
+        'icon' => 'fas fa-truck',
+        'modalTarget' => 'createProveedorModal',
+        'buttonText' => 'Nuevo Proveedor'
+    ])
+@endsection
 
-@section('content')
-    <div class="search-filter-container">
-        <div class="row align-items-center">
-            <div class="col-md-6">
-                <input type="text" id="filtro-proveedores" class="form-control" placeholder="Buscar proveedores...">
-            </div>
-            <div class="col-md-6 text-end">
-                <span id="filter-counter" class="filter-counter"></span>
-            </div>
-        </div>
-    </div>
+@section('main-content')
+    {{-- Búsqueda --}}
+    @include('inventario._components.search-filter', [
+        'placeholder' => 'Buscar proveedores...',
+        'inputId' => 'filtro-proveedores'
+    ])
 
     <div class="card">
         <div class="card-body p-0 table-responsive">
@@ -314,6 +303,13 @@
         @endif
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @vite(['resources/js/inventario/inventario_listas.js', 'resources/js/inventario/proveedores.js', 'resources/js/inventario/paginacion.js'])
-@stop
+    {{-- Modales se incluirían aquí --}}
+@endsection
+
+@push('scripts')
+    @vite([
+        'resources/js/inventario/inventario_listas.js',
+        'resources/js/inventario/proveedores.js',
+        'resources/js/inventario/paginacion.js'
+    ])
+@endpush

@@ -11,6 +11,14 @@ use App\Models\ParametroTema;
 
 class OrdenController extends InventarioController
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->middleware('can:VER ORDEN')->only('index');
+        $this->middleware('can:CREAR ORDEN')->only('store');
+        $this->middleware('can:EDITAR ORDEN')->only('update');
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -26,29 +34,6 @@ class OrdenController extends InventarioController
         ->get();
         
         return view('inventario.ordenes.index', compact('ordenes'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        $tiposOrdenes = ParametroTema::with(['parametro','tema'])
-            ->whereHas('tema', fn($q) => $q->where('name', 'TIPOS DE ORDEN'))
-            ->where('status', 1)
-            ->get();
-
-        $productos = Producto::with(['categoria', 'marca'])
-            ->where('cantidad', '>', 0)
-            ->orderBy('producto')
-            ->get();
-
-        $estadosOrden = ParametroTema::with(['parametro','tema'])
-            ->whereHas('tema', fn($q) => $q->where('name', 'ESTADOS DE ORDEN'))
-            ->where('status', 1)
-            ->get();
-
-        return view('inventario.ordenes.create', compact('tiposOrdenes', 'productos', 'estadosOrden'));
     }
 
     /**
@@ -115,57 +100,6 @@ class OrdenController extends InventarioController
                 ->withInput()
                 ->with('error', 'Error al crear la orden: ' . $e->getMessage());
         }
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        $orden = Orden::with([
-            'tipoOrden.parametro',
-            'detalles.producto.categoria',
-            'detalles.producto.marca',
-            'detalles.estadoOrden.parametro',
-            'detalles.devoluciones',
-            'userCreate.persona',
-            'userUpdate.persona'
-        ])->findOrFail($id);
-        
-        return view('inventario.ordenes.show', compact('orden'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        $orden = Orden::with(['detalles.producto'])->findOrFail($id);
-        
-        // Verificar si la orden ya tiene devoluciones
-        $tieneDevoluciones = $orden->detalles()->whereHas('devoluciones')->exists();
-        
-        if ($tieneDevoluciones) {
-            return redirect()->route('inventario.ordenes.show', $orden->id)
-                ->with('error', 'No se puede editar una orden que ya tiene devoluciones registradas.');
-        }
-
-        $tiposOrdenes = ParametroTema::with(['parametro','tema'])
-            ->whereHas('tema', fn($q) => $q->where('name', 'TIPOS DE ORDEN'))
-            ->where('status', 1)
-            ->get();
-
-        $productos = Producto::with(['categoria', 'marca'])
-            ->where('cantidad', '>', 0)
-            ->orderBy('producto')
-            ->get();
-
-        $estadosOrden = ParametroTema::with(['parametro','tema'])
-            ->whereHas('tema', fn($q) => $q->where('name', 'ESTADOS DE ORDEN'))
-            ->where('status', 1)
-            ->get();
-
-        return view('inventario.ordenes.edit', compact('orden', 'tiposOrdenes', 'productos', 'estadosOrden'));
     }
 
     /**
@@ -291,5 +225,23 @@ class OrdenController extends InventarioController
             return redirect()->route('inventario.ordenes.index')
                 ->with('error', 'Error al eliminar la orden: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Mostrar vista de préstamos y salidas
+     */
+    public function prestamosSalidas()
+    {
+        $ordenes = Orden::with([
+            'tipoOrden.parametro',
+            'userCreate.persona',
+            'userUpdate.persona',
+            'detalles.producto',
+            'detalles.estadoOrden.parametro'
+        ])
+        ->latest()
+        ->get();
+        
+        return view('inventario.ordenes.prestamos_salidas', compact('ordenes'));
     }
 }

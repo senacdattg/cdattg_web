@@ -1,14 +1,12 @@
-{{-- filepath: resources/views/inventario/carrito/index.blade.php --}}
-@extends('adminlte::page')
+@extends('inventario.layouts.base')
 
-@vite([
-    'resources/css/inventario/shared/base.css',
-    'resources/css/inventario/carrito.css',
-    'resources/css/inventario/shared/modal-imagen.css',
-    'resources/js/inventario/shared/modal-imagen.js'
-])
+@push('styles')
+    @vite([
+        'resources/css/inventario/carrito.css'
+    ])
+@endpush
 
-@section('content')
+@section('main-content')
 @php
     $carrito = [
         (object)[
@@ -43,7 +41,7 @@
             ],
             'cantidad' => 1
         ],
-         (object)[
+        (object)[
             'id' => 1,
             'producto' => (object)[
                 'producto' => 'Mouse inalámbrico',
@@ -130,9 +128,6 @@
     </div>
 </div>
 
-<!-- Modal para imagen expandida -->
-<div id="modalImagen" class="modal-imagen">
-    <span class="cerrar">&times;</span>
-    <img class="modal-contenido" id="imgExpandida">
-</div>
+{{-- Modal para imagen expandible --}}
+@include('inventario._components.image-modal')
 @endsection

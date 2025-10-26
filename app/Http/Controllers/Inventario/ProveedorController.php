@@ -7,6 +7,14 @@ use Illuminate\Http\Request;
 
 class ProveedorController extends InventarioController
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->middleware('can:VER PRODUCTO')->only('index');
+        $this->middleware('can:CREAR PRODUCTO')->only('store');
+        $this->middleware('can:EDITAR PRODUCTO')->only('update');
+        $this->middleware('can:ELIMINAR PRODUCTO')->only('destroy');
+    }
 
     public function index()
     {
@@ -15,11 +23,6 @@ class ProveedorController extends InventarioController
             ->latest()
             ->get();
         return view('inventario.proveedores.index', compact('proveedores'));
-    }
-
-    public function create()
-    {
-        return view('inventario.proveedores.create');
     }
 
     public function store(Request $request)
@@ -34,16 +37,6 @@ class ProveedorController extends InventarioController
 
         return redirect()->route('inventario.proveedores.index')
             ->with('success', 'Proveedor creado exitosamente.');
-    }
-
-    public function show(Proveedor $proveedor)
-    {
-        return view('inventario.proveedores.show', compact('proveedor'));
-    }
-
-    public function edit(Proveedor $proveedor)
-    {
-        return view('inventario.proveedores.edit', compact('proveedor'));
     }
 
     public function update(Request $request, string $id)

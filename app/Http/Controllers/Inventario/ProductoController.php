@@ -13,6 +13,15 @@ use App\Models\Ambiente;
 
 class ProductoController extends InventarioController
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->middleware('can:VER PRODUCTO')->only(['index', 'show']);
+        $this->middleware('can:CREAR PRODUCTO')->only(['create', 'store']);
+        $this->middleware('can:EDITAR PRODUCTO')->only(['edit', 'update']);
+        $this->middleware('can:ELIMINAR PRODUCTO')->only('destroy');
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -86,7 +95,7 @@ class ProductoController extends InventarioController
         $this->setUserIds($producto);
         $producto->save();
 
-        return redirect()->route('productos.create')->with('success', 'Producto creado correctamente.');
+        return redirect()->route('inventario.productos.index')->with('success', 'Producto creado correctamente.');
     }
 
     /**
@@ -100,7 +109,7 @@ class ProductoController extends InventarioController
             'estado.parametro',
             'categoria',
             'marca',
-            'contratoConvenio',
+            'contratoConvenio.proveedor',
             'ambiente'
         ])->findOrFail($id);
         return view('inventario.productos.show', compact('producto'));

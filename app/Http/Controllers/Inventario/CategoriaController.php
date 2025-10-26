@@ -7,6 +7,14 @@ use Illuminate\Http\Request;
 
 class CategoriaController extends InventarioController
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->middleware('can:VER PRODUCTO')->only('index');
+        $this->middleware('can:CREAR PRODUCTO')->only('store');
+        $this->middleware('can:EDITAR PRODUCTO')->only('update');
+        $this->middleware('can:ELIMINAR PRODUCTO')->only('destroy');
+    }
 
     public function index()
     {
@@ -15,11 +23,6 @@ class CategoriaController extends InventarioController
             ->latest()
             ->get();
         return view('inventario.categorias.index', compact('categorias'));
-    }
-
-    public function create()
-    {
-        return view('inventario.categorias.create');
     }
 
     public function store(Request $request)
@@ -34,16 +37,6 @@ class CategoriaController extends InventarioController
 
         return redirect()->route('inventario.categorias.index')
             ->with('success', 'Categoría creada exitosamente.');
-    }
-
-    public function show(Categoria $categoria)
-    {
-        return view('inventario.categorias.show', compact('categoria'));
-    }
-
-    public function edit(Categoria $categoria)
-    {
-        return view('inventario.categorias.edit', compact('categoria'));
     }
 
     public function update(Request $request, string $id)

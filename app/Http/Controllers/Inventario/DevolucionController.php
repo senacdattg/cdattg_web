@@ -8,6 +8,11 @@ use Illuminate\Http\Request;
 
 class DevolucionController extends InventarioController
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->middleware('can:DEVOLVER PRESTAMO')->only(['index', 'create', 'store']);
+    }
 
     // Mostrar lista de préstamos pendientes de devolución
     public function index()

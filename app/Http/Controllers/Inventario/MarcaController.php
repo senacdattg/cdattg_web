@@ -7,6 +7,14 @@ use Illuminate\Http\Request;
 
 class MarcaController extends InventarioController
 {
+    public function __construct()
+    {
+        parent::__construct();
+        $this->middleware('can:VER PRODUCTO')->only('index');
+        $this->middleware('can:CREAR PRODUCTO')->only('store');
+        $this->middleware('can:EDITAR PRODUCTO')->only('update');
+        $this->middleware('can:ELIMINAR PRODUCTO')->only('destroy');
+    }
 
     public function index()
     {
@@ -15,11 +23,6 @@ class MarcaController extends InventarioController
             ->latest()
             ->get();
         return view('inventario.marcas.index', compact('marcas'));
-    }
-
-    public function create()
-    {
-        return view('inventario.marcas.create');
     }
 
     public function store(Request $request)
@@ -34,16 +37,6 @@ class MarcaController extends InventarioController
 
         return redirect()->route('inventario.marcas.index')
             ->with('success', 'Marca creada exitosamente.');
-    }
-
-    public function show(Marca $marca)
-    {
-        return view('inventario.marcas.show', compact('marca'));
-    }
-
-    public function edit(Marca $marca)
-    {
-        return view('inventario.marcas.edit', compact('marca'));
     }
 
     public function update(Request $request, string $id)

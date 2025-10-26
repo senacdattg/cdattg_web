@@ -38,6 +38,11 @@ class Producto extends Model
         'fecha_vencimiento' => 'datetime'
     ];
 
+    public function setNameAttribute($value)
+    {
+        $this->attributes['producto'] = strtoupper($value);
+    }
+
     // Relaciones existentes
     public function tipoProducto()
     {
