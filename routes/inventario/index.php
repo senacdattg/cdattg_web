@@ -1,6 +1,7 @@
 <?php
 
 // Archivo central de rutas para el módulo de inventario.
+require __DIR__.'/dashboard.php';
 require __DIR__.'/carrito.php';
 require __DIR__.'/categoria.php';
 require __DIR__.'/contratoConvenio.php';

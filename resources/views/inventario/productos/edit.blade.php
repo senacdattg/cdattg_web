@@ -31,7 +31,7 @@
 
         <div class="acciones_carrito">
             <!-- Formulario de edición -->
-            <form action="{{ route('productos.update', $producto->id) }}" method="POST" enctype="multipart/form-data" class="form_flex">
+            <form action="{{ route('inventario.productos.update', $producto->id) }}" method="POST" enctype="multipart/form-data" class="form_flex">
                 @csrf
                 @method('PUT')
                 <div class="container_form">
