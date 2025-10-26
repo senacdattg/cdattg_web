@@ -94,7 +94,7 @@ class ProductoController extends Controller
 
         Producto::create($validated);
 
-        return redirect()->route('productos.create')->with('success', 'Producto creado correctamente.');
+        return redirect()->route('inventario.productos.create')->with('success', 'Producto creado correctamente.');
     }
 
     /**
@@ -222,6 +222,17 @@ class ProductoController extends Controller
         return redirect()->route('inventario.productos.index')
             ->with('success', 'Producto eliminado correctamente');
     }
-  
+    
+    public function buscarPorCodigo($codigo)
+    {
+        $producto = Producto::where('codigo_barras', $codigo)->first();
+
+        if ($producto) {
+            return response()->json($producto);
+        } else {
+            return response()->json(null, 404);
+        }
+    }
+
 
 }

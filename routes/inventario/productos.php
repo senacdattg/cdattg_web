@@ -8,5 +8,5 @@ Route::prefix('inventario')
     ->name('inventario.')
     ->group(function () {
         Route::resource('productos', ProductoController::class);
-        Route::get('productos/buscar', [ProductoController::class, 'to_search'])->name('productos.buscar');
+        Route::get('/productos/buscar/{codigo}', [ProductoController::class, 'buscarPorCodigo']);
     });

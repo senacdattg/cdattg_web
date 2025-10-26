@@ -61,7 +61,7 @@
         <!-- Tarjeta de Stock Bajo -->
         <div class="col-lg-3 col-6">
             <div class="small-box bg-danger">
-                <div class="inner">
+                <div class="color">
                     <h3>{{ $productosStockBajo }}</h3>
                     <p>Stock Bajo</p>
                 </div>
@@ -97,12 +97,12 @@
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <i class="fas fa-chart-bar mr-1"></i>
+                        <i class="fas fa-chart-bar"></i>
                         Productos por Tipo
                     </h3>
                 </div>
                 <div class="card-body">
-                    <div class="chart-container" style="height: 300px;">
+                    <div class="chart-container">
                         <canvas id="productosConsumibles"></canvas>
                     </div>
                 </div>
@@ -113,7 +113,7 @@
             <div class="card">
                 <div class="card-header">
                     <h3 class="card-title">
-                        <i class="fas fa-chart-line mr-1"></i>
+                        <i class="fas fa-chart-line"></i>
                         Productos Más Solicitados
                     </h3>
                 </div>
@@ -157,7 +157,7 @@
                     </h3>
                 </div>
                 <div class="card-body table-responsive p-0" style="height: 300px;">
-                    <table class="table table-head-fixed text-nowrap">
+                    <table class="table table-hover">
                         <thead>
                             <tr>
                                 <th>Producto</th>
