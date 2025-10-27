@@ -80,7 +80,7 @@
                     <!-- Cantidad -->
                     <div class="col-md-6 mb-4 form-floating">
                         <input type="number" name="cantidad" id="cantidad" class="form-control form-control-sm"
-                            value="{{ old('cantidad', $producto->cantidad ?? '') }}" required placeholder="">
+                            value="{{ old('cantidad', $producto->cantidad ?? '') }}" required placeholder="Cantidad">
                         <label for="cantidad">Cantidad</label>
                     </div>
 

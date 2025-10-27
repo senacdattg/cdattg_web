@@ -468,97 +468,38 @@
     background-color: #4caf50bd
 }
 
-/* Contenedor para las acciones del carrito */
-.container_form {
+/* Contenedor para las acciones del carrito (usado en formularios de producto) */
+.acciones_carrito {
     flex: 1 1 60%;
+    max-width: 800px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* Contenedor principal del formulario */
+.container_form {
+    flex: 1 1 100%;
     max-width: 800px;
     background-color: #ffffff;
     border-radius: 15px;
     width: 100%;   
-    min-height: 750px;  /* más espacio */
-    padding: 20px 30px; /* que se vea el contenido */
+    min-height: 750px;
+    padding: 20px 30px;
     transition: all 0.4s ease-in-out;
     opacity: 1; 
-    transform: translateY(0); /* evita que quede fuera de la vista */
+    transform: translateY(0);
     animation: fadeInUp 0.8s ease-out forwards;
     overflow: hidden;
     border-top: 5px solid #4caf50;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
 
-/* Contenedor para el carrito */
-.carrito_box {
-    text-align: center;
-    padding: 20px;
-    background-color: #fff;
-    border-radius: 15px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.container_form:hover {
+    box-shadow: 0 8px 16px rgb(52 127 103 / 48%);
 }
 
-/* Título del carrito */
-.carrito_box h5 {
-    margin-bottom: 15px;
-    font-size: 20px;
-    font-weight: bold;
-    color: #4caf509e;
-}
 
-/* Estilos para el formulario del carrito */
-.carrito_box .form-group {
-    margin-bottom: 15px;
-    padding: 12px 16px;
-    border: 1px solid #eee;
-    border-radius: 9px;
-    background-color: #f9f9f9;
-}
-
-/* Estilos para el botón del carrito */
-.carrito_box .btn_carrito {
-    padding: 12px 16px;
-    border: none;
-    border-radius: 9px;
-    background-color: #4caf509e;
-    color: white !important;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    text-align: center;
-    display: inline-block;
-    text-decoration: none;
-}
-
-/* Efecto hover para el botón del carrito */
-.carrito_box .btn_carrito:hover {
-    background-color: #4caf50bd;
-}
-
-/* Estilos para el contenedor de botones del carrito */
-.div_btn_carrito {
-    padding: 12px 16px;
-    border: none;
-    border-radius: 9px;
-    margin-bottom: 16px;
-    background-color: #f7f7f7f7;
-    color: white !important;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    text-align: center;
-    display: inline-block;
-    text-decoration: none;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Efecto hover para el contenedor de botones del carrito */
-.div_btn_carrito:hover {
-    background-color: #f7f7f7bd;
-}
-
-/* Estilos para el último botón del carrito */
-.div_btn_carrito:last-child {
-    margin-bottom: 0;
-}
-
-/* Estilos generales para ver todos los productos*/
 .header-container {
     display: flex;
     justify-content: space-between;

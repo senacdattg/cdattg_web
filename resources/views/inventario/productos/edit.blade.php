@@ -16,7 +16,7 @@
 @section('main-content')
     <div class="container inventario-container">
         @include('inventario._components.product-form', [
-            'action' => route('productos.update', $producto->id),
+            'action' => route('inventario.productos.update', $producto->id),
             'method' => 'PUT',
             'producto' => $producto,
             'tiposProductos' => $tiposProductos,
