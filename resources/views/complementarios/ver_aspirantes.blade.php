@@ -19,22 +19,33 @@
         <div class="card-body pb-2">
             <form class="row g-3 align-items-end">
                 <div class="col-md-4">
+                    <label class="form-label fw-bold">Buscar Aspirante</label>
                     <div class="input-group">
                         <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
-                        <input type="text" class="form-control" placeholder="Buscar por nombre o número de identidad">
+                        <input type="text" class="form-control form-control-lg" placeholder="Buscar por nombre o número de identidad">
                     </div>
                 </div>
                 <div class="col-md-2">
-                    <select class="form-select">
+                    <label class="form-label fw-bold">Programa</label>
+                    <select class="form-select form-select-lg">
                         <option selected>{{ $programa->nombre }}</option>
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <select class="form-select">
+                    <label class="form-label fw-bold">Año</label>
+                    <select class="form-select form-select-lg">
                         <option selected>Todos los años</option>
                         <option>2025</option>
                         <option>2024</option>
+                        <option>2023</option>
+                        <option>2022</option>
+                        <option>2021</option>
                     </select>
+                </div>
+                <div class="col-md-4">
+                    <button class="btn btn-primary w-100">
+                        <i class="fas fa-plus me-1"></i>Nuevo Aspirante
+                    </button>
                 </div>
             </form>
             <div class="mt-3">
