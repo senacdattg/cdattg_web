@@ -28,7 +28,9 @@ class ProveedorController extends InventarioController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'proveedor' => 'required|unique:proveedores,proveedor'
+            'proveedor' => 'required|unique:proveedores,proveedor',
+            'nit' => 'nullable|string|max:50',
+            'email' => 'nullable|email|max:255'
         ]);
 
         $proveedor = new Proveedor($validated);
@@ -45,8 +47,8 @@ class ProveedorController extends InventarioController
 
         $validated = $request->validate([
             'proveedor' => 'required|unique:proveedores,proveedor,' . $proveedor->id,
-            'nit' => 'nullable|unique:proveedores,nit,' . $proveedor->id,
-            'email' => 'nullable|email|unique:proveedores,email,' . $proveedor->id
+            'nit' => 'nullable|string|max:50|unique:proveedores,nit,' . $proveedor->id,
+            'email' => 'nullable|email|max:255|unique:proveedores,email,' . $proveedor->id
         ]);
 
         $proveedor->fill($validated);
