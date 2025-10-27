@@ -97,7 +97,7 @@ class ProductoController extends InventarioController
 
         Producto::create($validated);
 
-        return redirect()->route('productos.create')->with('success', 'Producto creado correctamente.');
+        return redirect()->route('inventario.productos.index')->with('success', 'Producto creado correctamente.');
     }
 
     /**

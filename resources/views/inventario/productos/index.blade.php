@@ -3,6 +3,7 @@
 @push('styles')
     @vite([
         'resources/css/inventario/productos.css',
+        'resources/css/inventario/shared/modal-imagen.css',
         'resources/js/inventario/productos.js'
     ])
 @endpush
