@@ -97,11 +97,14 @@ class ValidarSofiaJob implements ShouldQueue
 
                     if ($nuevoEstado === 1) {
                         $exitosos++;
+                    } elseif ($nuevoEstado === 0 || $nuevoEstado === 2) {
+                        // Considerar como exitoso cualquier validación que no sea error
+                        $exitosos++;
                     }
 
                     // Actualizar progreso
                     if ($progress) {
-                        $progress->incrementProcessed($nuevoEstado === 1);
+                        $progress->incrementProcessed($nuevoEstado === 1 || $nuevoEstado === 0 || $nuevoEstado === 2);
                     }
 
                 } catch (\Exception $e) {
@@ -131,7 +134,7 @@ class ValidarSofiaJob implements ShouldQueue
             }
 
             // Delay adicional entre lotes
-            if ($batches->count() > 1 && !$batches->last()->is($batch)) {
+            if ($batches->count() > 1 && $batchIndex < $batches->count() - 1) {
                 Log::info("🔄 Cambio de lote - Esperando 3 segundos...");
                 sleep(3);
             }
@@ -227,35 +230,54 @@ class ValidarSofiaJob implements ShouldQueue
     {
         $resultadoLower = strtolower($resultado);
 
-        // PRIMERO: Verificar si requiere cambio de documento
-        if (str_contains($resultadoLower, 'requiere_cambio') ||
-            str_contains($resultadoLower, 'actualizar tu documento') ||
-            str_contains($resultadoLower, 'cambiar tu documento')) {
-            return 2; // Requiere cambio de cédula
+        // PRIMERO: Verificar si es error
+        if ($resultado === 'ERROR' || str_contains($resultadoLower, 'error')) {
+            Log::warning("Error en validación de SenaSofiaPlus: '{$resultado}'");
+            return 0; // No registrado - error se trata como no registrado
         }
 
-        // SEGUNDO: Verificar si está registrado correctamente
-        elseif (str_contains($resultadoLower, 'ya existe') ||
-                str_contains($resultadoLower, 'ya cuentas con un registro')) {
+        // SEGUNDO: Verificar respuestas directas del script
+        if ($resultado === 'YA_EXISTE') {
             return 1; // Registrado
         }
 
-        // TERCERO: Verificar si NO está registrado (puede registrarse)
-        elseif (str_contains($resultadoLower, 'no_registrado') ||
-                str_contains($resultadoLower, 'continuar') ||
-                str_contains($resultadoLower, 'siguiente') ||
-                str_contains($resultadoLower, 'registro exitoso') ||
-                str_contains($resultadoLower, 'cuenta creada') ||
-                str_contains($resultadoLower, 'bienvenido') ||
-                trim($resultado) === '') {
+        if ($resultado === 'NO_REGISTRADO') {
+            return 0; // No registrado
+        }
+
+        if ($resultado === 'REQUIERE_CAMBIO') {
+            return 2; // Requiere cambio de cédula
+        }
+
+        if ($resultado === 'DESCONOCIDO') {
+            return 0; // No registrado
+        }
+
+        // TERCERO: Verificar si requiere cambio de documento (texto largo)
+        if (str_contains($resultadoLower, 'requiere_cambio') ||
+            str_contains($resultadoLower, 'actualizar tu documento') ||
+            str_contains($resultadoLower, 'cambiar tu documento') ||
+            str_contains($resultadoLower, 'tarjeta de identidad')) {
+            return 2; // Requiere cambio de cédula
+        }
+
+        // CUARTO: Verificar si está registrado correctamente (texto largo)
+        if (str_contains($resultadoLower, 'ya existe') ||
+            str_contains($resultadoLower, 'ya cuentas con un registro') ||
+            str_contains($resultadoLower, 'cuenta registrada')) {
+            return 1; // Registrado
+        }
+
+        // QUINTO: Verificar si NO está registrado (puede registrarse)
+        if (str_contains($resultadoLower, 'no_registrado') ||
+            str_contains($resultadoLower, 'desconocido') ||
+            trim($resultado) === '') {
             return 0; // No registrado - puede crear cuenta
         }
 
-        // CUARTO: Error o respuesta desconocida
-        else {
-            Log::warning("Respuesta no reconocida de SenaSofiaPlus: '{$resultado}'");
-            return 0; // Por defecto, asumir no registrado
-        }
+        // SEXTO: Cualquier otro resultado se considera como no registrado
+        Log::warning("Respuesta no reconocida de SenaSofiaPlus: '{$resultado}' - tratando como no registrado");
+        return 0; // Por defecto, asumir no registrado
     }
 
     /**
