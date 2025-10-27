@@ -12,7 +12,7 @@
 @stop
 
 @section('content')
-<link rel="stylesheet" href="{{ asset('css/gestion_aspirantes.css') }}">
+<link rel="stylesheet" href="{{ asset('resources/css/complementario/gestion_aspirantes.css') }}">
 
     <!-- Main Content -->
     <div class="container-fluid px-4 py-4">
