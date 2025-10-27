@@ -1,14 +1,16 @@
-@extends('adminlte::page')
+@extends('inventario.layouts.base')
 
-@section('classes_body', 'productos-page')
+@push('styles')
+    @vite([
+        'resources/css/inventario/shared/base.css',
+        'resources/css/inventario/productos.css',
+        'resources/css/inventario/shared/modal-imagen.css'
+    ])
+@endpush
 
-@vite([
-    'resources/css/inventario/shared/base.css',
-    'resources/css/inventario/productos.css',
-    'resources/js/inventario/productos.js',
-    'resources/css/inventario/shared/modal-imagen.css',
-    'resources/js/inventario/shared/modal-imagen.js'
-])
+@section('content_header')
+    <h1>Registrar Producto</h1>
+@endsection
 
 @section('content')
 <div class="container inventario-container">
@@ -31,7 +33,7 @@
 
         <div class="acciones_carrito">
             <!-- Formulario único -->
-            <form action="{{ route('inventario.productos.store') }}" method="POST" enctype="multipart/form-data" class="form_flex">
+            <form action="{{ route('productos.store') }}" method="POST" enctype="multipart/form-data" class="form_flex">
                 @csrf
                 <div class="container_form">
                     <div class="form_header">
@@ -44,7 +46,7 @@
                             <label for="producto">Nombre</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
-                            <select name="tipo_producto_id" id="tipo_producto_id" class="form-control form-control-sm" required>
+                                                        <select name="tipo_producto_id" id="tipo_producto_id" class="form-control form-control-sm" required>
                                 <option value="">Tipo de producto</option>
                                 @foreach ($tiposProductos as $tipo)
                                     <option value="{{ $tipo->id }}" {{ old('tipo_producto_id') == $tipo->id ? 'selected' : '' }}>
@@ -60,7 +62,7 @@
                             <label for="peso">Magnitud</label>
                         </div>
                         <div class="col-md-6 mb-4 form-floating">
-                            <select name="unidad_medida_id" id="unidad_medida_id" class="form-control form-control-sm" required>
+                                                        <select name="unidad_medida_id" id="unidad_medida_id" class="form-control form-control-sm" required>
                                 <option value="">Unidad de medida</option>
                                 @foreach ($unidadesMedida as $unidad)
                                     <option value="{{ $unidad->id }}" {{ old('unidad_medida_id') == $unidad->id ? 'selected' : '' }}>
@@ -75,48 +77,11 @@
                                 value="{{ old('cantidad') }}" required placeholder="">
                             <label for="cantidad">Cantidad</label>
                         </div>
-
                         <div class="col-md-6 mb-4 form-floating">
-                            <input type="text" id="codigo_barras" name="codigo_barras" 
-                                value="{{ old('codigo_barras') }}" required placeholder=""
-                                class="form-control" autocomplete="off" autofocus>
+                            <input type="text" name="codigo_barras" id="codigo_barras" class="form-control form-control-sm"
+                                value="{{ old('codigo_barras') }}" required placeholder="">
                             <label for="codigo_barras">Código de barras</label>
                         </div>
-
-                        <script>
-                            document.addEventListener('DOMContentLoaded', function() {
-                                const inputCodigo = document.getElementById('codigo_barras');
-
-                                inputCodigo.addEventListener('keypress', function(event) {
-                                    if (event.key === 'Enter') {
-                                        event.preventDefault();
-
-                                        const codigo = inputCodigo.value.trim();
-                                        if (codigo !== '') {
-                                            console.log('Código escaneado:', codigo);
-                                            buscarProductoPorCodigo(codigo);
-                                        }
-                                    }
-                                });
-
-                                function buscarProductoPorCodigo(codigo) {
-                                    fetch(`/productos/buscar/${codigo}`)
-                                        .then(response => response.json())
-                                        .then(data => {
-                                            if (data) {
-                                                alert(`Producto encontrado: ${data.nombre}`);
-                                                document.getElementById('nombre').value = data.nombre;
-                                                document.getElementById('precio').value = data.precio;
-                                            } else {
-                                                alert('Producto no encontrado');
-                                            }
-                                        })
-                                        .catch(error => console.error('Error:', error));
-                                }
-                            });
-                        </script>
-
-
                         <div class="col-md-6 mb-4 form-floating">
                             <select name="estado_producto_id" id="estado_producto_id" class="form-control form-control-sm" required>
                                 <option value="">Estado</option>
@@ -207,3 +172,10 @@
     <img class="modal-contenido" id="imgExpandida">
 </div>
 @endsection
+
+@push('scripts')
+    @vite([
+        'resources/js/inventario/productos.js',
+        'resources/js/inventario/shared/modal-imagen.js'
+    ])
+@endpush

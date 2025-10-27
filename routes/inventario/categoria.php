@@ -7,5 +7,8 @@ use App\Http\Controllers\Inventario\CategoriaController;
 Route::prefix('inventario')
     ->name('inventario.')
     ->group(function () {
-        Route::resource('categorias', CategoriaController::class);
+        // Solo se usa index porque create/edit están en modales
+        Route::resource('categorias', CategoriaController::class)->only([
+            'index', 'store', 'update', 'destroy'
+        ]);
     });

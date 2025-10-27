@@ -2,39 +2,38 @@
 
 namespace App\Http\Controllers\Inventario;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Inventario\Orden;
-use Illuminate\Support\Facades\Auth;
-use App\Models\User;
+use App\Models\Inventario\DetalleOrden;
+use App\Models\Inventario\Producto;
+use Illuminate\Support\Facades\DB;
 use App\Models\ParametroTema;
 
-class OrdenController extends Controller
+class OrdenController extends InventarioController
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        parent::__construct();
+        $this->middleware('can:VER ORDEN')->only('index');
+        $this->middleware('can:CREAR ORDEN')->only('store');
+        $this->middleware('can:EDITAR ORDEN')->only('update');
     }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $ordenes = Orden::with(['tipoOrden']);
-        return view('inventario.ordenes.index', compact('ordenes'));
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        $tiposOrdenes = ParametroTema::with(['parametro','tema'])
-        ->whereHas('tema', fn($q) => $q->where('name', 'TIPOS DE ORDEN'))
-        ->where('status', 1)
+        $ordenes = Orden::with([
+            'tipoOrden.parametro',
+            'userCreate.persona',
+            'userUpdate.persona',
+            'detalles.producto'
+        ])
+        ->latest()
         ->get();
-
-        return view('inventario.ordenes.create', compact('tiposOrdenes'));
+        
+        return view('inventario.ordenes.index', compact('ordenes'));
     }
 
     /**
@@ -45,33 +44,62 @@ class OrdenController extends Controller
         $validated = $request->validate([
             'descripcion_orden' => 'required|string',
             'tipo_orden_id' => 'required|exists:parametros_temas,id',
-            'fecha_devolucion' => 'nullable|date'
+            'fecha_devolucion' => 'nullable|date|after:today',
+            'productos' => 'required|array|min:1',
+            'productos.*.producto_id' => 'required|exists:productos,id',
+            'productos.*.cantidad' => 'required|integer|min:1',
+            'productos.*.estado_orden_id' => 'required|exists:parametros_temas,id'
         ]);
 
-        $validated['user_create_id'] = Auth::id();
-        $validated['user_update_id'] = Auth::id();
+        try {
+            DB::beginTransaction();
 
-        Orden::create($validated);
+            // Crear la orden
+            $orden = new Orden([
+                'descripcion_orden' => $validated['descripcion_orden'],
+                'tipo_orden_id' => $validated['tipo_orden_id'],
+                'fecha_devolucion' => $validated['fecha_devolucion'] ?? null
+            ]);
+            $this->setUserIds($orden);
+            $orden->save();
 
-        return redirect()->route('ordenes.create')->with('success', 'Orden creada correctamente');
-    }
+            // Procesar cada producto
+            foreach ($validated['productos'] as $productoData) {
+                $producto = Producto::findOrFail($productoData['producto_id']);
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
-    {
-        $orden = Orden::with(['tipoOrden'])->findOrFail($id);
-        return view('inventario.ordenes.show', compact('orden'));
-    }
+                // Validar stock disponible
+                if (!$producto->tieneStockDisponible($productoData['cantidad'])) {
+                    throw new \Exception(
+                        "Stock insuficiente para el producto '{$producto->producto}'. " .
+                        "Disponible: {$producto->cantidad}, Solicitado: {$productoData['cantidad']}"
+                    );
+                }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        $orden = Orden::findOrFail($id);
-        return view('invetario.ordenes.edit', compact('orden'));
+                // Crear detalle de orden
+                $detalle = new DetalleOrden([
+                    'orden_id' => $orden->id,
+                    'producto_id' => $producto->id,
+                    'cantidad' => $productoData['cantidad'],
+                    'estado_orden_id' => $productoData['estado_orden_id']
+                ]);
+                $this->setUserIds($detalle);
+                $detalle->save();
+
+                // Descontar stock
+                $producto->descontarStock($productoData['cantidad']);
+            }
+
+            DB::commit();
+
+            return redirect()->route('inventario.ordenes.index')
+                ->with('success', 'Orden creada exitosamente. Stock actualizado.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()
+                ->withInput()
+                ->with('error', 'Error al crear la orden: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -79,7 +107,83 @@ class OrdenController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $orden = Orden::with(['detalles.producto'])->findOrFail($id);
+
+        // Verificar si la orden ya tiene devoluciones
+        $tieneDevoluciones = $orden->detalles()->whereHas('devoluciones')->exists();
+        
+        if ($tieneDevoluciones) {
+            return redirect()->route('inventario.ordenes.show', $orden->id)
+                ->with('error', 'No se puede editar una orden que ya tiene devoluciones registradas.');
+        }
+
+        $validated = $request->validate([
+            'descripcion_orden' => 'required|string',
+            'tipo_orden_id' => 'required|exists:parametros_temas,id',
+            'fecha_devolucion' => 'nullable|date|after:today',
+            'productos' => 'required|array|min:1',
+            'productos.*.producto_id' => 'required|exists:productos,id',
+            'productos.*.cantidad' => 'required|integer|min:1',
+            'productos.*.estado_orden_id' => 'required|exists:parametros_temas,id'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Primero devolver el stock de los productos anteriores
+            foreach ($orden->detalles as $detalle) {
+                $detalle->producto->devolverStock($detalle->cantidad);
+            }
+
+            // Eliminar detalles anteriores
+            $orden->detalles()->delete();
+
+            // Actualizar la orden
+            $orden->fill([
+                'descripcion_orden' => $validated['descripcion_orden'],
+                'tipo_orden_id' => $validated['tipo_orden_id'],
+                'fecha_devolucion' => $validated['fecha_devolucion'] ?? null
+            ]);
+            $this->setUserIds($orden, true);
+            $orden->save();
+
+            // Procesar nuevos productos
+            foreach ($validated['productos'] as $productoData) {
+                $producto = Producto::findOrFail($productoData['producto_id']);
+
+                // Validar stock disponible
+                if (!$producto->tieneStockDisponible($productoData['cantidad'])) {
+                    throw new \Exception(
+                        "Stock insuficiente para el producto '{$producto->producto}'. " .
+                        "Disponible: {$producto->cantidad}, Solicitado: {$productoData['cantidad']}"
+                    );
+                }
+
+                // Crear nuevo detalle de orden
+                $detalle = new DetalleOrden([
+                    'orden_id' => $orden->id,
+                    'producto_id' => $producto->id,
+                    'cantidad' => $productoData['cantidad'],
+                    'estado_orden_id' => $productoData['estado_orden_id']
+                ]);
+                $this->setUserIds($detalle);
+                $detalle->save();
+
+                // Descontar stock
+                $producto->descontarStock($productoData['cantidad']);
+            }
+
+            DB::commit();
+
+            return redirect()->route('inventario.ordenes.show', $orden->id)
+                ->with('success', 'Orden actualizada exitosamente. Stock actualizado.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()
+                ->withInput()
+                ->with('error', 'Error al actualizar la orden: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -87,6 +191,57 @@ class OrdenController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $orden = Orden::with(['detalles.producto', 'detalles.devoluciones'])->findOrFail($id);
+
+        // Verificar si la orden ya tiene devoluciones
+        $tieneDevoluciones = $orden->detalles()->whereHas('devoluciones')->exists();
+        
+        if ($tieneDevoluciones) {
+            return redirect()->route('inventario.ordenes.index')
+                ->with('error', 'No se puede eliminar una orden que ya tiene devoluciones registradas.');
+        }
+
+        try {
+            DB::beginTransaction();
+
+            // Devolver el stock de todos los productos
+            foreach ($orden->detalles as $detalle) {
+                $detalle->producto->devolverStock($detalle->cantidad);
+            }
+
+            // Eliminar detalles
+            $orden->detalles()->delete();
+
+            // Eliminar orden
+            $orden->delete();
+
+            DB::commit();
+
+            return redirect()->route('inventario.ordenes.index')
+                ->with('success', 'Orden eliminada exitosamente. Stock restaurado.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('inventario.ordenes.index')
+                ->with('error', 'Error al eliminar la orden: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Mostrar vista de préstamos y salidas
+     */
+    public function prestamosSalidas()
+    {
+        $ordenes = Orden::with([
+            'tipoOrden.parametro',
+            'userCreate.persona',
+            'userUpdate.persona',
+            'detalles.producto',
+            'detalles.estadoOrden.parametro'
+        ])
+        ->latest()
+        ->get();
+        
+        return view('inventario.ordenes.prestamos_salidas', compact('ordenes'));
     }
 }

@@ -1,12 +1,12 @@
-@extends('adminlte::page')
+@extends('inventario.layouts.base')
 
-@vite([
-    'resources/css/inventario/shared/base.css',
-    'resources/css/inventario/ordenes.css',
-    'resources/js/inventario/ordenes.js'
-])
+@push('styles')
+    @vite([
+        'resources/css/inventario/ordenes.css'
+    ])
+@endpush
 
-@section('content')
+@section('main-content')
     <div class="container-fluid">
             <div class="card card-ordenes">
                 <div class="card-header">
@@ -66,7 +66,7 @@
                         <td><span class="badge badge-warning">Rechazada</span></td>
                         <td>2025-08-17</td>
                         <td>
-                            <a href="{{ route('inventario.salida.aprobar') }}" class="btn btn-info btn-sm" title="Ver"><i class="fas fa-eye"></i></a>
+                            <a href="{{ route('inventario.ordenes.index') }}" class="btn btn-info btn-sm" title="Ver"><i class="fas fa-eye"></i></a>
                             <a href="#" class="btn btn-warning btn-sm" title="Editar"><i class="fas fa-edit"></i></a>
                             <a href="#" class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash"></i></a>
                         </td>
@@ -97,3 +97,7 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    @vite(['resources/js/inventario/ordenes.js'])
+@endpush

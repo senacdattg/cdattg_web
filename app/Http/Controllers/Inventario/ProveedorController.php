@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers\Inventario;
 
-use App\Http\Controllers\Controller;
 use App\Models\Inventario\Proveedor;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class ProveedorController extends Controller
+class ProveedorController extends InventarioController
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        parent::__construct();
+        $this->middleware('can:VER PRODUCTO')->only('index');
+        $this->middleware('can:CREAR PRODUCTO')->only('store');
+        $this->middleware('can:EDITAR PRODUCTO')->only('update');
+        $this->middleware('can:ELIMINAR PRODUCTO')->only('destroy');
     }
 
     public function index()
@@ -23,34 +25,20 @@ class ProveedorController extends Controller
         return view('inventario.proveedores.index', compact('proveedores'));
     }
 
-    public function create()
-    {
-        return view('inventario.proveedores.create');
-    }
-
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'proveedor' => 'required|unique:proveedores,proveedor'
+            'proveedor' => 'required|unique:proveedores,proveedor',
+            'nit' => 'nullable|string|max:50',
+            'email' => 'nullable|email|max:255'
         ]);
-        
-        $validated['user_create_id'] = Auth::id();
-        $validated['user_update_id'] = Auth::id();
 
-        Proveedor::create($validated);
+        $proveedor = new Proveedor($validated);
+        $this->setUserIds($proveedor);
+        $proveedor->save();
 
         return redirect()->route('inventario.proveedores.index')
             ->with('success', 'Proveedor creado exitosamente.');
-    }
-
-    public function show(Proveedor $proveedor)
-    {
-        return view('inventario.proveedores.show', compact('proveedor'));
-    }
-
-    public function edit(Proveedor $proveedor)
-    {
-        return view('inventario.proveedores.edit', compact('proveedor'));
     }
 
     public function update(Request $request, string $id)
@@ -59,13 +47,13 @@ class ProveedorController extends Controller
 
         $validated = $request->validate([
             'proveedor' => 'required|unique:proveedores,proveedor,' . $proveedor->id,
-            'nit' => 'nullable|unique:proveedores,nit,' . $proveedor->id,
-            'email' => 'nullable|email|unique:proveedores,email,' . $proveedor->id
+            'nit' => 'nullable|string|max:50|unique:proveedores,nit,' . $proveedor->id,
+            'email' => 'nullable|email|max:255|unique:proveedores,email,' . $proveedor->id
         ]);
 
-        $validated['user_update_id'] = Auth::id();
-
-        $proveedor->update($validated);
+        $proveedor->fill($validated);
+        $this->setUserIds($proveedor, true);
+        $proveedor->save();
 
         return redirect()->route('inventario.proveedores.index')
             ->with('success', 'Proveedor actualizado exitosamente.');

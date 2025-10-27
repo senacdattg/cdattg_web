@@ -2,16 +2,18 @@
 
 namespace App\Http\Controllers\Inventario;
 
-use App\Http\Controllers\Controller;
 use App\Models\Inventario\Marca;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
-class MarcaController extends Controller
+class MarcaController extends InventarioController
 {
     public function __construct()
     {
-        $this->middleware('auth');
+        parent::__construct();
+        $this->middleware('can:VER PRODUCTO')->only('index');
+        $this->middleware('can:CREAR PRODUCTO')->only('store');
+        $this->middleware('can:EDITAR PRODUCTO')->only('update');
+        $this->middleware('can:ELIMINAR PRODUCTO')->only('destroy');
     }
 
     public function index()
@@ -23,34 +25,18 @@ class MarcaController extends Controller
         return view('inventario.marcas.index', compact('marcas'));
     }
 
-    public function create()
-    {
-        return view('inventario.marcas.create');
-    }
-
     public function store(Request $request)
     {
         $validated = $request->validate([
             'nombre' => 'required|unique:marcas,nombre'
         ]);
-        
-        $validated['user_create_id'] = Auth::id();
-        $validated['user_update_id'] = Auth::id();
 
-        Marca::create($validated);
+        $marca = new Marca($validated);
+        $this->setUserIds($marca);
+        $marca->save();
 
         return redirect()->route('inventario.marcas.index')
             ->with('success', 'Marca creada exitosamente.');
-    }
-
-    public function show(Marca $marca)
-    {
-        return view('inventario.marcas.show', compact('marca'));
-    }
-
-    public function edit(Marca $marca)
-    {
-        return view('inventario.marcas.edit', compact('marca'));
     }
 
     public function update(Request $request, string $id)
@@ -61,9 +47,9 @@ class MarcaController extends Controller
             'nombre' => 'required|unique:marcas,nombre,' . $marca->id
         ]);
 
-        $validated['user_update_id'] = Auth::id();
-
-        $marca->update($validated);
+        $marca->fill($validated);
+        $this->setUserIds($marca, true);
+        $marca->save();
 
         return redirect()->route('inventario.marcas.index')
             ->with('success', 'Marca actualizada exitosamente.');

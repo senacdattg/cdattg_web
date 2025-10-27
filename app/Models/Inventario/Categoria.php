@@ -2,11 +2,13 @@
 
 namespace App\Models\Inventario;
 
-use App\Models\User;
+use App\Traits\Seguimiento;
 use Illuminate\Database\Eloquent\Model;
 
 class Categoria extends Model
 {
+    use Seguimiento;
+
     protected $table = 'categorias';
 
     protected $fillable = [
@@ -14,18 +16,6 @@ class Categoria extends Model
         'user_create_id',
         'user_update_id'
     ];
-
-    // Relación con el usuario que creó
-    public function userCreate()
-    {
-        return $this->belongsTo(User::class, 'user_create_id');
-    }
-
-    // Relación con el usuario que actualizó
-    public function userUpdate()
-    {
-        return $this->belongsTo(User::class, 'user_update_id');
-    }
 
     // Relación con productos
     public function productos()

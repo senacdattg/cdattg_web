@@ -1,14 +1,16 @@
-@extends('adminlte::page')
+@extends('inventario.layouts.base')
 
-@section('classes_body', 'productos-page')
+@push('styles')
+    @vite([
+        'resources/css/inventario/shared/base.css',
+        'resources/css/inventario/productos.css',
+        'resources/css/inventario/shared/modal-imagen.css'
+    ])
+@endpush
 
-@vite([
-    'resources/css/inventario/shared/base.css',
-    'resources/css/inventario/productos.css',
-    'resources/js/inventario/productos.js',
-    'resources/css/inventario/shared/modal-imagen.css',
-    'resources/js/inventario/shared/modal-imagen.js'
-])
+@section('content_header')
+    <h1>Editar Producto</h1>
+@endsection
 
 @section('content')
 <div class="container inventario-container">
@@ -31,7 +33,7 @@
 
         <div class="acciones_carrito">
             <!-- Formulario de edición -->
-            <form action="{{ route('inventario.productos.update', $producto->id) }}" method="POST" enctype="multipart/form-data" class="form_flex">
+            <form action="{{ route('productos.update', $producto->id) }}" method="POST" enctype="multipart/form-data" class="form_flex">
                 @csrf
                 @method('PUT')
                 <div class="container_form">
@@ -171,3 +173,10 @@
     <img class="modal-contenido" id="imgExpandida">
 </div>
 @endsection
+
+@push('scripts')
+    @vite([
+        'resources/js/inventario/productos.js',
+        'resources/js/inventario/shared/modal-imagen.js'
+    ])
+@endpush
