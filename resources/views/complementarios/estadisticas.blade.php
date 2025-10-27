@@ -8,48 +8,6 @@
 @stop
 
 @section('content')
-    <div class="card mb-4">
-        <div class="card-body pb-2">
-            <form class="row g-3 align-items-end">
-                <div class="col-md-3">
-                    <label for="fecha_inicio" class="form-label mb-1">Fecha Inicio:</label>
-                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio">
-                </div>
-                <div class="col-md-3">
-                    <label for="fecha_fin" class="form-label mb-1">Fecha Fin:</label>
-                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin">
-                </div>
-                <div class="col-md-2">
-                    <label for="departamento" class="form-label mb-1">Departamento:</label>
-                    <select class="form-control" id="departamento" name="departamento">
-                        <option value="">Seleccione...</option>
-                        <!-- Las opciones se llenan por JS -->
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label for="municipio" class="form-label mb-1">Municipio:</label>
-                    <select class="form-control" id="municipio" name="municipio">
-                        <option value="">Seleccione...</option>
-                        <!-- Las opciones se llenan por JS -->
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <label for="programa" class="form-label mb-1">Programa:</label>
-                    <select class="form-control" id="programa" name="programa">
-                        <option selected>Todos los programas</option>
-                        <option>Desarrollo de Software</option>
-                        <option>Análisis de Datos</option>
-                        <option>Diseño Gráfico</option>
-                        <option>Redes y Telecomunicaciones</option>
-                        <option>Marketing Digital</option>
-                    </select>
-                </div>
-                <div class="col-md-2 d-grid">
-                    <button type="submit" class="btn btn-primary"><i class="fas fa-filter me-1"></i>Filtrar</button>
-                </div>
-            </form>
-        </div>
-    </div>
 
     <div class="row g-3 mb-4">
         <div class="col-md-3">
@@ -163,7 +121,6 @@
     <script src="{{ asset('js/complementarios/estadisticas.js') }}"></script>
     <script>
         let inscripcionesChart, programasPieChart;
-        const departamentos = @json($departamentos);
         const estadisticasIniciales = @json($estadisticas);
 
         // Función para formatear datos de tendencia
@@ -267,112 +224,9 @@
             });
         }
 
-        // Función para cargar datos con filtros
-        function cargarDatosConFiltros(filtros = {}) {
-            const params = new URLSearchParams(filtros);
-            
-            fetch(`/estadisticas/api?${params}`)
-                .then(response => response.json())
-                .then(data => {
-                    // Actualizar tarjetas
-                    document.getElementById('total-aspirantes').textContent = data.total_aspirantes.toLocaleString();
-                    document.getElementById('aspirantes-aceptados').textContent = data.aspirantes_aceptados.toLocaleString();
-                    document.getElementById('aspirantes-pendientes').textContent = data.aspirantes_pendientes.toLocaleString();
-                    document.getElementById('programas-activos').textContent = data.programas_activos.toLocaleString();
-
-                    // Actualizar gráfico de tendencia
-                    const tendenciaData = formatearTendenciaInscripciones(data.tendencia_inscripciones);
-                    inscripcionesChart.data.labels = tendenciaData.labels;
-                    inscripcionesChart.data.datasets[0].data = tendenciaData.data;
-                    inscripcionesChart.update();
-
-                    // Actualizar gráfico de distribución
-                    const distribucionData = data.distribucion_programas;
-                    programasPieChart.data.labels = distribucionData.map(item => item.programa);
-                    programasPieChart.data.datasets[0].data = distribucionData.map(item => item.total);
-                    programasPieChart.update();
-
-                    // Actualizar tabla de programas
-                    const tablaBody = document.getElementById('tabla-programas-demanda');
-                    tablaBody.innerHTML = '';
-                    data.programas_demanda.forEach(programa => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${programa.programa}</td>
-                            <td>${programa.total_aspirantes}</td>
-                            <td>${programa.aceptados}</td>
-                            <td>${programa.pendientes}</td>
-                            <td>${programa.tasa_aceptacion}%</td>
-                            <td class="text-success"><i class="fas fa-arrow-up"></i> 0%</td>
-                        `;
-                        tablaBody.appendChild(row);
-                    });
-                })
-                .catch(error => {
-                    console.error('Error al cargar datos:', error);
-                });
-        }
-
         document.addEventListener('DOMContentLoaded', function () {
             // Inicializar gráficos
             inicializarGraficos();
-
-            // Configurar selects de departamentos y municipios
-            const departamentoSelect = document.getElementById('departamento');
-            const municipioSelect = document.getElementById('municipio');
-            const fechaInicio = document.getElementById('fecha_inicio');
-            const fechaFin = document.getElementById('fecha_fin');
-            const programaSelect = document.getElementById('programa');
-            const formFiltros = document.querySelector('form');
-
-            // Llena el select de departamentos
-            departamentoSelect.innerHTML = '<option value="">Seleccione...</option>';
-            departamentos.forEach(dep => {
-                const opt = document.createElement('option');
-                opt.value = dep.id;
-                opt.text = dep.departamento;
-                departamentoSelect.appendChild(opt);
-            });
-
-            // Limpia y llena municipios según el departamento seleccionado
-            departamentoSelect.addEventListener('change', function () {
-                const departamentoId = this.value;
-                municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
-
-                if (departamentoId) {
-                    fetch(`/municipios/${departamentoId}`)
-                        .then(response => response.json())
-                        .then(municipios => {
-                            municipios.forEach(mun => {
-                                const opt = document.createElement('option');
-                                opt.value = mun.id;
-                                opt.text = mun.municipio;
-                                municipioSelect.appendChild(opt);
-                            });
-                        })
-                        .catch(error => {
-                            console.error('Error al cargar municipios:', error);
-                        });
-                }
-            });
-
-            // Manejar envío del formulario de filtros
-            formFiltros.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                const filtros = {
-                    fecha_inicio: fechaInicio.value,
-                    fecha_fin: fechaFin.value,
-                    departamento_id: departamentoSelect.value,
-                    municipio_id: municipioSelect.value,
-                    programa_id: programaSelect.value
-                };
-
-                cargarDatosConFiltros(filtros);
-            });
-
-            // Opcional: Limpia municipios si no hay departamento seleccionado
-            municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
         });
     </script>
 @stop
