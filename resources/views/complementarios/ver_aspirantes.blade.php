@@ -8,16 +8,21 @@
             <h1 class="mb-0"><i class="fas fa-users me-2"></i>Aspirantes - {{ $programa->nombre }}</h1>
             <p class="text-muted mb-0">Administre los aspirantes a programas de formación complementaria</p>
         </div>
-        <a href="{{ route('gestion-aspirantes') }}" class="btn btn-outline-secondary">
-            <i class="fas fa-arrow-left me-1"></i> Volver
-        </a>
+        <div class="d-flex" style="gap: 1rem;">
+            <button class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i>Nuevo Aspirante
+            </button>
+            <a href="{{ route('gestion-aspirantes') }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-1"></i> Volver
+            </a>
+        </div>
     </div>
 @stop
 
 @section('content')
     <div class="card shadow-sm">
         <div class="card-body pb-2">
-            <form class="row g-3 align-items-end">
+            <form class="row g-3">
                 <div class="col-md-4">
                     <label class="form-label fw-bold">Buscar Aspirante</label>
                     <div class="input-group">
@@ -25,15 +30,15 @@
                         <input type="text" class="form-control form-control-lg" placeholder="Buscar por nombre o número de identidad">
                     </div>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <label class="form-label fw-bold">Programa</label>
-                    <select class="form-select form-select-lg">
+                    <select class="form-select form-select-lg bg-light">
                         <option selected>{{ $programa->nombre }}</option>
                     </select>
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-3">
                     <label class="form-label fw-bold">Año</label>
-                    <select class="form-select form-select-lg">
+                    <select class="form-select form-select-lg bg-light">
                         <option selected>Todos los años</option>
                         <option>2025</option>
                         <option>2024</option>
@@ -42,9 +47,9 @@
                         <option>2021</option>
                     </select>
                 </div>
-                <div class="col-md-4">
-                    <button class="btn btn-primary w-100">
-                        <i class="fas fa-plus me-1"></i>Nuevo Aspirante
+                <div class="col-md-2 d-flex align-items-end">
+                    <button class="btn btn-outline-secondary btn-lg w-100">
+                        <i class="fas fa-filter me-1"></i>Filtrar
                     </button>
                 </div>
             </form>
