@@ -38,7 +38,7 @@
                     <!-- Nombre -->
                     <div class="col-md-6 mb-4 form-floating">
                         <input type="text" name="producto" id="producto" class="form-control form-control-sm"
-                            value="{{ old('producto', $producto->producto ?? '') }}" required placeholder="">
+                            value="{{ old('producto', $producto->producto ?? '') }}" required placeholder="Nombre del producto">
                         <label for="producto">Nombre</label>
                     </div>
 
@@ -59,7 +59,7 @@
                     <!-- Magnitud -->
                     <div class="col-md-6 mb-4 form-floating">
                         <input type="number" name="peso" id="peso" class="form-control form-control-sm"
-                            value="{{ old('peso', $producto->peso ?? '') }}" step="0.01" min="0" required placeholder="">
+                            value="{{ old('peso', $producto->peso ?? '') }}" step="0.01" min="0" required placeholder="Magnitud">
                         <label for="peso">Magnitud</label>
                     </div>
 
@@ -87,7 +87,7 @@
                     <!-- Código de barras -->
                     <div class="col-md-6 mb-4 form-floating">
                         <input type="text" name="codigo_barras" id="codigo_barras" class="form-control form-control-sm"
-                            value="{{ old('codigo_barras', $producto->codigo_barras ?? '') }}" required placeholder="">
+                            value="{{ old('codigo_barras', $producto->codigo_barras ?? '') }}" required placeholder="Código de barras">
                         <label for="codigo_barras">Código de barras</label>
                     </div>
 
