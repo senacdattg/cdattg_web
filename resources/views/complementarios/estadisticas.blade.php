@@ -56,7 +56,7 @@
             <div class="card shadow-sm text-center">
                 <div class="card-body">
                     <div class="h2 mb-2 text-primary"><i class="fas fa-users"></i></div>
-                    <div class="h4 mb-0">1,245</div>
+                    <div class="h4 mb-0" id="total-aspirantes">{{ number_format($estadisticas['total_aspirantes']) }}</div>
                     <small class="text-muted">Total Aspirantes</small>
                 </div>
             </div>
@@ -65,7 +65,7 @@
             <div class="card shadow-sm text-center">
                 <div class="card-body">
                     <div class="h2 mb-2 text-success"><i class="fas fa-user-check"></i></div>
-                    <div class="h4 mb-0">875</div>
+                    <div class="h4 mb-0" id="aspirantes-aceptados">{{ number_format($estadisticas['aspirantes_aceptados']) }}</div>
                     <small class="text-muted">Aspirantes Aceptados</small>
                 </div>
             </div>
@@ -74,7 +74,7 @@
             <div class="card shadow-sm text-center">
                 <div class="card-body">
                     <div class="h2 mb-2 text-warning"><i class="fas fa-user-clock"></i></div>
-                    <div class="h4 mb-0">370</div>
+                    <div class="h4 mb-0" id="aspirantes-pendientes">{{ number_format($estadisticas['aspirantes_pendientes']) }}</div>
                     <small class="text-muted">Aspirantes Pendientes</small>
                 </div>
             </div>
@@ -83,7 +83,7 @@
             <div class="card shadow-sm text-center">
                 <div class="card-body">
                     <div class="h2 mb-2 text-info"><i class="fas fa-graduation-cap"></i></div>
-                    <div class="h4 mb-0">15</div>
+                    <div class="h4 mb-0" id="programas-activos">{{ number_format($estadisticas['programas_activos']) }}</div>
                     <small class="text-muted">Programas Activos</small>
                 </div>
             </div>
@@ -131,47 +131,17 @@
                             <th>Tendencia</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="tabla-programas-demanda">
+                        @foreach($estadisticas['programas_demanda'] as $programa)
                         <tr>
-                            <td>Desarrollo de Software</td>
-                            <td>320</td>
-                            <td>240</td>
-                            <td>80</td>
-                            <td>75%</td>
-                            <td class="text-success"><i class="fas fa-arrow-up"></i> 12%</td>
+                            <td>{{ $programa['programa'] }}</td>
+                            <td>{{ $programa['total_aspirantes'] }}</td>
+                            <td>{{ $programa['aceptados'] }}</td>
+                            <td>{{ $programa['pendientes'] }}</td>
+                            <td>{{ $programa['tasa_aceptacion'] }}%</td>
+                            <td class="text-success"><i class="fas fa-arrow-up"></i> 0%</td>
                         </tr>
-                        <tr>
-                            <td>Análisis de Datos</td>
-                            <td>285</td>
-                            <td>205</td>
-                            <td>80</td>
-                            <td>72%</td>
-                            <td class="text-success"><i class="fas fa-arrow-up"></i> 8%</td>
-                        </tr>
-                        <tr>
-                            <td>Diseño Gráfico</td>
-                            <td>215</td>
-                            <td>180</td>
-                            <td>35</td>
-                            <td>83%</td>
-                            <td class="text-danger"><i class="fas fa-arrow-down"></i> 3%</td>
-                        </tr>
-                        <tr>
-                            <td>Redes y Telecomunicaciones</td>
-                            <td>185</td>
-                            <td>120</td>
-                            <td>65</td>
-                            <td>65%</td>
-                            <td class="text-success"><i class="fas fa-arrow-up"></i> 5%</td>
-                        </tr>
-                        <tr>
-                            <td>Marketing Digital</td>
-                            <td>170</td>
-                            <td>105</td>
-                            <td>65</td>
-                            <td>62%</td>
-                            <td class="text-success"><i class="fas fa-arrow-up"></i> 15%</td>
-                        </tr>
+                        @endforeach
                     </tbody>
                 </table>
             </div>
@@ -192,57 +162,168 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ asset('js/complementarios/estadisticas.js') }}"></script>
     <script>
-        // Línea: Tendencia de Inscripciones
-        const ctxLine = document.getElementById('inscripcionesChart').getContext('2d');
-        new Chart(ctxLine, {
-            type: 'line',
-            data: {
-                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-                datasets: [{
-                    label: 'Inscripciones',
-                    data: [120, 180, 250, 210, 300, 350],
-                    borderColor: '#0d6efd',
-                    backgroundColor: 'rgba(13,110,253,0.1)',
-                    tension: 0.4,
-                    fill: true,
-                    pointRadius: 4,
-                    pointBackgroundColor: '#0d6efd'
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true }
-                }
-            }
-        });
-
-        // Pastel: Distribución por Programas
-        const ctxPie = document.getElementById('programasPieChart').getContext('2d');
-        new Chart(ctxPie, {
-            type: 'pie',
-            data: {
-                labels: ['ADSO', 'Contabilidad', 'Salud Ocupacional', 'Diseño Gráfico'],
-                datasets: [{
-                    data: [30, 25, 20, 25],
-                    backgroundColor: [
-                        '#0d6efd', '#dc3545', '#ffc107', '#20c997'
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: { legend: { position: 'bottom' } }
-            }
-        });
-
-        // Datos de departamentos y municipios desde la base de datos
+        let inscripcionesChart, programasPieChart;
         const departamentos = @json($departamentos);
+        const estadisticasIniciales = @json($estadisticas);
+
+        // Función para formatear datos de tendencia
+        function formatearTendenciaInscripciones(tendencia) {
+            const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+            const labels = [];
+            const data = [];
+
+            // Crear array de los últimos 6 meses
+            const ultimosMeses = [];
+            for (let i = 5; i >= 0; i--) {
+                const fecha = new Date();
+                fecha.setMonth(fecha.getMonth() - i);
+                ultimosMeses.push({
+                    year: fecha.getFullYear(),
+                    month: fecha.getMonth() + 1
+                });
+            }
+
+            // Mapear datos existentes
+            const datosPorMes = {};
+            tendencia.forEach(item => {
+                const key = `${item.year}-${item.month}`;
+                datosPorMes[key] = item.total;
+            });
+
+            // Llenar con datos reales o cero
+            ultimosMeses.forEach(({year, month}) => {
+                const key = `${year}-${month}`;
+                labels.push(`${meses[month - 1]} ${year}`);
+                data.push(datosPorMes[key] || 0);
+            });
+
+            return { labels, data };
+        }
+
+        // Función para inicializar gráficos
+        function inicializarGraficos() {
+            // Datos de tendencia de inscripciones
+            const tendenciaData = formatearTendenciaInscripciones(estadisticasIniciales.tendencia_inscripciones);
+
+            // Línea: Tendencia de Inscripciones
+            const ctxLine = document.getElementById('inscripcionesChart').getContext('2d');
+            inscripcionesChart = new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: tendenciaData.labels,
+                    datasets: [{
+                        label: 'Inscripciones',
+                        data: tendenciaData.data,
+                        borderColor: '#0d6efd',
+                        backgroundColor: 'rgba(13,110,253,0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#0d6efd'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Datos para gráfico de distribución
+            const distribucionData = estadisticasIniciales.distribucion_programas;
+            const labelsPie = distribucionData.map(item => item.programa);
+            const dataPie = distribucionData.map(item => item.total);
+
+            // Pastel: Distribución por Programas
+            const ctxPie = document.getElementById('programasPieChart').getContext('2d');
+            programasPieChart = new Chart(ctxPie, {
+                type: 'pie',
+                data: {
+                    labels: labelsPie,
+                    datasets: [{
+                        data: dataPie,
+                        backgroundColor: [
+                            '#0d6efd', '#dc3545', '#ffc107', '#20c997', '#6f42c1',
+                            '#fd7e14', '#e83e8c', '#20c997', '#6610f2', '#6c757d'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: { 
+                        legend: { 
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 12,
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        } 
+                    }
+                }
+            });
+        }
+
+        // Función para cargar datos con filtros
+        function cargarDatosConFiltros(filtros = {}) {
+            const params = new URLSearchParams(filtros);
+            
+            fetch(`/estadisticas/api?${params}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Actualizar tarjetas
+                    document.getElementById('total-aspirantes').textContent = data.total_aspirantes.toLocaleString();
+                    document.getElementById('aspirantes-aceptados').textContent = data.aspirantes_aceptados.toLocaleString();
+                    document.getElementById('aspirantes-pendientes').textContent = data.aspirantes_pendientes.toLocaleString();
+                    document.getElementById('programas-activos').textContent = data.programas_activos.toLocaleString();
+
+                    // Actualizar gráfico de tendencia
+                    const tendenciaData = formatearTendenciaInscripciones(data.tendencia_inscripciones);
+                    inscripcionesChart.data.labels = tendenciaData.labels;
+                    inscripcionesChart.data.datasets[0].data = tendenciaData.data;
+                    inscripcionesChart.update();
+
+                    // Actualizar gráfico de distribución
+                    const distribucionData = data.distribucion_programas;
+                    programasPieChart.data.labels = distribucionData.map(item => item.programa);
+                    programasPieChart.data.datasets[0].data = distribucionData.map(item => item.total);
+                    programasPieChart.update();
+
+                    // Actualizar tabla de programas
+                    const tablaBody = document.getElementById('tabla-programas-demanda');
+                    tablaBody.innerHTML = '';
+                    data.programas_demanda.forEach(programa => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${programa.programa}</td>
+                            <td>${programa.total_aspirantes}</td>
+                            <td>${programa.aceptados}</td>
+                            <td>${programa.pendientes}</td>
+                            <td>${programa.tasa_aceptacion}%</td>
+                            <td class="text-success"><i class="fas fa-arrow-up"></i> 0%</td>
+                        `;
+                        tablaBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error al cargar datos:', error);
+                });
+        }
 
         document.addEventListener('DOMContentLoaded', function () {
+            // Inicializar gráficos
+            inicializarGraficos();
+
+            // Configurar selects de departamentos y municipios
             const departamentoSelect = document.getElementById('departamento');
             const municipioSelect = document.getElementById('municipio');
+            const fechaInicio = document.getElementById('fecha_inicio');
+            const fechaFin = document.getElementById('fecha_fin');
+            const programaSelect = document.getElementById('programa');
+            const formFiltros = document.querySelector('form');
 
             // Llena el select de departamentos
             departamentoSelect.innerHTML = '<option value="">Seleccione...</option>';
@@ -259,7 +340,6 @@
                 municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
 
                 if (departamentoId) {
-                    // Hacer petición AJAX para obtener municipios
                     fetch(`/municipios/${departamentoId}`)
                         .then(response => response.json())
                         .then(municipios => {
@@ -274,6 +354,21 @@
                             console.error('Error al cargar municipios:', error);
                         });
                 }
+            });
+
+            // Manejar envío del formulario de filtros
+            formFiltros.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const filtros = {
+                    fecha_inicio: fechaInicio.value,
+                    fecha_fin: fechaFin.value,
+                    departamento_id: departamentoSelect.value,
+                    municipio_id: municipioSelect.value,
+                    programa_id: programaSelect.value
+                };
+
+                cargarDatosConFiltros(filtros);
             });
 
             // Opcional: Limpia municipios si no hay departamento seleccionado

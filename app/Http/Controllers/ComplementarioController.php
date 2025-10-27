@@ -56,7 +56,98 @@ class ComplementarioController extends Controller
         $departamentos = Departamento::select('id', 'departamento')->get();
         $municipios = Municipio::select('id', 'municipio')->get();
 
-        return view('complementarios.estadisticas', compact('departamentos', 'municipios'));
+        // Obtener datos reales para las estadísticas
+        $estadisticas = $this->obtenerEstadisticasReales();
+
+        return view('complementarios.estadisticas', compact('departamentos', 'municipios', 'estadisticas'));
+    }
+
+    /**
+     * Obtener estadísticas reales de la base de datos
+     */
+    public function obtenerEstadisticasReales($filtros = [])
+    {
+        // Total de aspirantes
+        $totalAspirantes = AspiranteComplementario::count();
+
+        // Aspirantes aceptados (estado 3 = Aceptado)
+        $aspirantesAceptados = AspiranteComplementario::where('estado', 3)->count();
+
+        // Aspirantes pendientes (estado 1 = En proceso, 2 = Documento subido)
+        $aspirantesPendientes = AspiranteComplementario::whereIn('estado', [1, 2])->count();
+
+        // Programas activos
+        $programasActivos = ComplementarioOfertado::where('estado', 1)->count();
+
+        // Tendencia de inscripciones por mes (últimos 6 meses)
+        $tendenciaInscripciones = AspiranteComplementario::selectRaw('
+                YEAR(created_at) as year,
+                MONTH(created_at) as month,
+                COUNT(*) as total
+            ')
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->groupBy('year', 'month')
+            ->orderBy('year', 'asc')
+            ->orderBy('month', 'asc')
+            ->get();
+
+        // Distribución por programas
+        $distribucionProgramas = AspiranteComplementario::selectRaw('
+                complementarios_ofertados.nombre as programa,
+                COUNT(*) as total
+            ')
+            ->join('complementarios_ofertados', 'aspirantes_complementarios.complementario_id', '=', 'complementarios_ofertados.id')
+            ->groupBy('complementarios_ofertados.nombre')
+            ->orderBy('total', 'desc')
+            ->get();
+
+        // Programas con mayor demanda
+        $programasDemanda = AspiranteComplementario::selectRaw('
+                complementarios_ofertados.nombre as programa,
+                COUNT(*) as total_aspirantes,
+                SUM(CASE WHEN aspirantes_complementarios.estado = 3 THEN 1 ELSE 0 END) as aceptados,
+                SUM(CASE WHEN aspirantes_complementarios.estado IN (1, 2) THEN 1 ELSE 0 END) as pendientes
+            ')
+            ->join('complementarios_ofertados', 'aspirantes_complementarios.complementario_id', '=', 'complementarios_ofertados.id')
+            ->groupBy('complementarios_ofertados.nombre', 'complementarios_ofertados.id')
+            ->orderBy('total_aspirantes', 'desc')
+            ->limit(10)
+            ->get()
+            ->map(function($programa) {
+                $tasaAceptacion = $programa->total_aspirantes > 0 
+                    ? round(($programa->aceptados / $programa->total_aspirantes) * 100, 1)
+                    : 0;
+                
+                return [
+                    'programa' => $programa->programa,
+                    'total_aspirantes' => $programa->total_aspirantes,
+                    'aceptados' => $programa->aceptados,
+                    'pendientes' => $programa->pendientes,
+                    'tasa_aceptacion' => $tasaAceptacion
+                ];
+            });
+
+        return [
+            'total_aspirantes' => $totalAspirantes,
+            'aspirantes_aceptados' => $aspirantesAceptados,
+            'aspirantes_pendientes' => $aspirantesPendientes,
+            'programas_activos' => $programasActivos,
+            'tendencia_inscripciones' => $tendenciaInscripciones,
+            'distribucion_programas' => $distribucionProgramas,
+            'programas_demanda' => $programasDemanda
+        ];
+    }
+
+    /**
+     * API para obtener estadísticas con filtros
+     */
+    public function apiEstadisticas(Request $request)
+    {
+        $filtros = $request->only(['fecha_inicio', 'fecha_fin', 'departamento_id', 'municipio_id', 'programa_id']);
+        
+        $estadisticas = $this->obtenerEstadisticasReales($filtros);
+        
+        return response()->json($estadisticas);
     }
     public function verAspirantes($curso)
     {
