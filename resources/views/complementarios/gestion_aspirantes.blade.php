@@ -8,9 +8,6 @@
             <h1>Gestión de Aspirantes</h1>
             <p class="text-muted">Administre los aspirantes a programas de formación complementaria</p>
         </div>
-        <button class="btn btn-primary">
-            <i class="fas fa-plus"></i> Nuevo Aspirante
-        </button>
     </div>
 @stop
 
