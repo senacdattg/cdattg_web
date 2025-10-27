@@ -8,7 +8,7 @@ async function validarCedula(cedula, maxRetries = 3) {
 
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
-      console.log(`🔄 Intento ${attempt}/${maxRetries} - Validando cédula: ${cedula}`);
+      console.error(`🔄 Intento ${attempt}/${maxRetries} - Validando cédula: ${cedula}`);
 
       // Lanzar el navegador con configuración optimizada
       browser = await chromium.launch({
@@ -36,7 +36,7 @@ async function validarCedula(cedula, maxRetries = 3) {
       page.setDefaultTimeout(30000);
       page.setDefaultNavigationTimeout(30000);
 
-      console.log(`🔗 Cargando página para cédula: ${cedula}`);
+      console.error(`🔗 Cargando página para cédula: ${cedula}`);
       const response = await page.goto("https://betowa.sena.edu.co/registrarse", {
         waitUntil: "networkidle",
         timeout: 30000
@@ -46,26 +46,26 @@ async function validarCedula(cedula, maxRetries = 3) {
         throw new Error(`HTTP ${response.status()}: ${response.statusText()}`);
       }
 
-      console.log("✅ Página cargada exitosamente");
+      console.error("✅ Página cargada exitosamente");
 
       // Paso 1. Seleccionar tipo de documento
-      console.log("📋 Seleccionando tipo de documento...");
+      console.error("📋 Seleccionando tipo de documento...");
       await page.getByRole("form", { name: "Crear cuenta en Betowa" })
                   .getByRole("button").first().click();
       await page.getByRole("option", { name: "Cédula de Ciudadanía" }).click();
 
       // Paso 2. Llenar cédula
-      console.log(`🧾 Llenando cédula: ${cedula}`);
+      console.error(`🧾 Llenando cédula: ${cedula}`);
       await page.getByRole("textbox").fill(cedula);
 
       // Paso 3. Seleccionar ubicación (hardcodeada)
-      console.log("📍 Seleccionando ubicación...");
+      console.error("📍 Seleccionando ubicación...");
       await page.getByRole("button", { name: "Seleccionar ubicación" }).click();
       await page.getByRole("textbox", { name: "Buscar ciudad..." }).fill("san jose del gua");
       await page.getByRole("button", { name: "SAN JOSÉ DEL GUAVIARE" }).click();
 
       // Paso 4. Seleccionar fecha de nacimiento (hardcodeada)
-      console.log("📅 Seleccionando fecha de nacimiento...");
+      console.error("📅 Seleccionando fecha de nacimiento...");
       await page.getByRole("button", { name: "placeholder" }).click();
       await page.getByRole("button", { name: "2025" }).click();
       await page.getByRole("button", { name: "2005" }).click();
@@ -74,68 +74,105 @@ async function validarCedula(cedula, maxRetries = 3) {
       await page.getByRole("button", { name: "9", exact: true }).click();
 
       // Paso 5. Aceptar términos
-      console.log("✅ Aceptando términos...");
+      console.error("✅ Aceptando términos...");
       await page.getByRole("checkbox", { name: /Acepto Términos de uso/ }).check();
 
       // Paso 6. Enviar formulario
-      console.log("📤 Enviando formulario...");
+      console.error("📤 Enviando formulario...");
       await page.getByRole("button", { name: "Continuar →" }).click();
 
       // Paso 7. Esperar respuesta - lógica mejorada
-      console.log("⏳ Esperando respuesta del servidor...");
+      console.error("⏳ Esperando respuesta del servidor...");
 
-      // Usar Promise.race para esperar tanto el modal como un timeout
-      const result = await Promise.race([
-        // Opción 1: Esperar por modal de error
-        (async () => {
-          try {
-            const dialog = await page.waitForSelector('div[role="dialog"]', {
-              timeout: 15000,
-              state: 'visible'
-            });
-            const texto = await dialog.innerText();
-            console.log(`💬 Modal de error encontrado:\n${texto}`);
-            return { type: 'modal', text: texto };
-          } catch (error) {
-            // Modal no apareció dentro del timeout
-            return { type: 'no_modal' };
+      // Esperar un poco más para que aparezca cualquier modal
+      await page.waitForTimeout(12000); // Aumentar a 12 segundos
+
+      // PRIMERO: Buscar modal de error específicamente - múltiples selectores
+      const modalSelectors = [
+        'div[role="dialog"]',
+        '.modal',
+        '[class*="modal"]',
+        '[id*="modal"]',
+        '.swal2-popup', // SweetAlert2
+        '.alert',
+        '[class*="alert"]',
+        '.notification',
+        '.toast',
+        '.error',
+        '[class*="error"]'
+      ];
+
+      let modalFound = false;
+      let modalText = '';
+
+      for (const selector of modalSelectors) {
+        try {
+          const elements = await page.locator(selector).all();
+          for (const element of elements) {
+            const isVisible = await element.isVisible().catch(() => false);
+            if (isVisible) {
+              const text = await element.innerText().catch(() => '');
+              if (text && text.trim().length > 0 && text.toLowerCase().includes('ya existe')) {
+                modalFound = true;
+                modalText = text;
+                console.error(`💬 Modal de error encontrado con selector ${selector}:\n${text}`);
+                break;
+              }
+            }
           }
-        })(),
+        } catch (error) {
+          // Ignorar errores de selector
+          continue;
+        }
+        if (modalFound) break;
+      }
 
-        // Opción 2: Esperar por indicadores de que puede continuar
-        (async () => {
-          await page.waitForTimeout(3000); // Esperar 3 segundos mínimo
+      let result;
+      if (modalFound) {
+        result = { type: 'modal', text: modalText };
+      } else {
+        // SEGUNDO: Verificar si hay algún texto de error en la página
+        const pageText = await page.innerText().catch(() => '');
+        console.error(`📄 Texto completo de la página:\n${pageText}`);
 
-          // Verificar si cambió la URL (navegación exitosa)
-          const currentUrl = page.url();
-          if (currentUrl.includes('registro') || currentUrl.includes('siguiente') || currentUrl.includes('continuar')) {
-            console.log("🔄 Navegación detectada - puede continuar");
-            return { type: 'navigation' };
+        const errorIndicators = ['ya existe', 'ya cuentas con un registro', 'cuenta registrada', 'documento registrado', 'usuario ya registrado'];
+
+        for (const indicator of errorIndicators) {
+          if (pageText.toLowerCase().includes(indicator)) {
+            console.error(`⚠️ Texto de error encontrado en página: "${indicator}"`);
+            result = { type: 'modal', text: `Error detectado: ${indicator}` };
+            modalFound = true;
+            break;
           }
+        }
 
-          // Verificar si aparecieron nuevos elementos del formulario
-          const nextFormElements = await page.locator('input[type="email"], input[name*="email"], button[name*="siguiente"]').count();
-          if (nextFormElements > 0) {
-            console.log("📝 Nuevos elementos de formulario detectados");
-            return { type: 'form_elements' };
+        if (!modalFound) {
+          // No hay modal ni texto de error, verificar otros indicadores
+          const hasEmailField = await page.locator('input[type="email"], input[name*="email"], input[placeholder*="correo"], input[placeholder*="email"]').count().catch(() => 0);
+          const hasPasswordField = await page.locator('input[type="password"], input[name*="password"], input[placeholder*="contraseña"]').count().catch(() => 0);
+          const hasContinueButton = await page.locator('button[name*="continuar"], button[name*="Continuar"], button[name*="siguiente"]').count().catch(() => 0);
+
+          console.error(`🔍 Estado del formulario - Email: ${hasEmailField}, Password: ${hasPasswordField}, Continue: ${hasContinueButton}`);
+
+          if (hasEmailField > 0 || hasPasswordField > 0) {
+            console.error("📧 Campos de registro detectados - puede continuar");
+            result = { type: 'form_elements' };
+          } else if (hasContinueButton === 0) {
+            console.error("✅ Botón 'Continuar' desapareció - proceso avanzó");
+            result = { type: 'button_gone' };
+          } else {
+            console.error("⏰ Timeout alcanzado sin cambios claros");
+            result = { type: 'timeout' };
           }
-
-          // Verificar si desapareció el botón de "Continuar"
-          const continueButton = await page.locator('button[name*="continuar"], button[name*="Continuar"]').count();
-          if (continueButton === 0) {
-            console.log("✅ Botón 'Continuar' desapareció - proceso avanzó");
-            return { type: 'button_gone' };
-          }
-
-          return { type: 'timeout' };
-        })()
-      ]);
+        }
+      }
 
       let resultado;
 
       if (result.type === 'modal') {
         // Procesar modal de error
         const textoLower = result.text.toLowerCase();
+        console.error(`🔍 Procesando modal - Texto completo: "${result.text}"`);
 
         // Caso 1: Usuario ya existe y requiere cambio de documento (mensaje específico)
         if ((textoLower.includes("ya existe") || textoLower.includes("ya cuentas con un registro")) &&
@@ -148,22 +185,24 @@ async function validarCedula(cedula, maxRetries = 3) {
 
         // Caso 2: Usuario ya existe y está registrado correctamente
         else if (textoLower.includes("ya existe") ||
-                 textoLower.includes("ya cuentas con un registro")) {
+                 textoLower.includes("ya cuentas con un registro") ||
+                 textoLower.includes("cuenta registrada")) {
           resultado = "YA_EXISTE";
         }
 
         // Caso 3: Otro tipo de error
         else {
-          console.log(`⚠️ Modal con mensaje no reconocido: ${result.text}`);
+          console.error(`⚠️ Modal con mensaje no reconocido: ${result.text}`);
           resultado = "DESCONOCIDO";
         }
       } else {
         // No hubo modal de error - puede registrarse
-        console.log(`✅ No se detectó modal de error (${result.type}) - usuario puede registrarse`);
+        console.error(`✅ No se detectó modal de error (${result.type}) - usuario puede registrarse`);
         resultado = "NO_REGISTRADO";
       }
 
-      console.log(`✅ Validación exitosa para ${cedula}: ${resultado}`);
+      // Log interno, no va a Laravel
+      console.error(`✅ RESULTADO FINAL para ${cedula}: ${resultado}`);
       return resultado;
 
     } catch (error) {
@@ -177,7 +216,7 @@ async function validarCedula(cedula, maxRetries = 3) {
 
       // Esperar antes del siguiente intento (backoff exponencial)
       const waitTime = Math.min(1000 * Math.pow(2, attempt - 1), 5000);
-      console.log(`⏳ Esperando ${waitTime}ms antes del siguiente intento...`);
+      console.error(`⏳ Esperando ${waitTime}ms antes del siguiente intento...`);
       await new Promise(resolve => setTimeout(resolve, waitTime));
 
     } finally {
@@ -212,15 +251,16 @@ async function main() {
   const cedula = process.argv[2];
 
   if (!cedula) {
-    console.error("❌ Debe proporcionar una cédula como argumento");
+    process.stdout.write("ERROR: No cedula provided\n");
     process.exit(1);
   }
 
   try {
     const resultado = await validarCedula(cedula);
-    console.log(resultado); // Solo imprimir el resultado para que lo capture Laravel
+    // Usar stdout directamente para que Laravel lo capture correctamente
+    process.stdout.write(resultado + '\n');
   } catch (error) {
-    console.error("ERROR");
+    process.stdout.write("ERROR\n");
     process.exit(1);
   }
 }
