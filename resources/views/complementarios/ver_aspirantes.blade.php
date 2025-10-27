@@ -135,59 +135,7 @@
 @stop
 
 @section('css')
-    <style>
-        .badge.bg-warning {
-            background-color: #ffc107 !important;
-            color: #212529 !important;
-        }
-        .badge.bg-success {
-            background-color: #28a745 !important;
-        }
-        .badge.bg-danger {
-            background-color: #dc3545 !important;
-        }
-        .btn-info {
-            background-color: #17a2b8 !important;
-            border: none;
-            color: #fff;
-        }
-        .btn-warning {
-            background-color: #ffc107 !important;
-            border: none;
-            color: #212529;
-        }
-        .btn-danger {
-            background-color: #dc3545 !important;
-            border: none;
-            color: #fff;
-        }
-        .btn-primary {
-            background-color: #0d6efd !important;
-            border: none;
-        }
-        .btn-outline-secondary {
-            border-color: #ced4da;
-            color: #495057;
-        }
-        .btn-outline-warning {
-            border-color: #ffc107;
-            color: #ffc107;
-        }
-        .btn-outline-success {
-            border-color: #28a745;
-            color: #28a745;
-        }
-        .btn-outline-danger {
-            border-color: #dc3545;
-            color: #dc3545;
-        }
-        .card {
-            border-radius: 0.75rem;
-        }
-        .input-group-text {
-            background: #fff;
-        }
-    </style>
+<link rel="stylesheet" href="{{ asset('resources/css/complementario/ver_aspirantes.css') }}">
 @stop
 
 @section('js')
