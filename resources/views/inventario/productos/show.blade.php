@@ -39,9 +39,9 @@
                     </button>
                     
                     <form id="form-eliminar" 
-                          action="{{ route('inventario.productos.destroy', $producto->id) }}" 
-                          method="POST" 
-                          style="display: none;">
+                            action="{{ route('inventario.productos.destroy', $producto->id) }}" 
+                            method="POST" 
+                            style="display: none;">
                         @csrf
                         @method('DELETE')
                     </form>
@@ -56,3 +56,4 @@
     {{-- Modal para imagen expandible --}}
     @include('inventario._components.image-modal')
 @endsection
+
