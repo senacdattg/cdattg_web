@@ -1,0 +1,177 @@
+/* Fix for mobile scrolling issues */
+body, html {
+    height: auto !important;
+    overflow: visible !important;
+}
+.hold-transition.register-page {
+    height: auto !important;
+    overflow: visible !important;
+}
+.main-content {
+    min-height: auto !important;
+    height: auto !important;
+}
+.form-section {
+    margin-bottom: 2rem;
+}
+.section-title {
+    color: #007bff;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e9ecef;
+}
+.mobile-form-group {
+    margin-bottom: 1.5rem;
+}
+.mobile-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+.mobile-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    background-color: #fff;
+}
+.mobile-input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+.mobile-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    background-color: #fff;
+    cursor: pointer;
+}
+.mobile-select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+.input-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    z-index: 5;
+}
+.input-wrapper {
+    position: relative;
+}
+.checkbox-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.checkbox-group input[type="checkbox"] {
+    margin-top: 0.2rem;
+    transform: scale(1.2);
+}
+.checkbox-group label {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    margin-bottom: 0;
+    flex: 1;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    hyphens: auto;
+}
+.submit-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+.alert-mobile {
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+@media (max-width: 768px) {
+    body, html {
+        height: auto !important;
+        overflow-y: auto !important;
+    }
+    .container-fluid {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+        min-height: auto !important;
+    }
+    .mobile-form-group {
+        margin-bottom: 1rem;
+    }
+    .section-title {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem !important;
+        padding-bottom: 0.25rem !important;
+    }
+    .checkbox-group label {
+        font-size: 0.8rem !important;
+        line-height: 1.3 !important;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        hyphens: auto;
+        max-width: 100%;
+    }
+    .card-body {
+        padding: 0.75rem !important;
+    }
+    .form-section {
+        margin-bottom: 1.5rem !important;
+    }
+    .mobile-input, .mobile-select {
+        font-size: 16px !important; /* Previene zoom en iOS */
+    }
+    .input-icon {
+        right: 8px !important;
+    }
+    .submit-btn {
+        font-size: 1rem !important;
+        padding: 0.875rem 2rem !important;
+        width: 100% !important;
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .container-fluid {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+    .section-title {
+        font-size: 1rem;
+    }
+    .checkbox-group label {
+        font-size: 0.75rem !important;
+    }
+    .mobile-label {
+        font-size: 0.8rem !important;
+    }
+    .submit-btn {
+        padding: 0.75rem 1.5rem !important;
+        font-size: 0.95rem !important;
+    }
+}
