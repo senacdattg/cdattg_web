@@ -5,6 +5,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DepartamentoController;
 use App\Http\Controllers\MunicipioController;
 use App\Http\Controllers\AsistenceQrController;
+use App\Http\Controllers\GoogleDriveController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -17,6 +18,11 @@ use App\Http\Controllers\AsistenceQrController;
 Route::get('/', function () {
     return view('welcome');
 });
+
+// Google Drive OAuth helper routes (para renovar refresh_token y probar conexión)
+Route::get('/google-drive-connect', [GoogleDriveController::class, 'connect'])->name('google.drive.connect');
+Route::get('/google-drive-callback', [GoogleDriveController::class, 'callback'])->name('google.drive.callback');
+Route::get('/google-drive-test', [GoogleDriveController::class, 'test'])->name('google.drive.test');
 
 // Rutas públicas
 foreach (glob(routes_path('autenticacion/public') . '/*.php') as $routeFile) {
