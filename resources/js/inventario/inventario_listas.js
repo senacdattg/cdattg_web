@@ -227,6 +227,24 @@ document.addEventListener('DOMContentLoaded', function() {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
     }
+
+    // Inicializar configuradores por módulo (para funciones view*/edit* de los modales)
+    try {
+        if (document.querySelector('.marcas-table') && typeof window.configurarMarcas === 'function') {
+            window.configurarMarcas();
+        }
+        if (document.querySelector('.categorias-table') && typeof window.configurarCategorias === 'function') {
+            window.configurarCategorias();
+        }
+        if (document.querySelector('.proveedores-table') && typeof window.configurarProveedores === 'function') {
+            window.configurarProveedores();
+        }
+        if (document.querySelector('.contratos-table') && typeof window.configurarContratos === 'function') {
+            window.configurarContratos();
+        }
+    } catch (e) {
+        console.error('Error inicializando configuradores de inventario:', e);
+    }
 });
 
 /**

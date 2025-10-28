@@ -1,16 +1,27 @@
 
-@extends('inventario.layouts.base')
+@extends('inventario.layouts.form', [
+    'title' => 'Editar Producto',
+    'icon' => 'fas fa-edit',
+    'action' => route('inventario.productos.update', $producto->id),
+    'method' => 'PUT',
+    'submitText' => 'Guardar cambios',
+    'cancelRoute' => route('inventario.productos.index'),
+    'cancelText' => 'Cancelar',
+    'showReset' => true,
+    'resetText' => 'Limpiar'
+])
 
-@push('styles')
-    @vite([
-        'resources/css/inventario/shared/base.css',
-        'resources/css/inventario/productos.css',
-        'resources/css/inventario/shared/modal-imagen.css'
+@section('form-content')
+    @include('inventario._components.product-form', [
+        'producto' => $producto,
+        'tiposProductos' => $tiposProductos,
+        'unidadesMedida' => $unidadesMedida,
+        'estados' => $estados,
+        'contratosConvenios' => $contratosConvenios,
+        'categorias' => $categorias,
+        'marcas' => $marcas,
+        'ambientes' => $ambientes
     ])
-@endpush
-
-@section('content_header')
-    <h1>Editar Producto</h1>
 @endsection
 
 @section('main-content')
@@ -33,8 +44,10 @@
 @endsection
 
 @push('scripts')
+@section('form-scripts')
+
     @vite([
         'resources/js/inventario/productos.js',
         'resources/js/inventario/shared/modal-imagen.js'
     ])
-@endpush
+@endsection

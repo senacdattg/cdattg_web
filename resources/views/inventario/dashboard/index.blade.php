@@ -26,81 +26,54 @@
 @section('content')
 <div class="container-fluid">
     <div class="row">
-        <!-- Tarjeta de Total de Productos -->
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-info">
-                <div class="inner">
-                    <h3>{{ $totalProductos }}</h3>
-                    <p>Total Productos</p>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-boxes"></i>
-                </div>
-                <a href="{{ route('inventario.productos.index') }}" class="small-box-footer">
-                    Ver productos <i class="fas fa-arrow-circle-right"></i>
-                </a>
-            </div>
-        </div>
+        {{-- Tarjetas de estadísticas usando componentes --}}
+        @include('inventario._components.stats-card', [
+            'title' => 'Total Productos',
+            'value' => $totalProductos,
+            'icon' => 'fas fa-boxes',
+            'bgClass' => 'bg-info',
+            'link' => route('inventario.productos.index'),
+            'linkText' => 'Ver productos'
+        ])
 
-        <!-- Tarjeta de Productos por Vencer -->
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-warning">
-                <div class="inner">
-                    <h3>{{ $productosPorVencer }}</h3>
-                    <p>Productos por Vencer</p>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-calendar-alt"></i>
-                </div>
-                <a href="#" class="small-box-footer">
-                    Más información <i class="fas fa-arrow-circle-right"></i>
-                </a>
-            </div>
-        </div>
+        @include('inventario._components.stats-card', [
+            'title' => 'Productos por Vencer',
+            'value' => $productosPorVencer,
+            'icon' => 'fas fa-calendar-alt',
+            'bgClass' => 'bg-warning',
+            'link' => '#',
+            'linkText' => 'Más información'
+        ])
 
-        <!-- Tarjeta de Stock Bajo -->
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-danger">
-                <div class="color">
-                    <h3>{{ $productosStockBajo }}</h3>
-                    <p>Stock Bajo</p>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <a href="#" class="small-box-footer">
-                    Más información <i class="fas fa-arrow-circle-right"></i>
-                </a>
-            </div>
-        </div>
+        @include('inventario._components.stats-card', [
+            'title' => 'Stock Bajo',
+            'value' => $productosStockBajo,
+            'icon' => 'fas fa-exclamation-triangle',
+            'bgClass' => 'bg-danger',
+            'link' => '#',
+            'linkText' => 'Más información'
+        ])
 
-        <!-- Tarjeta de Categorías -->
-        <div class="col-lg-3 col-6">
-            <div class="small-box bg-success">
-                <div class="inner">
-                    <h3>{{ $totalCategorias }}</h3>
-                    <p>Categorías</p>
-                </div>
-                <div class="icon">
-                    <i class="fas fa-tags"></i>
-                </div>
-                <a href="#" class="small-box-footer">
-                    Más información <i class="fas fa-arrow-circle-right"></i>
-                </a>
-            </div>
-        </div>
+        @include('inventario._components.stats-card', [
+            'title' => 'Categorías',
+            'value' => $totalCategorias,
+            'icon' => 'fas fa-tags',
+            'bgClass' => 'bg-success',
+            'link' => '#',
+            'linkText' => 'Más información'
+        ])
     </div>
 
     <!-- Nueva fila para gráfico de consumibles/no consumibles -->
     <div class="row mb-4">
         <div class="col-md-6">
             <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-chart-bar"></i>
-                        Productos por Tipo
-                    </h3>
-                </div>
+                @include('inventario._components.card-header', [
+                    'title' => 'Productos por Tipo',
+                    'icon' => 'fas fa-chart-bar',
+                    'bgClass' => 'bg-primary',
+                    'textClass' => 'text-white'
+                ])
                 <div class="card-body">
                     <div class="chart-container">
                         <canvas id="productosConsumibles"></canvas>
@@ -111,12 +84,12 @@
 
         <div class="col-md-6">
             <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-chart-line"></i>
-                        Productos Más Solicitados
-                    </h3>
-                </div>
+                @include('inventario._components.card-header', [
+                    'title' => 'Productos Más Solicitados',
+                    'icon' => 'fas fa-chart-line',
+                    'bgClass' => 'bg-success',
+                    'textClass' => 'text-white'
+                ])
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover">
@@ -150,12 +123,12 @@
         <!-- Productos Recientes -->
         <div class="col-md-6">
             <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-box mr-1"></i>
-                        Productos Recientes
-                    </h3>
-                </div>
+                @include('inventario._components.card-header', [
+                    'title' => 'Productos Recientes',
+                    'icon' => 'fas fa-box',
+                    'bgClass' => 'bg-info',
+                    'textClass' => 'text-white'
+                ])
                 <div class="card-body table-responsive p-0" style="height: 300px;">
                     <table class="table table-hover">
                         <thead>
@@ -188,12 +161,12 @@
         <!-- Productos por Categoría -->
         <div class="col-md-6">
             <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">
-                        <i class="fas fa-chart-pie mr-1"></i>
-                        Productos por Categoría
-                    </h3>
-                </div>
+                @include('inventario._components.card-header', [
+                    'title' => 'Productos por Categoría',
+                    'icon' => 'fas fa-chart-pie',
+                    'bgClass' => 'bg-warning',
+                    'textClass' => 'text-white'
+                ])
                 <div class="card-body">
                     <div class="chart-container" style="height: 300px;">
                         <canvas id="productosPorCategoria"></canvas>

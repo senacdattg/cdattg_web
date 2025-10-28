@@ -22,7 +22,7 @@
                 @include('inventario._components.product-image', ['producto' => $producto])
             </div>
             
-            {{-- Botones de acción --}}
+            {{-- Botones de acción usando componente --}}
             <div class="div_btn">
                 <a href="{{ route('inventario.productos.index') }}" class="btn_show">
                     <i class="fas fa-arrow-left"></i> Volver
