@@ -244,7 +244,6 @@
             </div>
         </div>
     </div>
-@endsection
 
 <script>
     // Cargar municipios según departamento seleccionado
@@ -334,3 +333,4 @@
         // El formulario se enviará al servidor si todas las validaciones pasan
     });
 </script>
+@endsection
