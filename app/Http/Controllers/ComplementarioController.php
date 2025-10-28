@@ -577,8 +577,8 @@ class ComplementarioController extends Controller
                 ]);
             }
 
-            return redirect()->route('programas-complementarios.perfil-aspirante', ['id' => $aspirante->id])
-                ->with('success', 'Documento subido exitosamente. Su inscripción está en proceso de revisión.');
+            return redirect()->route('login.index')
+                ->with('success', 'Documento subido exitosamente. Su cuenta de usuario ha sido creada. Puede iniciar sesión con su correo electrónico y número de documento como contraseña.');
 
         } catch (\Exception $e) {
             Log::error('Error al subir documento: ' . $e->getMessage(), [
