@@ -546,7 +546,7 @@ class ComplementarioController extends Controller
             // Procesar el archivo y subirlo a Google Drive
             if ($request->hasFile('documento_identidad')) {
                 $file = $request->file('documento_identidad');
-                $fileName = 'documento_identidad_' . $aspirante->persona->numero_documento . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $fileName = $aspirante->persona->numero_documento . '.' . $file->getClientOriginalExtension();
 
                 Log::info('Attempting to upload file to Google Drive', [
                     'file_name' => $fileName,
