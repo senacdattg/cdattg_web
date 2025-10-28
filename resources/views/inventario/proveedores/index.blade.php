@@ -1,14 +1,20 @@
 @extends('inventario.layouts.page', [
-    'title' => 'Gestión de Proveedores',
-    'subtitle' => 'Administra los proveedores del inventario',
-    'icon' => 'fas fa-truck',
+        'title' => 'Gestión de Proveedores',
+        'subtitle' => 'Administra los proveedores del inventario',
+        'icon' => 'fas fa-truck',
     'showSearch' => true,
-    'searchPlaceholder' => 'Buscar proveedores...',
-    'createRoute' => route('inventario.proveedores.create'),
-    'createText' => 'Nuevo Proveedor'
+    'searchPlaceholder' => 'Buscar proveedores...'
 ])
 
 @section('page-content')
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button" 
+                class="btn btn-primary btn-lg" 
+                data-toggle="modal" 
+                data-target="#createProveedorModal">
+            <i class="fas fa-plus mr-2"></i> Nuevo Proveedor
+                                </button>
+    </div>
     {{-- Tabla usando componente genérico --}}
     @component('inventario._components.data-table', [
         'headers' => [
@@ -17,7 +23,7 @@
             'nit' => 'NIT',
             'contacto' => 'Contacto',
             'contratos_convenios_count' => 'Contratos',
-            'estado' => 'Estado'
+            'status' => 'Estado'
         ],
         'data' => $proveedores,
         'actions' => ['view', 'edit', 'delete'],

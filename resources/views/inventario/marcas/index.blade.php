@@ -3,19 +3,25 @@
     'subtitle' => 'Administra las marcas del inventario',
     'icon' => 'fas fa-trademark',
     'showSearch' => true,
-    'searchPlaceholder' => 'Buscar marcas...',
-    'createRoute' => route('inventario.marcas.create'),
-    'createText' => 'Nueva Marca'
+    'searchPlaceholder' => 'Buscar marcas...'
 ])
 
 @section('page-content')
+    <div class="d-flex justify-content-end mb-3">
+        <button type="button" 
+                class="btn btn-primary btn-lg" 
+                data-toggle="modal" 
+                data-target="#createMarcaModal">
+            <i class="fas fa-plus mr-2"></i> Nueva Marca
+        </button>
+    </div>
     {{-- Tabla usando componente genérico --}}
     @component('inventario._components.data-table', [
         'headers' => [
             '#' => '#',
             'nombre' => 'Marca',
             'productos_count' => 'Productos',
-            'estado' => 'Estado'
+            'status' => 'Estado'
         ],
         'data' => $marcas,
         'actions' => ['view', 'edit', 'delete'],
@@ -27,7 +33,7 @@
 
     {{-- Paginación --}}
     <div id="pagination-container" class="mt-3"></div>
-
+    
     {{-- Modales --}}
     @include('inventario.marcas._modals')
 @endsection
