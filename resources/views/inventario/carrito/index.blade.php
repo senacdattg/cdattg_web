@@ -6,6 +6,10 @@
     ])
 @endpush
 
+@section('content_header')
+    <h1><i class="fas fa-shopping-cart mr-2"></i> Carrito de Compras</h1>
+@endsection
+
 @section('main-content')
 @php
     $carrito = [
@@ -61,69 +65,75 @@
 @endphp
 
 <div class="div_flex">
+    {{-- Tabla del carrito usando componente --}}
     <div class="div_carrito">
-        <div class="div_titulo_carrito">
-            <h2><i class="fas fa-shopping-cart"></i> Carrito </h2>
+        @include('inventario._components.card-header', [
+            'title' => 'Carrito',
+            'icon' => 'fas fa-shopping-cart',
+            'bgClass' => 'bg-primary',
+            'textClass' => 'text-white'
+        ])
+        
+        <div class="card-body">
+            @component('inventario._components.data-table', [
+                'headers' => [
+                    'imagen' => 'Foto',
+                    'producto' => 'Producto',
+                    'cantidad' => 'Cantidad',
+                    'acciones' => 'Acciones'
+                ],
+                'data' => $carrito,
+                'actions' => ['delete'],
+                'emptyMessage' => 'El carrito está vacío.',
+                'emptyIcon' => 'fas fa-shopping-cart',
+                'tableClass' => 'carrito-table'
+            ])
+            @endcomponent
         </div>
-        <table class="carrito-table mt-3">
-            <thead>
-                <tr>
-                    <th>Foto</th>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($carrito as $item)
-                <tr>
-                    <td>
-                        <img src="{{ asset($item->producto->imagen ?? 'img/inventario/default.png') }}"
-                            alt="Foto"
-                            class="img img-expandable">
-                    <td>{{ $item->producto->producto }}</td>
-                    <td>{{ $item->cantidad }}</td>
-                    <td>
-                        <form method="POST">
-                            <button class="btn btn-danger btn-sm">
-                                <i class="fas fa-trash"></i> 
-                            </button>
-                        </form>
-                    </td>
-                </tr>
-                @endforeach
-            </tbody>
-        </table>
     </div>
 
-    
+    {{-- Panel lateral --}}
     <div class="div_lateral">
+        {{-- Resumen del pedido --}}
         <div class="div_pedido">
-            <div class="div_titulo">
-                <h2 class="h2_titulo"><i class="fas fa-receipt"></i> Pedido </h2>
-            </div>
-            <div class="div_titulo">
-                <p><strong>Productos:</strong> {{ count($carrito) }}</p>
-            </div>
-            <form>
-                @csrf
-                <div class="div_btn">
-                    <button type="submit" class="btn-pedido">
-                        <i class="fas fa-paper-plane"></i> Enviar 
-                    </button>
+            @include('inventario._components.card-header', [
+                'title' => 'Pedido',
+                'icon' => 'fas fa-receipt',
+                'bgClass' => 'bg-success',
+                'textClass' => 'text-white'
+            ])
+            
+            <div class="card-body">
+                <div class="div_titulo">
+                    <p><strong>Productos:</strong> {{ count($carrito) }}</p>
                 </div>
-            </form>
+                <form>
+                    @csrf
+                    <div class="div_btn">
+                        <button type="submit" class="btn-pedido">
+                            <i class="fas fa-paper-plane"></i> Enviar 
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
 
+        {{-- Resumen detallado --}}
         <div class="div_resumen">
-            <div class="div_titulo_resumen">
-                <h2><i class="fas fa-list-alt"></i> Resumen </h2>
+            @include('inventario._components.card-header', [
+                'title' => 'Resumen',
+                'icon' => 'fas fa-list-alt',
+                'bgClass' => 'bg-info',
+                'textClass' => 'text-white'
+            ])
+            
+            <div class="card-body">
+                <ul>
+                    @foreach($carrito as $item)
+                        <li>{{ $item->cantidad }} x {{ $item->producto->producto }}</li>
+                    @endforeach
+                </ul>
             </div>
-            <ul>
-                @foreach($carrito as $item)
-                    <li>{{ $item->cantidad }} x {{ $item->producto->producto }}</li>
-                @endforeach
-            </ul>
         </div>
     </div>
 </div>
