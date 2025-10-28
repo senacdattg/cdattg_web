@@ -102,7 +102,6 @@
                             </td>
                             <td><span class="badge {{ $aspirante->persona->estado_sofia_badge_class }}">{{ $aspirante->persona->estado_sofia_label }}</span></td>
                             <td>
-                                <a href="{{ route('programas-complementarios.perfil-aspirante', $aspirante->id) }}" class="btn btn-info btn-sm me-1" title="Ver"><i class="fas fa-eye"></i></a>
                                 <a href="#" class="btn btn-warning btn-sm me-1" title="Editar"><i class="fas fa-edit"></i></a>
                                 <a href="#" class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash"></i></a>
                             </td>
