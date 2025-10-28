@@ -5,36 +5,15 @@
 @endsection
 
 @section('content_header')
-    <section class="content-header dashboard-header py-4">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 d-flex align-items-center">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="fas fa-chalkboard-teacher text-white fa-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-0 text-gray-800">Instructores</h1>
-                        <p class="text-muted mb-0 font-weight-light">Gestión de instructores del sistema</p>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
-                                    <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-chalkboard-teacher"></i> Instructores
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header 
+        icon="fa-chalkboard-teacher" 
+        title="Instructores"
+        subtitle="Gestión de instructores del sistema"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'],
+            ['label' => 'Instructores', 'active' => true, 'icon' => 'fa-chalkboard-teacher']
+        ]"
+    />
 @endsection
 
 @section('content')
@@ -42,48 +21,29 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    @can('CREAR INSTRUCTOR')
-                        <a href="{{ route('instructor.create') }}" class="text-decoration-none">
-                            <div class="card shadow-sm mb-4 hover-card">
-                                <div class="card-header bg-white py-3 d-flex align-items-center">
-                                    <h5 class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1">
-                                        <i class="fas fa-plus-circle mr-2"></i> Crear Instructor
-                                    </h5>
-                                </div>
-                            </div>
-                        </a>
-                    @endcan
+                    <x-create-card 
+                        url="{{ route('instructor.create') }}"
+                        title="Crear Instructor"
+                        icon="fa-plus-circle"
+                        permission="CREAR INSTRUCTOR"
+                    />
 
-                    <div class="card shadow-sm no-hover">
-                        <div class="card-header bg-white py-3 d-flex align-items-center">
-                            <h6 class="m-0 font-weight-bold text-primary d-flex flex-grow-1">Lista de Instructores</h6>
-                            <div class="input-group w-25">
-                                <form action="{{ route('instructor.index') }}" method="GET" class="input-group">
-                                    <input type="text" name="search" id="searchInstructor"
-                                        class="form-control form-control-sm" placeholder="Buscar instructor..."
-                                        value="{{ request('search') }}" autocomplete="off">
-                                    <div class="input-group-append">
-                                        <button class="btn btn-primary btn-sm" type="submit">
-                                            <i class="fas fa-search"></i>
-                                        </button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-borderless table-striped mb-0">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th class="px-4 py-3" style="width: 5%">#</th>
-                                            <th class="px-4 py-3" style="width: 25%">Nombre</th>
-                                            <th class="px-4 py-3" style="width: 15%">Documento</th>
-                                            <th class="px-4 py-3" style="width: 20%">Especialidades</th>
-                                            <th class="px-4 py-3" style="width: 10%">Estado</th>
-                                            <th class="px-4 py-3 text-center" style="width: 25%">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+                    <x-data-table 
+                        title="Lista de Instructores"
+                        searchable="true"
+                        searchAction="{{ route('instructor.index') }}"
+                        searchPlaceholder="Buscar instructor..."
+                        searchValue="{{ request('search') }}"
+                        :columns="[
+                            ['label' => '#', 'width' => '5%'],
+                            ['label' => 'Nombre', 'width' => '25%'],
+                            ['label' => 'Documento', 'width' => '15%'],
+                            ['label' => 'Especialidades', 'width' => '20%'],
+                            ['label' => 'Estado', 'width' => '10%'],
+                            ['label' => 'Acciones', 'width' => '25%', 'class' => 'text-center']
+                        ]"
+                        :pagination="$instructores->links()"
+                    >
                                         @forelse ($instructores as $instructor)
                                             <tr>
                                                 <td class="px-4">{{ $loop->iteration }}</td>
@@ -116,80 +76,46 @@
                                                     @endif
                                                 </td>
                                                 <td class="px-4">
-                                                    <div class="d-inline-block px-3 py-1 rounded-pill {{ $instructor->status ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}">
-                                                        <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
-                                                        {{ $instructor->status ? 'Activo' : 'Inactivo' }}
-                                                    </div>
+                                                    <x-status-badge :status="$instructor->status" />
                                                 </td>
                                                 <td class="px-4 text-center">
-                                                    <div class="btn-group">
-                                                        @can('VER INSTRUCTOR')
-                                                            <a href="{{ route('instructor.show', $instructor->id) }}" 
-                                                               class="btn btn-light btn-sm" 
-                                                               data-toggle="tooltip" 
-                                                               title="Ver detalles">
-                                                                <i class="fas fa-eye text-warning"></i>
-                                                            </a>
-                                                        @endcan
-                                                        @can('EDITAR INSTRUCTOR')
-                                                            <a href="{{ route('instructor.edit', $instructor->id) }}" 
-                                                               class="btn btn-light btn-sm" 
-                                                               data-toggle="tooltip" 
-                                                               title="Editar">
-                                                                <i class="fas fa-pencil-alt text-info"></i>
-                                                            </a>
-                                                        @endcan
-                                                        @can('GESTIONAR ESPECIALIDADES INSTRUCTOR')
-                                                            <a href="{{ route('instructor.gestionarEspecialidades', $instructor->id) }}" 
-                                                               class="btn btn-light btn-sm" 
-                                                               data-toggle="tooltip" 
-                                                               title="Gestionar especialidades">
-                                                                <i class="fas fa-graduation-cap text-primary"></i>
-                                                            </a>
-                                                        @endcan
-                                                        @can('VER FICHAS ASIGNADAS')
-                                                            <a href="{{ route('instructor.fichasAsignadas', $instructor->id) }}" 
-                                                               class="btn btn-light btn-sm" 
-                                                               data-toggle="tooltip" 
-                                                               title="Ver fichas asignadas">
-                                                                <i class="fas fa-clipboard-list text-success"></i>
-                                                            </a>
-                                                        @endcan
-                                                        @can('ELIMINAR INSTRUCTOR')
-                                                            <form action="{{ route('instructor.destroy', $instructor->id) }}" 
-                                                                  method="POST" class="d-inline formulario-eliminar">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="btn btn-light btn-sm" 
-                                                                        data-toggle="tooltip" 
-                                                                        title="Eliminar">
-                                                                    <i class="fas fa-trash text-danger"></i>
-                                                                </button>
-                                                            </form>
-                                                        @endcan
-                                                    </div>
+                                                    <x-action-buttons 
+                                                        :show="true"
+                                                        :edit="true"
+                                                        :delete="true"
+                                                        showUrl="{{ route('instructor.show', $instructor->id) }}"
+                                                        editUrl="{{ route('instructor.edit', $instructor->id) }}"
+                                                        deleteUrl="{{ route('instructor.destroy', $instructor->id) }}"
+                                                        showPermission="VER INSTRUCTOR"
+                                                        editPermission="EDITAR INSTRUCTOR"
+                                                        deletePermission="ELIMINAR INSTRUCTOR"
+                                                        :custom="[
+                                                            [
+                                                                'url' => route('instructor.gestionarEspecialidades', $instructor->id),
+                                                                'title' => 'Gestionar especialidades',
+                                                                'icon' => 'fas fa-graduation-cap',
+                                                                'color' => 'text-primary',
+                                                                'permission' => 'GESTIONAR ESPECIALIDADES INSTRUCTOR'
+                                                            ],
+                                                            [
+                                                                'url' => route('instructor.fichasAsignadas', $instructor->id),
+                                                                'title' => 'Ver fichas asignadas',
+                                                                'icon' => 'fas fa-clipboard-list',
+                                                                'color' => 'text-success',
+                                                                'permission' => 'VER FICHAS ASIGNADAS'
+                                                            ]
+                                                        ]"
+                                                    />
                                                 </td>
                                             </tr>
                                         @empty
-                                            <tr>
-                                                <td colspan="6" class="text-center py-5">
-                                                    <img src="{{ asset('img/no-data.svg') }}" alt="No data"
-                                                        style="width: 120px" class="mb-3">
-                                                    <p class="text-muted">No hay instructores registrados</p>
-                                                </td>
-                                            </tr>
+                                            <x-empty-state 
+                                                message="No hay instructores registrados"
+                                                image="img/no-data.svg"
+                                                :colspan="6"
+                                            />
                                         @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="card-footer bg-white">
-                            <div class="float-right">
-                                {{ $instructores->links() }}
-                            </div>
-                        </div>
-                    </div>
+                    </x-data-table>
                 </div>
             </div>
         </div>
@@ -201,62 +127,5 @@
 @endsection
 
 @section('js')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        $(document).ready(function() {
-            // Confirmación para formularios de eliminación
-            $('.formulario-eliminar').on('submit', function(e) {
-                e.preventDefault();
-                const form = this;
-                
-                // Obtener información del instructor desde la fila de la tabla
-                const row = $(form).closest('tr');
-                const nombreInstructor = row.find('td:nth-child(2)').text().trim();
-                const documentoInstructor = row.find('td:nth-child(3)').text().trim();
-                
-                Swal.fire({
-                    title: '⚠️ Eliminar Instructor',
-                    html: `<div class="text-left">
-                        <div class="alert alert-info mb-3">
-                            <i class="fas fa-info-circle"></i>
-                            <strong>Información del Instructor:</strong>
-                        </div>
-                        <p><strong>Nombre:</strong> ${nombreInstructor}</p>
-                        <p><strong>Documento:</strong> ${documentoInstructor}</p>
-                        <div class="alert alert-warning mt-3">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <strong>Importante:</strong> Esta acción eliminará el instructor pero mantendrá la persona intacta.
-                        </div>
-                    </div>`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#dc3545',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: '<i class="fas fa-trash"></i> Sí, eliminar',
-                    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
-                    focusConfirm: false,
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Mostrar loading mientras se procesa
-                        Swal.fire({
-                            title: 'Eliminando...',
-                            text: 'Por favor espere mientras se procesa la solicitud',
-                            icon: 'info',
-                            allowOutsideClick: false,
-                            showConfirmButton: false,
-                            willOpen: () => {
-                                Swal.showLoading();
-                            }
-                        });
-                        
-                        form.submit();
-                    }
-                });
-            });
-
-            // Tooltips para elementos interactivos
-            $('[data-toggle="tooltip"]').tooltip();
-        });
-    </script>
+    @vite(['resources/js/pages/instructores-index.js'])
 @endsection

@@ -8,6 +8,7 @@ use App\Http\Requests\UpdateInstructorRequest;
 use App\Http\Requests\InstructorRequest;
 use App\Http\Requests\CreateInstructorRequest;
 use App\Services\InstructorBusinessRulesService;
+use App\Models\RedConocimiento;
 use App\Models\FichaCaracterizacion;
 use App\Models\Persona;
 use App\Models\Regional;
@@ -62,8 +63,8 @@ class InstructorController extends Controller
             $instructores = $this->instructorService->listarConFiltros($filtros);
             
             // Obtener datos para filtros
-            $regionales = \App\Models\Regional::where('status', true)->orderBy('nombre')->get();
-            $especialidades = \App\Models\RedConocimiento::where('status', true)->orderBy('nombre')->get();
+            $regionales = Regional::where('status', true)->orderBy('nombre')->get();
+            $especialidades = RedConocimiento::where('status', true)->orderBy('nombre')->get();
 
             // Estadísticas
             $estadisticas = $this->instructorService->obtenerEstadisticas();
@@ -173,7 +174,7 @@ class InstructorController extends Controller
     {
         try {
             // Obtener personas que no son instructores
-            $personas = \App\Models\Persona::whereDoesntHave('instructor')
+            $personas = Persona::whereDoesntHave('instructor')
                 ->whereHas('user') // Solo personas que tienen usuario
                 ->with(['user', 'tipoDocumento'])
                 ->get();
@@ -202,7 +203,7 @@ class InstructorController extends Controller
             file_put_contents($jsPath . '/instructor-create-data.js', $jsContent);
             
             $regionales = Regional::where('status', 1)->get();
-            $especialidades = \App\Models\RedConocimiento::where('status', true)->orderBy('nombre')->get();
+            $especialidades = RedConocimiento::where('status', true)->orderBy('nombre')->get();
 
             // Debug temporal
             Log::info('Variables pasadas a la vista create:', [
@@ -620,7 +621,7 @@ class InstructorController extends Controller
         $this->authorize('gestionarEspecialidades', $instructor);
         
         // Obtener redes de conocimiento disponibles según la regional del instructor
-        $redesConocimiento = \App\Models\RedConocimiento::where('regionals_id', $instructor->regional_id)
+        $redesConocimiento = RedConocimiento::where('regionals_id', $instructor->regional_id)
             ->where('status', true)
             ->orderBy('nombre')
             ->get();
@@ -656,7 +657,7 @@ class InstructorController extends Controller
             DB::beginTransaction();
             
             // Validar que la red de conocimiento pertenezca a la regional del instructor
-            $redConocimiento = \App\Models\RedConocimiento::where('id', $request->red_conocimiento_id)
+            $redConocimiento = RedConocimiento::where('id', $request->red_conocimiento_id)
                 ->where('regionals_id', $instructor->regional_id)
                 ->where('status', true)
                 ->first();
@@ -713,7 +714,7 @@ class InstructorController extends Controller
             ]);
 
             return redirect()->back()->with('success', $mensaje);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error al asignar especialidad', [
                 'instructor_id' => $instructor->id,
@@ -784,7 +785,7 @@ class InstructorController extends Controller
             DB::commit();
 
             return redirect()->back()->with('success', $mensaje);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error al remover especialidad', [
                 'instructor_id' => $instructor->id,
@@ -818,7 +819,7 @@ class InstructorController extends Controller
                     $q->with([
                         'programaFormacion.redConocimiento',
                         'modalidadFormacion',
-                        'ambiente.sede',
+                        'ambiente.piso.bloque.sede',
                         'jornadaFormacion',
                         'diasFormacion'
                     ]);
@@ -836,7 +837,7 @@ class InstructorController extends Controller
                     $q->with([
                         'programaFormacion.redConocimiento',
                         'modalidadFormacion',
-                        'ambiente.sede',
+                        'ambiente.piso.bloque.sede',
                         'jornadaFormacion',
                         'diasFormacion'
                     ]);
@@ -871,7 +872,7 @@ class InstructorController extends Controller
                 'actividadesRecientes'
             ));
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error cargando dashboard del instructor', [
                 'instructor_id' => Auth::user()->instructor?->id,
                 'error' => $e->getMessage()
@@ -1114,7 +1115,7 @@ class InstructorController extends Controller
                     $q->with([
                         'programaFormacion.redConocimiento',
                         'modalidadFormacion',
-                        'ambiente.sede',
+                        'ambiente.piso.bloque.sede',
                         'jornadaFormacion',
                         'diasFormacion'
                     ]);
@@ -1219,7 +1220,7 @@ class InstructorController extends Controller
                 : 'Instructor desactivado exitosamente';
                 
             return redirect()->back()->with('success', $mensaje);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error al cambiar estado del instructor: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Error al cambiar el estado del instructor');
         }
@@ -1251,7 +1252,7 @@ class InstructorController extends Controller
 
             return response()->json($disponibilidad);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error verificando disponibilidad del instructor', [
                 'instructor_id' => $instructor->id,
                 'error' => $e->getMessage()
@@ -1294,7 +1295,7 @@ class InstructorController extends Controller
 
             return view('instructores.disponibles', compact('instructoresDisponibles', 'criterios'));
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error obteniendo instructores disponibles', [
                 'error' => $e->getMessage(),
                 'criterios' => $request->all()
@@ -1336,7 +1337,7 @@ class InstructorController extends Controller
 
             return response()->json($validacion);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error validando reglas SENA', [
                 'instructor_id' => $instructor->id,
                 'error' => $e->getMessage()
@@ -1370,7 +1371,7 @@ class InstructorController extends Controller
 
             return view('instructores.estadisticas-carga', compact('estadisticas'));
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error obteniendo estadísticas de carga', [
                 'error' => $e->getMessage()
             ]);
@@ -1463,7 +1464,7 @@ class InstructorController extends Controller
                 'advertencias' => $validacionSENA['advertencias'] ?? []
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error asignando ficha al instructor', [
                 'instructor_id' => $instructor->id,
                 'ficha_id' => $request->ficha_id ?? null,
@@ -1517,7 +1518,7 @@ class InstructorController extends Controller
                 'message' => 'Ficha desasignada exitosamente del instructor'
             ]);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Error desasignando ficha del instructor', [
                 'instructor_id' => $instructor->id,
                 'ficha_id' => $fichaId,

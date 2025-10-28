@@ -1,31 +1,19 @@
 @extends('adminlte::page')
-@section('content')
 
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Asistencia @if ($ficha->ficha)
-                                {{ $ficha->ficha }}
-                            @else
-                                {{ $ficha->nombre_curso }}
-                            @endif
-                        </h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="{{ route('home.index') }}">inicio</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('fichaCaracterizacion.index') }}">Fichas de caracterización</a></li>
-                            <li class="breadcrumb-item active">Asistencia @if ($ficha->ficha)
-                                {{ $ficha->ficha }}
-                            @else
-                                {{ $ficha->nombre_curso }}
-                            @endif</li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </section>
+@section('content_header')
+    <x-page-header 
+        icon="fa-calendar-check" 
+        title="Asistencia {{ $ficha->ficha ?? $ficha->nombre_curso }}"
+        subtitle="Gestión de asistencias de la ficha"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => route('home.index'), 'icon' => 'fa-home'], 
+            ['label' => 'Fichas de caracterización', 'url' => route('fichaCaracterizacion.index'), 'icon' => 'fa-file-alt'],
+            ['label' => 'Asistencia ' . ($ficha->ficha ?? $ficha->nombre_curso), 'active' => true, 'icon' => 'fa-calendar-check']
+        ]"
+    />
+@endsection
+
+@section('content')
         <div class="content">
             {{-- <div class="row">
                 <div class="col">
@@ -91,25 +79,22 @@
                         </div>
                     </div>
                     {{-- finaliza datos --}}
-                    <div class="card-body p-0">
-                        <table class="table table-responsive">
-                            <thead>
-                                <tr>
-                                    <th style="width: 1%">
-                                        #
-                                    </th>
-                                    <th style="width: 20%">
-                                        Aprendiz
-                                    </th>
-                                    <th style="width: 30%">
-                                        entrada
-                                    </th>
-                                    <th style="width: 40%">
-                                        salida
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                    
+                    <x-data-table 
+                        title="Lista de Asistencias"
+                        searchable="true"
+                        searchAction="{{ route('entradaSalida.index', ['ficha' => $ficha->id]) }}"
+                        searchPlaceholder="Buscar aprendiz..."
+                        searchValue="{{ request('search') }}"
+                        :columns="[
+                            ['label' => '#', 'width' => '5%'],
+                            ['label' => 'Aprendiz', 'width' => '25%'],
+                            ['label' => 'Entrada', 'width' => '30%'],
+                            ['label' => 'Salida', 'width' => '30%'],
+                            ['label' => 'Acciones', 'width' => '10%', 'class' => 'text-center']
+                        ]"
+                        :pagination="$registros->links()"
+                    >
                                 <?php $i = 1; ?>
                                 @forelse ($registros as $registro)
                                     <tr>
@@ -127,17 +112,14 @@
                                         <td>
                                             {{ $registro->salida }}
                                         </td>
-                                        <td>
-                                            <form class="formulario-eliminar btn" action="{{ route('entradaSalida.destroy', ['entradaSalida' => $registro->id]) }}"
-                                            method="POST" class="d-inline">
-                                            @csrf
-                                            @method('DELETE')
-
-                                            <button type="submit" class="btn btn-danger btn-sm">
-
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                            </form>
+                                        <td class="text-center">
+                                            <x-action-buttons 
+                                                :show="false"
+                                                :edit="false"
+                                                :delete="true"
+                                                deleteUrl="{{ route('entradaSalida.destroy', $registro->id) }}"
+                                                deletePermission="ELIMINAR ASISTENCIA"
+                                            />
                                         </td>
                                     </tr>
                                 @empty
@@ -145,37 +127,19 @@
                                         <td colspan="4">No hay personas registradas</td>
                                     </tr>
                                 @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="row align-self-center">
-                    <div class="col align-self-center">
-                        <a href="{{ route('entradaSalida.generarCSV', ['ficha' => $ficha->id]) }}" id="btn-generarCSV"
-                            class="btn btn-warning btn-sm"><i class="fas fa-file-csv" style="font-size: 2em;"></i></a>
+                    </x-data-table>
+                    
+                    <div class="row align-self-center mt-3">
+                        <div class="col align-self-center">
+                            <a href="{{ route('entradaSalida.generarCSV', ['ficha' => $ficha->id]) }}" id="btn-generarCSV"
+                                class="btn btn-warning btn-sm"><i class="fas fa-file-csv" style="font-size: 2em;"></i></a>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
     </div>
 @endsection
-@section('script')
-    <script>
-        $(document).ready(function() {
-            var btnGenerarCSV = $('#btn-generarCSV');
-
-            btnGenerarCSV.click(function() {
-                // Simular un formulario oculto y realizar la descarga
-                var iframe = $('<iframe style="display: none;"></iframe>');
-                $('body').append(iframe);
-
-                iframe.attr('src', '{{ route('entradaSalida.generarCSV', ['ficha' => $ficha]) }}');
-
-                // Redirigir después de la descarga
-                setTimeout(function() {
-                    window.location.href = '{{ route('fichaCaracterizacion.index') }}';
-                }, 1000); // 2000 milisegundos (2 segundos) de retraso
-            });
-        });
-    </script>
+@section('js')
+    @vite(['resources/js/pages/formularios-generico.js'])
 @endsection

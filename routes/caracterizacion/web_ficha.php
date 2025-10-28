@@ -5,7 +5,7 @@ use App\Http\Controllers\FichaCaracterizacionController;
 
 // Rutas para FichasCaracterizacionController
 Route::resource('fichaCaracterizacion', FichaCaracterizacionController::class);
-route::middleware('can:VER PROGRAMA DE CARACTERIZACION')->group(function () {
+route::middleware('can:VER FICHA CARACTERIZACION')->group(function () {
     Route::get('/ficha/index', [FichaCaracterizacionController::class, 'index'])->name('ficha.index');
     Route::get('/ficha/search', [FichaCaracterizacionController::class, 'search'])->name('ficha.search');
     Route::post('/ficha/search-ajax', [FichaCaracterizacionController::class, 'search'])->name('ficha.search.ajax');
@@ -29,6 +29,13 @@ route::middleware('can:VER PROGRAMA DE CARACTERIZACION')->group(function () {
     Route::get('/fichaCaracterizacion/{id}/gestionar-instructores', [FichaCaracterizacionController::class, 'gestionarInstructores'])->name('fichaCaracterizacion.gestionarInstructores');
     Route::post('/fichaCaracterizacion/{id}/asignar-instructores', [FichaCaracterizacionController::class, 'asignarInstructores'])->name('fichaCaracterizacion.asignarInstructores');
     Route::post('/fichaCaracterizacion/{id}/desasignar-instructores', [FichaCaracterizacionController::class, 'desasignarInstructores'])->name('fichaCaracterizacion.desasignarInstructores');
+    
+    // Rutas para gestión de días de formación de instructores en fichas
+    Route::get('/fichaCaracterizacion/{fichaId}/instructor/{instructorFichaId}/gestionar-dias', [FichaCaracterizacionController::class, 'gestionarDiasInstructor'])->name('fichaCaracterizacion.instructor.gestionarDias');
+    Route::post('/fichaCaracterizacion/{fichaId}/instructor/{instructorFichaId}/asignar-dias', [FichaCaracterizacionController::class, 'asignarDiasInstructor'])->name('fichaCaracterizacion.instructor.asignarDias');
+    Route::get('/fichaCaracterizacion/{fichaId}/instructor/{instructorFichaId}/obtener-dias', [FichaCaracterizacionController::class, 'obtenerDiasInstructor'])->name('fichaCaracterizacion.instructor.obtenerDias');
+    Route::delete('/fichaCaracterizacion/{fichaId}/instructor/{instructorFichaId}/eliminar-dias', [FichaCaracterizacionController::class, 'eliminarDiasInstructor'])->name('fichaCaracterizacion.instructor.eliminarDias');
+    Route::post('/fichaCaracterizacion/{fichaId}/instructor/{instructorFichaId}/preview-fechas', [FichaCaracterizacionController::class, 'previewFechasInstructor'])->name('fichaCaracterizacion.instructor.previewFechas');
     
     // Rutas para gestión de días de formación
     Route::get('/fichaCaracterizacion/{id}/gestionar-dias-formacion', [FichaCaracterizacionController::class, 'gestionarDiasFormacion'])->name('fichaCaracterizacion.gestionarDiasFormacion');

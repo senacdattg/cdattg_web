@@ -39,36 +39,12 @@
 @endsection
 
 @section('content_header')
-    <section class="content-header dashboard-header py-4">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 d-flex align-items-center">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="fas fa-book-open text-white fa-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-0 text-gray-800">Guías de Aprendizaje</h1>
-                        <p class="text-muted mb-0 font-weight-light">Gestión de guías de aprendizaje del SENA</p>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
-                                <a href="{{ url('/') }}" class="link_right_header">
-                                    <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-book-open"></i> Guías de Aprendizaje
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header 
+        icon="fa-book-open" 
+        title="Guías de Aprendizaje"
+        subtitle="Gestión de guías de aprendizaje del SENA"
+        :breadcrumb="[['label' => 'Inicio', 'url' => url('/') , 'icon' => 'fa-home'], ['label' => 'Guías de Aprendizaje', 'icon' => 'fa-book-open', 'active' => true]]"
+    />
 @endsection
 
 @section('content')
@@ -164,21 +140,23 @@
                             </div>
                         </div>
 
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-borderless table-striped mb-0">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th class="px-4 py-3" style="width: 5%">#</th>
-                                            <th class="px-4 py-3" style="width: 15%">Código</th>
-                                            <th class="px-4 py-3" style="width: 30%">Nombre</th>
-                                            <th class="px-4 py-3" style="width: 15%">Estado</th>
-                                            <th class="px-4 py-3" style="width: 10%">Resultados</th>
-                                            <th class="px-4 py-3" style="width: 10%">Actividades</th>
-                                            <th class="px-4 py-3 text-center" style="width: 15%">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="guiasTableBody">
+                        <x-data-table 
+                            title="Lista de Guías de Aprendizaje"
+                            searchable="true"
+                            searchAction="{{ route('guiasAprendizaje.index') }}"
+                            searchPlaceholder="Buscar por código, nombre..."
+                            searchValue="{{ request('search') }}"
+                            :columns="[
+                                ['label' => '#', 'width' => '5%'],
+                                ['label' => 'Código', 'width' => '15%'],
+                                ['label' => 'Nombre', 'width' => '30%'],
+                                ['label' => 'Estado', 'width' => '15%'],
+                                ['label' => 'Resultados', 'width' => '10%'],
+                                ['label' => 'Actividades', 'width' => '10%'],
+                                ['label' => 'Acciones', 'width' => '15%', 'class' => 'text-center']
+                            ]"
+                            :pagination="$guiasAprendizaje->links()"
+                        >
                                         @forelse ($guiasAprendizaje as $guia)
                                             <tr>
                                                 <td class="px-4">{{ $loop->iteration }}</td>
@@ -239,16 +217,7 @@
                                                 </td>
                                             </tr>
                                         @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="card-footer bg-white">
-                            <div class="float-right">
-                                {{ $guiasAprendizaje->links() }}
-                            </div>
-                        </div>
+                        </x-data-table>
                     </div>
                 </div>
             </div>
@@ -261,109 +230,5 @@
 @endsection
 
 @section('js')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    $(document).ready(function() {
-        let searchTimeout;
-        
-        // Inicializar tooltips
-        $('[data-toggle="tooltip"]').tooltip();
-
-        // Auto-hide alerts
-        setTimeout(function() {
-            $('.alert').fadeOut('slow');
-        }, 5000);
-
-        // Búsqueda en tiempo real con debounce
-        $('#searchGuia').on('input', function() {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(function() {
-                performSearch();
-            }, 500);
-        });
-
-        // Botón de búsqueda
-        $('#btnSearch').on('click', function() {
-            performSearch();
-        });
-
-        // Limpiar filtros
-        $('#btnClearFilters').on('click', function() {
-            $('#searchGuia').val('');
-            $('#filterPrograma').val('');
-            $('#filterCompetencia').val('');
-            $('#filterStatus').val('');
-            window.location.href = '{{ route("guias-aprendizaje.index") }}';
-        });
-
-        // Cambios en filtros
-        $('#filterPrograma, #filterCompetencia, #filterStatus').on('change', function() {
-            performSearch();
-        });
-
-        // Función para realizar búsqueda
-        function performSearch() {
-            const searchTerm = $('#searchGuia').val();
-            const programaId = $('#filterPrograma').val();
-            const competenciaId = $('#filterCompetencia').val();
-            const status = $('#filterStatus').val();
-
-            // Construir URL con parámetros
-            let url = '{{ route("guias-aprendizaje.index") }}?';
-            const params = [];
-
-            if (searchTerm) params.push(`search=${encodeURIComponent(searchTerm)}`);
-            if (programaId) params.push(`programa_id=${programaId}`);
-            if (competenciaId) params.push(`competencia_id=${competenciaId}`);
-            if (status !== '') params.push(`status=${status}`);
-
-            if (params.length > 0) {
-                url += params.join('&');
-                window.location.href = url;
-            }
-        }
-
-        // Restaurar valores de filtros desde URL
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.has('search')) $('#searchGuia').val(urlParams.get('search'));
-        if (urlParams.has('programa_id')) $('#filterPrograma').val(urlParams.get('programa_id'));
-        if (urlParams.has('competencia_id')) $('#filterCompetencia').val(urlParams.get('competencia_id'));
-        if (urlParams.has('status')) $('#filterStatus').val(urlParams.get('status'));
-    });
-
-    // Confirmación de eliminación
-    function confirmarEliminacion(nombre, url) {
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: `¿Deseas eliminar la guía "${nombre}"? Esta acción no se puede deshacer.`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = url;
-                
-                const csrfToken = document.createElement('input');
-                csrfToken.type = 'hidden';
-                csrfToken.name = '_token';
-                csrfToken.value = '{{ csrf_token() }}';
-                
-                const methodField = document.createElement('input');
-                methodField.type = 'hidden';
-                methodField.name = '_method';
-                methodField.value = 'DELETE';
-                
-                form.appendChild(csrfToken);
-                form.appendChild(methodField);
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    }
-</script>
+    @vite(['resources/js/pages/guias-aprendizaje-index.js'])
 @endsection

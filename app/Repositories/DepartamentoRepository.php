@@ -10,10 +10,12 @@ class DepartamentoRepository
 {
     use HasCache;
 
-    protected $cacheType = 'parametros';
-    protected $cacheTags = ['departamentos', 'ubicacion'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'parametros';
+        $this->cacheTags = ['departamentos', 'ubicacion'];
+    }    /**
      * Obtiene todos los departamentos
      *
      * @return Collection

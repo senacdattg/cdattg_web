@@ -10,10 +10,12 @@ class MunicipioRepository
 {
     use HasCache;
 
-    protected $cacheType = 'parametros';
-    protected $cacheTags = ['municipios', 'ubicacion'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'parametros';
+        $this->cacheTags = ['municipios', 'ubicacion'];
+    }    /**
      * Obtiene municipios por departamento
      *
      * @param int $departamentoId

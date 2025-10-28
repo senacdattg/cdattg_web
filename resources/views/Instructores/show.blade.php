@@ -93,41 +93,12 @@
 @endsection
 
 @section('content_header')
-    <section class="content-header dashboard-header py-4">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 d-flex align-items-center">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="fas fa-chalkboard-teacher text-white fa-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-0 text-gray-800">Detalles del Instructor</h1>
-                        <p class="text-muted mb-0 font-weight-light">Información completa del instructor</p>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                        <li class="breadcrumb-item">
-                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
-                                    <i class="fas fa-home"></i> Inicio
-                            </a>
-                        </li>
-                        <li class="breadcrumb-item">
-                                <a href="{{ route('instructor.index') }}" class="link_right_header">
-                                    <i class="fas fa-chalkboard-teacher"></i> Instructores
-                            </a>
-                        </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-user"></i> {{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}
-                        </li>
-                    </ol>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header 
+        icon="fa-chalkboard-teacher" 
+        title="Detalles del Instructor"
+        subtitle="Información completa del instructor"
+        :breadcrumb="[['label' => 'Instructores', 'url' => route('instructor.index') , 'icon' => 'fa-chalkboard-teacher'], ['label' => '{{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}', 'icon' => 'fa-user', 'active' => true]]"
+    />
 @endsection
 
 @section('content')
@@ -608,94 +579,7 @@
 @endsection
 
 @section('js')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        $(document).ready(function() {
-            // Confirmación para cambiar estado de usuario
-            $('.cambiar-estado-usuario').on('click', function(e) {
-                e.preventDefault();
-                const form = $(this).closest('form');
-                const accion = $(this).text().trim();
-                const nombreInstructor = '{{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}';
-                
-                Swal.fire({
-                    title: `¿${accion} Usuario?`,
-                    html: `<div class="text-left">
-                        <p><strong>Instructor:</strong> ${nombreInstructor}</p>
-                        <p><strong>Email:</strong> {{ $instructor->persona->user->email ?? 'No disponible' }}</p>
-                        <div class="alert alert-info mt-3">
-                            <i class="fas fa-info-circle"></i>
-                            Esta acción ${accion.toLowerCase()} el acceso del usuario al sistema.
-                        </div>
-                    </div>`,
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#ffc107',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: `<i class="fas fa-sync"></i> ${accion}`,
-                    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
-                    focusConfirm: false,
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
-            });
-
-            // Confirmación para formularios de eliminación
-            $('.formulario-eliminar').on('submit', function(e) {
-                e.preventDefault();
-                const form = this;
-                const nombreInstructor = '{{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}';
-                const documentoInstructor = '{{ $instructor->persona->numero_documento }}';
-                
-                Swal.fire({
-                    title: '⚠️ Eliminar Instructor',
-                    html: `<div class="text-left">
-                        <div class="alert alert-info mb-3">
-                            <i class="fas fa-info-circle"></i>
-                            <strong>Información del Instructor:</strong>
-                        </div>
-                        <p><strong>Nombre:</strong> ${nombreInstructor}</p>
-                        <p><strong>Documento:</strong> ${documentoInstructor}</p>
-                        <p><strong>Email:</strong> {{ $instructor->persona->user->email ?? 'No disponible' }}</p>
-                        <div class="alert alert-warning mt-3">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <strong>Importante:</strong> Esta acción eliminará el instructor pero mantendrá la persona intacta.
-                        </div>
-                    </div>`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#dc3545',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: '<i class="fas fa-trash"></i> Sí, eliminar',
-                    cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
-                    focusConfirm: false,
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Mostrar loading mientras se procesa
-                        Swal.fire({
-                            title: 'Eliminando...',
-                            text: 'Por favor espere mientras se procesa la solicitud',
-                            icon: 'info',
-                            allowOutsideClick: false,
-                            showConfirmButton: false,
-                            willOpen: () => {
-                                Swal.showLoading();
-                            }
-                        });
-                        
-                        form.submit();
-                    }
-                });
-            });
-
-            // Tooltips para elementos interactivos
-            $('[data-toggle="tooltip"]').tooltip();
-        });
-    </script>
+    @vite(['resources/js/pages/resources-views\Instructores\show.js'])
 @endsection
 
 @section('footer')

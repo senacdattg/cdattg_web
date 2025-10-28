@@ -10,10 +10,12 @@ class CentroFormacionRepository
 {
     use HasCache;
 
-    protected $cacheType = 'parametros';
-    protected $cacheTags = ['centros', 'infraestructura'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'parametros';
+        $this->cacheTags = ['centros', 'infraestructura'];
+    }    /**
      * Obtiene todos los centros activos
      *
      * @return Collection

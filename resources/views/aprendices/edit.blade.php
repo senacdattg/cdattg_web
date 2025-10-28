@@ -7,41 +7,12 @@
 @endsection
 
 @section('content_header')
-    <section class="content-header dashboard-header py-4">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 d-flex align-items-center">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="fas fa-user-graduate text-white fa-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-0 text-gray-800">Aprendiz</h1>
-                        <p class="text-muted mb-0 font-weight-light">Edición del aprendiz</p>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
-                                    <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('aprendices.index') }}" class="link_right_header">
-                                    <i class="fas fa-user-graduate"></i> Aprendices
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-edit"></i> Editar aprendiz
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header 
+        icon="fa-user-graduate" 
+        title="Aprendiz"
+        subtitle="Edición del aprendiz"
+        :breadcrumb="[['label' => 'Aprendices', 'url' => route('aprendices.index') , 'icon' => 'fa-user-graduate'], ['label' => 'Editar aprendiz', 'icon' => 'fa-edit', 'active' => true]]"
+    />
 @endsection
 
 @section('content')
@@ -152,16 +123,5 @@
 @endsection
 
 @section('js')
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Inicializar Select2 para todos los select
-            $('.select2').select2({
-                theme: 'bootstrap-5',
-                width: '100%',
-                placeholder: 'Seleccione una opción',
-                allowClear: true
-            });
-        });
-    </script>
+    @vite(['resources/js/pages/formularios-generico.js'])
 @endsection

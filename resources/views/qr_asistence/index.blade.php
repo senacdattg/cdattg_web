@@ -4,31 +4,13 @@
 @endsection
 
 @section('content_header')
-    <section class="content-header dashboard-header py-4">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-sm-6">
-                    <div class="d-flex justify-content-start mt-1 mb">
-                        <a href="{{ route('registro-actividades.index', ['caracterizacion' => $caracterizacion]) }}"
-                            class="btn btn-outline-primary rounded-pill px-4">
-                            <i class="fas fa-arrow-left me-2"></i>Volver a las actividades
-                        </a>
-                    </div>
-                </div>
-                <div class="col-12 col-md-6 d-flex align-items-center justify-content-end">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="fas fa-fw fa-qrcode text-white"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-0 text-gray-800">Asistencia QR</h1>
-                        <p class="text-muted mb-0 font-weight-light">
-                            REGISTRO DE ASISTENCIA</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header 
+        icon="fa-home" 
+        title="Asistencia QR"
+        subtitle="
+                            REGISTRO DE ASISTENCIA"
+        :breadcrumb="[]"
+    />
 @endsection
 
 @section('content')
@@ -280,12 +262,6 @@
         window.csrfToken = '{{ csrf_token() }}';
         window.apiVerifyDocumentRoute = '{{ route('api.verifyDocument') }}';
         window.horarioHoy = @json($horarioHoy);
-
-        // Mostrar el div del escáner si hay clases programadas
-        const qrScannerCard = document.getElementById('qr-scanner-card');
-        if (qrScannerCard) {
-            qrScannerCard.style.display = 'block';
-        }
     </script>
     @vite(['resources/js/Asistencia/index-qr.js'])
 @endsection

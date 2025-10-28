@@ -45,36 +45,15 @@
 @endsection
 
 @section('content_header')
-    <section class="content-header dashboard-header py-4">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 d-flex align-items-center">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="fas fa-clipboard-list text-white fa-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-0 text-gray-800">Competencias</h1>
-                        <p class="text-muted mb-0 font-weight-light">Gestión de competencias del SENA</p>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
-                                <a href="{{ url('/') }}" class="link_right_header">
-                                    <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-clipboard-list"></i> Competencias
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header 
+        icon="fa-clipboard-list" 
+        title="Competencias"
+        subtitle="Gestión de competencias del SENA"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => url('/'), 'icon' => 'fa-home'],
+            ['label' => 'Competencias', 'active' => true, 'icon' => 'fa-clipboard-list']
+        ]"
+    />
 @endsection
 
 @section('content')
@@ -192,26 +171,23 @@
                         </div>
                     </div>
 
-                    <div class="card shadow-sm no-hover">
-                        <div class="card-header bg-white py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Lista de Competencias</h6>
-                        </div>
-
-                        <div class="card-body p-0">
-                            <div class="table-responsive">
-                                <table class="table table-borderless table-striped mb-0">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <th class="px-4 py-3" style="width: 5%">#</th>
-                                            <th class="px-4 py-3" style="width: 12%">Código</th>
-                                            <th class="px-4 py-3" style="width: 33%">Nombre</th>
-                                            <th class="px-4 py-3" style="width: 10%">Duración</th>
-                                            <th class="px-4 py-3" style="width: 10%">RAPs</th>
-                                            <th class="px-4 py-3" style="width: 15%">Estado</th>
-                                            <th class="px-4 py-3 text-center" style="width: 15%">Acciones</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+                    <x-data-table 
+                        title="Lista de Competencias"
+                        searchable="true"
+                        searchAction="{{ route('competencias.index') }}"
+                        searchPlaceholder="Buscar competencia..."
+                        searchValue="{{ request('search') }}"
+                        :columns="[
+                            ['label' => '#', 'width' => '5%'],
+                            ['label' => 'Código', 'width' => '12%'],
+                            ['label' => 'Nombre', 'width' => '33%'],
+                            ['label' => 'Duración', 'width' => '10%'],
+                            ['label' => 'RAPs', 'width' => '10%'],
+                            ['label' => 'Estado', 'width' => '15%'],
+                            ['label' => 'Acciones', 'width' => '15%', 'class' => 'text-center']
+                        ]"
+                        :pagination="$competencias->links()"
+                    >
                                         @forelse ($competencias as $competencia)
                                             <tr>
                                                 <td class="px-4">{{ $loop->iteration }}</td>
@@ -274,16 +250,7 @@
                                                 </td>
                                             </tr>
                                         @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="card-footer bg-white">
-                            <div class="float-right">
-                                {{ $competencias->links() }}
-                            </div>
-                        </div>
+                    </x-data-table>
                     </div>
                 </div>
             </div>
@@ -296,61 +263,5 @@
 @endsection
 
 @section('js')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    function confirmarEliminacion(nombre, url) {
-        Swal.fire({
-            title: '¿Estás seguro?',
-            text: `¿Deseas eliminar la competencia "${nombre}"? Esta acción no se puede deshacer.`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Sí, eliminar',
-            cancelButtonText: 'Cancelar'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = url;
-                
-                const csrfToken = document.createElement('input');
-                csrfToken.type = 'hidden';
-                csrfToken.name = '_token';
-                csrfToken.value = '{{ csrf_token() }}';
-                
-                const methodField = document.createElement('input');
-                methodField.type = 'hidden';
-                methodField.name = '_method';
-                methodField.value = 'DELETE';
-                
-                form.appendChild(csrfToken);
-                form.appendChild(methodField);
-                document.body.appendChild(form);
-                form.submit();
-            }
-        });
-    }
-
-    $(document).ready(function() {
-        setTimeout(function() {
-            $('.alert').fadeOut('slow');
-        }, 5000);
-
-        $('[data-toggle="tooltip"]').tooltip();
-
-        // Abrir filtros automáticamente si hay filtros activos
-        @if(request()->hasAny(['search', 'status', 'duracion_min', 'duracion_max', 'fecha_inicio', 'fecha_fin']))
-            $('#filtrosCollapse').collapse('show');
-        @endif
-
-        // Cambiar ícono del chevron al expandir/colapsar
-        $('#filtrosCollapse').on('show.bs.collapse', function () {
-            $('[data-target="#filtrosCollapse"] .fa-chevron-down').removeClass('fa-chevron-down').addClass('fa-chevron-up');
-        });
-        $('#filtrosCollapse').on('hide.bs.collapse', function () {
-            $('[data-target="#filtrosCollapse"] .fa-chevron-up').removeClass('fa-chevron-up').addClass('fa-chevron-down');
-        });
-    });
-</script>
+    @vite(['resources/js/pages/competencias-index.js'])
 @endsection

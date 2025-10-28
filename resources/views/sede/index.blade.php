@@ -1,145 +1,116 @@
 @extends('adminlte::page')
+
+@section('css')
+    @vite(['resources/css/parametros.css'])
+@endsection
+
+@section('content_header')
+    <x-page-header 
+        icon="fa-cogs" 
+        title="Sedes"
+        subtitle="Gestión de sedes del sistema"
+        :breadcrumb="[['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'], ['label' => 'Sedes', 'icon' => 'fa-cog', 'active' => true]]"
+    />
+@endsection
+
 @section('content')
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <x-create-card 
+                        url="{{ route('sede.create') }}"
+                        title="Crear Sede"
+                        icon="fa-plus-circle"
+                        permission="CREAR SEDE"
+                    />
 
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Sedes
-
-
-                        </h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('home.index') }}">Inicio</a>
-                            </li>
-                            <li class="breadcrumb-item active">Sedes
-                            </li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="content">
-            <div class="card">
-
-                <div class="card-body p-0">
-                    <table class="table table-responsive">
-                        <thead>
+                    <x-data-table 
+                        title="Lista de Sedes"
+                        searchable="true"
+                        searchAction="{{ route('sede.index') }}"
+                        searchPlaceholder="Buscar sede..."
+                        searchValue="{{ request('search') }}"
+                        :columns="[
+                            ['label' => '#', 'width' => '5%'],
+                            ['label' => 'Sede', 'width' => '20%'],
+                            ['label' => 'Dirección', 'width' => '25%'],
+                            ['label' => 'Municipio', 'width' => '20%'],
+                            ['label' => 'Estado', 'width' => '10%', 'class' => 'text-center'],
+                            ['label' => 'Acciones', 'width' => '20%', 'class' => 'text-center']
+                        ]"
+                        :pagination="$sedes->links()"
+                    >
+                        @forelse($sedes as $key => $sede)
                             <tr>
-                                <th style="width: 1%">
-                                    #
-                                </th>
-                                <th style="width: 20%">
-                                    Sede
-                                </th>
-                                <th style="width: 30%">
-                                    Direccion
-                                </th>
-                                <th style="width: 40%">
-                                    Municipio
-                                </th>
-                                <th style="width: 50%">
-                                    Estado
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            $i = 1;
-                            ?>
-                            @forelse ($sedes as $sede)
-                                <tr>
-                                    <td>
-                                        {{ $i++ }}
-                                    </td>
-                                    <td>
-                                        {{ $sede->sede }}
-                                    </td>
-
-                                    <td>
-                                        {{ $sede->direccion }}
-                                    </td>
-
-                                    <td>
-                                        {{ $sede->municipio->municipio }}
-                                    </td>
-
-                                    <td>
-                                        <span class="badge badge-{{ $sede->status === 1 ? 'success' : 'danger' }}">
-                                            @if ($sede->status === 1)
-                                                ACTIVO
-                                            @else
-                                                INACTIVO
-                                            @endif
-                                        </span>
-                                    </td>
-                                    @can('EDITAR SEDE')
-                                        <td>
-                                            <form id="cambiarEstadoForm" class=" d-inline"
-                                                action="{{ route('sede.cambiarEstado', ['sede' => $sede->id]) }}"
-                                                method="POST">
+                                <td>{{ $sedes->firstItem() + $key }}</td>
+                                <td>{{ $sede->sede }}</td>
+                                <td>{{ $sede->direccion }}</td>
+                                <td>{{ $sede->municipio->municipio ?? 'N/A' }}</td>
+                                <td class="text-center">
+                                    @if($sede->status === 1)
+                                        <span class="badge badge-success">Activo</span>
+                                    @else
+                                        <span class="badge badge-danger">Inactivo</span>
+                                    @endif
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        @can('EDITAR SEDE')
+                                            <form action="{{ route('sede.cambiarEstado', $sede->id) }}"
+                                                method="POST" style="display: inline-block; margin-right: 2px;">
                                                 @csrf
                                                 @method('PUT')
-                                                <button type="submit" class="btn btn-success btn-sm"><i
-                                                        class="fas fa-sync"></i></button>
+                                                <button type="submit" class="btn btn-sm btn-light" title="Cambiar Estado">
+                                                    <i class="fas fa-sync text-success"></i>
+                                                </button>
                                             </form>
-                                        </td>
-                                    @endcan
-                                    @can('VER SEDE')
-                                        <td>
-                                            <a class="btn btn-warning btn-sm"
-                                                href="{{ route('sede.show', ['sede' => $sede->id]) }}">
-                                                <i class="fas fa-eye"></i>
-
+                                        @endcan
+                                        @can('VER SEDE')
+                                            <a href="{{ route('sede.show', $sede->id) }}"
+                                                class="btn btn-sm btn-light" title="Ver"
+                                                style="margin-right: 2px;">
+                                                <i class="fas fa-eye text-warning"></i>
                                             </a>
-                                        </td>
-                                    @endcan
-                                    @can('EDITAR SEDE')
-
-                                    <td>
-                                        <a class="btn btn-info btn-sm"
-                                        href="{{ route('sede.edit', ['sede' => $sede->id]) }}">
-                                        <i class="fas fa-pencil-alt">
-                                        </i>
-                                    </a>
+                                        @endcan
+                                        @can('EDITAR SEDE')
+                                            <a href="{{ route('sede.edit', $sede->id) }}"
+                                                class="btn btn-sm btn-light" title="Editar"
+                                                style="margin-right: 2px;">
+                                                <i class="fas fa-pencil-alt text-primary"></i>
+                                            </a>
+                                        @endcan
+                                        @can('ELIMINAR SEDE')
+                                            <form action="{{ route('sede.destroy', $sede->id) }}"
+                                                method="POST" style="display: inline-block;"
+                                                onsubmit="return confirm('¿Está seguro de eliminar esta sede?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-light" title="Eliminar">
+                                                    <i class="fas fa-trash-alt text-danger"></i>
+                                                </button>
+                                            </form>
+                                        @endcan
+                                    </div>
                                 </td>
-                                @endcan
-                                @can('ELIMINAR SEDE')
-
-                                <td>
-                                    <form class="formulario-eliminar "
-                                    action="{{ route('sede.destroy', ['sede' => $sede->id]) }}" method="POST"
-                                    class="d-inline">
-                                    @csrf
-                                    @method('DELETE')
-
-                                    <button type="submit" class="btn btn-danger btn-sm">
-
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </form>
-                            </td>
-                            @endcan
-                                </tr>
-
-                            @empty
-                                <tr>
-                                    <td colspan="4">No hay sedes registradas</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center">No hay sedes registradas</td>
+                            </tr>
+                        @endforelse
+                    </x-data-table>
                 </div>
             </div>
-    </div>
-
-    <div class="card-footer">
-        <div class="float-right">
-            {{ $sedes->links() }}
         </div>
-    </div>
+    </section>
+@endsection
+
+@section('footer')
+    @include('layout.footer')
+@endsection
+
+@section('js')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @vite(['resources/js/parametros.js'])
 @endsection

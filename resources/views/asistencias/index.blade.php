@@ -1,24 +1,20 @@
-@extends('layout.app')
+@extends('adminlte::page')
 
 @section('title', 'Asistencias')
 
+@section('content_header')
+    <x-page-header 
+        icon="fa-check-circle" 
+        title="Asistencias"
+        subtitle="Gestión de asistencias de aprendices"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'],
+            ['label' => 'Asistencias', 'active' => true, 'icon' => 'fa-check-circle']
+        ]"
+    />
+@endsection
+
 @section('content')
-<div class="content-wrapper">
-    <section class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1>Asistencias</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Inicio</a></li>
-                        <li class="breadcrumb-item active">Asistencias</li>
-                    </ol>
-                </div>
-            </div>
-        </div>
-    </section>
 
     <section class="content">
         <div class="container-fluid">
@@ -61,15 +57,8 @@
             </div>
         </div>
     </section>
-</div>
 @endsection
 
 @section('js')
     <script src="{{ asset('js/websocket-handler.js') }}"></script>
-    <script>
-        // Configuración adicional específica para esta página
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Página de asistencias cargada con WebSocket habilitado');
-        });
-    </script>
 @endsection

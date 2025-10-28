@@ -59,7 +59,7 @@ class AsignacionInstructorService
                 
                 // Actualizar datos de la ficha con horas calculadas automáticamente
                 $datosFicha['horas_semanales'] = $horasCalculadas;
-                $datosFicha['dias_formacion'] = $instructorData['dias_formacion'] ?? [];
+                $datosFicha['dias_formacion'] = $instructorData['dias_semana'] ?? ($instructorData['dias_formacion'] ?? []);
                 
                 // Validar disponibilidad
                 $disponibilidad = $this->businessRulesService->verificarDisponibilidad($instructor, $datosFicha, $fichaId);
@@ -89,15 +89,42 @@ class AsignacionInstructorService
                         'user_edit_id' => $userId
                     ]);
                     
-                    // Actualizar días de formación si están definidos
-                    if (isset($instructorData['dias_formacion'])) {
-                        $asignacionExistente->instructorFichaDias()->delete();
-                        foreach ($instructorData['dias_formacion'] as $diaData) {
+                    // Eliminar días existentes
+                    $asignacionExistente->instructorFichaDias()->delete();
+                    
+                    // Obtener días seleccionados
+                    $diasSeleccionados = [];
+                    
+                    if (isset($instructorData['dias_semana']) && is_array($instructorData['dias_semana'])) {
+                        $diasSeleccionados = $instructorData['dias_semana'];
+                    } elseif (isset($instructorData['dias']) && is_array($instructorData['dias'])) {
+                        foreach ($instructorData['dias'] as $diaId => $diaInfo) {
+                            if (isset($diaInfo['hora_inicio']) && isset($diaInfo['hora_fin'])) {
+                                $asignacionExistente->instructorFichaDias()->create([
+                                    'dia_id' => $diaId,
+                                    'hora_inicio' => $diaInfo['hora_inicio'],
+                                    'hora_fin' => $diaInfo['hora_fin']
+                                ]);
+                            }
+                        }
+                        $asignacionesCreadas[] = $asignacionExistente;
+                        continue; // Ya se procesaron
+                    } elseif (isset($instructorData['dias_formacion']) && is_array($instructorData['dias_formacion'])) {
+                        $diasSeleccionados = collect($instructorData['dias_formacion'])->pluck('dia_id')->filter()->toArray();
+                    }
+                    
+                    // Crear días tomando horarios de la configuración de la ficha
+                    if (!empty($diasSeleccionados)) {
+                        foreach ($diasSeleccionados as $diaId) {
+                            $diaFormacionFicha = $ficha->diasFormacion->firstWhere('dia_id', $diaId);
+                            
+                            $horaInicio = $diaFormacionFicha->hora_inicio ?? ($ficha->jornadaFormacion->hora_inicio ?? '08:00');
+                            $horaFin = $diaFormacionFicha->hora_fin ?? ($ficha->jornadaFormacion->hora_fin ?? '12:00');
+                            
                             $asignacionExistente->instructorFichaDias()->create([
-                                'dia_id' => $diaData['dia_id'],
-                                'hora_inicio' => $ficha->jornadaFormacion->hora_inicio ?? null,
-                                'hora_fin' => $ficha->jornadaFormacion->hora_fin ?? null,
-                                'user_create_id' => $userId
+                                'dia_id' => $diaId,
+                                'hora_inicio' => $horaInicio,
+                                'hora_fin' => $horaFin
                             ]);
                         }
                     }
@@ -189,8 +216,8 @@ class AsignacionInstructorService
      */
     private function crearAsignacion(array $instructorData, int $fichaId, int $userId): InstructorFichaCaracterizacion
     {
-        // Obtener la ficha para acceder a los datos de la jornada
-        $ficha = FichaCaracterizacion::with('jornadaFormacion')->findOrFail($fichaId);
+        // Obtener la ficha con sus días de formación y jornada
+        $ficha = FichaCaracterizacion::with(['jornadaFormacion', 'diasFormacion'])->findOrFail($fichaId);
         
         $instructorFicha = InstructorFichaCaracterizacion::create([
             'instructor_id' => $instructorData['instructor_id'],
@@ -200,13 +227,44 @@ class AsignacionInstructorService
             'total_horas_instructor' => $instructorData['total_horas_instructor']
         ]);
 
-        // Crear días de formación si se proporcionaron
-        if (isset($instructorData['dias_formacion']) && is_array($instructorData['dias_formacion'])) {
-            foreach ($instructorData['dias_formacion'] as $diaData) {
+        // Crear días de formación tomando horarios de la configuración de la ficha
+        $diasSeleccionados = [];
+        
+        // Formato nuevo: dias_semana (array simple de IDs)
+        if (isset($instructorData['dias_semana']) && is_array($instructorData['dias_semana'])) {
+            $diasSeleccionados = $instructorData['dias_semana'];
+        }
+        // Formato con horarios específicos: dias (array asociativo)
+        elseif (isset($instructorData['dias']) && is_array($instructorData['dias'])) {
+            foreach ($instructorData['dias'] as $diaId => $diaInfo) {
+                if (isset($diaInfo['hora_inicio']) && isset($diaInfo['hora_fin'])) {
+                    $instructorFicha->instructorFichaDias()->create([
+                        'dia_id' => $diaId,
+                        'hora_inicio' => $diaInfo['hora_inicio'],
+                        'hora_fin' => $diaInfo['hora_fin']
+                    ]);
+                }
+            }
+            return $instructorFicha; // Salir porque ya se procesaron con horarios específicos
+        }
+        // Formato antiguo: dias_formacion
+        elseif (isset($instructorData['dias_formacion']) && is_array($instructorData['dias_formacion'])) {
+            $diasSeleccionados = collect($instructorData['dias_formacion'])->pluck('dia_id')->filter()->toArray();
+        }
+
+        // Procesar días seleccionados tomando horarios de la ficha
+        if (!empty($diasSeleccionados)) {
+            foreach ($diasSeleccionados as $diaId) {
+                // Buscar horario del día en la configuración de la ficha
+                $diaFormacionFicha = $ficha->diasFormacion->firstWhere('dia_id', $diaId);
+                
+                $horaInicio = $diaFormacionFicha->hora_inicio ?? ($ficha->jornadaFormacion->hora_inicio ?? '08:00');
+                $horaFin = $diaFormacionFicha->hora_fin ?? ($ficha->jornadaFormacion->hora_fin ?? '12:00');
+                
                 $instructorFicha->instructorFichaDias()->create([
-                    'dia_id' => $diaData['dia_id'],
-                    'hora_inicio' => $ficha->jornadaFormacion->hora_inicio ?? null,
-                    'hora_fin' => $ficha->jornadaFormacion->hora_fin ?? null
+                    'dia_id' => $diaId,
+                    'hora_inicio' => $horaInicio,
+                    'hora_fin' => $horaFin
                 ]);
             }
         }
@@ -220,20 +278,56 @@ class AsignacionInstructorService
     public function calcularHorasTotalesAutomaticas(array $instructorData, int $fichaId): int
     {
         try {
-            $ficha = FichaCaracterizacion::with('diasFormacion')->findOrFail($fichaId);
+            $ficha = FichaCaracterizacion::with(['diasFormacion', 'jornadaFormacion'])->findOrFail($fichaId);
             
-            // 1. Obtener fechas
-            $fechaInicio = Carbon::parse($instructorData['fecha_inicio']);
-            $fechaFin = Carbon::parse($instructorData['fecha_fin']);
+            // Obtener días seleccionados
+            $diasSeleccionados = [];
             
-            // 2. Calcular número de semanas
-            $semanas = $fechaInicio->diffInWeeks($fechaFin);
-            if ($semanas == 0) {
-                $semanas = 1; // Mínimo 1 semana
+            if (isset($instructorData['dias_semana']) && is_array($instructorData['dias_semana'])) {
+                $diasSeleccionados = $instructorData['dias_semana'];
+            } elseif (isset($instructorData['dias']) && is_array($instructorData['dias'])) {
+                $diasSeleccionados = array_keys($instructorData['dias']);
+            } elseif (isset($instructorData['dias_formacion']) && is_array($instructorData['dias_formacion'])) {
+                $diasSeleccionados = collect($instructorData['dias_formacion'])->pluck('dia_id')->filter()->toArray();
             }
             
-            // 3. Contar días de formación por semana
-            $diasFormacionPorSemana = count($instructorData['dias_formacion']);
+            if (empty($diasSeleccionados)) {
+                return 40; // Valor por defecto si no hay días
+            }
+            
+            // Preparar datos de días con horarios de la ficha
+            $diasParaServicio = [];
+            foreach ($diasSeleccionados as $diaId) {
+                // Buscar horario del día en la configuración de la ficha
+                $diaFormacionFicha = $ficha->diasFormacion->firstWhere('dia_id', $diaId);
+                
+                $horaInicio = $diaFormacionFicha->hora_inicio ?? ($ficha->jornadaFormacion->hora_inicio ?? '08:00');
+                $horaFin = $diaFormacionFicha->hora_fin ?? ($ficha->jornadaFormacion->hora_fin ?? '12:00');
+                
+                $diasParaServicio[] = [
+                    'dia_id' => $diaId,
+                    'hora_inicio' => $horaInicio,
+                    'hora_fin' => $horaFin
+                ];
+            }
+            
+            // Crear objeto temporal para el cálculo
+            $instructorFichaTemp = new \stdClass();
+            $instructorFichaTemp->fecha_inicio = $instructorData['fecha_inicio'];
+            $instructorFichaTemp->fecha_fin = $instructorData['fecha_fin'];
+            $instructorFichaTemp->ficha = $ficha;
+            
+            // Calcular horas totales basado en fechas efectivas
+            $totalHoras = $this->calcularHorasDesdeFechasEfectivas($instructorFichaTemp, $diasParaServicio);
+            
+            return $totalHoras > 0 ? $totalHoras : 40; // Mínimo 40 horas por defecto
+            
+        } catch (\Exception $e) {
+            Log::error('Error calculando horas automáticas', [
+                'ficha_id' => $fichaId,
+                'instructor_data' => $instructorData,
+                'error' => $e->getMessage()
+            ]);
             
             // 4. Obtener horas por jornada desde ficha_dias_formacion
             $horasPorJornada = 6.5; // Valor por defecto
@@ -285,6 +379,37 @@ class AsignacionInstructorService
             
             // Fallback: retornar un valor por defecto
             return 40; // 40 horas por defecto
+        }
+    }
+
+    /**
+     * Calcular horas totales desde fechas efectivas de formación
+     */
+    private function calcularHorasDesdeFechasEfectivas($instructorFicha, array $diasData): int
+    {
+        try {
+            $diasService = app(InstructorFichaDiasService::class);
+            $fechasEfectivas = $diasService->generarFechasEfectivas($instructorFicha, $diasData);
+            
+            $totalHoras = 0;
+            foreach ($fechasEfectivas as $fecha) {
+                if ($fecha['hora_inicio'] && $fecha['hora_fin']) {
+                    $horas = $this->convertirTiempoAHoras($fecha['hora_inicio'], $fecha['hora_fin']);
+                    $totalHoras += $horas;
+                }
+            }
+            
+            Log::info('Horas calculadas desde fechas efectivas', [
+                'total_fechas' => count($fechasEfectivas),
+                'total_horas' => $totalHoras
+            ]);
+            
+            return (int) $totalHoras;
+        } catch (\Exception $e) {
+            Log::error('Error al calcular horas desde fechas efectivas', [
+                'error' => $e->getMessage()
+            ]);
+            return 40; // Valor por defecto
         }
     }
 

@@ -162,29 +162,20 @@
 @stop
 
 @section('content_header')
-    <div class="row">
-        <div class="col-sm-6">
-            <h1>
-                <i class="fas fa-tachometer-alt mr-2"></i>
-                Dashboard Instructor
-            </h1>
-        </div>
-        <div class="col-sm-6">
-            <ol class="breadcrumb breadcrumb-custom float-sm-right">
-                <li class="breadcrumb-item">
-                    <a href="{{ route('home.index') }}">
-                        <i class="fas fa-home mr-1"></i>Inicio
-                    </a>
-                </li>
-                <li class="breadcrumb-item active">
-                    <i class="fas fa-tachometer-alt mr-1"></i>Dashboard
-                </li>
-            </ol>
-        </div>
-    </div>
+    <x-page-header 
+        icon="fa-tachometer-alt" 
+        title="Dashboard Instructor"
+        subtitle="Panel de control del instructor - {{ $instructor->nombre_completo }}"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => route('home.index'), 'icon' => 'fa-home'],
+            ['label' => 'Dashboard', 'active' => true, 'icon' => 'fa-tachometer-alt']
+        ]"
+    />
 @stop
 
 @section('content')
+    <x-session-alerts />
+    
     <div class="container-fluid">
         <!-- Header del Dashboard -->
         <div class="dashboard-header">
@@ -440,66 +431,5 @@
 @stop
 
 @section('js')
-    <!-- FullCalendar JS -->
-    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
-    
-    <script>
-        $(document).ready(function() {
-            // Inicializar calendario
-            var calendarEl = document.getElementById('calendar');
-            var eventos = <?php echo json_encode($eventosCalendario); ?>;
-            
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                locale: 'es',
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                },
-                events: eventos,
-                eventClick: function(info) {
-                    var event = info.event;
-                    var props = event.extendedProps;
-                    
-                    Swal.fire({
-                        title: event.title,
-                        html: '<div class="text-left">' +
-                              '<p><strong>Fecha:</strong> ' + event.start.toLocaleDateString('es-ES') + '</p>' +
-                              '<p><strong>Hora:</strong> ' + event.start.toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'}) + ' - ' + event.end.toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'}) + '</p>' +
-                              '<p><strong>Ambiente:</strong> ' + props.ambiente + '</p>' +
-                              '<p><strong>Sede:</strong> ' + props.sede + '</p>' +
-                              '<p><strong>Modalidad:</strong> ' + props.modalidad + '</p>' +
-                              '</div>',
-                        icon: 'info',
-                        confirmButtonText: 'Cerrar'
-                    });
-                },
-                eventMouseEnter: function(info) {
-                    $(info.el).css('cursor', 'pointer');
-                }
-            });
-            
-            calendar.render();
-
-            // Auto-hide alerts
-            setTimeout(function() {
-                $('.alert').fadeOut('slow');
-            }, 5000);
-
-            // Animación de entrada para las tarjetas
-            $('.stats-card, .ficha-card, .notification-item, .activity-item').each(function(index) {
-                $(this).css('opacity', '0').delay(index * 100).animate({
-                    opacity: 1
-                }, 500);
-            });
-
-            // Tooltip initialization
-            $('[data-toggle="tooltip"]').tooltip();
-        });
-    </script>
-@stop
-
-@section('footer')
-    @include('layout.footer')
+    @vite(['resources/js/pages/resources-views\Instructores\dashboard.js'])
 @endsection

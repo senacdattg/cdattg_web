@@ -39,59 +39,7 @@
         </div>
     </section>
 </div>
-<script>
-    $(document).ready(function() {
-        $('#ficha_id').select2({
-            tags: true,
-            placeholder: 'Selecciona o escribe un número',
-            allowClear: true,
-            createTag: function(params) {
-                var term = $.trim(params.term);
-                if (term === '') {
-                    return null;
-                }
-                return {
-                    id: term,
-                    text: term,
-                    newTag: true // add additional parameters
-                };
-            }
-        });
-
-        $('#ficha_id').on('select2:open', function() {
-            $('#input-group').show();
-        });
-
-     
-        $('#ficha_input').on('input', function() {
-            var searchTerm = $(this).val().toLowerCase();
-            $('#ficha_id').val(null).trigger('change'); // Clear the select2 value
-            $('#ficha_id option').each(function() {
-                var optionText = $(this).text().toLowerCase();
-                if (optionText.includes(searchTerm)) {
-                    $(this).show();
-                } else {
-                    $(this).hide();
-                }
-            });
-        });
-
-        $('#ficha_input').on('keypress', function(e) {
-            if (e.which == 13) { 
-                var newFicha = $(this).val();
-                if (newFicha) {
-                    var select = $('#ficha_id');
-                    if (select.find("option[value='" + newFicha + "']").length) {
-                        select.val(newFicha).trigger('change');
-                    } else {
-                        var newOption = new Option(newFicha, newFicha, true, true);
-                        select.append(newOption).trigger('change');
-                    }
-                    $(this).val(''); 
-                }
-                e.preventDefault(); 
-            }
-        });
-    });
-</script>
+@section('js')
+    @vite(['resources/js/pages/formularios-generico.js'])
+@endsection
 @endsection

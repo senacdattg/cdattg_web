@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 
@@ -109,6 +110,23 @@ class FichaCaracterizacion extends Model
     public function sede(): BelongsTo
     {
         return $this->belongsTo(Sede::class, 'sede_id');
+    }
+
+    /**
+     * Relación con la regional a través de la sede.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
+     */
+    public function regional(): HasOneThrough
+    {
+        return $this->hasOneThrough(
+            Regional::class,
+            Sede::class,
+            'id', // Foreign key on sedes table
+            'id', // Foreign key on regionals table
+            'sede_id', // Local key on fichas_caracterizacion table
+            'regional_id' // Local key on sedes table
+        );
     }
 
     /**

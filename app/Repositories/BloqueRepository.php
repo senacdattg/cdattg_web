@@ -10,10 +10,12 @@ class BloqueRepository
 {
     use HasCache;
 
-    protected $cacheType = 'parametros';
-    protected $cacheTags = ['bloques', 'infraestructura'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'parametros';
+        $this->cacheTags = ['bloques', 'infraestructura'];
+    }    /**
      * Obtiene bloques por sede
      *
      * @param int $sedeId

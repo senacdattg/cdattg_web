@@ -20,7 +20,7 @@ class FichaCaracterizacionPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -44,7 +44,7 @@ class FichaCaracterizacionPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -76,7 +76,7 @@ class FichaCaracterizacionPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -105,7 +105,7 @@ class FichaCaracterizacionPolicy
         }
 
         // Solo super administradores y administradores pueden eliminar
-        return $user->hasRole(['SUPERADMIN', 'ADMIN']);
+        return $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -114,7 +114,7 @@ class FichaCaracterizacionPolicy
     public function restore(User $user, FichaCaracterizacion $fichaCaracterizacion): bool
     {
         return $user->can('CREAR FICHA CARACTERIZACION') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -123,7 +123,7 @@ class FichaCaracterizacionPolicy
     public function forceDelete(User $user, FichaCaracterizacion $fichaCaracterizacion): bool
     {
         return $user->can('ELIMINAR FICHA CARACTERIZACION') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -146,7 +146,7 @@ class FichaCaracterizacionPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -170,7 +170,7 @@ class FichaCaracterizacionPolicy
         }
 
         // Solo super administradores y administradores pueden gestionar instructores
-        return $user->hasRole(['SUPERADMIN', 'ADMIN']);
+        return $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -201,7 +201,7 @@ class FichaCaracterizacionPolicy
         }
 
         // Super administradores y administradores tienen acceso total
-        if ($user->hasRole(['SUPERADMIN', 'ADMIN'])) {
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
             return true;
         }
 
@@ -315,7 +315,7 @@ class FichaCaracterizacionPolicy
     public function generarReporteGeneral(User $user): bool
     {
         return $user->can('VER FICHA CARACTERIZACION') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -324,7 +324,7 @@ class FichaCaracterizacionPolicy
     public function exportarFichas(User $user): bool
     {
         return $user->can('VER FICHA CARACTERIZACION') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -333,7 +333,7 @@ class FichaCaracterizacionPolicy
     public function descargarPlantillaImportacion(User $user): bool
     {
         return $user->can('CREAR FICHA CARACTERIZACION') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -342,7 +342,7 @@ class FichaCaracterizacionPolicy
     public function importarFichas(User $user): bool
     {
         return $user->can('CREAR FICHA CARACTERIZACION') && 
-               $user->hasRole(['SUPERADMIN', 'ADMIN']);
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
@@ -381,7 +381,7 @@ class FichaCaracterizacionPolicy
     public function before(User $user, string $ability): ?bool
     {
         // Super administradores tienen acceso total
-        if ($user->hasRole('SUPERADMIN')) {
+        if ($user->hasRole('SUPER ADMINISTRADOR')) {
             return true;
         }
 

@@ -10,10 +10,12 @@ class ModalidadFormacionRepository
 {
     use HasCache;
 
-    protected $cacheType = 'parametros';
-    protected $cacheTags = ['modalidades', 'configuracion'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'parametros';
+        $this->cacheTags = ['modalidades', 'configuracion'];
+    }    /**
      * Obtiene todas las modalidades activas
      *
      * @return Collection

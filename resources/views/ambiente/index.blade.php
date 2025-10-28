@@ -1,25 +1,15 @@
 @extends('adminlte::page')
-@section('content')
 
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Ambientes
-                        </h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('home.index') }}">Inicio</a>
-                            </li>
-                            <li class="breadcrumb-item active">Ambientes
-                            </li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </section>
+@section('content_header')
+    <x-page-header 
+        icon="fa-door-open" 
+        title="Ambientes"
+        subtitle="Gestión de ambientes del sistema"
+        :breadcrumb="[['label' => 'Inicio', 'url' => route('home.index'), 'icon' => 'fa-home'], ['label' => 'Ambientes', 'active' => true, 'icon' => 'fa-door-open']]"
+    />
+@endsection
+
+@section('content')
 
         <section class="content">
             <div class="card">

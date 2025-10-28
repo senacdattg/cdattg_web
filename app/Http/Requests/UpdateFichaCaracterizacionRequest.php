@@ -44,7 +44,7 @@ class UpdateFichaCaracterizacionRequest extends FormRequest
                 'exists:programas_formacion,id'
             ],
 
-            // Validación de fechas
+            // Validación de fechas (sin restricción de fecha mínima)
             'fecha_inicio' => [
                 'required',
                 'date'
@@ -52,7 +52,7 @@ class UpdateFichaCaracterizacionRequest extends FormRequest
             'fecha_fin' => [
                 'required',
                 'date',
-                'after:fecha_inicio'
+                'after_or_equal:fecha_inicio'
             ],
 
             // Validación de relaciones opcionales

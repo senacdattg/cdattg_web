@@ -15,7 +15,6 @@ class EstadisticasService
     protected AprendizRepository $aprendizRepo;
     protected FichaRepository $fichaRepo;
     protected AsistenciaAprendizRepository $asistenciaRepo;
-    protected $cacheType = 'estadisticas';
 
     public function __construct(
         AprendizRepository $aprendizRepo,
@@ -25,6 +24,7 @@ class EstadisticasService
         $this->aprendizRepo = $aprendizRepo;
         $this->fichaRepo = $fichaRepo;
         $this->asistenciaRepo = $asistenciaRepo;
+        $this->cacheType = 'estadisticas';
     }
 
     /**

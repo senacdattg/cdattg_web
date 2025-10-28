@@ -10,10 +10,12 @@ class SedeRepository
 {
     use HasCache;
 
-    protected $cacheType = 'parametros';
-    protected $cacheTags = ['sedes', 'infraestructura'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'parametros';
+        $this->cacheTags = ['sedes', 'infraestructura'];
+    }    /**
      * Obtiene todas las sedes activas
      *
      * @return Collection

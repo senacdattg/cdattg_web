@@ -10,10 +10,12 @@ class RegionalRepository
 {
     use HasCache;
 
-    protected $cacheType = 'regionales';
-    protected $cacheTags = ['regionales', 'configuracion'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'regionales';
+        $this->cacheTags = ['regionales', 'configuracion'];
+    }    /**
      * Obtiene todas las regionales activas
      *
      * @return Collection

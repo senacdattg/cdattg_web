@@ -339,7 +339,7 @@ class ProgramaFormacionController extends Controller
      * Cambiar el estado de un programa de formación.
      *
      * @param string $id El ID del programa de formación.
-     * @return \Illuminate\Http\JsonResponse Respuesta JSON con el resultado.
+     * @return \Illuminate\Http\RedirectResponse Redirección con mensaje de resultado.
      */
     public function cambiarEstado(string $id)
     {
@@ -354,16 +354,9 @@ class ProgramaFormacionController extends Controller
                     'usuario_id' => Auth::id()
                 ]);
                 
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Estado del programa actualizado exitosamente.',
-                    'status' => $programa->status
-                ]);
+                return redirect()->back()->with('success', 'Estado del programa actualizado exitosamente.');
             } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error al cambiar el estado del programa.'
-                ], 500);
+                return redirect()->back()->with('error', 'Error al cambiar el estado del programa.');
             }
         } catch (\Exception $e) {
             Log::error('Error al cambiar estado del programa', [
@@ -372,10 +365,7 @@ class ProgramaFormacionController extends Controller
                 'usuario_id' => Auth::id()
             ]);
             
-            return response()->json([
-                'success' => false,
-                'message' => 'Error interno al cambiar el estado del programa.'
-            ], 500);
+            return redirect()->back()->with('error', 'Error interno al cambiar el estado del programa.');
         }
     }
 
@@ -500,7 +490,7 @@ class ProgramaFormacionController extends Controller
             }
 
             if ($query->exists()) {
-                $redConocimiento = \App\Models\RedConocimiento::find($redConocimientoId);
+                $redConocimiento = RedConocimiento::find($redConocimientoId);
                 $errors['codigo'] = "El código '{$codigo}' ya existe para la red de conocimiento '{$redConocimiento->nombre}'.";
             }
         }
@@ -523,7 +513,7 @@ class ProgramaFormacionController extends Controller
             }
 
             if ($query->exists()) {
-                $redConocimiento = \App\Models\RedConocimiento::find($redConocimientoId);
+                $redConocimiento = RedConocimiento::find($redConocimientoId);
                 $errors['nombre'] = "El nombre '{$nombre}' ya existe para la red de conocimiento '{$redConocimiento->nombre}'.";
             }
         }
@@ -606,8 +596,8 @@ class ProgramaFormacionController extends Controller
     private function validateRedNivelCompatibility($redConocimientoId, $nivelFormacionId)
     {
         // Obtener la red de conocimiento
-        $redConocimiento = \App\Models\RedConocimiento::find($redConocimientoId);
-        $nivelFormacion = \App\Models\Parametro::find($nivelFormacionId);
+        $redConocimiento = RedConocimiento::find($redConocimientoId);
+        $nivelFormacion = Parametro::find($nivelFormacionId);
 
         if (!$redConocimiento || !$nivelFormacion) {
             return false;
@@ -638,33 +628,18 @@ class ProgramaFormacionController extends Controller
     private function validateSenaProgramRules($nombre, $nivelFormacionId)
     {
         $errors = [];
-        $nivelFormacion = \App\Models\Parametro::find($nivelFormacionId);
+        $nivelFormacion = Parametro::find($nivelFormacionId);
 
         if (!$nivelFormacion) {
             return $errors;
         }
 
-        // 1. Validar que el nombre contenga el nivel de formación
-        $nivelEnNombre = false;
-        $niveles = ['TÉCNICO', 'TECNÓLOGO', 'AUXILIAR', 'OPERARIO'];
-        
-        foreach ($niveles as $nivel) {
-            if (stripos($nombre, $nivel) !== false) {
-                $nivelEnNombre = true;
-                break;
-            }
-        }
-
-        if (!$nivelEnNombre) {
-            $errors['nombre'] = 'El nombre del programa debe contener el nivel de formación (Técnico, Tecnólogo, Auxiliar u Operario).';
-        }
-
-        // 2. Validar longitud mínima del nombre
+        // 1. Validar longitud mínima del nombre
         if (strlen($nombre) < 10) {
             $errors['nombre'] = 'El nombre del programa debe tener al menos 10 caracteres.';
         }
 
-        // 3. Validar que no contenga caracteres especiales no permitidos
+        // 2. Validar que no contenga caracteres especiales no permitidos
         if (preg_match('/[<>{}[\]\\|`~!@#$%^&*()+=]/', $nombre)) {
             $errors['nombre'] = 'El nombre del programa no puede contener caracteres especiales.';
         }

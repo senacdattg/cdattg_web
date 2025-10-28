@@ -268,30 +268,6 @@
 @stop
 
 @section('js')
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <script>
-        $(document).ready(function() {
-            // Inicializar Select2
-            $('.select2').select2({
-                theme: 'bootstrap4',
-                width: '100%',
-                placeholder: 'Seleccione una competencia...',
-                allowClear: true,
-                language: {
-                    noResults: function() {
-                        return "No se encontraron resultados";
-                    },
-                    searching: function() {
-                        return "Buscando...";
-                    }
-                }
-            });
-
-            // Auto-dismiss alerts después de 5 segundos
-            setTimeout(function() {
-                $('.alert').fadeOut('slow');
-            }, 5000);
-        });
-    </script>
-@stop
+    @vite(['resources/js/pages/gestion-especializada.js'])
+@endsection
 

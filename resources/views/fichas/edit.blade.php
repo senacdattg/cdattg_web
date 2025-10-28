@@ -5,59 +5,32 @@
 @endsection
 
 @section('content_header')
-    <section class="content-header dashboard-header py-4">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 d-flex align-items-center">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="fas fa-edit text-white fa-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-0 text-gray-800">Editar Ficha de Caracterización</h1>
-                        <p class="text-muted mb-0 font-weight-light">Modificar información de la ficha</p>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
-                                <a href="{{ url('/') }}" class="link_right_header">
-                                    <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('fichaCaracterizacion.index') }}" class="link_right_header">
-                                    <i class="fas fa-file-alt"></i> Fichas de Caracterización
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-edit"></i> Editar
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header 
+        icon="fa-edit" 
+        title="Editar Ficha de Caracterización"
+        subtitle="Modificar información de la ficha"
+        :breadcrumb="[['label' => 'Fichas de Caracterización', 'url' => route('fichaCaracterizacion.index') , 'icon' => 'fa-file-alt'], ['label' => 'Editar', 'icon' => 'fa-edit', 'active' => true]]"
+    />
 @endsection
 
 @section('content')
-    <section class="content mt-4">
+    <section class="content">
         <div class="container-fluid">
-            <div class="row">
-                <div class="col-12">
+            <a class="btn btn-outline-secondary btn-sm mb-3 mt-4" href="{{ route('fichaCaracterizacion.index') }}">
+                <i class="fas fa-arrow-left mr-1"></i> Volver
+            </a>
+            <div class="row mb-4">
+                <div class="col-md-12">
                     <div class="card shadow-sm no-hover">
-                        <div class="card-header bg-white py-3 d-flex align-items-center">
-                            <h6 class="m-0 font-weight-bold text-primary d-flex flex-grow-1">
-                                <i class="fas fa-file-alt mr-2"></i> Información de la Ficha: {{ $ficha->ficha }}
-                            </h6>
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                                <i class="fas fa-edit mr-2"></i>Editar Ficha de Caracterización: {{ $ficha->ficha }}
+                            </h5>
                         </div>
-
-                <form action="{{ route('fichaCaracterizacion.update', $ficha->id) }}" method="POST" id="formEditFicha">
-                    @csrf
-                    @method('PUT')
-                    <div class="card-body">
+                        <div class="card-body">
+                            <form action="{{ route('fichaCaracterizacion.update', $ficha->id) }}" method="POST" id="formEditFicha">
+                                @csrf
+                                @method('PUT')
                         <div class="row">
                             <!-- Número de Ficha -->
                             <div class="col-md-6">
@@ -140,7 +113,11 @@
                                     <select class="form-control @error('sede_id') is-invalid @enderror" 
                                             id="sede_id" name="sede_id">
                                         <option value="">Seleccione una sede...</option>
-                                        <!-- Se llenará dinámicamente -->
+                                        @foreach($sedes as $sede)
+                                            <option value="{{ $sede->id }}" {{ old('sede_id', $ficha->sede_id) == $sede->id ? 'selected' : '' }}>
+                                                {{ $sede->sede }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                     @error('sede_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -157,7 +134,11 @@
                                     <select class="form-control @error('instructor_id') is-invalid @enderror" 
                                             id="instructor_id" name="instructor_id">
                                         <option value="">Seleccione un instructor...</option>
-                                        <!-- Se llenará dinámicamente -->
+                                        @foreach($instructores as $instructor)
+                                            <option value="{{ $instructor->id }}" {{ old('instructor_id', $ficha->instructor_id) == $instructor->id ? 'selected' : '' }}>
+                                                {{ $instructor->persona->primer_nombre ?? '' }} {{ $instructor->persona->segundo_nombre ?? '' }} {{ $instructor->persona->primer_apellido ?? '' }} {{ $instructor->persona->segundo_apellido ?? '' }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                     @error('instructor_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -176,7 +157,11 @@
                                     <select class="form-control @error('modalidad_formacion_id') is-invalid @enderror" 
                                             id="modalidad_formacion_id" name="modalidad_formacion_id">
                                         <option value="">Seleccione una modalidad...</option>
-                                        <!-- Se llenará dinámicamente -->
+                                        @foreach($modalidades as $modalidad)
+                                            <option value="{{ $modalidad->id }}" {{ old('modalidad_formacion_id', $ficha->modalidad_formacion_id) == $modalidad->id ? 'selected' : '' }}>
+                                                {{ $modalidad->name }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                     @error('modalidad_formacion_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -193,7 +178,11 @@
                                     <select class="form-control @error('jornada_id') is-invalid @enderror" 
                                             id="jornada_id" name="jornada_id">
                                         <option value="">Seleccione una jornada...</option>
-                                        <!-- Se llenará dinámicamente -->
+                                        @foreach($jornadas as $jornada)
+                                            <option value="{{ $jornada->id }}" {{ old('jornada_id', $ficha->jornada_id) == $jornada->id ? 'selected' : '' }}>
+                                                {{ $jornada->jornada }}
+                                            </option>
+                                        @endforeach
                                     </select>
                                     @error('jornada_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -212,7 +201,23 @@
                                     <select class="form-control @error('ambiente_id') is-invalid @enderror" 
                                             id="ambiente_id" name="ambiente_id">
                                         <option value="">Seleccione un ambiente...</option>
-                                        <!-- Se llenará dinámicamente -->
+                                        @if($ficha->sede_id)
+                                            @foreach($ambientes->filter(function($ambiente) use ($ficha) {
+                                                return $ambiente->piso->bloque->sede_id == $ficha->sede_id;
+                                            }) as $ambiente)
+                                                <option value="{{ $ambiente->id }}" {{ old('ambiente_id', $ficha->ambiente_id) == $ambiente->id ? 'selected' : '' }}>
+                                                    {{ $ambiente->title }} - {{ $ambiente->piso->bloque->bloque ?? '' }}
+                                                </option>
+                                            @endforeach
+                                        @else
+                                            @foreach($ambientes as $ambiente)
+                                                <option value="{{ $ambiente->id }}" 
+                                                        {{ old('ambiente_id', $ficha->ambiente_id) == $ambiente->id ? 'selected' : '' }}
+                                                        data-sede="{{ $ambiente->piso->bloque->sede_id ?? '' }}">
+                                                    {{ $ambiente->title }} - {{ $ambiente->piso->bloque->bloque ?? '' }}
+                                                </option>
+                                            @endforeach
+                                        @endif
                                     </select>
                                     @error('ambiente_id')
                                         <div class="invalid-feedback">{{ $message }}</div>
@@ -242,6 +247,7 @@
                             <div class="col-md-12">
                                 <div class="form-group">
                                     <div class="custom-control custom-switch">
+                                        <input type="hidden" name="status" value="0">
                                         <input type="checkbox" class="custom-control-input" 
                                                id="status" name="status" value="1" 
                                                {{ old('status', $ficha->status) ? 'checked' : '' }}>
@@ -253,195 +259,98 @@
                             </div>
                         </div>
 
-                        <!-- Información adicional -->
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="alert alert-info">
-                                    <h5><i class="icon fas fa-info"></i> Información de la Ficha</h5>
-                                    <ul class="mb-0">
-                                        <li><strong>Creada:</strong> {{ $ficha->created_at->format('d/m/Y H:i') }}</li>
-                                        @if($ficha->updated_at != $ficha->created_at)
-                                            <li><strong>Última modificación:</strong> {{ $ficha->updated_at->format('d/m/Y H:i') }}</li>
-                                        @endif
-                                        @if($ficha->tieneAprendices())
-                                            <li><strong>Aprendices asignados:</strong> {{ $ficha->contarAprendices() }}</li>
-                                        @endif
-                                    </ul>
+                                <div class="col-12">
+                                    <hr class="mt-4">
+                                    <div class="d-flex justify-content-end">
+                                        <a href="{{ route('fichaCaracterizacion.index') }}" class="btn btn-light mr-2">
+                                            Cancelar
+                                        </a>
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="fas fa-save mr-1"></i>Guardar Cambios
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
+                            </form>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <a href="{{ route('fichaCaracterizacion.index') }}" class="btn btn-secondary">
-                                    <i class="fas fa-arrow-left"></i> Cancelar
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card shadow-sm no-hover">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                                <i class="fas fa-chalkboard-teacher mr-2"></i>Gestión de Instructores
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p class="mb-1"><strong>Instructores asignados:</strong> {{ $ficha->instructorFicha->count() }}</p>
+                                    <p class="mb-0 text-muted">Gestione los instructores que dictarán formación en esta ficha</p>
+                                </div>
+                                <a href="{{ route('fichaCaracterizacion.gestionarInstructores', $ficha->id) }}" 
+                                   class="btn btn-primary">
+                                    <i class="fas fa-users-cog mr-1"></i> Gestionar Instructores
                                 </a>
                             </div>
-                            <div class="col-md-6 text-right">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> Actualizar Ficha
-                                </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card shadow-sm no-hover">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                                <i class="fas fa-users mr-2"></i>Gestión de Aprendices
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p class="mb-1"><strong>Aprendices asignados:</strong> {{ $ficha->aprendices->count() }}</p>
+                                    <p class="mb-0 text-muted">Gestione las personas asignadas como aprendices a esta ficha</p>
+                                </div>
+                                <a href="{{ route('fichaCaracterizacion.gestionarAprendices', $ficha->id) }}" 
+                                   class="btn btn-success">
+                                    <i class="fas fa-user-graduate mr-1"></i> Gestionar Aprendices
+                                </a>
                             </div>
                         </div>
                     </div>
-                </form>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card shadow-sm no-hover">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                                <i class="fas fa-calendar-week mr-2"></i>Gestión de Días de Formación
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <p class="mb-1"><strong>Días configurados:</strong> {{ $ficha->diasFormacion->count() }}</p>
+                                    <p class="mb-0 text-muted">Configure los días y horarios de formación de la ficha</p>
+                                </div>
+                                <a href="{{ route('fichaCaracterizacion.gestionarDiasFormacion', $ficha->id) }}" 
+                                   class="btn btn-info">
+                                    <i class="fas fa-calendar-alt mr-1"></i> Gestionar Días
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 @endsection
 
 @section('js')
-<script>
-    $(document).ready(function() {
-        // Cargar datos iniciales
-        loadModalidades();
-        loadJornadas();
-        loadInstructores();
-        loadSedes();
-
-        // Establecer valores actuales
-        @if($ficha->sede_id)
-            $('#sede_id').val({{ $ficha->sede_id }});
-        @endif
-        
-        @if($ficha->instructor_id)
-            setTimeout(() => {
-                $('#instructor_id').val({{ $ficha->instructor_id }});
-            }, 1000);
-        @endif
-        
-        @if($ficha->modalidad_formacion_id)
-            setTimeout(() => {
-                $('#modalidad_formacion_id').val({{ $ficha->modalidad_formacion_id }});
-            }, 1000);
-        @endif
-        
-        @if($ficha->jornada_id)
-            setTimeout(() => {
-                $('#jornada_id').val({{ $ficha->jornada_id }});
-            }, 1000);
-        @endif
-        
-        @if($ficha->ambiente_id)
-            setTimeout(() => {
-                $('#ambiente_id').val({{ $ficha->ambiente_id }});
-            }, 1000);
-        @endif
-
-        // Cargar ambientes si hay sede seleccionada
-        @if($ficha->sede_id)
-            loadAmbientes({{ $ficha->sede_id }});
-        @endif
-
-        // Cuando cambie el programa de formación
-        $('#programa_formacion_id').change(function() {
-            const programaId = $(this).val();
-            if (programaId) {
-                const sedeId = $(this).find('option:selected').data('sede');
-                loadAmbientes(sedeId);
-                $('#sede_id').val(sedeId);
-            }
-        });
-
-        // Cuando cambie la sede
-        $('#sede_id').change(function() {
-            const sedeId = $(this).val();
-            if (sedeId) {
-                loadAmbientes(sedeId);
-            }
-        });
-
-        // Validación de fechas
-        $('#fecha_inicio, #fecha_fin').change(function() {
-            validateDates();
-        });
-    });
-
-    function loadModalidades() {
-        $.get('/api/modalidades', function(data) {
-            const select = $('#modalidad_formacion_id');
-            select.find('option:not(:first)').remove();
-            data.forEach(function(modalidad) {
-                select.append(new Option(modalidad.name, modalidad.id));
-            });
-        });
-    }
-
-    function loadJornadas() {
-        $.get('/api/jornadas', function(data) {
-            const select = $('#jornada_id');
-            select.find('option:not(:first)').remove();
-            data.forEach(function(jornada) {
-                select.append(new Option(jornada.name, jornada.id));
-            });
-        });
-    }
-
-    function loadInstructores() {
-        $.get('/api/instructores', function(data) {
-            const select = $('#instructor_id');
-            select.find('option:not(:first)').remove();
-            data.forEach(function(instructor) {
-                select.append(new Option(
-                    instructor.persona.primer_nombre + ' ' + instructor.persona.primer_apellido,
-                    instructor.id
-                ));
-            });
-        });
-    }
-
-    function loadSedes() {
-        $.get('/api/sedes', function(data) {
-            const select = $('#sede_id');
-            select.find('option:not(:first)').remove();
-            data.forEach(function(sede) {
-                select.append(new Option(sede.nombre, sede.id));
-            });
-        });
-    }
-
-    function loadAmbientes(sedeId) {
-        if (!sedeId) return;
-        
-        $.get('/api/ambientes/' + sedeId, function(data) {
-            const select = $('#ambiente_id');
-            select.find('option:not(:first)').remove();
-            data.forEach(function(ambiente) {
-                select.append(new Option(
-                    ambiente.nombre + ' - ' + ambiente.piso.bloque.nombre + ' - ' + ambiente.piso.nombre,
-                    ambiente.id
-                ));
-            });
-        });
-    }
-
-    function validateDates() {
-        const fechaInicio = $('#fecha_inicio').val();
-        const fechaFin = $('#fecha_fin').val();
-        
-        if (fechaInicio && fechaFin) {
-            if (new Date(fechaInicio) >= new Date(fechaFin)) {
-                $('#fecha_fin')[0].setCustomValidity('La fecha de fin debe ser posterior a la fecha de inicio');
-            } else {
-                $('#fecha_fin')[0].setCustomValidity('');
-            }
-        }
-    }
-
-    // Validación del formulario
-    $('#formEditFicha').submit(function(e) {
-        e.preventDefault();
-        
-        // Validar fechas
-        validateDates();
-        
-        if (this.checkValidity()) {
-            this.submit();
-        } else {
-            $(this).addClass('was-validated');
-        }
-    });
-</script>
+    @vite(['resources/js/pages/fichas-form.js'])
 @endsection

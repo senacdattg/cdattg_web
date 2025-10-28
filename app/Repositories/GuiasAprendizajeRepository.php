@@ -10,10 +10,12 @@ class GuiasAprendizajeRepository
 {
     use HasCache;
 
-    protected $cacheType = 'programas';
-    protected $cacheTags = ['guias', 'aprendizaje'];
 
-    /**
+    public function __construct()
+    {
+        $this->cacheType = 'programas';
+        $this->cacheTags = ['guias', 'aprendizaje'];
+    }    /**
      * Obtiene guías por programa
      *
      * @param int $programaId

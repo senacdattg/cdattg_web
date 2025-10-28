@@ -100,6 +100,6 @@
         </section>
     </div>
 @endsection
-@section('script')
-    <script src="{{ asset('js/jquery-selectDinamico.js') }}"></script>
+@section('js')
+    @vite(['resources/js/pages/formularios-select-dinamico.js'])
 @endsection

@@ -88,46 +88,12 @@
 @endsection
 
 @section('content_header')
-    <section class="content-header dashboard-header py-4">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 d-flex align-items-center">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="fas fa-clipboard-list text-white fa-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-0 text-gray-800">Fichas Asignadas</h1>
-                        <p class="text-muted mb-0 font-weight-light">Gestión de fichas del instructor</p>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
-                                    <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('instructor.index') }}" class="link_right_header">
-                                    <i class="fas fa-chalkboard-teacher"></i> Instructores
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('instructor.show', $instructorActual->id) }}" class="link_right_header">
-                                    <i class="fas fa-user"></i> {{ $instructorActual->persona->primer_nombre }} {{ $instructorActual->persona->primer_apellido }}
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-clipboard-list"></i> Fichas asignadas
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header 
+        icon="fa-clipboard-list" 
+        title="Fichas Asignadas"
+        subtitle="Gestión de fichas del instructor"
+        :breadcrumb="[['label' => '{{ $instructorActual->persona->primer_nombre }} {{ $instructorActual->persona->primer_apellido }}', 'url' => route('instructor.show', $instructorActual->id) , 'icon' => 'fa-user'], ['label' => 'Fichas asignadas', 'icon' => 'fa-clipboard-list', 'active' => true]]"
+    />
 @endsection
 
 @section('content')
@@ -327,18 +293,5 @@
 @endsection
 
 @section('js')
-    <script>
-        $(document).ready(function() {
-            // Tooltips para elementos interactivos
-            $('[data-toggle="tooltip"]').tooltip();
-
-            // Animación de barras de progreso
-            $('.progress-fill').each(function() {
-                const width = $(this).data('width');
-                $(this).css('width', '0%').animate({
-                    width: width
-                }, 1000);
-            });
-        });
-    </script>
+    @vite(['resources/js/pages/resources-views\Instructores\fichas-asignadas.js'])
 @endsection

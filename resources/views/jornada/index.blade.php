@@ -23,22 +23,10 @@
         {{ session('success') }}
     </div>
     @endif
-    <script>
-        setTimeout(function() {
-            document.getElementById('success-alert').style.display = 'none';
-        }, 3000);
-    </script>
-
-
     @if(session('error'))
     <div class="alert alert-danger" id="error-alert">
         {{ session('error') }}
     </div>
-    <script>
-        setTimeout(function() {
-            document.getElementById('error-alert').style.display = 'none';
-        }, 3000);
-    </script>
 @endif
     <section class="content">
         <div class="card">

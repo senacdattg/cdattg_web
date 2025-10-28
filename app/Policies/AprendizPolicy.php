@@ -145,7 +145,7 @@ class AprendizPolicy
     public function before(User $user, string $ability): ?bool
     {
         // Super administradores tienen acceso total
-        if ($user->hasRole('SUPERADMIN')) {
+        if ($user->hasRole('SUPER ADMINISTRADOR')) {
             return true;
         }
 

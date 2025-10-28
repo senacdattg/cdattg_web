@@ -37,4 +37,10 @@ class Ambiente extends Model
     {
         return $this->hasMany(FichaCaracterizacion::class, 'ambiente_id');
     }
+
+    // Accessor para obtener la sede a través de la cadena de relaciones
+    public function getSedeAttribute()
+    {
+        return $this->piso?->bloque?->sede;
+    }
 }

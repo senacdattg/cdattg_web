@@ -25,41 +25,12 @@
 @endsection
 
 @section('content_header')
-    <section class="content-header dashboard-header py-4">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 d-flex align-items-center">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="fas fa-clipboard-list text-white fa-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-0 text-gray-800">Competencias</h1>
-                        <p class="text-muted mb-0 font-weight-light">Gestión de competencias del SENA</p>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
-                                <a href="{{ url('/') }}" class="link_right_header">
-                                    <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('competencias.index') }}" class="link_right_header">
-                                    <i class="fas fa-clipboard-list"></i> Competencias
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-edit"></i> Editar
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header 
+        icon="fa-clipboard-list" 
+        title="Competencias"
+        subtitle="Gestión de competencias del SENA"
+        :breadcrumb="[['label' => 'Competencias', 'url' => route('competencias.index') , 'icon' => 'fa-clipboard-list'], ['label' => 'Editar', 'icon' => 'fa-edit', 'active' => true]]"
+    />
 @endsection
 
 @section('content')
@@ -239,27 +210,5 @@
 @endsection
 
 @section('js')
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    $(document).ready(function() {
-        setTimeout(function() {
-            $('.alert').fadeOut('slow');
-        }, 5000);
-
-        // Validación de fechas
-        $('#fecha_inicio, #fecha_fin').on('change', function() {
-            const fechaInicio = $('#fecha_inicio').val();
-            const fechaFin = $('#fecha_fin').val();
-            
-            if (fechaInicio && fechaFin && fechaInicio > fechaFin) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Fechas inválidas',
-                    text: 'La fecha de inicio debe ser anterior o igual a la fecha de fin.',
-                    confirmButtonText: 'Entendido'
-                });
-            }
-        });
-    });
-</script>
+    @vite(['resources/js/pages/competencias-form.js'])
 @endsection

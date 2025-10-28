@@ -74,8 +74,9 @@
         }
     </style>
     
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
+@section('js')
+    @vite(['resources/js/pages/gestion-especializada.js'])
+@endsection
         // Función para confirmar asignación de especialidad principal
         function confirmarAsignacionPrincipal(especialidadNombre) {
             return Swal.fire({
@@ -209,46 +210,12 @@
 @endsection
 
 @section('content_header')
-    <section class="content-header dashboard-header py-4">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 d-flex align-items-center">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="fas fa-graduation-cap text-white fa-lg"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-0 text-gray-800">Especialidades</h1>
-                        <p class="text-muted mb-0 font-weight-light">Gestión de especialidades del instructor</p>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
-                                    <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('instructor.index') }}" class="link_right_header">
-                                    <i class="fas fa-chalkboard-teacher"></i> Instructores
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('instructor.show', $instructor->id) }}" class="link_right_header">
-                                    <i class="fas fa-user"></i> {{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-graduation-cap"></i> Especialidades
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header 
+        icon="fa-graduation-cap" 
+        title="Especialidades"
+        subtitle="Gestión de especialidades del instructor"
+        :breadcrumb="[['label' => '{{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}', 'url' => route('instructor.show', $instructor->id) , 'icon' => 'fa-user'], ['label' => 'Especialidades', 'icon' => 'fa-graduation-cap', 'active' => true]]"
+    />
 @endsection
 
 @section('content')
@@ -471,38 +438,5 @@
 @endsection
 
 @section('js')
-    <script>
-        $(document).ready(function() {
-            // Tooltips para elementos interactivos
-            $('[data-toggle="tooltip"]').tooltip();
-
-            // Animación de entrada para las cards
-            $('.specialty-card').each(function(index) {
-                $(this).css('opacity', '0').delay(index * 100).animate({
-                    opacity: 1
-                }, 500);
-            });
-
-            // Confirmación para acciones de remover especialidad
-            $('form[action*="removerEspecialidad"]').on('submit', function(e) {
-                e.preventDefault();
-                const form = this;
-                
-                Swal.fire({
-                    title: '¿Remover Especialidad?',
-                    text: 'Esta acción removerá la especialidad del instructor. ¿Está seguro?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#dc3545',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Sí, remover',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
-            });
-        });
-    </script>
+    @vite(['resources/js/pages/gestion-especializada.js'])
 @endsection

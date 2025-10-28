@@ -7,67 +7,12 @@
 @endsection
 
 @section('content_header')
-    <section class="content-header dashboard-header py-4">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 d-flex align-items-center">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="fas fa-fw fa-paint-brush text-white"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-0 text-gray-800">Registro de actividades</h1>
-                        <p class="text-muted mb-0 font-weight-light">Gestión de actividades</p>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
-                                    <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-fw fa-paint-brush"></i> Registro de actividades
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-                <div class="col-12 mt-3">
-                    <div class="row row-cols-1 row-cols-md-2 g-3">
-                        <div class="col-12 col-md-6">
-                            <div class="card border-0 shadow-sm">
-                                <div class="card-body d-flex align-items-center">
-                                    <i class="fas fa-fw fa-book text-primary me-2 d-none d-sm-inline-block"
-                                        style="font-size: 1.25rem;"></i>
-                                    <div class="d-flex flex-column">
-                                        <span class="text-dark d-block">Programa de formación:</span>
-                                        <span class="badge bg-primary text-wrap text-start w-100"
-                                            style="white-space: normal !important;">{{ $caracterizacion->ficha->ficha }} -
-                                            {{ $caracterizacion->ficha->programaFormacion->nombre }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12 col-md-6">
-                            <div class="card border-0 shadow-sm">
-                                <div class="card-body d-flex align-items-center">
-                                    <i class="fas fa-fw fa-crown text-primary me-2 d-none d-sm-inline-block"
-                                        style="font-size: 1.25rem;"></i>
-                                    <div class="d-flex flex-column">
-                                        <span class="text-dark d-block">Competencia:</span>
-                                        <span class="badge bg-primary text-wrap text-start w-100"
-                                            style="white-space: normal !important;">{{ $caracterizacion->ficha->programaFormacion->competenciaActual()->nombre }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header 
+        icon="fa-home" 
+        title="Registro de actividades"
+        subtitle="Gestión de actividades"
+        :breadcrumb="[['label' => 'Inicio', 'url' => route('verificarLogin') , 'icon' => 'fa-home'], ['label' => 'Registro de actividades', 'icon' => 'fa-fw fa-paint-brush', 'active' => true]]"
+    />
 @endsection
 
 @section('content')
@@ -565,43 +510,5 @@
 @endsection
 
 @section('js')
-<script>
-    $(document).ready(function() {
-        // Manejar el click en el botón de cancelar actividad
-        $('button[data-target="#cancelarActividadModal"]').on('click', function() {
-            var actividadId = $(this).data('actividad-id');
-            var actividadNombre = $(this).data('actividad-nombre');
-            var caracterizacionId = $(this).data('caracterizacion-id');
-            
-            // Actualizar el nombre de la actividad en el modal
-            $('#actividad-nombre-modal').text(actividadNombre);
-            
-            // Actualizar la acción del formulario
-            var actionUrl = '{{ route("registro-actividades.destroy", [":caracterizacion", ":actividad"]) }}';
-            actionUrl = actionUrl.replace(':caracterizacion', caracterizacionId);
-            actionUrl = actionUrl.replace(':actividad', actividadId);
-            
-            $('#form-cancelar-actividad').attr('action', actionUrl);
-            
-            // Mostrar el modal con animación
-            $('#cancelarActividadModal').modal('show');
-        });
-        
-        // Animación de entrada para el modal
-        $('#cancelarActividadModal').on('show.bs.modal', function () {
-            $(this).find('.modal-content').addClass('animate__animated animate__fadeInDown');
-        });
-        
-        // Limpiar animación al cerrar
-        $('#cancelarActividadModal').on('hidden.bs.modal', function () {
-            $(this).find('.modal-content').removeClass('animate__animated animate__fadeInDown');
-        });
-        
-        // Mostrar loading al enviar el formulario
-        $('#form-cancelar-actividad').on('submit', function(e) {
-            // Mostrar loading en el botón
-            $(this).find('button[type="submit"]').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i> Cancelando...');
-        });
-    });
-</script>
+    @vite(['resources/js/pages/registro-actividades-index.js'])
 @endsection

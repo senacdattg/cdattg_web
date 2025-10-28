@@ -36,10 +36,10 @@ class FichaCaracterizacionController extends Controller
         $this->validationService = $validationService;
         $this->configuracionRepo = $configuracionRepo;
 
-        $this->middleware('can:VER PROGRAMA DE CARACTERIZACION')->only(['index', 'show', 'create', 'edit']);
-        $this->middleware('can:CREAR PROGRAMA DE CARACTERIZACION')->only(['store']);
-        $this->middleware('can:EDITAR PROGRAMA DE CARACTERIZACION')->only(['update']);
-        $this->middleware('can:ELIMINAR PROGRAMA DE CARACTERIZACION')->only(['destroy']);
+        $this->middleware('can:VER FICHA CARACTERIZACION')->only(['index', 'show', 'create', 'edit']);
+        $this->middleware('can:CREAR FICHA CARACTERIZACION')->only(['store']);
+        $this->middleware('can:EDITAR FICHA CARACTERIZACION')->only(['update']);
+        $this->middleware('can:ELIMINAR FICHA CARACTERIZACION')->only(['destroy']);
     }
 
     /**
@@ -194,12 +194,49 @@ class FichaCaracterizacionController extends Controller
             $ficha->user_edit_id = Auth::id(); // Agregar user_edit_id para creación
 
             if ($ficha->save()) {
+                // Guardar días de formación si se proporcionaron
+                if ($request->has('dias_formacion') && is_array($request->dias_formacion)) {
+                    Log::info('Guardando días de formación', [
+                        'dias_formacion' => $request->dias_formacion,
+                        'horarios_completos' => $request->horarios,
+                        'all_request' => $request->all()
+                    ]);
+                    
+                    foreach ($request->dias_formacion as $diaId) {
+                        $fichaDia = new \App\Models\FichaDiasFormacion();
+                        $fichaDia->ficha_id = $ficha->id;
+                        $fichaDia->dia_id = $diaId;
+                        
+                        // Obtener horarios desde el array
+                        $horarios = $request->input('horarios', []);
+                        
+                        if (isset($horarios[$diaId])) {
+                            $fichaDia->hora_inicio = $horarios[$diaId]['hora_inicio'] ?? '08:00:00';
+                            $fichaDia->hora_fin = $horarios[$diaId]['hora_fin'] ?? '16:00:00';
+                            
+                            Log::info("Horario para día {$diaId}", [
+                                'hora_inicio' => $fichaDia->hora_inicio,
+                                'hora_fin' => $fichaDia->hora_fin
+                            ]);
+                        } else {
+                            // Horarios por defecto
+                            $fichaDia->hora_inicio = '08:00:00';
+                            $fichaDia->hora_fin = '16:00:00';
+                            
+                            Log::warning("No se encontraron horarios para día {$diaId}, usando valores por defecto");
+                        }
+                        
+                        $fichaDia->save();
+                    }
+                }
+                
                 DB::commit();
                 
                 Log::info('Ficha de caracterización creada exitosamente', [
                     'ficha_id' => $ficha->id,
                     'numero_ficha' => $ficha->ficha,
                     'programa_id' => $ficha->programa_formacion_id,
+                    'dias_formacion' => $request->dias_formacion ?? [],
                     'user_id' => Auth::id()
                 ]);
 
@@ -378,25 +415,128 @@ class FichaCaracterizacionController extends Controller
     public function destroy(string $id)
     {
         try {
-            Log::info('Inicio de eliminación de ficha de caracterización', [
+            $user = Auth::user();
+            
+            Log::info('═══════════════════════════════════════════════════════════');
+            Log::info('INICIO: Intento de eliminación de ficha de caracterización', [
                 'ficha_id' => $id,
-                'user_id' => Auth::id(),
-                'timestamp' => now()
+                'user_id' => $user->id,
+                'user_name' => $user->name,
+                'user_email' => $user->email,
+                'user_roles' => $user->roles->pluck('name')->toArray(),
+                'user_permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
+                'timestamp' => now()->format('Y-m-d H:i:s'),
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent()
             ]);
 
+            // Buscar la ficha
             $ficha = FichaCaracterizacion::findOrFail($id);
+            
+            Log::info('Ficha encontrada', [
+                'ficha_id' => $ficha->id,
+                'numero_ficha' => $ficha->ficha,
+                'programa_formacion_id' => $ficha->programa_formacion_id,
+                'programa_nombre' => $ficha->programaFormacion->nombre ?? 'N/A',
+                'instructor_id' => $ficha->instructor_id,
+                'sede_id' => $ficha->sede_id,
+                'status' => $ficha->status ? 'Activa' : 'Inactiva',
+                'fecha_inicio' => $ficha->fecha_inicio ? $ficha->fecha_inicio->format('Y-m-d') : null,
+                'fecha_fin' => $ficha->fecha_fin ? $ficha->fecha_fin->format('Y-m-d') : null
+            ]);
+
+            // Verificar autorización de forma más directa
+            $puedeEliminar = false;
+            
+            // Verificar si es superadmin
+            if ($user->hasRole('SUPER ADMINISTRADOR')) {
+                $puedeEliminar = true;
+                Log::info('✓ Usuario SUPER ADMINISTRADOR detectado - acceso total concedido');
+            }
+            // Verificar si tiene el permiso específico y es admin
+            else if ($user->hasRole('ADMINISTRADOR') && $user->can('ELIMINAR FICHA CARACTERIZACION')) {
+                $puedeEliminar = true;
+                Log::info('✓ Usuario ADMINISTRADOR con permiso ELIMINAR FICHA CARACTERIZACION');
+            }
+            // Verificar usando la política
+            else {
+                try {
+                    $this->authorize('delete', $ficha);
+                    $puedeEliminar = true;
+                    Log::info('✓ Autorización verificada por política: Usuario autorizado para eliminar la ficha');
+                } catch (\Illuminate\Auth\Access\AuthorizationException $authException) {
+                    Log::error('✗ Autorización denegada por política', [
+                        'user_id' => $user->id,
+                        'ficha_id' => $id,
+                        'error' => 'El usuario no tiene permiso para eliminar esta ficha',
+                        'user_roles' => $user->roles->pluck('name')->toArray(),
+                        'user_permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
+                        'required_permission' => 'ELIMINAR FICHA CARACTERIZACION'
+                    ]);
+                    $puedeEliminar = false;
+                }
+            }
+            
+            if (!$puedeEliminar) {
+                Log::error('✗ ACCESO DENEGADO: Usuario no autorizado para eliminar fichas', [
+                    'user_id' => $user->id,
+                    'user_email' => $user->email,
+                    'user_roles' => $user->roles->pluck('name')->toArray(),
+                    'user_permissions' => $user->getAllPermissions()->pluck('name')->toArray(),
+                    'ficha_id' => $id
+                ]);
+                
+                return redirect()->route('fichaCaracterizacion.index')
+                    ->with('error', 'No tienes permisos para eliminar fichas de caracterización.');
+            }
 
             // Verificar si la ficha tiene aprendices asignados
+            $aprendicesCount = $ficha->contarAprendices();
+            Log::info('Verificando aprendices asignados', [
+                'tiene_aprendices' => $ficha->tieneAprendices(),
+                'cantidad_aprendices' => $aprendicesCount
+            ]);
+
             if ($ficha->tieneAprendices()) {
-                Log::warning('Intento de eliminar ficha con aprendices asignados', [
+                Log::warning('✗ VALIDACIÓN FALLIDA: Ficha con aprendices asignados', [
                     'ficha_id' => $id,
                     'numero_ficha' => $ficha->ficha,
-                    'aprendices_count' => $ficha->contarAprendices(),
-                    'user_id' => Auth::id()
+                    'aprendices_count' => $aprendicesCount,
+                    'user_id' => $user->id,
+                    'razon' => 'No se puede eliminar una ficha que tiene aprendices asignados'
                 ]);
 
                 return redirect()->route('fichaCaracterizacion.index')
-                    ->with('error', 'No se puede eliminar la ficha porque tiene aprendices asignados.');
+                    ->with('error', 'No se puede eliminar la ficha porque tiene ' . $aprendicesCount . ' aprendice(s) asignado(s).');
+            }
+
+            Log::info('✓ Validación de aprendices pasada: La ficha no tiene aprendices asignados');
+
+            // Verificar si tiene instructores asignados
+            $instructoresCount = $ficha->instructorFicha()->count();
+            Log::info('Verificando instructores asignados', [
+                'cantidad_instructores' => $instructoresCount
+            ]);
+
+            // Verificar si tiene asistencias
+            $tieneAsistencias = DB::table('asistencia_aprendices')
+                ->join('aprendiz_fichas_caracterizacion', 'asistencia_aprendices.aprendiz_ficha_id', '=', 'aprendiz_fichas_caracterizacion.id')
+                ->where('aprendiz_fichas_caracterizacion.ficha_id', $id)
+                ->exists();
+            
+            Log::info('Verificando asistencias registradas', [
+                'tiene_asistencias' => $tieneAsistencias
+            ]);
+
+            if ($tieneAsistencias) {
+                Log::warning('✗ VALIDACIÓN FALLIDA: Ficha con asistencias registradas', [
+                    'ficha_id' => $id,
+                    'numero_ficha' => $ficha->ficha,
+                    'razon' => 'No se puede eliminar una ficha que tiene asistencias registradas'
+                ]);
+
+                return redirect()->route('fichaCaracterizacion.index')
+                    ->with('error', 'No se puede eliminar la ficha porque tiene asistencias registradas.');
             }
 
             // Guardar información de la ficha antes de eliminar para el log
@@ -404,48 +544,202 @@ class FichaCaracterizacionController extends Controller
                 'id' => $ficha->id,
                 'numero_ficha' => $ficha->ficha,
                 'programa_formacion_id' => $ficha->programa_formacion_id,
+                'programa_nombre' => $ficha->programaFormacion->nombre ?? 'N/A',
+                'instructor_id' => $ficha->instructor_id,
+                'sede_id' => $ficha->sede_id,
+                'sede_nombre' => $ficha->sede->nombre ?? 'N/A',
+                'fecha_inicio' => $ficha->fecha_inicio ? $ficha->fecha_inicio->format('Y-m-d') : null,
+                'fecha_fin' => $ficha->fecha_fin ? $ficha->fecha_fin->format('Y-m-d') : null,
+                'created_at' => $ficha->created_at ? $ficha->created_at->format('Y-m-d H:i:s') : null,
+                'updated_at' => $ficha->updated_at ? $ficha->updated_at->format('Y-m-d H:i:s') : null
             ];
 
+            Log::info('Iniciando transacción de base de datos para eliminar la ficha');
             DB::beginTransaction();
 
-            if ($ficha->delete()) {
+            try {
+                // Eliminar días de formación asociados a la ficha
+                DB::table('ficha_dias_formacion')
+                    ->where('ficha_id', $id)
+                    ->delete();
+                
+                Log::info('✓ Días de formación eliminados correctamente', [
+                    'ficha_id' => $id
+                ]);
+                
+                $ficha->delete();
+                
                 DB::commit();
                 
-                Log::info('Ficha de caracterización eliminada exitosamente', [
+                Log::info('═══════════════════════════════════════════════════════════');
+                Log::info('✓ ÉXITO: Ficha de caracterización eliminada correctamente', [
                     'ficha_eliminada' => $fichaInfo,
-                    'user_id' => Auth::id()
+                    'eliminada_por_user_id' => $user->id,
+                    'eliminada_por_user_name' => $user->name,
+                    'timestamp' => now()->format('Y-m-d H:i:s')
                 ]);
+                Log::info('═══════════════════════════════════════════════════════════');
 
                 return redirect()->route('fichaCaracterizacion.index')
-                    ->with('success', 'Ficha de caracterización eliminada exitosamente.');
+                    ->with('success', 'Ficha de caracterización #' . $fichaInfo['numero_ficha'] . ' eliminada exitosamente.');
+                    
+            } catch (\Exception $dbException) {
+                DB::rollBack();
+                
+                Log::error('✗ ERROR en la base de datos al eliminar la ficha', [
+                    'ficha_id' => $id,
+                    'error' => $dbException->getMessage(),
+                    'file' => $dbException->getFile(),
+                    'line' => $dbException->getLine(),
+                    'trace' => $dbException->getTraceAsString()
+                ]);
+                
+                throw new \Exception('Error al eliminar la ficha de la base de datos: ' . $dbException->getMessage());
             }
 
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            Log::error('═══════════════════════════════════════════════════════════');
+            Log::error('✗ ERROR: Ficha de caracterización no encontrada', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
+                'timestamp' => now()->format('Y-m-d H:i:s')
+            ]);
+            Log::error('═══════════════════════════════════════════════════════════');
+
+            return redirect()->route('fichaCaracterizacion.index')
+                ->with('error', 'La ficha de caracterización solicitada no existe.');
+
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            Log::error('═══════════════════════════════════════════════════════════');
+            Log::error('✗ ERROR: Acceso denegado - Sin autorización para eliminar', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id(),
+                'user_email' => Auth::user()->email ?? 'N/A',
+                'user_roles' => Auth::user()->roles->pluck('name')->toArray() ?? [],
+                'error' => 'El usuario no tiene los permisos necesarios para eliminar fichas',
+                'required_permission' => 'ELIMINAR FICHA CARACTERIZACION',
+                'timestamp' => now()->format('Y-m-d H:i:s')
+            ]);
+            Log::error('═══════════════════════════════════════════════════════════');
+
+            return redirect()->route('fichaCaracterizacion.index')
+                ->with('error', 'No tienes permisos para eliminar fichas de caracterización.');
+
+        } catch (\Exception $e) {
             DB::rollBack();
-            throw new \Exception('Error al eliminar la ficha de la base de datos.');
+            
+            Log::error('═══════════════════════════════════════════════════════════');
+            Log::error('✗ ERROR GENERAL al eliminar ficha de caracterización', [
+                'ficha_id' => $id,
+                'error_message' => $e->getMessage(),
+                'error_type' => get_class($e),
+                'user_id' => Auth::id(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'timestamp' => now()->format('Y-m-d H:i:s')
+            ]);
+            Log::error('═══════════════════════════════════════════════════════════');
+
+            return redirect()->route('fichaCaracterizacion.index')
+                ->with('error', 'Ocurrió un error al eliminar la ficha de caracterización. Por favor, intente nuevamente. Error: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Obtiene instructores disponibles para una ficha específica (endpoint AJAX)
+     */
+    public function obtenerInstructoresDisponiblesParaFicha(string $id, Request $request)
+    {
+        try {
+            Log::info('Solicitud AJAX para obtener instructores disponibles', [
+                'ficha_id' => $id,
+                'user_id' => Auth::id(),
+                'timestamp' => now()
+            ]);
+
+            // Buscar la ficha
+            $ficha = FichaCaracterizacion::with([
+                'instructor.persona',
+                'instructorFicha.instructor.persona',
+                'programaFormacion.redConocimiento',
+                'sede.regional'
+            ])->findOrFail($id);
+
+            // Usar el servicio para obtener instructores disponibles
+            $asignacionService = app(\App\Services\AsignacionInstructorService::class);
+            $instructoresConDisponibilidad = $asignacionService->obtenerInstructoresDisponibles((int)$id);
+
+            // Filtrar instructores ya asignados
+            $instructorLiderId = $ficha->instructor_id;
+            $instructoresAsignadosIds = $ficha->instructorFicha()->pluck('instructor_id')->toArray();
+            
+            // Filtrar instructores disponibles (excluir ya asignados, pero NO el instructor líder)
+            $instructoresDisponibles = collect($instructoresConDisponibilidad)->filter(function($instructorData) use ($instructorLiderId, $instructoresAsignadosIds) {
+                $instructorId = $instructorData['instructor']->id;
+                // Incluir instructor líder siempre, excluir otros ya asignados
+                return $instructorId == $instructorLiderId || !in_array($instructorId, $instructoresAsignadosIds);
+            })->values();
+
+            // Transformar datos para el frontend (extraer solo lo necesario)
+            $instructoresParaFrontend = $instructoresDisponibles->map(function($instructorData) {
+                return [
+                    'id' => $instructorData['instructor']->id,
+                    'persona' => [
+                        'primer_nombre' => $instructorData['instructor']->persona->primer_nombre ?? '',
+                        'primer_apellido' => $instructorData['instructor']->persona->primer_apellido ?? '',
+                        'numero_documento' => $instructorData['instructor']->persona->numero_documento ?? ''
+                    ],
+                    'disponible' => $instructorData['disponible'],
+                    'razones_no_disponible' => $instructorData['razones_no_disponible'] ?? [],
+                    'advertencias' => $instructorData['advertencias'] ?? []
+                ];
+            });
+
+            Log::info('Instructores disponibles encontrados', [
+                'ficha_id' => $id,
+                'total_disponibles' => $instructoresParaFrontend->count(),
+                'instructor_lider_id' => $instructorLiderId,
+                'instructores_asignados' => $instructoresAsignadosIds
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'instructores' => $instructoresParaFrontend,
+                'total' => $instructoresParaFrontend->count(),
+                'ficha' => [
+                    'id' => $ficha->id,
+                    'numero' => $ficha->ficha,
+                    'programa' => $ficha->programaFormacion->nombre ?? 'N/A'
+                ]
+            ]);
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            Log::warning('Intento de eliminar ficha de caracterización inexistente', [
+            Log::error('Ficha no encontrada para obtener instructores', [
                 'ficha_id' => $id,
                 'user_id' => Auth::id(),
                 'error' => $e->getMessage()
             ]);
 
-            return redirect()->route('fichaCaracterizacion.index')
-                ->with('error', 'La ficha de caracterización solicitada no existe.');
+            return response()->json([
+                'success' => false,
+                'message' => 'La ficha especificada no existe'
+            ], 404);
 
         } catch (\Exception $e) {
-            DB::rollBack();
-            
-            Log::error('Error al eliminar ficha de caracterización', [
+            Log::error('Error al obtener instructores disponibles', [
                 'ficha_id' => $id,
-                'error' => $e->getMessage(),
                 'user_id' => Auth::id(),
+                'error' => $e->getMessage(),
                 'file' => $e->getFile(),
                 'line' => $e->getLine()
             ]);
 
-            return redirect()->route('fichaCaracterizacion.index')
-                ->with('error', 'Ocurrió un error al eliminar la ficha de caracterización. Por favor, intente nuevamente.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener instructores disponibles'
+            ], 500);
         }
     }
 
@@ -1758,6 +2052,11 @@ class FichaCaracterizacionController extends Controller
                 ->unique('id')
                 ->sortBy('id');
 
+            // Obtener todos los días de la semana disponibles para el modal
+            $diasSemana = \App\Models\Parametro::whereHas('parametrosTemas', function($query) {
+                $query->where('tema_id', 4); // ID del tema "Días de la semana"
+            })->orderBy('id')->get();
+
             // Usar el servicio robusto para obtener instructores disponibles
             $asignacionService = app(\App\Services\AsignacionInstructorService::class);
             $instructoresConDisponibilidad = $asignacionService->obtenerInstructoresDisponibles((int)$id);
@@ -1816,6 +2115,7 @@ class FichaCaracterizacionController extends Controller
                 'instructoresAsignados',
                 'instructoresConDisponibilidad',
                 'diasFormacionFicha',
+                'diasSemana',
                 'estadisticasAsignaciones',
                 'logsRecientes'
             ));
@@ -2556,11 +2856,9 @@ class FichaCaracterizacionController extends Controller
                 // Asignar aprendiz a la ficha en la tabla pivot
                 $ficha->aprendices()->attach($aprendiz->id);
                 
-                // Asignar rol de APRENDIZ al usuario si tiene usuario asociado
+                // Sincronizar solo el rol APRENDIZ al usuario si tiene usuario asociado
                 if ($persona->user) {
-                    if (!$persona->user->hasRole('APRENDIZ')) {
-                        $persona->user->assignRole('APRENDIZ');
-                    }
+                    $persona->user->syncRoles(['APRENDIZ']);
                 }
             }
 
@@ -2922,6 +3220,217 @@ class FichaCaracterizacionController extends Controller
 
             return response()->json([
                 'error' => 'Error interno del servidor'
+            ], 500);
+        }
+    }
+
+    /**
+     * Muestra el formulario para gestionar días de formación de un instructor en una ficha.
+     *
+     * @param string $fichaId
+     * @param string $instructorFichaId
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse
+     */
+    public function gestionarDiasInstructor(string $fichaId, string $instructorFichaId)
+    {
+        try {
+            $ficha = FichaCaracterizacion::with(['programaFormacion', 'sede'])->findOrFail($fichaId);
+            $instructorFicha = \App\Models\InstructorFichaCaracterizacion::with(['instructor.persona', 'ficha'])
+                ->findOrFail($instructorFichaId);
+
+            // Verificar que el instructor pertenezca a la ficha
+            if ($instructorFicha->ficha_id != $fichaId) {
+                return redirect()->back()->with('error', 'El instructor no pertenece a esta ficha');
+            }
+
+            // Obtener días de la semana (parámetros)
+            $diasSemana = \App\Models\Parametro::whereHas('parametrosTemas', function($query) {
+                $query->where('tema_id', 4); // ID del tema "Días de la semana"
+            })->orderBy('id')->get();
+
+            // Obtener días ya asignados usando el servicio
+            $diasService = app(\App\Services\InstructorFichaDiasService::class);
+            $diasAsignados = $diasService->obtenerDiasAsignados($instructorFichaId);
+
+            return view('fichas.instructor-dias', compact(
+                'ficha',
+                'instructorFicha',
+                'diasSemana',
+                'diasAsignados'
+            ));
+
+        } catch (\Exception $e) {
+            Log::error('Error al cargar formulario de días de instructor', [
+                'ficha_id' => $fichaId,
+                'instructor_ficha_id' => $instructorFichaId,
+                'error' => $e->getMessage()
+            ]);
+
+            return redirect()->back()->with('error', 'Error al cargar el formulario');
+        }
+    }
+
+    /**
+     * Asigna días de formación a un instructor en una ficha.
+     *
+     * @param Request $request
+     * @param string $fichaId
+     * @param string $instructorFichaId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function asignarDiasInstructor(Request $request, string $fichaId, string $instructorFichaId)
+    {
+        try {
+            // Log de datos recibidos para debug
+            Log::info('Datos recibidos para asignar días', [
+                'ficha_id' => $fichaId,
+                'instructor_ficha_id' => $instructorFichaId,
+                'request_data' => $request->all()
+            ]);
+
+            $validated = $request->validate([
+                'dias' => 'required|array|min:1',
+                'dias.*.dia_id' => 'required|integer|exists:parametros_temas,id',
+                'dias.*.hora_inicio' => 'nullable|date_format:H:i',
+                'dias.*.hora_fin' => 'nullable|date_format:H:i',
+            ]);
+
+            Log::info('Datos validados', ['validated' => $validated]);
+
+            // Verificar que los IDs de días existen
+            foreach ($validated['dias'] as $dia) {
+                $parametro = \App\Models\Parametro::find($dia['dia_id']);
+                Log::info("Verificando día ID {$dia['dia_id']}", [
+                    'existe' => $parametro ? 'SÍ' : 'NO',
+                    'nombre' => $parametro ? $parametro->name : 'N/A'
+                ]);
+            }
+
+            $diasService = app(\App\Services\InstructorFichaDiasService::class);
+            $resultado = $diasService->asignarDiasInstructor($instructorFichaId, $validated['dias']);
+
+            Log::info('Resultado del servicio', ['resultado' => $resultado]);
+
+            return response()->json($resultado);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Log::error('Error de validación al asignar días', [
+                'ficha_id' => $fichaId,
+                'instructor_ficha_id' => $instructorFichaId,
+                'errors' => $e->errors(),
+                'request_data' => $request->all()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error de validación',
+                'errors' => $e->errors()
+            ], 422);
+
+        } catch (\Exception $e) {
+            Log::error('Error al asignar días de instructor', [
+                'ficha_id' => $fichaId,
+                'instructor_ficha_id' => $instructorFichaId,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al asignar días de formación'
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtiene los días asignados a un instructor.
+     *
+     * @param string $fichaId
+     * @param string $instructorFichaId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function obtenerDiasInstructor(string $fichaId, string $instructorFichaId)
+    {
+        try {
+            $diasService = app(\App\Services\InstructorFichaDiasService::class);
+            $diasAsignados = $diasService->obtenerDiasAsignados($instructorFichaId);
+
+            return response()->json([
+                'success' => true,
+                'data' => $diasAsignados
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener los días asignados'
+            ], 500);
+        }
+    }
+
+    /**
+     * Elimina los días asignados a un instructor.
+     *
+     * @param string $fichaId
+     * @param string $instructorFichaId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function eliminarDiasInstructor(string $fichaId, string $instructorFichaId)
+    {
+        try {
+            \App\Models\InstructorFichaDias::where('instructor_ficha_id', $instructorFichaId)->delete();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Días de formación eliminados correctamente'
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar días de instructor', [
+                'ficha_id' => $fichaId,
+                'instructor_ficha_id' => $instructorFichaId,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al eliminar días de formación'
+            ], 500);
+        }
+    }
+
+    /**
+     * Genera preview de fechas efectivas para un instructor.
+     *
+     * @param Request $request
+     * @param string $fichaId
+     * @param string $instructorFichaId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function previewFechasInstructor(Request $request, string $fichaId, string $instructorFichaId)
+    {
+        try {
+            $instructorFicha = \App\Models\InstructorFichaCaracterizacion::with('ficha')->findOrFail($instructorFichaId);
+            
+            $diasService = app(\App\Services\InstructorFichaDiasService::class);
+            $fechasEfectivas = $diasService->generarFechasEfectivas($instructorFicha, $request->dias ?? []);
+
+            return response()->json([
+                'success' => true,
+                'fechas_efectivas' => $fechasEfectivas,
+                'total_sesiones' => count($fechasEfectivas)
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error al generar preview de fechas', [
+                'ficha_id' => $fichaId,
+                'instructor_ficha_id' => $instructorFichaId,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al generar preview de fechas'
             ], 500);
         }
     }
