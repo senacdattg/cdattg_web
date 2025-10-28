@@ -593,15 +593,6 @@ class ComplementarioController extends Controller
     }
 
 
-    /**
-      * Mostrar perfil del aspirante
-      */
-    public function perfilAspirante($id)
-    {
-        $aspirante = AspiranteComplementario::with('persona')->findOrFail($id);
-
-        return view('complementarios.perfil_aspirante', compact('aspirante'));
-    }
 
     public function validarSofia($complementarioId)
     {
