@@ -43,7 +43,14 @@
                                     <td>{{ $user->persona->numero_documento }}</td>
                                     <td>{{ $user->persona->email }}</td>
                                     <td>
-                                        {{ $user->getRoleNames()->implode(', ') }}
+                                        @php
+                                            $roles = $user->getRoleNames();
+                                            $primaryRole = $roles->first() ?? 'Sin rol';
+                                        @endphp
+                                        <span class="badge badge-primary">{{ $primaryRole }}</span>
+                                        @if($roles->count() > 1)
+                                            <small class="text-muted d-block">(+{{ $roles->count() - 1 }} más)</small>
+                                        @endif
                                     </td>
                                     <td class="text-center">
                                         <span class="badge badge-{{ $user->persona->user->status === 1 ? 'success' : 'danger' }}">

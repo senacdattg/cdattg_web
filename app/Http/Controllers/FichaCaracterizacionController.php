@@ -2856,11 +2856,9 @@ class FichaCaracterizacionController extends Controller
                 // Asignar aprendiz a la ficha en la tabla pivot
                 $ficha->aprendices()->attach($aprendiz->id);
                 
-                // Asignar rol de APRENDIZ al usuario si tiene usuario asociado
+                // Sincronizar solo el rol APRENDIZ al usuario si tiene usuario asociado
                 if ($persona->user) {
-                    if (!$persona->user->hasRole('APRENDIZ')) {
-                        $persona->user->assignRole('APRENDIZ');
-                    }
+                    $persona->user->syncRoles(['APRENDIZ']);
                 }
             }
 

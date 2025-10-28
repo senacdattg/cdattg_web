@@ -87,22 +87,15 @@ class AprendizObserver
             // Verificar que el rol APRENDIZ existe
             $aprendizRole = Role::firstOrCreate(['name' => 'APRENDIZ']);
 
-            // Asignar rol si no lo tiene
-            if (!$user->hasRole('APRENDIZ')) {
-                $user->assignRole('APRENDIZ');
-                
-                Log::info('Rol APRENDIZ asignado automáticamente', [
-                    'aprendiz_id' => $aprendiz->id,
-                    'user_id' => $user->id,
-                    'persona_id' => $persona->id,
-                    'ficha_id' => $aprendiz->ficha_caracterizacion_id
-                ]);
-            } else {
-                Log::debug('Usuario ya tiene rol APRENDIZ', [
-                    'aprendiz_id' => $aprendiz->id,
-                    'user_id' => $user->id
-                ]);
-            }
+            // Sincronizar solo el rol APRENDIZ (evita duplicados)
+            $user->syncRoles(['APRENDIZ']);
+            
+            Log::info('Rol APRENDIZ sincronizado automáticamente', [
+                'aprendiz_id' => $aprendiz->id,
+                'user_id' => $user->id,
+                'persona_id' => $persona->id,
+                'ficha_id' => $aprendiz->ficha_caracterizacion_id
+            ]);
 
         } catch (\Exception $e) {
             Log::error('Error al asignar rol APRENDIZ automáticamente', [

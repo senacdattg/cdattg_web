@@ -122,8 +122,8 @@ class InstructorService
                 $this->asignarEspecialidades($instructor, $datos['especialidades']);
             }
 
-            // Asignar rol de instructor
-            $persona->user->assignRole('INSTRUCTOR');
+            // Sincronizar solo el rol de instructor (evita duplicados)
+            $persona->user->syncRoles(['INSTRUCTOR']);
 
             Log::info('Instructor creado exitosamente', [
                 'instructor_id' => $instructor->id,

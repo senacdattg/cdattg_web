@@ -42,7 +42,7 @@ class AsistenceQrController extends Controller
      * Este método recupera todas las fichas de caracterización junto con su
      * relación 'programaFormacion' y las pasa a la vista 'fichas.index'.
      *
-     * @return \Illuminate\View\View|\Illuminate\Http\JsonResponse La vista que muestra la lista de fichas de caracterización o respuesta JSON de error.
+     * @return \Illuminate\View\View|\Illuminate\Http\RedirectResponse La vista que muestra la lista de fichas de caracterización o redirección con mensaje.
      */
     public function index()
     {
@@ -52,7 +52,8 @@ class AsistenceQrController extends Controller
         $diasFormacion = $this->asistenceQrService->getDiasFormacion();
 
         if (!$instructorFicha) {
-            return response()->json(['message' => 'El instructor no tiene fichas de caracterización asignadas'], 404);
+            return view('qr_asistence.caracter_selecter', compact('instructorFicha', 'diasFormacion'))
+                ->with('warning', 'No tienes fichas de caracterización asignadas. Contacta al administrador.');
         }
 
         return view('qr_asistence.caracter_selecter', compact('instructorFicha', 'diasFormacion'));

@@ -3,7 +3,8 @@
 namespace App\Observers;
 
 use App\Models\Instructor;
-use Illuminate\Support\Facades\Cache;
+use App\Models\User;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Log;
 
 class InstructorObserver
@@ -13,13 +14,7 @@ class InstructorObserver
      */
     public function created(Instructor $instructor): void
     {
-        $this->invalidarCache();
-        
-        Log::info('Instructor creado', [
-            'instructor_id' => $instructor->id,
-            'persona_id' => $instructor->persona_id,
-            'regional_id' => $instructor->regional_id,
-        ]);
+        $this->assignInstructorRole($instructor);
     }
 
     /**
@@ -27,28 +22,9 @@ class InstructorObserver
      */
     public function updated(Instructor $instructor): void
     {
-        $this->invalidarCache();
-        
-        $cambios = [];
-        if ($instructor->isDirty('status')) {
-            $cambios['status'] = [
-                'anterior' => $instructor->getOriginal('status'),
-                'nuevo' => $instructor->status,
-            ];
-        }
-        
-        if ($instructor->isDirty('especialidades')) {
-            $cambios['especialidades'] = [
-                'anterior' => $instructor->getOriginal('especialidades'),
-                'nuevo' => $instructor->especialidades,
-            ];
-        }
-
-        if (!empty($cambios)) {
-            Log::info('Instructor actualizado', [
-                'instructor_id' => $instructor->id,
-                'cambios' => $cambios,
-            ]);
+        // Si se cambia el estado, verificar que mantenga el rol
+        if ($instructor->wasChanged('status')) {
+            $this->assignInstructorRole($instructor);
         }
     }
 
@@ -57,20 +33,102 @@ class InstructorObserver
      */
     public function deleted(Instructor $instructor): void
     {
-        $this->invalidarCache();
-        
-        Log::info('Instructor eliminado', [
-            'instructor_id' => $instructor->id,
-            'persona_id' => $instructor->persona_id,
-        ]);
+        $this->removeInstructorRole($instructor);
     }
 
     /**
-     * Invalida caché de instructores
+     * Handle the Instructor "restored" event.
      */
-    protected function invalidarCache(): void
+    public function restored(Instructor $instructor): void
     {
-        Cache::tags(['instructores', 'personas'])->flush();
+        // Restaurar el rol cuando se restaura el instructor
+        $this->assignInstructorRole($instructor);
+    }
+
+    /**
+     * Asigna el rol INSTRUCTOR al usuario asociado a la persona del instructor.
+     *
+     * @param Instructor $instructor
+     * @return void
+     */
+    private function assignInstructorRole(Instructor $instructor): void
+    {
+        try {
+            $persona = $instructor->persona;
+            if (!$persona) {
+                Log::warning('Instructor sin persona asociada', [
+                    'instructor_id' => $instructor->id,
+                    'persona_id' => $instructor->persona_id
+                ]);
+                return;
+            }
+
+            if (!$persona->user) {
+                Log::warning('Instructor sin usuario asociado', [
+                    'instructor_id' => $instructor->id,
+                    'persona_id' => $persona->id
+                ]);
+                return;
+            }
+
+            $user = $persona->user;
+
+            // Verificar que el rol INSTRUCTOR existe
+            $instructorRole = Role::firstOrCreate(['name' => 'INSTRUCTOR']);
+
+            // Sincronizar solo el rol INSTRUCTOR (evita duplicados)
+            $user->syncRoles(['INSTRUCTOR']);
+            
+            Log::info('Rol INSTRUCTOR sincronizado automáticamente', [
+                'instructor_id' => $instructor->id,
+                'user_id' => $user->id,
+                'persona_id' => $persona->id,
+                'status' => $instructor->status
+            ]);
+
+        } catch (\Exception $e) {
+            Log::error('Error al asignar rol INSTRUCTOR', [
+                'instructor_id' => $instructor->id,
+                'persona_id' => $instructor->persona_id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+        }
+    }
+
+    /**
+     * Remueve el rol INSTRUCTOR del usuario asociado.
+     *
+     * @param Instructor $instructor
+     * @return void
+     */
+    private function removeInstructorRole(Instructor $instructor): void
+    {
+        try {
+            $persona = $instructor->persona;
+            if ($persona && $persona->user) {
+                $user = $persona->user;
+                
+                // Remover solo el rol INSTRUCTOR, mantener otros roles
+                $user->removeRole('INSTRUCTOR');
+                
+                // Si no tiene otros roles, asignar VISITANTE
+                if ($user->roles->isEmpty()) {
+                    $visitorRole = Role::firstOrCreate(['name' => 'VISITANTE']);
+                    $user->assignRole('VISITANTE');
+                }
+                
+                Log::info('Rol INSTRUCTOR removido automáticamente', [
+                    'instructor_id' => $instructor->id,
+                    'user_id' => $user->id,
+                    'persona_id' => $persona->id
+                ]);
+            }
+        } catch (\Exception $e) {
+            Log::error('Error al remover rol INSTRUCTOR', [
+                'instructor_id' => $instructor->id,
+                'error' => $e->getMessage()
+            ]);
+        }
     }
 }
-

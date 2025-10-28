@@ -174,6 +174,8 @@
 @stop
 
 @section('content')
+    <x-session-alerts />
+    
     <div class="container-fluid">
         <!-- Header del Dashboard -->
         <div class="dashboard-header">

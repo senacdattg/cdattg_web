@@ -32,6 +32,10 @@ class AsistenceQrService
     {
         $instructor = $this->instructorRepository->getInstructor($user->persona_id);
 
+        if (!$instructor) {
+            return null;
+        }
+
         return $this->instructorFichaCaracterizacionRepository->getInstructorFichaCaracterizacion($instructor->id);
     }
 

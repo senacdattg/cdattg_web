@@ -14,10 +14,29 @@
 @endsection
 
 @section('content')
+    <x-session-alerts />
+    
     <section class="content">
         <div class="container-fluid">
-            <div class="row">
-                @foreach ($instructorFicha as $caracterizacion)
+            @if(empty($instructorFicha) || $instructorFicha->isEmpty())
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-body text-center py-5">
+                                <i class="fas fa-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+                                <h3 class="mt-3 text-muted">No tienes fichas asignadas</h3>
+                                <p class="text-muted">No se encontraron fichas de caracterización asignadas a tu cuenta.</p>
+                                <p class="text-muted">Contacta al administrador para que te asigne las fichas correspondientes.</p>
+                                <a href="{{ route('verificarLogin') }}" class="btn btn-primary mt-3">
+                                    <i class="fas fa-home mr-2"></i>Volver al inicio
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="row">
+                    @foreach ($instructorFicha as $caracterizacion)
                     <div class="col-md-4 mb-4">
                         <div
                             class="card h-100 shadow-sm border-0 rounded-lg overflow-hidden transition-all hover:shadow-lg">
@@ -135,8 +154,9 @@
                             </div>
                         </div>
                     </div>
-                @endforeach
-            </div>
+                    @endforeach
+                </div>
+            @endif
         </div>
     </section>
 @endsection
