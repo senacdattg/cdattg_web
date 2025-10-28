@@ -81,7 +81,6 @@ Route::get('/programas-complementarios/{id}/inscripcion', [App\Http\Controllers\
 Route::post('/programas-complementarios/{id}/inscripcion', [App\Http\Controllers\ComplementarioController::class, 'procesarInscripcion'])->name('programas-complementarios.procesar-inscripcion');
 Route::get('/programas-complementarios/{id}/documentos', [App\Http\Controllers\ComplementarioController::class, 'formularioDocumentos'])->name('programas-complementarios.documentos');
 Route::post('/programas-complementarios/{id}/documentos', [App\Http\Controllers\ComplementarioController::class, 'subirDocumento'])->name('programas-complementarios.subir-documentos');
-Route::get('/programas-complementarios/aspirante/{id}', [App\Http\Controllers\ComplementarioController::class, 'perfilAspirante'])->name('programas-complementarios.perfil-aspirante');
 Route::post('/programas-complementarios/{id}/validar-sofia', [App\Http\Controllers\ComplementarioController::class, 'validarSofia'])->name('programas-complementarios.validar-sofia');
 Route::get('/sofia-validation-progress/{progressId}', [App\Http\Controllers\ComplementarioController::class, 'getValidationProgress'])->name('sofia-validation.progress');
 
