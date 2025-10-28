@@ -1,53 +1,43 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Programas Complementarios - SENA</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-    <div class="container mt-5">
-        <div class="text-center mb-5">
-            <h1><i class="fas fa-graduation-cap me-3"></i>Programas Complementarios</h1>
-            <p>Descubre nuestros programas de formación complementaria disponibles</p>
+@extends('layout.master-layout-registro')
+@section('content')
+<div class="card card-primary">
+    <div class="card-header">
+        <h3 class="card-title">
+            <i class="fas fa-graduation-cap mr-2"></i>Programas Complementarios
+        </h3>
+        <div class="card-tools">
+            <span class="badge badge-success">Disponibles</span>
         </div>
+    </div>
+    <div class="card-body">
+        <p class="text-muted mb-4">Descubre nuestros programas de formación complementaria disponibles</p>
 
         <!-- Programs Cards View -->
-        <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
+        <div class="row justify-content-center">
             @foreach($programas as $programa)
-            <div class="col mb-3">
-                <div class="card h-100">
-                    <div class="card-body text-center">
-                        <div class="h1 text-primary mb-3">
-                            <i class="{{ $programa->icono }}"></i>
+            <div class="col-12 col-md-6 col-lg-3 mb-4">
+                <div class="card card-outline card-info h-100 shadow-sm">
+                    <div class="card-body text-center py-3">
+                        <div class="mb-3">
+                            <i class="{{ $programa->icono }} fa-3x text-primary"></i>
                         </div>
-                        <div class="d-flex justify-content-center">
-                            <h5 class="card-title font-weight-bold">{{ $programa->nombre }}</h5>
-                        </div>
-                        <span class="badge bg-success mb-2 w-20 text-center">Con Oferta</span>
-                        <p class="card-text">{{ $programa->descripcion }}</p>
-                        <div class="d-flex justify-content-center mt-3 pt-3 border-top">
-                            <div>
-                                <small class="text-muted">Duración</small>
-                                <p class="mb-0"><strong>{{ $programa->duracion }} horas</strong></p>
-                            </div>
+                        <h6 class="card-title font-weight-bold mb-2">{{ $programa->nombre }}</h6>
+                        <span class="badge badge-success mb-3">Con Oferta</span>
+                        <p class="card-text text-muted small mb-3">{{ $programa->descripcion }}</p>
+                        <div class="mt-3 pt-2 border-top">
+                            <small class="text-muted">Duración</small>
+                            <p class="mb-0 font-weight-bold small">{{ $programa->duracion }} horas</p>
                         </div>
                     </div>
-                    <div class="card-footer bg-transparent border-0">
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                            <a href="{{ route('programa_complementario.ver', ['id' => $programa->id]) }}" class="btn btn-primary w-100">
-                                <i class="fas fa-eye"></i> Ver Detalles
-                            </a>
-                        </div>
+                    <div class="card-footer bg-transparent py-2">
+                        <a href="{{ route('programa_complementario.ver', ['id' => $programa->id]) }}" class="btn btn-primary btn-block">
+                            <i class="fas fa-eye mr-1"></i> Ver Detalles
+                        </a>
                     </div>
                 </div>
             </div>
             @endforeach
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+</div>
+@endsection
