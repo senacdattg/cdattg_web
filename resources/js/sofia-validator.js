@@ -112,10 +112,10 @@ async function validarCedula(cedula, maxRetries = 3) {
             const isVisible = await element.isVisible().catch(() => false);
             if (isVisible) {
               const text = await element.innerText().catch(() => '');
-              if (text && text.trim().length > 0 && text.toLowerCase().includes('ya existe')) {
+              if (text && text.trim().length > 0) {
                 modalFound = true;
                 modalText = text;
-                console.error(`💬 Modal de error encontrado con selector ${selector}:\n${text}`);
+                console.error(`💬 Modal encontrado con selector ${selector}:\n${text}`);
                 break;
               }
             }
@@ -186,7 +186,9 @@ async function validarCedula(cedula, maxRetries = 3) {
         // Caso 2: Usuario ya existe y está registrado correctamente
         else if (textoLower.includes("ya existe") ||
                  textoLower.includes("ya cuentas con un registro") ||
-                 textoLower.includes("cuenta registrada")) {
+                 textoLower.includes("cuenta registrada") ||
+                 textoLower.includes("múltiples registros") ||
+                 textoLower.includes("se encontraron múltiples")) {
           resultado = "YA_EXISTE";
         }
 
