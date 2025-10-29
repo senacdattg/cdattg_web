@@ -5,6 +5,7 @@
 
 @vite([
     'resources/css/inventario/shared/base.css',
+    'resources/css/inventario/sidebar-fix.css',
     'resources/css/inventario/shared/modal-imagen.css',
     'resources/js/inventario/shared/modal-imagen.js'
 ])

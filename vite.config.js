@@ -14,6 +14,7 @@ export default defineConfig({
                 'navbar': 'resources/css/shared/navbar.css',
                 'inventario_listas_css': 'resources/css/inventario/inventario_listas.css',
                 'inventario_base_css': 'resources/css/inventario/shared/base.css',
+                'inventario_sidebar_fix': 'resources/css/inventario/sidebar-fix.css',
                 
                 // JavaScript files
                 'app': 'resources/js/app.js',
