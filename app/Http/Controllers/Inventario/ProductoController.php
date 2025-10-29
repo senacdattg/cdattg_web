@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Inventario;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Inventario\Producto;
+use Illuminate\Support\Facades\Auth;
+use App\Models\User;
 use App\Models\ParametroTema;
 use App\Models\Inventario\Categoria;
 use App\Models\Inventario\Marca;
@@ -11,17 +14,12 @@ use App\Models\Inventario\ContratoConvenio;
 use App\Models\Ambiente;
 
 
-class ProductoController extends InventarioController
+class ProductoController extends Controller
 {
     public function __construct()
     {
-        parent::__construct();
-        $this->middleware('can:VER PRODUCTO')->only(['index', 'show']);
-        $this->middleware('can:CREAR PRODUCTO')->only(['create', 'store']);
-        $this->middleware('can:EDITAR PRODUCTO')->only(['edit', 'update']);
-        $this->middleware('can:ELIMINAR PRODUCTO')->only('destroy');
+        $this->middleware('auth');
     }
-
     /**
      * Display a listing of the resource.
      */
@@ -91,13 +89,12 @@ class ProductoController extends InventarioController
             $validated['imagen'] = 'img/inventario/' . $nombreArchivo;
         }   
 
-        $producto = new Producto($validated);
-        $this->setUserIds($producto);
-        $producto->save();
+        $validated['user_create_id'] = Auth::id();
+        $validated['user_update_id'] = Auth::id();
 
         Producto::create($validated);
 
-        return redirect()->route('inventario.productos.index')->with('success', 'Producto creado correctamente.');
+        return redirect()->route('inventario.productos.create')->with('success', 'Producto creado correctamente.');
     }
 
     /**
@@ -111,7 +108,7 @@ class ProductoController extends InventarioController
             'estado.parametro',
             'categoria',
             'marca',
-            'contratoConvenio.proveedor',
+            'contratoConvenio',
             'ambiente'
         ])->findOrFail($id);
         return view('inventario.productos.show', compact('producto'));
@@ -197,10 +194,11 @@ class ProductoController extends InventarioController
             $validated['imagen'] = 'img/inventario/' . $nombreArchivo;
         }
 
+        // Actualizar el usuario que modifica
+        $validated['user_update_id'] = Auth::id();
+
         // Actualizar el producto
-        $producto->fill($validated);
-        $this->setUserIds($producto, true);
-        $producto->save();
+        $producto->update($validated);
 
         // Redireccionar con mensaje de éxito
         return redirect()->route('inventario.productos.show', $producto->id)
