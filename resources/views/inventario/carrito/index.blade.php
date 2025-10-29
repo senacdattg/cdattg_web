@@ -79,11 +79,10 @@
                 'headers' => [
                     'imagen' => 'Foto',
                     'producto' => 'Producto',
-                    'cantidad' => 'Cantidad',
-                    'acciones' => 'Acciones'
+                    'cantidad' => 'Cantidad'
                 ],
                 'data' => $carrito,
-                'actions' => ['delete'],
+                'actions' => [], // El carrito usa local storage, no rutas del servidor
                 'emptyMessage' => 'El carrito está vacío.',
                 'emptyIcon' => 'fas fa-shopping-cart',
                 'tableClass' => 'carrito-table'

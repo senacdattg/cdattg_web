@@ -29,6 +29,26 @@
                         </thead>
                 <tbody>
                     {{-- Ejemplo visual, reemplaza por tu foreach real --}}
+                    {{-- @foreach($orders as $order)
+                        <tr>
+                            <td>{{ $order->id }}</td>
+                            <td>{{ $order->description ?? 'Sin descripción' }}</td>
+                            <td><span class="badge badge-secondary">{{ $order->type ?? 'Salida' }}</span></td>
+                            <td>{{ $order->return_date ?? 'N/A' }}</td>
+                            <td><span class="badge badge-primary"><i class="fas fa-user-circle"></i> {{ $order->user->name ?? 'Usuario' }}</span></td>
+                            <td><span class="badge badge-{{ $order->status == 'Aprobada' ? 'success' : ($order->status == 'Pendiente' ? 'warning' : 'secondary') }}">{{ $order->status ?? 'Pendiente' }}</span></td>
+                            <td>{{ $order->created_at->format('Y-m-d') }}</td>
+                            <td>
+                                <a href="{{ route('inventario.ordenes.show', $order->id) }}" class="btn btn-info btn-sm" title="Ver"><i class="fas fa-eye"></i></a>
+                                <a href="{{ route('inventario.ordenes.edit', $order->id) }}" class="btn btn-warning btn-sm" title="Editar"><i class="fas fa-edit"></i></a>
+                                <form action="{{ route('inventario.ordenes.destroy', $order->id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                    @endforeach --}}
                     <tr>
                         <td>1</td>
                         <td>Salida de reglas para ADSO</td>
@@ -71,25 +91,6 @@
                             <a href="#" class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash"></i></a>
                         </td>
                     </tr>
-                    {{-- @foreach($orders as $order)
-                        <tr>
-                            <td>{{ $order->id }}</td>
-                            <td><span class="badge badge-primary"><i class="fas fa-user-circle"></i> {{ $order->user->name }}</span></td>
-                            <td>
-                                <span class="badge badge-{{ $order->status == 'Aprobada' ? 'success' : ($order->status == 'Pendiente' ? 'warning' : 'secondary') }}">{{ $order->status }}</span>
-                            </td>
-                            <td>{{ $order->created_at }}</td>
-                            <td>
-                                <a href="{{ route('inventario.ordenes.show', $order->id) }}" class="btn btn-info btn-sm" title="Ver"><i class="fas fa-eye"></i></a>
-                                <a href="{{ route('inventario.ordenes.edit', $order->id) }}" class="btn btn-warning btn-sm" title="Editar"><i class="fas fa-edit"></i></a>
-                                <form action="{{ route('inventario.ordenes.destroy', $order->id) }}" method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash"></i></button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach 
                 </tbody>
                     </table>
                 </div>

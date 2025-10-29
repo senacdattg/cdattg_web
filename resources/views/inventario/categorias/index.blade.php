@@ -1,3 +1,4 @@
+
 @extends('inventario.layouts.page', [
     'title' => 'Gestión de Categorías',
     'subtitle' => 'Administra las categorías del inventario',
@@ -27,7 +28,8 @@
         'actions' => ['view', 'edit', 'delete'],
         'emptyMessage' => 'Sin categorías registradas.',
         'emptyIcon' => 'fas fa-inbox',
-        'tableClass' => 'categorias-table'
+        'tableClass' => 'categorias-table',
+        'entityType' => 'categorias'
     ])
     @endcomponent
 

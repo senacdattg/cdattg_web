@@ -51,7 +51,6 @@ class ParametroSeeder extends Seeder
 
             // Estados de evidencias
             ['id' => 25, 'name' => 'PENDIENTE', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-<<<<<<< HEAD
             ['id' => 26, 'name' => 'EN CURSO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 27, 'name' => 'COMPLETADO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
 
@@ -81,10 +80,6 @@ class ParametroSeeder extends Seeder
             // Tipos de orden
             ['id' => 44, 'name' => 'PRÉSTAMO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 45, 'name' => 'SALIDA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-        
-=======
-            ['id' => 26, 'name' => 'COMPLETADO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
->>>>>>> aa8374eeeafe82d12e153dfcc3d0c8cd7d7afe3e
         ];
 
         foreach ($parametros as $parametro) {

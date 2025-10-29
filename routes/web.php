@@ -40,33 +40,21 @@ Route::middleware('auth')->group(function () {
         'ubicacion'
     ];
 
-    // Incluir rutas de guías de aprendizaje
-    include_once routes_path('web_guias_aprendizaje.php');
-    
-    // Incluir rutas de resultados de aprendizaje
-    include_once routes_path('web_resultados_aprendizaje.php');
-    
-    // Incluir rutas de competencias
-    include_once routes_path('web_competencias.php');
-
     foreach ($protectedFolders as $folder) {
         if ($folder === 'inventario') {
+            // Cargar todas las rutas del inventario desde index.php
             $inventarioIndex = routes_path('inventario') . '/index.php';
             if (file_exists($inventarioIndex)) {
                 include_once $inventarioIndex;
             }
-            continue; 
-        }
-
-        foreach (glob(routes_path($folder) . '/*.php') as $routeFile) {
-            include_once $routeFile;
+        } else {
+            foreach (glob(routes_path($folder) . '/*.php') as $routeFile) {
+                include_once $routeFile;
+            }
         }
     }
 
     Route::post('/verify-document', [AsistenceQrController::class, 'verifyDocument'])->name('api.verifyDocument');
-    
-    // Incluir rutas específicas de instructores
-    include_once routes_path('web_instructores.php');
 });
 
 // Route::get('/perfil', [ProfileController::class, 'index'])->name('profile.index');
@@ -75,3 +63,5 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/departamentos/{pais}', [DepartamentoController::class, 'getByPais'])->name('departamentos.by.pais');
 Route::get('/municipios/{departamento}', [MunicipioController::class, 'getByDepartamento'])->name('municipios.by.departamento');
+
+

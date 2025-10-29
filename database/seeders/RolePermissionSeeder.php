@@ -97,7 +97,6 @@ class RolePermissionSeeder extends Seeder
             'EDITAR PERSONA',
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
-<<<<<<< HEAD
             // Permisos para inventario
             // Productos
             'CREAR PRODUCTO',
@@ -119,7 +118,6 @@ class RolePermissionSeeder extends Seeder
             // Salidas
             'VER SALIDA',
             'CREAR SALIDA',
-=======
             // Permisos para redes de conocimiento
             'CREAR RED CONOCIMIENTO',
             'EDITAR RED CONOCIMIENTO',
@@ -151,7 +149,6 @@ class RolePermissionSeeder extends Seeder
             'ELIMINAR COMPETENCIA',
             'GESTIONAR RESULTADOS COMPETENCIA',
             'CAMBIAR ESTADO COMPETENCIA',
->>>>>>> aa8374eeeafe82d12e153dfcc3d0c8cd7d7afe3e
         ];
 
         // Crear cada permiso si no existe
@@ -225,7 +222,6 @@ class RolePermissionSeeder extends Seeder
             'EDITAR PERSONA',
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
-<<<<<<< HEAD
             'CREAR PRODUCTO',
             'VER PRODUCTO',
             'EDITAR PRODUCTO',
@@ -241,7 +237,6 @@ class RolePermissionSeeder extends Seeder
             'CREAR ENTRADA',
             'VER SALIDA',
             'CREAR SALIDA',
-=======
             'CREAR RED CONOCIMIENTO',
             'EDITAR RED CONOCIMIENTO',
             'VER RED CONOCIMIENTO',
@@ -271,7 +266,6 @@ class RolePermissionSeeder extends Seeder
             'ELIMINAR COMPETENCIA',
             'GESTIONAR RESULTADOS COMPETENCIA',
             'CAMBIAR ESTADO COMPETENCIA',
->>>>>>> aa8374eeeafe82d12e153dfcc3d0c8cd7d7afe3e
         ]);
 
         // Asignar permisos al rol ADMINISTRADOR

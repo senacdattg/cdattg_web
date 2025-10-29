@@ -1,3 +1,4 @@
+
 @extends('inventario.layouts.form', [
     'title' => 'Registrar Producto',
     'icon' => 'fas fa-plus',
@@ -12,6 +13,8 @@
 
 @section('form-content')
     @include('inventario._components.product-form', [
+        'action' => route('inventario.productos.store'),
+        'method' => 'POST',
         'producto' => null,
         'tiposProductos' => $tiposProductos,
         'unidadesMedida' => $unidadesMedida,
@@ -29,5 +32,4 @@
         'resources/js/inventario/shared/modal-imagen.js'
     ])
 @endsection
-
 
