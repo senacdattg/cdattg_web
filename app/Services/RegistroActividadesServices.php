@@ -41,7 +41,7 @@ class RegistroActividadesServices
         foreach ($actividades as $actividad) {
             $actividad->id_estado = $this->formatearEstadoActividad($actividad);
         }
-        
+
         return $actividades;
     }
 
@@ -82,7 +82,17 @@ class RegistroActividadesServices
         $estados = Parametro::whereHas('parametrosTemas', function ($query) use ($evidencia) {
             $query->where('parametros_temas.id', $evidencia->id_estado);
         })->first()->name;
-        
+
         return $estados;
+    }
+
+    public function getGuiasAprendizaje(InstructorFichaCaracterizacion $instructorFichaCaracterizacion)
+    {
+        $fichaCaracterizacion = $this->fichaCaracterizacionRepository->getFichaCaracterizacion($instructorFichaCaracterizacion->ficha_id);
+        $programaFormacion = $fichaCaracterizacion->programaFormacion;
+        $competenciaActual = $programaFormacion->competenciaActual();
+        $rapActual = $competenciaActual->rapActual();
+        $guiasAprendizaje = $rapActual->guiasAprendizaje->first();
+        return $guiasAprendizaje;
     }
 }

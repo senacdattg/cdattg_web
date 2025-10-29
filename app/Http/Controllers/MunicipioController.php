@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\UbicacionService;
 use App\Models\Municipio;
 use App\Http\Requests\StoreMunicipioRequest;
 use App\Http\Requests\UpdateMunicipioRequest;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -14,6 +14,12 @@ use Illuminate\Database\QueryException;
 
 class MunicipioController extends Controller
 {
+    protected UbicacionService $ubicacionService;
+
+    public function __construct(UbicacionService $ubicacionService)
+    {
+        $this->ubicacionService = $ubicacionService;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -27,21 +33,14 @@ class MunicipioController extends Controller
 
     public function cargarMunicipios($departamento_id)
     {
-        // DB::enableQueryLog();
-        $municipios = Municipio::where('departamento_id', $departamento_id)
-            ->where('status', 1)->get();
+        $municipios = $this->ubicacionService->obtenerMunicipiosPorDepartamento($departamento_id);
         return response()->json(['success' => true, 'municipios' => $municipios]);
-        // dd(DB::getQueryLog());
     }
+
     public function apiCargarMunicipios(Request $request)
     {
-        // return response()->json(["message" => True]);
-        $departamento_id = $request->departamento_id;
-        // DB::enableQueryLog();
-        $municipios = Municipio::where('departamento_id', $departamento_id)
-            ->where('status', 1)->get();
+        $municipios = $this->ubicacionService->obtenerMunicipiosPorDepartamento($request->departamento_id);
         return response()->json($municipios, 200);
-        // dd(DB::getQueryLog());
     }
     /**
      * Store a newly created resource in storage.
@@ -147,9 +146,7 @@ class MunicipioController extends Controller
 
     public function getByDepartamento($departamentoId)
     {
-        $municipios = Municipio::where('departamento_id', $departamentoId)
-            ->where('status', 1)
-            ->get();
+        $municipios = $this->ubicacionService->obtenerMunicipiosPorDepartamento($departamentoId);
         return response()->json($municipios);
     }
 }

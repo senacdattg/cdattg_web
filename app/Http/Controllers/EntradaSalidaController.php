@@ -2,23 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\EntradaSalidaService;
+use App\Services\ExportService;
 use App\Models\EntradaSalida;
-use App\Http\Requests\StoreEntradaSalidaRequest;
-use App\Http\Requests\UpdateEntradaSalidaRequest;
-use App\Models\Ambiente;
 use App\Models\FichaCaracterizacion;
-use App\Models\User;
+use App\Models\Ambiente;
+use App\Http\Requests\StoreEntradaSalidaRequest;
+// use App\Http\Requests\UpdateEntradaSalidaRequest; // Request no existe
 use Carbon\Carbon;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class EntradaSalidaController extends Controller
 {
+    protected EntradaSalidaService $entradaSalidaService;
+    protected ExportService $exportService;
+
+    public function __construct(
+        EntradaSalidaService $entradaSalidaService,
+        ExportService $exportService
+    ) {
+        $this->entradaSalidaService = $entradaSalidaService;
+        $this->exportService = $exportService;
+    }
     /**
      * Display a listing of the resource.
      */
@@ -77,42 +87,33 @@ class EntradaSalidaController extends Controller
      */
     public function apiStoreEntradaSalida(Request $request)
     {
-        $ficha_caracterizacion_id = $request->ficha_caracterizacion_id;
-        $aprendiz = $request->aprendiz;
-        $instructor_user_id = $request->instructor_user_id;
-        $ambiente_id = $request->ambiente_id;
-        // @dd($ambiente_id);
-        $entradaSalida = EntradaSalida::create([
-            'fecha' => Carbon::now()->toDateString(),
-            'instructor_user_id' => $instructor_user_id,
-            'aprendiz' => $aprendiz,
-            'entrada' => Carbon::now(),
-            'ficha_caracterizacion_id' => $ficha_caracterizacion_id,
-            'ambiente_id' => $ambiente_id,
-        ]);
-        if ($entradaSalida) {
+        try {
+            $datos = [
+                'fecha' => Carbon::now()->toDateString(),
+                'instructor_user_id' => $request->instructor_user_id,
+                'aprendiz' => $request->aprendiz,
+                'entrada' => Carbon::now(),
+                'ficha_caracterizacion_id' => $request->ficha_caracterizacion_id,
+                'ambiente_id' => $request->ambiente_id,
+            ];
 
-            return response()->json(["message" => "Entrada Salida creada con éxito"], 200);
-        } else {
-            return response()->json(["error" => "Error al crear la entrada salida"], 500);
+            $this->entradaSalidaService->registrarEntrada($datos);
+
+            return response()->json(["message" => "Entrada registrada con éxito"], 200);
+        } catch (\Exception $e) {
+            Log::error('Error al registrar entrada: ' . $e->getMessage());
+            return response()->json(["error" => "Error al registrar entrada"], 500);
         }
     }
     public function apiUpdateEntradaSalida(Request $request)
     {
-        $aprendiz = $request->aprendiz;
-        $entradaSalida = EntradaSalida::where('aprendiz', $aprendiz)
-            ->where('salida', null)
-            ->where('listado', null)
-            ->first();
+        try {
+            $this->entradaSalidaService->registrarSalida($request->aprendiz);
 
-        if ($entradaSalida) {
-
-            $entradaSalida->update([
-                'salida' => Carbon::now(),
-            ]);
-            return response()->json(["message" => "Entrada salida Actualizada con éxito"], 200);
-        } else {
-            return response()->json(["error" => "Error al crear la entrada salida"], 500);
+            return response()->json(["message" => "Salida registrada con éxito"], 200);
+        } catch (\Exception $e) {
+            Log::error('Error al registrar salida: ' . $e->getMessage());
+            return response()->json(["error" => $e->getMessage()], 500);
         }
     }
     public function storeEntradaSalida($ficha_id, $aprendiz, $ambiente_id, $descripcion)
@@ -312,42 +313,22 @@ class EntradaSalidaController extends Controller
     }
     public function generarCSV($ficha)
     {
-        // @dd($ficha);
-        $lista = EntradaSalida::where('instructor_user_id', Auth::user()->id)
-            ->where('fecha', Carbon::now()->toDateString())
-            ->where('ficha_caracterizacion_id', $ficha)->get();
-        // @dd($lista);
-        $fichaCaracterizacion = FichaCaracterizacion::find($ficha);
-        // @dd($fichaCaracterizacion);
-        $fecha_actual = now()->format('Y-m-d_H-i-s');
+        try {
+            $datos = [
+                'instructor_user_id' => Auth::id(),
+                'ficha_caracterizacion_id' => $ficha,
+                'fecha' => Carbon::now()->toDateString(),
+            ];
 
-        $nombre_archivo = $fichaCaracterizacion->ficha . '-' . $fecha_actual . '.csv';
+            $response = $this->exportService->exportarEntradaSalidasCSV($datos);
 
-        // Inicializar el contenido del archivo CSV
-        $csv_content = "Aprendiz,Ficha,Fecha,HoraEntrada,HoraSalida" . PHP_EOL;
+            $this->entradaSalidaService->marcarComoListadas($datos);
 
-        // Agregar las líneas al contenido del archivo
-        foreach ($lista as $linea) {
-            // @dd($linea);
-            $csv_content .= $linea->aprendiz . ',' . $fichaCaracterizacion->ficha . ',' . $linea->fecha . ',' . $linea->entrada . ',' . $linea->salida . PHP_EOL;
+            return $response;
+        } catch (\Exception $e) {
+            Log::error('Error al generar CSV: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al generar CSV.');
         }
-
-        // Preparar la respuesta para la descarga
-        $response = response()->stream(
-            function () use ($csv_content) {
-                echo $csv_content;
-            },
-            200,
-            [
-                'Content-Type' => 'text/csv',
-                'Content-Disposition' => 'attachment; filename=' . $nombre_archivo,
-            ]
-        );
-
-        $this->marcarListado($ficha);
-
-        // Devolver una respuesta JSON después de la descarga
-        return $response;
     }
     /**
      * Display the specified resource.
@@ -380,7 +361,7 @@ class EntradaSalidaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateEntradaSalidaRequest $request, EntradaSalida $entradaSalida)
+    public function update(Request $request, EntradaSalida $entradaSalida)
     {
         //
     }
@@ -390,8 +371,14 @@ class EntradaSalidaController extends Controller
      */
     public function destroy(EntradaSalida $entradaSalida)
     {
-        $entradaSalida->delete();
-        return redirect()->back()->with('success', '¡Registro eliminado exitosamente!');
+        try {
+            $this->entradaSalidaService->eliminar($entradaSalida->id);
+
+            return redirect()->back()->with('success', '¡Registro eliminado exitosamente!');
+        } catch (\Exception $e) {
+            Log::error('Error al eliminar entrada/salida: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al eliminar registro.');
+        }
     }
 
     public function cargarDatos(Request $request)

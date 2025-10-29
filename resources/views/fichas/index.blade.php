@@ -1,110 +1,159 @@
 @extends('adminlte::page')
+
+@section('css')
+    @vite(['resources/css/parametros.css'])
+@endsection
+
+@section('content_header')
+    <x-page-header 
+        icon="fa-file-alt" 
+        title="Fichas de Caracterización"
+        subtitle="Gestión de fichas de caracterización del SENA"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => url('/'), 'icon' => 'fa-home'],
+            ['label' => 'Fichas de Caracterización', 'active' => true, 'icon' => 'fa-file-alt']
+        ]"
+    />
+@endsection
+
 @section('content')
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <x-session-alerts />
 
-        <section class="content-header mt-3">
-            <div class="container-fluid mt-3">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Consultar fichas</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item">
-                                <a href="">Inicio</a>
-                            </li>
-                            <li class="breadcrumb-item active">Programas de formación
-                            </li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </section>
-        @if (session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        @endif
-        @if (session('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ session('error') }}
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-        @endif
-        <section class="content">
-            <div class="card" style="margin: 0 auto;">
-                <div class="card-header">
-                    <form method="get" action={{ route('ficha.search') }}>
-
-                        <div class="input-group">
-                            <input type="text" name="search" class="form-control"
-                                placeholder="Buscar por número deficha " value="{{ request()->get('search') }}">
-                            <div class="input-group-append">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-search"></i> Buscar
-                                </button>
+            <div class="row">
+                <div class="col-12">
+                    @can('CREAR FICHA CARACTERIZACION')
+                        <div class="card shadow-sm mb-4 no-hover">
+                            <div class="card-header bg-white py-3 d-flex align-items-center">
+                                <a href="{{ route('fichaCaracterizacion.create') }}" class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1 text-decoration-none">
+                                    <i class="fas fa-plus-circle mr-2"></i> Crear Ficha de Caracterización
+                                </a>
                             </div>
                         </div>
-                    </form>
-                </div>
-                <div class="card-body p-0">
-                    <table class="table table-responsive" style="margin: 0 auto;">
-                        <thead>
-                            <tr>
-                                <th class="text-center" style="width: 10%;">
-                                    Id
-                                </th>
-                                <th class="text-center" style="width: 25%;">
-                                    Numero de ficha
-                                </th>
-                                <th class="text-center" style="width: 40%;">
-                                    Programa
-                                </th>
+                    @endcan
 
-                                <th class="text-center" style="width: 15%;">
-                                    Acciones
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach ($fichas as $ficha)
-                                <tr>
-                                    <td class="text-center">{{ $ficha->id }}</td>
-                                    <td class="text-center">{{ $ficha->ficha }}</td>
-                                    <td class="text-center">{{ $ficha->programaFormacion->nombre ?? 'N/A' }}</td>
-
-                                    <td class="text-center">
-                                        @can('VER PROGRAMA DE CARACTERIZACION')
-                                            <div class="btn-group d-flex justify-content-center" role="group"
-                                                aria-label="Acciones" style="gap: 10px;">
-                                                <a href="{{ route('ficha.edit', $ficha->id) }}" class="btn btn-warning btn-sm">
-                                                    <i class="fas fa-edit"></i>
-                                                </a>
-                                                <form action="{{ route('ficha.destroy', $ficha->id) }}" method="POST"
-                                                    style="display:inline;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm"
-                                                        onclick="return confirm('¿Estás seguro de eliminar este programa?')">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        @endcan
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                    <x-data-table 
+                        title="Lista de Fichas de Caracterización"
+                        searchable="true"
+                        searchAction="{{ route('fichaCaracterizacion.index') }}"
+                        searchPlaceholder="Buscar ficha..."
+                        searchValue="{{ request('search') }}"
+                        :columns="[
+                            ['label' => '#', 'width' => '5%'],
+                            ['label' => 'Ficha', 'width' => '15%'],
+                            ['label' => 'Programa', 'width' => '25%'],
+                            ['label' => 'Instructor Líder', 'width' => '20%'],
+                            ['label' => 'Sede', 'width' => '15%'],
+                            ['label' => 'Estado', 'width' => '10%'],
+                            ['label' => 'Aprendices', 'width' => '10%'],
+                            ['label' => 'Acciones', 'width' => '10%', 'class' => 'text-center']
+                        ]"
+                        :pagination="$fichas->links()"
+                    >
+                                        @forelse ($fichas as $ficha)
+                                            <tr>
+                                                <td class="px-4">{{ $loop->iteration }}</td>
+                                                <td class="px-4">
+                                                    <span class="badge badge-info">{{ $ficha->ficha }}</span>
+                                                </td>
+                                                <td class="px-4 font-weight-medium">
+                                                    <strong>{{ $ficha->programaFormacion->nombre ?? 'N/A' }}</strong>
+                                                    @if($ficha->programaFormacion->codigo ?? false)
+                                                        <br><small class="text-muted">{{ $ficha->programaFormacion->codigo }}</small>
+                                                    @endif
+                                                </td>
+                                                <td class="px-4">
+                                                    @if($ficha->instructor && $ficha->instructor->persona)
+                                                        <strong>{{ $ficha->instructor->persona->primer_nombre ?? '' }} {{ $ficha->instructor->persona->segundo_nombre ?? '' }}</strong>
+                                                        <br>
+                                                        <small class="text-muted">{{ $ficha->instructor->persona->primer_apellido ?? '' }} {{ $ficha->instructor->persona->segundo_apellido ?? '' }}</small>
+                                                    @else
+                                                        <span class="text-muted">Sin asignar</span>
+                                                    @endif
+                                                </td>
+                                                <td class="px-4">{{ $ficha->sede->nombre ?? 'N/A' }}</td>
+                                                <td class="px-4">
+                                                    <div class="d-inline-block px-3 py-1 rounded-pill {{ $ficha->status ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}">
+                                                        <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
+                                                        {{ $ficha->status ? 'Activa' : 'Inactiva' }}
+                                                    </div>
+                                                </td>
+                                                <td class="px-4 text-center">
+                                                    @if($ficha->aprendices && $ficha->aprendices->count() > 0)
+                                                        <span class="badge badge-primary">{{ $ficha->aprendices->count() }}</span>
+                                                    @else
+                                                        <span class="badge badge-secondary">0</span>
+                                                    @endif
+                                                </td>
+                                                <td class="px-4 text-center">
+                                                    <div class="btn-group-vertical btn-group-sm" role="group">
+                                                        <div class="btn-group btn-group-sm mb-1" role="group">
+                                                            @can('VER FICHA CARACTERIZACION')
+                                                                <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}"
+                                                                    class="btn btn-light btn-sm" data-toggle="tooltip"
+                                                                    title="Ver detalles">
+                                                                    <i class="fas fa-eye text-warning"></i>
+                                                                </a>
+                                                            @endcan
+                                                            @can('EDITAR FICHA CARACTERIZACION')
+                                                                <a href="{{ route('fichaCaracterizacion.edit', $ficha->id) }}"
+                                                                    class="btn btn-light btn-sm" data-toggle="tooltip"
+                                                                    title="Editar">
+                                                                    <i class="fas fa-pencil-alt text-info"></i>
+                                                                </a>
+                                                            @endcan
+                                                        </div>
+                                                        <div class="btn-group btn-group-sm mb-1" role="group">
+                                                            @can('GESTIONAR APRENDICES FICHA')
+                                                                <a href="{{ route('fichaCaracterizacion.gestionarAprendices', $ficha->id) }}"
+                                                                    class="btn btn-light btn-sm" data-toggle="tooltip"
+                                                                    title="Gestionar Aprendices">
+                                                                    <i class="fas fa-users text-success"></i>
+                                                                </a>
+                                                            @endcan
+                                                            @can('GESTIONAR INSTRUCTORES FICHA')
+                                                                <a href="{{ route('fichaCaracterizacion.gestionarInstructores', $ficha->id) }}"
+                                                                    class="btn btn-light btn-sm" data-toggle="tooltip"
+                                                                    title="Gestionar Instructores">
+                                                                    <i class="fas fa-chalkboard-teacher text-primary"></i>
+                                                                </a>
+                                                            @endcan
+                                                        </div>
+                                                        <div class="btn-group btn-group-sm" role="group">
+                                                            @can('ELIMINAR FICHA CARACTERIZACION')
+                                                                <button type="button" class="btn btn-light btn-sm" 
+                                                                        data-ficha="{{ $ficha->ficha }}" 
+                                                                        data-url="{{ route('fichaCaracterizacion.destroy', $ficha->id) }}"
+                                                                        onclick="confirmarEliminacion(this.dataset.ficha, this.dataset.url)"
+                                                                        data-toggle="tooltip" title="Eliminar">
+                                                                    <i class="fas fa-trash text-danger"></i>
+                                                                </button>
+                                                            @endcan
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="8" class="text-center py-5">
+                                                    <img src="{{ asset('img/no-data.svg') }}" alt="No data"
+                                                        style="width: 120px" class="mb-3">
+                                                    <p class="text-muted">No hay fichas de caracterización registradas</p>
+                                                </td>
+                                            </tr>
+                                        @endforelse
+                    </x-data-table>
                 </div>
             </div>
-            <div class="card-footer clearfix">
-                {{ $fichas->links() }}
-            </div>
+        </div>
+    </section>
+@endsection
 
-    </div>
+@section('footer')
+    @include('layout.footer')
+@endsection
+
+@section('js')
+    @vite(['resources/js/pages/fichas-index.js'])
 @endsection

@@ -91,9 +91,75 @@ class Persona extends Model
         return $this->belongsTo(Municipio::class);
     }
 
+    /**
+     * Relación One-to-One con Aprendiz.
+     * Una persona puede ser un aprendiz.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
     public function aprendiz()
     {
         return $this->hasOne(Aprendiz::class, 'persona_id');
+    }
+
+    /**
+     * Verifica si la persona es un aprendiz.
+     *
+     * @return bool
+     */
+    public function esAprendiz(): bool
+    {
+        return $this->aprendiz()->exists();
+    }
+
+    /**
+     * Verifica si la persona es un aprendiz activo.
+     *
+     * @return bool
+     */
+    public function esAprendizActivo(): bool
+    {
+        return $this->aprendiz()->where('estado', 1)->exists();
+    }
+
+    /**
+     * Verifica si la persona tiene un rol específico.
+     *
+     * @param string $role
+     * @return bool
+     */
+    public function hasRole(string $role): bool
+    {
+        if (!$this->user) {
+            return false;
+        }
+
+        return $this->user->hasRole(strtoupper($role));
+    }
+
+    /**
+     * Verifica si la persona es instructor.
+     *
+     * @return bool
+     */
+    public function esInstructor(): bool
+    {
+        return $this->instructor()->exists();
+    }
+
+
+    /**
+     * Verifica si la persona tiene el rol de APRENDIZ.
+     *
+     * @return bool
+     */
+    public function tieneRolAprendiz(): bool
+    {
+        if (!$this->user) {
+            return false;
+        }
+
+        return $this->user->hasRole('APRENDIZ');
     }
 
     /**

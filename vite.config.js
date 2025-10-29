@@ -9,7 +9,11 @@ export default defineConfig({
                 'style': 'resources/css/style.css',
                 'temas_css': 'resources/css/temas.css',
                 'parametros_css': 'resources/css/parametros.css',
-                'dashboard_superadmin': 'resources/css/dashboards/dashboard_superadmin.css',
+                'instructores_css': 'resources/css/instructores.css',
+                'guias_aprendizaje_css': 'resources/css/guias_aprendizaje.css',
+                'resultados_aprendizaje_css': 'resources/css/resultados-aprendizaje.css',
+                'dias_formacion_css': 'resources/css/dias-formacion.css',
+                'dashboard_superadmin': 'resources/css/dashboards/dashboard-superadmin.css',
                 'caracter_selecter': 'resources/css/Asistencia/caracter_selecter.css',
                 'navbar': 'resources/css/shared/navbar.css',
                 'inventario_listas_css': 'resources/css/inventario/inventario_listas.css',
@@ -37,4 +41,12 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    server: {
+        host: '0.0.0.0',  // Escucha en todas las interfaces de red
+        port: 5173,
+        strictPort: true,
+        hmr: {
+            host: 'localhost',  // Usa localhost para HMR en el navegador
+        },
+    },
 });

@@ -11,7 +11,7 @@ class Storeguia_aprendizajeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,28 @@ class Storeguia_aprendizajeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'codigo' => 'required|string|max:50|unique:guia_aprendizajes,codigo',
+            'nombre' => 'required|string|max:255',
+            'resultados_aprendizaje' => 'sometimes|array',
+            'resultados_aprendizaje.*' => 'exists:resultados_aprendizajes,id',
+        ];
+    }
+
+    /**
+     * Get custom messages for validator errors.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'codigo.required' => 'El código es obligatorio.',
+            'codigo.unique' => 'El código ya existe.',
+            'codigo.max' => 'El código no puede tener más de 50 caracteres.',
+            'nombre.required' => 'El nombre es obligatorio.',
+            'nombre.max' => 'El nombre no puede tener más de 255 caracteres.',
+            'resultados_aprendizaje.array' => 'Los resultados de aprendizaje deben ser un arreglo.',
+            'resultados_aprendizaje.*.exists' => 'Uno o más resultados de aprendizaje no existen.',
         ];
     }
 }

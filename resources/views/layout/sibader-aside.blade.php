@@ -13,7 +13,13 @@
             $canVerTema = $user->can('VER TEMA');
             $canVerRegional = $user->can('VER REGIONAL');
             $canCrearRegional = $user->can('CREAR REGIONAL');
-            // ... agrega otras variables según convenga.
+            // Permisos para Guías de Aprendizaje
+            $canVerGuiaAprendizaje = $user->can('VER GUIA APRENDIZAJE');
+            $canCrearGuiaAprendizaje = $user->can('CREAR GUIA APRENDIZAJE');
+            $canEditarGuiaAprendizaje = $user->can('EDITAR GUIA APRENDIZAJE');
+            $canEliminarGuiaAprendizaje = $user->can('ELIMINAR GUIA APRENDIZAJE');
+            
+            // Variables de permisos para uso en el sidebar
         @endphp
 
         <nav class="mt-2">
@@ -82,6 +88,7 @@
                         </ul>
                     </li>
                 @endif
+
 
                 {{-- Administrar Sedes --}}
                 @can('VER SEDE')

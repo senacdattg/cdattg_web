@@ -27,18 +27,6 @@
                     </div>
                 @endif
 
-                <script>
-                    setTimeout(() => {
-                        let successAlert = document.getElementById('success-alert');
-                        if (successAlert) {
-                            successAlert.style.display = 'none';
-                        }
-                        let errorAlert = document.getElementById('error-alert');
-                        if (errorAlert) {
-                            errorAlert.style.display = 'none';
-                        }
-                    }, 3000);
-                </script>
                 <div class="col-md-12 d-flex align-items-center justify-content-center">
                     <h5>Agregar novedad de salida</h5>
                 </div>

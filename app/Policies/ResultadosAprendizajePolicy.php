@@ -3,7 +3,7 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\resultados_aprendizaje;
+use App\Models\ResultadosAprendizaje;
 use Illuminate\Auth\Access\Response;
 
 class ResultadosAprendizajePolicy
@@ -13,15 +13,39 @@ class ResultadosAprendizajePolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        if (!$user->can('VER RESULTADO APRENDIZAJE')) {
+            return false;
+        }
+
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
+            return true;
+        }
+
+        if ($user->hasRole('INSTRUCTOR')) {
+            return true;
+        }
+
+        return true;
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, resultados_aprendizaje $resultadosAprendizaje): bool
+    public function view(User $user, ResultadosAprendizaje $resultadosAprendizaje): bool
     {
-        return false;
+        if (!$user->can('VER RESULTADO APRENDIZAJE')) {
+            return false;
+        }
+
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
+            return true;
+        }
+
+        if ($user->hasRole('INSTRUCTOR')) {
+            return true;
+        }
+
+        return true;
     }
 
     /**
@@ -29,38 +53,123 @@ class ResultadosAprendizajePolicy
      */
     public function create(User $user): bool
     {
-        return false;
+        return $user->can('CREAR RESULTADO APRENDIZAJE') && 
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR', 'INSTRUCTOR']);
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, resultados_aprendizaje $resultadosAprendizaje): bool
+    public function update(User $user, ResultadosAprendizaje $resultadosAprendizaje): bool
     {
+        if (!$user->can('EDITAR RESULTADO APRENDIZAJE')) {
+            return false;
+        }
+
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
+            return true;
+        }
+
+        if ($user->hasRole('INSTRUCTOR')) {
+            return $resultadosAprendizaje->user_create_id === $user->id;
+        }
+
         return false;
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, resultados_aprendizaje $resultadosAprendizaje): bool
+    public function delete(User $user, ResultadosAprendizaje $resultadosAprendizaje): bool
     {
+        if (!$user->can('ELIMINAR RESULTADO APRENDIZAJE')) {
+            return false;
+        }
+
+        if ($resultadosAprendizaje->guiasAprendizaje()->count() > 0) {
+            return false;
+        }
+
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
+            return true;
+        }
+
         return false;
     }
 
     /**
      * Determine whether the user can restore the model.
      */
-    public function restore(User $user, resultados_aprendizaje $resultadosAprendizaje): bool
+    public function restore(User $user, ResultadosAprendizaje $resultadosAprendizaje): bool
     {
-        return false;
+        return $user->can('CREAR RESULTADO APRENDIZAJE') && 
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function forceDelete(User $user, resultados_aprendizaje $resultadosAprendizaje): bool
+    public function forceDelete(User $user, ResultadosAprendizaje $resultadosAprendizaje): bool
     {
+        return $user->can('ELIMINAR RESULTADO APRENDIZAJE') && 
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
+    }
+
+    /**
+     * Determine whether the user can change the status.
+     */
+    public function cambiarEstado(User $user, ResultadosAprendizaje $resultadosAprendizaje): bool
+    {
+        if (!$user->can('EDITAR RESULTADO APRENDIZAJE')) {
+            return false;
+        }
+
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
+            return true;
+        }
+
+        if ($user->hasRole('INSTRUCTOR')) {
+            return $resultadosAprendizaje->user_create_id === $user->id;
+        }
+
         return false;
+    }
+
+    /**
+     * Determine whether the user can manage competencias.
+     */
+    public function gestionarCompetencias(User $user, ResultadosAprendizaje $resultadosAprendizaje): bool
+    {
+        if (!$user->can('EDITAR RESULTADO APRENDIZAJE')) {
+            return false;
+        }
+
+        if ($user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR'])) {
+            return true;
+        }
+
+        if ($user->hasRole('INSTRUCTOR')) {
+            return $resultadosAprendizaje->user_create_id === $user->id;
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine whether the user can associate with guias.
+     */
+    public function asociarGuia(User $user, ResultadosAprendizaje $resultadosAprendizaje): bool
+    {
+        return $user->can('EDITAR RESULTADO APRENDIZAJE') && 
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR', 'INSTRUCTOR']);
+    }
+
+    /**
+     * Determine whether the user can export results.
+     */
+    public function exportar(User $user): bool
+    {
+        return $user->can('VER RESULTADO APRENDIZAJE') && 
+               $user->hasRole(['SUPER ADMINISTRADOR', 'ADMINISTRADOR']);
     }
 }

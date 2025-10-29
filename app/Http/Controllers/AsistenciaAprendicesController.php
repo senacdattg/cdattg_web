@@ -2,20 +2,28 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\AsistenciaAprendiz;
+use App\Services\AsistenciaService;
+use App\Services\JornadaValidationService;
 use App\Models\FichaCaracterizacion;
+use App\Models\AsistenciaAprendiz;
 use App\Models\JornadaFormacion;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rules\Exists;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx\Rels;
-use PhpParser\Node\Expr\Cast\String_;
-use PHPUnit\Framework\Constraint\Count;
 
 class AsistenciaAprendicesController extends Controller
 {
+    protected AsistenciaService $asistenciaService;
+    protected JornadaValidationService $jornadaValidation;
+
+    public function __construct(
+        AsistenciaService $asistenciaService,
+        JornadaValidationService $jornadaValidation
+    ) {
+        $this->asistenciaService = $asistenciaService;
+        $this->jornadaValidation = $jornadaValidation;
+    }
 
     /**
      * Muestra una lista de fichas de caracterización.
@@ -39,25 +47,24 @@ class AsistenciaAprendicesController extends Controller
      * @throws \Exception Si ocurre un error al obtener las asistencias.
      */
     public function getAttendanceByFicha (Request $request){
-       
         try {
             $fichaId = $request->input('ficha');
+            
             if (!$fichaId) {
                 return response()->json(['message' => 'ID de ficha no proporcionado'], 400);
             }
             
-            $asistencias = AsistenciaAprendiz::whereHas('caracterizacion', function ($query) use ($fichaId) {
-                $query->where('ficha_id', $fichaId);
-            })->orderBy('id', 'desc')->get();
+            $asistencias = $this->asistenciaService->obtenerPorFicha($fichaId);
 
             if ($asistencias->isEmpty()) {
                 return response()->json(['message' => 'No se encontraron asistencias para la ficha proporcionada'], 404);
             }
+            
             return view('asistencias.asistencia_by_ficha', ['asistencias' => $asistencias]);
         } catch (Exception $e) {
+            Log::error('Error obteniendo asistencias por ficha: ' . $e->getMessage());
             return response()->json(['message' => 'Error obteniendo asistencias', 'error' => $e->getMessage()], 500);
         }
-    
     }
 
     /**
@@ -82,21 +89,25 @@ class AsistenciaAprendicesController extends Controller
      */
     public function getAttendanceByDateAndFicha(Request $request){
        $ficha = $request->input('ficha');
-       $fecha_inicio = $request->input('fecha_inicio');
-       $fecha_fin = $request->input('fecha_fin');
+       $fechaInicio = $request->input('fecha_inicio');
+       $fechaFin = $request->input('fecha_fin');
 
-         if (!$ficha || !$fecha_inicio || !$fecha_fin) {
-              return response()->json(['message' => 'Datos incompletos'], 400);
-         }
-            $asistencias = AsistenciaAprendiz::whereHas('caracterizacion', function ($query) use ($ficha) {
-                $query->where('ficha_id', $ficha);
-            })->whereBetween('created_at', [$fecha_inicio, $fecha_fin])->orderBy('created_at', 'desc')
-            ->get();
-        if ($asistencias->isEmpty()) {
-            return response()->json(['message' => 'No se encontraron asistencias para la ficha y fechas proporcionadas'], 404);
+        if (!$ficha || !$fechaInicio || !$fechaFin) {
+            return response()->json(['message' => 'Datos incompletos'], 400);
         }
 
-        return view('asistencias.asistencia_by_date', ['asistencias' => $asistencias]);
+        try {
+            $asistencias = $this->asistenciaService->obtenerPorFichaYFechas($ficha, $fechaInicio, $fechaFin);
+
+            if ($asistencias->isEmpty()) {
+                return response()->json(['message' => 'No se encontraron asistencias para la ficha y fechas proporcionadas'], 404);
+            }
+
+            return view('asistencias.asistencia_by_date', ['asistencias' => $asistencias]);
+        } catch (Exception $e) {
+            Log::error('Error obteniendo asistencias por fecha: ' . $e->getMessage());
+            return response()->json(['message' => 'Error obteniendo asistencias', 'error' => $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -110,28 +121,22 @@ class AsistenciaAprendicesController extends Controller
      */
     public function getDocumentsByFicha(Request $request)
     {
-        $ficha_id = $request->input('ficha'); 
+        $fichaId = $request->input('ficha'); 
         
         try {
-            if (!$ficha_id) {
+            if (!$fichaId) {
                 return response()->json(['message' => 'ID de ficha no proporcionado'], 400);
             }
 
-            $documentos = AsistenciaAprendiz::select('numero_identificacion')
-            ->whereHas('caracterizacion', function ($query) use ($ficha_id) {
-                $query->where('ficha_id', $ficha_id);
-            })
-            ->get();
+            $documentos = $this->asistenciaService->obtenerDocumentosPorFicha($fichaId);
             
             if ($documentos->isEmpty()) {
                 return response()->json(['message' => 'No se encontraron documentos para la ficha proporcionada'], 404);
             }
 
             return view('asistencias.consulta_by_document', ['documentos' => $documentos]);
-
-
-            return response()->json(['documentos' => $documentos], 200);
         } catch (Exception $e) {
+            Log::error('Error obteniendo documentos por ficha: ' . $e->getMessage());
             return response()->json(['message' => 'Error obteniendo documentos', 'error' => $e->getMessage()], 500);
         }
     }
@@ -145,17 +150,22 @@ class AsistenciaAprendicesController extends Controller
     public function getAttendanceByDocument(Request $request){
         $document = $request->input('documento'); 
        
-            if ( !$document) {
-                return response()->json(['message' => 'Datos incompletos'], 400);
-            }
+        if (!$document) {
+            return response()->json(['message' => 'Datos incompletos'], 400);
+        }
 
-            $asistencias = AsistenciaAprendiz::where('numero_identificacion', $document)->get();
+        try {
+            $asistencias = $this->asistenciaService->obtenerPorDocumento($document);
            
             if ($asistencias->isEmpty()) {
-                return response()->json(['message' => 'No se encontraron asistencias para la ficha y documento proporcionados'], 404);
+                return response()->json(['message' => 'No se encontraron asistencias para el documento proporcionado'], 404);
             }
 
             return view('asistencias.asistencia_by_document', ['asistencias' => $asistencias]);
+        } catch (Exception $e) {
+            Log::error('Error obteniendo asistencias por documento: ' . $e->getMessage());
+            return response()->json(['message' => 'Error obteniendo asistencias', 'error' => $e->getMessage()], 500);
+        }
     }
 
   
@@ -171,39 +181,31 @@ class AsistenciaAprendicesController extends Controller
      */
     public function store(Request $request)
     {
+        try {
             $data = $request->all();
-      
-            if (isset($data['attendance']) ) {
-               
-                foreach ($data['attendance'] as $attendance) {
-                    $horaIngreso = Carbon::parse($attendance['hora_ingreso'])->format('Y-m-d H:i:s');
-    
-                    AsistenciaAprendiz::create([
-                        'caracterizacion_id' => $data['caracterizacion_id'],
-                        'nombres' => $attendance['nombres'],
-                        'apellidos' => $attendance['apellidos'],
-                        'numero_identificacion' => $attendance['numero_identificacion'],
-                        'hora_ingreso' => $horaIngreso,
-                    ]);
-                }
-                return response()->json(['message' => 'Lista de asistencia guardada con éxito'], 200);
-            }else {
-                if($data != null){
-                    Log::info('Data: '.json_encode($data));
-                    $horaIngreso = Carbon::parse($data['hora_ingreso'])->format('Y-m-d H:i:s');
-                    AsistenciaAprendiz::create([
-                        'caracterizacion_id' => $data['caracterizacion_id'],
-                        'nombres' => $data['nombres'],
-                        'apellidos' => $data['apellidos'],
-                        'numero_identificacion' => $data['numero_identificacion'],
-                        'hora_ingreso' => $horaIngreso,
-                    ]);
-                    return response()->json(['message' => 'Asistencia guardada con éxito'], 200);
-                }else {
-                    return response()->json(['message' => 'Datos incompletos'], 400);
-                }
+
+            if (empty($data)) {
+                return response()->json(['message' => 'Datos incompletos'], 400);
             }
-            return response()->json(['message' => 'Error saving attendance'], 500);
+      
+            if (isset($data['attendance'])) {
+                // Registro en lote
+                $cantidad = $this->asistenciaService->registrarAsistenciaLote(
+                    $data['attendance'], 
+                    $data['caracterizacion_id']
+                );
+                
+                return response()->json(['message' => "Lista de {$cantidad} asistencias guardada con éxito"], 200);
+            } else {
+                // Registro individual
+                $this->asistenciaService->registrarAsistencia($data);
+                
+                return response()->json(['message' => 'Asistencia guardada con éxito'], 200);
+            }
+        } catch (Exception $e) {
+            Log::error('Error guardando asistencia: ' . $e->getMessage());
+            return response()->json(['message' => 'Error guardando asistencia', 'error' => $e->getMessage()], 500);
+        }
     }
 
     
@@ -228,28 +230,28 @@ class AsistenciaAprendicesController extends Controller
      */
     public function update(Request $request)
     {
+        try {
             $data = $request->all();
+            
             if (!isset($data['caracterizacion_id']) || !isset($data['hora_salida']) || !isset($data['fecha'])) {
                 return response()->json(['message' => 'Datos incompletos'], 400);
             }
-            $horaSalida = Carbon::parse($data['hora_salida'])->format('Y-m-d H:i:s');
-            $asistencias = AsistenciaAprendiz::where('caracterizacion_id', $data['caracterizacion_id'])
-                ->whereDate('created_at', $data['fecha'])
-                ->select('id', 'hora_salida')
-                ->get();
-            if (!$asistencias) {
-                return response()->json(['message' => 'Asistencias no encontradas'], 404);
+
+            $cantidad = $this->asistenciaService->actualizarHoraSalida(
+                $data['caracterizacion_id'], 
+                $data['fecha'], 
+                $data['hora_salida']
+            );
+
+            if ($cantidad === 0) {
+                return response()->json(['message' => 'No se encontraron asistencias para actualizar'], 404);
             }
 
-            foreach ($asistencias as $asistencia) {
-
-                if($asistencia->hora_salida == null){
-                    $asistencia->hora_salida = $horaSalida;
-                }
-                $asistencia->save();
-            }
-
-            return response()->json(['message' => 'Asistencias actualizadas con éxito'], 200);
+            return response()->json(['message' => "Se actualizaron {$cantidad} asistencias con éxito"], 200);
+        } catch (Exception $e) {
+            Log::error('Error actualizando asistencias: ' . $e->getMessage());
+            return response()->json(['message' => 'Error actualizando asistencias', 'error' => $e->getMessage()], 500);
+        }
     }
 
     
@@ -281,28 +283,23 @@ class AsistenciaAprendicesController extends Controller
         $numero_identificacion = $request->input('numero_identificacion');
         $hora_ingreso_peticion = $request->input('hora_entrada');
         $novedad_salida = $request->input('novedad');
-
         
         $hora_ingreso = Carbon::parse($hora_ingreso_peticion)->format('H:i:s');
-
       
         $asistencia = AsistenciaAprendiz::where('caracterizacion_id', $caracterizacion_id)
             ->where('numero_identificacion', $numero_identificacion)
             ->where('hora_ingreso', $hora_ingreso)
             ->first();
 
-        if($asistencia){
-            $asistencia->hora_salida = Carbon::now();
-            $asistencia->novedad_salida = $novedad_salida;
-            $asistencia->save();
-
-            return response()->json(['message' => 'Solicitud de respuesta acepta'], 200);
-        }
-
         if (!$asistencia) {
             return response()->json(['message' => 'No se encontró asistencia'], 404);
         }
-        
+
+        $asistencia->hora_salida = Carbon::now();
+        $asistencia->novedad_salida = $novedad_salida;
+        $asistencia->save();
+
+        return response()->json(['message' => 'Solicitud de respuesta aceptada'], 200);
     }
 
    
@@ -353,92 +350,11 @@ class AsistenciaAprendicesController extends Controller
         return response()->json(['message' => 'No se encontraron asistencias para la ficha y jornada proporcionadas'], 404);
     }
 
-    public function validateHour($ingreso, $jornada, $hora1, $min1, $hora2, $min2)
-    {
-        $horaInicio = Carbon::createFromTime($hora1, $min1 , 0); 
-        $horaFin = Carbon::createFromTime($hora2, $min2, 0); 
-      
-
-        $horaIngreso = Carbon::parse($ingreso);
-
-        if ($horaIngreso->between($horaInicio, $horaFin)) {
-            return true;
-        }
-
-         // if ($horaIngreso->between($horaInicio, $horaFin) && $jornada === $morning ) {
-        //     return true;
-        // }
-
-
-        return false;
-    }
-
-
     /**
-     * Verifica si la hora de ingreso está dentro del rango de la mañana y si la jornada es "Mañana".
-     *
-     * @param string $ingreso La hora de ingreso en formato de cadena.
-     * @param string $jornada La jornada del aprendiz.
-     * @return bool Retorna true si la hora de ingreso está entre las 06:00 y las 13:10 y la jornada es "Mañana", de lo contrario retorna false.
+     * REFACTORIZADO: Los métodos morning, afternoon, night fueron eliminados.
+     * Ahora se usa JornadaValidationService->validarHorarioJornada()
+     * Configuración en config/jornadas.php
      */
-    public function morning($ingreso, $jornada)
-    {
-        $horaInicio = Carbon::createFromTime(06, 00, 0); 
-        $horaFin = Carbon::createFromTime(13, 10, 0); 
-        $morning = 'Mañana'; 
-
-        $horaIngreso = Carbon::parse($ingreso);
-
-        if ($horaIngreso->between($horaInicio, $horaFin) && $jornada === $morning ) {
-            return true;
-        }
-
-       
-        return false;
-    }
-
-    /**
-     * Verifica si la hora de ingreso está dentro del rango de la tarde.
-     *
-     * @param string $ingreso La hora de ingreso en formato de cadena.
-     * @param string $jornada La jornada a verificar, debe ser 'Tarde'.
-     * @return bool Retorna true si la hora de ingreso está entre las 13:00 y las 18:10 y la jornada es 'Tarde', de lo contrario retorna false.
-     */
-    public function afternoon ($ingreso, $jornada){
-        $horaInicio = Carbon::createFromTime(13, 00, 0); 
-        $horaFin = Carbon::createFromTime(18, 10, 0); 
-        $morning = 'Tarde'; 
-
-        $horaIngreso = Carbon::parse($ingreso);
-
-        if ($horaIngreso->between($horaInicio, $horaFin) && $morning === $jornada) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Verifica si la hora de ingreso está dentro del rango de la noche y si la jornada es nocturna.
-     *
-     * @param string $ingreso La hora de ingreso en formato de cadena.
-     * @param string $jornada La jornada del aprendiz.
-     * @return bool Retorna true si la hora de ingreso está entre las 17:50 y las 23:10 y la jornada es nocturna, de lo contrario retorna false.
-     */
-    public function night($ingreso, $jornada)
-    {
-        $horaInicio = Carbon::createFromTime(17, 50, 0); 
-        $horaFin = Carbon::createFromTime(23, 10, 0);
-        $night = 'Noche'; 
-
-        $horaIngreso = Carbon::parse($ingreso);
-
-        if ($horaIngreso->between($horaInicio, $horaFin) && $jornada === $night) {
-            return true;
-        }
-
-        return false;
-    }
 
 
     /***********Metodos para actulizar novedades de estrada y salida**************/ 
@@ -461,55 +377,37 @@ class AsistenciaAprendicesController extends Controller
      * @throws \Exception Si ocurre un error al procesar la solicitud.
      */
     public function updateExitAsistence(Request $request){
+        try {
+            $data = $request->all();
 
-        $actualDate = Carbon::now()->format('Y-m-d');
-        $actualHour = Carbon::now()->format('H:i:s');
+            if (!isset($data['numero_identificacion']) || !isset($data['hora_ingreso']) || !isset($data['novedad_salida'])) {
+                return response()->json(['message' => 'Datos incompletos'], 400);
+            }
 
-        $data = $request->all();
+            // Obtener jornada a partir de la hora de ingreso
+            $jornada = $this->jornadaValidation->obtenerJornadaPorHora($data['hora_ingreso']);
 
-        $numeroIdentificacion = $data['numero_identificacion'];
-        $horaIngreso = Carbon::parse($data['hora_ingreso'])->format('H:i:s');
+            if (!$jornada) {
+                return response()->json(['message' => 'No se pudo determinar la jornada'], 400);
+            }
 
-        Log::info('Hora de ingreso: ' . $horaIngreso);
+            $actualizado = $this->asistenciaService->actualizarNovedadSalida(
+                $data['caracterizacion_id'] ?? 0,
+                $data['numero_identificacion'],
+                $data['hora_ingreso'],
+                $data['novedad_salida'],
+                $jornada
+            );
 
-        $asistencia = AsistenciaAprendiz::where('numero_identificacion', $numeroIdentificacion)
-            ->where('hora_ingreso', $horaIngreso)
-            ->first();
+            if ($actualizado) {
+                return response()->json(['message' => 'Novedad de salida actualizada'], 200);
+            }
 
-        Log::info('Asistencia: ' . $asistencia);
-
-        $dateAsistence = $asistencia->created_at->format('Y-m-d');
-        $actualHourCarbon = Carbon::parse($actualHour);
-
-        if($this->morningAsistence($horaIngreso, $actualHourCarbon) == true && $dateAsistence == $actualDate){
-            $asistencia->novedad_salida = $data['novedad_salida'];
-            $asistencia->hora_salida = $actualHour; 
-            $asistencia->save();
-            return response()->json(['message' => 'Novedad de salidad Actualizada'], 200);
+            return response()->json(['message' => 'No se pudo actualizar la novedad'], 400);
+        } catch (Exception $e) {
+            Log::error('Error actualizando novedad de salida: ' . $e->getMessage());
+            return response()->json(['message' => $e->getMessage()], 400);
         }
-
-        if($this->affternoonAsistence($horaIngreso, $actualHourCarbon) == true && $dateAsistence == $actualDate){
-            $asistencia->novedad_salida = $data['novedad_salida'];
-            $asistencia->hora_salida = $actualHour; 
-            $asistencia->save();
-            return response()->json(['message' => 'Novedad de salidad Actualizada'], 200);
-        }
-
-        if($this->nightAsistence($horaIngreso, $actualHourCarbon) == true && $dateAsistence == $actualDate){
-            $asistencia->novedad_salida = $data['novedad_salida'];
-            $asistencia->hora_salida = $actualHour; 
-            $asistencia->save();
-            return response()->json(['message' => 'Novedad de salidad Actualizada'], 200);
-        }
-        
-       
-
-        if (!$asistencia) {
-            return response()->json(['message' => 'Asistencia no encontrada'], 404);
-        }
-
-        
-  
     }
 
     /**
@@ -533,114 +431,42 @@ class AsistenciaAprendicesController extends Controller
      * @throws \Exception Si ocurre un error al procesar la solicitud.
      */
     public function updateEntraceAsistence (Request $request){
-        $actualDate = Carbon::now()->format('Y-m-d');
-        $actualHour = Carbon::now()->format('H:i:s');
+        try {
+            $data = $request->all();
 
-        $data = $request->all();
+            if (!isset($data['numero_identificacion']) || !isset($data['hora_ingreso']) || !isset($data['novedad_entrada'])) {
+                return response()->json(['message' => 'Datos incompletos'], 400);
+            }
 
-        log::info('data: '.json_encode($data)); 
+            // Obtener jornada a partir de la hora de ingreso
+            $jornada = $this->jornadaValidation->obtenerJornadaPorHora($data['hora_ingreso']);
 
-        $numeroIdentificacion = $data['numero_identificacion'];
-        $horaIngreso = Carbon::parse($data['hora_ingreso'])->format('H:i:s');
+            if (!$jornada) {
+                return response()->json(['message' => 'No se pudo determinar la jornada'], 400);
+            }
 
-        Log::info('Hora de ingreso: ' . $horaIngreso);
+            $actualizado = $this->asistenciaService->actualizarNovedadEntrada(
+                $data['caracterizacion_id'] ?? 0,
+                $data['numero_identificacion'],
+                $data['hora_ingreso'],
+                $data['novedad_entrada'],
+                $jornada
+            );
 
-        $asistencia = AsistenciaAprendiz::where('numero_identificacion', $numeroIdentificacion)
-            ->where('hora_ingreso', $horaIngreso)
-            ->first();
+            if ($actualizado) {
+                return response()->json(['message' => 'Novedad de entrada actualizada'], 200);
+            }
 
-        Log::info('Asistencia: ' . $asistencia);
-
-        $dateAsistence = $asistencia->created_at->format('Y-m-d');
-        $actualHourCarbon = Carbon::parse($actualHour);
-
-        if($this->morningAsistence($horaIngreso, $actualHourCarbon) == true && $dateAsistence == $actualDate){
-            $asistencia->novedad_entrada = $data['novedad_entrada'];
-            $asistencia->hora_ingreso = carbon::now()->format('H:i:s');  
-            $asistencia->save();
-            return response()->json(['message' => 'Novedad de entrada Actualizada'], 200);
-        }
-
-        if($this->affternoonAsistence($horaIngreso, $actualHourCarbon) == true && $dateAsistence == $actualDate){
-            $asistencia->novedad_entrada = $data['novedad_entrada'];
-            $asistencia->save();
-            return response()->json(['message' => 'Novedad de entrada Actualizada'], 200);
-        }
-
-        if($this->nightAsistence($horaIngreso, $actualHourCarbon) == true && $dateAsistence == $actualDate){
-            $asistencia->novedad_entrada = $data['novedad_entrada'];
-            $asistencia->save();
-            return response()->json(['message' => 'Novedad de entrada Actualizada'], 200);
-        }
-        
-        if (!$asistencia) {
-            return response()->json(['message' => 'Asistencia no encontrada'], 404);
+            return response()->json(['message' => 'No se pudo actualizar la novedad'], 400);
+        } catch (Exception $e) {
+            Log::error('Error actualizando novedad de entrada: ' . $e->getMessage());
+            return response()->json(['message' => $e->getMessage()], 400);
         }
     }
 
     /**
-     * Verifica si la hora de entrada dada y la hora actual caen dentro del período de asistencia matutina.
-     *
-     * Este método verifica si la hora de entrada proporcionada ($horaIngreso) y la hora actual ($actualHour)
-     * están dentro del período de asistencia matutina definido, que comienza a las 06:00 AM y termina a la 01:10 PM.
-     *
-     * @param string $horaIngreso La hora de entrada a verificar, en un formato que pueda ser interpretado por Carbon.
-     * @param \Carbon\Carbon $actualHour La hora actual a verificar.
-     * @return bool Devuelve true si ambas horas están dentro del período de asistencia matutina, de lo contrario false.
+     * REFACTORIZADO: Los métodos morningAsistence, affternoonAsistence, nightAsistence fueron eliminados.
+     * Ahora se usa JornadaValidationService->validarAsistenciaEnJornada()
+     * Configuración en config/jornadas.php
      */
-    
-    private function morningAsistence($horaIngreso, $actualHour){
-        $horaInicio = Carbon::createFromTime(06, 00, 0); 
-        $horaFin = Carbon::createFromTime(13, 10, 0);
-    
-        $horaIngreso = Carbon::parse($horaIngreso);
-
-        if ($horaIngreso->between($horaInicio, $horaFin) && $actualHour->between($horaInicio, $horaFin)) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Verifica si la hora de ingreso y la hora actual están dentro del rango de asistencia de la tarde.
-     *
-     * @param string $horaIngreso La hora de ingreso en formato de cadena.
-     * @param \Carbon\Carbon $actualHour La hora actual como una instancia de Carbon.
-     * @return bool Retorna true si ambas horas están dentro del rango de 13:00 a 18:10, de lo contrario, retorna false.
-     */
-    private function affternoonAsistence($horaIngreso, $actualHour){
-        $horaInicio = Carbon::createFromTime(13, 00, 0); 
-        $horaFin = Carbon::createFromTime(18, 10, 0);
-    
-        $horaIngreso = Carbon::parse($horaIngreso);
-
-        if ($horaIngreso->between($horaInicio, $horaFin) && $actualHour->between($horaInicio, $horaFin)) {
-            return true;
-        }
-
-        return false;
-
-    }
-
-    /**
-     * Verifica si la hora de ingreso y la hora actual están dentro del rango de asistencia nocturna.
-     *
-     * @param string $horaIngreso La hora de ingreso en formato de cadena.
-     * @param \Carbon\Carbon $actualHour La hora actual como instancia de Carbon.
-     * @return bool Retorna true si ambas horas están dentro del rango de asistencia nocturna, de lo contrario retorna false.
-     */
-    private function nightAsistence($horaIngreso, $actualHour){
-        $horaInicio = Carbon::createFromTime(17, 50, 0); 
-        $horaFin = Carbon::createFromTime(23, 10, 0);
-        $horaIngreso = Carbon::parse($horaIngreso);
-
-        if ($horaIngreso->between($horaInicio, $horaFin) && $actualHour->between($horaInicio, $horaFin)) {
-            return true;
-        }
-
-        return false;
-    }
-    
-   
 }

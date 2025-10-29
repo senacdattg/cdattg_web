@@ -2,23 +2,25 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\BloqueService;
 use App\Models\Bloque;
+use App\Models\Sede;
 use App\Http\Requests\StoreBloqueRequest;
 use App\Http\Requests\UpdateBloqueRequest;
-use App\Models\Sede;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class BloqueController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth'); // Middleware de autenticación para todos los métodos del controlador
+    protected BloqueService $bloqueService;
 
-        // Middleware específico para métodos individuales
+    public function __construct(BloqueService $bloqueService)
+    {
+        $this->middleware('auth');
+        $this->bloqueService = $bloqueService;
+
         $this->middleware('can:VER BLOQUE')->only('index');
         $this->middleware('can:VER BLOQUE')->only('show');
         $this->middleware('can:CREAR BLOQUE')->only(['create', 'store']);
@@ -30,22 +32,20 @@ class BloqueController extends Controller
      */
     public function index()
     {
-        $bloques = Bloque::paginate(10);
+        $bloques = $this->bloqueService->listar(10);
         return view('bloque.index', compact('bloques'));
     }
-    public function cargarBloques($sede_id){
-        // DB::enableQueryLog();
-        $bloques = Bloque::where('sede_id', $sede_id)->get();
+
+    public function cargarBloques($sede_id)
+    {
+        $bloques = $this->bloqueService->obtenerPorSede($sede_id);
         return response()->json(['success' => true, 'bloques' => $bloques]);
-        // dd(DB::getQueryLog());
     }
+
     public function apiCargarBloques(Request $request)
     {
-        // DB::enableQueryLog();
-        $sede_id = $request->sede_id;
-        $bloques = Bloque::where('sede_id', $sede_id)->get();
+        $bloques = $this->bloqueService->obtenerPorSede($request->sede_id);
         return response()->json($bloques, 200);
-        // dd(DB::getQueryLog());
     }
     /**
      * Show the form for creating a new resource.
@@ -61,23 +61,20 @@ class BloqueController extends Controller
      */
     public function store(StoreBloqueRequest $request)
     {
-        // @dd($request);
         try {
-            $bloque = Bloque::create([
+            $datos = [
                 'bloque' => $request->input('bloque'),
                 'sede_id' => $request->input('sede_id'),
-                'user_create_id' => Auth::user()->id,
-                'user_edit_id' => Auth::user()->id,
-            ]);
+                'user_create_id' => Auth::id(),
+                'user_edit_id' => Auth::id(),
+            ];
+
+            $this->bloqueService->crear($datos);
+
             return redirect()->route('bloque.index')->with('success', '¡Registro Exitoso!');
-        } catch (QueryException $e) {
-            // Manejar excepciones de la base de datos
-            @dd($e);
-            return redirect()->back()->withErrors(['error' => 'Error de base de datos. Por favor, inténtelo de nuevo.']);
         } catch (\Exception $e) {
-            // Manejar otras excepciones
-            @dd($e);
-            return redirect()->back()->withErrors(['error' => 'Se produjo un error. Por favor, inténtelo de nuevo.']);
+            Log::error('Error al crear bloque: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al crear bloque.');
         }
     }
 
@@ -103,19 +100,20 @@ class BloqueController extends Controller
      */
     public function update(UpdateBloqueRequest $request, Bloque $bloque)
     {
-        try{
-            DB::beginTransaction();
-            $bloque->update([
+        try {
+            $datos = [
                 'bloque' => $request->bloque,
                 'sede_id' => $request->sede_id,
                 'status' => $request->status,
-                'user_edit_id' => Auth::user()->id,
-            ]);
-            DB::commit();
-            return redirect()->route('bloque.show', ['bloque' => $bloque->id])->with('success', 'Bloque Actualizado con éxito.');
-        }catch (QueryException $e){
-            DB::rollBack();
-            return redirect()->back()->withInput()->with('error', 'No se pudo actualizar el bloque. ' . $e->getMessage());
+                'user_edit_id' => Auth::id(),
+            ];
+
+            $this->bloqueService->actualizar($bloque->id, $datos);
+
+            return redirect()->route('bloque.show', $bloque->id)->with('success', 'Bloque actualizado con éxito.');
+        } catch (\Exception $e) {
+            Log::error('Error al actualizar bloque: ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Error al actualizar bloque.');
         }
     }
 
@@ -125,31 +123,26 @@ class BloqueController extends Controller
     public function destroy(Bloque $bloque)
     {
         try {
-            DB::beginTransaction();
-            $bloque->delete();
-            DB::commit();
+            $this->bloqueService->eliminar($bloque->id);
+
             return redirect()->route('bloque.index')->with('success', 'Bloque eliminado exitosamente');
         } catch (QueryException $e) {
-            DB::rollBack();
             if ($e->getCode() == 23000) {
-                return redirect()->back()->with('error','El bloque esta siendo usado y no es posible eliminarlo.');
+                return redirect()->back()->with('error', 'El bloque está en uso, no se puede eliminar.');
             }
+            return redirect()->back()->with('error', 'Error al eliminar bloque.');
         }
     }
-    public function cambiarEstado(Bloque $bloque){
-        try{
-            DB::beginTransaction();
-            if($bloque->status == 1){
 
-                $bloque->update(['status' => 0]);
-            }else{
-                $bloque->update(['status' => 1]);
-            }
-            DB::commit();
-            return redirect()->back();
-        }catch (QueryException $e){
-            DB::rollBack();
-            return redirect()->back()->with('error', 'Ha ocurrido un error al actualizar el estado del bloque' . $e->getMessage());
+    public function cambiarEstado(Bloque $bloque)
+    {
+        try {
+            $this->bloqueService->cambiarEstado($bloque->id);
+
+            return redirect()->back()->with('success', 'Estado cambiado exitosamente.');
+        } catch (\Exception $e) {
+            Log::error('Error al cambiar estado: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Error al actualizar estado.');
         }
     }
 }

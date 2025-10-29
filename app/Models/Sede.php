@@ -33,4 +33,9 @@ class Sede extends Model
     {
         return $this->belongsTo(Municipio::class);
     }
+
+    public function regional()
+    {
+        return $this->belongsTo(Regional::class);
+    }
 }

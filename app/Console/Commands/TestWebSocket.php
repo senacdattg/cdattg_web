@@ -4,7 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Events\QrScanned;
-use App\Events\AsistenciaCreated;
+use App\Events\NuevaAsistenciaRegistrada;
 
 class TestWebSocket extends Command
 {
@@ -59,15 +59,15 @@ class TestWebSocket extends Command
 
     private function testAsistenciaEvent()
     {
-        // Crear una asistencia de prueba
-        $asistencia = new \App\Models\AsistenciaAprendiz([
-            'instructor_ficha_id' => 1,
-            'aprendiz_ficha_id' => 1,
-            'hora_ingreso' => now()->format('H:i:s'),
-            'hora_salida' => null,
-        ]);
+        // Crear datos de asistencia de prueba
+        $asistenciaData = [
+            'id' => 999,
+            'aprendiz' => 'Juan Pérez - Prueba',
+            'estado' => 'entrada',
+            'timestamp' => now()->toISOString(),
+        ];
 
-        event(new AsistenciaCreated($asistencia));
-        $this->info('Evento AsistenciaCreated enviado con datos de prueba');
+        event(new NuevaAsistenciaRegistrada($asistenciaData));
+        $this->info('Evento NuevaAsistenciaRegistrada enviado con datos de prueba');
     }
 }

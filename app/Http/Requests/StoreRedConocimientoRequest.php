@@ -11,7 +11,7 @@ class StoreRedConocimientoRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,25 @@ class StoreRedConocimientoRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'nombre' => ['required', 'string', 'max:255', 'unique:red_conocimientos,nombre'],
+            'regionals_id' => ['nullable', 'integer', 'exists:regionals,id'],
+        ];
+    }
+
+    /**
+     * Get custom error messages for validator.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'nombre.required' => 'El nombre de la red de conocimiento es obligatorio.',
+            'nombre.string' => 'El nombre debe ser una cadena de texto.',
+            'nombre.max' => 'El nombre no puede exceder los 255 caracteres.',
+            'nombre.unique' => 'Ya existe una red de conocimiento con este nombre.',
+            'regionals_id.integer' => 'El ID de la regional debe ser un número entero.',
+            'regionals_id.exists' => 'La regional seleccionada no existe.',
         ];
     }
 }

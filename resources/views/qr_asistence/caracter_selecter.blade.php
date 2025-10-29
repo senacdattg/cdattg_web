@@ -5,43 +5,38 @@
 @endsection
 
 @section('content_header')
-    <section class="content-header dashboard-header py-4">
-        <div class="container-fluid">
-            <div class="row align-items-center">
-                <div class="col-12 col-md-6 d-flex align-items-center">
-                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mr-3"
-                        style="width: 48px; height: 48px;">
-                        <i class="fas fa-fw fa-paint-brush text-white"></i>
-                    </div>
-                    <div>
-                        <h1 class="h3 mb-0 text-gray-800">Fichas de formación</h1>
-                        <p class="text-muted mb-0 font-weight-light">Gestión de fichas de formación</p>
-                    </div>
-                </div>
-                <div class="col-sm-6">
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb bg-transparent mb-0 justify-content-end">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('verificarLogin') }}" class="link_right_header">
-                                    <i class="fas fa-home"></i> Inicio
-                                </a>
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page">
-                                <i class="fas fa-fw fa-paint-brush"></i> Fichas de formación
-                            </li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-        </div>
-    </section>
+    <x-page-header 
+        icon="fa-home" 
+        title="Fichas de formación"
+        subtitle="Gestión de fichas de formación"
+        :breadcrumb="[['label' => 'Inicio', 'url' => route('verificarLogin') , 'icon' => 'fa-home'], ['label' => 'Fichas de formación', 'icon' => 'fa-fw fa-paint-brush', 'active' => true]]"
+    />
 @endsection
 
 @section('content')
+    <x-session-alerts />
+    
     <section class="content">
         <div class="container-fluid">
-            <div class="row">
-                @foreach ($instructorFicha as $caracterizacion)
+            @if(empty($instructorFicha) || $instructorFicha->isEmpty())
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-body text-center py-5">
+                                <i class="fas fa-exclamation-triangle text-warning" style="font-size: 4rem;"></i>
+                                <h3 class="mt-3 text-muted">No tienes fichas asignadas</h3>
+                                <p class="text-muted">No se encontraron fichas de caracterización asignadas a tu cuenta.</p>
+                                <p class="text-muted">Contacta al administrador para que te asigne las fichas correspondientes.</p>
+                                <a href="{{ route('verificarLogin') }}" class="btn btn-primary mt-3">
+                                    <i class="fas fa-home mr-2"></i>Volver al inicio
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="row">
+                    @foreach ($instructorFicha as $caracterizacion)
                     <div class="col-md-4 mb-4">
                         <div
                             class="card h-100 shadow-sm border-0 rounded-lg overflow-hidden transition-all hover:shadow-lg">
@@ -159,8 +154,9 @@
                             </div>
                         </div>
                     </div>
-                @endforeach
-            </div>
+                    @endforeach
+                </div>
+            @endif
         </div>
     </section>
 @endsection

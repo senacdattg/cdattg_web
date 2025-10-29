@@ -1,146 +1,121 @@
 @extends('adminlte::page')
 
-@section('content')
-        <!-- Encabezado de la página -->
-        <section class="content-header">
-            <div class="container-fluid">
-                <div class="row mb-2">
-                    <div class="col-sm-6">
-                        <h1>Personas</h1>
-                    </div>
-                    <div class="col-sm-6">
-                        <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item">
-                                <a href="{{ route('verificarLogin') }}">Inicio</a>
-                            </li>
-                            <li class="breadcrumb-item active">Personas</li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Contenido principal -->
-        <section class="content">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title">Lista de Personas</h3>
-                    <div class="card-tools">
-                        @can('CREAR PERSONA')
-                            <a href="{{ route('personas.create') }}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-plus"></i> Crear Persona
-                            </a>
-                        @endcan
-                    </div>
-                </div>
-
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-striped projects text-center">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Nombre y Apellido</th>
-                                    <th>Número de Documento</th>
-                                    <th>Correo Electrónico</th>
-                                    <th>Estado</th>
-                                    <th colspan="4">Opciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($personas as $persona)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td>{{ $persona->nombre_completo }}</td>
-                                        <td>{{ $persona->numero_documento }}</td>
-                                        <td>{{ $persona->email }}</td>
-                                        <td class="project-state">
-                                            <span class="badge badge-{{ $persona->status === 1 ? 'success' : 'danger' }}">
-                                                {{ $persona->status === 1 ? 'ACTIVO' : 'INACTIVO' }}
-                                            </span>
-                                        </td>
-                                        <td class="project-actions">
-                                            @can('CAMBIAR ESTADO PERSONA')
-                                                <form class="d-inline"
-                                                    action="{{ route('persona.cambiarEstadoPersona', $persona->id) }}"
-                                                    method="POST" title="Cambiar Estado">
-                                                    @csrf
-                                                    @method('PUT')
-                                                    <button type="submit" class="btn btn-success btn-sm">
-                                                        <i class="fas fa-sync"></i>
-                                                    </button>
-                                                </form>
-                                            @endcan
-                                            @can('VER PERSONA')
-                                                <a href="{{ route('personas.show', $persona->id) }}"
-                                                    class="btn btn-warning btn-sm" title="Ver">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                            @endcan
-                                            @can('EDITAR PERSONA')
-                                                <a href="{{ route('personas.edit', $persona->id) }}"
-                                                    class="btn btn-info btn-sm" title="Editar">
-                                                    <i class="fas fa-pencil-alt"></i>
-                                                </a>
-                                            @endcan
-                                            @can('ELIMINAR PERSONA')
-                                                <form class="d-inline eliminar-persona-form"
-                                                    action="{{ route('personas.destroy', $persona->id) }}" method="POST"
-                                                    title="Eliminar">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-danger btn-sm">
-                                                        <i class="fas fa-trash"></i>
-                                                    </button>
-                                                </form>
-                                            @endcan
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="9" class="text-center">No hay personas registradas</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Paginación -->
-                <div class="card-footer">
-                    <div class="float-right">
-                        {{ $personas->links() }}
-                    </div>
-                </div>
-            </div>
-        </section>
-    </div>
+@section('css')
+    @vite(['resources/css/parametros.css'])
 @endsection
 
-@section('script')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const forms = document.querySelectorAll('.eliminar-persona-form');
-            forms.forEach(form => {
-                form.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    Swal.fire({
-                        title: '¿Está seguro de eliminar esta persona?',
-                        text: "¡Esta acción no se podrá revertir!",
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#3085d6',
-                        cancelButtonColor: '#d33',
-                        confirmButtonText: 'Sí, eliminar',
-                        cancelButtonText: 'Cancelar'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            form.submit();
-                        }
-                    });
-                });
-            });
-        });
-    </script>
+@section('content_header')
+    <x-page-header 
+        icon="fa-cogs" 
+        title="Personas"
+        subtitle="Gestión de personas del sistema"
+        :breadcrumb="[['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'], ['label' => 'Personas', 'icon' => 'fa-cog', 'active' => true]]"
+    />
+@endsection
+
+@section('content')
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <x-create-card 
+                        url="{{ route('personas.create') }}"
+                        title="Crear Persona"
+                        icon="fa-plus-circle"
+                        permission="CREAR PERSONA"
+                    />
+
+                    <x-data-table 
+                        title="Lista de Personas"
+                        searchable="true"
+                        searchAction="{{ route('personas.index') }}"
+                        searchPlaceholder="Buscar persona..."
+                        searchValue="{{ request('search') }}"
+                        :columns="[
+                            ['label' => '#', 'width' => '5%'],
+                            ['label' => 'Nombre y Apellido', 'width' => '25%'],
+                            ['label' => 'Número de Documento', 'width' => '20%'],
+                            ['label' => 'Correo Electrónico', 'width' => '25%'],
+                            ['label' => 'Estado', 'width' => '10%'],
+                            ['label' => 'Opciones', 'width' => '15%', 'class' => 'text-center']
+                        ]"
+                        :pagination="$personas->links()"
+                    >
+                        @forelse ($personas as $persona)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $persona->nombre_completo }}</td>
+                                <td>{{ $persona->numero_documento }}</td>
+                                <td>{{ $persona->email }}</td>
+                                <td class="text-center">
+                                    <span class="badge badge-{{ $persona->status === 1 ? 'success' : 'danger' }}">
+                                        {{ $persona->status === 1 ? 'ACTIVO' : 'INACTIVO' }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        @can('CAMBIAR ESTADO PERSONA')
+                                            <form class="d-inline"
+                                                action="{{ route('persona.cambiarEstadoPersona', $persona->id) }}"
+                                                method="POST" title="Cambiar Estado"
+                                                style="display: inline-block; margin-right: 2px;">
+                                                @csrf
+                                                @method('PUT')
+                                                <button type="submit" class="btn btn-sm btn-light">
+                                                    <i class="fas fa-sync text-success"></i>
+                                                </button>
+                                            </form>
+                                        @endcan
+                                        @can('VER PERSONA')
+                                            <a href="{{ route('personas.show', $persona->id) }}"
+                                                class="btn btn-sm btn-light" title="Ver"
+                                                style="margin-right: 2px;">
+                                                <i class="fas fa-eye text-warning"></i>
+                                            </a>
+                                        @endcan
+                                        @can('EDITAR PERSONA')
+                                            <a href="{{ route('personas.edit', $persona->id) }}"
+                                                class="btn btn-sm btn-light" title="Editar"
+                                                style="margin-right: 2px;">
+                                                <i class="fas fa-pencil-alt text-primary"></i>
+                                            </a>
+                                        @endcan
+                                        @can('ELIMINAR PERSONA')
+                                            <form class="d-inline eliminar-persona-form"
+                                                action="{{ route('personas.destroy', $persona->id) }}" method="POST"
+                                                title="Eliminar"
+                                                style="display: inline-block;"
+                                                onsubmit="return confirm('¿Está seguro de eliminar esta persona?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-light">
+                                                    <i class="fas fa-trash-alt text-danger"></i>
+                                                </button>
+                                            </form>
+                                        @endcan
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center">No hay personas registradas</td>
+                            </tr>
+                        @endforelse
+                    </x-data-table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @include('components.confirm-delete-modal')
+@endsection
+
+@section('footer')
+    @include('layout.footer')
+@endsection
+
+@section('js')
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @vite(['resources/js/parametros.js'])
+    @vite(['resources/js/pages/formularios-generico.js'])
 @endsection

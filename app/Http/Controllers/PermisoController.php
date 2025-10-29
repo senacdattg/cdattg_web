@@ -2,13 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\PermisoService;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class PermisoController extends Controller
 {
+    protected PermisoService $permisoService;
+
+    public function __construct(PermisoService $permisoService)
+    {
+        $this->permisoService = $permisoService;
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -38,34 +47,16 @@ class PermisoController extends Controller
      */
     public function store(Request $request)
     {
-        $permisosUser = $request->input('permisos', []);
-        $user_id = $request->user_id;
-        $user = User::find($user_id);
-        $roles = $user->roles->pluck('name'); // Obtener los nombres de los roles del usuario
-        $instructorNecesario = false;
-        $instructorRole = false;
+        try {
+            $permisosUser = $request->input('permisos', []);
+            $userId = $request->user_id;
 
-        foreach ($permisosUser as $permiso) {
-            if ($permiso == 'TOMAR ASISTENCIA') {
-                $instructorNecesario = true;
-                break;
-            }
-        }
+            $this->permisoService->asignarPermisos($userId, $permisosUser);
 
-        if ($instructorNecesario) {
-            if ($roles->contains('INSTRUCTOR')) {
-                $instructorRole = true;
-            }
-
-            if ($instructorRole) {
-                $user->syncPermissions($permisosUser);
-                return redirect()->route('permiso.index')->with('success', 'Permisos asignados con éxito');
-            } else {
-                return redirect()->back()->with('error', 'Para asignar el permiso TOMAR ASISTENCIA el usuario debe tener el Rol de instructor');
-            }
-        } else {
-            $user->syncPermissions($permisosUser);
             return redirect()->route('permiso.index')->with('success', 'Permisos asignados con éxito');
+        } catch (\Exception $e) {
+            Log::error('Error al asignar permisos: ' . $e->getMessage());
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 

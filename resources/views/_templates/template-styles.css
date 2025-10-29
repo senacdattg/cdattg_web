@@ -1,0 +1,269 @@
+/**
+ * PLANTILLA DE ESTILOS CSS - Sistema SENA
+ * 
+ * Combina el diseño de:
+ * - CRUD de Parámetros (formularios limpios)
+ * - Headers de Fichas de Caracterización (diseño profesional)
+ * 
+ * Para usar en un nuevo módulo:
+ * 1. Copia este archivo a resources/css/{tu-modulo}.css
+ * 2. Agrégalo en vite.config.js en la sección input
+ * 3. Usa @vite(['resources/css/{tu-modulo}.css']) en tus vistas
+ */
+
+/* ========================================
+   HEADER Y NAVEGACIÓN
+   ======================================== */
+.dashboard-header {
+    background: #fff;
+    border-bottom: 1px solid rgba(0, 0, 0, .05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .03);
+}
+
+.breadcrumb-item {
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+}
+
+.breadcrumb-item i {
+    font-size: 0.8rem;
+    margin-right: 0.4rem;
+}
+
+.breadcrumb-item a {
+    color: #4a5568;
+    text-decoration: none;
+}
+
+.breadcrumb-item.active {
+    color: #718096;
+}
+
+.link_right_header {
+    color: #4a5568;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.link_right_header:hover {
+    font-size: 15px;
+    color: #4299e1;
+}
+
+/* ========================================
+   TARJETAS Y CONTENEDORES
+   ======================================== */
+.no-hover {
+    transition: none !important;
+}
+
+.no-hover:hover {
+    transform: none !important;
+}
+
+.detail-card {
+    border: none;
+    box-shadow: 0 0 10px rgba(0, 0, 0, .05);
+}
+
+.card-header.d-flex {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.card-header .btn-primary {
+    white-space: nowrap;
+}
+
+/* ========================================
+   BADGES Y ESTADOS
+   ======================================== */
+.bg-success-light {
+    background-color: rgba(40, 167, 69, 0.1);
+}
+
+.bg-danger-light {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.bg-primary-light {
+    background-color: rgba(66, 153, 225, 0.1);
+}
+
+.bg-secondary-light {
+    background-color: rgba(108, 117, 125, 0.1);
+}
+
+.rounded-pill {
+    font-size: 0.875rem;
+}
+
+.status-badge {
+    border-radius: 50px;
+    font-weight: 500;
+}
+
+/* ========================================
+   BOTONES
+   ======================================== */
+.btn-light {
+    background-color: #f8f9fa;
+    border-color: #f8f9fa;
+    transition: all 0.2s ease;
+}
+
+.btn-light:hover {
+    background-color: #e2e6ea;
+    border-color: #dae0e5;
+    transform: translateY(-1px);
+}
+
+.btn-outline-primary {
+    color: #4299e1;
+    border-color: #4299e1;
+}
+
+.btn-outline-primary:hover {
+    background-color: #4299e1;
+    color: white;
+}
+
+.card-header .btn-sm {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-group .btn {
+    margin: 0 2px;
+}
+
+.btn-group-sm > .btn,
+.btn-group-sm .btn {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    border-radius: 0.2rem;
+    min-width: 36px;
+}
+
+.btn-group .btn-light {
+    border: 1px solid #dee2e6;
+    margin: 0 1px;
+}
+
+/* ========================================
+   FORMULARIOS
+   ======================================== */
+.form-control {
+    border-radius: 0.25rem;
+    border: 1px solid #e2e8f0;
+    padding: 0.5rem 1rem;
+}
+
+.form-control:focus {
+    border-color: #4299e1;
+    box-shadow: 0 0 0 0.2rem rgba(66, 153, 225, 0.25);
+}
+
+.form-label {
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    color: #4a5568;
+}
+
+/* ========================================
+   TABLAS
+   ======================================== */
+.table td,
+.table th {
+    vertical-align: middle;
+}
+
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.detail-table th {
+    width: 240px;
+    background-color: #f8f9fc;
+}
+
+td[style*="white-space: nowrap"] {
+    min-width: 200px;
+}
+
+/* ========================================
+   TEXTOS Y TIPOGRAFÍA
+   ======================================== */
+.text-xs {
+    font-size: 0.7rem;
+}
+
+.text-gray-300 {
+    color: #dddfeb !important;
+}
+
+.text-gray-800 {
+    color: #5a5c69 !important;
+}
+
+.user-info {
+    color: #495057;
+    font-weight: 500;
+}
+
+.timestamp {
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+small {
+    font-size: 16px !important;
+    color: #6c757d;
+}
+
+/* ========================================
+   BORDES Y DECORACIÓN
+   ======================================== */
+.border-left-primary {
+    border-left: 0.25rem solid #4e73df !important;
+}
+
+.border-left-success {
+    border-left: 0.25rem solid #1cc88a !important;
+}
+
+.border-left-warning {
+    border-left: 0.25rem solid #f6c23e !important;
+}
+
+.border-left-info {
+    border-left: 0.25rem solid #36b9cc !important;
+}
+
+/* ========================================
+   RESPONSIVE
+   ======================================== */
+@media (max-width: 768px) {
+    .card-header.d-flex {
+        flex-direction: column;
+        align-items: flex-start !important;
+    }
+    
+    .card-header .btn-primary {
+        width: 100%;
+        text-align: center;
+    }
+
+    .input-group.w-25 {
+        width: 100% !important;
+        margin-top: 1rem;
+    }
+}
+

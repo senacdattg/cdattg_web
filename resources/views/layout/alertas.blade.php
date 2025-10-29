@@ -16,6 +16,7 @@
         setTimeout(function() {
             var successMessage = @json(Session::get('success'));
             var errorMessage = @json(Session::get('error'));
+            var warningMessage = @json(Session::get('warning'));
 
             if (successMessage) {
                 Toastify({
@@ -52,6 +53,30 @@
                         background: "#ffffff",
                         color: "#c62828",
                         border: "1px solid #f5c6cb",
+                        borderRadius: "6px",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                        minWidth: "400px",
+                        padding: "16px",
+                        textAlign: "center",
+                        fontSize: "16px",
+                        fontWeight: "500",
+                        fontFamily: "'Segoe UI', Arial, sans-serif"
+                    },
+                    close: true
+                }).showToast();
+            }
+
+            if (warningMessage) { 
+                Toastify({
+                    text: `<i class="fas fa-exclamation-triangle"></i> ${warningMessage}`,
+                    duration: 4000,
+                    gravity: "top",
+                    position: "center",
+                    escapeMarkup: false,
+                    style: {
+                        background: "#ffffff",
+                        color: "#ff9800",
+                        border: "1px solid #ffeaa7",
                         borderRadius: "6px",
                         boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
                         minWidth: "400px",

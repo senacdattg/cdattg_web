@@ -70,11 +70,18 @@ class RolePermissionSeeder extends Seeder
             'VER INSTRUCTOR',
             'EDITAR INSTRUCTOR',
             'ELIMINAR INSTRUCTOR',
+            'GESTIONAR ESPECIALIDADES INSTRUCTOR',
+            'VER FICHAS ASIGNADAS',
+            'CAMBIAR ESTADO INSTRUCTOR',
             // Permisos para fichas de caracterización
-            'CREAR FICHA DE CARACTERIZACION',
-            'EDITAR FICHA DE CARACTERIZACION',
-            'VER FICHA DE CARACTERIZACION',
-            'ELIMINAR FICHA DE CARACTERIZACION',
+            'CREAR FICHA CARACTERIZACION',
+            'EDITAR FICHA CARACTERIZACION',
+            'VER FICHA CARACTERIZACION',
+            'ELIMINAR FICHA CARACTERIZACION',
+            'GESTIONAR INSTRUCTORES FICHA',
+            'GESTIONAR DIAS FICHA',
+            'GESTIONAR APRENDICES FICHA',
+            'CAMBIAR ESTADO FICHA',
             // Permisos para roles y permisos
             'ASIGNAR PERMISOS',
             // Permisos para asistencia
@@ -90,6 +97,7 @@ class RolePermissionSeeder extends Seeder
             'EDITAR PERSONA',
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+<<<<<<< HEAD
             // Permisos para inventario
             // Productos
             'CREAR PRODUCTO',
@@ -111,6 +119,39 @@ class RolePermissionSeeder extends Seeder
             // Salidas
             'VER SALIDA',
             'CREAR SALIDA',
+=======
+            // Permisos para redes de conocimiento
+            'CREAR RED CONOCIMIENTO',
+            'EDITAR RED CONOCIMIENTO',
+            'VER RED CONOCIMIENTO',
+            'ELIMINAR RED CONOCIMIENTO',
+            // Permisos para aprendices
+            'VER APRENDIZ',
+            'CREAR APRENDIZ',
+            'EDITAR APRENDIZ',
+            'ELIMINAR APRENDIZ',
+            // Permisos para programas de formación
+            'programa.index',
+            'programa.show',
+            'programa.create',
+            'programa.edit',
+            'programa.delete',
+            'programa.search',
+            // Permisos para resultados de aprendizaje
+            'VER RESULTADO APRENDIZAJE',
+            'CREAR RESULTADO APRENDIZAJE',
+            'EDITAR RESULTADO APRENDIZAJE',
+            'ELIMINAR RESULTADO APRENDIZAJE',
+            'GESTIONAR COMPETENCIAS RAP',
+            'CAMBIAR ESTADO RAP',
+            // Permisos para competencias
+            'VER COMPETENCIA',
+            'CREAR COMPETENCIA',
+            'EDITAR COMPETENCIA',
+            'ELIMINAR COMPETENCIA',
+            'GESTIONAR RESULTADOS COMPETENCIA',
+            'CAMBIAR ESTADO COMPETENCIA',
+>>>>>>> aa8374eeeafe82d12e153dfcc3d0c8cd7d7afe3e
         ];
 
         // Crear cada permiso si no existe
@@ -157,16 +198,34 @@ class RolePermissionSeeder extends Seeder
             'VER AMBIENTE',
             'EDITAR AMBIENTE',
             'ELIMINAR AMBIENTE',
+            // Permisos para instructores
+            'CREAR INSTRUCTOR',
+            'VER INSTRUCTOR',
+            'EDITAR INSTRUCTOR',
+            'ELIMINAR INSTRUCTOR',
+            'GESTIONAR ESPECIALIDADES INSTRUCTOR',
+            'VER FICHAS ASIGNADAS',
+            'CAMBIAR ESTADO INSTRUCTOR',
             'ASIGNAR PERMISOS',
             'VER PROGRAMA DE CARACTERIZACION',
             'CREAR PROGRAMA DE CARACTERIZACION',
             'EDITAR PROGRAMA DE CARACTERIZACION',
             'ELIMINAR PROGRAMA DE CARACTERIZACION',
+            // Permisos para fichas de caracterización
+            'CREAR FICHA CARACTERIZACION',
+            'EDITAR FICHA CARACTERIZACION',
+            'VER FICHA CARACTERIZACION',
+            'ELIMINAR FICHA CARACTERIZACION',
+            'GESTIONAR INSTRUCTORES FICHA',
+            'GESTIONAR DIAS FICHA',
+            'GESTIONAR APRENDICES FICHA',
+            'CAMBIAR ESTADO FICHA',
             'CREAR PERSONA',
             'VER PERSONA',
             'EDITAR PERSONA',
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+<<<<<<< HEAD
             'CREAR PRODUCTO',
             'VER PRODUCTO',
             'EDITAR PRODUCTO',
@@ -182,27 +241,111 @@ class RolePermissionSeeder extends Seeder
             'CREAR ENTRADA',
             'VER SALIDA',
             'CREAR SALIDA',
+=======
+            'CREAR RED CONOCIMIENTO',
+            'EDITAR RED CONOCIMIENTO',
+            'VER RED CONOCIMIENTO',
+            'ELIMINAR RED CONOCIMIENTO',
+            'VER APRENDIZ',
+            'CREAR APRENDIZ',
+            'EDITAR APRENDIZ',
+            'ELIMINAR APRENDIZ',
+            // Permisos para programas de formación
+            'programa.index',
+            'programa.show',
+            'programa.create',
+            'programa.edit',
+            'programa.delete',
+            'programa.search',
+            // Permisos para resultados de aprendizaje
+            'VER RESULTADO APRENDIZAJE',
+            'CREAR RESULTADO APRENDIZAJE',
+            'EDITAR RESULTADO APRENDIZAJE',
+            'ELIMINAR RESULTADO APRENDIZAJE',
+            'GESTIONAR COMPETENCIAS RAP',
+            'CAMBIAR ESTADO RAP',
+            // Permisos para competencias
+            'VER COMPETENCIA',
+            'CREAR COMPETENCIA',
+            'EDITAR COMPETENCIA',
+            'ELIMINAR COMPETENCIA',
+            'GESTIONAR RESULTADOS COMPETENCIA',
+            'CAMBIAR ESTADO COMPETENCIA',
+>>>>>>> aa8374eeeafe82d12e153dfcc3d0c8cd7d7afe3e
         ]);
 
         // Asignar permisos al rol ADMINISTRADOR
         $administrador->givePermissionTo([
-            'CREAR FICHA DE CARACTERIZACION',
-            'EDITAR FICHA DE CARACTERIZACION',
-            'VER FICHA DE CARACTERIZACION',
-            'ELIMINAR FICHA DE CARACTERIZACION',
+            // Permisos para fichas de caracterización
+            'CREAR FICHA CARACTERIZACION',
+            'EDITAR FICHA CARACTERIZACION',
+            'VER FICHA CARACTERIZACION',
+            'ELIMINAR FICHA CARACTERIZACION',
+            'GESTIONAR INSTRUCTORES FICHA',
+            'GESTIONAR DIAS FICHA',
+            'GESTIONAR APRENDICES FICHA',
+            'CAMBIAR ESTADO FICHA',
+            // Permisos para instructores
             'CREAR INSTRUCTOR',
             'VER INSTRUCTOR',
             'EDITAR INSTRUCTOR',
             'ELIMINAR INSTRUCTOR',
+            'GESTIONAR ESPECIALIDADES INSTRUCTOR',
+            'VER FICHAS ASIGNADAS',
+            'CAMBIAR ESTADO INSTRUCTOR',
+            // Permisos para personas
             'CREAR PERSONA',
             'VER PERSONA',
             'EDITAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+            // Permisos para redes de conocimiento
+            'CREAR RED CONOCIMIENTO',
+            'EDITAR RED CONOCIMIENTO',
+            'VER RED CONOCIMIENTO',
+            'ELIMINAR RED CONOCIMIENTO',
+            // Permisos para aprendices
+            'VER APRENDIZ',
+            'CREAR APRENDIZ',
+            'EDITAR APRENDIZ',
+            'ELIMINAR APRENDIZ',
+            // Permisos para programas de formación (solo lectura y búsqueda para administradores)
+            'programa.index',
+            'programa.show',
+            'programa.search',
         ]);
 
         // Asignar permisos al rol INSTRUCTOR
         $instructor->givePermissionTo([
             'TOMAR ASISTENCIA',
+            'VER APRENDIZ',
+            // Permisos para instructores (solo los que le corresponden)
+            'VER INSTRUCTOR',
+            'VER FICHAS ASIGNADAS',
+            // Permisos para fichas de caracterización (limitados a fichas asignadas)
+            'VER FICHA CARACTERIZACION',
+            'EDITAR FICHA CARACTERIZACION',
+            'GESTIONAR DIAS FICHA',
+            'GESTIONAR APRENDICES FICHA',
+            'CAMBIAR ESTADO FICHA',
+            // Permisos para programas de formación (solo consulta para instructores)
+            'programa.index',
+            'programa.show',
+            'programa.search',
+            // Permisos para resultados de aprendizaje
+            'VER RESULTADO APRENDIZAJE',
+            'CREAR RESULTADO APRENDIZAJE',
+            'EDITAR RESULTADO APRENDIZAJE',
+            'GESTIONAR COMPETENCIAS RAP',
+            'CAMBIAR ESTADO RAP',
+            // Permisos para competencias
+            'VER COMPETENCIA',
+        ]);
+
+        // Asignar permisos al rol APRENDIZ
+        // Los aprendices tienen acceso limitado solo a consultar su propia información
+        $aprendiz->givePermissionTo([
+            // Por ahora, el rol aprendiz no tiene permisos específicos
+            // Se controla el acceso mediante políticas y middleware
         ]);
     }
 }

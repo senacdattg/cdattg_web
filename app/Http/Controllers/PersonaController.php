@@ -3,27 +3,37 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Services\PersonaService;
+use App\Services\UbicacionService;
+use App\Repositories\TemaRepository;
 use App\Models\Persona;
+use App\Models\Tema;
 use App\Models\Pais;
 use App\Models\Departamento;
 use App\Models\Municipio;
-
 use App\Http\Requests\StorePersonaRequest;
 use App\Http\Requests\UpdatePersonaRequest;
-use App\Models\Tema;
-use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Database\QueryException;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
+use App\Models\User;
 
 class PersonaController extends Controller
 {
-    public function __construct()
-    {
+    protected PersonaService $personaService;
+    protected UbicacionService $ubicacionService;
+    protected TemaRepository $temaRepo;
+
+    public function __construct(
+        PersonaService $personaService,
+        UbicacionService $ubicacionService,
+        TemaRepository $temaRepo
+    ) {
         $this->middleware('auth');
+        $this->personaService = $personaService;
+        $this->ubicacionService = $ubicacionService;
+        $this->temaRepo = $temaRepo;
 
         $this->middleware('can:VER PERSONA')->only(['index', 'show']);
         $this->middleware('can:CREAR PERSONA')->only(['create', 'store']);
@@ -37,7 +47,7 @@ class PersonaController extends Controller
      */
     public function index()
     {
-        $personas = Persona::paginate(10);
+        $personas = $this->personaService->listar(10);
         return view('personas.index', compact('personas'));
     }
 
@@ -46,17 +56,11 @@ class PersonaController extends Controller
      */
     public function create()
     {
-        $documentos = Tema::with(['parametros' => function ($query) {
-            $query->wherePivot('status', 1);
-        }])->findOrFail(2);
-
-        $generos = Tema::with(['parametros' => function ($query) {
-            $query->wherePivot('status', 1);
-        }])->findOrFail(3);
-
-        $paises = Pais::where('status', 1)->get();
-        $departamentos = Departamento::where('status', 1)->get();
-        $municipios = Municipio::where('status', 1)->get();
+        $documentos = $this->temaRepo->obtenerTiposDocumento();
+        $generos = $this->temaRepo->obtenerGeneros();
+        $paises = \App\Models\Pais::where('status', 1)->get();
+        $departamentos = \App\Models\Departamento::where('status', 1)->get();
+        $municipios = \App\Models\Municipio::where('status', 1)->get();
 
         return view('personas.create', compact('documentos', 'generos', 'paises', 'departamentos', 'municipios'));
     }
@@ -67,19 +71,7 @@ class PersonaController extends Controller
     public function store(StorePersonaRequest $request)
     {
         try {
-            DB::transaction(function () use ($request) {
-                // Obtener los datos validados
-                $data = $request->validated();
-
-                $data['user_create_id'] = Auth::id();
-                $data['user_edit_id'] = Auth::id();
-
-                // Crear la persona de forma masiva
-                $persona = Persona::create($data);
-
-                // Crear el usuario asociado a la persona
-                $this->crearUsuarioPersona($persona);
-            });
+            $this->personaService->crear($request->validated());
 
             return redirect()->route('personas.index')->with('success', '¡Registro Exitoso!');
         } catch (\Exception $e) {

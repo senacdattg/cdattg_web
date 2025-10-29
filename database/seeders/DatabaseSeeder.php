@@ -13,16 +13,30 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            // Primero los roles y permisos
+            // Primero los roles y permisos generales
             RolePermissionSeeder::class,
+            
+            // Permisos específicos de FichaCaracterizacion
+            FichaCaracterizacionPermissionsSeeder::class,
+            
+            // Permisos específicos de Guías de Aprendizaje
+            GuiasAprendizajePermissionsSeeder::class,
+            
+            // Permisos específicos de Resultados de Aprendizaje
+            ResultadosAprendizajePermissionsSeeder::class,
 
             // Luego los datos geográficos
             PaisSeeder::class,
             DepartamentoSeeder::class,
             MunicipioSeeder::class,
 
-            // Crear usuarios sin persona_id (super-admin, admin e instructor)
+            // Crear personas primero (necesarias para usuarios)
             PersonaSeeder::class,
+            
+            // Crear Super Admin con todos los permisos
+            SuperAdminSeeder::class,
+            
+            // Crear otros usuarios
             UsersTableSeeder::class,
 
             // Crear infraestructura que dependen del usuario super admin
@@ -48,6 +62,7 @@ class DatabaseSeeder extends Seeder
 
             // las relaciones
             InstructorSeeder::class,
+            InstructorTestDataSeeder::class,
             UpdatePersonasUserFieldsSeeder::class,
             AprendizSeeder::class,
             FichaCaracterizacionSeeder::class,//Depende super-admin, instructor, ambiente, modalidad de formacion, sede, jornada

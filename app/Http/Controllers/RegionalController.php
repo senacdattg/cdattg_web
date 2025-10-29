@@ -81,8 +81,8 @@ class RegionalController extends Controller
      */
     public function edit(Regional $regional)
     {
-
-        return view('regional.edit', ['regional' => $regional]);
+        $departamentos = Departamento::all();
+        return view('regional.edit', compact('regional', 'departamentos'));
     }
 
     /**
