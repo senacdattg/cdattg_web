@@ -741,8 +741,8 @@ return [
             'icon' => 'fa-solid fa-folder-open',
             'submenu' => [
                 [
-                    'text' => 'Gestion complementarios',
-                    'url' => 'programa',
+                    'text' => 'Gestion Programas',
+                    'url' => 'gestion-programas-complementarios',
                     'icon' => 'fas fa-tasks',
                     'can' => [
                         'VER PROGRAMA DE CARACTERIZACION',

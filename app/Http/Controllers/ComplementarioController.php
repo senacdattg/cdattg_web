@@ -16,8 +16,23 @@ class ComplementarioController extends Controller
         return view('complementarios.gestion_aspirantes');
     }
 
-    public function procesarDcoumentos() 
+    /**
+     * Display the procesamiento documentos view.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function procesarDocumentos() 
     {
         return view('complementarios.procesamiento_documentos');
+    }
+
+    /**
+     * Display the gestion programas complementarios view.
+     *
+     * @return \Illuminate\View\View
+     */
+    public function gestionProgramasComplementarios()
+    {
+        return view('complementarios.gestion_programas_complementarios');
     }
 }
