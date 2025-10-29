@@ -16,13 +16,98 @@
         if(is_numeric($value)) return (string)$value;
         if(is_bool($value)) return $value ? 'Sí' : 'No';
         if(is_object($value)) {
+            // Manejar objetos ParametroTema
+            if(get_class($value) === 'App\Models\ParametroTema') {
+                // ParametroTema se relaciona con parametro y tema
+                if($value->parametro) {
+                    return $value->parametro->name ?? 'N/A';
+                }
+                if($value->tema) {
+                    return $value->tema->name ?? 'N/A';
+                }
+                return 'N/A';
+            }
+            
+            // Manejar objetos Proveedor
+            if(get_class($value) === 'App\Models\Inventario\Proveedor') {
+                return $value->proveedor ?? $value->name ?? 'N/A';
+            }
+            
+            // Manejar objetos del módulo inventario
+            if(get_class($value) === 'App\Models\Inventario\Categoria') {
+                return $value->nombre ?? 'N/A';
+            }
+            if(get_class($value) === 'App\Models\Inventario\Marca') {
+                return $value->nombre ?? 'N/A';
+            }
+            if(get_class($value) === 'App\Models\Inventario\Producto') {
+                return $value->producto ?? 'N/A';
+            }
+            
+            // Manejar relaciones dinámicas
             if(isset($value->name)) return $value->name;
             if(isset($value->producto)) return $value->producto;
             if(isset($value->nombre)) return $value->nombre;
-            if(isset($value->parametro)) return $value->parametro;
+            if(isset($value->proveedor)) {
+                // Si es un objeto Proveedor, usar su nombre
+                if(is_object($value->proveedor)) {
+                    return $value->proveedor->proveedor ?? $value->proveedor->name ?? 'N/A';
+                }
+                return $value->proveedor;
+            }
+            if(isset($value->estado)) {
+                // Si es un objeto ParametroTema (estado), usar su nombre
+                if(is_object($value->estado)) {
+                    if(get_class($value->estado) === 'App\Models\ParametroTema') {
+                        if($value->estado->parametro) {
+                            return $value->estado->parametro->name ?? 'N/A';
+                        }
+                        if($value->estado->tema) {
+                            return $value->estado->tema->name ?? 'N/A';
+                        }
+                    }
+                    return 'N/A';
+                }
+                return $value->estado;
+            }
+            if(isset($value->parametro)) {
+                // Si es un objeto ParametroTema, usar su name
+                if(is_object($value->parametro)) {
+                    if(get_class($value->parametro) === 'App\Models\ParametroTema') {
+                        if($value->parametro->parametro) {
+                            return $value->parametro->parametro->name ?? 'N/A';
+                        }
+                        if($value->parametro->tema) {
+                            return $value->parametro->tema->name ?? 'N/A';
+                        }
+                    }
+                    return 'N/A';
+                }
+                return $value->parametro;
+            }
+            
+            // Manejar fecha de vigencia (caso especial para contratos)
+            if(isset($value->fecha_inicio) || isset($value->fecha_fin)) {
+                $inicio = $value->fecha_inicio ? $value->fecha_inicio->format('d/m/Y') : 'N/A';
+                $fin = $value->fecha_fin ? $value->fecha_fin->format('d/m/Y') : 'N/A';
+                return $inicio . ' - ' . $fin;
+            }
+            
             return 'N/A';
         }
         return 'N/A';
+    }
+    
+    function safeInteger($value) {
+        if(is_null($value)) return 1; // Por defecto activo
+        if(is_numeric($value)) return (int)$value;
+        if(is_object($value)) {
+            if(get_class($value) === 'App\Models\ParametroTema') {
+                return isset($value->status) ? (int)$value->status : 1;
+            }
+            return 1; // Por defecto activo
+        }
+        return (int)$value;
     }
 @endphp
 
@@ -33,7 +118,7 @@
     'emptyMessage' => 'No hay datos registrados',
     'emptyIcon' => 'fas fa-inbox',
     'tableClass' => '',
-    'entityType' => 'categoria'
+    'entityType' => 'categorias'
 ])
 
 @php
@@ -71,7 +156,10 @@
                                 @elseif($key === 'producto' && isset($item->producto))
                                     {{ safeValue($item->producto) }}
                                 @elseif($key === 'estado' || $key === 'status')
-                                    @if(($item->status ?? $item->estado ?? 1) == 1)
+                                    @php
+                                        $estadoValor = safeInteger($item->status ?? $item->estado ?? 1);
+                                    @endphp
+                                    @if($estadoValor == 1)
                                         <span class="badge bg-success">ACTIVO</span>
                                     @else
                                         <span class="badge bg-danger">INACTIVO</span>
@@ -87,7 +175,7 @@
                         @if($hasActions)
                             <td class="text-center actions-cell">
                                 @php
-                                    $entityType = $entityType ?? 'categoria';
+                                    $entityType = $entityType ?? 'categorias';
                                     $itemId = $item->id ?? $item->categoria_id ?? $item->producto_id ?? 0;
                                     $itemName = $item->nombre ?? $item->producto ?? $item->marca ?? $item->proveedor ?? 'este elemento';
                                 @endphp

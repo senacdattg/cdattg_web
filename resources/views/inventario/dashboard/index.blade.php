@@ -1,4 +1,34 @@
-@extends('inventario.layouts.base')
+@extends('adminlte::page')
+
+@section('title', 'Dashboard de Inventario')
+
+@section('content_header')
+    <x-page-header
+        icon="fas fa-chart-bar"
+        title="Dashboard de Inventario"
+        subtitle="Resumen general del inventario"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => '#'],
+            ['label' => 'Inventario', 'active' => true]
+        ]"
+    />
+@endsection
+
+@section('content')
+    
+    {{-- Alertas --}}
+    @include('layout.alertas')
+    
+    {{-- Footer SENA --}}
+    @include('inventario._components.sena-footer')
+    
+@push('css')
+    @vite(['resources/css/style.css'])
+@endpush
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@endpush
 
 @section('title', 'Dashboard Inventario')
 

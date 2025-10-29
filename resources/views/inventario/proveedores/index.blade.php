@@ -1,12 +1,20 @@
-@extends('inventario.layouts.page', [
-        'title' => 'Gestión de Proveedores',
-        'subtitle' => 'Administra los proveedores del inventario',
-        'icon' => 'fas fa-truck',
-    'showSearch' => true,
-    'searchPlaceholder' => 'Buscar proveedores...'
-])
+@extends('adminlte::page')
 
-@section('page-content')
+@section('title', 'Gestión de Proveedores')
+
+@section('content_header')
+    <x-page-header
+        icon="fas fa-truck"
+        title="Gestión de Proveedores"
+        subtitle="Administra los proveedores del inventario"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => '#'],
+            ['label' => 'Inventario', 'active' => true]
+        ]"
+    />
+@endsection
+
+@section('content')
     <div class="d-flex justify-content-end mb-3">
         <button type="button" 
                 class="btn btn-primary btn-lg" 
@@ -26,19 +34,34 @@
             'status' => 'Estado'
         ],
         'data' => $proveedores,
-        'actions' => ['view', 'edit', 'delete'],
+        'actions' => ['delete'],
         'emptyMessage' => 'Sin proveedores registrados.',
         'emptyIcon' => 'fas fa-truck',
-        'tableClass' => 'proveedores-table'
+        'tableClass' => 'proveedores-table',
+        'entityType' => 'proveedores'
     ])
     @endcomponent
 
     {{-- Paginación --}}
     <div id="pagination-container" class="mt-3"></div>
-
+    
     {{-- Modales --}}
     @include('inventario.proveedores._modals')
+    
+    {{-- Alertas --}}
+    @include('layout.alertas')
+    
+    {{-- Footer SENA --}}
+    @include('inventario._components.sena-footer')
 @endsection
+
+@push('css')
+    @vite(['resources/css/style.css'])
+@endpush
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@endpush
 
 @section('additional-scripts')
     @vite([

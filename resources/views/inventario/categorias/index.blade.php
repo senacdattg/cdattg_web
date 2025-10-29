@@ -1,13 +1,21 @@
 
-@extends('inventario.layouts.page', [
-    'title' => 'Gestión de Categorías',
-    'subtitle' => 'Administra las categorías del inventario',
-    'icon' => 'fas fa-tags',
-    'showSearch' => true,
-    'searchPlaceholder' => 'Buscar categorías...'
-])
+@extends('adminlte::page')
 
-@section('page-content')
+@section('title', 'Gestión de Categorías')
+
+@section('content_header')
+    <x-page-header
+        icon="fas fa-tags"
+        title="Gestión de Categorías"
+        subtitle="Administra las categorías del inventario"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => '#'],
+            ['label' => 'Inventario', 'active' => true]
+        ]"
+    />
+@endsection
+
+@section('content')
     <div class="d-flex justify-content-end mb-3">
         <button type="button" 
                 class="btn btn-primary btn-lg" 
@@ -25,7 +33,7 @@
             'status' => 'Estado'
         ],
         'data' => $categorias,
-        'actions' => ['view', 'edit', 'delete'],
+        'actions' => ['delete'],
         'emptyMessage' => 'Sin categorías registradas.',
         'emptyIcon' => 'fas fa-inbox',
         'tableClass' => 'categorias-table',
@@ -38,7 +46,21 @@
     
     {{-- Modales --}}
     @include('inventario.categorias._modals')
+    
+    {{-- Alertas --}}
+    @include('layout.alertas')
+    
+    {{-- Footer SENA --}}
+    @include('inventario._components.sena-footer')
 @endsection
+
+@push('css')
+    @vite(['resources/css/style.css'])
+@endpush
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@endpush
 
 @section('additional-scripts')
     @vite([

@@ -1,6 +1,35 @@
 
-@extends('inventario.layouts.form', [
-    'title' => 'Editar Producto',
+@extends('adminlte::page')
+
+@section('title', 'Editar Producto')
+
+@section('content_header')
+    <x-page-header
+        icon="fas fa-edit"
+        title="Editar Producto"
+        subtitle="Modificar datos del producto"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => '#'],
+            ['label' => 'Inventario', 'active' => true]
+        ]"
+    />
+@endsection
+
+@section('content')
+    
+    {{-- Alertas --}}
+    @include('layout.alertas')
+    
+    {{-- Footer SENA --}}
+    @include('inventario._components.sena-footer')
+    
+@push('css')
+    @vite(['resources/css/style.css'])
+@endpush
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@endpush
     'icon' => 'fas fa-edit',
     'action' => route('inventario.productos.update', $producto->id),
     'method' => 'PUT',

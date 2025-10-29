@@ -1,4 +1,23 @@
-@extends('inventario.layouts.base')
+@extends('adminlte::page')
+
+@section('title', 'Gestión de Productos')
+
+@section('content_header')
+    <x-page-header
+        icon="fas fa-boxes"
+        title="Gestión de Productos"
+        subtitle="Administra los productos del inventario"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => '#'],
+            ['label' => 'Inventario', 'active' => true]
+        ]"
+    />
+@endsection
+
+@section('content')
+    
+    {{-- Alertas --}}
+    @include('layout.alertas')
 
 @push('styles')
     @vite([
@@ -38,4 +57,15 @@
 
     {{-- Modal para imagen expandible --}}
     @include('inventario._components.image-modal')
+    
+    {{-- Footer SENA --}}
+    @include('inventario._components.sena-footer')
 @endsection
+
+@push('css')
+    @vite(['resources/css/style.css'])
+@endpush
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@endpush

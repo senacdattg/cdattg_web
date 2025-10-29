@@ -1,146 +1,164 @@
-@extends('inventario.layouts.base')
+@extends('adminlte::page')
 
-@push('styles')
-    @vite([
-        'resources/css/inventario/shared/base.css',
-        'resources/css/inventario/ordenes.css'
-    ])
-@endpush
+@section('title', 'Préstamo o Salida')
 
 @section('content_header')
-    <h1><i class="fas fa-exchange-alt mr-2"></i> Préstamo o Salida</h1>
+    <x-page-header
+        icon="fas fa-exchange-alt"
+        title="Préstamo o Salida"
+        subtitle="Gestión de préstamos y salidas del inventario"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => '#'],
+            ['label' => 'Inventario', 'active' => true]
+        ]"
+    />
 @endsection
 
-@section('main-content')
-    @component('inventario._components.form-wrapper', [
-        'action' => route('inventario.prestamos-salidas'),
-        'method' => 'POST',
-        'title' => 'Préstamo o Salida',
-        'icon' => 'fas fa-exchange-alt',
-        'submitText' => 'Crear Préstamo/Salida',
-        'submitIcon' => 'fas fa-save',
-        'cancelRoute' => route('inventario.ordenes.index'),
-        'cancelText' => 'Cancelar',
-        'showReset' => true,
-        'resetText' => 'Limpiar',
-        'noteText' => 'Todos los campos marcados con * son obligatorios. Asegúrese de seleccionar todos los elementos antes de proceder.'
-    ])
+@section('content')
+    <div class="container-fluid">
+        <div class="card">
+            @include('inventario._components.card-header', [
+                'title' => 'Préstamo o Salida',
+                'icon' => 'fas fa-exchange-alt'
+            ])
+            
+            <div class="card-body">
+                <form action="{{ route('inventario.prestamos-salidas') }}" method="POST">
+                    @csrf
+                    
                     <div class="row">
-            @component('inventario._components.form-field-wrapper', [
-                'name' => 'nombre',
-                'label' => 'Nombre',
-                'type' => 'text',
-                'value' => old('nombre'),
-                'required' => true,
-                'icon' => 'fas fa-user'
-            ])
-            @endcomponent
+                        @include('inventario._components.form-field', [
+                            'name' => 'nombre',
+                            'label' => 'Nombre',
+                            'type' => 'text',
+                            'value' => old('nombre'),
+                            'required' => true,
+                            'icon' => 'fas fa-user'
+                        ])
 
-            @component('inventario._components.form-field-wrapper', [
-                'name' => 'documento',
-                'label' => 'Documento',
-                'type' => 'text',
-                'value' => old('documento'),
-                'required' => true,
-                'icon' => 'fas fa-id-card'
-            ])
-            @endcomponent
+                        @include('inventario._components.form-field', [
+                            'name' => 'documento',
+                            'label' => 'Documento',
+                            'type' => 'text',
+                            'value' => old('documento'),
+                            'required' => true,
+                            'icon' => 'fas fa-id-card'
+                        ])
                     </div>
 
                     <div class="row">
-            @component('inventario._components.form-field-wrapper', [
-                'name' => 'rol',
-                'label' => 'Rol',
-                'type' => 'select',
-                'value' => old('rol'),
-                'required' => true,
-                'icon' => 'fas fa-user-tag',
-                'placeholder' => 'Seleccionar rol...',
-                'options' => [
-                    'estudiante' => 'Estudiante',
-                    'instructor' => 'Instructor',
-                    'coordinador' => 'Coordinador',
-                    'administrativo' => 'Administrativo'
-                ]
-            ])
-            @endcomponent
+                        @include('inventario._components.form-field', [
+                            'name' => 'rol',
+                            'label' => 'Rol',
+                            'type' => 'select',
+                            'value' => old('rol'),
+                            'required' => true,
+                            'icon' => 'fas fa-user-tag',
+                            'placeholder' => 'Seleccionar rol...',
+                            'options' => [
+                                'estudiante' => 'Estudiante',
+                                'instructor' => 'Instructor',
+                                'coordinador' => 'Coordinador',
+                                'administrativo' => 'Administrativo'
+                            ]
+                        ])
 
-            @component('inventario._components.form-field-wrapper', [
-                'name' => 'programa_formacion',
-                'label' => 'Nombre del programa formación',
-                'type' => 'text',
-                'value' => old('programa_formacion'),
-                'required' => true,
-                'icon' => 'fas fa-graduation-cap'
-            ])
-            @endcomponent
+                        @include('inventario._components.form-field', [
+                            'name' => 'programa_formacion',
+                            'label' => 'Nombre del programa formación',
+                            'type' => 'text',
+                            'value' => old('programa_formacion'),
+                            'required' => true,
+                            'icon' => 'fas fa-graduation-cap'
+                        ])
                     </div>
 
                     <div class="row">
-            @component('inventario._components.form-field-wrapper', [
-                'name' => 'ficha',
-                'label' => 'Ficha',
-                'type' => 'text',
-                'value' => old('ficha'),
-                'required' => true,
-                'icon' => 'fas fa-ticket-alt'
-            ])
-            @endcomponent
+                        @include('inventario._components.form-field', [
+                            'name' => 'ficha',
+                            'label' => 'Ficha',
+                            'type' => 'text',
+                            'value' => old('ficha'),
+                            'required' => true,
+                            'icon' => 'fas fa-ticket-alt'
+                        ])
 
-            @component('inventario._components.form-field-wrapper', [
-                'name' => 'tipo',
-                'label' => 'Tipo',
-                'type' => 'select',
-                'value' => old('tipo'),
-                'required' => true,
-                'icon' => 'fas fa-tags',
-                'placeholder' => 'Seleccionar tipo...',
-                'options' => [
-                    'prestamo' => 'Préstamo',
-                    'salida' => 'Salida'
-                ]
-            ])
-            @endcomponent
+                        @include('inventario._components.form-field', [
+                            'name' => 'tipo',
+                            'label' => 'Tipo',
+                            'type' => 'select',
+                            'value' => old('tipo'),
+                            'required' => true,
+                            'icon' => 'fas fa-tags',
+                            'placeholder' => 'Seleccionar tipo...',
+                            'options' => [
+                                'prestamo' => 'Préstamo',
+                                'salida' => 'Salida'
+                            ]
+                        ])
                     </div>
 
                     <div class="row">
-            @component('inventario._components.form-field-wrapper', [
-                'name' => 'fecha_adquirido',
-                'label' => 'Fecha de adquisición',
-                'type' => 'date',
-                'value' => old('fecha_adquirido'),
-                'required' => true,
-                'icon' => 'fas fa-calendar-plus'
-            ])
-            @endcomponent
+                        @include('inventario._components.form-field', [
+                            'name' => 'fecha_adquirido',
+                            'label' => 'Fecha de adquisición',
+                            'type' => 'date',
+                            'value' => old('fecha_adquirido'),
+                            'required' => true,
+                            'icon' => 'fas fa-calendar-plus'
+                        ])
 
-            @component('inventario._components.form-field-wrapper', [
-                'name' => 'fecha_devolucion',
-                'label' => 'Fecha de devolución',
-                'type' => 'date',
-                'value' => old('fecha_devolucion'),
-                'required' => true,
-                'icon' => 'fas fa-calendar-minus'
-            ])
-            @endcomponent
+                        @include('inventario._components.form-field', [
+                            'name' => 'fecha_devolucion',
+                            'label' => 'Fecha de devolución',
+                            'type' => 'date',
+                            'value' => old('fecha_devolucion'),
+                            'required' => true,
+                            'icon' => 'fas fa-calendar-minus'
+                        ])
                     </div>
 
                     <div class="row">
-            @component('inventario._components.form-field-wrapper', [
-                'name' => 'descripcion',
-                'label' => 'Descripción',
-                'type' => 'textarea',
-                'value' => old('descripcion'),
-                'required' => true,
-                'icon' => 'fas fa-comment-alt',
-                'placeholder' => 'Describe el motivo del préstamo/salida, condiciones especiales, etc.',
-                'rows' => 4,
-                'colSize' => 'col-12'
-            ])
-            @endcomponent
+                        @include('inventario._components.form-field', [
+                            'name' => 'descripcion',
+                            'label' => 'Descripción',
+                            'type' => 'textarea',
+                            'value' => old('descripcion'),
+                            'required' => true,
+                            'icon' => 'fas fa-comment-alt',
+                            'placeholder' => 'Describe el motivo del préstamo/salida, condiciones especiales, etc.',
+                            'rows' => 4,
+                            'colSize' => 'col-12'
+                        ])
+                    </div>
+
+                    @include('inventario._components.form-actions', [
+                        'submitText' => 'Crear Préstamo/Salida',
+                        'submitIcon' => 'fas fa-save',
+                        'cancelRoute' => route('inventario.ordenes.index'),
+                        'cancelText' => 'Cancelar',
+                        'showReset' => true,
+                        'resetText' => 'Limpiar'
+                    ])
+                </form>
+            </div>
         </div>
-    @endcomponent
+    </div>
+    
+    {{-- Alertas --}}
+    @include('layout.alertas')
+    
+    {{-- Footer SENA --}}
+    @include('inventario._components.sena-footer')
 @endsection
+
+@push('css')
+    @vite(['resources/css/style.css'])
+@endpush
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@endpush
 
 @push('scripts')
     <script>

@@ -1,12 +1,20 @@
-@extends('inventario.layouts.page', [
-    'title' => 'Gestión de Contratos & Convenios',
-    'subtitle' => 'Administra los contratos y convenios del inventario',
-    'icon' => 'fas fa-file-contract',
-    'showSearch' => true,
-    'searchPlaceholder' => 'Buscar contratos/convenios...'
-])
+@extends('adminlte::page')
 
-@section('page-content')
+@section('title', 'Gestión de Contratos & Convenios')
+
+@section('content_header')
+    <x-page-header
+        icon="fas fa-file-contract"
+        title="Gestión de Contratos & Convenios"
+        subtitle="Administra los contratos y convenios del inventario"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => '#'],
+            ['label' => 'Inventario', 'active' => true]
+        ]"
+    />
+@endsection
+
+@section('content')
     <div class="d-flex justify-content-end mb-3">
         <button type="button" 
                 class="btn btn-primary btn-lg" 
@@ -28,10 +36,11 @@
             'status' => 'Estado'
         ],
         'data' => $contratosConvenios,
-        'actions' => ['view', 'edit', 'delete'],
+        'actions' => ['delete'],
         'emptyMessage' => 'Sin contratos/convenios registrados.',
         'emptyIcon' => 'fas fa-file-contract',
-        'tableClass' => 'contratos-table'
+        'tableClass' => 'contratos-table',
+        'entityType' => 'contratos-convenios'
     ])
     @endcomponent
 
@@ -40,7 +49,21 @@
     
     {{-- Modales --}}
     @include('inventario.contratos_convenios._modals')
+    
+    {{-- Alertas --}}
+    @include('layout.alertas')
+    
+    {{-- Footer SENA --}}
+    @include('inventario._components.sena-footer')
 @endsection
+
+@push('css')
+    @vite(['resources/css/style.css'])
+@endpush
+
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@endpush
 
 @section('additional-scripts')
     @vite([

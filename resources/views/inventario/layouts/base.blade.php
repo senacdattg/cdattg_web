@@ -4,10 +4,7 @@
 @section('plugins.Sweetalert2', true)
 
 @vite([
-    'resources/css/inventario/shared/base.css',
-    'resources/css/inventario/sidebar-fix.css',
-    'resources/css/inventario/shared/modal-imagen.css',
-    'resources/js/inventario/shared/modal-imagen.js'
+    'resources/css/inventario/shared/base.css'
 ])
 
 @stack('styles')
