@@ -654,7 +654,7 @@
 
 .product-image-container {
     position: relative;
-    padding-top: 100%;
+    padding-top: 10px;
     background: #f8f9fa;
 }
 
@@ -683,11 +683,12 @@
     flex-grow: 1;
     display: flex;
     flex-direction: column;
+    gap: 10px;
 }
 
 .product-title {
     font-size: 16px;
-    margin-bottom: 10px;
+    margin-bottom: -5px;
     font-weight: 600;
     white-space: nowrap;
     overflow: hidden;
@@ -700,6 +701,33 @@
     justify-content: space-between;
     gap: 5px;
 }
+
+.product-details {
+    display: flex;
+    justify-content: space-between;
+    gap: 3px;
+}
+
+/* badge visual para indicar stock (no afecta la altura de la tarjeta) */
+.stock-badge {
+    position: absolute;
+    top: 8px;
+    left: 12px;
+    background: #ffc107;
+    color: #111;
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    z-index: 5;
+}
+
+.stock-badge.low {
+    background: #dc3545;
+    color: #fff;
+}
+
 
 .action-btn {
     flex: 1;
