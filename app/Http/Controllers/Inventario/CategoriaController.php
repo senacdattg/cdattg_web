@@ -2,26 +2,41 @@
 
 namespace App\Http\Controllers\Inventario;
 
-use App\Models\Inventario\Categoria;
+use App\Models\Inventario\categoria;
+use App\Models\Parametro;
+use App\Models\ParametroTema;
+use App\Models\Tema;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\QueryException;
 
 class CategoriaController extends InventarioController
 {
+    protected $temacategorias;
+
     public function __construct()
     {
         parent::__construct();
+
         $this->middleware('can:VER CATEGORIA')->only('index', 'show');
         $this->middleware('can:CREAR CATEGORIA')->only('create', 'store');
         $this->middleware('can:EDITAR CATEGORIA')->only('edit', 'update');
-        $this->middleware('can:ELIMINAR PRODUCTO')->only('destroy');
+        $this->middleware('can:ELIMINAR CATEGORIA')->only('destroy');
+
+        $this->temacategorias = Tema::where('name', 'CATEGORIAS')->first();
     }
 
     public function index()
     {
-        $categorias = Categoria::with(['userCreate.persona', 'userUpdate.persona'])
-            ->withCount('productos')
-            ->latest()
+        if (!$this->temacategorias) {
+            return back()->with('error', 'No existe el tema "CATEGORIAS" en la base de datos.');
+        }
+
+        $categorias = $this->temacategorias->parametros()
+            ->with(['userCreate.persona', 'userUpdate.persona'])
+            ->wherePivot('status', 1)
             ->get();
+
         return view('inventario.categorias.index', compact('categorias'));
     }
 
@@ -30,55 +45,86 @@ class CategoriaController extends InventarioController
         return view('inventario.categorias.create');
     }
 
-    public function show(Categoria $categoria)
-    {
-        $categoria->load(['productos', 'userCreate.persona', 'userUpdate.persona']);
-        return view('inventario.categorias.show', compact('categoria'));
-    }
-
-    public function edit(Categoria $categoria)
-    {
-        return view('inventario.categorias.edit', compact('categoria'));
-    }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nombre' => 'required|unique:categorias,nombre'
+            'nombre' => 'required|string|unique:parametros,name',
         ]);
 
-        $categoria = new Categoria($validated);
-        $this->setUserIds($categoria);
-        $categoria->save();
-
-        return redirect()->route('inventario.categorias.index')
-            ->with('success', 'Categoría creada exitosamente.');
-    }
-
-    public function update(Request $request, string $id)
-    {
-        $categoria = Categoria::findOrFail($id);
-
-        $validated = $request->validate([
-            'nombre' => 'required|unique:categorias,nombre,' . $categoria->id
-        ]);
-
-        $categoria->fill($validated);
-        $this->setUserIds($categoria, true);
-        $categoria->save();
-
-        return redirect()->route('inventario.categorias.index')
-            ->with('success', 'Categoría actualizada exitosamente.');
-    }
-
-    public function destroy(Categoria $categoria)
-    {
         try {
-            $categoria->delete();
+            $categoria = new categoria([
+                'name'           => $validated['nombre'],
+                'status'         => 1,
+                'user_create_id' => Auth::id(),
+                'user_edit_id'   => Auth::id(),
+            ]);
+            $categoria->save();
+
+            // Se asocia al tema "categoriaS"
+            $categoria->asociarATemacategorias();
+
             return redirect()->route('inventario.categorias.index')
-                ->with('success', 'Categoría eliminada exitosamente.');
-        } catch (\Exception $e) {
-            return back()->with('error', 'No se puede eliminar la categoría porque está en uso.');
+                ->with('success', 'Categoria creada exitosamente.');
+        } catch (QueryException $e) {
+            return back()->with('error', 'Error al crear la categoria: ' . $e->getMessage());
         }
     }
+
+    public function edit(Parametro $categoria)
+    {
+        return view('inventario.categorias.edit', [
+            'title' => 'Editar categoria',
+            'icon' => 'fas fa-tag',
+            'action' => route('inventario.categorias.update', $categoria->id),
+            'method' => 'PUT',
+            'submitText' => 'Actualizar categoria',
+            'cancelRoute' => route('inventario.categorias.index'),
+            'categoria' => $categoria
+        ]);
+    }
+
+
+    public function update(Request $request, Parametro $categoria)
+    {
+        $validated = $request->validate([
+            'nombre' => 'required|string|unique:parametros,name,' . $categoria->id,
+        ]);
+
+        $categoria->update([
+            'name'         => strtoupper($validated['nombre']),
+            'user_edit_id' => Auth::id(),
+        ]);
+
+        return redirect()->route('inventario.categorias.index')
+            ->with('success', 'categoria actualizada exitosamente.');
+    }
+
+    public function destroy(Parametro $categoria)
+    {
+        try {
+            // Desvincular del tema "categoriaS"
+            ParametroTema::where('parametro_id', $categoria->id)
+                ->where('tema_id', $this->temacategorias->id)
+                ->delete();
+
+            $categoria->delete();
+
+            return redirect()->route('inventario.categorias.index')
+                ->with('success', 'categoria eliminada exitosamente.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'No se puede eliminar la categoria porque está en uso.');
+        }
+    }
+
+    public function show(Parametro $categoria)
+    {
+        $categoria->load(['userCreate.persona', 'userUpdate.persona']);
+        return view('inventario.categorias.show', [
+            'title' => 'Detalle de la categoria',
+            'icon' => 'fas fa-eye',
+            'categoria' => $categoria   
+        ]);
+    }
+
 }

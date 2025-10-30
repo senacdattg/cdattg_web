@@ -42,16 +42,7 @@ class MarcaController extends InventarioController
 
     public function create()
     {
-        return view('inventario.marcas.create', [
-            'title' => 'Registrar nueva marca',
-            'icon' => 'fas fa-tag',
-            'action' => route('inventario.marcas.store'),
-            'method' => 'POST',
-            'submitText' => 'Guardar marca',
-            'cancelRoute' => route('inventario.marcas.index'),
-            'showNote' => true,
-            'noteText' => 'Recuerda que las marcas se gestionan desde los parámetros del tema "MARCAS".'
-        ]);
+        return view('inventario.marcas.create');
     }
 
 
@@ -132,7 +123,7 @@ class MarcaController extends InventarioController
         return view('inventario.marcas.show', [
             'title' => 'Detalle de la marca',
             'icon' => 'fas fa-eye',
-            'marca' => $marca
+            'marca' => $marca   
         ]);
     }
 
