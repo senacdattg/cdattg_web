@@ -291,6 +291,12 @@
                                 </div>
 
                                 <div class="card-footer">
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="acepto_terminos" name="acepto_terminos" required>
+                                        <label class="form-check-label" for="acepto_terminos">
+                                            Acepto los <a href="#" data-toggle="modal" data-target="#modalTerminos">términos y condiciones</a> *
+                                        </label>
+                                    </div>
                                     <button type="submit" class="btn btn-primary btn-lg">
                                         <i class="fas fa-save mr-2"></i>Registrar Datos
                                     </button>
@@ -360,4 +366,6 @@
             }
         });
     </script>
+
+    @include('components.modal-terminos')
 @endsection
