@@ -1,4 +1,4 @@
-/* Colores del SENA inspirados en Betowa */
+ /* Colores del SENA inspirados en Betowa */
 .btn-success {
     background-color: #008000;
     border-color: #008000;
@@ -49,4 +49,17 @@
 .card-outline .card-body .row .col-12 {
     padding-left: 15px;
     padding-right: 15px;
+}
+
+/* Forzar que el badge esté siempre abajo del título en las cards de programas */
+.card .card-body .card-title {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+.card .card-body .badge {
+    display: block;
+    margin: 0.5rem 0;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
 }
