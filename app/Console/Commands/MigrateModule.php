@@ -12,7 +12,7 @@ class MigrateModule extends Command
      *
      * @var string
      */
-    protected $signature = 'migrate:batch 
+    protected $signature = 'migrate:module
                             {module? : El nombre del módulo a migrar (batch_01_sistema_base, batch_02_permisos, etc.)}
                             {--all : Ejecutar todos los módulos en orden}
                             {--fresh : Ejecutar fresh antes de migrar}
@@ -46,6 +46,7 @@ class MigrateModule extends Command
         'batch_13_competencias' => 'Competencias, Resultados de Aprendizaje y Guías',
         'batch_14_evidencias' => 'Evidencias de Aprendizaje',
         'batch_15_logs_auditoria' => 'Logs y Auditoría',
+        'batch_17_complementarios' => 'Módulo de Complementarios (cursos complementarios, aspirantes, caracterización)',
     ];
 
     /**
