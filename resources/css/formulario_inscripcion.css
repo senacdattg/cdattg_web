@@ -1,0 +1,31 @@
+/* Colores del SENA inspirados en Betowa */
+.btn-success {
+    background-color: #008000;
+    border-color: #008000;
+}
+.btn-success:hover {
+    background-color: #006400;
+    border-color: #006400;
+}
+.card-success .card-header {
+    background-color: #90EE90;
+    color: #000;
+}
+.bg-success {
+    background-color: #008000 !important;
+}
+.form-control:focus {
+    border-color: #008000;
+    box-shadow: 0 0 0 0.2rem rgba(0, 128, 0, 0.25);
+}
+.card-success {
+    border-color: #008000;
+}
+.text-success {
+    color: #008000 !important;
+}
+.alert-info {
+    background-color: #FFD700;
+    color: #000;
+    border-color: #FFD700;
+}
