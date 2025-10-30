@@ -799,15 +799,47 @@ return [
                 ],
                 [
                     'text' => 'Productos',
-                    'url'  => 'inventario/productos',
                     'icon' => 'fa-solid fa-box',
                     'can'  => 'VER PRODUCTO',
+                    'submenu' => [
+                        [
+                            'text' => 'Lista de Productos',
+                            'url'  => 'inventario/productos',
+                            'icon' => 'fa-solid fa-list',
+                            'can'  => 'VER PRODUCTO',
+                        ],
+                        [
+                            'text' => 'Catálogo de Productos',
+                            'url'  => 'inventario/productos/catalogo',
+                            'icon' => 'fa-solid fa-th',
+                            'can'  => 'VER CATALOGO PRODUCTO',
+                        ],
+                        [
+                            'text' => 'Crear Producto',
+                            'url'  => 'inventario/productos/create',
+                            'icon' => 'fa-solid fa-plus',
+                            'can'  => 'CREAR PRODUCTO',
+                        ],
+                    ],
                 ],
                 [
                     'text' => 'Carrito',
-                    'url'  => 'inventario/carrito',
                     'icon' => 'fa-solid fa-cart-plus',
-                    'can'  => 'VER PRODUCTO',
+                    'can'  => ['VER CARRITO', 'VER PRODUCTO'],
+                    'submenu' => [
+                        [
+                            'text' => 'Ver Carrito',
+                            'url'  => 'inventario/carrito',
+                            'icon' => 'fa-solid fa-shopping-cart',
+                            'can'  => 'VER CARRITO',
+                        ],
+                        [
+                            'text' => 'Carrito E-commerce',
+                            'url'  => 'inventario/carrito-ecommerce',
+                            'icon' => 'fa-solid fa-cart-shopping',
+                            'can'  => 'VER CARRITO',
+                        ],
+                    ],
                 ],
                 [
                     'text' => 'Órdenes',

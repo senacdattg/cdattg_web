@@ -120,6 +120,14 @@ class SuperAdminSeeder extends Seeder
             'VER PRODUCTO',
             'EDITAR PRODUCTO',
             'ELIMINAR PRODUCTO',
+            'VER CATALOGO PRODUCTO',
+            'BUSCAR PRODUCTO',
+            // Carrito
+            'VER CARRITO',
+            'AGREGAR CARRITO',
+            'ACTUALIZAR CARRITO',
+            'ELIMINAR CARRITO',
+            'VACIAR CARRITO',
             // Categorías
             'CREAR CATEGORIA',
             'VER CATEGORIA',
@@ -144,17 +152,27 @@ class SuperAdminSeeder extends Seeder
             'VER ORDEN',
             'CREAR ORDEN',
             'EDITAR ORDEN',
+            'ELIMINAR ORDEN',
+            'APROBAR ORDEN',
+            'COMPLETAR ORDEN',
             // Préstamos
             'VER PRESTAMO',
             'CREAR PRESTAMO',
             'EDITAR PRESTAMO',
             'DEVOLVER PRESTAMO',
+            'APROBAR PRESTAMO',
             // Entradas
             'VER ENTRADA',
             'CREAR ENTRADA',
             // Salidas
             'VER SALIDA',
             'CREAR SALIDA',
+            // Devoluciones
+            'VER DEVOLUCION',
+            'CREAR DEVOLUCION',
+            'PROCESAR DEVOLUCION',
+            // Dashboard
+            'VER DASHBOARD INVENTARIO',
             
             // Permisos para redes de conocimiento
             'CREAR RED CONOCIMIENTO',
