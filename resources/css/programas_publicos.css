@@ -1,0 +1,16 @@
+/* Estilos específicos para la página de programas públicos */
+.card .card-body .card-title {
+    display: block !important;
+    margin-bottom: 0.5rem !important;
+    text-align: center !important;
+    width: 100% !important;
+}
+.card .card-body .badge {
+    display: block !important;
+    margin: 0.5rem auto !important;
+    width: fit-content !important;
+    text-align: center !important;
+}
+.card .card-body .card-title + .badge {
+    margin-top: 0.5rem !important;
+}

@@ -1,20 +1,33 @@
 @extends('layout.master-layout-registro')
+@extends('layout.alertas')
+@section('css')
+    @vite(['resources/css/formulario_inscripcion.css'])
+@endsection
 @section('content')
-    <div class="card card-primary">
-        <div class="card-header">
-            <h3 class="card-title">
-                <i class="fas fa-file-upload mr-2"></i>Subir Documento de Identidad
-            </h3>
-            <div class="card-tools">
-                <a href="{{ url('/login') }}" class="btn btn-outline-secondary btn-sm">
-                    <i class="fas fa-sign-in-alt mr-1"></i> Login
-                </a>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="text-center mb-4">
-                <h4 class="text-muted">{{ $programa->nombre }}</h4>
-            </div>
+    @include('complementarios.components.header-programas-publicos')
+
+    <div class="container-fluid mt-4">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="text-center mb-4">
+                    <h2 class="text-success">Subir Documento de Identidad</h2>
+                    <p class="text-muted">Complete el proceso de inscripción</p>
+                </div>
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-file-upload mr-2"></i>Subir Documento de Identidad
+                        </h3>
+                        <div class="card-tools">
+                            <a href="{{ url('/login') }}" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-sign-in-alt mr-1"></i> Login
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <h4 class="text-muted">{{ $programa->nombre }}</h4>
+                        </div>
 
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -25,66 +38,66 @@
             @endif
 
 
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="card card-primary">
-                        <div class="card-header">
-                            <h5 class="mb-0"><i class="fas fa-id-card mr-2"></i>Documento de Identidad</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="alert alert-info">
-                                <i class="fas fa-info-circle mr-2"></i>
-                                <strong>Importante:</strong> Por favor suba una copia digital de su documento de identidad
-                                en formato PDF.
-                                El archivo debe ser legible y no debe superar los 5MB.
-                            </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="card card-success">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-id-card mr-2"></i>Documento de Identidad</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="alert alert-info">
+                                            <i class="fas fa-info-circle mr-2"></i>
+                                            <strong>Importante:</strong> Por favor suba una copia digital de su documento de identidad
+                                            en formato PDF.
+                                            El archivo debe ser legible y no debe superar los 5MB.
+                                        </div>
 
 
-                            <form id="formDocumentos" method="POST"
-                                action="{{ route('programas-complementarios.subir-documentos', ['id' => $programa->id]) }}"
-                                enctype="multipart/form-data">
-                                @csrf
-                                <input type="hidden" name="aspirante_id" value="{{ $aspirante_id }}">
+                                        <form id="formDocumentos" method="POST"
+                                            action="{{ route('programas-complementarios.subir-documentos', ['id' => $programa->id]) }}"
+                                            enctype="multipart/form-data">
+                                            @csrf
+                                            <input type="hidden" name="aspirante_id" value="{{ $aspirante_id }}">
 
-                                <div class="mb-4">
-                                    <label for="documento_identidad" class="form-label">Documento de Identidad (PDF)
-                                        *</label>
-                                    <input type="file" class="form-control" id="documento_identidad"
-                                        name="documento_identidad" accept=".pdf" required>
-                                    <div class="form-text">
-                                        Formatos aceptados: PDF. Tamaño máximo: 5MB.
+                                            <div class="mb-4">
+                                                <label for="documento_identidad" class="form-label">Documento de Identidad (PDF)
+                                                    *</label>
+                                                <input type="file" class="form-control" id="documento_identidad"
+                                                    name="documento_identidad" accept=".pdf" required>
+                                                <div class="form-text">
+                                                    Formatos aceptados: PDF. Tamaño máximo: 5MB.
+                                                </div>
+                                            </div>
+
+                                            <div class="form-check mb-4">
+                                                <input class="form-check-input" type="checkbox" id="acepto_privacidad" required>
+                                                <label class="form-check-label" for="acepto_privacidad">
+                                                    Autorizo el tratamiento de mis datos personales de acuerdo con la política de
+                                                    privacidad *
+                                                </label>
+                                            </div>
+                                            <input type="hidden" name="acepto_privacidad" id="acepto_privacidad_hidden" value="0">
+
+                                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                                <a href="{{ route('programas-complementarios.inscripcion', $programa->id) }}"
+                                                    class="btn btn-outline-secondary me-md-2">
+                                                    <i class="fas fa-arrow-left mr-1"></i> Volver Atrás
+                                                </a>
+                                                <button type="submit" class="btn btn-success" disabled id="btnEnviar">
+                                                    <i class="fas fa-paper-plane mr-1"></i> Enviar Documento
+                                                </button>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
+                            </div>
 
-                                <div class="form-check mb-4">
-                                    <input class="form-check-input" type="checkbox" id="acepto_privacidad" required>
-                                    <label class="form-check-label" for="acepto_privacidad">
-                                        Autorizo el tratamiento de mis datos personales de acuerdo con la política de
-                                        privacidad *
-                                    </label>
+                        <div class="col-md-4">
+                            <div class="card card-widget widget-user">
+                                <div class="widget-user-header bg-success">
+                                    <h3 class="widget-user-username">Información del Programa</h3>
+                                    <h5 class="widget-user-desc">{{ $programa->nombre }}</h5>
                                 </div>
-                                <input type="hidden" name="acepto_privacidad" id="acepto_privacidad_hidden" value="0">
-
-                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                    <a href="{{ route('programas-complementarios.inscripcion', $programa->id) }}"
-                                        class="btn btn-outline-secondary me-md-2">
-                                        <i class="fas fa-arrow-left mr-1"></i> Volver Atrás
-                                    </a>
-                                    <button type="submit" class="btn btn-primary" disabled id="btnEnviar">
-                                        <i class="fas fa-paper-plane mr-1"></i> Enviar Documento
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="card card-widget widget-user">
-                        <div class="widget-user-header bg-info">
-                            <h3 class="widget-user-username">Información del Programa</h3>
-                            <h5 class="widget-user-desc">{{ $programa->nombre }}</h5>
-                        </div>
                         <div class="card-footer">
                             <div class="row">
                                 <div class="col-sm-12">
@@ -126,21 +139,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <div class="card mt-3">
-                        <div class="card-header bg-warning">
-                            <h6 class="mb-0"><i class="fas fa-exclamation-triangle mr-2"></i>Estado de la Inscripción</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="d-flex align-items-center">
-                                <div class="bg-primary rounded-circle p-2 mr-3">
-                                    <i class="fas fa-clock text-white"></i>
-                                </div>
-                                <div>
-                                    <strong>En Proceso</strong>
-                                    <p class="mb-0 small text-muted">Su inscripción está en proceso de revisión</p>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -149,7 +147,7 @@
     </div>
 
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+@include('layout.footer')
 <script>
     // Habilitar botón de envío cuando se selecciona un archivo y se acepta la privacidad
     const documentoInput = document.getElementById('documento_identidad');

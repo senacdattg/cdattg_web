@@ -1,0 +1,65 @@
+ /* Colores del SENA inspirados en Betowa */
+.btn-success {
+    background-color: #008000;
+    border-color: #008000;
+}
+.btn-success:hover {
+    background-color: #006400;
+    border-color: #006400;
+}
+.card-success .card-header {
+    background-color: #90EE90;
+    color: #000;
+}
+.bg-success {
+    background-color: #008000 !important;
+}
+.form-control:focus {
+    border-color: #008000;
+    box-shadow: 0 0 0 0.2rem rgba(0, 128, 0, 0.25);
+}
+.card-success {
+    border-color: #008000;
+}
+.text-success {
+    color: #008000 !important;
+}
+.alert-info {
+    background-color: #FFD700;
+    color: #000;
+    border-color: #FFD700;
+}
+
+/* Estilos para centrar y reducir el tamaño del formulario */
+.container-fluid {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+.card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Ajustes para textos largos en las categorías de caracterización */
+.card-outline .card-body .form-check-label {
+    word-wrap: break-word;
+    white-space: normal;
+    line-height: 1.4;
+    font-size: 0.9rem;
+}
+.card-outline .card-body .row .col-12 {
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+/* Forzar que el badge esté siempre abajo del título en las cards de programas */
+.card .card-body .card-title {
+    display: block;
+    margin-bottom: 0.5rem;
+}
+.card .card-body .badge {
+    display: block;
+    margin: 0.5rem 0;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
