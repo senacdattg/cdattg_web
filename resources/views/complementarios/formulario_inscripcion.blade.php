@@ -4,21 +4,29 @@
     @vite(['resources/css/formulario_inscripcion.css'])
 @endsection
 @section('content')
-    <div class="card card-success">
-        <div class="card-header">
-            <h3 class="card-title">
-                <i class="fas fa-user-plus mr-2"></i>Formulario de Inscripción
-            </h3>
-            <div class="card-tools">
-                <a href="{{ route('programas-complementarios.publicos') }}" class="btn btn-outline-secondary btn-sm">
-                    <i class="fas fa-arrow-left mr-1"></i> Volver a Programas
-                </a>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="text-center mb-4">
-                <h4 class="text-muted">{{ $programa->nombre }}</h4>
-            </div>
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-lg-10 col-xl-8">
+                <div class="text-center mb-4">
+                    <img src="{{ asset('vendor/adminlte/dist/img/LogoSena.png') }}" alt="SENA Logo" class="mb-3" style="height: 80px;">
+                    <h2 class="text-success">Servicio Nacional de Aprendizaje - SENA</h2>
+                    <p class="text-muted">Regional Guaviare</p>
+                </div>
+                <div class="card card-success">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-user-plus mr-2"></i>Formulario de Inscripción
+                        </h3>
+                        <div class="card-tools">
+                            <a href="{{ route('programas-complementarios.publicos') }}" class="btn btn-outline-secondary btn-sm">
+                                <i class="fas fa-arrow-left mr-1"></i> Volver a Programas
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <h4 class="text-muted">{{ $programa->nombre }}</h4>
+                        </div>
 
             <div class="row">
                 <div class="col-md-8">
@@ -147,50 +155,63 @@
 
                                 <hr class="my-4">
 
-                                <h5 class="mb-3"><i class="fas fa-tags mr-2"></i>Caracterización</h5>
-                                <p class="text-muted mb-3">Seleccione las categorías que correspondan a su situación:</p>
+                                <div class="card card-success mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-tags mr-2"></i>Caracterización</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="text-muted mb-3">Seleccione las categorías que correspondan a su situación:</p>
 
-                                @foreach ($categoriasConHijos as $categoria)
-                                    <div class="card card-outline card-primary mb-3">
-                                        <div class="card-header">
-                                            <h6 class="mb-0">{{ $categoria['nombre'] }}</h6>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row">
-                                                @foreach ($categoria['hijos'] as $hijo)
-                                                    <div class="col-12 mb-2">
-                                                        <div class="form-check">
-                                                            <input class="form-check-input" type="checkbox"
-                                                                name="categorias[]" value="{{ $hijo->id }}"
-                                                                id="categoria_{{ $hijo->id }}">
-                                                            <label class="form-check-label"
-                                                                for="categoria_{{ $hijo->id }}">
-                                                                {{ $hijo->nombre }}
-                                                            </label>
-                                                        </div>
+                                        @foreach ($categoriasConHijos as $categoria)
+                                            <div class="card card-outline card-success mb-3">
+                                                <div class="card-header">
+                                                    <h6 class="mb-0">{{ $categoria['nombre'] }}</h6>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="row">
+                                                        @foreach ($categoria['hijos'] as $hijo)
+                                                            <div class="col-12 mb-2">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        name="categorias[]" value="{{ $hijo->id }}"
+                                                                        id="categoria_{{ $hijo->id }}">
+                                                                    <label class="form-check-label"
+                                                                        for="categoria_{{ $hijo->id }}">
+                                                                        {{ ucwords(str_replace('_', ' ', $hijo->nombre)) }}
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        @endforeach
                                                     </div>
-                                                @endforeach
+                                                </div>
                                             </div>
+                                        @endforeach
+                                    </div>
+                                </div>
+
+                                <div class="card card-success mb-4">
+                                    <div class="card-header">
+                                        <h5 class="mb-0"><i class="fas fa-sticky-note mr-2"></i>Observaciones y Términos</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="observaciones" class="form-label">Observaciones</label>
+                                            <textarea class="form-control" id="observaciones" name="observaciones" rows="3"
+                                                placeholder="Información adicional que considere relevante..."></textarea>
+                                        </div>
+
+                                        <div class="form-check mb-4">
+                                            <input class="form-check-input" type="checkbox" id="acepto_terminos" required>
+                                            <label class="form-check-label" for="acepto_terminos">
+                                                Acepto los términos y condiciones del proceso de inscripción *
+                                            </label>
+                                        </div>
+
+                                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                            <button type="reset" class="btn btn-outline-secondary me-md-2">Limpiar</button>
+                                            <button type="submit" class="btn btn-success">Enviar Inscripción</button>
                                         </div>
                                     </div>
-                                @endforeach
-
-                                <div class="mb-3">
-                                    <label for="observaciones" class="form-label">Observaciones</label>
-                                    <textarea class="form-control" id="observaciones" name="observaciones" rows="3"
-                                        placeholder="Información adicional que considere relevante..."></textarea>
-                                </div>
-
-                                <div class="form-check mb-4">
-                                    <input class="form-check-input" type="checkbox" id="acepto_terminos" required>
-                                    <label class="form-check-label" for="acepto_terminos">
-                                        Acepto los términos y condiciones del proceso de inscripción *
-                                    </label>
-                                </div>
-
-                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                    <button type="reset" class="btn btn-outline-secondary me-md-2">Limpiar</button>
-                                    <button type="submit" class="btn btn-success">Enviar Inscripción</button>
                                 </div>
                             </form>
                         </div>
