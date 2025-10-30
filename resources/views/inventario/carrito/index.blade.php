@@ -15,158 +15,148 @@
 @endsection
 
 @section('content')
-    
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <x-data-table
+                        title="Lista de Productos en Carrito"
+                        searchable="true"
+                        searchAction="{{ route('inventario.carrito.index') }}"
+                        searchPlaceholder="Buscar producto en carrito..."
+                        searchValue="{{ request('search') }}"
+                        :columns="[
+                            ['label' => '#', 'width' => '5%'],
+                            ['label' => 'Producto', 'width' => '40%'],
+                            ['label' => 'Cantidad', 'width' => '15%'],
+                            ['label' => 'Categoría', 'width' => '20%'],
+                            ['label' => 'Estado', 'width' => '10%'],
+                            ['label' => 'Opciones', 'width' => '10%', 'class' => 'text-center']
+                        ]"
+                    >
+                        @if(isset($carrito) && count($carrito) > 0)
+                            @foreach($carrito as $item)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ $item->producto->producto ?? 'Producto no encontrado' }}</td>
+                                    <td>
+                                        <span class="badge badge-info">
+                                            {{ $item->cantidad ?? 0 }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-secondary">
+                                            {{ $item->producto->categoria->nombre ?? 'Sin categoría' }}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge badge-success">ACTIVO</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group">
+                                            <button type="button"
+                                                class="btn btn-sm btn-light"
+                                                title="Quitar del carrito"
+                                                onclick="eliminarDelCarrito({{ $item->id }})">
+                                                <i class="fas fa-trash text-danger"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @else
+                            <tr>
+                                <td colspan="6" class="text-center">
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+                                        <h5 class="text-muted">El carrito está vacío</h5>
+                                        <p class="text-muted">Agrega productos desde el catálogo para verlos aquí</p>
+                                        <a href="{{ route('inventario.productos.index') }}" class="btn btn-primary">
+                                            <i class="fas fa-box mr-2"></i> Ver Productos
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endif
+                    </x-data-table>
+                    
+                    @if(!empty($carrito))
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body text-center">
+                                        <h5>Resumen del Pedido</h5>
+                                        <p><strong>Total de productos:</strong> {{ count($carrito) }}</p>
+                                        <button type="button" class="btn btn-success" onclick="procesarPedido()">
+                                            <i class="fas fa-paper-plane mr-2"></i> Enviar Pedido
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </section>
+
     {{-- Alertas --}}
     @include('layout.alertas')
-    
+@endsection
+
+@section('footer')
     {{-- Footer SENA --}}
     @include('inventario._components.sena-footer')
-    
+@endsection
+
 @push('css')
     @vite(['resources/css/style.css'])
 @endpush
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-@endpush
-
-@push('styles')
-    @vite([
-        'resources/css/inventario/carrito.css'
-    ])
-@endpush
-
-@section('content_header')
-    <h1><i class="fas fa-shopping-cart mr-2"></i> Carrito de Compras</h1>
-@endsection
-
-@section('main-content')
-@php
-    $carrito = [
-        (object)[
-            'id' => 1,
-            'producto' => (object)[
-                'producto' => 'Mouse inalámbrico',
-                'imagen' => 'img/inventario/imagen_default.png'
-            ],
-            'cantidad' => 2
-        ],
-        (object)[
-            'id' => 2,
-            'producto' => (object)[
-                'producto' => 'Teclado mecánico',
-                'imagen' => 'img/inventario/imagen_default.png'
-            ],
-            'cantidad' => 1
-        ],
-        (object)[
-            'id' => 3,
-            'producto' => (object)[
-                'producto' => 'Teclado',
-                'imagen' => 'img/inventario/imagen_default.png'
-            ],
-            'cantidad' => 1
-        ],
-        (object)[
-            'id' => 4,
-            'producto' => (object)[
-                'producto' => 'Teclado',
-                'imagen' => 'img/inventario/imagen_default.png'
-            ],
-            'cantidad' => 1
-        ],
-        (object)[
-            'id' => 1,
-            'producto' => (object)[
-                'producto' => 'Mouse inalámbrico',
-                'imagen' => 'img/inventario/imagen_default.png'
-            ],
-            'cantidad' => 2
-        ],
-        (object)[
-            'id' => 2,
-            'producto' => (object)[
-                'producto' => 'Teclado mecánico',
-                'imagen' => 'img/inventario/imagen_default.png'
-            ],
-            'cantidad' => 1
-        ],
-    ];
-@endphp
-
-<div class="div_flex">
-    {{-- Tabla del carrito usando componente --}}
-    <div class="div_carrito">
-        @include('inventario._components.card-header', [
-            'title' => 'Carrito',
-            'icon' => 'fas fa-shopping-cart',
-            'bgClass' => 'bg-primary',
-            'textClass' => 'text-white'
-        ])
+    <script>
+        function eliminarDelCarrito(itemId) {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Este producto se quitará del carrito",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, quitarlo'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Aquí iría la lógica para eliminar del carrito
+                    location.reload();
+                }
+            });
+        }
         
-        <div class="card-body">
-            @component('inventario._components.data-table', [
-                'headers' => [
-                    'imagen' => 'Foto',
-                    'producto' => 'Producto',
-                    'cantidad' => 'Cantidad'
-                ],
-                'data' => $carrito,
-                'actions' => [], // El carrito usa local storage, no rutas del servidor
-                'emptyMessage' => 'El carrito está vacío.',
-                'emptyIcon' => 'fas fa-shopping-cart',
-                'tableClass' => 'carrito-table'
-            ])
-            @endcomponent
-        </div>
-    </div>
-
-    {{-- Panel lateral --}}
-    <div class="div_lateral">
-        {{-- Resumen del pedido --}}
-        <div class="div_pedido">
-            @include('inventario._components.card-header', [
-                'title' => 'Pedido',
-                'icon' => 'fas fa-receipt',
-                'bgClass' => 'bg-success',
-                'textClass' => 'text-white'
-            ])
-            
-            <div class="card-body">
-                <div class="div_titulo">
-                    <p><strong>Productos:</strong> {{ count($carrito) }}</p>
-                </div>
-                <form>
-                    @csrf
-                    <div class="div_btn">
-                        <button type="submit" class="btn-pedido">
-                            <i class="fas fa-paper-plane"></i> Enviar 
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-
-        {{-- Resumen detallado --}}
-        <div class="div_resumen">
-            @include('inventario._components.card-header', [
-                'title' => 'Resumen',
-                'icon' => 'fas fa-list-alt',
-                'bgClass' => 'bg-info',
-                'textClass' => 'text-white'
-            ])
-            
-            <div class="card-body">
-                <ul>
-                    @foreach($carrito as $item)
-                        <li>{{ $item->cantidad }} x {{ $item->producto->producto }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- Modal para imagen expandible --}}
-@include('inventario._components.image-modal')
-@endsection
+        function procesarPedido() {
+            Swal.fire({
+                title: 'Procesar Pedido',
+                text: "Se enviará el pedido para revisión",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Enviar Pedido',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Aquí iría la lógica para procesar el pedido
+                    Swal.fire({
+                        title: '¡Pedido Enviado!',
+                        text: 'Tu pedido ha sido enviado para revisión',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = '{{ route("inventario.productos.index") }}';
+                    });
+                }
+            });
+        }
+    </script>
+@endpush

@@ -15,120 +15,97 @@
 @endsection
 
 @section('content')
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <x-create-card
+                        url="#"
+                        title="Nueva Orden"
+                        icon="fa-plus-circle"
+                        permission="CREAR ORDEN"
+                    />
+                    
+                    <x-data-table
+                        title="Lista de Órdenes"
+                        searchable="true"
+                        searchAction="{{ route('inventario.ordenes.index') }}"
+                        searchPlaceholder="Buscar orden..."
+                        searchValue="{{ request('search') }}"
+                        :columns="[
+                            ['label' => '#', 'width' => '5%'],
+                            ['label' => 'Descripción', 'width' => '25%'],
+                            ['label' => 'Tipo', 'width' => '15%'],
+                            ['label' => 'Fecha Devolución', 'width' => '15%'],
+                            ['label' => 'Usuario', 'width' => '15%'],
+                            ['label' => 'Estado', 'width' => '10%'],
+                            ['label' => 'Opciones', 'width' => '15%', 'class' => 'text-center']
+                        ]"
+                    >
+                        @forelse ($ordenes as $orden)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ Str::limit($orden->descripcion_orden, 50) }}</td>
+                                <td>
+                                    <span class="badge badge-secondary">
+                                        {{ $orden->tipoOrden->parametro->name ?? 'N/A' }}
+                                    </span>
+                                </td>
+                                <td>{{ $orden->fecha_devolucion ? $orden->fecha_devolucion->format('d/m/Y') : 'N/A' }}</td>
+                                <td>
+                                    <span class="badge badge-primary">
+                                        <i class="fas fa-user-circle"></i> {{ $orden->userCreate->name ?? 'Usuario' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <x-status-badge
+                                        status="true"
+                                        activeText="ACTIVA"
+                                        inactiveText="INACTIVA"
+                                    />
+                                </td>
+                                <td class="text-center">
+                                    <x-action-buttons
+                                        show="true"
+                                        edit="true"
+                                        delete="true"
+                                        showUrl="#"
+                                        editUrl="#"
+                                        deleteUrl="#"
+                                        showTitle="Ver orden"
+                                        editTitle="Editar orden"
+                                        deleteTitle="Eliminar orden"
+                                    />
+                            </tr>
+                        @empty
+                            <x-table-empty
+                                colspan="7"
+                                message="No hay órdenes registradas"
+                                icon="fas fa-list"
+                            />
+                        @endforelse
+                    </x-data-table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- Modal de confirmación de eliminación --}}
+    <x-confirm-delete-modal />
     
     {{-- Alertas --}}
     @include('layout.alertas')
-    
+@endsection
+
+@section('footer')
     {{-- Footer SENA --}}
     @include('inventario._components.sena-footer')
-    
+@endsection
+
 @push('css')
     @vite(['resources/css/style.css'])
 @endpush
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-@endpush
-
-@push('styles')
-    @vite([
-        'resources/css/inventario/ordenes.css'
-    ])
-@endpush
-
-@section('main-content')
-    <div class="container-fluid">
-            <div class="card card-ordenes">
-                <div class="card-header">
-                    <h3><i class="fas fa-clipboard-list"></i> Listado de Órdenes</h3>
-            </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table id="orders-table" class="table-ordenes">
-                        <thead>
-                            <tr>
-                                <th><i class="fas fa-hashtag"></i> ID</th>
-                                <th><i class="fas fa-align-left"></i> Descripción</th>
-                                <th><i class="fas fa-tags"></i> Tipo</th>
-                                <th><i class="fas fa-calendar-alt"></i> Fecha devolución</th>
-                                <th><i class="fas fa-user"></i> Usuario</th>
-                                <th><i class="fas fa-info-circle"></i> Estado</th>
-                                <th><i class="fas fa-calendar-alt"></i> Creación</th>
-                                <th><i class="fas fa-cogs"></i> Acciones</th>
-                            </tr>
-                        </thead>
-                <tbody>
-                    {{-- Ejemplo visual, reemplaza por tu foreach real --}}
-                    {{-- @foreach($orders as $order)
-                        <tr>
-                            <td>{{ $order->id }}</td>
-                            <td>{{ $order->description ?? 'Sin descripción' }}</td>
-                            <td><span class="badge badge-secondary">{{ $order->type ?? 'Salida' }}</span></td>
-                            <td>{{ $order->return_date ?? 'N/A' }}</td>
-                            <td><span class="badge badge-primary"><i class="fas fa-user-circle"></i> {{ $order->user->name ?? 'Usuario' }}</span></td>
-                            <td><span class="badge badge-{{ $order->status == 'Aprobada' ? 'success' : ($order->status == 'Pendiente' ? 'warning' : 'secondary') }}">{{ $order->status ?? 'Pendiente' }}</span></td>
-                            <td>{{ $order->created_at->format('Y-m-d') }}</td>
-                            <td>
-                                <a href="{{ route('inventario.ordenes.show', $order->id) }}" class="btn btn-info btn-sm" title="Ver"><i class="fas fa-eye"></i></a>
-                                <a href="{{ route('inventario.ordenes.edit', $order->id) }}" class="btn btn-warning btn-sm" title="Editar"><i class="fas fa-edit"></i></a>
-                                <form action="{{ route('inventario.ordenes.destroy', $order->id) }}" method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash"></i></button>
-                                </form>
-                            </td>
-                        </tr>
-                    @endforeach --}}
-                    <tr>
-                        <td>1</td>
-                        <td>Salida de reglas para ADSO</td>
-                        <td><span class="badge badge-secondary">Salida</span></td>
-                        <td>2025-08-25</td>
-                        <td><span class="badge badge-primary"><i class="fas fa-user-circle"></i> Juan Pérez</span></td>
-                        <td><span class="badge badge-success">Aprobada</span></td>
-                        <td>2025-08-18</td>
-                        <td>
-                            <a href="#" class="btn btn-info btn-sm" title="Ver"><i class="fas fa-eye"></i></a>
-                            <a href="#" class="btn btn-warning btn-sm" title="Editar"><i class="fas fa-edit"></i></a>
-                            <a href="#" class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash"></i></a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td>Salida de equipos para mantenimiento</td>
-                        <td><span class="badge badge-secondary">Salida</span></td>
-                        <td>2025-08-30</td>
-                        <td><span class="badge badge-primary"><i class="fas fa-user-circle"></i> Ana Gómez</span></td>
-                        <td><span class="badge badge-warning">Pendiente</span></td>
-                        <td>2025-08-17</td>
-                        <td>
-                            <a href="#" class="btn btn-info btn-sm" title="Ver"><i class="fas fa-eye"></i></a>
-                            <a href="#" class="btn btn-warning btn-sm" title="Editar"><i class="fas fa-edit"></i></a>
-                            <a href="#" class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash"></i></a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td>Llevarme un pc pa la casa pa jugar</td>
-                        <td><span class="badge badge-secondary">Salida</span></td>
-                        <td>2026-08-30</td>
-                        <td><span class="badge badge-primary"><i class="fas fa-user-circle"></i> Jhon Santamaria</span></td>
-                        <td><span class="badge badge-warning">Rechazada</span></td>
-                        <td>2025-08-17</td>
-                        <td>
-                            <a href="{{ route('inventario.ordenes.index') }}" class="btn btn-info btn-sm" title="Ver"><i class="fas fa-eye"></i></a>
-                            <a href="#" class="btn btn-warning btn-sm" title="Editar"><i class="fas fa-edit"></i></a>
-                            <a href="#" class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash"></i></a>
-                        </td>
-                    </tr>
-                </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-    </div>
-@endsection
-
-@push('scripts')
-    @vite(['resources/js/inventario/ordenes.js'])
 @endpush

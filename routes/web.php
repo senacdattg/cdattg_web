@@ -42,10 +42,9 @@ Route::middleware('auth')->group(function () {
 
     foreach ($protectedFolders as $folder) {
         if ($folder === 'inventario') {
-            // Cargar todas las rutas del inventario desde index.php
-            $inventarioIndex = routes_path('inventario') . '/index.php';
-            if (file_exists($inventarioIndex)) {
-                include_once $inventarioIndex;
+            // Cargar todas las rutas del inventario
+            foreach (glob(routes_path($folder) . '/*.php') as $routeFile) {
+                include_once $routeFile;
             }
         } else {
             foreach (glob(routes_path($folder) . '/*.php') as $routeFile) {

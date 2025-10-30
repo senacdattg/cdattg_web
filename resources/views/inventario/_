@@ -1,0 +1,19 @@
+@props([
+    'colspan' => 1,
+    'message' => 'No hay registros',
+    'icon' => 'fas fa-inbox',
+    'image' => 'img/no-data.svg',
+    'showImage' => true,
+    'class' => 'text-center py-5'
+])
+
+<tr>
+    <td colspan="{{ $colspan }}" class="{{ $class }}">
+        @if($showImage && $image)
+            <img src="{{ asset($image) }}" alt="No data" class="img-fluid mb-3" style="max-width: 120px;">
+        @elseif($icon)
+            <i class="{{ $icon }} fa-3x text-muted mb-3"></i>
+        @endif
+        <p class="text-muted mb-0">{{ $message }}</p>
+    </td>
+</tr>

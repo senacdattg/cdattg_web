@@ -15,49 +15,126 @@
 @endsection
 
 @section('content')
-    
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <x-create-card
+                        url="{{ route('inventario.productos.create') }}"
+                        title="Crear Producto"
+                        icon="fa-plus-circle"
+                        permission="CREAR PRODUCTO"
+                    />
+
+                    <x-data-table
+                        title="Lista de Productos"
+                        searchable="true"
+                        searchAction="{{ route('inventario.productos.index') }}"
+                        searchPlaceholder="Buscar producto..."
+                        searchValue="{{ request('search') }}"
+                        :columns="[
+                            ['label' => '#', 'width' => '3%'],
+                            ['label' => 'Producto', 'width' => '20%'],
+                            ['label' => 'Código', 'width' => '10%'],
+                            ['label' => 'Categoría', 'width' => '10%'],
+                            ['label' => 'Marca', 'width' => '10%'],
+                            ['label' => 'Cantidad', 'width' => '8%'],
+                            ['label' => 'Peso', 'width' => '8%'],
+                            ['label' => 'Proveedor', 'width' => '12%'],
+                            ['label' => 'Estado', 'width' => '8%'],
+                            ['label' => 'Opciones', 'width' => '11%', 'class' => 'text-center']
+                        ]"
+                    >
+                        @forelse ($productos as $producto)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>
+                                    <strong>{{ $producto->producto }}</strong>
+                                    <br>
+                                    <small class="text-muted">
+                                        {{ Str::limit($producto->descripcion, 30) ?? 'Sin descripción' }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <span class="badge badge-secondary">
+                                        {{ $producto->codigo_barras ?? 'N/A' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-info">
+                                        {{ $producto->categoria->nombre ?? 'Sin categoría' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span class="badge badge-dark">
+                                        {{ $producto->marca->nombre ?? 'Sin marca' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    @php
+                                        $stockClass = 'success';
+                                        if ($producto->cantidad <= 5) $stockClass = 'danger';
+                                        elseif ($producto->cantidad <= 10) $stockClass = 'warning';
+                                        elseif ($producto->cantidad <= 20) $stockClass = 'info';
+                                    @endphp
+                                    <span class="badge badge-{{ $stockClass }}">
+                                        {{ $producto->cantidad }}
+                                    </span>
+                                </td>
+                                <td>
+                                    @if($producto->peso && $producto->unidadMedida)
+                                        <small>{{ $producto->peso }} {{ $producto->unidadMedida->parametro->name ?? '' }}</small>
+                                    @else
+                                        <small class="text-muted">N/A</small>
+                                    @endif
+                                </td>
+                                <td>
+                                    <small>
+                                        {{ $producto->contratoConvenio->name ?? $producto->contratoConvenio->proveedor->proveedor ?? 'N/A' }}
+                                    </small>
+                                </td>
+                                <td>
+                                    <x-status-badge
+                                        status="{{ $producto->estado->status ?? true }}"
+                                        activeText="ACTIVO"
+                                        inactiveText="INACTIVO"
+                                    />
+                                </td>
+                                <td class="text-center">
+                                    <x-action-buttons
+                                        show="true"
+                                        edit="true"
+                                        delete="true"
+                                        showUrl="{{ route('inventario.productos.show', $producto->id) }}"
+                                        editUrl="{{ route('inventario.productos.edit', $producto->id) }}"
+                                        deleteUrl="{{ route('inventario.productos.destroy', $producto->id) }}"
+                                        showTitle="Ver producto"
+                                        editTitle="Editar producto"
+                                        deleteTitle="Eliminar producto"
+                                    />
+                                </td>
+                            </tr>
+                        @empty
+                            <x-table-empty
+                                colspan="10"
+                                message="No hay productos registrados"
+                                icon="fas fa-box"
+                            />
+                        @endforelse
+                    </x-data-table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {{-- Modal de confirmación de eliminación --}}
+    <x-confirm-delete-modal />
+
     {{-- Alertas --}}
     @include('layout.alertas')
-
-@push('styles')
-    @vite([
-        'resources/css/inventario/productos.css',
-        'resources/css/inventario/shared/modal-imagen.css',
-        'resources/js/inventario/productos.js'
-    ])
-@endpush
-
-@section('classes_body', 'productos-page')
-
-@section('header')
-    @include('inventario._components.page-header', [
-        'title' => 'Catálogo de Productos',
-        'icon' => 'fas fa-box',
-        'showSearch' => true,
-        'showCart' => true,
-        'searchPlaceholder' => 'Buscar productos...',
-        'createRoute' => route('inventario.productos.create'),
-        'createText' => 'Nuevo Producto'
-    ])
 @endsection
 
-@section('main-content')
-    <div class="product-grid" id="productGrid">
-        @forelse($productos as $producto)
-            @include('inventario._components.product-card', ['producto' => $producto])
-        @empty
-            @include('inventario._components.empty-state', [
-                'message' => 'No hay productos registrados',
-                'icon' => 'fas fa-box-open',
-                'actionRoute' => route('inventario.productos.create'),
-                'actionText' => 'Agregar primer producto'
-            ])
-        @endforelse
-    </div>
-
-    {{-- Modal para imagen expandible --}}
-    @include('inventario._components.image-modal')
-    
+@section('footer')
     {{-- Footer SENA --}}
     @include('inventario._components.sena-footer')
 @endsection
