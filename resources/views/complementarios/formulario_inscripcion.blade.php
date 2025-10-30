@@ -346,6 +346,62 @@
     document.getElementById('telefono').addEventListener('keypress', soloNumeros);
     document.getElementById('celular').addEventListener('keypress', soloNumeros);
 
+    // Funcionalidad del formulario de dirección estructurada
+    document.getElementById('toggleAddressForm').addEventListener('click', function() {
+        const addressForm = document.getElementById('addressForm');
+        const isVisible = addressForm.classList.contains('show');
+        if (isVisible) {
+            $('#addressForm').collapse('hide');
+        } else {
+            $('#addressForm').collapse('show');
+        }
+    });
+
+    document.getElementById('saveAddress').addEventListener('click', function() {
+        const carrera = document.getElementById('carrera').value.trim();
+        const calle = document.getElementById('calle').value.trim();
+        const numeroCasa = document.getElementById('numero_casa').value.trim();
+        const numeroApartamento = document.getElementById('numero_apartamento').value.trim();
+
+        // Validar campos obligatorios
+        if (!carrera || !calle || !numeroCasa) {
+            alert('Por favor complete todos los campos obligatorios: Carrera, Calle y Número Casa.');
+            return;
+        }
+
+        // Construir la dirección
+        let direccion = `Carrera ${carrera} Calle ${calle} #${numeroCasa}`;
+        if (numeroApartamento) {
+            direccion += ` Apt ${numeroApartamento}`;
+        }
+
+        // Asignar al campo principal
+        document.getElementById('direccion').value = direccion;
+
+        // Ocultar el formulario
+        $('#addressForm').collapse('hide');
+
+        // Limpiar campos
+        document.querySelectorAll('.address-field').forEach(field => field.value = '');
+    });
+
+    document.getElementById('cancelAddress').addEventListener('click', function() {
+        // Ocultar el formulario
+        $('#addressForm').collapse('hide');
+
+        // Limpiar campos
+        document.querySelectorAll('.address-field').forEach(field => field.value = '');
+    });
+
+    // Validar solo números en campos de dirección
+    const addressNumericFields = ['carrera', 'calle', 'numero_casa', 'numero_apartamento'];
+    addressNumericFields.forEach(fieldId => {
+        const element = document.getElementById(fieldId);
+        if (element) {
+            element.addEventListener('keypress', soloNumeros);
+        }
+    });
+
     // Validación del formulario
     document.getElementById('formInscripcion').addEventListener('submit', function(e) {
         // Validar términos y condiciones

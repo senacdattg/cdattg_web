@@ -241,7 +241,60 @@
                                                 <label for="direccion">Dirección *</label>
                                                 <input type="text" class="form-control" id="direccion"
                                                     value="{{ old('direccion') }}" name="direccion"
-                                                    placeholder="Dirección completa" required>
+                                                    placeholder="Dirección completa" required readonly>
+                                                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
+                                                    <i class="fas fa-edit"></i> Ingresar Dirección
+                                                </button>
+                                            </div>
+                                            <div id="addressForm" class="collapse mt-3" aria-labelledby="addressFormLabel">
+                                                <div class="card card-outline-secondary">
+                                                    <div class="card-header">
+                                                        <h5 id="addressFormLabel" class="mb-0">Ingresar Dirección</h5>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="row">
+                                                            <div class="col-12 col-md-6">
+                                                                <div class="form-group">
+                                                                    <label for="carrera">Carrera *</label>
+                                                                    <input type="text" class="form-control address-field" id="carrera"
+                                                                        placeholder="Ej: 1" data-required="true">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="calle">Calle *</label>
+                                                                    <input type="text" class="form-control address-field" id="calle"
+                                                                        placeholder="Ej: 2" data-required="true">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="numero_casa">Número Casa *</label>
+                                                                    <input type="text" class="form-control address-field" id="numero_casa"
+                                                                        placeholder="Ej: 3" data-required="true">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="numero_apartamento">Número Apartamento</label>
+                                                                    <input type="text" class="form-control address-field" id="numero_apartamento"
+                                                                        placeholder="Ej: 4 (opcional)">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-12 col-md-6 d-flex align-items-center">
+                                                                <div class="w-100">
+                                                                    <p class="mb-2"><strong>Ejemplo de formato:</strong></p>
+                                                                    <p class="text-muted">Carrera 1 Calle 2 #3 Apt 4</p>
+                                                                    <p class="text-muted small">Los campos marcados con * son obligatorios.</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <button type="button" class="btn btn-success btn-sm mr-2" id="saveAddress">
+                                                                    <i class="fas fa-save"></i> Guardar Dirección
+                                                                </button>
+                                                                <button type="button" class="btn btn-secondary btn-sm" id="cancelAddress">
+                                                                    <i class="fas fa-times"></i> Cancelar
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -363,6 +416,65 @@
             const elemento = document.getElementsByName(campo)[0];
             if (elemento) {
                 elemento.addEventListener('keypress', soloNumeros);
+            }
+        });
+
+        // Funcionalidad del formulario de dirección estructurada
+        document.getElementById('toggleAddressForm').addEventListener('click', function() {
+            const addressForm = document.getElementById('addressForm');
+            const isVisible = addressForm.classList.contains('show');
+            const button = this;
+            if (isVisible) {
+                $('#addressForm').collapse('hide');
+                button.setAttribute('aria-expanded', 'false');
+            } else {
+                $('#addressForm').collapse('show');
+                button.setAttribute('aria-expanded', 'true');
+            }
+        });
+
+        document.getElementById('saveAddress').addEventListener('click', function() {
+            const carrera = document.getElementById('carrera').value.trim();
+            const calle = document.getElementById('calle').value.trim();
+            const numeroCasa = document.getElementById('numero_casa').value.trim();
+            const numeroApartamento = document.getElementById('numero_apartamento').value.trim();
+
+            // Validar campos obligatorios
+            if (!carrera || !calle || !numeroCasa) {
+                alert('Por favor complete todos los campos obligatorios: Carrera, Calle y Número Casa.');
+                return;
+            }
+
+            // Construir la dirección
+            let direccion = `Carrera ${carrera} Calle ${calle} #${numeroCasa}`;
+            if (numeroApartamento) {
+                direccion += ` Apt ${numeroApartamento}`;
+            }
+
+            // Asignar al campo principal
+            document.getElementById('direccion').value = direccion;
+
+            // Ocultar el formulario
+            $('#addressForm').collapse('hide');
+
+            // Limpiar campos
+            document.querySelectorAll('.address-field').forEach(field => field.value = '');
+        });
+
+        document.getElementById('cancelAddress').addEventListener('click', function() {
+            // Ocultar el formulario
+            $('#addressForm').collapse('hide');
+
+            // Limpiar campos
+            document.querySelectorAll('.address-field').forEach(field => field.value = '');
+        });
+
+        // Validar solo números en campos de dirección
+        const addressNumericFields = ['carrera', 'calle', 'numero_casa', 'numero_apartamento'];
+        addressNumericFields.forEach(fieldId => {
+            const element = document.getElementById(fieldId);
+            if (element) {
+                element.addEventListener('keypress', soloNumeros);
             }
         });
     </script>
