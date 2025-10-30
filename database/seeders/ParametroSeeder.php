@@ -58,7 +58,6 @@ class ParametroSeeder extends Seeder
             ['id' => 28, 'name' => 'CONSUMIBLE', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 29, 'name' => 'NO CONSUMIBLE', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
 
-            
             // Unidades de medida
             ['id' => 30, 'name' => 'GRAMOS', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 31, 'name' => 'LIBRAS', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
@@ -80,6 +79,38 @@ class ParametroSeeder extends Seeder
             // Tipos de orden
             ['id' => 44, 'name' => 'PRÉSTAMO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 45, 'name' => 'SALIDA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+
+            // Categorías
+            ['id' => 46, 'name' => 'CONSUMIBLES AGRÍCOLAS', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 47, 'name' => 'HERRAMIENTAS MANUALES', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 48, 'name' => 'MAQUINARIA Y EQUIPOS', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 49, 'name' => 'INSUMOS DE LABORATORIO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 50, 'name' => 'OFIMÁTICA Y PAPELERÍA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 51, 'name' => 'ASEO Y CAFETERÍA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 52, 'name' => 'SEGURIDAD INDUSTRIAL', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 53, 'name' => 'TECNOLOGÍA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 54, 'name' => 'MOBILIARIO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+
+            // Marcas
+            ['id' => 55, 'name' => 'LENOVO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 56, 'name' => 'DELL', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 57, 'name' => 'ACER', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 58, 'name' => 'ASUS', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 59, 'name' => 'HP', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 60, 'name' => 'SAMSUNG', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 61, 'name' => 'LG', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 62, 'name' => 'HUAWEI', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 63, 'name' => 'EPSON', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 64, 'name' => 'MICROSOFT', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 65, 'name' => 'ADIDAS', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 66, 'name' => 'NIKE', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 67, 'name' => 'PUMA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 68, 'name' => 'REEBOK', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 69, 'name' => 'SKECHERS', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 70, 'name' => 'TOTTO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 71, 'name' => 'NORMA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            
+
         ];
 
         foreach ($parametros as $parametro) {
