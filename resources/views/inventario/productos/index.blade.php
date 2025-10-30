@@ -37,8 +37,6 @@
                             ['label' => '#', 'width' => '3%'],
                             ['label' => 'Producto', 'width' => '20%'],
                             ['label' => 'Código', 'width' => '10%'],
-                            ['label' => 'Categoría', 'width' => '10%'],
-                            ['label' => 'Marca', 'width' => '10%'],
                             ['label' => 'Cantidad', 'width' => '8%'],
                             ['label' => 'Peso', 'width' => '8%'],
                             ['label' => 'Proveedor', 'width' => '12%'],
@@ -59,16 +57,6 @@
                                 <td>
                                     <span class="badge badge-secondary">
                                         {{ $producto->codigo_barras ?? 'N/A' }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge badge-info">
-                                        {{ $producto->categoria->nombre ?? 'Sin categoría' }}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge badge-dark">
-                                        {{ $producto->marca->nombre ?? 'Sin marca' }}
                                     </span>
                                 </td>
                                 <td>
