@@ -7,10 +7,8 @@ use App\Http\Controllers\Inventario\ContratoConvenioController;
 Route::prefix('inventario')
     ->name('inventario.')
     ->group(function () {
-        // Solo se usa index porque create/edit están en la misma vista
-        Route::resource('contratos-convenios', ContratoConvenioController::class)->only([
-            'index', 'store', 'update', 'destroy'
-        ])->parameters([
+        // Rutas completas para contratos y convenios con vistas CRUD
+        Route::resource('contratos-convenios', ContratoConvenioController::class)->except(['catalogo'])->parameters([
             'contratos-convenios' => 'contratoConvenio'
         ]);
     });

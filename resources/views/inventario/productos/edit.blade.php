@@ -1,5 +1,5 @@
 
-@extends('adminlte::page')
+@extends('inventario.layouts.form')
 
 @section('title', 'Editar Producto')
 
@@ -15,14 +15,6 @@
     />
 @endsection
 
-@section('content')
-    
-    {{-- Alertas --}}
-    @include('layout.alertas')
-    
-    {{-- Footer SENA --}}
-    @include('inventario._components.sena-footer')
-    
 @push('css')
     @vite(['resources/css/style.css'])
 @endpush
@@ -30,15 +22,21 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endpush
-    'icon' => 'fas fa-edit',
-    'action' => route('inventario.productos.update', $producto->id),
-    'method' => 'PUT',
-    'submitText' => 'Guardar cambios',
-    'cancelRoute' => route('inventario.productos.index'),
-    'cancelText' => 'Cancelar',
-    'showReset' => true,
-    'resetText' => 'Limpiar'
-])
+
+@section('form-config')
+    @php
+        $formConfig = [
+            'icon' => 'fas fa-edit',
+            'action' => route('inventario.productos.update', $producto->id),
+            'method' => 'PUT',
+            'submitText' => 'Guardar cambios',
+            'cancelRoute' => route('inventario.productos.index'),
+            'cancelText' => 'Cancelar',
+            'showReset' => true,
+            'resetText' => 'Limpiar'
+        ];
+    @endphp
+@endsection
 
 @section('form-content')
     @include('inventario._components.product-form', [

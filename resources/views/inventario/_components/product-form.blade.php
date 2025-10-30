@@ -86,8 +86,15 @@
 
                     <!-- Código de barras -->
                     <div class="col-md-6 mb-4 form-floating">
-                        <input type="text" name="codigo_barras" id="codigo_barras" class="form-control form-control-sm"
-                            value="{{ old('codigo_barras', $producto->codigo_barras ?? '') }}" required placeholder="Código de barras">
+                        <div class="input-group">
+                            <input type="text" name="codigo_barras" id="codigo_barras" class="form-control form-control-sm"
+                                value="{{ old('codigo_barras', $producto->codigo_barras ?? '') }}" required placeholder="Código de barras">
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="scan-btn" title="Escanear código de barras">
+                                    <i class="fas fa-scan"></i>
+                                </button>
+                            </div>
+                        </div>
                         <label for="codigo_barras">Código de barras</label>
                     </div>
 
@@ -196,5 +203,163 @@
         </form>
     </div>
 </div>
+
+{{-- Modal para scanner de códigos de barras --}}
+<div class="modal fade" id="scannerModal" tabindex="-1" aria-labelledby="scannerModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="scannerModalLabel">
+                    <i class="fas fa-scan mr-2"></i>
+                    Escanear Código de Barras
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center">
+                    <div id="scanner-container" style="width: 100%; margin: 0 auto;">
+                        <div id="qr-reader" style="width: 100%;"></div>
+                    </div>
+                    <div id="scanner-error" class="text-danger mt-3" style="display: none;">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="error-message"></span>
+                    </div>
+                    <div id="scanner-success" class="text-success mt-3" style="display: none;">
+                        <i class="fas fa-check-circle"></i>
+                        <span id="success-message"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-times"></i> Cerrar
+                </button>
+                <button type="button" class="btn btn-primary" id="stop-scanner">
+                    <i class="fas fa-stop"></i> Detener Escáner
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const scanBtn = document.getElementById('scan-btn');
+    const scannerModal = document.getElementById('scannerModal');
+    const codigoBarrasInput = document.getElementById('codigo_barras');
+    let scanner = null;
+    
+    // Función para iniciar el escáner
+    function startScanner() {
+        const html5QrCode = new Html5Qrcode("qr-reader");
+        const config = {
+            fps: 10,
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1.0
+        };
+        
+        html5QrCode.start(
+            { facingMode: "environment" }, // Usar cámara trasera si está disponible
+            config,
+            (decodedText, decodedResult) => {
+                // Código escaneado exitosamente
+                codigoBarrasInput.value = decodedText;
+                
+                // Mostrar mensaje de éxito
+                document.getElementById('scanner-success').style.display = 'block';
+                document.getElementById('success-message').textContent = 'Código escaneado: ' + decodedText;
+                
+                // Cerrar modal después de un breve retraso
+                setTimeout(() => {
+                    stopScanner(html5QrCode);
+                    $(scannerModal).modal('hide');
+                }, 1500);
+            },
+            (errorMessage) => {
+                // Error durante el escaneo (normal, se muestra continuamente)
+                console.log('Error de escaneo:', errorMessage);
+            }
+        ).catch(err => {
+            // Error al iniciar la cámara
+            showScannerError('Error al acceder a la cámara: ' + err);
+        });
+        
+        scanner = html5QrCode;
+    }
+    
+    // Función para detener el escáner
+    function stopScanner(html5QrCodeInstance = null) {
+        if (html5QrCodeInstance) {
+            html5QrCodeInstance.stop().then(() => {
+                html5QrCodeInstance.clear();
+            }).catch(err => {
+                console.log('Error al detener escáner:', err);
+            });
+        } else if (scanner) {
+            scanner.stop().then(() => {
+                scanner.clear();
+            }).catch(err => {
+                console.log('Error al detener escáner:', err);
+            });
+        }
+        
+        scanner = null;
+    }
+    
+    // Función para mostrar errores
+    function showScannerError(message) {
+        const errorDiv = document.getElementById('scanner-error');
+        document.getElementById('error-message').textContent = message;
+        errorDiv.style.display = 'block';
+        
+        setTimeout(() => {
+            errorDiv.style.display = 'none';
+        }, 5000);
+    }
+    
+    // Event listeners
+    if (scanBtn) {
+        scanBtn.addEventListener('click', function() {
+            // Limpiar mensajes anteriores
+            document.getElementById('scanner-error').style.display = 'none';
+            document.getElementById('scanner-success').style.display = 'none';
+            
+            // Mostrar modal
+            $(scannerModal).modal('show');
+            
+            // Iniciar escáner después de que el modal se muestre
+            setTimeout(() => {
+                startScanner();
+            }, 500);
+        });
+    }
+    
+    // Detener escáner cuando se cierre el modal
+    $(scannerModal).on('hidden.bs.modal', function() {
+        stopScanner();
+        document.getElementById('scanner-error').style.display = 'none';
+        document.getElementById('scanner-success').style.display = 'none';
+    });
+    
+    // Botón para detener manualmente el escáner
+    const stopBtn = document.getElementById('stop-scanner');
+    if (stopBtn) {
+        stopBtn.addEventListener('click', function() {
+            stopScanner();
+            $(scannerModal).modal('hide');
+        });
+    }
+    
+    // Verificar soporte de cámara
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        if (scanBtn) {
+            scanBtn.disabled = true;
+            scanBtn.title = 'Su navegador no soporta acceso a la cámara';
+        }
+    }
+});
+</script>
 
 @include('inventario._components.image-modal')

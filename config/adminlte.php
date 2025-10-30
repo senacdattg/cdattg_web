@@ -863,27 +863,31 @@ return [
                 [
                     'text' => 'Configuración',
                     'icon' => 'fa-solid fa-cog',
-                    'can'  => ['VER PRODUCTO', 'CREAR PRODUCTO'],
+                    'can'  => ['VER CATEGORIA', 'VER MARCA', 'VER PROVEEDOR', 'VER CONTRATO'],
                     'submenu' => [
                         [
                             'text' => 'Categorías',
                             'url'  => 'inventario/categorias',
                             'icon' => 'fa-solid fa-tags',
+                            'can'  => 'VER CATEGORIA',
                         ],
                         [
                             'text' => 'Marcas',
                             'url'  => 'inventario/marcas',
                             'icon' => 'fa-solid fa-trademark',
+                            'can'  => 'VER MARCA',
                         ],
                         [
                             'text' => 'Proveedores',
                             'url'  => 'inventario/proveedores',
                             'icon' => 'fa-solid fa-truck',
+                            'can'  => 'VER PROVEEDOR',
                         ],
                         [
                             'text' => 'Contratos/Convenios',
                             'url'  => 'inventario/contratos-convenios',
                             'icon' => 'fa-solid fa-file-contract',
+                            'can'  => 'VER CONTRATO',
                         ],
                     ],
                 ],

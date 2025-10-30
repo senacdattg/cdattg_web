@@ -10,9 +10,9 @@ class ProveedorController extends InventarioController
     public function __construct()
     {
         parent::__construct();
-        $this->middleware('can:VER PRODUCTO')->only('index');
-        $this->middleware('can:CREAR PRODUCTO')->only('store');
-        $this->middleware('can:EDITAR PRODUCTO')->only('update');
+        $this->middleware('can:VER PROVEEDOR')->only('index', 'show');
+        $this->middleware('can:CREAR PROVEEDOR')->only('create', 'store');
+        $this->middleware('can:EDITAR PROVEEDOR')->only('edit', 'update');
         $this->middleware('can:ELIMINAR PRODUCTO')->only('destroy');
     }
 
@@ -23,6 +23,22 @@ class ProveedorController extends InventarioController
             ->latest()
             ->get();
         return view('inventario.proveedores.index', compact('proveedores'));
+    }
+
+    public function create()
+    {
+        return view('inventario.proveedores.create');
+    }
+
+    public function show(Proveedor $proveedor)
+    {
+        $proveedor->load(['contratosConvenios', 'userCreate.persona', 'userUpdate.persona']);
+        return view('inventario.proveedores.show', compact('proveedor'));
+    }
+
+    public function edit(Proveedor $proveedor)
+    {
+        return view('inventario.proveedores.edit', compact('proveedor'));
     }
 
     public function store(Request $request)

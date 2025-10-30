@@ -9,7 +9,8 @@
         subtitle="Productos seleccionados para el inventario"
         :breadcrumb="[
             ['label' => 'Inicio', 'url' => '#'],
-            ['label' => 'Inventario', 'active' => true]
+            ['label' => 'Inventario', 'active' => true],
+            ['label' => 'Carrito', 'active' => true]
         ]"
     />
 @endsection

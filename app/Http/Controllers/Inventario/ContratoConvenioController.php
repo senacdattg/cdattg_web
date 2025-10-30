@@ -13,9 +13,9 @@ class ContratoConvenioController extends InventarioController
     public function __construct()
     {
         parent::__construct();
-        $this->middleware('can:VER PRODUCTO')->only('index');
-        $this->middleware('can:CREAR PRODUCTO')->only('store');
-        $this->middleware('can:EDITAR PRODUCTO')->only('update');
+        $this->middleware('can:VER CONTRATO')->only('index', 'show');
+        $this->middleware('can:CREAR CONTRATO')->only('create', 'store');
+        $this->middleware('can:EDITAR CONTRATO')->only('edit', 'update');
         $this->middleware('can:ELIMINAR PRODUCTO')->only('destroy');
     }
 
@@ -37,6 +37,24 @@ class ContratoConvenioController extends InventarioController
             ->get();
         
         return view('inventario.contratos_convenios.index', compact('contratosConvenios', 'proveedores', 'estados'));
+    }
+
+    public function create()
+    {
+        $proveedores = Proveedor::orderBy('proveedor')->get();
+        return view('inventario.contratos_convenios.create', compact('proveedores'));
+    }
+
+    public function show(ContratoConvenio $contratoConvenio)
+    {
+        $contratoConvenio->load(['proveedor', 'productos', 'userCreate.persona', 'userUpdate.persona']);
+        return view('inventario.contratos_convenios.show', compact('contratoConvenio'));
+    }
+
+    public function edit(ContratoConvenio $contratoConvenio)
+    {
+        $proveedores = Proveedor::orderBy('proveedor')->get();
+        return view('inventario.contratos_convenios.edit', compact('contratoConvenio', 'proveedores'));
     }
 
     public function store(Request $request)

@@ -9,7 +9,8 @@
         subtitle="Gestión de préstamos y salidas del inventario"
         :breadcrumb="[
             ['label' => 'Inicio', 'url' => '#'],
-            ['label' => 'Inventario', 'active' => true]
+            ['label' => 'Inventario', 'active' => true],
+            ['label' => 'Préstamos/Salidas', 'active' => true]
         ]"
     />
 @endsection
