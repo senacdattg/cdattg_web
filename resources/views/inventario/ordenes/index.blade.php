@@ -9,7 +9,8 @@
         subtitle="Administra las órdenes del inventario"
         :breadcrumb="[
             ['label' => 'Inicio', 'url' => '#'],
-            ['label' => 'Inventario', 'active' => true]
+            ['label' => 'Inventario', 'active' => true],
+            ['label' => 'Órdenes', 'active' => true]
         ]"
     />
 @endsection
@@ -20,7 +21,7 @@
             <div class="row">
                 <div class="col-12">
                     <x-create-card
-                        url="#"
+                        url="inventario.ordenes.prestamos_salidas"
                         title="Nueva Orden"
                         icon="fa-plus-circle"
                         permission="CREAR ORDEN"

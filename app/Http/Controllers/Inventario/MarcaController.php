@@ -10,9 +10,9 @@ class MarcaController extends InventarioController
     public function __construct()
     {
         parent::__construct();
-        $this->middleware('can:VER PRODUCTO')->only('index');
-        $this->middleware('can:CREAR PRODUCTO')->only('store');
-        $this->middleware('can:EDITAR PRODUCTO')->only('update');
+        $this->middleware('can:VER MARCA')->only('index', 'show');
+        $this->middleware('can:CREAR MARCA')->only('create', 'store');
+        $this->middleware('can:EDITAR MARCA')->only('edit', 'update');
         $this->middleware('can:ELIMINAR PRODUCTO')->only('destroy');
     }
 
@@ -23,6 +23,22 @@ class MarcaController extends InventarioController
             ->latest()
             ->get();
         return view('inventario.marcas.index', compact('marcas'));
+    }
+
+    public function create()
+    {
+        return view('inventario.marcas.create');
+    }
+
+    public function show(Marca $marca)
+    {
+        $marca->load(['productos', 'userCreate.persona', 'userUpdate.persona']);
+        return view('inventario.marcas.show', compact('marca'));
+    }
+
+    public function edit(Marca $marca)
+    {
+        return view('inventario.marcas.edit', compact('marca'));
     }
 
     public function store(Request $request)

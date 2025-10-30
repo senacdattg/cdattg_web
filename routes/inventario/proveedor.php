@@ -7,10 +7,8 @@ use App\Http\Controllers\Inventario\ProveedorController;
 Route::prefix('inventario')
     ->name('inventario.')
     ->group(function () {
-        // Solo se usa index porque create/edit están en la misma vista
-        Route::resource('proveedores', ProveedorController::class)->only([
-            'index', 'store', 'update', 'destroy'
-        ])->parameters([
+        // Rutas completas para proveedores con vistas CRUD
+        Route::resource('proveedores', ProveedorController::class)->except(['catalogo'])->parameters([
             'proveedores' => 'proveedor'
         ]);
     });

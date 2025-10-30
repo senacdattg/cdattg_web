@@ -9,7 +9,8 @@
         subtitle="Administra los productos del inventario"
         :breadcrumb="[
             ['label' => 'Inicio', 'url' => '#'],
-            ['label' => 'Inventario', 'active' => true]
+            ['label' => 'Inventario', 'active' => true],
+            ['label' => 'Productos', 'active' => true]
         ]"
     />
 @endsection
