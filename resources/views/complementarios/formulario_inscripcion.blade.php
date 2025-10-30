@@ -1,6 +1,10 @@
 @extends('layout.master-layout-registro')
+@extends('layout.alertas')
+@section('css')
+    @vite(['resources/css/formulario_inscripcion.css'])
+@endsection
 @section('content')
-    <div class="card card-primary">
+    <div class="card card-success">
         <div class="card-header">
             <h3 class="card-title">
                 <i class="fas fa-user-plus mr-2"></i>Formulario de Inscripción
@@ -18,7 +22,7 @@
 
             <div class="row">
                 <div class="col-md-8">
-                    <div class="card card-primary">
+                    <div class="card card-success">
                         <div class="card-header">
                             <h5 class="mb-0"><i class="fas fa-user mr-2"></i>Datos Personales</h5>
                         </div>
@@ -186,7 +190,7 @@
 
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                     <button type="reset" class="btn btn-outline-secondary me-md-2">Limpiar</button>
-                                    <button type="submit" class="btn btn-primary">Enviar Inscripción</button>
+                                    <button type="submit" class="btn btn-success">Enviar Inscripción</button>
                                 </div>
                             </form>
                         </div>
@@ -195,7 +199,7 @@
 
                 <div class="col-md-4">
                     <div class="card card-widget widget-user">
-                        <div class="widget-user-header bg-info">
+                        <div class="widget-user-header bg-success">
                             <h3 class="widget-user-username">Información del Programa</h3>
                             <h5 class="widget-user-desc">{{ $programa->nombre }}</h5>
                         </div>
@@ -333,4 +337,5 @@
         // El formulario se enviará al servidor si todas las validaciones pasan
     });
 </script>
+@include('layout.footer')
 @endsection
