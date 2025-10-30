@@ -4,14 +4,14 @@
     @vite(['resources/css/programas_publicos.css'])
 @endsection
 @section('content')
-    <div class="container-fluid">
+    @include('complementarios.components.header-programas-publicos')
+
+    <div class="container-fluid mt-4">
         <div class="row justify-content-center">
             <div class="col-lg-12 col-xl-10">
                 <div class="text-center mb-4">
-                    <img src="{{ asset('vendor/adminlte/dist/img/LogoSena.png') }}" alt="SENA Logo" class="mb-3"
-                        style="height: 80px;">
-                    <h2 class="text-success">Servicio Nacional de Aprendizaje - SENA</h2>
-                    <p class="text-muted">Regional Guaviare</p>
+                    <h2 class="text-success">Programas Complementarios</h2>
+                    <p class="text-muted">Descubre nuestros programas de formación complementaria disponibles</p>
                 </div>
                 <div class="card card-success">
                     <div class="card-header">
@@ -23,7 +23,6 @@
                         </div>
                     </div>
                     <div class="card-body">
-                        <p class="text-muted mb-4">Descubre nuestros programas de formación complementaria disponibles</p>
 
                         <!-- Programs Cards View -->
                         <div class="row justify-content-center">
