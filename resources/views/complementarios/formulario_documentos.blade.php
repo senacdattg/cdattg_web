@@ -4,13 +4,14 @@
     @vite(['resources/css/formulario_inscripcion.css'])
 @endsection
 @section('content')
-    <div class="container-fluid">
+    @include('complementarios.components.header-programas-publicos')
+
+    <div class="container-fluid mt-4">
         <div class="row justify-content-center">
             <div class="col-lg-10 col-xl-8">
                 <div class="text-center mb-4">
-                    <img src="{{ asset('vendor/adminlte/dist/img/LogoSena.png') }}" alt="SENA Logo" class="mb-3" style="height: 80px;">
-                    <h2 class="text-success">Servicio Nacional de Aprendizaje - SENA</h2>
-                    <p class="text-muted">Regional Guaviare</p>
+                    <h2 class="text-success">Subir Documento de Identidad</h2>
+                    <p class="text-muted">Complete el proceso de inscripción</p>
                 </div>
                 <div class="card card-success">
                     <div class="card-header">
