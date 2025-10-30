@@ -29,3 +29,24 @@
     color: #000;
     border-color: #FFD700;
 }
+
+/* Estilos para centrar y reducir el tamaño del formulario */
+.container-fluid {
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+.card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Ajustes para textos largos en las categorías de caracterización */
+.card-outline .card-body .form-check-label {
+    word-wrap: break-word;
+    white-space: normal;
+    line-height: 1.4;
+    font-size: 0.9rem;
+}
+.card-outline .card-body .row .col-12 {
+    padding-left: 15px;
+    padding-right: 15px;
+}
