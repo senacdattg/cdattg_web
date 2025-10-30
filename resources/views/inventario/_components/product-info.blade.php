@@ -55,13 +55,13 @@
             <strong>Marca:</strong> 
             {{ $producto->marca->nombre ?? 'N/A' }}
         </li>
-        
+
         <li class="list-group-item">
             <i class="fas fa-list"></i> 
             <strong>Categoría:</strong> 
             {{ $producto->categoria->nombre ?? 'N/A' }}
         </li>
-        
+
         <li class="list-group-item">
             <i class="fas fa-map-marker-alt"></i> 
             <strong>Ambiente:</strong> 

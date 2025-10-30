@@ -8,8 +8,8 @@ use App\Models\Inventario\Producto;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\ParametroTema;
-use App\Models\Inventario\Categoria;
-use App\Models\Inventario\Marca;
+use App\Models\Parametro;
+use App\Models\Tema;
 use App\Models\Inventario\ContratoConvenio;
 use App\Models\Ambiente;
 
@@ -35,25 +35,30 @@ class ProductoController extends Controller
 
     public function create()
     {
-        $tiposProductos = ParametroTema::with(['parametro','tema'])
-            ->whereHas('tema', fn($q) => $q->where('name', 'TIPOS DE PRODUCTO'))
+        $tiposProductos = Parametro::where('name', 'LIKE', '%CONSUMIBLE%')
+            ->orWhere('name', 'LIKE', '%NO CONSUMIBLE%')
             ->where('status', 1)
             ->get();
 
-        $unidadesMedida = ParametroTema::with(['parametro','tema'])
-            ->whereHas('tema', fn($q) => $q->where('name', 'UNIDADES DE MEDIDA'))
+        $unidadesMedida = Parametro::whereIn('name', [
+            'GRAMOS', 'LIBRAS', 'KILOGRAMOS', 'ARROBA', 'QUINTAL', 'ONZA',
+            'MILILITRO', 'LITRO', 'GALÓN', 'ONZA LÍQUIDA', 'BARRIL', 'UNIDADES'
+        ])->where('status', 1)->get();
+
+        $estados = Parametro::whereIn('name', ['DISPONIBLE', 'AGOTADO'])
             ->where('status', 1)
             ->get();
 
-        $estados = ParametroTema::with(['parametro','tema'])
-            ->whereHas('tema', fn($q) => $q->where('name', 'ESTADOS DE PRODUCTO'))
+        $categorias = ParametroTema::with(['parametro','tema'])
+            ->whereHas('tema', fn($q) => $q->where('name', 'CATEGORÍAS'))
+            ->where('status', 1)
+            ->get();
+
+        $marcas = ParametroTema::with(['parametro','tema'])
+            ->whereHas('tema', fn($q) => $q->where('name', 'MARCAS'))
             ->where('status', 1)
             ->get();
         
-        $categorias = Categoria::all();
-
-        $marcas = Marca::all();
-
         $contratosConvenios = ContratoConvenio::all();
 
         $ambientes = Ambiente::all();
@@ -75,8 +80,8 @@ class ProductoController extends Controller
             'cantidad' => 'required|integer|min:0',
             'codigo_barras' => 'required|string',
             'estado_producto_id' => 'required|exists:parametros_temas,id',
-            'categoria_id' => 'required|exists:categorias,id',
-            'marca_id' => 'required|exists:marcas,id',
+            'categoria_id' => 'required|exists:parametros,id',
+            'marca_id' => 'required|exists:parametros,id',
             'contrato_convenio_id' => 'required|exists:contratos_convenios,id',
             'ambiente_id' => 'required|exists:ambientes,id',
             'fecha_vencimiento' => 'nullable|date',
@@ -140,9 +145,17 @@ class ProductoController extends Controller
             ->where('status', 1)
             ->get();
 
-        $categorias = Categoria::all();
+        // Obtener categorías
+        $categorias = ParametroTema::with(['parametro','tema'])
+            ->whereHas('tema', fn($q) => $q->where('name', 'CATEGORÍAS'))
+            ->where('status', 1)
+            ->get();
 
-        $marcas = Marca::all();
+        // Obtener marcas
+        $estados = ParametroTema::with(['parametro','tema'])
+            ->whereHas('tema', fn($q) => $q->where('name', 'MARCAS'))
+            ->where('status', 1)
+            ->get();
 
         $contratosConvenios = ContratoConvenio::all();
 
@@ -178,6 +191,10 @@ class ProductoController extends Controller
             'cantidad' => 'required|integer|min:0',
             'codigo_barras' => 'required|string',
             'estado_producto_id' => 'required|exists:parametros_temas,id',
+            'categoria_id' => 'required|exists:parametros,id',
+            'marca_id' => 'required|exists:parametros,id',
+            'contrato_convenio_id' => 'required|exists:contratos_convenios,id',
+            'ambiente_id' => 'required|exists:ambientes,id',
             'fecha_vencimiento' => 'nullable|date',
             'imagen' => 'nullable|image|mimes:jpg,jpeg,png'
         ]);

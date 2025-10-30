@@ -2,24 +2,43 @@
 
 namespace App\Models\Inventario;
 
-use App\Traits\Seguimiento;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Parametro;
+use App\Models\ParametroTema;
+use App\Models\Tema;
 
-class Marca extends Model
+class Marca extends Parametro
 {
-    use Seguimiento;
+    protected static function booted()
+    {
+        static::creating(function ($marca) {
+            $marca->name = strtoupper($marca->name);
+        });
+    }
 
-    protected $table = 'marcas';
+    // Relación con el tema "MARCAS".
+    public static function tema()
+    {
+        return Tema::where('name', 'MARCAS')->first();
+    }
 
-    protected $fillable = [
-        'nombre',
-        'user_create_id',
-        'user_update_id'
-    ];
+    // Guardar la marca como parámetro asociado al tema "MARCAS".
+    public function asociarATemaMarcas()
+    {
+        $tema = self::tema();
 
-    // Relación con productos
+        if ($tema) {
+            ParametroTema::create([
+                'parametro_id'  => $this->id,
+                'tema_id'       => $tema->id,
+                'status'        => 1,
+                'user_create_id'=> $this->user_create_id,
+                'user_edit_id'  => $this->user_edit_id,
+            ]);
+        }
+    }
+
     public function productos()
     {
-        return $this->hasMany(Producto::class);
+        return $this->hasMany(Producto::class, 'id_marca'); 
     }
 }

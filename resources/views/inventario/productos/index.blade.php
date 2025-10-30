@@ -66,11 +66,13 @@
                                         {{ $producto->categoria->nombre ?? 'Sin categoría' }}
                                     </span>
                                 </td>
+
                                 <td>
                                     <span class="badge badge-dark">
                                         {{ $producto->marca->nombre ?? 'Sin marca' }}
                                     </span>
                                 </td>
+
                                 <td>
                                     @php
                                         $stockClass = 'success';

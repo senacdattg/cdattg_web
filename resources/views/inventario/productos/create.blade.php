@@ -73,7 +73,7 @@
                 <div class="form-group">
                     <label for="categoria_id">Categoría <span class="text-danger">*</span></label>
                     <select
-                        class="form-control @error('categoria_id') is-invalid @description"
+                        class="form-control @error('categoria_id') is-invalid @enderror"
                         id="categoria_id"
                         name="categoria_id"
                         required
@@ -219,9 +219,7 @@
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
-@endpush
 
-@section('form-scripts')
     <script>
         // Configuración del scanner
         let html5QrcodeScanner = null;
@@ -273,10 +271,7 @@
         }
         
         function onScanSuccess(decodedText, decodedResult) {
-            // Llenar el campo de código de barras
             $('#codigo_barras').val(decodedText);
-            
-            // Mostrar mensaje de éxito
             Swal.fire({
                 title: '¡Código Escaneado!',
                 text: 'Código: ' + decodedText,
@@ -284,19 +279,17 @@
                 timer: 2000,
                 showConfirmButton: false
             });
-            
-            // Cerrar el modal
             $('#scannerModal').modal('hide');
         }
         
         function onScanError(error) {
-            // Opcional: mostrar errores de escaneo (se ejecuta frecuentemente)
             // console.log("Scan error:", error);
         }
     </script>
+
     @vite([
         'resources/js/inventario/productos.js',
         'resources/js/inventario/shared/modal-imagen.js'
     ])
 @endpush
-@endsection
+

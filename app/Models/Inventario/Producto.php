@@ -2,6 +2,7 @@
 
 namespace App\Models\Inventario;
 
+use App\Models\Parametro;
 use App\Traits\Seguimiento;
 use App\Models\Ambiente;
 use App\Models\ParametroTema;
@@ -61,12 +62,12 @@ class Producto extends Model
 
     public function categoria()
     {
-        return $this->belongsTo(Categoria::class);
+        return $this->belongsTo(Parametro::class, 'categoria_id');
     }
 
     public function marca()
     {
-        return $this->belongsTo(Marca::class);
+        return $this->belongsTo(Parametro::class, 'marca_id');
     }
 
     public function contratoConvenio()
