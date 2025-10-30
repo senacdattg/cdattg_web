@@ -46,6 +46,7 @@ class MigrateModule extends Command
         'batch_13_competencias' => 'Competencias, Resultados de Aprendizaje y Guías',
         'batch_14_evidencias' => 'Evidencias de Aprendizaje',
         'batch_15_logs_auditoria' => 'Logs y Auditoría',
+        'batch_17_complementarios' => 'Módulo de Complementarios (cursos complementarios, aspirantes, caracterización)',
     ];
 
     /**
