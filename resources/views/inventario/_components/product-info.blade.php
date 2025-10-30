@@ -51,15 +51,15 @@
         </li>
         
         <li class="list-group-item">
-            <i class="fas fa-tag"></i> 
-            <strong>Marca:</strong> 
-            {{ $producto->marca->nombre ?? 'N/A' }}
+            <i class="fas fa-tag"></i>
+            <strong>Marca:</strong>
+            {{ $producto->marca->name ?? 'N/A' }}
         </li>
 
         <li class="list-group-item">
-            <i class="fas fa-list"></i> 
-            <strong>Categoría:</strong> 
-            {{ $producto->categoria->nombre ?? 'N/A' }}
+            <i class="fas fa-list"></i>
+            <strong>Categoría:</strong>
+            {{ $producto->categoria->name ?? 'N/A' }}
         </li>
 
         <li class="list-group-item">

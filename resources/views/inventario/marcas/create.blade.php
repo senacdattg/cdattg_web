@@ -43,17 +43,17 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="nombre">Nombre de la Marca <span class="text-danger">*</span></label>
+                                            <label for="name">Nombre de la Marca <span class="text-danger">*</span></label>
                                             <input
                                                 type="text"
-                                                class="form-control @error('nombre') is-invalid @enderror"
-                                                id="nombre"
-                                                name="nombre"
-                                                value="{{ old('nombre') }}"
+                                                class="form-control @error('name') is-invalid @enderror"
+                                                id="name"
+                                                name="name"
+                                                value="{{ old('name') }}"
                                                 placeholder="Ingrese el nombre de la marca"
                                                 required
                                             >
-                                            @error('nombre')
+                                            @error('name')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>

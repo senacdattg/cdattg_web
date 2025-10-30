@@ -792,39 +792,78 @@ return [
             'icon' => 'fa-solid fa-boxes-stacked',
             'submenu' => [
                 [
+                    'text' => 'Dashboard',
+                    'url'  => 'inventario/dashboard',
+                    'icon' => 'fa-solid fa-chart-bar',
+                    'can'  => 'VER PRODUCTO',
+                ],
+                [
                     'text' => 'Productos',
-                    'url'  => 'inventario/productos',
                     'icon' => 'fa-solid fa-box',
-                    'can'  => ['VER PRODUCTO', 'CREAR PRODUCTO', 'EDITAR PRODUCTO', 'ELIMINAR PRODUCTO'],
+                    'can'  => 'VER PRODUCTO',
+                    'submenu' => [
+                        [
+                            'text' => 'Lista de Productos',
+                            'url'  => 'inventario/productos',
+                            'icon' => 'fa-solid fa-list',
+                            'can'  => 'VER PRODUCTO',
+                        ],
+                        [
+                            'text' => 'Catálogo de Productos',
+                            'url'  => 'inventario/productos/catalogo',
+                            'icon' => 'fa-solid fa-th',
+                            'can'  => 'VER CATALOGO PRODUCTO',
+                        ],
+                        [
+                            'text' => 'Crear Producto',
+                            'url'  => 'inventario/productos/create',
+                            'icon' => 'fa-solid fa-plus',
+                            'can'  => 'CREAR PRODUCTO',
+                        ],
+                    ],
                 ],
                 [
                     'text' => 'Carrito',
-                    'url'  => 'inventario/carrito',
                     'icon' => 'fa-solid fa-cart-plus',
+                    'can'  => ['VER CARRITO', 'VER PRODUCTO'],
+                    'submenu' => [
+                        [
+                            'text' => 'Ver Carrito',
+                            'url'  => 'inventario/carrito',
+                            'icon' => 'fa-solid fa-shopping-cart',
+                            'can'  => 'VER CARRITO',
+                        ],
+                        [
+                            'text' => 'Carrito E-commerce',
+                            'url'  => 'inventario/carrito-ecommerce',
+                            'icon' => 'fa-solid fa-cart-shopping',
+                            'can'  => 'VER CARRITO',
+                        ],
+                    ],
                 ],
                 [
                     'text' => 'Órdenes',
                     'url'  => 'inventario/ordenes',
                     'icon' => 'fa-solid fa-file-invoice',
-                    'can'  => ['VER ORDEN', 'CREAR ORDEN', 'EDITAR ORDEN'],
+                    'can'  => 'VER ORDEN',
                     'submenu' => [
                         [
                             'text' => 'Todas las Órdenes',
                             'url'  => 'inventario/ordenes',
                             'icon' => 'fa-solid fa-list',
-                            'can'  => ['VER ORDEN'],
+                            'can'  => 'VER ORDEN',
                         ],
                         [
                             'text' => 'Órdenes Pendientes',
                             'url'  => 'inventario/ordenes/pendientes',
                             'icon' => 'fa-solid fa-hourglass-half',
-                            'can'  => ['VER ORDEN'],
+                            'can'  => 'VER ORDEN',
                         ],
                         [
                             'text' => 'Órdenes Completadas',
                             'url'  => 'inventario/ordenes/completadas',
                             'icon' => 'fa-solid fa-check-circle',
-                            'can'  => ['VER ORDEN'],
+                            'can'  => 'VER ORDEN',
                         ],
                     ],
                 ],
@@ -832,25 +871,25 @@ return [
                     'text' => 'Préstamos y Salidas',
                     'url'  => 'inventario/ordenes/prestamos-salidas',
                     'icon' => 'fa-solid fa-exchange-alt',
-                    'can'  => ['VER ORDEN', 'CREAR ORDEN'],
+                    'can'  => 'VER ORDEN',
                     'submenu' => [
                         [
                             'text' => 'Solicitar Préstamo/Salida',
                             'url'  => 'inventario/ordenes/solicitar',
                             'icon' => 'fa-solid fa-plus',
-                            'can'  => ['CREAR ORDEN'],
+                            'can'  => 'CREAR ORDEN',
                         ],
                         [
                             'text' => 'Préstamos',
                             'url'  => 'inventario/ordenes/prestamos',
                             'icon' => 'fa-solid fa-hand-holding-box',
-                            'can'  => ['VER ORDEN'],
+                            'can'  => 'VER ORDEN',
                         ],
                         [
                             'text' => 'Salidas',
                             'url'  => 'inventario/ordenes/salidas',
                             'icon' => 'fa-solid fa-sign-out-alt',
-                            'can'  => ['VER ORDEN'],
+                            'can'  => 'VER ORDEN',
                         ],
                     ],
                 ],
@@ -858,12 +897,12 @@ return [
                     'text' => 'Devoluciones',
                     'url'  => 'inventario/devoluciones',
                     'icon' => 'fa-solid fa-undo',
-                    'can'  => ['VER ORDEN'],
+                    'can'  => 'VER ORDEN',
                 ],
                 [
                     'text' => 'Configuración',
                     'icon' => 'fa-solid fa-cog',
-                    'can'  => ['VER CATEGORIA', 'VER MARCA', 'VER PROVEEDOR', 'VER CONTRATO'],
+                    'can'  => 'VER CATEGORIA',
                     'submenu' => [
                         [
                             'text' => 'Categorías',

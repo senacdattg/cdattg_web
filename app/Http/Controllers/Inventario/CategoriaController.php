@@ -61,8 +61,8 @@ class CategoriaController extends InventarioController
             ]);
             $categoria->save();
 
-            // Se asocia al tema "categoriaS"
-            $categoria->asociarATemacategorias();
+            // Se asocia al tema "CATEGORIAS"
+            $categoria->asociarATemaCategorias();
 
             return redirect()->route('inventario.categorias.index')
                 ->with('success', 'Categoria creada exitosamente.');
@@ -103,7 +103,7 @@ class CategoriaController extends InventarioController
     public function destroy(Parametro $categoria)
     {
         try {
-            // Desvincular del tema "categoriaS"
+            // Desvincular del tema "CATEGORIAS"
             ParametroTema::where('parametro_id', $categoria->id)
                 ->where('tema_id', $this->temacategorias->id)
                 ->delete();

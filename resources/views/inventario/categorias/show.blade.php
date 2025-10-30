@@ -15,7 +15,7 @@
             ['label' => 'Inicio', 'url' => '#'],
             ['label' => 'Inventario', 'active' => true],
             ['label' => 'Categorías', 'url' => route('inventario.categorias.index')],
-            ['label' => $categoria->nombre, 'active' => true]
+            ['label' => $categoria->name, 'active' => true]
         ]"
     />
 @endsection
@@ -81,7 +81,7 @@
                                         <tr>
                                             <th class="py-3">Nombre</th>
                                             <td class="py-3">
-                                                <strong>{{ $categoria->nombre }}</strong>
+                                                <strong>{{ $categoria->name }}</strong>
                                                 <br><small class="text-muted">Categoría registrada</small>
                                             </td>
                                         </tr>

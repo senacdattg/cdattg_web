@@ -80,9 +80,9 @@
                     >
                         <option value="">Seleccione una categoría</option>
                         @foreach($categorias as $categoria)
-                            <option value="{{ $categoria->id }}" {{ old('categoria_id') == $categoria->id ? 'selected' : '' }}>
-                                                        {{ $categoria->nombre }}
-                                                    </option>
+                            <option value="{{ $categoria->parametro->id }}" {{ old('categoria_id') == $categoria->parametro->id ? 'selected' : '' }}>
+                                {{ $categoria->parametro->name }}
+                            </option>
                         @endforeach
                     </select>
                     @error('categoria_id')
@@ -101,9 +101,9 @@
                     >
                         <option value="">Seleccione una marca</option>
                         @foreach($marcas as $marca)
-                            <option value="{{ $marca->id }}" {{ old('marca_id') == $marca->id ? 'selected' : '' }}>
-                                                        {{ $marca->nombre }}
-                                                    </option>
+                            <option value="{{ $marca->parametro->id }}" {{ old('marca_id') == $marca->parametro->id ? 'selected' : '' }}>
+                                {{ $marca->parametro->name }}
+                            </option>
                         @endforeach
                     </select>
                     @error('marca_id')

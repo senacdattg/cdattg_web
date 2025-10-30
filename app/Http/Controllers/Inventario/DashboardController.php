@@ -21,12 +21,16 @@ class DashboardController extends Controller
         $totalProductos = Producto::count();
 
         // Productos consumibles y no consumibles
-        $productosConsumibles = Producto::whereHas('tipoProducto.parametro', function($query) {
-            $query->where('name', 'CONSUMIBLE');
+        $productosConsumibles = Producto::whereHas('tipoProducto', function($query) {
+            $query->whereHas('parametro', function($subQuery) {
+                $subQuery->where('name', 'CONSUMIBLE');
+            });
         })->count();
 
-        $productosNoConsumibles = Producto::whereHas('tipoProducto.parametro', function($query) {
-            $query->where('name', 'NO CONSUMIBLE');
+        $productosNoConsumibles = Producto::whereHas('tipoProducto', function($query) {
+            $query->whereHas('parametro', function($subQuery) {
+                $subQuery->where('name', 'NO CONSUMIBLE');
+            });
         })->count();
 
         // Productos más y menos solicitados (datos de ejemplo por ahora)
@@ -59,16 +63,16 @@ class DashboardController extends Controller
         $totalCategorias = Categoria::count();
 
         // Productos recientes (últimos 5)
-        $productosRecientes = Producto::with(['estado.parametro'])
+        $productosRecientes = Producto::with(['estado', 'estado.parametro'])
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
 
         // Productos por categoría para el gráfico
         $productosPorCategoria = DB::table('productos')
-            ->join('categorias', 'productos.categoria_id', '=', 'categorias.id')
-            ->select('categorias.nombre as categoria', DB::raw('count(*) as total'))
-            ->groupBy('categorias.id', 'categorias.nombre')
+            ->join('parametros', 'productos.categoria_id', '=', 'parametros.id')
+            ->select('parametros.name as categoria', DB::raw('count(*) as total'))
+            ->groupBy('parametros.id', 'parametros.name')
             ->get();
 
         return view('inventario.dashboard.index', compact(

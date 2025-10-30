@@ -139,9 +139,9 @@
                         <select name="categoria_id" id="categoria_id" class="form-control form-control-sm" required>
                             <option value="">Categoría</option>
                             @foreach ($categorias as $categoria)
-                                <option value="{{ $categoria->id }}" 
-                                    {{ old('categoria_id', $producto->categoria_id ?? '') == $categoria->id ? 'selected' : '' }}>
-                                    {{ $categoria->nombre }}
+                                <option value="{{ $categoria->parametro->id }}"
+                                    {{ old('categoria_id', $producto->categoria_id ?? '') == $categoria->parametro->id ? 'selected' : '' }}>
+                                    {{ $categoria->parametro->name }}
                                 </option>
                             @endforeach
                         </select>
@@ -153,9 +153,9 @@
                         <select name="marca_id" id="marca_id" class="form-control form-control-sm" required>
                             <option value="">Marca</option>
                             @foreach ($marcas as $marca)
-                                <option value="{{ $marca->id }}" 
-                                    {{ old('marca_id', $producto->marca_id ?? '') == $marca->id ? 'selected' : '' }}>
-                                    {{ $marca->nombre }}
+                                <option value="{{ $marca->parametro->id }}"
+                                    {{ old('marca_id', $producto->marca_id ?? '') == $marca->parametro->id ? 'selected' : '' }}>
+                                    {{ $marca->parametro->name }}
                                 </option>
                             @endforeach
                         </select>

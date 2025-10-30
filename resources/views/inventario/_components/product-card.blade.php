@@ -36,7 +36,7 @@
             </span>
             @if($producto->categoria)
                 <span class="badge badge-info">
-                    <i class="fas fa-tag"></i> {{ $producto->categoria->nombre }}
+                    <i class="fas fa-tag"></i> {{ $producto->categoria->name }}
                 </span>
             @endif
         </div>

@@ -15,14 +15,14 @@ class Categoria extends Parametro
         });
     }
 
-    // Relación con el tema "CATEGORÍAS".
+    // Relación con el tema "CATEGORIAS".
     public static function tema()
     {
-        return Tema::where('name', 'categoriaS')->first();
+        return Tema::where('name', 'CATEGORIAS')->first();
     }
 
-    // Guardar la categoria como parámetro asociado al tema "categoriaS".
-    public function asociarATemacategorias()
+    // Guardar la categoria como parámetro asociado al tema "CATEGORIAS".
+    public function asociarATemaCategorias()
     {
         $tema = self::tema();
 

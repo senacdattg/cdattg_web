@@ -35,22 +35,23 @@ class ProductoController extends Controller
 
     public function create()
     {
-        $tiposProductos = Parametro::where('name', 'LIKE', '%CONSUMIBLE%')
-            ->orWhere('name', 'LIKE', '%NO CONSUMIBLE%')
+        $tiposProductos = ParametroTema::with(['parametro','tema'])
+            ->whereHas('tema', fn($q) => $q->where('name', 'TIPOS DE PRODUCTO'))
             ->where('status', 1)
             ->get();
 
-        $unidadesMedida = Parametro::whereIn('name', [
-            'GRAMOS', 'LIBRAS', 'KILOGRAMOS', 'ARROBA', 'QUINTAL', 'ONZA',
-            'MILILITRO', 'LITRO', 'GALÓN', 'ONZA LÍQUIDA', 'BARRIL', 'UNIDADES'
-        ])->where('status', 1)->get();
+        $unidadesMedida = ParametroTema::with(['parametro','tema'])
+            ->whereHas('tema', fn($q) => $q->where('name', 'UNIDADES DE MEDIDA'))
+            ->where('status', 1)
+            ->get();
 
-        $estados = Parametro::whereIn('name', ['DISPONIBLE', 'AGOTADO'])
+        $estados = ParametroTema::with(['parametro','tema'])
+            ->whereHas('tema', fn($q) => $q->where('name', 'ESTADOS DE PRODUCTO'))
             ->where('status', 1)
             ->get();
 
         $categorias = ParametroTema::with(['parametro','tema'])
-            ->whereHas('tema', fn($q) => $q->where('name', 'CATEGORÍAS'))
+            ->whereHas('tema', fn($q) => $q->where('name', 'CATEGORIAS'))
             ->where('status', 1)
             ->get();
 
@@ -152,7 +153,7 @@ class ProductoController extends Controller
             ->get();
 
         // Obtener marcas
-        $estados = ParametroTema::with(['parametro','tema'])
+        $marcas = ParametroTema::with(['parametro','tema'])
             ->whereHas('tema', fn($q) => $q->where('name', 'MARCAS'))
             ->where('status', 1)
             ->get();
@@ -251,5 +252,106 @@ class ProductoController extends Controller
         }
     }
 
+    /**
+     * Mostrar catálogo de productos estilo ecommerce
+     */
+    public function catalogo()
+    {
+        $productos = Producto::with([
+            'tipoProducto.parametro',
+            'unidadMedida.parametro',
+            'estado.parametro',
+            'categoria',
+            'marca',
+            'contratoConvenio',
+            'ambiente'
+        ])
+        ->where('cantidad', '>', 0) // Solo productos con stock
+        ->orderBy('producto', 'asc')
+        ->get();
 
+        // Obtener categorías desde ParametroTema
+        $temaCategorias = Tema::where('name', 'CATEGORIAS')->first();
+        $categorias = $temaCategorias ? $temaCategorias->parametros()->wherePivot('status', 1)->get() : collect();
+
+        // Obtener marcas desde ParametroTema
+        $temaMarcas = Tema::where('name', 'MARCAS')->first();
+        $marcas = $temaMarcas ? $temaMarcas->parametros()->wherePivot('status', 1)->get() : collect();
+
+        return view('inventario.productos.card', compact('productos', 'categorias', 'marcas'));
+    }
+
+    /**
+     * Buscar productos por término de búsqueda (AJAX)
+     */
+    public function buscar(Request $request)
+    {
+        $search = $request->input('search', '');
+        $categoryId = $request->input('category_id');
+        $brandId = $request->input('brand_id');
+
+        $query = Producto::with([
+            'categoria',
+            'marca',
+            'estado.parametro'
+        ]);
+
+        // Filtro por búsqueda
+        if (!empty($search)) {
+            $query->where(function($q) use ($search) {
+                $q->where('producto', 'LIKE', "%{$search}%")
+                  ->orWhere('codigo_barras', 'LIKE', "%{$search}%")
+                  ->orWhere('descripcion', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Filtro por categoría
+        if ($categoryId) {
+            $query->where('categoria_id', $categoryId);
+        }
+
+        // Filtro por marca
+        if ($brandId) {
+            $query->where('marca_id', $brandId);
+        }
+
+        $productos = $query->get();
+
+        return response()->json([
+            'success' => true,
+            'productos' => $productos
+        ]);
+    }
+
+    /**
+     * Agregar producto al carrito (AJAX)
+     */
+    public function agregarAlCarrito(Request $request)
+    {
+        $validated = $request->validate([
+            'producto_id' => 'required|exists:productos,id',
+            'cantidad' => 'required|integer|min:1'
+        ]);
+
+        $producto = Producto::findOrFail($validated['producto_id']);
+
+        // Verificar stock disponible
+        if ($producto->cantidad < $validated['cantidad']) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Stock insuficiente',
+                'stock_disponible' => $producto->cantidad
+            ], 400);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Producto agregado al carrito',
+            'producto' => [
+                'id' => $producto->id,
+                'nombre' => $producto->producto,
+                'stock' => $producto->cantidad
+            ]
+        ]);
+    }
 }

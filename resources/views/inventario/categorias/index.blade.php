@@ -45,7 +45,7 @@
                         @forelse ($categorias as $categoria)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ $categoria->nombre }}</td>
+                                <td>{{ $categoria->name }}</td>
                                 <td>
                                     <span class="badge badge-info">
                                         {{ $categoria->productos_count ?? 0 }}

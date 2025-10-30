@@ -15,7 +15,7 @@
             ['label' => 'Inicio', 'url' => '#'],
             ['label' => 'Inventario', 'active' => true],
             ['label' => 'Marcas', 'url' => route('inventario.marcas.index')],
-            ['label' => $marca->nombre, 'active' => true]
+            ['label' => $marca->name, 'active' => true]
         ]"
     />
 @endsection
@@ -81,7 +81,7 @@
                                         <tr>
                                             <th class="py-3">Nombre</th>
                                             <td class="py-3">
-                                                <strong>{{ $marca->nombre }}</strong>
+                                                <strong>{{ $marca->name }}</strong>
                                                 <br><small class="text-muted">Marca registrada</small>
                                             </td>
                                         </tr>

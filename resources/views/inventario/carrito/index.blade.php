@@ -47,7 +47,7 @@
                                     </td>
                                     <td>
                                         <span class="badge badge-secondary">
-                                            {{ $item->producto->categoria->nombre ?? 'Sin categoría' }}
+                                            {{ $item->producto->categoria->name ?? 'Sin categoría' }}
                                         </span>
                                     </td>
                                     <td class="text-center">
