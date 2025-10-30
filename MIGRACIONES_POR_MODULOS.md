@@ -45,6 +45,7 @@ php artisan migrate:module --all
 | 13 | `batch_13_evidencias` | Evidencias | 1 tabla + modificaciones |
 | 14 | `batch_14_logs_auditoria` | Logs del sistema | 1 tabla + modificaciones |
 | 15 | `batch_15_parametros` | Configuración | 2 tablas |
+| 16 | `batch_15_inventario` | Inventario | 6 tablas |
 
 ## 🔄 Flujo de Trabajo Recomendado
 

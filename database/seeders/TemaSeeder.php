@@ -163,6 +163,35 @@ class TemaSeeder extends Seeder
         foreach ([44, 45] as $id) {
             $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
         }
+
+        $tema->parametros()->sync($syncData);
+
+        // Tema 12: CATEGORÍAS
+        $tema = Tema::create([
+            'id'             => 12,
+            'name'           => 'CATEGORÍAS',
+            'status'         => 1,
+            'user_create_id' => 1,
+            'user_edit_id'   => 1,
+        ]);
+        $syncData = [];
+        foreach (range(46, 54) as $id) {
+            $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
+        }
+        $tema->parametros()->sync($syncData);
+
+        // Tema 13: MARCAS
+        $tema = Tema::create([
+            'id'             => 13,
+            'name'           => 'MARCAS',
+            'status'         => 1,
+            'user_create_id' => 1,
+            'user_edit_id'   => 1,
+        ]);
+        $syncData = [];
+        foreach (range(55, 71) as $id) {
+            $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
+        }
         $tema->parametros()->sync($syncData);
     }
 }

@@ -176,5 +176,19 @@ return [
         ],
         'orden' => 15,
     ],
+
+    'batch_16_inventario' => [
+        'descripcion' => 'Módulo de inventario',
+        'dependencias' => ['batch_01_sistema_base','batc_02_permisos', 'batch_03_parametros', 'batch_05_personas', 'batch_06_infraestructura'],
+        'tablas' => [
+            'productos',
+            'ordenes',
+            'proveedores',
+            'contratos_convenios',
+            'detalle_ordenes',
+            'devoluciones',
+        ],
+        'orden' => 16,
+    ],
 ];
 
