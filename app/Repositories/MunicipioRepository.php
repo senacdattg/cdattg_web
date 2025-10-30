@@ -25,7 +25,7 @@ class MunicipioRepository
     {
         return $this->cache("departamento.{$departamentoId}.municipios", function () use ($departamentoId) {
             return Municipio::where('departamento_id', $departamentoId)
-                ->orderBy('nombre')
+                ->orderBy('municipio')
                 ->get();
         }, 1440); // 24 horas
     }
@@ -39,13 +39,13 @@ class MunicipioRepository
      */
     public function buscar(string $termino, ?int $departamentoId = null): Collection
     {
-        $query = Municipio::where('nombre', 'LIKE', "%{$termino}%");
+        $query = Municipio::where('municipio', 'LIKE', "%{$termino}%");
 
         if ($departamentoId) {
             $query->where('departamento_id', $departamentoId);
         }
 
-        return $query->orderBy('nombre')->limit(20)->get();
+        return $query->orderBy('municipio')->limit(20)->get();
     }
 
     /**
