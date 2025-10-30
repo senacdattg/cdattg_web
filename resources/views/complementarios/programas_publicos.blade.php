@@ -8,7 +8,8 @@
         <div class="row justify-content-center">
             <div class="col-lg-12 col-xl-10">
                 <div class="text-center mb-4">
-                    <img src="{{ asset('vendor/adminlte/dist/img/LogoSena.png') }}" alt="SENA Logo" class="mb-3" style="height: 80px;">
+                    <img src="{{ asset('vendor/adminlte/dist/img/LogoSena.png') }}" alt="SENA Logo" class="mb-3"
+                        style="height: 80px;">
                     <h2 class="text-success">Servicio Nacional de Aprendizaje - SENA</h2>
                     <p class="text-muted">Regional Guaviare</p>
                 </div>
@@ -34,9 +35,7 @@
                                                 <i class="{{ $programa->icono }} fa-3x text-success"></i>
                                             </div>
                                             <h6 class="card-title font-weight-bold mb-2">{{ $programa->nombre }}</h6>
-                                            <div class="mb-3">
-                                                <span class="badge badge-success">Con Oferta</span>
-                                            </div>
+                                            
                                             <p class="card-text text-muted small mb-3">{{ $programa->descripcion }}</p>
                                             <div class="mt-3 pt-2 border-top">
                                                 <small class="text-muted">Duración</small>
@@ -58,5 +57,5 @@
             </div>
         </div>
     </div>
-@include('layout.footer')
+    @include('layout.footer')
 @endsection
