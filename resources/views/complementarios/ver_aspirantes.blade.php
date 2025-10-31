@@ -9,7 +9,7 @@
             <p class="text-muted mb-0">Administre los aspirantes a programas de formación complementaria</p>
         </div>
         <div class="d-flex" style="gap: 1rem;">
-            <button class="btn btn-primary" id="btn-nuevo-aspirante" @if(isset($existingProgress) && $existingProgress) disabled @endif>
+            <button class="btn btn-primary" id="btn-nuevo-aspirante" @if(isset($existingProgress) && $existingProgress) disabled @endif onclick="console.log('Botón Nuevo Aspirante clickeado'); $('#modalNuevoAspirante').modal('show');">
                 <i class="fas fa-plus me-1"></i>Nuevo Aspirante
             </button>
             <a href="{{ route('gestion-aspirantes') }}" class="btn btn-outline-secondary">
@@ -135,6 +135,42 @@
             </nav>
         </div>
     </div>
+
+    <!-- Modal Nuevo Aspirante -->
+    <div class="modal fade" id="modalNuevoAspirante" tabindex="-1" aria-labelledby="modalNuevoAspiranteLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalNuevoAspiranteLabel">
+                        <i class="fas fa-plus me-2"></i>Agregar Nuevo Aspirante
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="formNuevoAspirante">
+                        <div class="mb-3">
+                            <label for="numero_documento" class="form-label fw-bold">
+                                <i class="fas fa-id-card me-1"></i>Número de Documento
+                            </label>
+                            <input type="text" class="form-control form-control-lg" id="numero_documento"
+                                   placeholder="Ingrese el número de documento" required>
+                            <div class="form-text">
+                                Ingrese el número de documento de la persona que desea agregar como aspirante.
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-1"></i>Cancelar
+                    </button>
+                    <button type="button" class="btn btn-primary" id="btnAgregarAspirante">
+                        <i class="fas fa-plus me-1"></i>Agregar Aspirante
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 @stop
 
 @section('css')
@@ -149,8 +185,15 @@
         let progressInterval = null;
         let currentProgressId = null;
 
+        console.log('JavaScript cargado - verificando elementos...');
+        console.log('Botón nuevo aspirante:', document.getElementById('btn-nuevo-aspirante'));
+        console.log('Botón agregar aspirante:', document.getElementById('btnAgregarAspirante'));
+        console.log('Modal:', document.getElementById('modalNuevoAspirante'));
+
         // Verificar progreso existente al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOMContentLoaded ejecutado');
+
             @if(isset($existingProgress) && $existingProgress)
                 console.log('Progreso existente encontrado, iniciando monitoreo...');
                 currentProgressId = {{ $existingProgress->id }};
@@ -159,6 +202,71 @@
                 // Actualizar estado del botón y deshabilitar acciones
                 updateUIForValidationInProgress();
             @endif
+
+            // Configurar event listener para agregar aspirante
+            console.log('Configurando event listener para btnAgregarAspirante...');
+            const btnAgregar = document.getElementById('btnAgregarAspirante');
+            if (btnAgregar) {
+                btnAgregar.addEventListener('click', async function() {
+                    console.log('Botón Agregar Aspirante clickeado desde DOMContentLoaded');
+                    const numeroDocumento = document.getElementById('numero_documento').value.trim();
+                    console.log('Número de documento:', numeroDocumento);
+
+                    if (!numeroDocumento) {
+                        showAlert('error', 'Por favor ingrese un número de documento.');
+                        return;
+                    }
+
+                    // Deshabilitar botón mientras procesa
+                    const button = this;
+                    const originalText = button.innerHTML;
+                    button.disabled = true;
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Agregando...';
+
+                    try {
+                        const response = await fetch(`/programas-complementarios/{{ $programa->id }}/agregar-aspirante`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                            },
+                            body: JSON.stringify({
+                                numero_documento: numeroDocumento
+                            })
+                        });
+
+                        const data = await response.json();
+                        console.log('Respuesta del servidor:', data);
+
+                        if (data.success) {
+                            showAlert('success', data.message);
+
+                            // Cerrar modal y limpiar formulario
+                            $('#modalNuevoAspirante').modal('hide');
+                            document.getElementById('numero_documento').value = '';
+
+                            // Recargar la página para mostrar el nuevo aspirante
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1500);
+
+                        } else {
+                            showAlert('error', data.message);
+                        }
+
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showAlert('error', 'Error de conexión. Intente nuevamente.');
+                    } finally {
+                        // Restaurar botón
+                        button.disabled = false;
+                        button.innerHTML = originalText;
+                    }
+                });
+                console.log('Event listener configurado exitosamente');
+            } else {
+                console.error('No se encontró el botón btnAgregarAspirante');
+            }
         });
 
         // Función para actualizar UI durante validación
@@ -455,6 +563,7 @@
                 button.disabled = false;
             });
         }
+
 
         // Función para mostrar alertas
         function showAlert(type, message) {
