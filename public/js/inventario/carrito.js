@@ -80,7 +80,8 @@ async function loadProductDetails(productId) {
             id: productId,
             name: doc.querySelector('h3')?.textContent.trim() || 'Producto',
             image: doc.querySelector('img')?.src || '',
-            stock: parseInt(doc.querySelector('.badge-success, .badge-warning, .badge-danger')?.textContent) || 0,
+            stock: parseInt(doc.querySelector('.stat-card-value')?.textContent) || 
+                   parseInt(Array.from(doc.querySelectorAll('.badge')).find(el => el.textContent.includes('unidades'))?.textContent) || 0,
             code: doc.querySelector('.badge-secondary')?.textContent.trim() || '',
             description: doc.querySelector('.card-text')?.textContent.trim() || ''
         };

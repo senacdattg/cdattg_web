@@ -92,7 +92,7 @@
                                     <img src="{{ asset($producto->imagen) }}" 
                                          class="card-img-top product-image" 
                                          alt="{{ $producto->producto }}"
-                                         onerror="this.src='{{ asset('img/no-image.png') }}'">
+                                         onerror="this.src='{{ asset('img/inventario/real.jpg') }}'">
                                 @else
                                     <div class="no-image-placeholder">
                                         <i class="fas fa-box fa-4x text-muted"></i>
@@ -240,6 +240,7 @@
 
 @push('css')
     <link rel="stylesheet" href="{{ asset('css/inventario/card.css') }}">
+    @vite(['resources/css/inventario/shared/base.css'])
     <style>
         /* Estilos adicionales inline si es necesario */
         .product-image-container {

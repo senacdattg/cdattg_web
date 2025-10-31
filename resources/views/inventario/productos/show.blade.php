@@ -37,10 +37,10 @@
                         <i class="fas fa-image"></i> Imagen del Producto
                     </h5>
                     <div class="product-image-wrapper">
-                        <img src="{{ $producto->imagen ? asset($producto->imagen) : asset('img/no-image.png') }}" 
+                        <img src="{{ $producto->imagen ? asset($producto->imagen) : asset('img/inventario/real.jpg') }}" 
                              alt="{{ $producto->producto }}"
                              class="img-fluid"
-                             onerror="this.onerror=null; this.src='{{ asset('img/no-image.png') }}'"
+                             onerror="this.onerror=null; this.src='{{ asset('img/inventario/real.jpg') }}'"
                              style="cursor: pointer;"
                              onclick="$('#imageModal').modal('show'); $('#expandedImage').attr('src', this.src);">
                     </div>

@@ -109,11 +109,11 @@ function renderCartItems() {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>
-                <img src="${product.image || '/img/no-image.png'}" 
+                <img src="${product.image || '/img/inventario/real.jpg'}" 
                      alt="${product.name}" 
                      class="img-thumbnail" 
                      style="max-width: 60px; max-height: 60px; object-fit: cover;"
-                     onerror="this.src='/img/no-image.png'">
+                     onerror="this.src='/img/inventario/real.jpg'">
             </td>
             <td>
                 <strong>${product.name}</strong>

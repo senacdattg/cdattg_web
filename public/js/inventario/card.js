@@ -197,7 +197,12 @@ async function showProductDetails(productId) {
     modal.show();
 
     try {
-        const response = await fetch(`${API_BASE_URL}/productos/${productId}`);
+        const response = await fetch(`${API_BASE_URL}/productos/${productId}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
+            }
+        });
         
         if (!response.ok) {
             throw new Error('Error al cargar los detalles del producto');
