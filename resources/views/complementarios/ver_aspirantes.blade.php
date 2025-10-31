@@ -145,6 +145,22 @@
         let progressInterval = null;
         let currentProgressId = null;
 
+        // Verificar progreso existente al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(isset($existingProgress) && $existingProgress)
+                console.log('Progreso existente encontrado, iniciando monitoreo...');
+                currentProgressId = {{ $existingProgress->id }};
+                startProgressMonitoring(currentProgressId);
+
+                // Actualizar estado del botón
+                const button = document.getElementById('btn-validar-sofia');
+                if (button) {
+                    button.disabled = true;
+                    button.innerHTML = '<i class="fas fa-clock me-1"></i>Procesando...';
+                }
+            @endif
+        });
+
         // Botón de validación SenaSofiaPlus
         document.getElementById('btn-validar-sofia').addEventListener('click', async function() {
             const button = this;
