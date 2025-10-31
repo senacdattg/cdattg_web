@@ -93,11 +93,13 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <x-status-badge
-                                        status="{{ $contrato->status ?? true }}"
-                                        activeText="ACTIVO"
-                                        inactiveText="INACTIVO"
-                                    />
+                                    @if($contrato->estado)
+                                        <span class="badge badge-{{ $contrato->estado->status == 1 ? 'success' : 'danger' }}">
+                                            {{ $contrato->estado->parametro->name ?? 'N/A' }}
+                                        </span>
+                                    @else
+                                        <span class="badge badge-secondary">SIN ESTADO</span>
+                                    @endif
                                 </td>
                                 <td class="text-center">
                                     <x-action-buttons

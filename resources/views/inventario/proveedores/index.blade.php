@@ -34,13 +34,17 @@
                         searchPlaceholder="Buscar proveedor..."
                         searchValue="{{ request('search') }}"
                         :columns="[
-                            ['label' => '#', 'width' => '5%'],
-                            ['label' => 'Proveedor', 'width' => '25%'],
-                            ['label' => 'NIT', 'width' => '15%'],
-                            ['label' => 'Email', 'width' => '20%'],
-                            ['label' => 'Contratos', 'width' => '10%'],
-                            ['label' => 'Estado', 'width' => '10%'],
-                            ['label' => 'Opciones', 'width' => '15%', 'class' => 'text-center']
+                            ['label' => '#', 'width' => '3%'],
+                            ['label' => 'Proveedor', 'width' => '12%'],
+                            ['label' => 'NIT', 'width' => '8%'],
+                            ['label' => 'Email', 'width' => '12%'],
+                            ['label' => 'Teléfono', 'width' => '8%'],
+                            ['label' => 'Dirección', 'width' => '12%'],
+                            ['label' => 'Municipio', 'width' => '10%'],
+                            ['label' => 'Contacto', 'width' => '10%'],
+                            ['label' => 'Contratos', 'width' => '6%'],
+                            ['label' => 'Estado', 'width' => '8%'],
+                            ['label' => 'Opciones', 'width' => '11%', 'class' => 'text-center']
                         ]"
                     >
                         @forelse ($proveedores as $proveedor)
@@ -49,17 +53,23 @@
                                 <td>{{ $proveedor->proveedor }}</td>
                                 <td>{{ $proveedor->nit ?? 'N/A' }}</td>
                                 <td>{{ $proveedor->email ?? 'N/A' }}</td>
+                                <td>{{ $proveedor->telefono ?? 'N/A' }}</td>
+                                <td>{{ $proveedor->direccion ?? 'N/A' }}</td>
+                                <td>{{ $proveedor->municipio->municipio ?? 'N/A' }}</td>
+                                <td>{{ $proveedor->contacto ?? 'N/A' }}</td>
                                 <td>
                                     <span class="badge badge-info">
                                         {{ $proveedor->contratos_convenios_count ?? 0 }}
                                     </span>
                                 </td>
                                 <td>
-                                    <x-status-badge
-                                        status="{{ $proveedor->status ?? true }}"
-                                        activeText="ACTIVO"
-                                        inactiveText="INACTIVO"
-                                    />
+                                    @if($proveedor->estado)
+                                        <span class="badge badge-{{ $proveedor->estado->status == 1 ? 'success' : 'danger' }}">
+                                            {{ $proveedor->estado->parametro->name ?? 'N/A' }}
+                                        </span>
+                                    @else
+                                        <span class="badge badge-secondary">SIN ESTADO</span>
+                                    @endif
                                 </td>
                                 <td class="text-center">
                                     <x-action-buttons
@@ -77,7 +87,7 @@
                             </tr>
                         @empty
                             <x-table-empty
-                                colspan="7"
+                                colspan="11"
                                 message="No hay proveedores registrados"
                                 icon="fas fa-truck"
                             />

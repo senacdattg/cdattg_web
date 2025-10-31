@@ -18,7 +18,12 @@ class ProveedorController extends InventarioController
 
     public function index()
     {
-        $proveedores = Proveedor::with(['userCreate.persona', 'userUpdate.persona'])
+        $proveedores = Proveedor::with([
+                'userCreate.persona',
+                'userUpdate.persona',
+                'estado.parametro',
+                'municipio'
+            ])
             ->withCount('contratosConvenios')
             ->latest()
             ->get();
@@ -32,7 +37,13 @@ class ProveedorController extends InventarioController
 
     public function show(Proveedor $proveedor)
     {
-        $proveedor->load(['contratosConvenios', 'userCreate.persona', 'userUpdate.persona']);
+        $proveedor->load([
+            'contratosConvenios',
+            'userCreate.persona',
+            'userUpdate.persona',
+            'estado.parametro',
+            'municipio.departamento'
+        ]);
         return view('inventario.proveedores.show', compact('proveedor'));
     }
 
@@ -46,7 +57,12 @@ class ProveedorController extends InventarioController
         $validated = $request->validate([
             'proveedor' => 'required|unique:proveedores,proveedor',
             'nit' => 'nullable|string|max:50',
-            'email' => 'nullable|email|max:255'
+            'email' => 'nullable|email|max:255',
+            'telefono' => 'nullable|string|max:10',
+            'direccion' => 'nullable|string|max:255',
+            'municipio_id' => 'nullable|exists:municipios,id',
+            'contacto' => 'nullable|string|max:100',
+            'estado_id' => 'nullable|exists:parametros_temas,id'
         ]);
 
         $proveedor = new Proveedor($validated);
@@ -64,7 +80,12 @@ class ProveedorController extends InventarioController
         $validated = $request->validate([
             'proveedor' => 'required|unique:proveedores,proveedor,' . $proveedor->id,
             'nit' => 'nullable|string|max:50|unique:proveedores,nit,' . $proveedor->id,
-            'email' => 'nullable|email|max:255|unique:proveedores,email,' . $proveedor->id
+            'email' => 'nullable|email|max:255|unique:proveedores,email,' . $proveedor->id,
+            'telefono' => 'nullable|string|max:10',
+            'direccion' => 'nullable|string|max:255',
+            'municipio_id' => 'nullable|exists:municipios,id',
+            'contacto' => 'nullable|string|max:100',
+            'estado_id' => 'nullable|exists:parametros_temas,id'
         ]);
 
         $proveedor->fill($validated);

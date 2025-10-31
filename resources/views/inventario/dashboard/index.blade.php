@@ -1,15 +1,16 @@
-@extends('inventario.layouts.base')
+@extends('adminlte::page')
 
 @section('title', 'Dashboard de Inventario')
 
 @section('content_header')
-    <x-inventario.page-header
+    <x-page-header
         icon="fas fa-chart-bar"
         title="Dashboard de Inventario"
         subtitle="Resumen general del inventario"
         :breadcrumb="[
-            ['label' => 'Inicio', 'url' => route('home')],
-            ['label' => 'Inventario', 'active' => true]
+            ['label' => 'Inicio', 'url' => '#'],
+            ['label' => 'Inventario', 'active' => true],
+            ['label' => 'Dashboard', 'active' => true]
         ]"
     />
 @endsection
@@ -18,53 +19,77 @@
     <div class="container-fluid">
         {{-- Tarjetas de estadísticas --}}
         <div class="row mb-4">
-            @include('inventario._components.stats-card', [
-                'title' => 'Total Productos',
-                'value' => $totalProductos,
-                'icon' => 'fas fa-boxes',
-                'bgClass' => 'bg-info',
-                'link' => route('inventario.productos.index'),
-                'linkText' => 'Ver productos'
-            ])
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-info">
+                    <div class="inner">
+                        <h3>{{ $totalProductos }}</h3>
+                        <p>Total Productos</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-boxes"></i>
+                    </div>
+                    <a href="{{ route('inventario.productos.index') }}" class="small-box-footer">
+                        Ver productos <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
 
-            @include('inventario._components.stats-card', [
-                'title' => 'Productos por Vencer',
-                'value' => $productosPorVencer,
-                'icon' => 'fas fa-calendar-alt',
-                'bgClass' => 'bg-warning',
-                'link' => '#',
-                'linkText' => 'Más información'
-            ])
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-warning">
+                    <div class="inner">
+                        <h3>{{ $productosPorVencer }}</h3>
+                        <p>Productos por Vencer</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">
+                        Más información <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
 
-            @include('inventario._components.stats-card', [
-                'title' => 'Stock Bajo',
-                'value' => $productosStockBajo,
-                'icon' => 'fas fa-exclamation-triangle',
-                'bgClass' => 'bg-danger',
-                'link' => '#',
-                'linkText' => 'Más información'
-            ])
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-danger">
+                    <div class="inner">
+                        <h3>{{ $productosStockBajo }}</h3>
+                        <p>Stock Bajo</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <a href="#" class="small-box-footer">
+                        Más información <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
 
-            @include('inventario._components.stats-card', [
-                'title' => 'Categorías',
-                'value' => $totalCategorias,
-                'icon' => 'fas fa-tags',
-                'bgClass' => 'bg-success',
-                'link' => route('inventario.categorias.index'),
-                'linkText' => 'Ver categorías'
-            ])
+            <div class="col-lg-3 col-6">
+                <div class="small-box bg-success">
+                    <div class="inner">
+                        <h3>{{ $totalCategorias }}</h3>
+                        <p>Categorías</p>
+                    </div>
+                    <div class="icon">
+                        <i class="fas fa-tags"></i>
+                    </div>
+                    <a href="{{ route('inventario.categorias.index') }}" class="small-box-footer">
+                        Ver categorías <i class="fas fa-arrow-circle-right"></i>
+                    </a>
+                </div>
+            </div>
         </div>
 
         {{-- Gráficos --}}
         <div class="row mb-4">
             <div class="col-md-6">
                 <div class="card">
-                    @include('inventario._components.card-header', [
-                        'title' => 'Productos por Tipo',
-                        'icon' => 'fas fa-chart-bar',
-                        'bgClass' => 'bg-primary',
-                        'textClass' => 'text-white'
-                    ])
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-bar mr-2"></i>
+                            Productos por Tipo
+                        </h3>
+                    </div>
                     <div class="card-body">
                         <div class="chart-container" style="height: 300px;">
                             <canvas id="productosConsumibles"></canvas>
@@ -75,12 +100,12 @@
 
             <div class="col-md-6">
                 <div class="card">
-                    @include('inventario._components.card-header', [
-                        'title' => 'Productos Más Solicitados',
-                        'icon' => 'fas fa-chart-line',
-                        'bgClass' => 'bg-success',
-                        'textClass' => 'text-white'
-                    ])
+                    <div class="card-header bg-success text-white">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-line mr-2"></i>
+                            Productos Más Solicitados
+                        </h3>
+                    </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-hover">
@@ -91,17 +116,24 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach($productosMasSolicitados as $producto)
+                                    @forelse($productosMasSolicitados as $producto)
                                     <tr>
                                         <td>{{ $producto['nombre'] }}</td>
                                         <td>
+                                            @php
+                                                $maxSolicitudes = collect($productosMasSolicitados)->max('solicitudes') ?: 1;
+                                            @endphp
                                             <div class="progress progress-xs">
-                                                <div class="progress-bar bg-success" style="width: {{ ($producto['solicitudes'] / 45) * 100 }}%"></div>
+                                                <div class="progress-bar bg-success" style="width: {{ ($producto['solicitudes'] / $maxSolicitudes) * 100 }}%"></div>
                                             </div>
                                             <span class="badge bg-success">{{ $producto['solicitudes'] }}</span>
                                         </td>
                                     </tr>
-                                    @endforeach
+                                    @empty
+                                    <tr>
+                                        <td colspan="2" class="text-center text-muted">No hay datos de solicitudes</td>
+                                    </tr>
+                                    @endforelse
                                 </tbody>
                             </table>
                         </div>
@@ -114,12 +146,12 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="card">
-                    @include('inventario._components.card-header', [
-                        'title' => 'Productos Recientes',
-                        'icon' => 'fas fa-box',
-                        'bgClass' => 'bg-info',
-                        'textClass' => 'text-white'
-                    ])
+                    <div class="card-header bg-info text-white">
+                        <h3 class="card-title">
+                            <i class="fas fa-box mr-2"></i>
+                            Productos Recientes
+                        </h3>
+                    </div>
                     <div class="card-body table-responsive p-0" style="height: 300px;">
                         <table class="table table-hover">
                             <thead>
@@ -159,12 +191,12 @@
 
             <div class="col-md-6">
                 <div class="card">
-                    @include('inventario._components.card-header', [
-                        'title' => 'Productos por Categoría',
-                        'icon' => 'fas fa-chart-pie',
-                        'bgClass' => 'bg-warning',
-                        'textClass' => 'text-white'
-                    ])
+                    <div class="card-header bg-warning text-white">
+                        <h3 class="card-title">
+                            <i class="fas fa-chart-pie mr-2"></i>
+                            Productos por Categoría
+                        </h3>
+                    </div>
                     <div class="card-body">
                         <div class="chart-container" style="height: 300px;">
                             <canvas id="productosPorCategoria"></canvas>
@@ -174,10 +206,13 @@
             </div>
         </div>
     </div>
+
+    {{-- Footer SENA --}}
+    @include('inventario._components.sena-footer')
 @endsection
 
 @push('css')
-    @vite(['resources/css/inventario/base.css'])
+    @vite(['resources/css/style.css'])
     <style>
         .chart-container {
             position: relative;

@@ -47,7 +47,13 @@ class ContratoConvenioController extends InventarioController
 
     public function show(ContratoConvenio $contratoConvenio)
     {
-        $contratoConvenio->load(['proveedor', 'productos', 'userCreate.persona', 'userUpdate.persona']);
+        $contratoConvenio->load([
+            'proveedor',
+            'productos',
+            'estado.parametro',
+            'userCreate.persona',
+            'userUpdate.persona'
+        ]);
         return view('inventario.contratos_convenios.show', compact('contratoConvenio'));
     }
 

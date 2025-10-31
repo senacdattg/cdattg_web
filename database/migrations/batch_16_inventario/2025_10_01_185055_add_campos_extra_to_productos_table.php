@@ -17,8 +17,8 @@ return new class extends Migration
             $table->unsignedBigInteger('contrato_convenio_id')->nullable()->after('marca_id');
             $table->unsignedBigInteger('ambiente_id')->nullable()->after('contrato_convenio_id');
 
-            $table->foreign('categoria_id')->references('id')->on('parametros_temas')->onDelete('restrict');
-            $table->foreign('marca_id')->references('id')->on('parametros_temas')->onDelete('restrict');
+            $table->foreign('categoria_id')->references('id')->on('parametros')->onDelete('restrict');
+            $table->foreign('marca_id')->references('id')->on('parametros')->onDelete('restrict');
 
             $table->foreign('contrato_convenio_id')->references('id')->on('contratos_convenios')->onDelete('restrict');
             $table->foreign('ambiente_id')->references('id')->on('ambientes')->onDelete('restrict');

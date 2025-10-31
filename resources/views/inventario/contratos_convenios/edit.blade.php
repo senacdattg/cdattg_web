@@ -37,7 +37,7 @@
                         </div>
 
                         <div class="card-body">
-                            <form action="{{ route('inventario.contratos-convenios.update', $contrato->id) }}" method="POST">
+                            <form action="{{ route('inventario.contratos-convenios.update', $contratoConvenio->id) }}" method="POST">
                                 @csrf
                                 @method('PUT')
                                 
@@ -50,7 +50,7 @@
                                                 class="form-control @error('name') is-invalid @enderror"
                                                 id="name"
                                                 name="name"
-                                                value="{{ old('name', $contrato->name) }}"
+                                                value="{{ old('name', $contratoConvenio->name) }}"
                                                 placeholder="Ingrese el nombre del contrato o convenio"
                                                 required
                                             >
@@ -67,7 +67,7 @@
                                                 class="form-control @error('codigo') is-invalid @enderror"
                                                 id="codigo"
                                                 name="codigo"
-                                                value="{{ old('codigo', $contrato->codigo) }}"
+                                                value="{{ old('codigo', $contratoConvenio->codigo) }}"
                                                 placeholder="Ingrese el código del contrato/convenio"
                                             >
                                             @error('codigo')
@@ -80,34 +80,15 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="tipo">Tipo <span class="text-danger">*</span></label>
-                                            <select
-                                                class="form-control @error('tipo') is-invalid @enderror"
-                                                id="tipo"
-                                                name="tipo"
-                                                required
-                                            >
-                                                <option value="">Seleccione un tipo</option>
-                                                <option value="contrato" {{ old('tipo', $contrato->tipo) == 'contrato' ? 'selected' : '' }}>Contrato</option>
-                                                <option value="convenio" {{ old('tipo', $contrato->tipo) == 'convenio' ? 'selected' : '' }}>Convenio</option>
-                                            </select>
-                                            @error('tipo')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="proveedor_id">Proveedor <span class="text-danger">*</span></label>
+                                            <label for="proveedor_id">Proveedor</label>
                                             <select
                                                 class="form-control @error('proveedor_id') is-invalid @enderror"
                                                 id="proveedor_id"
                                                 name="proveedor_id"
-                                                required
                                             >
                                                 <option value="">Seleccione un proveedor</option>
                                                 @foreach($proveedores as $proveedor)
-                                                    <option value="{{ $proveedor->id }}" {{ old('proveedor_id', $contrato->proveedor_id) == $proveedor->id ? 'selected' : '' }}>
+                                                    <option value="{{ $proveedor->id }}" {{ old('proveedor_id', $contratoConvenio->proveedor_id) == $proveedor->id ? 'selected' : '' }}>
                                                         {{ $proveedor->proveedor }}
                                                     </option>
                                                 @endforeach
@@ -117,19 +98,39 @@
                                             @enderror
                                         </div>
                                     </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="estado_id">Estado <span class="text-danger">*</span></label>
+                                            <select
+                                                class="form-control @error('estado_id') is-invalid @enderror"
+                                                id="estado_id"
+                                                name="estado_id"
+                                                required
+                                            >
+                                                <option value="">Seleccione un estado</option>
+                                                @foreach(\App\Models\ParametroTema::with(['parametro','tema'])->whereHas('tema', fn($q) => $q->where('name', 'ESTADOS'))->where('status', 1)->get() as $estado)
+                                                    <option value="{{ $estado->id }}" {{ old('estado_id', $contratoConvenio->estado_id) == $estado->id ? 'selected' : '' }}>
+                                                        {{ $estado->parametro->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('estado_id')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="fecha_inicio">Fecha de Inicio <span class="text-danger">*</span></label>
+                                            <label for="fecha_inicio">Fecha de Inicio</label>
                                             <input
                                                 type="date"
                                                 class="form-control @error('fecha_inicio') is-invalid @enderror"
                                                 id="fecha_inicio"
                                                 name="fecha_inicio"
-                                                value="{{ old('fecha_inicio', $contrato->fecha_inicio) }}"
-                                                required
+                                                value="{{ old('fecha_inicio', $contratoConvenio->fecha_inicio instanceof \Carbon\Carbon ? $contratoConvenio->fecha_inicio->format('Y-m-d') : $contratoConvenio->fecha_inicio) }}"
                                             >
                                             @error('fecha_inicio')
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -144,63 +145,9 @@
                                                 class="form-control @error('fecha_fin') is-invalid @enderror"
                                                 id="fecha_fin"
                                                 name="fecha_fin"
-                                                value="{{ old('fecha_fin', $contrato->fecha_fin) }}"
+                                                value="{{ old('fecha_fin', $contratoConvenio->fecha_fin instanceof \Carbon\Carbon ? $contratoConvenio->fecha_fin->format('Y-m-d') : $contratoConvenio->fecha_fin) }}"
                                             >
                                             @error('fecha_fin')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="valor">Valor</label>
-                                            <input
-                                                type="number"
-                                                step="0.01"
-                                                class="form-control @error('valor') is-invalid @enderror"
-                                                id="valor"
-                                                name="valor"
-                                                value="{{ old('valor', $contrato->valor) }}"
-                                                placeholder="Ingrese el valor del contrato/convenio"
-                                            >
-                                            @error('valor')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="status">Estado</label>
-                                            <select
-                                                class="form-control @error('status') is-invalid @enderror"
-                                                id="status"
-                                                name="status"
-                                            >
-                                                <option value="1" {{ old('status', $contrato->status) == '1' ? 'selected' : '' }}>Activo</option>
-                                                <option value="0" {{ old('status', $contrato->status) == '0' ? 'selected' : '' }}>Inactivo</option>
-                                            </select>
-                                            @error('status')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-12">
-                                        <div class="form-group">
-                                            <label for="descripcion">Descripción</label>
-                                            <textarea
-                                                class="form-control @error('descripcion') is-invalid @enderror"
-                                                id="descripcion"
-                                                name="descripcion"
-                                                rows="3"
-                                                placeholder="Ingrese una descripción del contrato/convenio (opcional)"
-                                            >{{ old('descripcion', $contrato->descripcion) }}</textarea>
-                                            @error('descripcion')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>

@@ -8,6 +8,8 @@ use App\Models\Tema;
 
 class Categoria extends Parametro
 {
+    protected $table = 'parametros';
+
     protected static function booted()
     {
         static::creating(function ($categoria) {
@@ -39,6 +41,6 @@ class Categoria extends Parametro
 
     public function productos()
     {
-        return $this->hasMany(Producto::class, 'id_categoria'); 
+        return $this->hasMany(Producto::class, 'categoria_id');
     }
 }

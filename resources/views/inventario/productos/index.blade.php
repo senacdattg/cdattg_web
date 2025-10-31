@@ -62,15 +62,45 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <span class="badge badge-info">
-                                        {{ $producto->categoria->name ?? 'Sin categoría' }}
-                                    </span>
+                                    @php
+                                        $cat = \App\Models\Parametro::find($producto->categoria_id);
+                                        $esCategoria = false;
+                                        if ($cat) {
+                                            $esCategoria = $cat->temas()->where('name', 'CATEGORIAS')->exists();
+                                        }
+                                    @endphp
+                                    @if($cat && $esCategoria)
+                                        <span class="badge badge-info">
+                                            {{ $cat->name }}
+                                        </span>
+                                    @elseif($cat)
+                                        <span class="badge badge-warning" title="Dato incorrecto: {{ $cat->name }}">
+                                            <i class="fas fa-exclamation-triangle"></i> {{ $cat->name }}
+                                        </span>
+                                    @else
+                                        <span class="badge badge-secondary">Sin categoría</span>
+                                    @endif
                                 </td>
 
                                 <td>
-                                    <span class="badge badge-dark">
-                                        {{ $producto->marca->name ?? 'Sin marca' }}
-                                    </span>
+                                    @php
+                                        $marca = \App\Models\Parametro::find($producto->marca_id);
+                                        $esMarca = false;
+                                        if ($marca) {
+                                            $esMarca = $marca->temas()->where('name', 'MARCAS')->exists();
+                                        }
+                                    @endphp
+                                    @if($marca && $esMarca)
+                                        <span class="badge badge-dark">
+                                            {{ $marca->name }}
+                                        </span>
+                                    @elseif($marca)
+                                        <span class="badge badge-warning" title="Dato incorrecto: {{ $marca->name }}">
+                                            <i class="fas fa-exclamation-triangle"></i> {{ $marca->name }}
+                                        </span>
+                                    @else
+                                        <span class="badge badge-secondary">Sin marca</span>
+                                    @endif
                                 </td>
                                 <td>
                                     @php

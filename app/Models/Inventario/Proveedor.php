@@ -11,13 +11,41 @@ class Proveedor extends Model
 
     protected $table = 'proveedores';
 
+    protected static function booted()
+    {
+        static::creating(function ($proveedor) {
+            $proveedor->proveedor = strtoupper($proveedor->proveedor);
+        });
+
+        static::updating(function ($proveedor) {
+            $proveedor->proveedor = strtoupper($proveedor->proveedor);
+        });
+    }
+
     protected $fillable = [
         'proveedor',
         'nit',
         'email',
+        'telefono',
+        'direccion',
+        'municipio_id',
+        'contacto',
+        'estado_id',
         'user_create_id',
         'user_update_id'
     ];
+
+    // Relación con el estado
+    public function estado()
+    {
+        return $this->belongsTo(\App\Models\ParametroTema::class, 'estado_id');
+    }
+
+    // Relación con el municipio
+    public function municipio()
+    {
+        return $this->belongsTo(\App\Models\Municipio::class);
+    }
 
     // Relación con contratos y convenios
     public function contratosConvenios()

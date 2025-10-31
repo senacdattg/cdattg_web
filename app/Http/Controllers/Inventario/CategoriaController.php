@@ -37,6 +37,11 @@ class CategoriaController extends InventarioController
             ->wherePivot('status', 1)
             ->get();
 
+        // Cargar conteo de productos manualmente para cada categoría
+        $categorias->each(function($categoria) {
+            $categoria->productos_count = \App\Models\Inventario\Producto::where('categoria_id', $categoria->id)->count();
+        });
+
         return view('inventario.categorias.index', compact('categorias'));
     }
 
@@ -49,12 +54,12 @@ class CategoriaController extends InventarioController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nombre' => 'required|string|unique:parametros,name',
+            'name' => 'required|string|unique:parametros,name',
         ]);
 
         try {
             $categoria = new categoria([
-                'name'           => $validated['nombre'],
+                'name'           => $validated['name'],
                 'status'         => 1,
                 'user_create_id' => Auth::id(),
                 'user_edit_id'   => Auth::id(),
@@ -88,11 +93,11 @@ class CategoriaController extends InventarioController
     public function update(Request $request, Parametro $categoria)
     {
         $validated = $request->validate([
-            'nombre' => 'required|string|unique:parametros,name,' . $categoria->id,
+            'name' => 'required|string|unique:parametros,name,' . $categoria->id,
         ]);
 
         $categoria->update([
-            'name'         => strtoupper($validated['nombre']),
+            'name'         => strtoupper($validated['name']),
             'user_edit_id' => Auth::id(),
         ]);
 

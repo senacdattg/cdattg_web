@@ -37,6 +37,11 @@ class MarcaController extends InventarioController
             ->wherePivot('status', 1)
             ->get();
 
+        // Cargar conteo de productos manualmente para cada marca
+        $marcas->each(function($marca) {
+            $marca->productos_count = \App\Models\Inventario\Producto::where('marca_id', $marca->id)->count();
+        });
+
         return view('inventario.marcas.index', compact('marcas'));
     }
 
@@ -49,12 +54,12 @@ class MarcaController extends InventarioController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'nombre' => 'required|string|unique:parametros,name',
+            'name' => 'required|string|unique:parametros,name',
         ]);
 
         try {
             $marca = new Marca([
-                'name'           => $validated['nombre'],
+                'name'           => $validated['name'],
                 'status'         => 1,
                 'user_create_id' => Auth::id(),
                 'user_edit_id'   => Auth::id(),
@@ -88,11 +93,11 @@ class MarcaController extends InventarioController
     public function update(Request $request, Parametro $marca)
     {
         $validated = $request->validate([
-            'nombre' => 'required|string|unique:parametros,name,' . $marca->id,
+            'name' => 'required|string|unique:parametros,name,' . $marca->id,
         ]);
 
         $marca->update([
-            'name'         => strtoupper($validated['nombre']),
+            'name'         => strtoupper($validated['name']),
             'user_edit_id' => Auth::id(),
         ]);
 

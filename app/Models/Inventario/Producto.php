@@ -39,9 +39,19 @@ class Producto extends Model
         'fecha_vencimiento' => 'datetime'
     ];
 
-    public function setNameAttribute($value)
+    protected static function booted()
     {
-        $this->attributes['producto'] = strtoupper($value);
+        static::creating(function ($producto) {
+            if (isset($producto->producto)) {
+                $producto->producto = strtoupper($producto->producto);
+            }
+        });
+
+        static::updating(function ($producto) {
+            if (isset($producto->producto)) {
+                $producto->producto = strtoupper($producto->producto);
+            }
+        });
     }
 
     // Relaciones existentes
@@ -60,14 +70,20 @@ class Producto extends Model
         return $this->belongsTo(ParametroTema::class, 'estado_producto_id');
     }
 
-    public function categoria()
-    {
-        return $this->belongsTo(Parametro::class, 'categoria_id');
-    }
-
     public function marca()
     {
-        return $this->belongsTo(Parametro::class, 'marca_id');
+        return $this->belongsTo(Parametro::class, 'marca_id')
+            ->whereHas('temas', function($query) {
+                $query->where('name', 'MARCAS');
+            });
+    }
+
+    public function categoria()
+    {
+        return $this->belongsTo(Parametro::class, 'categoria_id')
+        ->whereHas('temas', function($query) {
+            $query->where('name', 'CATEGORIAS');
+        });
     }
 
     public function contratoConvenio()
@@ -84,7 +100,7 @@ class Producto extends Model
     // Relación con detalles de órdenes
     public function detalleOrdenes()
     {
-        return $this->hasMany(DetalleOrden::class, 'producto_id');
+        return $this->hasMany(DetalleOrden::class, 'productos_id');
     }
 
   

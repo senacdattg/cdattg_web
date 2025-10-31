@@ -14,10 +14,11 @@ use App\Models\Inventario\ContratoConvenio;
 use App\Models\Ambiente;
 
 
-class ProductoController extends Controller
+class ProductoController extends InventarioController
 {
     public function __construct()
     {
+        parent::__construct();
         $this->middleware('auth');
     }
     /**
@@ -25,7 +26,15 @@ class ProductoController extends Controller
      */
     public function index()
     {
-        $productos = Producto::with(['tipoProducto', 'unidadMedida', 'estado'])->get();
+        $productos = Producto::with([
+            'tipoProducto.parametro',
+            'unidadMedida.parametro',
+            'estado.parametro',
+            'categoria',
+            'marca',
+            'contratoConvenio.proveedor'
+        ])->get();
+        
         return view('inventario.productos.index', compact('productos'));
     }
 
@@ -148,7 +157,7 @@ class ProductoController extends Controller
 
         // Obtener categorías
         $categorias = ParametroTema::with(['parametro','tema'])
-            ->whereHas('tema', fn($q) => $q->where('name', 'CATEGORÍAS'))
+            ->whereHas('tema', fn($q) => $q->where('name', 'CATEGORIAS'))
             ->where('status', 1)
             ->get();
 
@@ -202,6 +211,7 @@ class ProductoController extends Controller
 
         // Manejar la imagen si se sube una nueva
         if ($request->hasFile('imagen')) {
+            // Eliminar imagen anterior si existe
             if ($producto->imagen && file_exists(public_path($producto->imagen))) {
                 unlink(public_path($producto->imagen));
             }
@@ -212,10 +222,10 @@ class ProductoController extends Controller
             $validated['imagen'] = 'img/inventario/' . $nombreArchivo;
         }
 
-        // Actualizar el usuario que modifica
+        // Añadir user_update_id
         $validated['user_update_id'] = Auth::id();
 
-        // Actualizar el producto
+        // Actualizar el producto usando el método update de Eloquent
         $producto->update($validated);
 
         // Redireccionar con mensaje de éxito

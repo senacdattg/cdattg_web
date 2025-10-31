@@ -15,7 +15,7 @@
             ['label' => 'Inicio', 'url' => '#'],
             ['label' => 'Inventario', 'active' => true],
             ['label' => 'Contratos y Convenios', 'url' => route('inventario.contratos-convenios.index')],
-            ['label' => $contrato->name ?? 'N/A', 'active' => true]
+            ['label' => $contratoConvenio->name ?? 'N/A', 'active' => true]
         ]"
     />
 @endsection
@@ -37,25 +37,36 @@
                 <!-- Estadísticas Generales -->
                 <div class="col-md-4">
                     <div class="stats-card">
-                        <div class="stats-number">{{ $contrato->productos_count ?? 0 }}</div>
+                        <div class="stats-number">{{ $contratoConvenio->productos_count ?? 0 }}</div>
                         <div class="stats-label">
                             <i class="fas fa-boxes mr-1"></i>
-                            Productos
+                            Productos Asociados
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="stats-card">
-                        <div class="stats-number">{{ ucfirst($contrato->tipo ?? 'N/A') }}</div>
+                        <div class="stats-number">
+                            @php
+                                $fechaFin = $contratoConvenio->fecha_fin 
+                                    ? (is_string($contratoConvenio->fecha_fin) 
+                                        ? \Carbon\Carbon::parse($contratoConvenio->fecha_fin) 
+                                        : $contratoConvenio->fecha_fin)
+                                    : null;
+                            @endphp
+                            {{ $fechaFin && $fechaFin->isPast() ? 'Vencido' : 'Vigente' }}
+                        </div>
                         <div class="stats-label">
-                            <i class="fas fa-tag mr-1"></i>
-                            Tipo
+                            <i class="fas fa-calendar-check mr-1"></i>
+                            Vigencia
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="stats-card">
-                        <div class="stats-number">{{ $contrato->status == 1 ? 'Activo' : 'Inactivo' }}</div>
+                        <div class="stats-number">
+                            {{ $contratoConvenio->estado->parametro->name ?? 'N/A' }}
+                        </div>
                         <div class="stats-label">
                             <i class="fas fa-toggle-on mr-1"></i>
                             Estado
@@ -81,32 +92,18 @@
                                         <tr>
                                             <th class="py-3">Nombre</th>
                                             <td class="py-3">
-                                                <strong>{{ $contrato->name ?? 'N/A' }}</strong>
-                                                <br><small class="text-muted">{{ ucfirst($contrato->tipo ?? 'N/A') }} registrado</small>
+                                                <strong>{{ $contratoConvenio->name ?? 'N/A' }}</strong>
                                             </td>
                                         </tr>
                                         <tr>
                                             <th class="py-3">Código</th>
-                                            <td class="py-3">{{ $contrato->codigo ?? 'N/A' }}</td>
+                                            <td class="py-3">{{ $contratoConvenio->codigo ?? 'N/A' }}</td>
                                         </tr>
                                         <tr>
                                             <th class="py-3">Proveedor</th>
                                             <td class="py-3">
                                                 <i class="fas fa-truck mr-1"></i>
-                                                {{ $contrato->proveedor->proveedor ?? 'N/A' }}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="py-3">Valor</th>
-                                            <td class="py-3">
-                                                @if($contrato->valor)
-                                                    <span class="status-badge status-active">
-                                                        <i class="fas fa-dollar-sign mr-1"></i>
-                                                        ${{ number_format($contrato->valor, 2) }}
-                                                    </span>
-                                                @else
-                                                    <span class="text-muted">No especificado</span>
-                                                @endif
+                                                {{ $contratoConvenio->proveedor->proveedor ?? 'N/A' }}
                                             </td>
                                         </tr>
                                         <tr>
@@ -115,12 +112,12 @@
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <strong>Inicio:</strong><br>
-                                                        @if($contrato->fecha_inicio)
+                                                        @if($contratoConvenio->fecha_inicio)
                                                             <i class="far fa-calendar-alt mr-1"></i>
-                                                            @if(is_string($contrato->fecha_inicio))
-                                                                {{ \Carbon\Carbon::parse($contrato->fecha_inicio)->format('d/m/Y') }}
+                                                            @if(is_string($contratoConvenio->fecha_inicio))
+                                                                {{ \Carbon\Carbon::parse($contratoConvenio->fecha_inicio)->format('d/m/Y') }}
                                                             @else
-                                                                {{ $contrato->fecha_inicio->format('d/m/Y') }}
+                                                                {{ $contratoConvenio->fecha_inicio->format('d/m/Y') }}
                                                             @endif
                                                         @else
                                                             <span class="text-muted">No especificada</span>
@@ -128,12 +125,12 @@
                                                     </div>
                                                     <div class="col-md-6">
                                                         <strong>Fin:</strong><br>
-                                                        @if($contrato->fecha_fin)
+                                                        @if($contratoConvenio->fecha_fin)
                                                             <i class="far fa-calendar-alt mr-1"></i>
                                                             @php
-                                                                $fechaFin = is_string($contrato->fecha_fin)
-                                                                    ? \Carbon\Carbon::parse($contrato->fecha_fin)
-                                                                    : $contrato->fecha_fin;
+                                                                $fechaFin = is_string($contratoConvenio->fecha_fin)
+                                                                    ? \Carbon\Carbon::parse($contratoConvenio->fecha_fin)
+                                                                    : $contratoConvenio->fecha_fin;
                                                             @endphp
                                                             <span class="badge badge-{{ $fechaFin->isPast() ? 'danger' : 'success' }}">
                                                                 {{ $fechaFin->format('d/m/Y') }}
@@ -148,11 +145,13 @@
                                         <tr>
                                             <th class="py-3">Estado</th>
                                             <td class="py-3">
-                                                <x-status-badge
-                                                    status="{{ $contrato->status ?? true }}"
-                                                    activeText="ACTIVO"
-                                                    inactiveText="INACTIVO"
-                                                />
+                                                @if($contratoConvenio->estado)
+                                                    <span class="badge badge-{{ $contratoConvenio->estado->status == 1 ? 'success' : 'danger' }}">
+                                                        {{ $contratoConvenio->estado->parametro->name ?? 'N/A' }}
+                                                    </span>
+                                                @else
+                                                    <span class="badge badge-secondary">SIN ESTADO</span>
+                                                @endif
                                             </td>
                                         </tr>
                                         <tr>
@@ -160,7 +159,7 @@
                                             <td class="py-3">
                                                 <span class="status-badge status-active">
                                                     <i class="fas fa-boxes mr-1"></i>
-                                                    {{ $contrato->productos_count ?? 0 }} producto(s)
+                                                    {{ $contratoConvenio->productos_count ?? 0 }} producto(s)
                                                 </span>
                                             </td>
                                         </tr>
@@ -168,14 +167,14 @@
                                             <th class="py-3">Fecha de Creación</th>
                                             <td class="py-3">
                                                 <i class="far fa-calendar-alt mr-1"></i>
-                                                {{ \Carbon\Carbon::parse($contrato->created_at)->format('d/m/Y H:i') }}
+                                                {{ \Carbon\Carbon::parse($contratoConvenio->created_at)->format('d/m/Y H:i') }}
                                             </td>
                                         </tr>
                                         <tr>
                                             <th class="py-3">Última Actualización</th>
                                             <td class="py-3">
                                                 <i class="far fa-calendar-alt mr-1"></i>
-                                                {{ \Carbon\Carbon::parse($contrato->updated_at)->format('d/m/Y H:i') }}
+                                                {{ \Carbon\Carbon::parse($contratoConvenio->updated_at)->format('d/m/Y H:i') }}
                                             </td>
                                         </tr>
                                     </tbody>
@@ -193,13 +192,13 @@
                         <div class="card-footer bg-white py-3">
                             <div class="action-buttons">
                                 @can('EDITAR CONTRATO')
-                                    <a href="{{ route('inventario.contratos-convenios.edit', $contrato->id) }}" class="btn btn-outline-info btn-sm">
+                                    <a href="{{ route('inventario.contratos-convenios.edit', $contratoConvenio->id) }}" class="btn btn-outline-info btn-sm">
                                         <i class="fas fa-pencil-alt mr-1"></i> Editar
                                     </a>
                                 @endcan
 
                                 @can('ELIMINAR CONTRATO')
-                                    <form action="{{ route('inventario.contratos-convenios.destroy', $contrato->id) }}" 
+                                    <form action="{{ route('inventario.contratos-convenios.destroy', $contratoConvenio->id) }}" 
                                           method="POST" class="d-inline formulario-eliminar">
                                         @csrf
                                         @method('DELETE')

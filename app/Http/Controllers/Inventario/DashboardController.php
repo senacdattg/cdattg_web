@@ -33,22 +33,26 @@ class DashboardController extends Controller
             });
         })->count();
 
-        // Productos más y menos solicitados (datos de ejemplo por ahora)
-        $productosMasSolicitados = [
-            ['nombre' => 'Laptop Dell XPS', 'solicitudes' => 45],
-            ['nombre' => 'Monitor HP 24"', 'solicitudes' => 38],
-            ['nombre' => 'Teclado Mecánico', 'solicitudes' => 32],
-            ['nombre' => 'Mouse Inalámbrico', 'solicitudes' => 30],
-            ['nombre' => 'Webcam HD', 'solicitudes' => 25],
-        ];
+        // Productos más solicitados desde las órdenes
+        $productosMasSolicitados = DB::table('detalle_ordenes')
+            ->join('productos', 'detalle_ordenes.productos_id', '=', 'productos.id')
+            ->select('productos.producto', DB::raw('SUM(detalle_ordenes.cantidad) as solicitudes'))
+            ->groupBy('productos.id', 'productos.producto')
+            ->orderBy('solicitudes', 'desc')
+            ->take(5)
+            ->get()
+            ->map(function($item) {
+                return [
+                    'nombre' => $item->producto,
+                    'solicitudes' => $item->solicitudes
+                ];
+            })
+            ->toArray();
 
-        $productosMenosSolicitados = [
-            ['nombre' => 'Cable HDMI', 'solicitudes' => 3],
-            ['nombre' => 'Adaptador USB', 'solicitudes' => 4],
-            ['nombre' => 'Hub USB', 'solicitudes' => 5],
-            ['nombre' => 'Cargador Universal', 'solicitudes' => 6],
-            ['nombre' => 'Funda Laptop', 'solicitudes' => 7],
-        ];
+        // Si no hay datos, usar array vacío
+        if (empty($productosMasSolicitados)) {
+            $productosMasSolicitados = [];
+        }
 
         // Productos por vencer (próximos 30 días)
         $productosPorVencer = Producto::whereNotNull('fecha_vencimiento')
@@ -60,7 +64,10 @@ class DashboardController extends Controller
         $productosStockBajo = Producto::where('cantidad', '<', 10)->count();
 
         // Total de categorías
-        $totalCategorias = Categoria::count();
+        $temaCategorias = \App\Models\Tema::where('name', 'CATEGORIAS')->first();
+        $totalCategorias = $temaCategorias
+            ? $temaCategorias->parametros()->wherePivot('status', 1)->count()
+            : 0;
 
         // Productos recientes (últimos 5)
         $productosRecientes = Producto::with(['estado', 'estado.parametro'])
@@ -84,8 +91,7 @@ class DashboardController extends Controller
             'productosPorCategoria',
             'productosConsumibles',
             'productosNoConsumibles',
-            'productosMasSolicitados',
-            'productosMenosSolicitados'
+            'productosMasSolicitados'
         ));
     }
 }

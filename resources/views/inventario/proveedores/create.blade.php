@@ -115,12 +115,12 @@
                                     <div class="col-md-6">
                                         <div class="form-group">
                                             <label for="direccion">Dirección</label>
-                                            <input 
-                                                type="text" 
-                                                class="form-control @error('direccion') is-invalid @enderror" 
-                                                id="direccion" 
-                                                name="direccion" 
-                                                value="{{ old('direccion') }}" 
+                                            <input
+                                                type="text"
+                                                class="form-control @error('direccion') is-invalid @enderror"
+                                                id="direccion"
+                                                name="direccion"
+                                                value="{{ old('direccion') }}"
                                                 placeholder="Ingrese la dirección"
                                             >
                                             @error('direccion')
@@ -130,16 +130,59 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label for="status">Estado</label>
-                                            <select 
-                                                class="form-control @error('status') is-invalid @enderror" 
-                                                id="status" 
-                                                name="status"
+                                            <label for="municipio_id">Municipio</label>
+                                            <select
+                                                class="form-control @error('municipio_id') is-invalid @enderror"
+                                                id="municipio_id"
+                                                name="municipio_id"
                                             >
-                                                <option value="1" {{ old('status', '1') == '1' ? 'selected' : '' }}>Activo</option>
-                                                <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Inactivo</option>
+                                                <option value="">Seleccione un municipio</option>
+                                                @foreach(\App\Models\Municipio::with('departamento')->orderBy('municipio')->get() as $municipio)
+                                                    <option value="{{ $municipio->id }}" {{ old('municipio_id') == $municipio->id ? 'selected' : '' }}>
+                                                        {{ $municipio->municipio }} ({{ $municipio->departamento->departamento ?? '' }})
+                                                    </option>
+                                                @endforeach
                                             </select>
-                                            @error('status')
+                                            @error('municipio_id')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="contacto">Contacto</label>
+                                            <input
+                                                type="text"
+                                                class="form-control @error('contacto') is-invalid @enderror"
+                                                id="contacto"
+                                                name="contacto"
+                                                value="{{ old('contacto') }}"
+                                                placeholder="Ingrese el nombre del contacto"
+                                            >
+                                            @error('contacto')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="estado_id">Estado</label>
+                                            <select
+                                                class="form-control @error('estado_id') is-invalid @enderror"
+                                                id="estado_id"
+                                                name="estado_id"
+                                            >
+                                                <option value="">Seleccione un estado</option>
+                                                @foreach(\App\Models\ParametroTema::with(['parametro','tema'])->whereHas('tema', fn($q) => $q->where('name', 'ESTADOS'))->where('status', 1)->get() as $estado)
+                                                    <option value="{{ $estado->id }}" {{ old('estado_id') == $estado->id ? 'selected' : '' }}>
+                                                        {{ $estado->parametro->name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('estado_id')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>

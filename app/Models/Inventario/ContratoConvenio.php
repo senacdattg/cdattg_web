@@ -12,6 +12,17 @@ class ContratoConvenio extends Model
 
     protected $table = 'contratos_convenios';
 
+    protected static function booted()
+    {
+        static::creating(function ($contrato) {
+            $contrato->name = strtoupper($contrato->name);
+        });
+
+        static::updating(function ($contrato) {
+            $contrato->name = strtoupper($contrato->name);
+        });
+    }
+
     protected $fillable = [
         'name',
         'codigo',

@@ -55,7 +55,9 @@
                 </div>
                 <div class="col-md-4">
                     <div class="stats-card">
-                        <div class="stats-number">{{ $proveedor->status == 1 ? 'Activo' : 'Inactivo' }}</div>
+                        <div class="stats-number">
+                            {{ $proveedor->estado->parametro->name ?? 'SIN ESTADO' }}
+                        </div>
                         <div class="stats-label">
                             <i class="fas fa-toggle-on mr-1"></i>
                             Estado
@@ -130,13 +132,38 @@
                                             </td>
                                         </tr>
                                         <tr>
+                                            <th class="py-3">Municipio</th>
+                                            <td class="py-3">
+                                                @if($proveedor->municipio)
+                                                    <i class="fas fa-map-pin mr-1"></i>
+                                                    {{ $proveedor->municipio->municipio }}
+                                                    <small class="text-muted">({{ $proveedor->municipio->departamento->departamento ?? 'N/A' }})</small>
+                                                @else
+                                                    <span class="text-muted">No especificado</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Contacto</th>
+                                            <td class="py-3">
+                                                @if($proveedor->contacto)
+                                                    <i class="fas fa-user mr-1"></i>
+                                                    {{ $proveedor->contacto }}
+                                                @else
+                                                    <span class="text-muted">No especificado</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <th class="py-3">Estado</th>
                                             <td class="py-3">
-                                                <x-status-badge
-                                                    status="{{ $proveedor->status ?? true }}"
-                                                    activeText="ACTIVO"
-                                                    inactiveText="INACTIVO"
-                                                />
+                                                @if($proveedor->estado)
+                                                    <span class="badge badge-{{ $proveedor->estado->status == 1 ? 'success' : 'danger' }}">
+                                                        {{ $proveedor->estado->parametro->name ?? 'N/A' }}
+                                                    </span>
+                                                @else
+                                                    <span class="badge badge-secondary">SIN ESTADO</span>
+                                                @endif
                                             </td>
                                         </tr>
                                         <tr>

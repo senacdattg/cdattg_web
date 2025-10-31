@@ -8,6 +8,8 @@ use App\Models\Tema;
 
 class Marca extends Parametro
 {
+    protected $table = 'parametros';
+
     protected static function booted()
     {
         static::creating(function ($marca) {
@@ -39,6 +41,6 @@ class Marca extends Parametro
 
     public function productos()
     {
-        return $this->hasMany(Producto::class, 'id_marca'); 
+        return $this->hasMany(Producto::class, 'marca_id');
     }
 }
