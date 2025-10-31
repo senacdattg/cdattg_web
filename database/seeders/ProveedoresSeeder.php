@@ -59,7 +59,7 @@ class ProveedoresSeeder extends Seeder
                 'proveedor' => 'SEMILLAS Y AGROQUÍMICOS EL CAMPO',
                 'nit' => '800123456-7',
                 'email' => 'campo@semillasagro.com',
-                'telefono' => '11223345566',
+                'telefono' => '1122334556',
                 'direccion' => 'carretera 24 #41-16, ',
                 'municipio_id' =>334,
                 'contacto' => 'ALVARO LOPEZ',
