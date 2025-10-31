@@ -110,17 +110,11 @@
 
 @push('css')
     @vite([
-        'resources/css/inventario/shared/base.css',
-        'resources/css/style.css'
+        'public/css/inventario/shared/base.css',
+        'public/css/style.css'
     ])
 @endpush
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endpush
-
-@section('additional-scripts')
-    @vite([
-        'resources/js/inventario/proveedores.js'
-    ])
-@endsection

@@ -416,11 +416,11 @@
 @endsection
 
 @section('footer')
-    @include('inventario._components.sena-footer')
+    @include('layout.footer')
 @endsection
 
 @push('css')
-    @vite(['resources/css/inventario/shared/base.css'])
+    @vite(['public/css/inventario/shared/base.css'])
     <link href="{{ asset('css/inventario/inventario.css') }}" rel="stylesheet">
     <link href="{{ asset('css/inventario/imagen.css') }}" rel="stylesheet">
 @endpush
@@ -442,5 +442,4 @@
             }
         });
     </script>
-    @vite(['resources/js/inventario/shared/modal-imagen.js'])
 @endpush

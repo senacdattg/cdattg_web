@@ -7,6 +7,14 @@ body {
     min-height: 100vh;
 }
 
+h1 {
+    color: #fdfdfd !important;
+}
+
+P {
+    color: #fdfdfd !important;
+}
+
 /* Fondo específico solo para el módulo de inventario */
 body .content-wrapper {
   background: linear-gradient(to bottom, 

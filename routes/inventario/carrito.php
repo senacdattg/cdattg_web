@@ -6,12 +6,9 @@ use App\Http\Controllers\Inventario\CarritoController;
 // Rutas para el carrito del inventario
 Route::prefix('inventario')
     ->name('inventario.carrito.')
-    ->group(function () {
-        // Rutas administrativas
-        Route::get('carrito', [CarritoController::class, 'index'])->name('index');
-        
+    ->group(function () {    
         // Rutas e-commerce modernas
-        Route::get('carrito-ecommerce', [CarritoController::class, 'ecommerce'])->name('ecommerce');
+        Route::get('carrito-sena', [CarritoController::class, 'index'])->name('ecommerce');
         
         // Rutas AJAX para funcionalidad del carrito
         Route::post('carrito/agregar', [CarritoController::class, 'agregar'])->name('agregar');

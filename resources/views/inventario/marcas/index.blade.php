@@ -91,13 +91,13 @@
     @include('layout.alertas')
     
     {{-- Footer SENA --}}
-    @include('inventario._components.sena-footer')
+    @include('layout.footer')
 @endsection
 
 @push('css')
     @vite([
-        'resources/css/inventario/shared/base.css',
-        'resources/css/style.css'
+        'public/css/inventario/shared/base.css',
+        'public/css/style.css'
     ])
 @endpush
 
@@ -105,8 +105,3 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endpush
 
-@section('additional-scripts')
-    @vite([
-        'resources/js/inventario/marcas.js'
-    ])
-@endsection

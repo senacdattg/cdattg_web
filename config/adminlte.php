@@ -828,14 +828,8 @@ return [
                     'can'  => ['VER CARRITO', 'VER PRODUCTO'],
                     'submenu' => [
                         [
-                            'text' => 'Ver Carrito',
-                            'url'  => 'inventario/carrito',
-                            'icon' => 'fa-solid fa-shopping-cart',
-                            'can'  => 'VER CARRITO',
-                        ],
-                        [
-                            'text' => 'Carrito E-commerce',
-                            'url'  => 'inventario/carrito-ecommerce',
+                            'text' => 'Carrito Sena',
+                            'url'  => 'inventario/carrito-sena',
                             'icon' => 'fa-solid fa-cart-shopping',
                             'can'  => 'VER CARRITO',
                         ],

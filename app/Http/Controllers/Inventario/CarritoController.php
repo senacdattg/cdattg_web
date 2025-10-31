@@ -17,19 +17,9 @@ class CarritoController extends Controller
     }
 
     /**
-     * Vista administrativa del carrito (legacy)
+     * Vista del carrito
      */
     public function index()
-    {
-        $carrito = [];
-        $total = 0;
-        return view('inventario.carrito.index', compact('carrito', 'total'));
-    }
-
-    /**
-     * Vista ecommerce del carrito
-     */
-    public function ecommerce()
     {
         return view('inventario.carrito.carrito');
     }

@@ -235,12 +235,12 @@
 
 @section('footer')
     {{-- Footer SENA --}}
-    @include('inventario._components.sena-footer')
+    @include('layout.footer')
 @endsection
 
 @push('css')
     <link rel="stylesheet" href="{{ asset('css/inventario/card.css') }}">
-    @vite(['resources/css/inventario/shared/base.css'])
+    @vite(['public/css/inventario/shared/base.css'])
     <style>
         /* Estilos adicionales inline si es necesario */
         .product-image-container {

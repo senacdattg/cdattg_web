@@ -7,7 +7,7 @@
 @endsection
 
 @push('css')
-    @vite(['resources/css/inventario/shared/base.css'])
+    @vite(['public/css/inventario/shared/base.css'])
 @endpush
 
 @section('content_header')
@@ -249,8 +249,4 @@
 
 @section('footer')
     @include('layout.footer')
-@endsection
-
-@section('js')
-    @vite(['resources/js/inventario/proveedores.js'])
 @endsection

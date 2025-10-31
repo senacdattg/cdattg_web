@@ -208,13 +208,13 @@
     </div>
 
     {{-- Footer SENA --}}
-    @include('inventario._components.sena-footer')
+    @include('layout.footer')
 @endsection
 
 @push('css')
     @vite([
-        'resources/css/inventario/shared/base.css',
-        'resources/css/style.css'
+        'public/css/inventario/shared/base.css',
+        'public/css/style.css'
     ])
     <style>
         .chart-container {
