@@ -58,7 +58,7 @@
                         </li>
                         <li class="user-footer">
                             @if($user && $user->hasRole('ASPIRANTE'))
-                                <a href="/mi-perfil" class="btn btn-default btn-flat">Mi Perfil</a>
+                                <a href="/mi-perfil" class="btn btn-default btn-flat">Perfil</a>
                             @else
                                 <a href="{{ route('personas.show', ['persona' => $persona->id]) }}" class="btn btn-default btn-flat">Perfil</a>
                             @endif

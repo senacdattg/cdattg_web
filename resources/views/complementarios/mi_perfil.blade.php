@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
-@section('title', 'Mi Perfil - Aspirante')
+@section('title', 'Perfil')
 
 @section('content_header')
-    <h1><i class="fas fa-user-circle me-2"></i>Mi Perfil</h1>
+    <h1><i class="fas fa-user-circle mr-2"></i>Perfil</h1>
     <p class="text-muted mb-0">Información de mi inscripción a programas complementarios</p>
 @stop
 
@@ -12,7 +12,7 @@
     <div class="col-md-8">
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-primary text-white">
-                <h5 class="mb-0"><i class="fas fa-user me-2"></i>Datos Personales</h5>
+                <h5 class="mb-0"><i class="fas fa-user mr-2"></i>Datos Personales</h5>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -116,7 +116,7 @@
 
         <div class="card shadow-sm">
             <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Programa Inscrito</h5>
+                <h5 class="mb-0"><i class="fas fa-graduation-cap mr-2"></i>Programa Inscrito</h5>
             </div>
             <div class="card-body">
                 <div class="row">
@@ -146,7 +146,7 @@
     <div class="col-md-4">
         <div class="card sticky-top shadow-sm" style="top:20px;">
             <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>Estado de la Inscripción</h5>
+                <h5 class="mb-0"><i class="fas fa-info-circle mr-2"></i>Estado de la Inscripción</h5>
             </div>
             <div class="card-body text-center">
                 @php
@@ -188,18 +188,18 @@
 
         <div class="card mt-3 shadow-sm">
             <div class="card-header bg-warning text-dark">
-                <h6 class="mb-0"><i class="fas fa-file-pdf me-2"></i>Documentos</h6>
+                <h6 class="mb-0"><i class="fas fa-file-pdf mr-2"></i>Documentos</h6>
             </div>
             <div class="card-body">
                 <div class="d-flex align-items-center mb-3">
-                    <i class="fas fa-id-card text-primary me-3 fa-lg"></i>
+                    <i class="fas fa-id-card text-primary mr-3 fa-lg"></i>
                     <div>
                         <strong>Documento de Identidad</strong>
                         <p class="mb-0 small text-muted">PDF subido</p>
                     </div>
                 </div>
                 <div class="alert alert-info small">
-                    <i class="fas fa-info-circle me-2"></i>
+                    <i class="fas fa-info-circle mr-2"></i>
                     Los documentos están siendo revisados por el equipo administrativo.
                 </div>
             </div>
@@ -207,22 +207,20 @@
 
         <div class="card mt-3 shadow-sm">
             <div class="card-header bg-secondary text-white">
-                <h6 class="mb-0"><i class="fas fa-phone me-2"></i>Contacto</h6>
+                <h6 class="mb-0"><i class="fas fa-phone mr-2"></i>Contacto</h6>
             </div>
             <div class="card-body">
                 <p class="small mb-2">
-                    <i class="fas fa-envelope me-2"></i>
+                    <i class="fas fa-envelope mr-2"></i>
                     <strong>Correo:</strong> administrativo@sena.edu.co
                 </p>
                 <p class="small mb-0">
-                    <i class="fas fa-phone me-2"></i>
+                    <i class="fas fa-phone mr-2"></i>
                     <strong>Teléfono:</strong> (601) 546 1500
                 </p>
             </div>
         </div>
-    </div>
-</div>
-@stop
+@endsection
 
 @section('css')
 <style>
@@ -239,4 +237,4 @@
 <script>
     console.log('Página de perfil del aspirante cargada');
 </script>
-@stop
+@endsection
