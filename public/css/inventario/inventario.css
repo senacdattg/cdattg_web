@@ -7,9 +7,9 @@
    Variables CSS
    ======================================== */
 :root {
-    --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --primary-gradient: linear-gradient(135deg, #54ba47d6 0%, #75d389 100%);
     --success-gradient: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
-    --info-gradient: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+    --info-gradient: linear-gradient(135deg, #54ba47d6 0%, #75d389 100%);
     --warning-gradient: linear-gradient(135deg, #f2994a 0%, #f2c94c 100%);
     --danger-gradient: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
     
@@ -145,7 +145,7 @@
 
 .image-upload-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 5px 15px rgba(19, 171, 85, 0.927);
 }
 
 .image-upload-btn input[type="file"] {
@@ -176,7 +176,7 @@
 }
 
 .form-section-title i {
-    color: #667eea;
+    color: #2fc63b;
 }
 
 /* ========================================
@@ -197,7 +197,7 @@
 }
 
 .form-group-modern label i {
-    color: #667eea;
+    color: #66ea99;
 }
 
 .form-group-modern label .text-danger {
@@ -215,7 +215,7 @@
 }
 
 .form-control-modern:focus {
-    border-color: #667eea;
+    border-color: #22d17c;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     outline: none;
 }
@@ -297,7 +297,7 @@ textarea.form-control-modern {
 .btn-modern-primary {
     background: var(--primary-gradient);
     color: white;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 4px 15px rgba(13, 195, 95, 0.708);
 }
 
 .btn-modern-primary:hover {
@@ -402,7 +402,7 @@ textarea.form-control-modern {
 }
 
 .product-info-list li i {
-    color: #667eea;
+    color: #48d771;
     font-size: 1.1rem;
     width: 20px;
     text-align: center;
@@ -532,13 +532,13 @@ textarea.form-control-modern {
 }
 
 .btn-action-primary {
-    border-color: #667eea;
-    color: #667eea;
+    border-color: #239e37;
+    color: #309e56;
     background: white;
 }
 
 .btn-action-primary:hover {
-    background: #667eea;
+    background: #149527;
     color: white;
     transform: translateY(-2px);
 }
@@ -739,7 +739,7 @@ textarea.form-control-modern {
    Mejoras de Accesibilidad
    ======================================== */
 *:focus-visible {
-    outline: 2px solid #667eea;
+    outline: 2px solid #52c968;
     outline-offset: 2px;
 }
 
