@@ -1,4 +1,4 @@
-/* Estilos base compartidos para todas las vistas del inventario */
+/* Estilos base compartidos para todas las vistas del inventario (shared) */
 
 /* Fondo general */
 body {
@@ -50,4 +50,5 @@ body .content-wrapper {
         padding-right: 1rem;
     }
 }
+
 
