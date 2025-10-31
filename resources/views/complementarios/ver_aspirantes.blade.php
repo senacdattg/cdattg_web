@@ -9,7 +9,7 @@
             <p class="text-muted mb-0">Administre los aspirantes a programas de formación complementaria</p>
         </div>
         <div class="d-flex" style="gap: 1rem;">
-            <button class="btn btn-primary">
+            <button class="btn btn-primary" id="btn-nuevo-aspirante" @if(isset($existingProgress) && $existingProgress) disabled @endif>
                 <i class="fas fa-plus me-1"></i>Nuevo Aspirante
             </button>
             <a href="{{ route('gestion-aspirantes') }}" class="btn btn-outline-secondary">
@@ -102,8 +102,12 @@
                             </td>
                             <td><span class="badge {{ $aspirante->persona->estado_sofia_badge_class }}">{{ $aspirante->persona->estado_sofia_label }}</span></td>
                             <td>
-                                <a href="#" class="btn btn-warning btn-sm me-1" title="Editar"><i class="fas fa-edit"></i></a>
-                                <a href="#" class="btn btn-danger btn-sm" title="Eliminar"><i class="fas fa-trash"></i></a>
+                                <button class="btn btn-warning btn-sm me-1 aspirante-action-btn" title="Editar" @if(isset($existingProgress) && $existingProgress) disabled @endif>
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-danger btn-sm aspirante-action-btn" title="Eliminar" @if(isset($existingProgress) && $existingProgress) disabled @endif>
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </td>
                         </tr>
                         @empty
@@ -152,14 +156,32 @@
                 currentProgressId = {{ $existingProgress->id }};
                 startProgressMonitoring(currentProgressId);
 
-                // Actualizar estado del botón
-                const button = document.getElementById('btn-validar-sofia');
-                if (button) {
-                    button.disabled = true;
-                    button.innerHTML = '<i class="fas fa-clock me-1"></i>Procesando...';
-                }
+                // Actualizar estado del botón y deshabilitar acciones
+                updateUIForValidationInProgress();
             @endif
         });
+
+        // Función para actualizar UI durante validación
+        function updateUIForValidationInProgress() {
+            // Deshabilitar botón de validación
+            const validationButton = document.getElementById('btn-validar-sofia');
+            if (validationButton) {
+                validationButton.disabled = true;
+                validationButton.innerHTML = '<i class="fas fa-clock me-1"></i>Procesando...';
+            }
+
+            // Deshabilitar botón de nuevo aspirante
+            const newAspirantButton = document.getElementById('btn-nuevo-aspirante');
+            if (newAspirantButton) {
+                newAspirantButton.disabled = true;
+            }
+
+            // Deshabilitar botones de acciones de aspirantes
+            const actionButtons = document.querySelectorAll('.aspirante-action-btn');
+            actionButtons.forEach(button => {
+                button.disabled = true;
+            });
+        }
 
         // Botón de validación SenaSofiaPlus
         document.getElementById('btn-validar-sofia').addEventListener('click', async function() {
@@ -192,8 +214,9 @@
                     // Iniciar monitoreo del progreso
                     startProgressMonitoring(currentProgressId);
 
-                    // Cambiar texto del botón
+                    // Cambiar texto del botón y deshabilitar acciones
                     button.innerHTML = '<i class="fas fa-clock me-1"></i>Procesando...';
+                    updateUIForValidationInProgress();
 
                 } else {
                     // Mostrar mensaje de error
@@ -384,9 +407,10 @@
                     showErrorDetails(progress.errors);
                 }
 
-                // Restaurar botón
+                // Restaurar botón y habilitar acciones
                 button.disabled = false;
                 button.innerHTML = '<i class="fas fa-search me-1"></i>Validar SenaSofiaPlus';
+                restoreUIAfterValidation();
             }
 
             // Ocultar contenedor de progreso después de 5 segundos
@@ -415,6 +439,21 @@
             if (progressContainer) {
                 progressContainer.appendChild(errorContainer);
             }
+        }
+
+        // Función para restaurar UI después de validación
+        function restoreUIAfterValidation() {
+            // Habilitar botón de nuevo aspirante
+            const newAspirantButton = document.getElementById('btn-nuevo-aspirante');
+            if (newAspirantButton) {
+                newAspirantButton.disabled = false;
+            }
+
+            // Habilitar botones de acciones de aspirantes
+            const actionButtons = document.querySelectorAll('.aspirante-action-btn');
+            actionButtons.forEach(button => {
+                button.disabled = false;
+            });
         }
 
         // Función para mostrar alertas
