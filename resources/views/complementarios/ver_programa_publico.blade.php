@@ -142,10 +142,12 @@ function redirectToLogin() {
 
 function redirectToRegistro() {
     if (selectedProgramaId) {
-        // Redirigir directamente al formulario de inscripción del programa
-        window.location.href = '/programas-complementarios/' + selectedProgramaId + '/inscripcion?programa_id=' + selectedProgramaId;
+        // Redirigir directamente al formulario de inscripción del programa complementario
+        // El formulario creará automáticamente el perfil de usuario
+        window.location.href = '/programas-complementarios/' + selectedProgramaId + '/inscripcion';
     } else {
-        window.location.href = '/registro';
+        // Si no hay programa seleccionado, redirigir a programas públicos
+        window.location.href = '/programas-complementarios';
     }
 }
 </script>

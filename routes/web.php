@@ -83,7 +83,7 @@ Route::post('/programas-complementarios/{id}/validar-sofia', [App\Http\Controlle
 Route::get('/sofia-validation-progress/{progressId}', [App\Http\Controllers\ComplementarioController::class, 'getValidationProgress'])->name('sofia-validation.progress');
 
 Route::middleware('auth')->group(function () {
-    Route::get('/mi-perfil', [App\Http\Controllers\ComplementarioController::class, 'miPerfil'])->name('aspirantes.mi-perfil');
+    Route::get('/mi-perfil', [App\Http\Controllers\ComplementarioController::class, 'Perfil'])->name('aspirantes.perfil');
 });
 Route::get('/departamentos/{pais}', [DepartamentoController::class, 'getByPais'])->name('departamentos.by.pais');
 Route::get('/municipios/{departamento}', [MunicipioController::class, 'getByDepartamento'])->name('municipios.by.departamento');
