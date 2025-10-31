@@ -8,7 +8,7 @@
         title="Dashboard de Inventario"
         subtitle="Resumen general del inventario"
         :breadcrumb="[
-            ['label' => 'Inicio', 'url' => '#'],
+            ['label' => 'Inicio', 'url' => '/home'],
             ['label' => 'Inventario', 'active' => true],
             ['label' => 'Dashboard', 'active' => true]
         ]"

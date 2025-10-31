@@ -14,7 +14,13 @@ h1 {
 P {
     color: #fdfdfd !important;
 }
+li {
+    color: #fdfdfd !important;
+}
 
+.text-muted {
+    color: #fdfdfd !important;
+}
 /* Fondo específico solo para el módulo de inventario */
 body .content-wrapper {
   background: linear-gradient(to bottom, 
