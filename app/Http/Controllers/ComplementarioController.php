@@ -159,7 +159,12 @@ class ComplementarioController extends Controller
             ->where('complementario_id', $programa->id)
             ->get();
 
-        return view('complementarios.ver_aspirantes', compact('programa', 'aspirantes'));
+        // Check for existing validation progress for this program
+        $existingProgress = SofiaValidationProgress::where('complementario_id', $programa->id)
+            ->whereIn('status', ['pending', 'processing'])
+            ->first();
+
+        return view('complementarios.ver_aspirantes', compact('programa', 'aspirantes', 'existingProgress'));
     }
     public function verPrograma($id)
     {
