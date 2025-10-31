@@ -60,10 +60,10 @@
                                                 <div class="description-block">
                                                     <span class="description-text">¿ESTÁS INTERESADO?</span>
                                                     <p class="text-muted mb-3">Realiza tu inscripción ahora mismo</p>
-                                                    <a href="{{ route('programas-complementarios.inscripcion', $programaData['id'] ?? '') }}"
-                                                        class="btn btn-success btn-block">
+                                                    <button type="button" class="btn btn-success btn-block"
+                                                            onclick="openInscripcionModal({{ $programaData['id'] }}, '{{ $programaData['nombre'] }}')">
                                                         <i class="fas fa-user-plus mr-1"></i> Inscribirse
-                                                    </a>
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -76,5 +76,76 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal de Inscripción -->
+    <div class="modal fade" id="inscripcionModal" tabindex="-1" role="dialog" aria-labelledby="inscripcionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="inscripcionModalLabel">
+                        <i class="fas fa-user-plus mr-2"></i>Inscripción al Programa
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body text-center">
+                    <h6 class="mb-4">¿Ya tienes una cuenta en el sistema?</h6>
+                    <div class="row">
+                        <div class="col-6">
+                            <button type="button" class="btn btn-primary btn-block" onclick="redirectToLogin()">
+                                <i class="fas fa-sign-in-alt fa-2x mb-2"></i><br>
+                                <strong>Iniciar Sesión</strong><br>
+                                <small>Ya tengo cuenta</small>
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button type="button" class="btn btn-success btn-block" onclick="redirectToRegistro()">
+                                <i class="fas fa-user-plus fa-2x mb-2"></i><br>
+                                <strong>Registrarme</strong><br>
+                                <small>Soy nuevo</small>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <small class="text-muted">
+                            Si ya tienes cuenta, inicia sesión para continuar con tu inscripción.<br>
+                            Si eres nuevo, regístrate primero para crear tu cuenta.
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @include('layout.footer')
 @endsection
+
+<script>
+let selectedProgramaId = null;
+
+function openInscripcionModal(programaId, programaNombre) {
+   selectedProgramaId = programaId;
+   document.getElementById('inscripcionModalLabel').innerHTML =
+       '<i class="fas fa-user-plus mr-2"></i>Inscripción: ' + programaNombre;
+   $('#inscripcionModal').modal('show');
+}
+
+function redirectToLogin() {
+   if (selectedProgramaId) {
+       // Redirigir al login con parámetro para recordar el programa
+       window.location.href = '/login?redirect=programas-complementarios/' + selectedProgramaId + '/inscripcion';
+   } else {
+       window.location.href = '/login';
+   }
+}
+
+function redirectToRegistro() {
+   if (selectedProgramaId) {
+       // Redirigir al registro con parámetro para recordar el programa
+       window.location.href = '/registro?redirect=programas-complementarios/' + selectedProgramaId + '/inscripcion';
+   } else {
+       window.location.href = '/registro';
+   }
+}
+</script>
