@@ -132,20 +132,20 @@ function openInscripcionModal(programaId, programaNombre) {
 }
 
 function redirectToLogin() {
-   if (selectedProgramaId) {
-       // Redirigir al login con parámetro para recordar el programa
-       window.location.href = '/login?redirect=programas-complementarios/' + selectedProgramaId + '/inscripcion';
-   } else {
-       window.location.href = '/login';
-   }
+    if (selectedProgramaId) {
+        // Redirigir al login con parámetro para recordar el programa
+        window.location.href = '/login?redirect=' + selectedProgramaId;
+    } else {
+        window.location.href = '/login';
+    }
 }
 
 function redirectToRegistro() {
-   if (selectedProgramaId) {
-       // Redirigir al registro con parámetro para recordar el programa
-       window.location.href = '/registro?redirect=programas-complementarios/' + selectedProgramaId + '/inscripcion';
-   } else {
-       window.location.href = '/registro';
-   }
+    if (selectedProgramaId) {
+        // Redirigir directamente al formulario de inscripción del programa
+        window.location.href = '/programas-complementarios/' + selectedProgramaId + '/inscripcion?programa_id=' + selectedProgramaId;
+    } else {
+        window.location.href = '/registro';
+    }
 }
 </script>

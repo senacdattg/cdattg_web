@@ -35,7 +35,27 @@ class LoginController extends Controller
                     return back()->withInput()->withErrors(['error' => 'La cuenta se encuentra inactiva']);
                 }
 
-                return redirect()->route('home.index')->with('success', '¡Sesión Iniciada!');
+                // Verificar si hay un parámetro de redirección (primero del input POST, luego del query string)
+                $redirect = $request->input('redirect') ?: $request->query('redirect');
+                Log::info('LoginController - Verificando redirect', [
+                    'redirect_input' => $request->input('redirect'),
+                    'redirect_query' => $request->query('redirect'),
+                    'redirect_final' => $redirect,
+                    'has_redirect' => !empty($redirect),
+                    'all_input' => $request->all(),
+                    'all_query_params' => $request->query()
+                ]);
+                if ($redirect) {
+                    Log::info('LoginController - Redirigiendo a formulario de inscripción', ['redirect_id' => $redirect]);
+                    // Redirigir al formulario de inscripción con los datos del usuario pre-llenados
+                    return redirect('/programas-complementarios/' . $redirect . '/inscripcion')
+                        ->with('user_data', $this->getUserDataForForm($user))
+                        ->with('success', '¡Sesión Iniciada! Complete su información para finalizar la inscripción.');
+                }
+
+                Log::info('LoginController - No hay redirect, redirigiendo a /home');
+                // Redirigir al dashboard principal (/home) para usuarios normales
+                return redirect('/home')->with('success', '¡Sesión Iniciada!');
             } else {
                 Log::warning("Fallo en el inicio de sesión para el correo: {$request->email}");
 
@@ -54,7 +74,14 @@ class LoginController extends Controller
 
     public function verificarLogin()
     {
-        return auth()->check() ? redirect('home') : redirect('login');
+        return Auth::check() ? redirect('/home') : redirect('/login');
+    }
+
+    public function store(Request $request)
+    {
+        // Este método maneja el POST a /login desde el resource route
+        // Redirigir al método iniciarSesion
+        return $this->iniciarSesion($request);
     }
 
     public function authenticate(Request $request)
@@ -66,7 +93,7 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
-            $token = $user->createToken('Token Name')->plainTextToken;
+            // $token = $user->createToken('Token Name')->plainTextToken; // Comentado para evitar error
 
             // Buscar la persona asociada
             $personaD = Persona::find($user->persona_id);
@@ -92,9 +119,39 @@ class LoginController extends Controller
                 "regional_id" => optional(optional($personaD->instructor)->regional)->id,
             ];
 
-            return response()->json(['user' => $user, 'persona' => $persona, 'token' => $token], 200);
+            return response()->json(['user' => $user, 'persona' => $persona], 200);
         }
 
         return response()->json(['error' => 'Credenciales incorrectas'], 401);
+    }
+
+    /**
+     * Obtener datos del usuario para pre-llenar el formulario
+     */
+    private function getUserDataForForm($user)
+    {
+        $persona = $user->persona;
+
+        if (!$persona) {
+            return [];
+        }
+
+        return [
+            'tipo_documento' => $persona->tipo_documento,
+            'numero_documento' => $persona->numero_documento,
+            'primer_nombre' => $persona->primer_nombre,
+            'segundo_nombre' => $persona->segundo_nombre,
+            'primer_apellido' => $persona->primer_apellido,
+            'segundo_apellido' => $persona->segundo_apellido,
+            'fecha_nacimiento' => $persona->fecha_nacimiento,
+            'genero' => $persona->genero,
+            'telefono' => $persona->telefono,
+            'celular' => $persona->celular,
+            'email' => $persona->email,
+            'pais_id' => $persona->pais_id,
+            'departamento_id' => $persona->departamento_id,
+            'municipio_id' => $persona->municipio_id,
+            'direccion' => $persona->direccion,
+        ];
     }
 }
