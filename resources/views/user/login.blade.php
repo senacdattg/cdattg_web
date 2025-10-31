@@ -50,6 +50,8 @@
                 {{-- Formulario de inicio de sesión --}}
                 <form action="{{ route('iniciarSesion') }}" method="POST">
                     @csrf
+                    {{-- Campo hidden para el parámetro de redirección --}}
+                    <input type="hidden" name="redirect" value="{{ request()->query('redirect') }}">
 
                     {{-- Correo Institucional --}}
                     <div class="form-group">
