@@ -127,9 +127,7 @@
                             <div class="col-md-6">
                                 <small><strong>Duración:</strong> {{ $aspirante->complementario->duracion }} horas</small>
                             </div>
-                            <div class="col-md-6">
-                                <small><strong>Cupos:</strong> {{ $aspirante->complementario->cupos }}</small>
-                            </div>
+                            
                         </div>
                     </div>
                     <div class="col-md-4 text-center">
@@ -144,80 +142,27 @@
     </div>
 
     <div class="col-md-4">
-        <div class="card sticky-top shadow-sm" style="top:20px;">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0"><i class="fas fa-info-circle mr-2"></i>Estado de la Inscripción</h5>
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white text-center">
+                <h5 class="mb-0"><i class="fas fa-graduation-cap mr-2"></i>Programa Inscrito</h5>
             </div>
             <div class="card-body text-center">
-                @php
-                    $estadoClass = match($aspirante->estado) {
-                        1 => 'bg-primary',
-                        2 => 'bg-danger',
-                        3 => 'bg-success',
-                        default => 'bg-secondary'
-                    };
-
-                    $estadoIcon = match($aspirante->estado) {
-                        1 => 'fas fa-clock',
-                        2 => 'fas fa-times-circle',
-                        3 => 'fas fa-check-circle',
-                        default => 'fas fa-question-circle'
-                    };
-                @endphp
-
-                <div class="{{ $estadoClass }} text-white rounded-circle mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
-                    <i class="{{ $estadoIcon }} fa-2x"></i>
-                </div>
-
-                <h4 class="mb-2">{{ $aspirante->estado_label }}</h4>
-
-                @if($aspirante->estado == 1)
-                    <p class="text-muted">Su inscripción está siendo revisada. Recibirá una notificación por correo electrónico cuando haya una actualización.</p>
-                @elseif($aspirante->estado == 2)
-                    <p class="text-muted">Lamentablemente su solicitud no fue aprobada. Puede contactar al área administrativa para más información.</p>
-                @elseif($aspirante->estado == 3)
-                    <p class="text-muted">¡Felicidades! Su inscripción ha sido aprobada. Pronto recibirá información sobre el inicio del programa.</p>
-                @endif
-
-                <div class="mt-4">
-                    <small class="text-muted">ID de Inscripción: {{ $aspirante->id }}</small><br>
-                    <small class="text-muted">Fecha de registro: {{ $aspirante->created_at->format('d/m/Y') }}</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="card mt-3 shadow-sm">
-            <div class="card-header bg-warning text-dark">
-                <h6 class="mb-0"><i class="fas fa-file-pdf mr-2"></i>Documentos</h6>
-            </div>
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                    <i class="fas fa-id-card text-primary mr-3 fa-lg"></i>
-                    <div>
-                        <strong>Documento de Identidad</strong>
-                        <p class="mb-0 small text-muted">PDF subido</p>
+                <div class="bg-light rounded p-4 mb-3">
+                    <i class="fas fa-graduation-cap fa-3x text-success mb-3"></i>
+                    <h5 class="text-success mb-2">{{ $aspirante->complementario->nombre }}</h5>
+                    <p class="text-muted small mb-3">{{ $aspirante->complementario->descripcion }}</p>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <small class="text-muted d-block">Duración</small>
+                            <strong>{{ $aspirante->complementario->duracion }} horas</strong>
+                        </div>
+                        
                     </div>
                 </div>
-                <div class="alert alert-info small">
-                    <i class="fas fa-info-circle mr-2"></i>
-                    Los documentos están siendo revisados por el equipo administrativo.
+                <div class="border-top pt-3">
+                    
+                    <small class="text-muted">Fecha de registro: {{ $aspirante->created_at->format('d/m/Y') }}</small>
                 </div>
-            </div>
-        </div>
-
-        <div class="card mt-3 shadow-sm">
-            <div class="card-header bg-secondary text-white">
-                <h6 class="mb-0"><i class="fas fa-phone mr-2"></i>Contacto</h6>
-            </div>
-            <div class="card-body">
-                <p class="small mb-2">
-                    <i class="fas fa-envelope mr-2"></i>
-                    <strong>Correo:</strong> administrativo@sena.edu.co
-                </p>
-                <p class="small mb-0">
-                    <i class="fas fa-phone mr-2"></i>
-                    <strong>Teléfono:</strong> (601) 546 1500
-                </p>
             </div>
         </div>
 @endsection
