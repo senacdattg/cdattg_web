@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Jobs\ValidarSofiaJob;
 use App\Models\SofiaValidationProgress;
+use Spatie\Permission\Models\Role;
 
 class ComplementarioController extends Controller
 {
@@ -287,11 +288,7 @@ class ComplementarioController extends Controller
 
     public function formularioInscripcion($id)
     {
-        // Verificar si el usuario está autenticado
-        if (!Auth::check()) {
-            return redirect()->route('login.index')->with('error', 'Debe iniciar sesión para acceder al formulario de inscripción.');
-        }
-
+        // Permitir acceso a usuarios no autenticados - el formulario crea la cuenta automáticamente
         $programa = ComplementarioOfertado::with(['modalidad.parametro', 'jornada'])->findOrFail($id);
 
         // Obtener categorías de caracterización principales con sus hijos
@@ -804,9 +801,20 @@ class ComplementarioController extends Controller
     /**
      * Mostrar perfil propio del aspirante autenticado
      */
-    public function miPerfil()
+    public function Perfil()
     {
         $user = Auth::user();
+
+        // Verificar que el usuario esté autenticado
+        if (!$user) {
+            return redirect('/login')->with('error', 'Debe iniciar sesión para acceder a su perfil.');
+        }
+
+        // Verificar que el usuario tenga rol de aspirante
+        if (!$user->hasRole('ASPIRANTE')) {
+            return redirect()->route('home')->with('error', 'Acceso no autorizado. Solo los aspirantes pueden acceder a esta sección.');
+        }
+
         $aspirante = AspiranteComplementario::with(['persona', 'complementario'])
             ->where('persona_id', $user->persona_id)
             ->first();
