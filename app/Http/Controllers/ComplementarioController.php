@@ -287,8 +287,13 @@ class ComplementarioController extends Controller
 
     public function formularioInscripcion($id)
     {
+        // Verificar si el usuario está autenticado
+        if (!Auth::check()) {
+            return redirect()->route('login.index')->with('error', 'Debe iniciar sesión para acceder al formulario de inscripción.');
+        }
+
         $programa = ComplementarioOfertado::with(['modalidad.parametro', 'jornada'])->findOrFail($id);
-        
+
         // Obtener categorías de caracterización principales con sus hijos
         $categorias = CategoriaCaracterizacionComplementario::getMainCategories();
         $categoriasConHijos = $categorias->map(function($categoria) {
