@@ -33,11 +33,12 @@
                     </div>
 
                     @php($tipoInicial = old('tipo', request('tipo')))
-                <form action="{{ route('inventario.prestamos-salidas') }}" method="POST">
-                    @csrf
+
+                    <form action="{{ route('inventario.prestamos-salidas') }}" method="POST">
+                        @csrf
 
                         <div class="form-content-container">
-                            {{-- Resumen del Carrito (valores provistos por el controlador) --}}
+                            {{-- Resumen del Carrito --}}
                             @if(!empty($totalProductos) && $totalProductos > 0)
                                 <div class="stats-grid">
                                     <div class="stat-card stat-info">
@@ -73,18 +74,20 @@
                                     <i class="fas fa-user"></i>
                                     Datos del Solicitante
                                 </h4>
-                    
-                    <div class="row">
+
+                                <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-modern">
                                             <label>
                                                 <i class="fas fa-user"></i>
                                                 Solicitante
                                             </label>
-                                            <input type="text"
-                                                   class="form-control-modern"
-                                                   value="{{ auth()->user()->name ?? 'Usuario' }}"
-                                                   readonly>
+                                            <input
+                                                type="text"
+                                                class="form-control-modern"
+                                                value="{{ auth()->user()->name ?? 'Usuario' }}"
+                                                readonly
+                                            >
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -93,25 +96,36 @@
                                                 <i class="fas fa-envelope"></i>
                                                 Correo
                                             </label>
-                                            <input type="text"
-                                                   class="form-control-modern"
-                                                   value="{{ auth()->user()->email ?? '' }}"
-                                                   readonly>
+                                            <input
+                                                type="text"
+                                                class="form-control-modern"
+                                                value="{{ auth()->user()->email ?? '' }}"
+                                                readonly
+                                            >
                                         </div>
                                     </div>
                                     <input type="hidden" name="solicitante_email" value="{{ auth()->user()->email ?? '' }}">
                                     <input type="hidden" name="solicitante_id" value="{{ auth()->id() }}">
-                    </div>
+                                </div>
 
-                    <div class="row">
+                                <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-modern">
                                             <label>
                                                 <i class="fas fa-user-tag"></i>
                                                 Rol
                                             </label>
-                                            <input type="text" class="form-control-modern" value="{{ (auth()->check() && method_exists(auth()->user(), 'getRoleNames') && auth()->user()->getRoleNames()->first()) ? auth()->user()->getRoleNames()->first() : (auth()->user()->role->name ?? 'N/A') }}" readonly>
-                                            <input type="hidden" name="rol" value="{{ (auth()->check() && method_exists(auth()->user(), 'getRoleNames') && auth()->user()->getRoleNames()->first()) ? auth()->user()->getRoleNames()->first() : (auth()->user()->role->name ?? '') }}">
+                                            <input
+                                                type="text"
+                                                class="form-control-modern"
+                                                value="{{ (auth()->check() && method_exists(auth()->user(), 'getRoleNames') && auth()->user()->getRoleNames()->first()) ? auth()->user()->getRoleNames()->first() : (auth()->user()->role->name ?? 'N/A') }}"
+                                                readonly
+                                            >
+                                            <input
+                                                type="hidden"
+                                                name="rol"
+                                                value="{{ (auth()->check() && method_exists(auth()->user(), 'getRoleNames') && auth()->user()->getRoleNames()->first()) ? auth()->user()->getRoleNames()->first() : (auth()->user()->role->name ?? '') }}"
+                                            >
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -121,20 +135,22 @@
                                                 Nombre del programa formación
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <input type="text"
-                                                   class="form-control-modern @error('programa_formacion') is-invalid @enderror"
-                                                   id="programa_formacion"
-                                                   name="programa_formacion"
-                                                   value="{{ old('programa_formacion') }}"
-                                                   placeholder="Ej: ADSI, Electricidad, etc."
-                                                   required>
+                                            <input
+                                                type="text"
+                                                class="form-control-modern @error('programa_formacion') is-invalid @enderror"
+                                                id="programa_formacion"
+                                                name="programa_formacion"
+                                                value="{{ old('programa_formacion') }}"
+                                                placeholder="Ej: ADSI, Electricidad, etc."
+                                                required
+                                            >
                                             @error('programa_formacion')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
                                 </div>
-                    </div>
+                            </div>
 
                             {{-- Sección: Detalles y Fechas --}}
                             <div class="form-section">
@@ -143,7 +159,7 @@
                                     Detalles y Fechas
                                 </h4>
 
-                    <div class="row">
+                                <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-modern">
                                             <label for="ficha">
@@ -151,13 +167,15 @@
                                                 Ficha
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <input type="text"
-                                                   class="form-control-modern @error('ficha') is-invalid @enderror"
-                                                   id="ficha"
-                                                   name="ficha"
-                                                   value="{{ old('ficha') }}"
-                                                   placeholder="Número de ficha"
-                                                   required>
+                                            <input
+                                                type="text"
+                                                class="form-control-modern @error('ficha') is-invalid @enderror"
+                                                id="ficha"
+                                                name="ficha"
+                                                value="{{ old('ficha') }}"
+                                                placeholder="Número de ficha"
+                                                required
+                                            >
                                             @error('ficha')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -170,8 +188,12 @@
                                                 Tipo
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <select class="form-control-modern @error('tipo') is-invalid @enderror"
-                                                    id="tipo" name="tipo" required>
+                                            <select
+                                                class="form-control-modern @error('tipo') is-invalid @enderror"
+                                                id="tipo"
+                                                name="tipo"
+                                                required
+                                            >
                                                 <option value="">Seleccionar tipo...</option>
                                                 <option value="prestamo" {{ ($tipoInicial ?? '') === 'prestamo' ? 'selected' : '' }}>Préstamo</option>
                                                 <option value="salida" {{ ($tipoInicial ?? '') === 'salida' ? 'selected' : '' }}>Salida</option>
@@ -181,9 +203,9 @@
                                             @enderror
                                         </div>
                                     </div>
-                    </div>
+                                </div>
 
-                    <div class="row">
+                                <div class="row">
                                     <div class="col-md-6 d-none" id="grupo-fecha-devolucion">
                                         <div class="form-group-modern">
                                             <label for="fecha_devolucion">
@@ -191,30 +213,37 @@
                                                 Fecha de entrega
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <input type="date"
-                                                   class="form-control-modern @error('fecha_devolucion') is-invalid @enderror"
-                                                   id="fecha_devolucion"
-                                                   name="fecha_devolucion"
-                                                   value="{{ old('fecha_devolucion') }}">
+                                            <input
+                                                type="date"
+                                                class="form-control-modern @error('fecha_devolucion') is-invalid @enderror"
+                                                id="fecha_devolucion"
+                                                name="fecha_devolucion"
+                                                value="{{ old('fecha_devolucion') }}"
+                                            >
                                             @error('fecha_devolucion')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
                                 </div>
-                    
-                    <div class="row">
+
+                                <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-modern">
                                             <label>
                                                 <i class="fas fa-boxes"></i>
                                                 Productos en carrito
                                             </label>
-                                            <input type="number" class="form-control-modern" value="{{ $totalProductos ?? 0 }}" readonly>
+                                            <input
+                                                type="number"
+                                                class="form-control-modern"
+                                                value="{{ $totalProductos ?? 0 }}"
+                                                readonly
+                                            >
                                         </div>
                                     </div>
                                 </div>
-                    </div>
+                            </div>
 
                             {{-- Sección: Descripción --}}
                             <div class="form-section">
@@ -223,7 +252,7 @@
                                     Descripción
                                 </h4>
 
-                    <div class="row">
+                                <div class="row">
                                     <div class="col-12">
                                         <div class="form-group-modern">
                                             <label for="descripcion">
@@ -231,11 +260,14 @@
                                                 Descripción
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <textarea class="form-control-modern @error('descripcion') is-invalid @enderror"
-                                                      id="descripcion"
-                                                      name="descripcion"
-                                                      rows="4"
-                                                      placeholder="Describe el motivo del préstamo/salida, condiciones especiales, etc." required>{{ old('descripcion') }}</textarea>
+                                            <textarea
+                                                class="form-control-modern @error('descripcion') is-invalid @enderror"
+                                                id="descripcion"
+                                                name="descripcion"
+                                                rows="4"
+                                                placeholder="Describe el motivo del préstamo/salida, condiciones especiales, etc."
+                                                required
+                                            >{{ old('descripcion') }}</textarea>
                                             @error('descripcion')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -243,7 +275,7 @@
                                     </div>
                                 </div>
                             </div>
-                    </div>
+                        </div>
 
                         {{-- Botones de Acción --}}
                         <div class="form-actions-container">
@@ -256,15 +288,15 @@
                                 Crear Préstamo/Salida
                             </button>
                         </div>
-                </form>
+                    </form>
                 </div>
             </div>
         </div>
     </div>
-    
+
     {{-- Alertas --}}
     @include('layout.alertas')
-    
+
     {{-- Footer SENA --}}
     @include('inventario._components.sena-footer')
 @endsection
