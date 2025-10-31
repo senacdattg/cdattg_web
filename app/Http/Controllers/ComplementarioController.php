@@ -415,6 +415,17 @@ class ComplementarioController extends Controller
      */
     public function procesarInscripcion(Request $request, $id)
     {
+        // Si el usuario está autenticado, verificar si ya está inscrito en este programa
+        if (Auth::check()) {
+            $existingInscription = AspiranteComplementario::where('persona_id', Auth::user()->persona_id)
+                ->where('complementario_id', $id)
+                ->first();
+
+            if ($existingInscription) {
+                return redirect()->back()->with('error', 'Ya estás inscrito en este programa complementario.');
+            }
+        }
+
         // Validar los datos del formulario
         $request->validate([
             'tipo_documento' => 'required|integer',
@@ -445,12 +456,12 @@ class ComplementarioController extends Controller
         if ($personaExistente) {
             // Si ya existe, usar esa persona
             $persona = $personaExistente;
-            
+
             // Actualizar datos si es necesario
             $persona->update($request->only([
                 'tipo_documento', 'numero_documento', 'primer_nombre', 'segundo_nombre',
                 'primer_apellido', 'segundo_apellido', 'fecha_nacimiento', 'genero',
-                'telefono', 'celular', 'email', 'pais_id', 'departamento_id', 
+                'telefono', 'celular', 'email', 'pais_id', 'departamento_id',
                 'municipio_id', 'direccion'
             ]));
         } else {
@@ -458,22 +469,27 @@ class ComplementarioController extends Controller
             $persona = Persona::create($request->only([
                 'tipo_documento', 'numero_documento', 'primer_nombre', 'segundo_nombre',
                 'primer_apellido', 'segundo_apellido', 'fecha_nacimiento', 'genero',
-                'telefono', 'celular', 'email', 'pais_id', 'departamento_id', 
+                'telefono', 'celular', 'email', 'pais_id', 'departamento_id',
                 'municipio_id', 'direccion', 'status'
             ]));
         }
 
-        // Crear o actualizar el registro del aspirante
-        $aspirante = AspiranteComplementario::updateOrCreate(
-            [
-                'persona_id' => $persona->id,
-                'complementario_id' => $id
-            ],
-            [
-                'observaciones' => $request->observaciones,
-                'estado' => 1, // Estado "En proceso"
-            ]
-        );
+        // Verificar si ya existe una inscripción para esta persona en este programa
+        $existingInscription = AspiranteComplementario::where('persona_id', $persona->id)
+            ->where('complementario_id', $id)
+            ->first();
+
+        if ($existingInscription) {
+            return redirect()->back()->with('error', 'Ya estás inscrito en este programa complementario.');
+        }
+
+        // Crear el registro del aspirante
+        $aspirante = AspiranteComplementario::create([
+            'persona_id' => $persona->id,
+            'complementario_id' => $id,
+            'observaciones' => $request->observaciones,
+            'estado' => 1, // Estado "En proceso"
+        ]);
 
         // Verificar si ya existe un usuario con este email
         $existingUser = User::where('email', $request->email)->first();
