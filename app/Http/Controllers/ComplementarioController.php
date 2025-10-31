@@ -769,40 +769,7 @@ class ComplementarioController extends Controller
                 ]);
             }
 
-            // Verificar si ya está inscrita en cualquier programa complementario (sin complementario_id)
-            $aspiranteSinPrograma = AspiranteComplementario::where('persona_id', $persona->id)
-                ->whereNull('complementario_id')
-                ->first();
-
-            if ($aspiranteSinPrograma) {
-                // Actualizar el registro existente asignándolo a este programa
-                $aspiranteSinPrograma->update([
-                    'complementario_id' => $complementarioId,
-                    'observaciones' => 'Asignado a programa desde gestión de aspirantes'
-                ]);
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Aspirante asignado exitosamente. ' . $persona->primer_nombre . ' ' . $persona->primer_apellido . ' ha sido asignado a este programa complementario.'
-                ]);
-            }
-
-            // Verificar si existe algún registro con esta persona_id (independientemente del complementario_id)
-            $cualquierAspirante = AspiranteComplementario::where('persona_id', $persona->id)->first();
-
-            if ($cualquierAspirante) {
-                // Si existe pero en otro programa, informar que ya está inscrita en otro lado
-                if ($cualquierAspirante->complementario_id !== null) {
-                    $programaExistente = ComplementarioOfertado::find($cualquierAspirante->complementario_id);
-                    $nombrePrograma = $programaExistente ? $programaExistente->nombre : 'otro programa';
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'La persona con documento "' . $request->numero_documento . '" ya se encuentra inscrita en el programa "' . $nombrePrograma . '".'
-                    ]);
-                }
-            }
-
-            // Crear nuevo aspirante
+            // Crear nuevo aspirante - ahora permite múltiples programas por persona
             AspiranteComplementario::create([
                 'persona_id' => $persona->id,
                 'complementario_id' => $complementarioId,
