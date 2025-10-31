@@ -15,9 +15,7 @@ use App\Http\Controllers\GoogleDriveController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [App\Http\Controllers\ComplementarioController::class, 'programasPublicos'])->name('home');
 
 // Google Drive OAuth helper routes (para renovar refresh_token y probar conexión)
 Route::get('/google-drive-connect', [GoogleDriveController::class, 'connect'])->name('google.drive.connect');
