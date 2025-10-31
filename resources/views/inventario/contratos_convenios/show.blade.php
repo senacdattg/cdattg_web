@@ -6,6 +6,10 @@
     <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
 @endsection
 
+@push('css')
+    @vite(['resources/css/inventario/shared/base.css'])
+@endpush
+
 @section('content_header')
     <x-page-header
         icon="fas fa-eye"

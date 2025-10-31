@@ -104,7 +104,10 @@
 @endsection
 
 @push('css')
-    @vite(['resources/css/style.css'])
+    @vite([
+        'resources/css/inventario/shared/base.css',
+        'resources/css/style.css'
+    ])
 @endpush
 
 @push('scripts')

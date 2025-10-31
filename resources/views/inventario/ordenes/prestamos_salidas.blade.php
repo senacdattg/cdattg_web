@@ -16,145 +16,294 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid">
-        <div class="card">
-            @include('inventario._components.card-header', [
-                'title' => 'Préstamo o Salida',
-                'icon' => 'fas fa-exchange-alt'
-            ])
-            
-            <div class="card-body">
-                <form action="{{ route('inventario.prestamos-salidas') }}" method="POST">
-                    @csrf
-                    
-                    <div class="row">
-                        @include('inventario._components.form-field', [
-                            'name' => 'nombre',
-                            'label' => 'Nombre',
-                            'type' => 'text',
-                            'value' => old('nombre'),
-                            'required' => true,
-                            'icon' => 'fas fa-user'
-                        ])
+    <div class="producto-form-container fade-in">
+        {{-- Alertas --}}
+        @include('components.session-alerts')
 
-                        @include('inventario._components.form-field', [
-                            'name' => 'documento',
-                            'label' => 'Documento',
-                            'type' => 'text',
-                            'value' => old('documento'),
-                            'required' => true,
-                            'icon' => 'fas fa-id-card'
-                        ])
+        <div class="row">
+            <div class="col-12">
+                <div class="producto-form-card slide-in">
+                    <div class="form-header-gradient">
+                        <h3>
+                            <span class="header-icon">
+                                <i class="fas fa-exchange-alt"></i>
+                            </span>
+                            Préstamo o Salida
+                        </h3>
                     </div>
 
-                    <div class="row">
-                        @include('inventario._components.form-field', [
-                            'name' => 'rol',
-                            'label' => 'Rol',
-                            'type' => 'select',
-                            'value' => old('rol'),
-                            'required' => true,
-                            'icon' => 'fas fa-user-tag',
-                            'placeholder' => 'Seleccionar rol...',
-                            'options' => [
-                                'estudiante' => 'Estudiante',
-                                'instructor' => 'Instructor',
-                                'coordinador' => 'Coordinador',
-                                'administrativo' => 'Administrativo'
-                            ]
-                        ])
+                    @php($tipoInicial = old('tipo', request('tipo')))
 
-                        @include('inventario._components.form-field', [
-                            'name' => 'programa_formacion',
-                            'label' => 'Nombre del programa formación',
-                            'type' => 'text',
-                            'value' => old('programa_formacion'),
-                            'required' => true,
-                            'icon' => 'fas fa-graduation-cap'
-                        ])
-                    </div>
+                    <form action="{{ route('inventario.prestamos-salidas') }}" method="POST">
+                        @csrf
 
-                    <div class="row">
-                        @include('inventario._components.form-field', [
-                            'name' => 'ficha',
-                            'label' => 'Ficha',
-                            'type' => 'text',
-                            'value' => old('ficha'),
-                            'required' => true,
-                            'icon' => 'fas fa-ticket-alt'
-                        ])
+                        <div class="form-content-container">
+                            {{-- Resumen del Carrito --}}
+                            @if(!empty($totalProductos) && $totalProductos > 0)
+                                <div class="stats-grid">
+                                    <div class="stat-card stat-info">
+                                        <div class="stat-card-header">
+                                            <div class="stat-card-icon">
+                                                <i class="fas fa-boxes"></i>
+                                            </div>
+                                            <div>
+                                                <div class="stat-card-label">Productos en la solicitud</div>
+                                                <div class="stat-card-value">{{ $totalProductos ?? 0 }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="stat-card stat-success">
+                                        <div class="stat-card-header">
+                                            <div class="stat-card-icon">
+                                                <i class="fas fa-layer-group"></i>
+                                            </div>
+                                            <div>
+                                                <div class="stat-card-label">Total de ítems</div>
+                                                <div class="stat-card-value">{{ $totalItems ?? 0 }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <input type="hidden" name="total_productos" value="{{ $totalProductos ?? 0 }}">
+                                <input type="hidden" name="total_items" value="{{ $totalItems ?? 0 }}">
+                            @endif
 
-                        @include('inventario._components.form-field', [
-                            'name' => 'tipo',
-                            'label' => 'Tipo',
-                            'type' => 'select',
-                            'value' => old('tipo'),
-                            'required' => true,
-                            'icon' => 'fas fa-tags',
-                            'placeholder' => 'Seleccionar tipo...',
-                            'options' => [
-                                'prestamo' => 'Préstamo',
-                                'salida' => 'Salida'
-                            ]
-                        ])
-                    </div>
+                            {{-- Sección: Datos del Solicitante --}}
+                            <div class="form-section">
+                                <h4 class="form-section-title">
+                                    <i class="fas fa-user"></i>
+                                    Datos del Solicitante
+                                </h4>
 
-                    <div class="row">
-                        @include('inventario._components.form-field', [
-                            'name' => 'fecha_adquirido',
-                            'label' => 'Fecha de adquisición',
-                            'type' => 'date',
-                            'value' => old('fecha_adquirido'),
-                            'required' => true,
-                            'icon' => 'fas fa-calendar-plus'
-                        ])
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-modern">
+                                            <label>
+                                                <i class="fas fa-user"></i>
+                                                Solicitante
+                                            </label>
+                                            <input
+                                                type="text"
+                                                class="form-control-modern"
+                                                value="{{ auth()->user()->name ?? 'Usuario' }}"
+                                                readonly
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group-modern">
+                                            <label>
+                                                <i class="fas fa-envelope"></i>
+                                                Correo
+                                            </label>
+                                            <input
+                                                type="text"
+                                                class="form-control-modern"
+                                                value="{{ auth()->user()->email ?? '' }}"
+                                                readonly
+                                            >
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="solicitante_email" value="{{ auth()->user()->email ?? '' }}">
+                                    <input type="hidden" name="solicitante_id" value="{{ auth()->id() }}">
+                                </div>
 
-                        @include('inventario._components.form-field', [
-                            'name' => 'fecha_devolucion',
-                            'label' => 'Fecha de devolución',
-                            'type' => 'date',
-                            'value' => old('fecha_devolucion'),
-                            'required' => true,
-                            'icon' => 'fas fa-calendar-minus'
-                        ])
-                    </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-modern">
+                                            <label>
+                                                <i class="fas fa-user-tag"></i>
+                                                Rol
+                                            </label>
+                                            <input
+                                                type="text"
+                                                class="form-control-modern"
+                                                value="{{ (auth()->check() && method_exists(auth()->user(), 'getRoleNames') && auth()->user()->getRoleNames()->first()) ? auth()->user()->getRoleNames()->first() : (auth()->user()->role->name ?? 'N/A') }}"
+                                                readonly
+                                            >
+                                            <input
+                                                type="hidden"
+                                                name="rol"
+                                                value="{{ (auth()->check() && method_exists(auth()->user(), 'getRoleNames') && auth()->user()->getRoleNames()->first()) ? auth()->user()->getRoleNames()->first() : (auth()->user()->role->name ?? '') }}"
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group-modern">
+                                            <label for="programa_formacion">
+                                                <i class="fas fa-graduation-cap"></i>
+                                                Nombre del programa formación
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                class="form-control-modern @error('programa_formacion') is-invalid @enderror"
+                                                id="programa_formacion"
+                                                name="programa_formacion"
+                                                value="{{ old('programa_formacion') }}"
+                                                placeholder="Ej: ADSI, Electricidad, etc."
+                                                required
+                                            >
+                                            @error('programa_formacion')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                    <div class="row">
-                        @include('inventario._components.form-field', [
-                            'name' => 'descripcion',
-                            'label' => 'Descripción',
-                            'type' => 'textarea',
-                            'value' => old('descripcion'),
-                            'required' => true,
-                            'icon' => 'fas fa-comment-alt',
-                            'placeholder' => 'Describe el motivo del préstamo/salida, condiciones especiales, etc.',
-                            'rows' => 4,
-                            'colSize' => 'col-12'
-                        ])
-                    </div>
+                            {{-- Sección: Detalles y Fechas --}}
+                            <div class="form-section">
+                                <h4 class="form-section-title">
+                                    <i class="fas fa-clipboard-list"></i>
+                                    Detalles y Fechas
+                                </h4>
 
-                    @include('inventario._components.form-actions', [
-                        'submitText' => 'Crear Préstamo/Salida',
-                        'submitIcon' => 'fas fa-save',
-                        'cancelRoute' => route('inventario.ordenes.index'),
-                        'cancelText' => 'Cancelar',
-                        'showReset' => true,
-                        'resetText' => 'Limpiar'
-                    ])
-                </form>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-modern">
+                                            <label for="ficha">
+                                                <i class="fas fa-ticket-alt"></i>
+                                                Ficha
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                class="form-control-modern @error('ficha') is-invalid @enderror"
+                                                id="ficha"
+                                                name="ficha"
+                                                value="{{ old('ficha') }}"
+                                                placeholder="Número de ficha"
+                                                required
+                                            >
+                                            @error('ficha')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group-modern">
+                                            <label for="tipo">
+                                                <i class="fas fa-tags"></i>
+                                                Tipo
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <select
+                                                class="form-control-modern @error('tipo') is-invalid @enderror"
+                                                id="tipo"
+                                                name="tipo"
+                                                required
+                                            >
+                                                <option value="">Seleccionar tipo...</option>
+                                                <option value="prestamo" {{ ($tipoInicial ?? '') === 'prestamo' ? 'selected' : '' }}>Préstamo</option>
+                                                <option value="salida" {{ ($tipoInicial ?? '') === 'salida' ? 'selected' : '' }}>Salida</option>
+                                            </select>
+                                            @error('tipo')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6 d-none" id="grupo-fecha-devolucion">
+                                        <div class="form-group-modern">
+                                            <label for="fecha_devolucion">
+                                                <i class="fas fa-calendar-minus"></i>
+                                                Fecha de entrega
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <input
+                                                type="date"
+                                                class="form-control-modern @error('fecha_devolucion') is-invalid @enderror"
+                                                id="fecha_devolucion"
+                                                name="fecha_devolucion"
+                                                value="{{ old('fecha_devolucion') }}"
+                                            >
+                                            @error('fecha_devolucion')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group-modern">
+                                            <label>
+                                                <i class="fas fa-boxes"></i>
+                                                Productos en carrito
+                                            </label>
+                                            <input
+                                                type="number"
+                                                class="form-control-modern"
+                                                value="{{ $totalProductos ?? 0 }}"
+                                                readonly
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Sección: Descripción --}}
+                            <div class="form-section">
+                                <h4 class="form-section-title">
+                                    <i class="fas fa-comment-alt"></i>
+                                    Descripción
+                                </h4>
+
+                                <div class="row">
+                                    <div class="col-12">
+                                        <div class="form-group-modern">
+                                            <label for="descripcion">
+                                                <i class="fas fa-comment-alt"></i>
+                                                Descripción
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <textarea
+                                                class="form-control-modern @error('descripcion') is-invalid @enderror"
+                                                id="descripcion"
+                                                name="descripcion"
+                                                rows="4"
+                                                placeholder="Describe el motivo del préstamo/salida, condiciones especiales, etc."
+                                                required
+                                            >{{ old('descripcion') }}</textarea>
+                                            @error('descripcion')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Botones de Acción --}}
+                        <div class="form-actions-container">
+                            <a href="{{ route('inventario.ordenes.index') }}" class="btn-modern btn-modern-secondary">
+                                <i class="fas fa-times"></i>
+                                Cancelar
+                            </a>
+                            <button type="submit" class="btn-modern btn-modern-success">
+                                <i class="fas fa-save"></i>
+                                Crear Préstamo/Salida
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
-    
+
     {{-- Alertas --}}
     @include('layout.alertas')
-    
+
     {{-- Footer SENA --}}
     @include('inventario._components.sena-footer')
 @endsection
 
 @push('css')
-    @vite(['resources/css/style.css'])
+    @vite(['resources/css/inventario/shared/base.css'])
+    <link href="{{ asset('css/inventario/inventario.css') }}" rel="stylesheet">
 @endpush
 
 @push('scripts')
@@ -163,25 +312,28 @@
 
 @push('scripts')
     <script>
-        // Validación de fechas
+        // Lógica para mostrar/ocultar fecha de entrega según tipo
         document.addEventListener('DOMContentLoaded', function() {
-            const fechaAdquirido = document.getElementById('fecha_adquirido');
+            const tipo = document.getElementById('tipo');
+            const grupoFecha = document.getElementById('grupo-fecha-devolucion');
             const fechaDevolucion = document.getElementById('fecha_devolucion');
             
-            fechaAdquirido.addEventListener('change', function() {
-                fechaDevolucion.min = this.value;
-            });
-            
-            fechaDevolucion.addEventListener('change', function() {
-                if (fechaAdquirido.value && this.value < fechaAdquirido.value) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Fecha inválida',
-                        text: 'La fecha de devolución no puede ser anterior a la fecha de adquisición'
-                    });
-                    this.value = '';
+            function updateFechaEntregaVisibility() {
+                if (!tipo) return;
+                if (tipo.value === 'prestamo') {
+                    grupoFecha.classList.remove('d-none');
+                    fechaDevolucion.setAttribute('required', 'required');
+                } else {
+                    grupoFecha.classList.add('d-none');
+                    fechaDevolucion.removeAttribute('required');
+                    fechaDevolucion.value = '';
                 }
-            });
+            }
+
+            if (tipo) {
+                tipo.addEventListener('change', updateFechaEntregaVisibility);
+                updateFechaEntregaVisibility();
+            }
         });
     </script>
 @endpush
