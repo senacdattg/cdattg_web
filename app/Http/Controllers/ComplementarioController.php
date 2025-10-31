@@ -735,6 +735,68 @@ class ComplementarioController extends Controller
     }
 
     /**
+     * Agregar aspirante existente a un programa complementario
+     */
+    public function agregarAspirante(Request $request, $complementarioId)
+    {
+        $request->validate([
+            'numero_documento' => 'required|string|max:191',
+        ]);
+
+        try {
+            // Verificar que el programa existe
+            $programa = ComplementarioOfertado::findOrFail($complementarioId);
+
+            // Buscar persona por número de documento
+            $persona = Persona::where('numero_documento', $request->numero_documento)->first();
+
+            if (!$persona) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se encontró ninguna persona registrada con el número de documento "' . $request->numero_documento . '".'
+                ]);
+            }
+
+            // Verificar si ya está inscrita en este programa
+            $aspiranteExistente = AspiranteComplementario::where('persona_id', $persona->id)
+                ->where('complementario_id', $complementarioId)
+                ->first();
+
+            if ($aspiranteExistente) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'La persona con documento "' . $request->numero_documento . '" ya se encuentra inscrita en este programa complementario.'
+                ]);
+            }
+
+            // Crear nuevo aspirante
+            AspiranteComplementario::create([
+                'persona_id' => $persona->id,
+                'complementario_id' => $complementarioId,
+                'estado' => 1, // Estado "En proceso"
+                'observaciones' => 'Agregado manualmente desde gestión de aspirantes'
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Aspirante agregado exitosamente. ' . $persona->primer_nombre . ' ' . $persona->primer_apellido . ' ha sido inscrito en el programa.'
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error agregando aspirante: ' . $e->getMessage(), [
+                'complementario_id' => $complementarioId,
+                'numero_documento' => $request->numero_documento,
+                'exception' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error interno del servidor. Por favor intente nuevamente.'
+            ], 500);
+        }
+    }
+
+    /**
      * Mostrar perfil propio del aspirante autenticado
      */
     public function miPerfil()
