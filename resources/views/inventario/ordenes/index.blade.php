@@ -70,7 +70,7 @@
                                         show="true"
                                         edit="true"
                                         delete="true"
-                                        showUrl="#"
+                                        showUrl="{{ route('inventario.ordenes.show', $orden) }}"
                                         editUrl="#"
                                         deleteUrl="#"
                                         showTitle="Ver orden"

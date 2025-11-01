@@ -14,7 +14,7 @@ class OrdenController extends InventarioController
     public function __construct()
     {
         parent::__construct();
-        $this->middleware('can:VER ORDEN')->only('index');
+        $this->middleware('can:VER ORDEN')->only(['index', 'show']);
         $this->middleware('can:CREAR ORDEN')->only(['store', 'storePrestamos']);
         $this->middleware('can:EDITAR ORDEN')->only('update');
     }
@@ -148,18 +148,50 @@ class OrdenController extends InventarioController
             $this->setUserIds($orden);
             $orden->save();
 
-            // Crear detalle para el préstamo/salida con los datos del beneficiario
-            // Nota: Aquí necesitarías un producto predeterminado o un campo adicional para producto
-            // Por ahora creamos un detalle genérico
-            $detalle = new DetalleOrden([
-                'orden_id' => $orden->id,
-                'producto_id' => 1, // Producto por defecto - esto debe ser configurado
-                'cantidad' => 1,
-                'estado_orden_id' => $parametroTipoOrden->id
-            ]);
-            
-            $this->setUserIds($detalle);
-            $detalle->save();
+            // Crear detalles para cada producto en el carrito (no descontar stock aún)
+            $carrito = session('carrito', []);
+            if (empty($carrito) || count($carrito) === 0) {
+                throw new \Exception('El carrito está vacío. Agregue productos antes de crear el préstamo/salida.');
+            }
+
+            // Buscar parámetro de estado PENDIENTE para los detalles
+            $estadoPendiente = ParametroTema::where('codigo', 'PENDIENTE')->first();
+            if (!$estadoPendiente) {
+                throw new \Exception("Parámetro 'PENDIENTE' no encontrado en 'parametros_temas'. Por favor agregue el parámetro con código 'PENDIENTE'.");
+            }
+
+            foreach ($carrito as $item) {
+                // Soportar estructuras de array u objeto del carrito
+                $productoId = null;
+                $cantidad = 1;
+
+                if (is_array($item)) {
+                    $productoId = $item['producto_id'] ?? $item['id'] ?? null;
+                    $cantidad = (int)($item['cantidad'] ?? 1);
+                } elseif (is_object($item)) {
+                    $productoId = $item->producto_id ?? $item->id ?? null;
+                    $cantidad = (int)($item->cantidad ?? 1);
+                }
+
+                if (!$productoId) {
+                    continue; // saltar si no podemos identificar producto
+                }
+
+                $producto = Producto::findOrFail($productoId);
+
+                // Crear detalle en estado pendiente (se mantendrá hasta aprobación)
+                $detalle = new DetalleOrden([
+                    'orden_id' => $orden->id,
+                    'producto_id' => $producto->id,
+                    'cantidad' => $cantidad,
+                    'estado_orden_id' => $estadoPendiente->id
+                ]);
+                $this->setUserIds($detalle);
+                $detalle->save();
+            }
+
+            // Vaciar carrito de sesión tras crear la orden
+            session()->forget('carrito');
 
             // Guardar información adicional del beneficiario en la descripción detallada
             $descripcionDetallada = sprintf(
@@ -362,5 +394,21 @@ class OrdenController extends InventarioController
             'totalProductos',
             'totalItems'
         ));
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(Orden $orden)
+    {
+        $orden->load([
+            'tipoOrden.parametro',
+            'userCreate',
+            'detalles.producto',
+            'detalles.estadoOrden.parametro',
+            'detalles.aprobaciones.aprobador'
+        ]);
+
+        return view('inventario.ordenes.show', compact('orden'));
     }
 }
