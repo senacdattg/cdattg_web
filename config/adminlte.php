@@ -823,17 +823,10 @@ return [
                     ],
                 ],
                 [
-                    'text' => 'Carrito',
+                    'text' => 'Carrito Sena',
+                    'url'  => 'inventario/carrito-sena',
                     'icon' => 'fa-solid fa-cart-plus',
                     'can'  => ['VER CARRITO', 'VER PRODUCTO'],
-                    'submenu' => [
-                        [
-                            'text' => 'Carrito Sena',
-                            'url'  => 'inventario/carrito-sena',
-                            'icon' => 'fa-solid fa-cart-shopping',
-                            'can'  => 'VER CARRITO',
-                        ],
-                    ],
                 ],
                 [
                     'text' => 'Órdenes',
@@ -854,9 +847,15 @@ return [
                             'can'  => 'VER ORDEN',
                         ],
                         [
-                            'text' => 'Órdenes Completadas',
+                            'text' => 'Órdenes Aprobadas',
                             'url'  => 'inventario/ordenes/completadas',
                             'icon' => 'fa-solid fa-check-circle',
+                            'can'  => 'VER ORDEN',
+                        ],
+                        [
+                            'text' => 'Órdenes Rechazadas',
+                            'url'  => 'inventario/ordenes/rechazadas',
+                            'icon' => 'fa-solid fa-times-circle',
                             'can'  => 'VER ORDEN',
                         ],
                     ],
@@ -868,7 +867,7 @@ return [
                     'can'  => 'VER ORDEN',
                     'submenu' => [
                         [
-                            'text' => 'Solicitar Préstamo/Salida',
+                            'text' => 'Solicitar',
                             'url'  => 'inventario/ordenes/solicitar',
                             'icon' => 'fa-solid fa-plus',
                             'can'  => 'CREAR ORDEN',
@@ -876,7 +875,7 @@ return [
                         [
                             'text' => 'Préstamos',
                             'url'  => 'inventario/ordenes/prestamos',
-                            'icon' => 'fa-solid fa-hand-holding-box',
+                            'icon' => 'fa-solid fa-sign-in-alt',
                             'can'  => 'VER ORDEN',
                         ],
                         [
@@ -885,13 +884,13 @@ return [
                             'icon' => 'fa-solid fa-sign-out-alt',
                             'can'  => 'VER ORDEN',
                         ],
+                        [
+                            'text' => 'Devoluciones',
+                            'url'  => 'inventario/ordenes/devoluciones',
+                            'icon' => 'fa-solid fa-undo',
+                            'can'  => 'VER ORDEN',
+                        ],
                     ],
-                ],
-                [
-                    'text' => 'Devoluciones',
-                    'url'  => 'inventario/devoluciones',
-                    'icon' => 'fa-solid fa-undo',
-                    'can'  => 'VER ORDEN',
                 ],
                 [
                     'text' => 'Configuración',
