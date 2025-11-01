@@ -154,8 +154,9 @@
                             <li>
                                 <i class="fas fa-truck"></i>
                                 <strong>Proveedor:</strong>
-                                <span>{{ $producto->contratoConvenio->proveedor->proveedor ?? 'N/A' }}</span>
+                                <span>{{ $producto->proveedor->proveedor ?? 'N/A' }}</span>
                             </li>
+
                             
                             <li>
                                 <i class="fas fa-calendar-times"></i>
