@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('orden_id');
             
             // Relación con producto
-            $table->unsignedBigInteger('productos_id'); 
+            $table->unsignedBigInteger('producto_id'); 
             
             // Estado del detalle de la orden
             $table->unsignedBigInteger('estado_orden_id');
@@ -33,7 +33,7 @@ return new class extends Migration
             
             // Llaves foráneas
             $table->foreign('orden_id')->references('id')->on('ordenes')->onDelete('cascade');
-            $table->foreign('productos_id')->references('id')->on('productos')->onDelete('restrict');
+            $table->foreign('producto_id')->references('id')->on('productos')->onDelete('restrict');
             $table->foreign('estado_orden_id')->references('id')->on('parametros_temas')->onDelete('restrict');
             $table->foreign('user_create_id')->references('id')->on('users')->onDelete('restrict');
             $table->foreign('user_update_id')->references('id')->on('users')->onDelete('restrict');

@@ -164,32 +164,58 @@ class TemaSeeder extends Seeder
             $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
         }
 
-        $tema->parametros()->sync($syncData);
-
-        // Tema 12: CATEGORÍAS
+        // Tema 12: ESTADOS DE ORDEN
         $tema = Tema::create([
             'id'             => 12,
+            'name'           => 'ESTADOS DE ORDEN',
+            'status'         => 1,
+            'user_create_id' => 1,
+            'user_edit_id'   => 1,
+        ]);
+        $syncData = [];
+        foreach ([46, 47, 48] as $id) {
+            $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
+        }
+        $tema->parametros()->sync($syncData);
+
+        // Tema 13: ESTADOS DE APROBACIONES
+        $tema = Tema::create([
+            'id'             => 13,
+            'name'           => 'ESTADOS DE APROBACIONES',
+            'status'         => 1,
+            'user_create_id' => 1,
+            'user_edit_id'   => 1,
+        ]);
+        $syncData = [];
+        foreach ([49, 50] as $id) {
+            $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
+        }
+        $tema->parametros()->sync($syncData);
+
+        // Tema 14: CATEGORÍAS
+        $tema = Tema::create([
+            'id'             => 14,
             'name'           => 'CATEGORÍAS',
             'status'         => 1,
             'user_create_id' => 1,
             'user_edit_id'   => 1,
         ]);
         $syncData = [];
-        foreach (range(46, 54) as $id) {
+        foreach (range(51, 59) as $id) {
             $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
         }
         $tema->parametros()->sync($syncData);
 
-        // Tema 13: MARCAS
+        // Tema 15: MARCAS
         $tema = Tema::create([
-            'id'             => 13,
+            'id'             => 15,
             'name'           => 'MARCAS',
             'status'         => 1,
             'user_create_id' => 1,
             'user_edit_id'   => 1,
         ]);
         $syncData = [];
-        foreach (range(55, 71) as $id) {
+        foreach (range(60, 76) as $id) {
             $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
         }
         $tema->parametros()->sync($syncData);
