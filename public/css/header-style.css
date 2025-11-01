@@ -1,0 +1,70 @@
+/* Estilos para el header de programas públicos */
+.user-avatar-circle {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    color: rgb(0, 0, 0);
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.user-avatar-circle:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: scale(1.05);
+}
+
+.user-avatar-circle-large {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #28a745;
+    border: 3px solid #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 24px;
+    color: white;
+    text-transform: uppercase;
+    margin: 0 auto;
+}
+
+.dropdown-menu-lg {
+    min-width: 280px;
+}
+
+.dropdown-menu-right {
+    right: 0;
+    left: auto;
+}
+
+.user-header {
+    padding: 15px;
+    text-align: center;
+    background-color: rgba(0, 123, 255, 0.1) !important;
+}
+
+.user-footer {
+    padding: 10px;
+    background-color: #f8f9fa;
+}
+
+.btn-flat {
+    border-radius: 0;
+    border: 0;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+}

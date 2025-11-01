@@ -1,14 +1,14 @@
-@extends('layout.master-layout-registro')
-@extends('layout.alertas')
+@extends('complementarios.layout.master-layout-complementarios')
+@section('title', 'Información del Programa | SENA')
 @section('css')
     @vite(['resources/css/formulario_inscripcion.css'])
 @endsection
 @section('content')
-    @include('complementarios.components.header-programas-publicos')
+    
 
-    <div class="container-fluid mt-4">
+    <div class="container-fluid mt-4 px-2 px-md-4">
         <div class="row justify-content-center">
-            <div class="col-lg-10 col-xl-8">
+            <div class="col-12">
                 <div class="text-center mb-4">
                     <h2 class="text-success">Información del Programa</h2>
                     <p class="text-muted">Detalles del programa seleccionado</p>
@@ -60,10 +60,17 @@
                                                 <div class="description-block">
                                                     <span class="description-text">¿ESTÁS INTERESADO?</span>
                                                     <p class="text-muted mb-3">Realiza tu inscripción ahora mismo</p>
+                                                    @auth
+                                                    <a href="{{ route('programas-complementarios.inscripcion', ['id' => $programaData['id']]) }}"
+                                                        class="btn btn-success btn-block">
+                                                        <i class="fas fa-user-plus mr-1"></i> Inscribirse
+                                                    </a>
+                                                    @else
                                                     <button type="button" class="btn btn-success btn-block"
                                                             onclick="openInscripcionModal({{ $programaData['id'] }}, '{{ $programaData['nombre'] }}')">
                                                         <i class="fas fa-user-plus mr-1"></i> Inscribirse
                                                     </button>
+                                                    @endauth
                                                 </div>
                                             </div>
                                         </div>
