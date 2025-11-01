@@ -1,10 +1,9 @@
-@extends('layout.master-layout-registro')
-@extends('layout.alertas')
+@extends('complementarios.layout.master-layout-complementarios')
+@section('title', 'Formulario de Inscripción | SENA')
 @section('css')
     @vite(['resources/css/formulario_inscripcion.css'])
 @endsection
 @section('content')
-     @include('complementarios.components.header-programas-publicos')
 
      <div class="container-fluid mt-4">
          @if(session('user_data'))

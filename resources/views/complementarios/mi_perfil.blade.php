@@ -1,13 +1,15 @@
-@extends('adminlte::page')
+@extends('complementarios.layout.master-layout-complementarios')
 
-@section('title', 'Perfil')
-
-@section('content_header')
-    <h1><i class="fas fa-user-circle mr-2"></i>Perfil</h1>
-    <p class="text-muted mb-0">Información de mi inscripción a programas complementarios</p>
-@stop
+@section('title', 'Mi Perfil | SENA')
 
 @section('content')
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="text-center mb-4">
+                <h2 class="text-success">Mi Perfil</h2>
+                <p class="text-muted">Información de mi inscripción a programas complementarios</p>
+            </div>
 <div class="row">
     <div class="col-md-8">
         <div class="card shadow-sm mb-4">
@@ -155,6 +157,8 @@
                 @endforeach
             </div>
         </div>
+    </div>
+</div>
 @endsection
 
 @section('css')
@@ -166,10 +170,4 @@
         z-index: 100;
     }
 </style>
-@stop
-
-@section('js')
-<script>
-    console.log('Página de perfil del aspirante cargada');
-</script>
 @endsection
