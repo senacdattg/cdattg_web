@@ -6,7 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Inventario\Aprobacion;
 
-class AprobacionesSeeders extends Seeder
+class AprobacionSeeder extends Seeder
 {
     /**
      * Run the database seeds.
