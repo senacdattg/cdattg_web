@@ -831,14 +831,17 @@ class ComplementarioController extends Controller
             return redirect()->route('home')->with('error', 'Acceso no autorizado. Solo los aspirantes pueden acceder a esta sección.');
         }
 
-        $aspirante = AspiranteComplementario::with(['persona', 'complementario'])
+        $aspirantes = AspiranteComplementario::with(['persona', 'complementario'])
             ->where('persona_id', $user->persona_id)
-            ->first();
+            ->get();
 
-        if (!$aspirante) {
+        if ($aspirantes->isEmpty()) {
             return redirect()->route('home')->with('error', 'No se encontró información de aspirante para este usuario.');
         }
 
-        return view('complementarios.mi_perfil', compact('aspirante'));
+        // Usar el primer aspirante para los datos personales (todos tienen la misma persona)
+        $aspirante = $aspirantes->first();
+
+        return view('complementarios.mi_perfil', compact('aspirante', 'aspirantes'));
     }
 }
