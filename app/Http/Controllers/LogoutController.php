@@ -11,7 +11,7 @@ class LogoutController extends Controller
     public function cerrarSesion()
     {
         Auth::logout();
-        return redirect()->route('login.index')->with('success', '¡Sesión cerrada exitosamente!');
+        return redirect('/')->with('success', '¡Sesión cerrada exitosamente!');
     }
     public function logout(){
         Auth::logout();
