@@ -22,13 +22,13 @@
     <link rel="icon" type="image/png" href="{{ asset('img/sena-logo.png') }}">
 </head>
 
-<body class="layout-fullwidth">
+<body class="layout-fullwidth sidebar-collapse">
     <!-- Header -->
     @include('complementarios.layout.header-complementarios')
 
     <!-- Main Content -->
-    <div class="content-wrapper" style="min-height: calc(100vh - 60px);">
-        <div class="content">
+    <div class="content-wrapper" style="min-height: calc(100vh - 60px); margin-left: 0;">
+        <div class="content" style="padding: 0;">
             @yield('content')
         </div>
     </div>
