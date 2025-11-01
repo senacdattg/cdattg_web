@@ -35,7 +35,7 @@ class CategoriaController extends InventarioController
         $categorias = $this->temacategorias->parametros()
             ->with(['userCreate.persona', 'userUpdate.persona'])
             ->wherePivot('status', 1)
-            ->get();
+            ->paginate(10);
 
         // Cargar conteo de productos manualmente para cada categoría
         $categorias->each(function($categoria) {

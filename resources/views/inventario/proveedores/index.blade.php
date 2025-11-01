@@ -46,6 +46,7 @@
                             ['label' => 'Estado', 'width' => '8%'],
                             ['label' => 'Opciones', 'width' => '11%', 'class' => 'text-center']
                         ]"
+                        :pagination="$proveedores->links()"
                     >
                         @forelse ($proveedores as $proveedor)
                             <tr>
@@ -116,4 +117,5 @@
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @vite(['resources/js/pages/formularios-generico.js'])
 @endpush

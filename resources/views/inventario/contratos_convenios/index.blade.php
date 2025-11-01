@@ -44,6 +44,7 @@
                             ['label' => 'Estado', 'width' => '6%'],
                             ['label' => 'Opciones', 'width' => '5%', 'class' => 'text-center']
                         ]"
+                        :pagination="$contratosConvenios->links()"
                     >
                         @forelse ($contratosConvenios as $contrato)
                             <tr>
@@ -143,10 +144,11 @@
 
 @push('css')
     @vite([
-        'public/css/inventario/shared/base.css',
+        'public/css/inventario/shared/base.css',    
     ])
 @endpush
 
 @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    @vite(['resources/js/pages/formularios-generico.js'])
 @endpush

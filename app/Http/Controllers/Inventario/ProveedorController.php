@@ -26,7 +26,7 @@ class ProveedorController extends InventarioController
             ])
             ->withCount('contratosConvenios')
             ->latest()
-            ->get();
+            ->paginate(10);
         return view('inventario.proveedores.index', compact('proveedores'));
     }
 

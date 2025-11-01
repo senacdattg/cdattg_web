@@ -35,7 +35,7 @@ class MarcaController extends InventarioController
         $marcas = $this->temaMarcas->parametros()
             ->with(['userCreate.persona', 'userUpdate.persona'])
             ->wherePivot('status', 1)
-            ->get();
+            ->paginate(10);
 
         // Cargar conteo de productos manualmente para cada marca
         $marcas->each(function($marca) {

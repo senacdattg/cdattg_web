@@ -31,7 +31,7 @@ class OrdenController extends InventarioController
             'detalles.producto'
         ])
         ->latest()
-        ->get();
+        ->paginate(10);
         
         return view('inventario.ordenes.index', compact('ordenes'));
     }

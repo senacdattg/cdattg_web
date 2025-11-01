@@ -18,6 +18,9 @@ li {
     color: #fdfdfd !important;
 }
 
+.bg-light {
+    background-color: #72cd79 !important;
+}
 .text-muted {
     color: #fdfdfd !important;
 }
@@ -35,6 +38,10 @@ li {
 {
     background-color: #007bff !important;
     color: #343a40 !important;
+}
+
+#inventario .text-gray-800 {
+    color: #f2f3f4 !important;
 }
 
 /* Fondo específico solo para el módulo de inventario */

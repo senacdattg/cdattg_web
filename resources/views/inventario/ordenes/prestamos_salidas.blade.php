@@ -260,7 +260,7 @@
                                 </div>
                             </div>
 
-                            {{-- Sección: Descripción --}}
+                            {{-- Sección: Motivo --}}
                             <div class="form-section">
                                 <h4 class="form-section-title">
                                     <i class="fas fa-comment-alt"></i>
@@ -280,7 +280,7 @@
                                                 id="descripcion"
                                                 name="descripcion"
                                                 rows="4"
-                                                placeholder="Describe el motivo del préstamo/salida, condiciones especiales, etc."
+                                                placeholder="Describe el motivo de la solicitud, para qué se necesita, etc."
                                                 required
                                             >{{ old('descripcion') }}</textarea>
                                             @error('descripcion')
