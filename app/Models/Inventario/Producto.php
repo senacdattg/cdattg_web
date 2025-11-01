@@ -96,6 +96,10 @@ class Producto extends Model
         return $this->belongsTo(Ambiente::class);
     }
 
+    public function proveedor()
+    {
+        return $this->belongsTo(Proveedor::class);
+    }
     
     // Relación con detalles de órdenes
     public function detalleOrdenes()
@@ -135,12 +139,12 @@ class Producto extends Model
     }
 
     // Obtener el porcentaje de stock actual
-    public function getPorcentajeStock()
+    public function getPorcentajeStock($stockMaximo = 100)
     {
         if ($this->cantidad <= 0) {
             return 0;
         }
-        return ($this->cantidad / 100) * 100;
+        return round(($this->cantidad / $stockMaximo) * 100, 2);
     }
 
  

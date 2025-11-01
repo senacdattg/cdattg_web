@@ -12,6 +12,7 @@ use App\Models\Parametro;
 use App\Models\Tema;
 use App\Models\Inventario\ContratoConvenio;
 use App\Models\Ambiente;
+use App\Models\Inventario\Proveedor;
 
 
 class ProductoController extends InventarioController
@@ -32,7 +33,9 @@ class ProductoController extends InventarioController
             'estado.parametro',
             'categoria',
             'marca',
-            'contratoConvenio.proveedor'
+            'contratoConvenio',
+            'ambiente',
+            'proveedor'
         ])->get();
         
         return view('inventario.productos.index', compact('productos'));
@@ -73,7 +76,9 @@ class ProductoController extends InventarioController
 
         $ambientes = Ambiente::all();
 
-        return view('inventario.productos.create', compact('tiposProductos', 'unidadesMedida', 'estados', 'categorias', 'marcas', 'contratosConvenios', 'ambientes'));
+        $proveedores = Proveedor::all();
+
+        return view('inventario.productos.create', compact('tiposProductos', 'unidadesMedida', 'estados', 'categorias', 'marcas', 'contratosConvenios', 'ambientes', 'proveedores'));
     }
 
     /**
@@ -94,8 +99,9 @@ class ProductoController extends InventarioController
             'marca_id' => 'required|exists:parametros,id',
             'contrato_convenio_id' => 'required|exists:contratos_convenios,id',
             'ambiente_id' => 'required|exists:ambientes,id',
+            'proveedor_id' => 'required|exists:proveedores,id',
             'fecha_vencimiento' => 'nullable|date',
-            'imagen' => 'nullable|image|mimes:jpg,jpeg,png'
+            'imagen' => 'nullable|image|mimes:jpg,jpeg,png| max:2048'
         ]);
 
         if ($request->hasFile('imagen')){
@@ -124,7 +130,8 @@ class ProductoController extends InventarioController
             'categoria',
             'marca',
             'contratoConvenio',
-            'ambiente'
+            'ambiente',
+            'proveedor',
         ])->findOrFail($id);
         return view('inventario.productos.show', compact('producto'));
     }
