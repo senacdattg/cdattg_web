@@ -104,11 +104,14 @@ class ProductoController extends InventarioController
             'imagen' => 'nullable|image|mimes:jpg,jpeg,png| max:2048'
         ]);
 
-        if ($request->hasFile('imagen')){
+        if ($request->hasFile('imagen')) {
             $nombreArchivo = time() . '.' . $request->imagen->extension();
             $request->imagen->move(public_path('img/inventario'), $nombreArchivo);
             $validated['imagen'] = 'img/inventario/' . $nombreArchivo;
-        }   
+        } else {
+            // Si no se sube imagen, se subirá la imagen por defecto
+            $validated['imagen'] = 'img/inventario/producto-default.png';
+        }
 
         $validated['user_create_id'] = Auth::id();
         $validated['user_update_id'] = Auth::id();
@@ -216,13 +219,13 @@ class ProductoController extends InventarioController
             'imagen' => 'nullable|image|mimes:jpg,jpeg,png'
         ]);
 
-        // Manejar la imagen si se sube una nueva
         if ($request->hasFile('imagen')) {
-            // Eliminar imagen anterior si existe
-            if ($producto->imagen && file_exists(public_path($producto->imagen))) {
+            // Se elimina la imagen si no es la de defecto
+            if ($producto->imagen && 
+                $producto->imagen !== 'img/inventario/producto-default.png' && 
+                file_exists(public_path($producto->imagen))) {
                 unlink(public_path($producto->imagen));
             }
-            
             // Guardar la nueva imagen
             $nombreArchivo = time() . '.' . $request->imagen->extension();
             $request->imagen->move(public_path('img/inventario'), $nombreArchivo);
@@ -247,8 +250,10 @@ class ProductoController extends InventarioController
     {
         $producto = Producto::findOrFail($id);
         
-        // Eliminar la imagen si existe
-        if ($producto->imagen && file_exists(public_path($producto->imagen))) {
+        // Se elimina la imagen si no es la de defecto
+        if ($producto->imagen && 
+            $producto->imagen !== 'img/inventario/producto-default.png' && 
+            file_exists(public_path($producto->imagen))) {
             unlink(public_path($producto->imagen));
         }
         
