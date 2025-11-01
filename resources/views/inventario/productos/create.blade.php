@@ -315,7 +315,7 @@
                                 </div>
                             </div>
 
-                            {{-- Sección: Ubicación y Contratos --}}
+                            {{-- Sección: Ubicación y Proveedor --}}
                             <div class="form-section">
                                 <h4 class="form-section-title">
                                     <i class="fas fa-map-marker-alt"></i>
@@ -342,6 +342,28 @@
                                                 @endforeach
                                             </select>
                                             @error('ambiente_id')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="form-group-modern">
+                                            <label for="proveedor_id">
+                                                <i class="fas fa-truck"></i>
+                                                Proveedor
+                                                <span class="text-danger">*</span>
+                                            </label>
+                                            <select class="form-control-modern @error('proveedor_id') is-invalid @enderror" 
+                                                    id="proveedor_id" name="proveedor_id" required>
+                                                <option value="">Seleccionar proveedor</option>
+                                                @foreach($proveedores as $proveedor)
+                                                    <option value="{{ $proveedor->id }}" {{ old('proveedor_id') == $proveedor->id ? 'selected' : '' }}>
+                                                        {{ $proveedor->proveedor }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('proveedor_id')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
