@@ -7,7 +7,7 @@
 @endsection
 
 @push('css')
-    @vite(['/css/inventario/shared/base.css'])
+    @vite(['public/css/inventario/shared/base.css'])
 @endpush
 
 @section('content_header')

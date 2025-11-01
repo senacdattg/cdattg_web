@@ -36,7 +36,7 @@ class ProductoController extends InventarioController
             'contratoConvenio',
             'ambiente',
             'proveedor'
-        ])->get();
+        ])->paginate(10);
         
         return view('inventario.productos.index', compact('productos'));
     }

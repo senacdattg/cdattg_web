@@ -21,7 +21,7 @@ class DevolucionController extends InventarioController
             ->whereHas('orden', function ($query) {
                 $query->whereNotNull('fecha_devolucion'); // Solo préstamos
             })
-            ->get()
+            ->paginate(10)
             ->filter(function ($detalle) {
                 return !$detalle->estaCompletamenteDevuelto();
             });

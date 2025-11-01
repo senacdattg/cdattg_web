@@ -26,17 +26,14 @@ class ContratoConvenioController extends InventarioController
             'estado.parametro', 
             'userCreate.persona', 
             'userUpdate.persona'
-        ])->latest()->get();
-        
-        // Cargar datos para los modales
-        $proveedores = Proveedor::orderBy('proveedor')->get();
+        ])->latest()->paginate(10);
         
         $estados = ParametroTema::with(['parametro', 'tema'])
             ->whereHas('tema', fn($q) => $q->where('name', 'ESTADOS'))
             ->where('parametros_temas.status', 1)
             ->get();
         
-        return view('inventario.contratos_convenios.index', compact('contratosConvenios', 'proveedores', 'estados'));
+        return view('inventario.contratos_convenios.index', compact('contratosConvenios', 'estados'));
     }
 
     public function create()
