@@ -28,6 +28,7 @@ class Proveedor extends Model
         'email',
         'telefono',
         'direccion',
+        'departamento_id',
         'municipio_id',
         'contacto',
         'estado_id',
@@ -39,6 +40,12 @@ class Proveedor extends Model
     public function estado()
     {
         return $this->belongsTo(\App\Models\ParametroTema::class, 'estado_id');
+    }
+
+    // Relación con el departamento
+    public function departamento()
+    {
+        return $this->belongsTo(\App\Models\Departamento::class);
     }
 
     // Relación con el municipio
