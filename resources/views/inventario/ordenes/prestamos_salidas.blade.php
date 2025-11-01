@@ -30,6 +30,9 @@
                             </span>
                             Préstamo o Salida
                         </h3>
+                        <p class="header-subtitle mt-2 mb-0">
+                            <small class="text-muted">Completa los datos para registrar la solicitud</small>
+                        </p>
                     </div>
 
                     @php($tipoInicial = old('tipo', request('tipo')))
@@ -66,7 +69,56 @@
                                 </div>
                                 <input type="hidden" name="total_productos" value="{{ $totalProductos ?? 0 }}">
                                 <input type="hidden" name="total_items" value="{{ $totalItems ?? 0 }}">
+                            @else
+                                {{-- Resumen dinámico desde carrito (se llenará con JavaScript) --}}
+                                <div class="stats-grid" id="carrito-resumen-stats">
+                                    <div class="stat-card stat-info">
+                                        <div class="stat-card-header">
+                                            <div class="stat-card-icon">
+                                                <i class="fas fa-boxes"></i>
+                                            </div>
+                                            <div>
+                                                <div class="stat-card-label">Productos en la solicitud</div>
+                                                <div class="stat-card-value" id="carrito-total-productos">0</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="stat-card stat-success">
+                                        <div class="stat-card-header">
+                                            <div class="stat-card-icon">
+                                                <i class="fas fa-layer-group"></i>
+                                            </div>
+                                            <div>
+                                                <div class="stat-card-label">Total de ítems</div>
+                                                <div class="stat-card-value" id="carrito-total-items">0</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             @endif
+
+                            {{-- Resumen de productos del carrito --}}
+                            <div class="card mt-3 d-none" id="carrito-items-card">
+                                <div class="card-header bg-light">
+                                    <h5 class="card-title mb-0">
+                                        <i class="fas fa-shopping-cart"></i> Productos del Carrito
+                                    </h5>
+                                </div>
+                                <div class="card-body p-0">
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-hover mb-0">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Producto</th>
+                                                    <th width="100" class="text-center">Cantidad</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="carrito-items-tbody">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
 
                             {{-- Sección: Datos del Solicitante --}}
                             <div class="form-section">
@@ -162,27 +214,6 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-modern">
-                                            <label for="ficha">
-                                                <i class="fas fa-ticket-alt"></i>
-                                                Ficha
-                                                <span class="text-danger">*</span>
-                                            </label>
-                                            <input
-                                                type="text"
-                                                class="form-control-modern @error('ficha') is-invalid @enderror"
-                                                id="ficha"
-                                                name="ficha"
-                                                value="{{ old('ficha') }}"
-                                                placeholder="Número de ficha"
-                                                required
-                                            >
-                                            @error('ficha')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group-modern">
                                             <label for="tipo">
                                                 <i class="fas fa-tags"></i>
                                                 Tipo
@@ -203,14 +234,11 @@
                                             @enderror
                                         </div>
                                     </div>
-                                </div>
-
-                                <div class="row">
                                     <div class="col-md-6 d-none" id="grupo-fecha-devolucion">
                                         <div class="form-group-modern">
                                             <label for="fecha_devolucion">
-                                                <i class="fas fa-calendar-minus"></i>
-                                                Fecha de entrega
+                                                <i class="fas fa-calendar-check"></i>
+                                                Fecha de Devolución
                                                 <span class="text-danger">*</span>
                                             </label>
                                             <input
@@ -220,26 +248,13 @@
                                                 name="fecha_devolucion"
                                                 value="{{ old('fecha_devolucion') }}"
                                             >
+                                            <small class="form-text text-muted d-block mt-1">
+                                                <i class="fas fa-info-circle"></i>
+                                                Fecha en la que se espera devolver los materiales
+                                            </small>
                                             @error('fecha_devolucion')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group-modern">
-                                            <label>
-                                                <i class="fas fa-boxes"></i>
-                                                Productos en carrito
-                                            </label>
-                                            <input
-                                                type="number"
-                                                class="form-control-modern"
-                                                value="{{ $totalProductos ?? 0 }}"
-                                                readonly
-                                            >
                                         </div>
                                     </div>
                                 </div>
@@ -249,7 +264,7 @@
                             <div class="form-section">
                                 <h4 class="form-section-title">
                                     <i class="fas fa-comment-alt"></i>
-                                    Descripción
+                                    Motivo
                                 </h4>
 
                                 <div class="row">
@@ -257,7 +272,7 @@
                                         <div class="form-group-modern">
                                             <label for="descripcion">
                                                 <i class="fas fa-comment-alt"></i>
-                                                Descripción
+                                                Motivo de la solicitud
                                                 <span class="text-danger">*</span>
                                             </label>
                                             <textarea
@@ -294,6 +309,9 @@
         </div>
     </div>
 
+    {{-- Script para cargar datos del carrito y manejar campos dinámicos --}}
+    <script src="{{ asset('js/inventario/solicitud.js') }}"></script>
+
     {{-- Alertas --}}
     @include('layout.alertas')
 
@@ -304,36 +322,4 @@
 @push('css')
     @vite(['public/css/inventario/shared/base.css'])
     <link href="{{ asset('css/inventario/inventario.css') }}" rel="stylesheet">
-@endpush
-
-@push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-@endpush
-
-@push('scripts')
-    <script>
-        // Lógica para mostrar/ocultar fecha de entrega según tipo
-        document.addEventListener('DOMContentLoaded', function() {
-            const tipo = document.getElementById('tipo');
-            const grupoFecha = document.getElementById('grupo-fecha-devolucion');
-            const fechaDevolucion = document.getElementById('fecha_devolucion');
-            
-            function updateFechaEntregaVisibility() {
-                if (!tipo) return;
-                if (tipo.value === 'prestamo') {
-                    grupoFecha.classList.remove('d-none');
-                    fechaDevolucion.setAttribute('required', 'required');
-                } else {
-                    grupoFecha.classList.add('d-none');
-                    fechaDevolucion.removeAttribute('required');
-                    fechaDevolucion.value = '';
-                }
-            }
-
-            if (tipo) {
-                tipo.addEventListener('change', updateFechaEntregaVisibility);
-                updateFechaEntregaVisibility();
-            }
-        });
-    </script>
 @endpush

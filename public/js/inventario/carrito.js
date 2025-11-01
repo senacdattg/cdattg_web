@@ -13,6 +13,54 @@ let cart = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 let productsDetails = {}; // Cache de detalles de productos
 
 /**
+ * Helper para mostrar/ocultar modales 
+ */
+function showModal(elementId) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    try {
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            // Bootstrap 5
+            const modal = new bootstrap.Modal(element);
+            modal.show();
+        } else if (typeof jQuery !== 'undefined') {
+            // Bootstrap 4 con jQuery
+            jQuery(element).modal('show');
+        }
+    } catch (error) {
+        console.error('Error mostrando modal:', error);
+    }
+}
+
+/**
+ * Helper para ocultar modales
+ */
+function hideModal(elementId) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    try {
+        // Intentar primero con Bootstrap 5
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal && typeof bootstrap.Modal.getInstance === 'function') {
+            const modal = bootstrap.Modal.getInstance(element);
+            if (modal) {
+                modal.hide();
+                return;
+            }
+        }
+        
+        // Fallback para Bootstrap 4 con jQuery
+        if (typeof jQuery !== 'undefined') {
+            jQuery(element).modal('hide');
+        }
+    } catch (error) {
+        // Log silencioso - esto es normal si el modal no estaba abierto
+        console.debug('Modal no activo o error al cerrar:', elementId);
+    }
+}
+
+/**
  * Inicialización cuando el DOM está listo
  */
 document.addEventListener('DOMContentLoaded', function() {
@@ -104,27 +152,32 @@ function renderCartItems() {
     tbody.innerHTML = '';
 
     cart.forEach((item, index) => {
-        const product = productsDetails[item.id];
-        if (!product) return;
+        // Usar el nombre del item directamente, o cargar detalles si no existe
+        const productName = item.name || (productsDetails[item.id]?.name || 'Producto desconocido');
+        const product = productsDetails[item.id] || {};
+        const displayName = productName;
+        const displayImage = product.image || '/img/no-image.png';
+        const displayCode = product.code || '';
+        const displayStock = product.stock || item.maxStock || 0;
 
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>
-                <img src="${product.image || '/img/no-image.png'}" 
-                     alt="${product.name}" 
+                <img src="${displayImage}" 
+                     alt="${displayName}" 
                      class="img-thumbnail" 
                      style="max-width: 60px; max-height: 60px; object-fit: cover;"
                      onerror="this.src='/img/no-image.png'">
             </td>
             <td>
-                <strong>${product.name}</strong>
+                <strong>${displayName}</strong>
                 <br>
                 <small class="text-muted">
-                    <i class="fas fa-barcode"></i> ${product.code}
+                    <i class="fas fa-barcode"></i> ${displayCode}
                 </small>
             </td>
             <td class="text-center">
-                <span class="badge badge-info">${product.stock} unidades</span>
+                <span class="badge badge-info">${displayStock} unidades</span>
             </td>
             <td class="text-center">
                 <div class="input-group input-group-sm" style="max-width: 150px; margin: 0 auto;">
@@ -141,17 +194,17 @@ function renderCartItems() {
                            data-index="${index}"
                            value="${item.quantity}" 
                            min="1" 
-                           max="${product.stock}">
+                           max="${displayStock}">
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary btn-increase" 
                                 data-index="${index}" 
                                 type="button"
-                                ${item.quantity >= product.stock ? 'disabled' : ''}>
+                                ${item.quantity >= displayStock ? 'disabled' : ''}>
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
                 </div>
-                ${item.quantity >= product.stock ? '<small class="text-warning d-block mt-1">Máximo alcanzado</small>' : ''}
+                ${item.quantity >= displayStock ? '<small class="text-warning d-block mt-1">Máximo alcanzado</small>' : ''}
             </td>
             <td class="text-center">
                 <button class="btn btn-sm btn-danger btn-remove" 
@@ -252,14 +305,18 @@ function decreaseQuantity(index) {
  * Aumentar cantidad de un item
  */
 function increaseQuantity(index) {
-    const product = productsDetails[cart[index].id];
-    if (cart[index].quantity < product.stock) {
-        cart[index].quantity++;
+    const item = cart[index];
+    const product = productsDetails[item.id];
+    const maxStock = product?.stock || item.maxStock || 0;
+    const productName = item.name || product?.name || 'Producto';
+    
+    if (item.quantity < maxStock) {
+        item.quantity++;
         saveCart();
         renderCartItems();
         updateCartSummary();
     } else {
-        showStockWarning(product.name, product.stock);
+        showStockWarning(productName, maxStock);
     }
 }
 
@@ -267,16 +324,19 @@ function increaseQuantity(index) {
  * Actualizar cantidad de un item
  */
 function updateQuantity(index, newQuantity) {
-    const product = productsDetails[cart[index].id];
+    const item = cart[index];
+    const product = productsDetails[item.id];
+    const maxStock = product?.stock || item.maxStock || 0;
+    const productName = item.name || product?.name || 'Producto';
     
     if (newQuantity < 1) {
         newQuantity = 1;
-    } else if (newQuantity > product.stock) {
-        newQuantity = product.stock;
-        showStockWarning(product.name, product.stock);
+    } else if (newQuantity > maxStock) {
+        newQuantity = maxStock;
+        showStockWarning(productName, maxStock);
     }
 
-    cart[index].quantity = newQuantity;
+    item.quantity = newQuantity;
     saveCart();
     renderCartItems();
     updateCartSummary();
@@ -286,11 +346,13 @@ function updateQuantity(index, newQuantity) {
  * Eliminar item del carrito
  */
 function removeItem(index) {
-    const product = productsDetails[cart[index].id];
+    const item = cart[index];
+    const product = productsDetails[item.id];
+    const productName = item.name || product?.name || 'Producto';
     
     Swal.fire({
         title: '¿Eliminar producto?',
-        html: `¿Estás seguro de eliminar <strong>"${product.name}"</strong> del carrito?`,
+        html: `¿Estás seguro de eliminar <strong>"${productName}"</strong> del carrito?`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -395,9 +457,10 @@ function confirmOrder() {
     
     cart.forEach(item => {
         const product = productsDetails[item.id];
+        const productName = item.name || product?.name || 'Producto';
         summaryHTML += `
             <tr>
-                <td><strong>${product.name}</strong></td>
+                <td><strong>${productName}</strong></td>
                 <td class="text-right">${item.quantity} unidades</td>
             </tr>
         `;
@@ -418,67 +481,34 @@ function confirmOrder() {
     document.getElementById('order-summary-content').innerHTML = summaryHTML;
     
     // Mostrar modal
-    const modal = new bootstrap.Modal(document.getElementById('confirmOrderModal'));
-    modal.show();
+    showModal('confirmOrderModal');
 }
 
 /**
- * Enviar orden al servidor
+ * Enviar orden al servidor - Redirigir a préstamo/salida
  */
 async function submitOrder() {
     const notes = document.getElementById('order-notes')?.value || '';
     
-    // Preparar datos de la orden
+    // Calcular totales
+    const totalProductos = cart.length;
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    
+    // Preparar datos para enviar a la vista de préstamo/salida
     const orderData = {
-        items: cart.map(item => ({
-            producto_id: item.id,
-            cantidad: item.quantity
-        })),
-        notas: notes
+        items: cart,
+        notas: notes,
+        totalProductos: totalProductos,
+        totalItems: totalItems
     };
 
     try {
-        // Mostrar loading
-        Swal.fire({
-            title: 'Procesando solicitud...',
-            html: 'Por favor espera',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
-        const response = await fetch(`${API_BASE_URL}/carrito/agregar`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-            },
-            body: JSON.stringify(orderData)
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            // Limpiar carrito
-            cart = [];
-            saveCart();
-            
-            // Cerrar modal
-            bootstrap.Modal.getInstance(document.getElementById('confirmOrderModal'))?.hide();
-            
-            // Mostrar éxito
-            Swal.fire({
-                icon: 'success',
-                title: '¡Solicitud enviada!',
-                text: 'Tu solicitud ha sido enviada correctamente',
-                confirmButtonText: 'Ver catálogo'
-            }).then(() => {
-                window.location.href = '/inventario/productos/catalogo';
-            });
-        } else {
-            throw new Error(result.message || 'Error al procesar la solicitud');
-        }
+        // Guardar datos en sessionStorage para pasar a la siguiente vista
+        sessionStorage.setItem('carrito_data', JSON.stringify(orderData));
+        
+        // Redirigir a la vista de préstamo/salida
+        window.location.href = '/inventario/ordenes/prestamos-salidas?desde_carrito=true';
+        
     } catch (error) {
         console.error('Error:', error);
         Swal.fire({
@@ -516,7 +546,6 @@ function saveDraft() {
  * Mostrar advertencia de stock
  */
 function showStockWarning(productName, maxStock) {
-    const modal = new bootstrap.Modal(document.getElementById('stockWarningModal'));
     const content = document.getElementById('stock-warning-content');
     
     content.innerHTML = `
@@ -525,7 +554,7 @@ function showStockWarning(productName, maxStock) {
         <p class="text-muted text-center">Stock disponible: ${maxStock} unidades</p>
     `;
     
-    modal.show();
+    showModal('stockWarningModal');
 }
 
 /**
