@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::table('ordenes', function (Blueprint $table) {
             $table->unsignedBigInteger('programa_formacion_id')->nullable()->after('tipo_orden_id');
-            $table->string('ficha', 7)->nullable()->after('programa_formacion_id');
 
             $table->foreign('programa_formacion_id')->references('id')->on('programas_formacion')->onDelete('restrict');
         });
@@ -27,7 +26,7 @@ return new class extends Migration
         Schema::table('ordenes', function (Blueprint $table) {
             $table->dropForeign(['programa_formacion_id']);
             
-            $table->dropColumn(['programa_formacion_id', 'ficha']);
+            $table->dropColumn(['programa_formacion_id']);
         }); 
     }
 };
