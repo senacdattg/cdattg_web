@@ -48,6 +48,11 @@ class DetalleOrden extends Model
         return $this->hasMany(Devolucion::class, 'detalle_orden_id');
     }
 
+    public function aprobacion()
+    {
+        return $this->hasOne(\App\Models\Inventario\Aprobacion::class, 'detalle_orden_id', 'id');
+    }
+
     // Obtener la cantidad total devuelta
     public function getCantidadDevuelta()
     {

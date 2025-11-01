@@ -26,8 +26,16 @@ Route::prefix('inventario')
         // Rutas adicionales para órdenes (sin crear conflictos)
         Route::get('ordenes', [OrdenController::class, 'index'])
             ->name('ordenes.index');
+        Route::get('ordenes/{orden}', [OrdenController::class, 'show'])
+            ->name('ordenes.show');
         Route::put('ordenes/{orden}', [OrdenController::class, 'update'])
             ->name('ordenes.update');
         Route::delete('ordenes/{orden}', [OrdenController::class, 'destroy'])
             ->name('ordenes.destroy');
+
+        // Rutas para aprobar/rechazar detalles de orden (superadministrador)
+        Route::post('ordenes/detalles/{detalle}/aprobar', [\App\Http\Controllers\Inventario\AprobacionController::class, 'aprobar'])
+            ->name('ordenes.detalles.aprobar');
+        Route::post('ordenes/detalles/{detalle}/rechazar', [\App\Http\Controllers\Inventario\AprobacionController::class, 'rechazar'])
+            ->name('ordenes.detalles.rechazar');
     });

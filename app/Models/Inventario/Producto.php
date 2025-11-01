@@ -109,7 +109,7 @@ class Producto extends Model
 
   
     // Verificar si hay stock disponible
-    public function StockDisponible($cantidadRequerida)
+    public function tieneStockDisponible($cantidadRequerida)
     {
         return $this->cantidad >= $cantidadRequerida;
     }
@@ -118,7 +118,7 @@ class Producto extends Model
     // Descontar stock del producto
     public function descontarStock($cantidad)
     {
-        if (!$this->StockDisponible($cantidad)) {
+        if (!$this->tieneStockDisponible($cantidad)) {
             throw new \Exception("Stock insuficiente. Disponible: {$this->cantidad}, Requerido: {$cantidad}");
         }
 
