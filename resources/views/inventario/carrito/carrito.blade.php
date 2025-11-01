@@ -67,21 +67,6 @@
                             </div>
                         </div>
                     </div>
-
-                    {{-- Notas adicionales --}}
-                    <div class="card">
-                        <div class="card-header">
-                            <h3 class="card-title">
-                                <i class="fas fa-sticky-note"></i> Notas de la Solicitud
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <textarea class="form-control" 
-                                      id="order-notes" 
-                                      rows="4" 
-                                      placeholder="Agrega notas o comentarios sobre tu solicitud (opcional)"></textarea>
-                        </div>
-                    </div>
                 </div>
 
                 {{-- Resumen del carrito --}}
@@ -152,24 +137,6 @@
                                     class="btn btn-outline-secondary btn-block mt-2" 
                                     id="btn-save-draft">
                                 <i class="fas fa-save"></i> Guardar Borrador
-                            </button>
-                        </div>
-                    </div>
-
-                    {{-- Ayuda --}}
-                    <div class="card mt-3">
-                        <div class="card-header bg-info">
-                            <h3 class="card-title">
-                                <i class="fas fa-question-circle"></i> ¿Necesitas ayuda?
-                            </h3>
-                        </div>
-                        <div class="card-body">
-                            <p class="text-sm">
-                                Si tienes dudas sobre la disponibilidad de productos o el proceso de solicitud, 
-                                contacta al administrador del inventario.
-                            </p>
-                            <button type="button" class="btn btn-info btn-sm btn-block">
-                                <i class="fas fa-headset"></i> Contactar Soporte
                             </button>
                         </div>
                     </div>

@@ -232,6 +232,10 @@
     box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.1);
 }
 
+#descripcion {
+    padding: 12px 160px !important;
+}
+
 .input-group-modern {
     position: relative;
 }

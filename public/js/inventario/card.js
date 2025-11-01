@@ -11,6 +11,27 @@ const STORAGE_KEY = 'inventario_carrito';
 let cart = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
 /**
+ * Helper para mostrar/ocultar modales compatible con Bootstrap 4 y 5
+ */
+function showModal(elementId) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    try {
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            // Bootstrap 5
+            const modal = new bootstrap.Modal(element);
+            modal.show();
+        } else if (typeof jQuery !== 'undefined') {
+            // Bootstrap 4 con jQuery
+            jQuery(element).modal('show');
+        }
+    } catch (error) {
+        console.error('Error mostrando modal:', error);
+    }
+}
+
+/**
  * Inicialización cuando el DOM está listo
  */
 document.addEventListener('DOMContentLoaded', function() {
@@ -183,7 +204,6 @@ function setupProductActions() {
  * Mostrar detalles del producto en modal
  */
 async function showProductDetails(productId) {
-    const modal = new bootstrap.Modal(document.getElementById('productDetailModal'));
     const contentDiv = document.getElementById('product-detail-content');
 
     // Mostrar loading
@@ -194,7 +214,7 @@ async function showProductDetails(productId) {
         </div>
     `;
     
-    modal.show();
+    showModal('productDetailModal');
 
     try {
         const response = await fetch(`${API_BASE_URL}/productos/${productId}`, {

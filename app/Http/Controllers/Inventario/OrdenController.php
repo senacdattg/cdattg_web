@@ -341,26 +341,8 @@ class OrdenController extends InventarioController
         ])
         ->latest()
         ->get();
-
-        // Resumen del carrito para la vista de préstamos/salidas
-        $carrito = session('carrito', []);
-        $totalProductos = is_countable($carrito) ? count($carrito) : 0;
-        $totalItems = 0;
-        if (is_iterable($carrito)) {
-            foreach ($carrito as $item) {
-                if (is_array($item)) {
-                    $totalItems += (int)($item['cantidad'] ?? 0);
-                } elseif (is_object($item)) {
-                    $totalItems += (int)($item->cantidad ?? 0);
-                }
-            }
-        }
-
         return view('inventario.ordenes.prestamos_salidas', compact(
             'ordenes',
-            'carrito',
-            'totalProductos',
-            'totalItems'
         ));
     }
 }

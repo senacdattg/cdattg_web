@@ -13,6 +13,54 @@ let cart = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 let productsDetails = {}; // Cache de detalles de productos
 
 /**
+ * Helper para mostrar/ocultar modales 
+ */
+function showModal(elementId) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    try {
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            // Bootstrap 5
+            const modal = new bootstrap.Modal(element);
+            modal.show();
+        } else if (typeof jQuery !== 'undefined') {
+            // Bootstrap 4 con jQuery
+            jQuery(element).modal('show');
+        }
+    } catch (error) {
+        console.error('Error mostrando modal:', error);
+    }
+}
+
+/**
+ * Helper para ocultar modales
+ */
+function hideModal(elementId) {
+    const element = document.getElementById(elementId);
+    if (!element) return;
+    
+    try {
+        // Intentar primero con Bootstrap 5
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal && typeof bootstrap.Modal.getInstance === 'function') {
+            const modal = bootstrap.Modal.getInstance(element);
+            if (modal) {
+                modal.hide();
+                return;
+            }
+        }
+        
+        // Fallback para Bootstrap 4 con jQuery
+        if (typeof jQuery !== 'undefined') {
+            jQuery(element).modal('hide');
+        }
+    } catch (error) {
+        // Log silencioso - esto es normal si el modal no estaba abierto
+        console.debug('Modal no activo o error al cerrar:', elementId);
+    }
+}
+
+/**
  * Inicialización cuando el DOM está listo
  */
 document.addEventListener('DOMContentLoaded', function() {
@@ -433,67 +481,34 @@ function confirmOrder() {
     document.getElementById('order-summary-content').innerHTML = summaryHTML;
     
     // Mostrar modal
-    const modal = new bootstrap.Modal(document.getElementById('confirmOrderModal'));
-    modal.show();
+    showModal('confirmOrderModal');
 }
 
 /**
- * Enviar orden al servidor
+ * Enviar orden al servidor - Redirigir a préstamo/salida
  */
 async function submitOrder() {
     const notes = document.getElementById('order-notes')?.value || '';
     
-    // Preparar datos de la orden
+    // Calcular totales
+    const totalProductos = cart.length;
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    
+    // Preparar datos para enviar a la vista de préstamo/salida
     const orderData = {
-        items: cart.map(item => ({
-            producto_id: item.id,
-            cantidad: item.quantity
-        })),
-        notas: notes
+        items: cart,
+        notas: notes,
+        totalProductos: totalProductos,
+        totalItems: totalItems
     };
 
     try {
-        // Mostrar loading
-        Swal.fire({
-            title: 'Procesando solicitud...',
-            html: 'Por favor espera',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
-        const response = await fetch(`${API_BASE_URL}/carrito/agregar`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
-            },
-            body: JSON.stringify(orderData)
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            // Limpiar carrito
-            cart = [];
-            saveCart();
-            
-            // Cerrar modal
-            bootstrap.Modal.getInstance(document.getElementById('confirmOrderModal'))?.hide();
-            
-            // Mostrar éxito
-            Swal.fire({
-                icon: 'success',
-                title: '¡Solicitud enviada!',
-                text: 'Tu solicitud ha sido enviada correctamente',
-                confirmButtonText: 'Ver catálogo'
-            }).then(() => {
-                window.location.href = '/inventario/productos/catalogo';
-            });
-        } else {
-            throw new Error(result.message || 'Error al procesar la solicitud');
-        }
+        // Guardar datos en sessionStorage para pasar a la siguiente vista
+        sessionStorage.setItem('carrito_data', JSON.stringify(orderData));
+        
+        // Redirigir a la vista de préstamo/salida
+        window.location.href = '/inventario/ordenes/prestamos-salidas?desde_carrito=true';
+        
     } catch (error) {
         console.error('Error:', error);
         Swal.fire({
@@ -531,7 +546,6 @@ function saveDraft() {
  * Mostrar advertencia de stock
  */
 function showStockWarning(productName, maxStock) {
-    const modal = new bootstrap.Modal(document.getElementById('stockWarningModal'));
     const content = document.getElementById('stock-warning-content');
     
     content.innerHTML = `
@@ -540,7 +554,7 @@ function showStockWarning(productName, maxStock) {
         <p class="text-muted text-center">Stock disponible: ${maxStock} unidades</p>
     `;
     
-    modal.show();
+    showModal('stockWarningModal');
 }
 
 /**
