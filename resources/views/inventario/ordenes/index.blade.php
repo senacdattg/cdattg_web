@@ -106,7 +106,6 @@
 @push('css')
     @vite([
         'public/css/inventario/shared/base.css',
-        'public/css/style.css'
     ])
 @endpush
 
