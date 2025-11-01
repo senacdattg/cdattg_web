@@ -136,6 +136,17 @@
                                             </td>
                                         </tr>
                                         <tr>
+                                            <th class="py-3">Departamento</th>
+                                            <td class="py-3">
+                                                @if($proveedor->departamento)
+                                                    <i class="fas fa-map-marker-alt mr-1"></i>
+                                                    {{ $proveedor->departamento->departamento }}
+                                                @else
+                                                    <span class="text-muted">No especificado</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <th class="py-3">Municipio</th>
                                             <td class="py-3">
                                                 @if($proveedor->municipio)

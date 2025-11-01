@@ -40,6 +40,7 @@
                             ['label' => 'Email', 'width' => '12%'],
                             ['label' => 'Teléfono', 'width' => '8%'],
                             ['label' => 'Dirección', 'width' => '12%'],
+                            ['label' => 'Departamento', 'width' => '9%'],
                             ['label' => 'Municipio', 'width' => '10%'],
                             ['label' => 'Contacto', 'width' => '10%'],
                             ['label' => 'Contratos', 'width' => '6%'],
@@ -56,6 +57,7 @@
                                 <td>{{ $proveedor->email ?? 'N/A' }}</td>
                                 <td>{{ $proveedor->telefono ?? 'N/A' }}</td>
                                 <td>{{ $proveedor->direccion ?? 'N/A' }}</td>
+                                <td>{{ $proveedor->departamento->departamento ?? 'N/A' }}</td>
                                 <td>{{ $proveedor->municipio->municipio ?? 'N/A' }}</td>
                                 <td>{{ $proveedor->contacto ?? 'N/A' }}</td>
                                 <td>

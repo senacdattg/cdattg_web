@@ -44,6 +44,10 @@ li {
     color: #f2f3f4 !important;
 }
 
+#municipio_id {
+    padding: .375rem .75rem !important;
+}
+
 /* Fondo específico solo para el módulo de inventario */
 body .content-wrapper {
   background: linear-gradient(to bottom, 

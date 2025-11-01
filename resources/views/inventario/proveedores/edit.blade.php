@@ -135,6 +135,26 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
+                                            <label for="departamento_id">Departamento</label>
+                                            <select
+                                                class="form-control @error('departamento_id') is-invalid @enderror"
+                                                id="departamento_id"
+                                                name="departamento_id"
+                                            >
+                                                <option value="">Seleccione un departamento</option>
+                                                @foreach(\App\Models\Departamento::orderBy('departamento')->get() as $departamento)
+                                                    <option value="{{ $departamento->id }}" {{ old('departamento_id', $proveedor->departamento_id) == $departamento->id ? 'selected' : '' }}>
+                                                        {{ $departamento->departamento }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('departamento_id')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-12">
+                                        <div class="form-group">
                                             <label for="municipio_id">Municipio</label>
                                             <select
                                                 class="form-control @error('municipio_id') is-invalid @enderror"
