@@ -1,9 +1,10 @@
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #40c240;">
+<nav class="navbar navbar-expand-lg navbar-light" style="background-color: #40c240; margin-top: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
     <div class="container-fluid">
-        <a class="navbar-brand text-white" href="{{ route('programas-complementarios.publicos') }}">
+        <a class="navbar-brand text-white d-flex align-items-center" href="{{ route('programas-complementarios.publicos') }}">
             <img src="{{ asset('vendor/adminlte/dist/img/LogoSena.png') }}" alt="SENA Logo" height="40" class="me-2 rounded-circle bg-white p-1">
-            <strong>SENA Regional Guaviare</strong>
+            <span class="d-none d-lg-inline"><strong>SENA Regional Guaviare</strong></span>
+            <span class="d-lg-none"><strong>SENA</strong></span>
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -12,6 +13,11 @@
 
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link text-white" href="/home">
+                        <i class="fas fa-home me-1"></i> Inicio
+                    </a>
+                </li>
                 <li class="nav-item">
                     <a class="nav-link text-white" href="{{ route('programas-complementarios.publicos') }}">
                         <i class="fas fa-graduation-cap me-1"></i> Programas
