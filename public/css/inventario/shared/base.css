@@ -21,6 +21,22 @@ li {
 .text-muted {
     color: #fdfdfd !important;
 }
+
+.text-dark {
+    color: #fdfdfd !important;
+}
+.dashboard-header
+{
+    background-color: #00041d05 !important;
+    color: #ffffff !important;
+}
+
+[class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link.active, [class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link.active:focus, [class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link.active:hover
+{
+    background-color: #007bff !important;
+    color: #343a40 !important;
+}
+
 /* Fondo específico solo para el módulo de inventario */
 body .content-wrapper {
   background: linear-gradient(to bottom, 
@@ -64,5 +80,4 @@ body .content-wrapper {
         padding-right: 1rem;
     }
 }
-
 

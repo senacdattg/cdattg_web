@@ -105,13 +105,12 @@
     @include('layout.alertas')
     
     {{-- Footer SENA --}}
-    @include('inventario._components.sena-footer')
+    @include('layout.footer')
 @endsection
 
 @push('css')
     @vite([
         'public/css/inventario/shared/base.css',
-        'public/css/style.css'
     ])
 @endpush
 
