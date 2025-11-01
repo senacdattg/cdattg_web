@@ -104,27 +104,32 @@ function renderCartItems() {
     tbody.innerHTML = '';
 
     cart.forEach((item, index) => {
-        const product = productsDetails[item.id];
-        if (!product) return;
+        // Usar el nombre del item directamente, o cargar detalles si no existe
+        const productName = item.name || (productsDetails[item.id]?.name || 'Producto desconocido');
+        const product = productsDetails[item.id] || {};
+        const displayName = productName;
+        const displayImage = product.image || '/img/no-image.png';
+        const displayCode = product.code || '';
+        const displayStock = product.stock || item.maxStock || 0;
 
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>
-                <img src="${product.image || '/img/no-image.png'}" 
-                     alt="${product.name}" 
+                <img src="${displayImage}" 
+                     alt="${displayName}" 
                      class="img-thumbnail" 
                      style="max-width: 60px; max-height: 60px; object-fit: cover;"
                      onerror="this.src='/img/no-image.png'">
             </td>
             <td>
-                <strong>${product.name}</strong>
+                <strong>${displayName}</strong>
                 <br>
                 <small class="text-muted">
-                    <i class="fas fa-barcode"></i> ${product.code}
+                    <i class="fas fa-barcode"></i> ${displayCode}
                 </small>
             </td>
             <td class="text-center">
-                <span class="badge badge-info">${product.stock} unidades</span>
+                <span class="badge badge-info">${displayStock} unidades</span>
             </td>
             <td class="text-center">
                 <div class="input-group input-group-sm" style="max-width: 150px; margin: 0 auto;">
@@ -141,17 +146,17 @@ function renderCartItems() {
                            data-index="${index}"
                            value="${item.quantity}" 
                            min="1" 
-                           max="${product.stock}">
+                           max="${displayStock}">
                     <div class="input-group-append">
                         <button class="btn btn-outline-secondary btn-increase" 
                                 data-index="${index}" 
                                 type="button"
-                                ${item.quantity >= product.stock ? 'disabled' : ''}>
+                                ${item.quantity >= displayStock ? 'disabled' : ''}>
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
                 </div>
-                ${item.quantity >= product.stock ? '<small class="text-warning d-block mt-1">Máximo alcanzado</small>' : ''}
+                ${item.quantity >= displayStock ? '<small class="text-warning d-block mt-1">Máximo alcanzado</small>' : ''}
             </td>
             <td class="text-center">
                 <button class="btn btn-sm btn-danger btn-remove" 
@@ -252,14 +257,18 @@ function decreaseQuantity(index) {
  * Aumentar cantidad de un item
  */
 function increaseQuantity(index) {
-    const product = productsDetails[cart[index].id];
-    if (cart[index].quantity < product.stock) {
-        cart[index].quantity++;
+    const item = cart[index];
+    const product = productsDetails[item.id];
+    const maxStock = product?.stock || item.maxStock || 0;
+    const productName = item.name || product?.name || 'Producto';
+    
+    if (item.quantity < maxStock) {
+        item.quantity++;
         saveCart();
         renderCartItems();
         updateCartSummary();
     } else {
-        showStockWarning(product.name, product.stock);
+        showStockWarning(productName, maxStock);
     }
 }
 
@@ -267,16 +276,19 @@ function increaseQuantity(index) {
  * Actualizar cantidad de un item
  */
 function updateQuantity(index, newQuantity) {
-    const product = productsDetails[cart[index].id];
+    const item = cart[index];
+    const product = productsDetails[item.id];
+    const maxStock = product?.stock || item.maxStock || 0;
+    const productName = item.name || product?.name || 'Producto';
     
     if (newQuantity < 1) {
         newQuantity = 1;
-    } else if (newQuantity > product.stock) {
-        newQuantity = product.stock;
-        showStockWarning(product.name, product.stock);
+    } else if (newQuantity > maxStock) {
+        newQuantity = maxStock;
+        showStockWarning(productName, maxStock);
     }
 
-    cart[index].quantity = newQuantity;
+    item.quantity = newQuantity;
     saveCart();
     renderCartItems();
     updateCartSummary();
@@ -286,11 +298,13 @@ function updateQuantity(index, newQuantity) {
  * Eliminar item del carrito
  */
 function removeItem(index) {
-    const product = productsDetails[cart[index].id];
+    const item = cart[index];
+    const product = productsDetails[item.id];
+    const productName = item.name || product?.name || 'Producto';
     
     Swal.fire({
         title: '¿Eliminar producto?',
-        html: `¿Estás seguro de eliminar <strong>"${product.name}"</strong> del carrito?`,
+        html: `¿Estás seguro de eliminar <strong>"${productName}"</strong> del carrito?`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
@@ -395,9 +409,10 @@ function confirmOrder() {
     
     cart.forEach(item => {
         const product = productsDetails[item.id];
+        const productName = item.name || product?.name || 'Producto';
         summaryHTML += `
             <tr>
-                <td><strong>${product.name}</strong></td>
+                <td><strong>${productName}</strong></td>
                 <td class="text-right">${item.quantity} unidades</td>
             </tr>
         `;
