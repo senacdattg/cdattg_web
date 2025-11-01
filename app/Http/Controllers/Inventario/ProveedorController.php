@@ -22,6 +22,7 @@ class ProveedorController extends InventarioController
                 'userCreate.persona',
                 'userUpdate.persona',
                 'estado.parametro',
+                'departamento',
                 'municipio'
             ])
             ->withCount('contratosConvenios')
@@ -42,7 +43,8 @@ class ProveedorController extends InventarioController
             'userCreate.persona',
             'userUpdate.persona',
             'estado.parametro',
-            'municipio.departamento'
+            'departamento',
+            'municipio'
         ]);
         return view('inventario.proveedores.show', compact('proveedor'));
     }
@@ -60,6 +62,7 @@ class ProveedorController extends InventarioController
             'email' => 'nullable|email|max:255',
             'telefono' => 'nullable|string|max:10',
             'direccion' => 'nullable|string|max:255',
+            'departamento_id' => 'nullable|exists:departamentos,id',
             'municipio_id' => 'nullable|exists:municipios,id',
             'contacto' => 'nullable|string|max:100',
             'estado_id' => 'nullable|exists:parametros_temas,id'
@@ -83,6 +86,7 @@ class ProveedorController extends InventarioController
             'email' => 'nullable|email|max:255|unique:proveedores,email,' . $proveedor->id,
             'telefono' => 'nullable|string|max:10',
             'direccion' => 'nullable|string|max:255',
+            'departamento_id' => 'nullable|exists:departamentos,id',
             'municipio_id' => 'nullable|exists:municipios,id',
             'contacto' => 'nullable|string|max:100',
             'estado_id' => 'nullable|exists:parametros_temas,id'
