@@ -13,17 +13,18 @@ return new class extends Migration
     {
         Schema::create('aprobaciones', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('orden_id');
-            $table->unsignedBigInteger('producto_id');
-            $table->integer('cantidad');
-            $table->unsignedBigInteger('aprobador_id')->nullable();
-            $table->timestamp('fecha_aprobacion')->nullable();
-            $table->text('observaciones')->nullable();
+            
+            $table->unsignedBigInteger('detalle_orden_id');
+            $table->unsignedBigInteger('estado_aprobacion_id');
+            $table->unsignedBigInteger('user_create_id');
+            $table->unsignedBigInteger('user_update_id');
+
             $table->timestamps();
 
-            $table->foreign('orden_id')->references('id')->on('ordenes')->onDelete('cascade');
-            $table->foreign('producto_id')->references('id')->on('productos')->onDelete('restrict');
-            $table->foreign('aprobador_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('detalle_orden_id')->references('id')->on('detalle_ordenes')->onDelete('restrict');
+            $table->foreign('estado_aprobacion_id')->references('id')->on('parametros_temas')->onDelete('restrict');
+            $table->foreign('user_create_id')->references('id')->on('users')->onDelete('restrict');
+            $table->foreign('user_update_id')->references('id')->on('users')->onDelete('restrict');
         });
     }
 

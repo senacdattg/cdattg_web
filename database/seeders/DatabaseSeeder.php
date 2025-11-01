@@ -84,6 +84,7 @@ class DatabaseSeeder extends Seeder
             ProveedoresSeeder::class, //Crear proveedores
             ContratosConveniosSeeder::class, //Crear contratos y convenios
             ProductoSeeder::class, // Crear productos para agregar al módulo de inventario
+            DetalleOrdenSeeder::class, // Crear detalles de ordenes
         ]);
     }
 }

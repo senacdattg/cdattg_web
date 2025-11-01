@@ -14,7 +14,7 @@ class Aprobacion extends Model
 
     protected $fillable = [
         'detalle_orden_id',
-        'estado_id',
+        'estado_aprobacion_id',
         'user_create_id',
         'user_update_id'
     ];
@@ -26,7 +26,7 @@ class Aprobacion extends Model
 
     public function estado()
     {
-        return $this->belongsTo(\App\Models\ParametroTema::class, 'estado_id');
+        return $this->belongsTo(\App\Models\ParametroTema::class, 'estado_aprobacion_id');
     }
 
     public function aprobador()
