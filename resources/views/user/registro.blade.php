@@ -19,6 +19,21 @@
                         'departamentos' => \App\Models\Departamento::all(),
                     ])
 
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary btn-block">
+                                <i class="fas fa-user-plus mr-2"></i>Registrarme
+                            </button>
+                        </div>
+                    </div>
+
+                    <script>
+                        // Mostrar preloader al enviar el formulario
+                        document.getElementById('registroForm').addEventListener('submit', function() {
+                            $('body').addClass('preloader-active');
+                        });
+                    </script>
+
                     <script>
                         document.addEventListener('DOMContentLoaded', function() {
                             // Configurar conversión a mayúsculas

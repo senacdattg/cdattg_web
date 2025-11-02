@@ -49,7 +49,7 @@
                                     <p class="text-muted mb-3">Realiza tu inscripción ahora mismo</p>
                                     @auth
                                     <a href="{{ route('programas-complementarios.inscripcion', ['id' => $programaData['id']]) }}"
-                                        class="btn btn-success btn-block">
+                                        class="btn btn-success btn-block" data-show-preloader>
                                         <i class="fas fa-user-plus mr-1"></i> Inscribirse
                                     </a>
                                     @else

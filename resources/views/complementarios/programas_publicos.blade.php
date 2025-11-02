@@ -1,8 +1,6 @@
 @extends('complementarios.layout.master-layout-complementarios')
 @section('title', 'Programas Complementarios | SENA')
-@section('css')
-    @vite(['resources/css/programas_publicos.css'])
-@endsection
+
 @section('content')
     
 
