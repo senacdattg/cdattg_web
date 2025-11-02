@@ -359,6 +359,12 @@ return [
             'url' => 'home',
             'icon' => 'fas fa-fw fa-tachometer-alt',
         ],
+        [
+            'text' => 'Notificaciones',
+            'url' => 'notifications',
+            'icon' => 'fas fa-fw fa-bell',
+            'can' => 'superadministrador',
+        ],
 
         // ========================================
         // MÓDULO: CONFIGURACIÓN DEL SISTEMA
@@ -798,6 +804,11 @@ return [
                     'can'  => 'VER PRODUCTO',
                 ],
                 [
+                    'text' => 'Notificaciones',
+                    'url' => '/inventario/notifications',
+                    'icon' => 'fa-solid fa-bell',
+                ],
+                [
                     'text' => 'Productos',
                     'icon' => 'fa-solid fa-box',
                     'can'  => 'VER PRODUCTO',
@@ -1087,4 +1098,3 @@ return [
         'public/css/app.css',
     ],
 ];
-
