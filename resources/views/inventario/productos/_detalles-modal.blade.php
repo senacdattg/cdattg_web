@@ -31,8 +31,18 @@
             <td>Stock:</td>
             <td>
                 <span class="modal-badge {{ $producto->cantidad > 0 ? 'badge-success' : 'badge-danger' }}">
-                    {{ $producto->cantidad }} {{ $producto->unidadMedida->parametro->name ?? 'unidades' }}
+                    {{ $producto->cantidad }} unidades
                 </span>
+            </td>
+        </tr>
+        <tr>
+            <td>Peso:</td>
+            <td>
+                @if($producto->peso)
+                    {{ $producto->peso }} kg
+                @else
+                    N/A
+                @endif
             </td>
         </tr>
         <tr>

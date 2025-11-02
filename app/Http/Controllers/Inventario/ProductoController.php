@@ -287,18 +287,45 @@ class ProductoController extends InventarioController
      */
     public function catalogo()
     {
-        $productos = Producto::with([
+        // Obtener el ParametroTema del estado "AGOTADO"
+        // Primero obtener el Parámetro con ID 43 (AGOTADO)
+        $parametroAgotado = Parametro::find(43);
+
+        $query = Producto::with([
             'tipoProducto.parametro',
             'unidadMedida.parametro',
             'estado.parametro',
-            'categoria',
-            'marca',
             'contratoConvenio',
             'ambiente'
         ])
         ->where('cantidad', '>', 0) // Solo productos con stock
-        ->orderBy('producto', 'asc')
-        ->get();
+        ->orderBy('producto', 'asc');
+
+        // Excluir productos con estado "AGOTADO"
+        if ($parametroAgotado) {
+            // Buscar el ParametroTema para este parámetro
+            $estadoAgotadoTema = ParametroTema::where('parametro_id', 43)
+                ->whereHas('tema', function($query) {
+                    $query->where('name', 'ESTADOS DE PRODUCTO');
+                })
+                ->first();
+            
+            if ($estadoAgotadoTema) {
+                $query->where('estado_producto_id', '!=', $estadoAgotadoTema->id);
+            }
+        }
+
+        $productos = $query->paginate(12);
+
+        // Cargar marca y categoria directamente para cada producto
+        $productos->each(function($producto) {
+            if ($producto->marca_id) {
+                $producto->marca = Parametro::find($producto->marca_id);
+            }
+            if ($producto->categoria_id) {
+                $producto->categoria = Parametro::find($producto->categoria_id);
+            }
+        });
 
         // Obtener categorías desde ParametroTema
         $temaCategorias = Tema::where('name', 'CATEGORIAS')->first();

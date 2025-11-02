@@ -41,6 +41,7 @@
                             ['label' => 'Marca', 'width' => '10%'],
                             ['label' => 'Cantidad', 'width' => '8%'],
                             ['label' => 'Peso', 'width' => '8%'],
+                            ['label' => 'Estado', 'width' => '8%'],
                             ['label' => 'Contrato', 'width' => '8%'],
                             ['label' => 'Proveedor', 'width' => '12%'],
                             ['label' => 'Opciones', 'width' => '11%', 'class' => 'text-center']
@@ -90,6 +91,29 @@
                                     @else
                                         <small class="text-muted">N/A</small>
                                     @endif
+                                </td>
+                                <td>
+                                    @php
+                                        $estadoClass = 'success';
+                                        $estadoText = 'DISPONIBLE';
+                                        
+                                        // Verificar el estado del producto primero
+                                        $estadoProducto = $producto->estado?->parametro?->name;
+                                        
+                                        if ($estadoProducto === 'AGOTADO') {
+                                            $estadoClass = 'danger';
+                                            $estadoText = 'AGOTADO';
+                                        } elseif ($producto->cantidad <= 0) {
+                                            $estadoClass = 'danger';
+                                            $estadoText = 'AGOTADO';
+                                        } elseif ($producto->cantidad <= 5) {
+                                            $estadoClass = 'warning';
+                                            $estadoText = 'BAJO STOCK';
+                                        }
+                                    @endphp
+                                    <span class="badge badge-{{ $estadoClass }}">
+                                        {{ $estadoText }}
+                                    </span>
                                 </td>
                                 <td>
                                     <small>
