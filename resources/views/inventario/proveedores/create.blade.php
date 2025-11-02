@@ -116,7 +116,7 @@
                                 </div>
 
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-12">
                                         <div class="form-group">
                                             <label for="direccion">Dirección</label>
                                             <input
@@ -132,46 +132,11 @@
                                             @enderror
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="departamento_id">Departamento</label>
-                                            <select
-                                                class="form-control @error('departamento_id') is-invalid @enderror"
-                                                id="departamento_id"
-                                                name="departamento_id"
-                                            >
-                                                <option value="">Seleccione un departamento</option>
-                                                @foreach($departamentos as $departamento)
-                                                    <option value="{{ $departamento->id }}" {{ old('departamento_id') == $departamento->id ? 'selected' : '' }}>
-                                                        {{ $departamento->departamento }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            @error('departamento_id')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12">
-                                        <div class="form-group">
-                                            <label for="municipio_id">Municipio</label>
-                                            <select
-                                                class="form-control @error('municipio_id') is-invalid @enderror"
-                                                id="municipio_id"
-                                                name="municipio_id"
-                                            >
-                                                <option value="">Seleccione un municipio</option>
-                                                @foreach($municipios as $municipio)
-                                                    <option value="{{ $municipio->id }}" {{ old('municipio_id') == $municipio->id ? 'selected' : '' }}>
-                                                        {{ $municipio->municipio }} ({{ $municipio->departamento->departamento ?? '' }})
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            @error('municipio_id')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                    </div>
+                                    {{-- Componente de filtro departamento-municipio --}}
+                                    @include('inventario._components.filtro-departamento', [
+                                        'departamentos' => $departamentos,
+                                        'municipios' => $municipios
+                                    ])
                                 </div>
 
                                 <div class="row">
@@ -257,3 +222,20 @@
 @section('footer')
     @include('layout.footer')
 @endsection
+
+<script src="{{ asset('js/inventario/filtro-departamento.js') }}"></script>
+<script>
+    // Pasar datos de municipios al JavaScript
+    window.municipiosData = @json($municipios->map(function($m) {
+        return [
+            'id' => $m->id,
+            'municipio' => $m->municipio,
+            'departamento' => $m->departamento->departamento ?? ''
+        ];
+    }));
+
+    // Inicializar filtro con el municipio seleccionado
+    document.addEventListener('DOMContentLoaded', function() {
+        initFiltroMunicipios({{ json_encode(old('municipio_id')) }});
+    });
+</script>

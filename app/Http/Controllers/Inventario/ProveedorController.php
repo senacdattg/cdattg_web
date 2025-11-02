@@ -55,7 +55,9 @@ class ProveedorController extends InventarioController
 
     public function edit(Proveedor $proveedor)
     {
-        return view('inventario.proveedores.edit', compact('proveedor'));
+        $departamentos = Departamento::orderBy('departamento')->get();
+        $municipios = Municipio::with('departamento')->orderBy('municipio')->get();
+        return view('inventario.proveedores.edit', compact('proveedor', 'departamentos', 'municipios'));
     }
 
     public function store(Request $request)
@@ -113,5 +115,24 @@ class ProveedorController extends InventarioController
         } catch (\Exception $e) {
             return back()->with('error', 'No se puede eliminar el proveedor porque está en uso.');
         }
+    }
+
+    /**
+     * Obtener municipios por departamento (API)
+     */
+    public function getMunicipiosPorDepartamento($departamentoId)
+    {
+        $municipios = Municipio::where('departamento_id', $departamentoId)
+            ->orderBy('municipio')
+            ->get()
+            ->map(function($municipio) {
+                return [
+                    'id' => $municipio->id,
+                    'municipio' => $municipio->municipio,
+                    'departamento' => $municipio->departamento->departamento ?? ''
+                ];
+            });
+
+        return response()->json($municipios);
     }
 }
