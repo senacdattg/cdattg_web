@@ -59,7 +59,7 @@
                     <form action="{{ route('inventario.productos.store') }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         
-                        <div class="form-content-container">
+                        <div class="form-content-container" id="form">
                             {{-- Sección: Información Básica --}}
                             <div class="form-section">
                                 <h4 class="form-section-title">
