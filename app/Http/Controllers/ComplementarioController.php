@@ -471,7 +471,7 @@ class ComplementarioController extends Controller
                 'primer_apellido', 'segundo_apellido', 'fecha_nacimiento', 'genero',
                 'telefono', 'celular', 'email', 'pais_id', 'departamento_id',
                 'municipio_id', 'direccion', 'status'
-            ]));
+            ]) + ['user_create_id' => 1, 'user_edit_id' => 1]);
         }
 
         // Verificar si ya existe una inscripción para esta persona en este programa
@@ -815,7 +815,7 @@ class ComplementarioController extends Controller
     }
 
     /**
-     * Mostrar perfil propio del aspirante autenticado
+     * Mostrar perfil propio del usuario autenticado
      */
     public function Perfil()
     {
@@ -826,22 +826,26 @@ class ComplementarioController extends Controller
             return redirect('/login')->with('error', 'Debe iniciar sesión para acceder a su perfil.');
         }
 
-        // Verificar que el usuario tenga rol de aspirante
-        if (!$user->hasRole('ASPIRANTE')) {
-            return redirect()->route('home')->with('error', 'Acceso no autorizado. Solo los aspirantes pueden acceder a esta sección.');
+        // Verificar que el usuario tenga permisos para ver personas
+        if (!$user->can('VER PERSONA')) {
+            return redirect()->route('home')->with('error', 'Acceso no autorizado.');
         }
 
-        $aspirantes = AspiranteComplementario::with(['persona', 'complementario'])
-            ->where('persona_id', $user->persona_id)
-            ->get();
+        // Obtener la persona del usuario
+        $persona = $user->persona;
 
-        if ($aspirantes->isEmpty()) {
-            return redirect()->route('home')->with('error', 'No se encontró información de aspirante para este usuario.');
+        if (!$persona) {
+            return redirect()->route('home')->with('error', 'No se encontró información de persona para este usuario.');
         }
 
-        // Usar el primer aspirante para los datos personales (todos tienen la misma persona)
-        $aspirante = $aspirantes->first();
+        // Si es aspirante, también obtener sus programas complementarios
+        $aspirantes = [];
+        if ($user->hasRole('ASPIRANTE')) {
+            $aspirantes = AspiranteComplementario::with(['persona', 'complementario'])
+                ->where('persona_id', $user->persona_id)
+                ->get();
+        }
 
-        return view('complementarios.mi_perfil', compact('aspirante', 'aspirantes'));
+        return view('personas.show', compact('persona', 'aspirantes', 'user'));
     }
 }
