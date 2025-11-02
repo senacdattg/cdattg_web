@@ -111,11 +111,10 @@
                                         $stockText = 'BAJO STOCK';
                                     }
                                 @endphp
-                                <span class="badge badge-{{ $stockClass }} stock-badge">
+                                <span class="badge stock-badge stock-badge-{{ $stockClass }}">
                                     {{ $stockText }}
                                 </span>
                             </div>
-
                             <div class="card-body d-flex flex-column">
                                 {{-- Categoría y marca --}}
                                 <div class="mb-2">
@@ -206,23 +205,24 @@
         </div>
     </section>
 
-    {{-- Modal de detalles del producto --}}
-    <div class="modal fade" id="productDetailModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
-            <div class="modal-content">
-                <div class="modal-header bg-info">
-                    <h5 class="modal-title">
-                        <i class="fas fa-box"></i> Detalles del Producto
-                    </h5>
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span>&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body" id="product-detail-content">
-                    <div class="text-center">
-                        <i class="fas fa-spinner fa-spin fa-3x"></i>
-                        <p>Cargando detalles...</p>
-                    </div>
+    {{-- Modal simple de detalles del producto --}}
+    <div id="productDetailModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
+        <div style="background:white; border-radius:8px; width:90%; max-width:600px; max-height:90vh; overflow-y:auto; box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+            <!-- Header -->
+            <div style="padding:20px; background:#17a2b8; color:white; display:flex; justify-content:space-between; align-items:center; border-radius:8px 8px 0 0;">
+                <h5 style="margin:0; font-size:18px;">
+                    <i class="fas fa-box"></i> Detalles del Producto
+                </h5>
+                <button onclick="closeProductModal()" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">
+                    ×
+                </button>
+            </div>
+            
+            <!-- Body -->
+            <div id="product-detail-content" style="padding:20px;">
+                <div style="text-align:center;">
+                    <i class="fas fa-spinner fa-spin fa-3x"></i>
+                    <p>Cargando detalles...</p>
                 </div>
             </div>
         </div>
@@ -239,6 +239,7 @@
 
 @push('css')
     <link rel="stylesheet" href="{{ asset('css/inventario/card.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/inventario/modal-producto.css') }}">
     @vite(['public/css/inventario/shared/base.css'])
     <style>
         /* Estilos adicionales inline si es necesario */
@@ -261,13 +262,6 @@
             align-items: center;
             justify-content: center;
             height: 100%;
-        }
-        
-        .stock-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            z-index: 1;
         }
         
         .hover-shadow:hover {

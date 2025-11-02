@@ -143,7 +143,6 @@
     margin-bottom: 0.75rem;
     min-height: 2.8rem;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -153,7 +152,6 @@
     line-height: 1.5;
     min-height: 3.75rem;
     display: -webkit-box;
-    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
