@@ -104,7 +104,7 @@ class Producto extends Model
     // Relación con detalles de órdenes
     public function detalleOrdenes()
     {
-        return $this->hasMany(DetalleOrden::class, 'productos_id');
+        return $this->hasMany(DetalleOrden::class, 'producto_id');
     }
 
   

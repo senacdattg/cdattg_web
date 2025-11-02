@@ -35,7 +35,7 @@ class DashboardController extends Controller
 
         // Productos más solicitados desde las órdenes
         $productosMasSolicitados = DB::table('detalle_ordenes')
-            ->join('productos', 'detalle_ordenes.productos_id', '=', 'productos.id')
+            ->join('productos', 'detalle_ordenes.producto_id', '=', 'productos.id')
             ->select('productos.producto', DB::raw('SUM(detalle_ordenes.cantidad) as solicitudes'))
             ->groupBy('productos.id', 'productos.producto')
             ->orderBy('solicitudes', 'desc')
