@@ -4,7 +4,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\models\User;
+use App\Models\User;
+use App\Models\Persona;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class RegisterController extends Controller
 {
@@ -15,27 +19,79 @@ class RegisterController extends Controller
     
     public function create(Request $request)
     {
-        $data = $request->validate([
-            'primer_nombre' => 'required|string|max:255',
-            'segundo_nombre' => 'string|max:255',
-            'primer_apellido' => 'required|string|max:255',
-            'segundo_apellido' => 'string|max:255',
-            'documento' => 'required|string|unique:users|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
+        Log::info('RegisterController - Método create llamado', [
+            'all_data' => $request->all(),
+            'method' => $request->method(),
+            'has_csrf' => $request->has('_token'),
+            'csrf_token' => $request->input('_token')
         ]);
 
+        // Validación completa
+        $validatedData = $request->validate([
+            'tipo_documento' => 'required|integer',
+            'numero_documento' => 'required|string|max:191|unique:personas',
+            'primer_nombre' => 'required|string|max:191',
+            'segundo_nombre' => 'nullable|string|max:191',
+            'primer_apellido' => 'required|string|max:191',
+            'segundo_apellido' => 'nullable|string|max:191',
+            'fecha_nacimiento' => 'required|date',
+            'genero' => 'required|integer',
+            'telefono' => 'nullable|string|max:191',
+            'celular' => 'required|string|max:191',
+            'email' => 'required|email|max:191|unique:personas',
+            'pais_id' => 'required|exists:pais,id',
+            'departamento_id' => 'required|exists:departamentos,id',
+            'municipio_id' => 'required|exists:municipios,id',
+            'direccion' => 'required|string|max:191',
+        ]);
+
+        Log::info('RegisterController - Validación pasada', ['validated_data' => $validatedData]);
+
         // Convertir a mayúsculas los campos
-        $data['primer_nombre'] = strtoupper($data['primer_nombre']);
-        $data['segundo_nombre'] = strtoupper($data['segundo_nombre']);
-        $data['primer_apellido'] = strtoupper($data['primer_apellido']);
-        $data['segundo_apellido'] = strtoupper($data['segundo_apellido']);
-        $data['password'] = bcrypt($data['documento']);
+        $validatedData['primer_nombre'] = strtoupper($validatedData['primer_nombre']);
+        $validatedData['segundo_nombre'] = strtoupper($validatedData['segundo_nombre'] ?? '');
+        $validatedData['primer_apellido'] = strtoupper($validatedData['primer_apellido']);
+        $validatedData['segundo_apellido'] = strtoupper($validatedData['segundo_apellido'] ?? '');
+        $validatedData['password'] = bcrypt($validatedData['numero_documento']);
 
-        $user = User::create($data);
+        // Mapear numero_documento a documento para la base de datos
+        $validatedData['documento'] = $validatedData['numero_documento'];
+        unset($validatedData['numero_documento']);
 
-        // Autenticar al usuario automáticamente si lo deseas
+        Log::info('RegisterController - Datos procesados', ['processed_data' => $validatedData]);
 
-        return redirect('/login')->with('success', '¡Registro Exitoso!'); // Puedes redirigir a donde desees
+        // Verificar si ya existe una persona con el mismo documento o email
+        $personaExistente = Persona::where('numero_documento', $request->numero_documento)
+            ->orWhere('email', $request->email)
+            ->first();
+
+        if ($personaExistente) {
+            return back()->withInput()->with('error', 'Ya existe una persona registrada con este número de documento o correo electrónico.');
+        }
+
+        // Crear nueva persona
+        $persona = Persona::create($request->only([
+            'tipo_documento', 'numero_documento', 'primer_nombre', 'segundo_nombre',
+            'primer_apellido', 'segundo_apellido', 'fecha_nacimiento', 'genero',
+            'telefono', 'celular', 'email', 'pais_id', 'departamento_id',
+            'municipio_id', 'direccion'
+        ]) + ['user_create_id' => 1, 'user_edit_id' => 1]);
+
+        // Crear cuenta de usuario automáticamente
+        $user = User::create([
+            'email' => $request->email,
+            'password' => Hash::make($request->numero_documento), // Usar documento como contraseña
+            'status' => 1,
+            'persona_id' => $persona->id,
+        ]);
+
+        // Asignar rol de visitante
+        $user->assignRole('VISITANTE');
+
+        // Autenticar al usuario automáticamente
+        Auth::login($user);
+
+        return redirect('/')->with('success', '¡Registro Exitoso! Bienvenido a la plataforma.');
     }
 
     public function mostrarFormulario()

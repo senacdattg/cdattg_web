@@ -365,7 +365,7 @@ return [
         // MÓDULO: CONFIGURACIÓN DEL SISTEMA
         // ========================================
         [
-            'header' => 'CONFIGURACIÓN',
+            
         ],
         [
             'text' => 'Sistema',
@@ -403,7 +403,7 @@ return [
         // MÓDULO: INFRAESTRUCTURA
         // ========================================
         [
-            'header' => 'INFRAESTRUCTURA',
+            
         ],
         [
             'text' => 'Regionales',
@@ -498,7 +498,7 @@ return [
         // MÓDULO: GESTIÓN ACADÉMICA
         // ========================================
         [
-            'header' => 'GESTIÓN ACADÉMICA',
+            
         ],
         [
             'text' => 'Programas de Formación',
@@ -587,7 +587,7 @@ return [
         // MÓDULO: FICHAS Y CARACTERIZACIÓN
         // ========================================
         [
-            'header' => 'FICHAS Y CARACTERIZACIÓN',
+            
         ],
         [
             'text' => 'Fichas de Caracterización',
@@ -632,7 +632,7 @@ return [
         // MÓDULO: PERSONAL
         // ========================================
         [
-            'header' => 'PERSONAL',
+            
         ],
         [
             'text' => 'Instructores',
@@ -683,7 +683,7 @@ return [
         // MÓDULO: ASISTENCIA
         // ========================================
         [
-            'header' => 'ASISTENCIA',
+            
         ],
         [
             'text' => 'Tomar Asistencia',
@@ -715,7 +715,7 @@ return [
         // MÓDULO: CARNETS
         // ========================================
         [
-            'header' => 'CARNETS',
+            
         ],
         [
             'text' => 'Gestión de Carnets',

@@ -1,13 +1,15 @@
-@extends('adminlte::page')
+@extends('complementarios.layout.master-layout-complementarios')
 
-@section('title', 'Perfil')
-
-@section('content_header')
-    <h1><i class="fas fa-user-circle mr-2"></i>Perfil</h1>
-    <p class="text-muted mb-0">Información de mi inscripción a programas complementarios</p>
-@stop
+@section('title', 'Mi Perfil | SENA')
 
 @section('content')
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-12">
+            <div class="text-center mb-4">
+                <h2 class="text-success">Mi Perfil</h2>
+                <p class="text-muted">Información de mi inscripción a programas complementarios</p>
+            </div>
 <div class="row">
     <div class="col-md-8">
         <div class="card shadow-sm mb-4">
@@ -114,57 +116,49 @@
             </div>
         </div>
 
-        <div class="card shadow-sm">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0"><i class="fas fa-graduation-cap mr-2"></i>Programa Inscrito</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-8">
-                        <h6>{{ $aspirante->complementario->nombre }}</h6>
-                        <p class="text-muted mb-2">{{ $aspirante->complementario->descripcion }}</p>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <small><strong>Duración:</strong> {{ $aspirante->complementario->duracion }} horas</small>
-                            </div>
-                            
-                        </div>
-                    </div>
-                    <div class="col-md-4 text-center">
-                        <div class="bg-light rounded p-3">
-                            <i class="fas fa-graduation-cap fa-2x text-primary mb-2"></i>
-                            <p class="mb-0 small">Programa Complementario</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="col-md-4">
         <div class="card shadow-sm">
             <div class="card-header bg-success text-white text-center">
-                <h5 class="mb-0"><i class="fas fa-graduation-cap mr-2"></i>Programa Inscrito</h5>
+                <h5 class="mb-0"><i class="fas fa-graduation-cap mr-2"></i>Programas Inscritos</h5>
             </div>
-            <div class="card-body text-center">
-                <div class="bg-light rounded p-4 mb-3">
-                    <i class="fas fa-graduation-cap fa-3x text-success mb-3"></i>
-                    <h5 class="text-success mb-2">{{ $aspirante->complementario->nombre }}</h5>
-                    <p class="text-muted small mb-3">{{ $aspirante->complementario->descripcion }}</p>
+            <div class="card-body">
+                @foreach($aspirantes as $aspiranteItem)
+                <div class="bg-light rounded p-3 mb-3">
+                    <i class="fas fa-graduation-cap fa-2x text-success mb-2"></i>
+                    <h6 class="text-success mb-1">{{ $aspiranteItem->complementario->nombre }}</h6>
+                    <p class="text-muted small mb-2">{{ $aspiranteItem->complementario->descripcion }}</p>
                     <div class="row text-center">
                         <div class="col-6">
                             <small class="text-muted d-block">Duración</small>
-                            <strong>{{ $aspirante->complementario->duracion }} horas</strong>
+                            <strong>{{ $aspiranteItem->complementario->duracion }} horas</strong>
                         </div>
-                        
+                        <div class="col-6">
+                            <small class="text-muted d-block">Estado</small>
+                            <strong>
+                                @php
+                                    $estado = match($aspiranteItem->estado) {
+                                        1 => 'En proceso',
+                                        2 => 'Documento subido',
+                                        3 => 'Aceptado',
+                                        4 => 'Rechazado',
+                                        default => 'Desconocido'
+                                    };
+                                @endphp
+                                {{ $estado }}
+                            </strong>
+                        </div>
+                    </div>
+                    <div class="border-top pt-2 mt-2">
+                        <small class="text-muted">Fecha de registro: {{ $aspiranteItem->created_at->format('d/m/Y') }}</small>
                     </div>
                 </div>
-                <div class="border-top pt-3">
-                    
-                    <small class="text-muted">Fecha de registro: {{ $aspirante->created_at->format('d/m/Y') }}</small>
-                </div>
+                @endforeach
             </div>
         </div>
+    </div>
+</div>
 @endsection
 
 @section('css')
@@ -176,10 +170,4 @@
         z-index: 100;
     }
 </style>
-@stop
-
-@section('js')
-<script>
-    console.log('Página de perfil del aspirante cargada');
-</script>
 @endsection
