@@ -18,6 +18,15 @@
     <!-- Custom CSS -->
     @yield('css')
 
+    <!-- Preloader Section -->
+    @section('preloader')
+        <img src="{{ asset('img/sena-logo.png') }}" alt="SENA Logo"
+             class="img-circle animation__shake"
+             width="80" height="80"
+             style="animation-iteration-count:infinite;">
+        <p class="mt-3">Cargando...</p>
+    @endsection
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="{{ asset('img/sena-logo.png') }}">
 </head>
@@ -39,6 +48,32 @@
     <script src="{{ asset('plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('dist/js/adminlte.min.js') }}?v=3.2.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Preloader Script -->
+    <script>
+        // Mostrar preloader en envíos de formularios
+        document.addEventListener('DOMContentLoaded', function() {
+            // Interceptar envíos de formularios
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    // Solo mostrar preloader si no es un formulario con data-no-preloader
+                    if (!form.hasAttribute('data-no-preloader')) {
+                        // Mostrar preloader usando AdminLTE
+                        $('body').addClass('preloader-active');
+                    }
+                });
+            });
+
+            // Interceptar clics en enlaces que podrían tardar
+            const links = document.querySelectorAll('a[data-show-preloader]');
+            links.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    $('body').addClass('preloader-active');
+                });
+            });
+        });
+    </script>
 
     @yield('scripts')
 </body>

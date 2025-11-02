@@ -196,6 +196,13 @@ function loadMunicipiosForDepartamento(departamentoId) {
                                             <button type="reset" class="btn btn-outline-secondary me-md-2">Limpiar</button>
                                             <button type="submit" class="btn btn-success">Enviar Inscripción</button>
                                         </div>
+
+                                        <script>
+                                            // Mostrar preloader al enviar el formulario
+                                            document.getElementById('formInscripcion').addEventListener('submit', function() {
+                                                $('body').addClass('preloader-active');
+                                            });
+                                        </script>
                                     </div>
                                 </div>
                             </form>
