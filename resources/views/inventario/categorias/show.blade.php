@@ -33,11 +33,11 @@
             <!-- Botón Volver -->
             <div class="mb-3">
                 <a class="btn btn-outline-secondary btn-sm" href="{{ route('inventario.categorias.index') }}">
-                    <i class="fas fa-arrow-left mr-1"></i> Volver
+                    <i class="fas fa-arrow-left mr-1" id="icono-volver"></i> Volver
                 </a>
             </div>
 
-            <div class="row">
+            <div class="row" id="estadisticas-generales">
                 <!-- Estadísticas Generales -->
                 <div class="col-md-4">
                     <div class="stats-card">
@@ -69,7 +69,7 @@
             </div>
 
             <!-- Información de la Categoría -->
-            <div class="row mb-4">
+            <div class="row mb-4" id="detalle">
                 <div class="col-12">
                     <div class="card detail-card no-hover">
                         <div class="card-header bg-white py-3">

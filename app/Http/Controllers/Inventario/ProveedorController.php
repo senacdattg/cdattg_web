@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Inventario;
 
 use App\Models\Inventario\Proveedor;
+use App\Models\Departamento;
+use App\Models\Municipio;
 use Illuminate\Http\Request;
 
 class ProveedorController extends InventarioController
@@ -33,7 +35,9 @@ class ProveedorController extends InventarioController
 
     public function create()
     {
-        return view('inventario.proveedores.create');
+        $departamentos = Departamento::orderBy('departamento')->get();
+        $municipios = Municipio::with('departamento')->orderBy('municipio')->get();
+        return view('inventario.proveedores.create', compact('departamentos', 'municipios'));
     }
 
     public function show(Proveedor $proveedor)

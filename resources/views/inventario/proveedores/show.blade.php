@@ -31,13 +31,13 @@
             @include('components.session-alerts')
 
             <!-- Botón Volver -->
-            <div class="mb-3">
+            <div class="mb-3" id="boton-volver">
                 <a class="btn btn-outline-secondary btn-sm" href="{{ route('inventario.proveedores.index') }}">
-                    <i class="fas fa-arrow-left mr-1"></i> Volver
+                    <i class="fas fa-arrow-left mr-1" id="icono-volver"></i> Volver
                 </a>
             </div>
 
-            <div class="row">
+            <div class="row" id="estadisticas-generales">
                 <!-- Estadísticas Generales -->
                 <div class="col-md-4">
                     <div class="stats-card">
@@ -74,13 +74,13 @@
             <div class="row mb-4">
                 <div class="col-12">
                     <div class="card detail-card no-hover">
-                        <div class="card-header bg-white py-3">
+                        <div id="informacion-proveedor" class="card-header bg-white py-3">
                             <h5 class="card-title m-0 font-weight-bold text-primary">
                                 <i class="fas fa-info-circle mr-2"></i>Información del Proveedor
                             </h5>
                         </div>
 
-                        <div class="card-body p-0">
+                        <div class="card-body p-0" id="detalle">
                             <div class="table-responsive">
                                 <table class="table detail-table mb-0">
                                     <tbody>

@@ -83,6 +83,28 @@ body .content-wrapper {
 .main-header.navbar .nav-item i {
     color: #ffffff !important;
 }
+.row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+#detalle {
+    text-align: center !important;
+}
+
+#estadisticas-generales {
+    margin-top: 18px !important;
+    padding: 15px 12px !important;
+    background-color: #535c6800 !important;
+    border-radius: 12px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: #fdfdfd;
+
+}
+#icono-volver {
+    margin-right: 6px !important;
+    color: #e0e8e3 !important;
+}
 
 /* Estilos responsivos del navbar */
 @media (max-width: 768px) {

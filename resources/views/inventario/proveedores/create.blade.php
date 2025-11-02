@@ -141,7 +141,7 @@
                                                 name="departamento_id"
                                             >
                                                 <option value="">Seleccione un departamento</option>
-                                                @foreach(\App\Models\Departamento::orderBy('departamento')->get() as $departamento)
+                                                @foreach($departamentos as $departamento)
                                                     <option value="{{ $departamento->id }}" {{ old('departamento_id') == $departamento->id ? 'selected' : '' }}>
                                                         {{ $departamento->departamento }}
                                                     </option>
@@ -161,7 +161,7 @@
                                                 name="municipio_id"
                                             >
                                                 <option value="">Seleccione un municipio</option>
-                                                @foreach(\App\Models\Municipio::with('departamento')->orderBy('municipio')->get() as $municipio)
+                                                @foreach($municipios as $municipio)
                                                     <option value="{{ $municipio->id }}" {{ old('municipio_id') == $municipio->id ? 'selected' : '' }}>
                                                         {{ $municipio->municipio }} ({{ $municipio->departamento->departamento ?? '' }})
                                                     </option>
