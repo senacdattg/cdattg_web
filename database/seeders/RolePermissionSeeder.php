@@ -174,7 +174,12 @@ class RolePermissionSeeder extends Seeder
 
         // Asignar permisos al rol ASPIRANTE
         $aspirante->givePermissionTo([
-            'VER MI PERFIL',
+            'VER PERSONA',
+        ]);
+
+        // Asignar permisos al rol VISITANTE
+        $visitante->givePermissionTo([
+            'VER PERSONA',
         ]);
     }
 }
