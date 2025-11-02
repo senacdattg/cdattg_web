@@ -12,6 +12,10 @@ Route::prefix('inventario')
         Route::get('productos/catalogo', [ProductoController::class, 'catalogo'])
             ->name('productos.catalogo');
         
+        // Ruta para detalles del producto (en modal)
+        Route::get('productos/detalles/{id}', [ProductoController::class, 'detalles'])
+            ->name('productos.detalles');
+        
         // Rutas AJAX para funcionalidades e-commerce
         Route::post('productos/agregar-carrito', [ProductoController::class, 'agregarAlCarrito'])
             ->name('productos.agregar-carrito');

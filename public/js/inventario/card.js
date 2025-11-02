@@ -17,17 +17,26 @@ function showModal(elementId) {
     const element = document.getElementById(elementId);
     if (!element) return;
     
+    element.style.display = 'flex';
+}
+
+function closeProductModal() {
+    const modal = document.getElementById('productDetailModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+/**
+ * Agregar producto al carrito desde el modal
+ */
+function agregarAlCarritoDesdeModal(productId, productName, productStock) {
     try {
-        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
-            // Bootstrap 5
-            const modal = new bootstrap.Modal(element);
-            modal.show();
-        } else if (typeof jQuery !== 'undefined') {
-            // Bootstrap 4 con jQuery
-            jQuery(element).modal('show');
-        }
+        addToCart(productId, productName, productStock);
+        closeProductModal();
     } catch (error) {
-        console.error('Error mostrando modal:', error);
+        console.error('Error al agregar al carrito:', error);
+        alert('Error al agregar al carrito. Por favor intente de nuevo.');
     }
 }
 
@@ -213,11 +222,10 @@ async function showProductDetails(productId) {
             <p class="mt-3">Cargando detalles...</p>
         </div>
     `;
-    
-    showModal('productDetailModal');
 
     try {
-        const response = await fetch(`${API_BASE_URL}/productos/${productId}`, {
+        // Usar la ruta /detalles en lugar de la ruta show normal
+        const response = await fetch(`${API_BASE_URL}/productos/detalles/${productId}`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.content || ''
@@ -229,26 +237,22 @@ async function showProductDetails(productId) {
         }
 
         const html = await response.text();
+        contentDiv.innerHTML = html;
         
-        // Extraer solo el contenido del card-body si viene en formato completo
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const cardBody = doc.querySelector('.card-body');
+        // Mostrar el modal DESPUÉS de cargar el contenido
+        showModal('productDetailModal');
         
-        if (cardBody) {
-            contentDiv.innerHTML = cardBody.innerHTML;
-        } else {
-            contentDiv.innerHTML = html;
-        }
-
     } catch (error) {
         console.error('Error:', error);
         contentDiv.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle"></i>
-                Error al cargar los detalles del producto. Por favor, intenta nuevamente.
+            <div class="alert alert-danger text-center">
+                <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                <p>Error al cargar los detalles del producto</p>
+                <small>${error.message}</small>
             </div>
         `;
+        // Mostrar el modal incluso con error para que vea el mensaje
+        showModal('productDetailModal');
     }
 }
 

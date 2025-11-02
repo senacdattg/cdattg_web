@@ -31,12 +31,20 @@ class ProductoController extends InventarioController
             'tipoProducto.parametro',
             'unidadMedida.parametro',
             'estado.parametro',
-            'categoria',
-            'marca',
             'contratoConvenio',
             'ambiente',
             'proveedor'
         ])->paginate(10);
+
+        // Cargar marca y categoria directamente para cada producto
+        $productos->each(function($producto) {
+            if ($producto->marca_id) {
+                $producto->marca = Parametro::find($producto->marca_id);
+            }
+            if ($producto->categoria_id) {
+                $producto->categoria = Parametro::find($producto->categoria_id);
+            }
+        });
         
         return view('inventario.productos.index', compact('productos'));
     }
@@ -375,5 +383,30 @@ class ProductoController extends InventarioController
                 'stock' => $producto->cantidad
             ]
         ]);
+    }
+
+    /**
+     * Obtener detalles del producto para modal 
+     */
+    public function detalles(string $id)
+    {
+        $producto = Producto::with([
+            'tipoProducto.parametro',
+            'unidadMedida.parametro',
+            'estado.parametro',
+            'contratoConvenio',
+            'ambiente',
+            'proveedor',
+        ])->findOrFail($id);
+
+        // Cargar marca y categoria DIRECTAMENTE desde Parametro sin usar la relación del modelo
+        if ($producto->marca_id) {
+            $producto->marca = Parametro::find($producto->marca_id);
+        }
+        if ($producto->categoria_id) {
+            $producto->categoria = Parametro::find($producto->categoria_id);
+        }
+
+        return view('inventario.productos._detalles-modal', compact('producto'));
     }
 }
