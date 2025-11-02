@@ -75,7 +75,7 @@ class RegisterController extends Controller
             'primer_apellido', 'segundo_apellido', 'fecha_nacimiento', 'genero',
             'telefono', 'celular', 'email', 'pais_id', 'departamento_id',
             'municipio_id', 'direccion'
-        ]));
+        ]) + ['user_create_id' => 1, 'user_edit_id' => 1]);
 
         // Crear cuenta de usuario automáticamente
         $user = User::create([
