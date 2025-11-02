@@ -39,11 +39,12 @@ function cargarDatosCarrito() {
                 if (carritoItemsTbodyEl && data.items && data.items.length > 0) {
                     let html = '';
                     data.items.forEach(item => {
+                        const cantidad = item.quantity || item.cantidad || 1;
                         html += `
                             <tr>
                                 <td><strong>${item.name || 'Producto'}</strong></td>
                                 <td class="text-center">
-                                    <span class="badge badge-primary">${item.quantity}</span>
+                                    <span class="badge badge-primary">${cantidad}</span>
                                 </td>
                             </tr>
                         `;
@@ -56,10 +57,16 @@ function cargarDatosCarrito() {
                 // Crear input oculto con el carrito (para el backend)
                 const form = document.querySelector('#form-solicitud');
                 if (form) {
+                    // Asegurar que cada item tenga la propiedad 'quantity' correcta
+                    const itemsProcesados = (data.items || []).map(item => ({
+                        ...item,
+                        quantity: item.quantity || item.cantidad || 1
+                    }));
+
                     const inputHidden = document.createElement('input');
                     inputHidden.type = 'hidden';
                     inputHidden.name = 'carrito';
-                    inputHidden.value = JSON.stringify(data.items || []);
+                    inputHidden.value = JSON.stringify(itemsProcesados);
                     form.appendChild(inputHidden);
                 }
 

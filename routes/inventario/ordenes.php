@@ -38,13 +38,19 @@ Route::prefix('inventario')
             // Ver solicitudes pendientes
             Route::get('aprobaciones/pendientes', [AprobacionController::class, 'pendientes'])
                 ->name('aprobaciones.pendientes');
-            
+
             // Aprobar/Rechazar detalles de orden
             Route::post('aprobaciones/{detalleOrden}/aprobar', [AprobacionController::class, 'aprobar'])
                 ->name('aprobaciones.aprobar');
             Route::post('aprobaciones/{detalleOrden}/rechazar', [AprobacionController::class, 'rechazar'])
                 ->name('aprobaciones.rechazar');
-            
+
+            // Aprobar/Rechazar orden completa
+            Route::post('aprobaciones/orden/{orden}/aprobar', [AprobacionController::class, 'aprobarOrden'])
+                ->name('aprobaciones.aprobar-orden');
+            Route::post('aprobaciones/orden/{orden}/rechazar', [AprobacionController::class, 'rechazarOrden'])
+                ->name('aprobaciones.rechazar-orden');
+
             // Historial de aprobaciones
             Route::get('aprobaciones/historial', [AprobacionController::class, 'historial'])
                 ->name('aprobaciones.historial');

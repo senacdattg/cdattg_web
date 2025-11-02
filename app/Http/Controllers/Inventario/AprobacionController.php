@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Inventario\Aprobacion;
 use App\Models\Inventario\DetalleOrden;
 use App\Models\Inventario\Producto;
+use App\Models\Inventario\Orden;
 use App\Models\ParametroTema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -212,6 +213,179 @@ class AprobacionController extends InventarioController
             DB::rollBack();
             return back()
                 ->with('error', 'Error al rechazar la solicitud: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Aprobar toda una orden completa
+     */
+    public function aprobarOrden(Request $request, $ordenId)
+    {
+        try {
+            DB::beginTransaction();
+
+            $orden = Orden::with('detalles.producto')->findOrFail($ordenId);
+
+            // Verificar que todos los detalles estén en estado EN ESPERA
+            $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
+                $q->where('name', 'EN ESPERA');
+            })
+            ->whereHas('tema', function($q) {
+                $q->where('name', 'ESTADOS DE ORDEN');
+            })
+            ->first();
+
+            if (!$estadoEnEspera) {
+                throw new \Exception("Estado 'EN ESPERA' no encontrado.");
+            }
+
+            // Verificar que todos los detalles estén pendientes
+            $detallesPendientes = $orden->detalles->where('estado_orden_id', $estadoEnEspera->id);
+
+            if ($detallesPendientes->isEmpty()) {
+                throw new \Exception('No hay productos pendientes de aprobación en esta orden.');
+            }
+
+            // Verificar stock para todos los productos
+            foreach ($detallesPendientes as $detalle) {
+                if ($detalle->producto->cantidad < $detalle->cantidad) {
+                    throw new \Exception(
+                        "Stock insuficiente para '{$detalle->producto->producto}'. " .
+                        "Disponible: {$detalle->producto->cantidad}, Solicitado: {$detalle->cantidad}"
+                    );
+                }
+            }
+
+            // Obtener estado APROBADA
+            $estadoAprobada = ParametroTema::whereHas('parametro', function($q) {
+                $q->where('name', 'APROBADA');
+            })
+            ->whereHas('tema', function($q) {
+                $q->where('name', 'ESTADOS DE ORDEN');
+            })
+            ->first();
+
+            if (!$estadoAprobada) {
+                throw new \Exception("Estado 'APROBADA' no encontrado.");
+            }
+
+            // Aprobar todos los detalles
+            foreach ($detallesPendientes as $detalle) {
+                // Actualizar estado del detalle
+                $detalle->update([
+                    'estado_orden_id' => $estadoAprobada->id,
+                    'user_update_id' => Auth::id()
+                ]);
+
+                // Crear registro de aprobación
+                $aprobacion = new Aprobacion([
+                    'detalle_orden_id' => $detalle->id,
+                    'estado_aprobacion_id' => $estadoAprobada->id,
+                    'user_create_id' => Auth::id(),
+                    'user_update_id' => Auth::id()
+                ]);
+                $aprobacion->save();
+
+                // Descontar stock
+                $detalle->producto->cantidad -= $detalle->cantidad;
+                $detalle->producto->user_update_id = Auth::id();
+                $detalle->producto->save();
+            }
+
+            DB::commit();
+
+            return redirect()->back()
+                ->with('success', "Orden #{$ordenId} aprobada exitosamente. Stock actualizado para todos los productos.");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()
+                ->with('error', 'Error al aprobar la orden: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Rechazar toda una orden completa
+     */
+    public function rechazarOrden(Request $request, $ordenId)
+    {
+        $validated = $request->validate([
+            'motivo_rechazo' => 'required|string|max=1000'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $orden = Orden::with('detalles.producto')->findOrFail($ordenId);
+
+            // Verificar que todos los detalles estén en estado EN ESPERA
+            $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
+                $q->where('name', 'EN ESPERA');
+            })
+            ->whereHas('tema', function($q) {
+                $q->where('name', 'ESTADOS DE ORDEN');
+            })
+            ->first();
+
+            if (!$estadoEnEspera) {
+                throw new \Exception("Estado 'EN ESPERA' no encontrado.");
+            }
+
+            // Verificar que todos los detalles estén pendientes
+            $detallesPendientes = $orden->detalles->where('estado_orden_id', $estadoEnEspera->id);
+
+            if ($detallesPendientes->isEmpty()) {
+                throw new \Exception('No hay productos pendientes de aprobación en esta orden.');
+            }
+
+            // Obtener estado RECHAZADA
+            $estadoRechazada = ParametroTema::whereHas('parametro', function($q) {
+                $q->where('name', 'RECHAZADA');
+            })
+            ->whereHas('tema', function($q) {
+                $q->where('name', 'ESTADOS DE ORDEN');
+            })
+            ->first();
+
+            if (!$estadoRechazada) {
+                throw new \Exception("Estado 'RECHAZADA' no encontrado.");
+            }
+
+            // Rechazar todos los detalles
+            foreach ($detallesPendientes as $detalle) {
+                // Actualizar estado del detalle
+                $detalle->update([
+                    'estado_orden_id' => $estadoRechazada->id,
+                    'user_update_id' => Auth::id()
+                ]);
+
+                // Crear registro de aprobación (con estado rechazada)
+                $aprobacion = new Aprobacion([
+                    'detalle_orden_id' => $detalle->id,
+                    'estado_aprobacion_id' => $estadoRechazada->id,
+                    'user_create_id' => Auth::id(),
+                    'user_update_id' => Auth::id()
+                ]);
+                $aprobacion->save();
+            }
+
+            // Agregar motivo de rechazo a la descripción de la orden
+            $orden->descripcion_orden .= "\n\n--- ORDEN RECHAZADA COMPLETA ---\n";
+            $orden->descripcion_orden .= "Motivo: {$validated['motivo_rechazo']}\n";
+            $orden->descripcion_orden .= "Rechazado por: " . Auth::user()->name . "\n";
+            $orden->descripcion_orden .= "Fecha: " . now()->format('d/m/Y H:i') . "\n";
+            $orden->user_update_id = Auth::id();
+            $orden->save();
+
+            DB::commit();
+
+            return redirect()->back()
+                ->with('success', "Orden #{$ordenId} rechazada exitosamente.");
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return back()
+                ->with('error', 'Error al rechazar la orden: ' . $e->getMessage());
         }
     }
 
