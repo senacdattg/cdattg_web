@@ -14,7 +14,7 @@
 
                     @include('complementarios.components.form-datos-personales', [
                         'context' => 'registro',
-                        'userData' => session('registro_data', []),
+                        'userData' => [],
                         'paises' => \App\Models\Pais::all(),
                         'departamentos' => \App\Models\Departamento::all(),
                     ])

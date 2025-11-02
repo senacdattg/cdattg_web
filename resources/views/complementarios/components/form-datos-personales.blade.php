@@ -9,6 +9,24 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6 mb-3">
+                    <label for="tipo_documento" class="form-label">Tipo de Documento *</label>
+                    <select class="form-control" id="tipo_documento" name="tipo_documento" required>
+                        <option value="">Seleccione...</option>
+                        <option value="1" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '1' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
+                        <option value="2" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '2' ? 'selected' : '' }}>Tarjeta de Identidad</option>
+                        <option value="3" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '3' ? 'selected' : '' }}>Cédula de Extranjería</option>
+                        <option value="4" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '4' ? 'selected' : '' }}>Pasaporte</option>
+                    </select>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label for="numero_documento" class="form-label">Número de Documento *</label>
+                    <input type="text" class="form-control" id="numero_documento" name="numero_documento"
+                            value="{{ old('numero_documento', $userData['numero_documento'] ?? '') }}" required>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
                     <label for="primer_nombre" class="form-label">Primer Nombre *</label>
                     <input type="text" class="form-control" id="primer_nombre" name="primer_nombre"
                             value="{{ old('primer_nombre', $userData['primer_nombre'] ?? '') }}" required>
@@ -38,12 +56,6 @@
                 <input type="email" class="form-control" id="email" name="email"
                         value="{{ old('email', $userData['email'] ?? '') }}" required>
             </div>
-
-            <div class="mb-3">
-                <label for="numero_documento" class="form-label">Número de Documento *</label>
-                <input type="text" class="form-control" id="numero_documento" name="numero_documento"
-                        value="{{ old('numero_documento', $userData['numero_documento'] ?? '') }}" required>
-            </div>
         </div>
     </div>
 
@@ -52,22 +64,21 @@
             <h5 class="mb-0"><i class="fas fa-birthday-cake mr-2"></i>Información Personal Adicional</h5>
         </div>
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento *</label>
-                    <input type="date" class="form-control" id="fecha_nacimiento"
-                            name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $userData['fecha_nacimiento'] ?? '') }}" required>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="genero" class="form-label">Género *</label>
-                    <select class="form-control" id="genero" name="genero" required>
-                        <option value="">Seleccione...</option>
-                        <option value="1" {{ old('genero', $userData['genero'] ?? '') == '1' ? 'selected' : '' }}>Masculino</option>
-                        <option value="2" {{ old('genero', $userData['genero'] ?? '') == '2' ? 'selected' : '' }}>Femenino</option>
-                        <option value="3" {{ old('genero', $userData['genero'] ?? '') == '3' ? 'selected' : '' }}>Otro</option>
-                        <option value="4" {{ old('genero', $userData['genero'] ?? '') == '4' ? 'selected' : '' }}>Prefiero no decir</option>
-                    </select>
-                </div>
+            <div class="mb-3">
+                <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento *</label>
+                <input type="date" class="form-control" id="fecha_nacimiento"
+                        name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $userData['fecha_nacimiento'] ?? '') }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="genero" class="form-label">Género *</label>
+                <select class="form-control" id="genero" name="genero" required>
+                    <option value="">Seleccione...</option>
+                    <option value="1" {{ old('genero', $userData['genero'] ?? '') == '1' ? 'selected' : '' }}>Masculino</option>
+                    <option value="2" {{ old('genero', $userData['genero'] ?? '') == '2' ? 'selected' : '' }}>Femenino</option>
+                    <option value="3" {{ old('genero', $userData['genero'] ?? '') == '3' ? 'selected' : '' }}>Otro</option>
+                    <option value="4" {{ old('genero', $userData['genero'] ?? '') == '4' ? 'selected' : '' }}>Prefiero no decir</option>
+                </select>
             </div>
 
             <div class="row">
@@ -183,22 +194,21 @@
             <h5 class="mb-0"><i class="fas fa-birthday-cake mr-2"></i>Información Personal</h5>
         </div>
         <div class="card-body">
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento *</label>
-                    <input type="date" class="form-control" id="fecha_nacimiento"
-                           name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $userData['fecha_nacimiento'] ?? '') }}" required>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label for="genero" class="form-label">Género *</label>
-                    <select class="form-control" id="genero" name="genero" required>
-                        <option value="">Seleccione...</option>
-                        <option value="1" {{ old('genero', $userData['genero'] ?? '') == '1' ? 'selected' : '' }}>Masculino</option>
-                        <option value="2" {{ old('genero', $userData['genero'] ?? '') == '2' ? 'selected' : '' }}>Femenino</option>
-                        <option value="3" {{ old('genero', $userData['genero'] ?? '') == '3' ? 'selected' : '' }}>Otro</option>
-                        <option value="4" {{ old('genero', $userData['genero'] ?? '') == '4' ? 'selected' : '' }}>Prefiero no decir</option>
-                    </select>
-                </div>
+            <div class="mb-3">
+                <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento *</label>
+                <input type="date" class="form-control" id="fecha_nacimiento"
+                       name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $userData['fecha_nacimiento'] ?? '') }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="genero" class="form-label">Género *</label>
+                <select class="form-control" id="genero" name="genero" required>
+                    <option value="">Seleccione...</option>
+                    <option value="1" {{ old('genero', $userData['genero'] ?? '') == '1' ? 'selected' : '' }}>Masculino</option>
+                    <option value="2" {{ old('genero', $userData['genero'] ?? '') == '2' ? 'selected' : '' }}>Femenino</option>
+                    <option value="3" {{ old('genero', $userData['genero'] ?? '') == '3' ? 'selected' : '' }}>Otro</option>
+                    <option value="4" {{ old('genero', $userData['genero'] ?? '') == '4' ? 'selected' : '' }}>Prefiero no decir</option>
+                </select>
             </div>
 
             <div class="row">

@@ -4,7 +4,7 @@
     @vite(['resources/css/formulario_inscripcion.css'])
 @endsection
 @section('content')
-    @include('complementarios.components.header-programas-publicos')
+    @include('complementarios.layout.header-complementarios')
 
     <div class="container-fluid mt-4">
         <div class="row justify-content-center">
