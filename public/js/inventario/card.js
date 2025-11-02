@@ -28,6 +28,22 @@ function closeProductModal() {
 }
 
 /**
+ * Expandir imagen en modal
+ */
+function expandirImagen(imageSrc) {
+    const expandedImage = document.getElementById('expandedImage');
+    const imageModal = document.getElementById('imageModal');
+    
+    if (expandedImage && imageModal) {
+        expandedImage.src = imageSrc;
+        // Usar jQuery si está disponible
+        if (typeof $ !== 'undefined') {
+            $(imageModal).modal('show');
+        }
+    }
+}
+
+/**
  * Agregar producto al carrito desde el modal
  */
 function agregarAlCarritoDesdeModal(productId, productName, productStock) {
