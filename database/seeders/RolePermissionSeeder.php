@@ -187,6 +187,15 @@ class RolePermissionSeeder extends Seeder
             'ELIMINAR COMPETENCIA',
             'GESTIONAR RESULTADOS COMPETENCIA',
             'CAMBIAR ESTADO COMPETENCIA',
+            // Permisos para notificaciones
+            'VER NOTIFICACIONES',
+            'MARCAR NOTIFICACIONES LEIDAS',
+            // Permisos para notificaciones
+            'VER NOTIFICACIONES',
+            'MARCAR NOTIFICACIONES LEIDAS',
+            // Permisos para notificaciones
+            'VER NOTIFICACIONES',
+            'MARCAR NOTIFICACIONES LEIDAS',
         ];
 
         // Crear cada permiso si no existe
@@ -196,6 +205,9 @@ class RolePermissionSeeder extends Seeder
 
         // Asignar permisos a SUPER ADMINISTRADOR (todos los permisos que quieras para este rol)
         $superAdministrador->givePermissionTo([
+            // Permisos para notificaciones
+            'VER NOTIFICACIONES',
+            'MARCAR NOTIFICACIONES LEIDAS',
             'CREAR PARAMETRO',
             'EDITAR PARAMETRO',
             'VER PARAMETRO',
