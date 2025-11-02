@@ -43,9 +43,6 @@
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">
                     <i class="fas fa-times mr-1"></i> Cerrar
                 </button>
-                <button type="button" class="btn btn-primary" id="downloadImage">
-                    <i class="fas fa-download mr-1"></i> Descargar
-                </button>
             </div>
         </div>
     </div>

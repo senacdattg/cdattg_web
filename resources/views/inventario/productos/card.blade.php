@@ -102,17 +102,13 @@
                                 {{-- Badge de stock --}}
                                 @php
                                     $stockClass = 'success';
-                                    $stockText = 'DISPONIBLE';
                                     if ($producto->cantidad <= 0) {
                                         $stockClass = 'danger';
-                                        $stockText = 'AGOTADO';
                                     } elseif ($producto->cantidad <= 5) {
                                         $stockClass = 'warning';
-                                        $stockText = 'BAJO STOCK';
                                     }
                                 @endphp
                                 <span class="badge stock-badge stock-badge-{{ $stockClass }}">
-                                    {{ $stockText }}
                                 </span>
                             </div>
                             <div class="card-body d-flex flex-column">
@@ -240,40 +236,8 @@
 @push('css')
     <link rel="stylesheet" href="{{ asset('css/inventario/card.css') }}">
     <link rel="stylesheet" href="{{ asset('css/inventario/modal-producto.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/inventario/imagen.css') }}">
     @vite(['public/css/inventario/shared/base.css'])
-    <style>
-        /* Estilos adicionales inline si es necesario */
-        .product-image-container {
-            position: relative;
-            height: 200px;
-            overflow: hidden;
-            background: #f8f9fa;
-        }
-        
-        .product-image {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-        
-        .no-image-placeholder {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-        }
-        
-        .hover-shadow:hover {
-            box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15) !important;
-            transform: translateY(-5px);
-            transition: all 0.3s ease;
-        }
-        
-        .card {
-            transition: all 0.3s ease;
-        }
-    </style>
 @endpush
 
 @push('js')
