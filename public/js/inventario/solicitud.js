@@ -3,55 +3,45 @@
  */
 
 // Esperar a que el DOM esté listo
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', cargarDatosCarrito);
-} else {
+document.addEventListener('DOMContentLoaded', function () {
     cargarDatosCarrito();
-}
+});
 
 /**
  * Cargar datos del carrito desde sessionStorage
  */
 function cargarDatosCarrito() {
-    // ===== Cargar datos del carrito si viene desde la ruta =====
     const urlParams = new URLSearchParams(window.location.search);
     const desdeCarrito = urlParams.get('desde_carrito');
-    
+
     if (desdeCarrito === 'true') {
-        const carritoData = sessionStorage.getItem('carrito_data');
-        
-        if (carritoData) {
+        const carritoDataString = sessionStorage.getItem('carrito_data');
+
+        if (carritoDataString) {
             try {
-                const data = JSON.parse(carritoData);
-                
-                // Actualizar estadísticas
+                const data = JSON.parse(carritoDataString);
+
+                // Elementos del DOM
                 const totalProductosEl = document.getElementById('carrito-total-productos');
                 const totalItemsEl = document.getElementById('carrito-total-items');
                 const carritoResumenStatsEl = document.getElementById('carrito-resumen-stats');
                 const carritoItemsCardEl = document.getElementById('carrito-items-card');
                 const carritoItemsTbodyEl = document.getElementById('carrito-items-tbody');
-                
-                if (totalProductosEl) {
-                    totalProductosEl.textContent = data.totalProductos;
-                }
-                if (totalItemsEl) {
-                    totalItemsEl.textContent = data.totalItems;
-                }
-                
-                // Mostrar tarjeta de resumen si no está visible
-                if (carritoResumenStatsEl) {
-                    carritoResumenStatsEl.style.display = 'grid';
-                }
-                
-                // Llenar tabla de productos
+
+                // Actualizar totales
+                if (totalProductosEl) totalProductosEl.textContent = data.totalProductos || 0;
+                if (totalItemsEl) totalItemsEl.textContent = data.totalItems || 0;
+
+                // Mostrar resumen si existe
+                if (carritoResumenStatsEl) carritoResumenStatsEl.style.display = 'grid';
+
+                // Llenar la tabla de productos
                 if (carritoItemsTbodyEl && data.items && data.items.length > 0) {
                     let html = '';
                     data.items.forEach(item => {
                         html += `
                             <tr>
-                                <td>
-                                    <strong>${item.name || 'Producto'}</strong>
-                                </td>
+                                <td><strong>${item.name || 'Producto'}</strong></td>
                                 <td class="text-center">
                                     <span class="badge badge-primary">${item.quantity}</span>
                                 </td>
@@ -59,26 +49,34 @@ function cargarDatosCarrito() {
                         `;
                     });
                     carritoItemsTbodyEl.innerHTML = html;
-                    
-                    // Mostrar tarjeta de items
-                    if (carritoItemsCardEl) {
-                        carritoItemsCardEl.classList.remove('d-none');
-                    }
+
+                    if (carritoItemsCardEl) carritoItemsCardEl.classList.remove('d-none');
                 }
-                
-                // Mostrar alerta informativa
+
+                // Crear input oculto con el carrito (para el backend)
+                const form = document.querySelector('#form-solicitud');
+                if (form) {
+                    const inputHidden = document.createElement('input');
+                    inputHidden.type = 'hidden';
+                    inputHidden.name = 'carrito';
+                    inputHidden.value = JSON.stringify(data.items || []);
+                    form.appendChild(inputHidden);
+                }
+
+                // Mostrar alerta de éxito
                 if (typeof Swal !== 'undefined') {
                     Swal.fire({
                         icon: 'success',
                         title: 'Carrito cargado',
                         html: `Se han cargado <strong>${data.totalProductos} producto(s)</strong> con <strong>${data.totalItems} ítems</strong><br><small class="text-muted">Completa los datos faltantes</small>`,
-                        timer: 3500,
+                        timer: 3000,
                         showConfirmButton: false
                     });
                 }
-                
-                // Limpiar sessionStorage
+
+                // Limpiar sessionStorage (para evitar duplicados)
                 sessionStorage.removeItem('carrito_data');
+
             } catch (error) {
                 console.error('Error al cargar datos del carrito:', error);
                 if (typeof Swal !== 'undefined') {
@@ -91,23 +89,24 @@ function cargarDatosCarrito() {
             }
         }
     }
-    
-    // ===== Lógica para mostrar/ocultar fecha de devolución =====
+
+    // Configurar comportamiento de la fecha de devolución
     setupFechaDevolucionToggle();
 }
 
 /**
- * Configurar toggle de fecha de devolución según el tipo seleccionado
+ * Mostrar u ocultar fecha de devolución según el tipo
  */
 function setupFechaDevolucionToggle() {
     const tipo = document.getElementById('tipo');
     const grupoFecha = document.getElementById('grupo-fecha-devolucion');
     const fechaDevolucion = document.getElementById('fecha_devolucion');
-    
+
     function updateFechaEntregaVisibility() {
-        if (!tipo) return;
-        
-        if (tipo.value === 'prestamo') {
+        if (!tipo || !grupoFecha || !fechaDevolucion) return;
+
+        // Si el tipo es PRÉSTAMO (id=44)
+        if (tipo.value === '44' || tipo.value.toLowerCase() === 'prestamo') {
             grupoFecha.classList.remove('d-none');
             fechaDevolucion.setAttribute('required', 'required');
         } else {
