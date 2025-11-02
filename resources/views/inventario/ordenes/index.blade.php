@@ -21,11 +21,21 @@
             <div class="row">
                 <div class="col-12">
                     <div class="mb-3">
-                        <a href="{{ route('inventario.prestamos-salidas') }}" 
+                        <a href="{{ route('inventario.prestamos-salidas') }}"
                            class="btn btn-success">
                             <i class="fas fa-plus-circle"></i> Nueva Solicitud
                         </a>
                     </div>
+
+                    {{-- Script para limpiar carrito si viene de una orden exitosa --}}
+                    @if(session('clear_cart'))
+                        <script>
+                            // Limpiar carrito del localStorage después de crear orden exitosamente
+                            localStorage.removeItem('inventario_carrito');
+                            localStorage.removeItem('inventario_draft');
+                            sessionStorage.removeItem('carrito_data');
+                        </script>
+                    @endif
                     
                     <x-data-table
                         title="Lista de Órdenes"

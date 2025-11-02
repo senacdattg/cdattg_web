@@ -319,7 +319,7 @@ class OrdenController extends InventarioController
             // Procesar productos del carrito
             foreach ($carrito as $item) {
                 $productoId = $item['id'] ?? $item['producto_id'] ?? null;
-                $cantidad = (int)($item['cantidad'] ?? 1);
+                $cantidad = (int)($item['quantity'] ?? $item['cantidad'] ?? 1);
 
                 if (!$productoId) {
                     continue;
@@ -352,8 +352,12 @@ class OrdenController extends InventarioController
 
             DB::commit();
 
+            // Limpiar el carrito después de crear la orden exitosamente
+            session()->forget('carrito_data');
+
             return redirect()->route('inventario.ordenes.index')
-                ->with('success', 'Solicitud creada exitosamente. Está pendiente de aprobación por el administrador.');
+                ->with('success', 'Solicitud creada exitosamente. Está pendiente de aprobación por el administrador.')
+                ->with('clear_cart', true);
 
         } catch (\Exception $e) {
             DB::rollBack();
