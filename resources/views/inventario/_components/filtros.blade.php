@@ -70,18 +70,20 @@
                                             <td>
                                                 <span class="badge badge-secondary">{{ $orden->id }}</span>
                                             </td>
-                                            <td>{{ $orden->user->name ?? 'N/A' }}</td>
+                                            <td>{{ $orden->userCreate->name ?? 'N/A' }}</td>
                                             <td>
                                                 @php
-                                                    $tipoClass = $orden->tipo === 'PRÉSTAMO' ? 'info' : 'warning';
+                                                    $tipoNombre = $orden->tipoOrden->parametro->name ?? 'N/A';
+                                                    $tipoClass = $tipoNombre === 'PRÉSTAMO' ? 'info' : 'warning';
                                                 @endphp
                                                 <span class="badge badge-{{ $tipoClass }}">
-                                                    {{ $orden->tipo ?? 'N/A' }}
+                                                    {{ $tipoNombre }}
                                                 </span>
                                             </td>
                                             <td>
                                                 @php
-                                                    $estadoClass = match($orden->estado ?? '') {
+                                                    $estadoNombre = $orden->detalles->first()->estadoOrden->parametro->name ?? 'N/A';
+                                                    $estadoClass = match($estadoNombre) {
                                                         'EN ESPERA' => 'warning',
                                                         'APROBADA' => 'success',
                                                         'RECHAZADA' => 'danger',
@@ -89,7 +91,7 @@
                                                     };
                                                 @endphp
                                                 <span class="badge badge-{{ $estadoClass }}">
-                                                    {{ $orden->estado ?? 'N/A' }}
+                                                    {{ $estadoNombre }}
                                                 </span>
                                             </td>
                                             <td>
@@ -106,7 +108,10 @@
                                                    title="Ver detalles">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                                @if($orden->estado === 'EN ESPERA')
+                                                @php
+                                                    $estadoActual = $orden->detalles->first()->estadoOrden->parametro->name ?? '';
+                                                @endphp
+                                                @if($estadoActual === 'EN ESPERA')
                                                     <a href="{{ route('inventario.ordenes.index') }}?action=edit&id={{ $orden->id }}" 
                                                        class="btn btn-sm btn-warning" 
                                                        title="Editar">

@@ -104,6 +104,10 @@ body .content-wrapper {
     width: 95% !important;
 }
 
+#grupo-programa-formacion {
+   width:  220px !important;
+}
+
 #tipo_producto_id {
     width: 95% !important;
 }
@@ -162,3 +166,6 @@ body .content-wrapper {
     }
 }
 
+.modal-body p {
+    color: #343a40 !important;
+}

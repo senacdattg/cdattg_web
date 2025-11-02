@@ -163,6 +163,7 @@ class TemaSeeder extends Seeder
         foreach ([44, 45] as $id) {
             $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
         }
+        $tema->parametros()->sync($syncData);
 
         // Tema 12: ESTADOS DE ORDEN
         $tema = Tema::create([

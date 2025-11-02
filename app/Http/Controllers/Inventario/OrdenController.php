@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Inventario\Orden;
 use App\Models\Inventario\DetalleOrden;
 use App\Models\Inventario\Producto;
+use App\Models\ProgramaFormacion;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ParametroTema;
@@ -15,8 +16,8 @@ class OrdenController extends InventarioController
     public function __construct()
     {
         parent::__construct();
-        $this->middleware('can:VER ORDEN')->only(['index', 'show']);
-        $this->middleware('can:CREAR ORDEN')->only(['store', 'storePrestamos', 'prestamosSalidas']);
+        $this->middleware('can:VER ORDEN')->only(['index', 'show', 'prestamosSalidas', 'storePrestamos']);
+        $this->middleware('can:CREAR ORDEN')->only(['store']);
         $this->middleware('can:EDITAR ORDEN')->only('update');
     }
 
@@ -27,12 +28,12 @@ class OrdenController extends InventarioController
     {
         $ordenes = Orden::with([
             'tipoOrden.parametro',
-            'userCreate.persona',
-            'userUpdate.persona',
-            'detalles.producto'
+            'userCreate',
+            'detalles.producto',
+            'detalles.estadoOrden.parametro'
         ])
         ->latest()
-        ->paginate(10);
+        ->paginate(15);
         
         return view('inventario.ordenes.index', compact('ordenes'));
     }
@@ -108,7 +109,107 @@ class OrdenController extends InventarioController
      */
     public function prestamosSalidas()
     {
-        return view('inventario.ordenes.prestamos_salidas');
+        $programas = ProgramaFormacion::where('status', true)
+            ->orderBy('nombre', 'asc')
+            ->get(['id', 'nombre', 'codigo']);
+            
+        return view('inventario.ordenes.prestamos_salidas', compact('programas'));
+    }
+
+    /**
+     * Mostrar órdenes pendientes (EN ESPERA)
+     */
+    public function pendientes()
+    {
+        $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
+            $q->where('name', 'EN ESPERA');
+        })
+        ->whereHas('tema', function($q) {
+            $q->where('name', 'ESTADOS DE ORDEN');
+        })
+        ->first();
+
+        $ordenes = collect();
+        
+        if ($estadoEnEspera) {
+            $ordenes = Orden::with([
+                'tipoOrden.parametro',
+                'userCreate',
+                'detalles.producto',
+                'detalles.estadoOrden.parametro'
+            ])
+            ->whereHas('detalles', function($q) use ($estadoEnEspera) {
+                $q->where('estado_orden_id', $estadoEnEspera->id);
+            })
+            ->latest()
+            ->paginate(15);
+        }
+        
+        return view('inventario.ordenes.pendientes', compact('ordenes'));
+    }
+
+    /**
+     * Mostrar órdenes completadas (APROBADA)
+     */
+    public function completadas()
+    {
+        $estadoAprobada = ParametroTema::whereHas('parametro', function($q) {
+            $q->where('name', 'APROBADA');
+        })
+        ->whereHas('tema', function($q) {
+            $q->where('name', 'ESTADOS DE ORDEN');
+        })
+        ->first();
+
+        $ordenes = collect();
+        
+        if ($estadoAprobada) {
+            $ordenes = Orden::with([
+                'tipoOrden.parametro',
+                'userCreate',
+                'detalles.producto',
+                'detalles.estadoOrden.parametro'
+            ])
+            ->whereHas('detalles', function($q) use ($estadoAprobada) {
+                $q->where('estado_orden_id', $estadoAprobada->id);
+            })
+            ->latest()
+            ->paginate(15);
+        }
+        
+        return view('inventario.ordenes.completadas', compact('ordenes'));
+    }
+
+    /**
+     * Mostrar órdenes rechazadas (RECHAZADA)
+     */
+    public function rechazadas()
+    {
+        $estadoRechazada = ParametroTema::whereHas('parametro', function($q) {
+            $q->where('name', 'RECHAZADA');
+        })
+        ->whereHas('tema', function($q) {
+            $q->where('name', 'ESTADOS DE ORDEN');
+        })
+        ->first();
+
+        $ordenes = collect();
+        
+        if ($estadoRechazada) {
+            $ordenes = Orden::with([
+                'tipoOrden.parametro',
+                'userCreate',
+                'detalles.producto',
+                'detalles.estadoOrden.parametro'
+            ])
+            ->whereHas('detalles', function($q) use ($estadoRechazada) {
+                $q->where('estado_orden_id', $estadoRechazada->id);
+            })
+            ->latest()
+            ->paginate(15);
+        }
+        
+        return view('inventario.ordenes.rechazadas', compact('ordenes'));
     }
 
     /**
@@ -135,14 +236,20 @@ class OrdenController extends InventarioController
                 throw new \Exception('El carrito está vacío. Agregue productos antes de crear la solicitud.');
             }
 
-            // Determinar el tipo de orden (PRESTAMO o SALIDA)
-            $codigoTipoOrden = strtoupper($validated['tipo']);
+            // Determinar el tipo de orden (PRÉSTAMO o SALIDA)
+            $tipoMap = [
+                'prestamo' => 'PRÉSTAMO',
+                'salida' => 'SALIDA'
+            ];
+            
+            $codigoTipoOrden = $tipoMap[$validated['tipo']] ?? strtoupper($validated['tipo']);
 
             // Buscar el parámetro de tipo de orden (tema: TIPOS DE ORDEN)
             $parametroTipoOrden = ParametroTema::whereHas('tema', function ($q) {
                     $q->whereRaw('UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(name, "Á", "A"), "É", "E"), "Í", "I"), "Ó", "O"), "Ú", "U")) = ?', ['TIPOS DE ORDEN']);
                 })
                 ->whereHas('parametro', function ($q) use ($codigoTipoOrden) {
+                    // Normalizar sin acentos para la comparación
                     $nombreNormalizado = str_replace(
                         ['Á', 'É', 'Í', 'Ó', 'Ú'],
                         ['A', 'E', 'I', 'O', 'U'],

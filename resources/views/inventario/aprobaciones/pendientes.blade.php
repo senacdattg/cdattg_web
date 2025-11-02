@@ -8,12 +8,16 @@
         title="Aprobaciones Pendientes"
         subtitle="Gestión de solicitudes de préstamos y salidas"
         :breadcrumb="[
-            ['label' => 'Inicio', 'url' => route('home')],
+            ['label' => 'Inicio', 'url' => '#'],
             ['label' => 'Inventario', 'active' => true],
             ['label' => 'Aprobaciones', 'active' => true]
         ]"
     />
 @endsection
+@push('css')
+    @vite(['public/css/inventario/shared/base.css'])
+    <link rel="stylesheet" href="{{ asset('css/inventario/modal-orden.css') }}">
+@endpush
 
 @section('content')
     <div class="container-fluid">
@@ -42,31 +46,41 @@
                         <table class="table table-hover mb-0">
                             <thead class="thead-light">
                                 <tr>
-                                    <th>Orden</th>
-                                    <th>Solicitante</th>
-                                    <th>Producto</th>
-                                    <th class="text-center">Cantidad</th>
-                                    <th>Tipo</th>
-                                    <th>Fecha Solicitud</th>
-                                    <th class="text-center">Acciones</th>
+                                    <th width="4%">#</th>
+                                    <th width="6%">Orden</th>
+                                    <th width="12%">Solicitante</th>
+                                    <th width="10%">Email</th>
+                                    <th width="12%">Producto</th>
+                                    <th width="6%" class="text-center">Stock</th>
+                                    <th width="6%" class="text-center">Cantidad</th>
+                                    <th width="7%">Tipo</th>
+                                    <th width="15%">Motivo</th>
+                                    <th width="9%">Fecha</th>
+                                    <th width="13%" class="text-center">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @foreach($detalles as $detalle)
+                                    @php
+                                        $descripcion = $detalle->orden->descripcion_orden ?? '';
+                                        preg_match('/MOTIVO:\s*(.+?)$/s', $descripcion, $matchMotivo);
+                                        $motivoCorto = isset($matchMotivo[1]) ? trim($matchMotivo[1]) : 'N/A';
+                                    @endphp
                                     <tr>
+                                        <td>{{ $loop->iteration }}</td>
                                         <td>
-                                            <strong>#{{ $detalle->orden_id }}</strong>
-                                            <br>
-                                            <small class="text-muted">
-                                                {{ Str::limit($detalle->orden->descripcion_orden, 50) }}
-                                            </small>
+                                            <span class="badge badge-secondary">
+                                                #{{ $detalle->orden_id }}
+                                            </span>
                                         </td>
                                         <td>
-                                            <i class="fas fa-user text-primary"></i>
+                                            <i class="fas fa-user-circle text-primary"></i>
                                             {{ $detalle->orden->userCreate->name ?? 'N/A' }}
-                                            <br>
+                                        </td>
+                                        <td>
                                             <small class="text-muted">
-                                                {{ $detalle->orden->userCreate->email ?? '' }}
+                                                <i class="fas fa-envelope"></i>
+                                                {{ $detalle->orden->userCreate->email ?? 'N/A' }}
                                             </small>
                                         </td>
                                         <td>
@@ -74,108 +88,197 @@
                                                 <img src="{{ asset($detalle->producto->imagen ?? 'img/inventario/producto-default.png') }}" 
                                                      alt="{{ $detalle->producto->producto }}"
                                                      class="img-thumbnail mr-2"
-                                                     style="width: 50px; height: 50px; object-fit: cover;">
-                                                <div>
-                                                    <strong>{{ $detalle->producto->producto }}</strong>
-                                                    <br>
-                                                    <small class="text-muted">
-                                                        Stock: {{ $detalle->producto->cantidad }}
-                                                    </small>
-                                                </div>
+                                                     style="width: 40px; height: 40px; object-fit: cover;">
+                                                <span>{{ Str::limit($detalle->producto->producto, 20) }}</span>
                                             </div>
                                         </td>
                                         <td class="text-center">
+                                            <span class="badge badge-{{ $detalle->producto->cantidad >= $detalle->cantidad ? 'success' : 'danger' }}">
+                                                <i class="fas fa-boxes"></i>
+                                                {{ $detalle->producto->cantidad }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
                                             <span class="badge badge-info badge-lg">
+                                                <i class="fas fa-hashtag"></i>
                                                 {{ $detalle->cantidad }}
                                             </span>
                                         </td>
                                         <td>
                                             @php
                                                 $tipoOrden = $detalle->orden->tipoOrden->parametro->name ?? 'N/A';
+                                                $tipoClass = $tipoOrden === 'PRÉSTAMO' ? 'warning' : 'info';
                                             @endphp
-                                            <span class="badge badge-{{ strtolower($tipoOrden) === 'prestamo' ? 'warning' : 'info' }}">
+                                            <span class="badge badge-{{ $tipoClass }}">
+                                                <i class="fas fa-{{ $tipoOrden === 'PRÉSTAMO' ? 'handshake' : 'sign-out-alt' }}"></i>
                                                 {{ $tipoOrden }}
                                             </span>
                                         </td>
                                         <td>
-                                            <i class="fas fa-calendar"></i>
+                                            <small class="text-muted" title="{{ $motivoCorto }}">
+                                                <i class="fas fa-comment-dots"></i>
+                                                {{ Str::limit($motivoCorto, 50) }}
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <i class="fas fa-calendar-alt text-muted"></i>
                                             {{ $detalle->created_at->format('d/m/Y') }}
                                             <br>
                                             <small class="text-muted">
-                                                {{ $detalle->created_at->diffForHumans() }}
+                                                {{ $detalle->created_at->format('H:i') }}
                                             </small>
                                         </td>
                                         <td class="text-center">
-                                            <div class="btn-group" role="group">
+                                            <div class="btn-group-vertical btn-group-sm" role="group">
                                                 {{-- Botón Ver Detalles --}}
                                                 <button type="button" 
-                                                        class="btn btn-sm btn-info"
+                                                        class="btn btn-info mb-1"
                                                         data-toggle="modal"
                                                         data-target="#detalleModal{{ $detalle->id }}"
                                                         title="Ver detalles">
-                                                    <i class="fas fa-eye"></i>
+                                                    <i class="fas fa-eye"></i> Ver
                                                 </button>
 
                                                 {{-- Botón Aprobar --}}
                                                 <button type="button" 
-                                                        class="btn btn-sm btn-success"
+                                                        class="btn btn-success mb-1"
                                                         onclick="aprobarSolicitud({{ $detalle->id }}, '{{ addslashes($detalle->producto->producto) }}')"
                                                         title="Aprobar">
-                                                    <i class="fas fa-check"></i>
+                                                    <i class="fas fa-check"></i> Aprobar
                                                 </button>
 
                                                 {{-- Botón Rechazar --}}
                                                 <button type="button" 
-                                                        class="btn btn-sm btn-danger"
+                                                        class="btn btn-danger"
                                                         onclick="rechazarSolicitud({{ $detalle->id }}, '{{ addslashes($detalle->producto->producto) }}')"
                                                         title="Rechazar">
-                                                    <i class="fas fa-times"></i>
+                                                    <i class="fas fa-times"></i> Rechazar
                                                 </button>
                                             </div>
                                         </td>
                                     </tr>
 
                                     {{-- Modal de Detalles --}}
-                                    <div class="modal fade" id="detalleModal{{ $detalle->id }}" tabindex="-1">
+                                    <div class="modal fade modal-orden" id="detalleModal{{ $detalle->id }}" tabindex="-1">
                                         <div class="modal-dialog modal-lg">
                                             <div class="modal-content">
-                                                <div class="modal-header bg-info text-white">
+                                                <div class="modal-header">
                                                     <h5 class="modal-title">
-                                                        <i class="fas fa-info-circle"></i>
-                                                        Detalles de la Solicitud #{{ $detalle->orden_id }}
+                                                        <i class="fas fa-clipboard-list"></i>
+                                                        Solicitud #{{ $detalle->orden_id }}
                                                     </h5>
-                                                    <button type="button" class="close text-white" data-dismiss="modal">
+                                                    <button type="button" class="close" data-dismiss="modal">
                                                         <span>&times;</span>
                                                     </button>
                                                 </div>
                                                 <div class="modal-body">
                                                     <div class="row">
-                                                        <div class="col-md-6">
-                                                            <h6><strong>Información de la Orden</strong></h6>
-                                                            <p><strong>Descripción:</strong><br>
-                                                                <pre style="white-space: pre-wrap; font-size: 0.9em;">{{ $detalle->orden->descripcion_orden }}</pre>
-                                                            </p>
-                                                            @if($detalle->orden->fecha_devolucion)
-                                                                <p><strong>Fecha Devolución:</strong> {{ $detalle->orden->fecha_devolucion->format('d/m/Y') }}</p>
-                                                            @endif
+                                                        <div class="col-md-6 mb-3">
+                                                            <div class="info-card">
+                                                                <h6>
+                                                                    <i class="fas fa-user-graduate"></i>
+                                                                    Información del Solicitante
+                                                                </h6>
+                                                                @php
+                                                                    $descripcion = $detalle->orden->descripcion_orden ?? '';
+                                                                    preg_match('/MOTIVO:\s*(.+?)$/s', $descripcion, $matchMotivo);
+                                                                    preg_match('/Programa de Formación:\s*(.+?)[\n\r]/i', $descripcion, $matchPrograma);
+                                                                    preg_match('/Rol:\s*(.+?)[\n\r]/i', $descripcion, $matchRol);
+                                                                    preg_match('/Email:\s*(.+?)[\n\r]/i', $descripcion, $matchEmail);
+                                                                    
+                                                                    $motivo = isset($matchMotivo[1]) ? trim($matchMotivo[1]) : 'N/A';
+                                                                    $programa = isset($matchPrograma[1]) ? trim($matchPrograma[1]) : 'N/A';
+                                                                    $rol = isset($matchRol[1]) ? trim($matchRol[1]) : 'N/A';
+                                                                    $email = isset($matchEmail[1]) ? trim($matchEmail[1]) : 'N/A';
+                                                                @endphp
+                                                                <div class="info-item">
+                                                                    <strong><i class="fas fa-graduation-cap"></i> Programa:</strong><br>
+                                                                    <span class="text-muted">{{ $programa }}</span>
+                                                                </div>
+                                                                <div class="info-item">
+                                                                    <strong><i class="fas fa-id-badge"></i> Rol:</strong><br>
+                                                                    <span class="text-muted">{{ $rol }}</span>
+                                                                </div>
+                                                                <div class="info-item">
+                                                                    <strong><i class="fas fa-envelope"></i> Email:</strong><br>
+                                                                    <span class="text-muted">{{ $email }}</span>
+                                                                </div>
+                                                                <div class="info-item">
+                                                                    <strong><i class="fas fa-exchange-alt"></i> Tipo de Orden:</strong><br>
+                                                                    @php
+                                                                        $tipoOrdenModal = $detalle->orden->tipoOrden->parametro->name ?? 'N/A';
+                                                                        $tipoClassModal = $tipoOrdenModal === 'PRÉSTAMO' ? 'warning' : 'info';
+                                                                        $tipoIconModal = $tipoOrdenModal === 'PRÉSTAMO' ? 'handshake' : 'sign-out-alt';
+                                                                    @endphp
+                                                                    <span class="badge badge-{{ $tipoClassModal }}">
+                                                                        <i class="fas fa-{{ $tipoIconModal }}"></i>
+                                                                        {{ $tipoOrdenModal }}
+                                                                    </span>
+                                                                </div>
+                                                                @if($detalle->orden->fecha_devolucion)
+                                                                    <div class="info-item">
+                                                                        <strong><i class="fas fa-calendar-check"></i> Fecha Devolución:</strong><br>
+                                                                        <span class="badge badge-warning">
+                                                                            <i class="fas fa-clock"></i>
+                                                                            {{ $detalle->orden->fecha_devolucion->format('d/m/Y') }}
+                                                                        </span>
+                                                                    </div>
+                                                                @endif
+                                                            </div>
                                                         </div>
-                                                        <div class="col-md-6">
-                                                            <h6><strong>Información del Producto</strong></h6>
-                                                            <p><strong>Producto:</strong> {{ $detalle->producto->producto }}</p>
-                                                            <p><strong>Código:</strong> {{ $detalle->producto->codigo_barras }}</p>
-                                                            <p><strong>Stock Actual:</strong> 
-                                                                <span class="badge badge-{{ $detalle->producto->cantidad >= $detalle->cantidad ? 'success' : 'danger' }}">
-                                                                    {{ $detalle->producto->cantidad }}
-                                                                </span>
-                                                            </p>
-                                                            <p><strong>Cantidad Solicitada:</strong> 
-                                                                <span class="badge badge-info">{{ $detalle->cantidad }}</span>
-                                                            </p>
+                                                        
+                                                        <div class="col-md-6 mb-3">
+                                                            <div class="info-card">
+                                                                <h6>
+                                                                    <i class="fas fa-box"></i>
+                                                                    Información del Producto
+                                                                </h6>
+                                                                <div class="info-item">
+                                                                    <strong><i class="fas fa-tag"></i> Producto:</strong><br>
+                                                                    <span class="text-muted">{{ $detalle->producto->producto }}</span>
+                                                                </div>
+                                                                <div class="info-item">
+                                                                    <strong><i class="fas fa-barcode"></i> Código:</strong><br>
+                                                                    <span class="text-muted">{{ $detalle->producto->codigo_barras ?? 'N/A' }}</span>
+                                                                </div>
+                                                                <div class="info-item">
+                                                                    <strong><i class="fas fa-warehouse"></i> Stock Actual:</strong><br>
+                                                                    <span class="badge badge-{{ $detalle->producto->cantidad >= $detalle->cantidad ? 'success' : 'danger' }}">
+                                                                        <i class="fas fa-cubes"></i>
+                                                                        {{ $detalle->producto->cantidad }} unidades
+                                                                    </span>
+                                                                </div>
+                                                                <div class="info-item">
+                                                                    <strong><i class="fas fa-shopping-cart"></i> Cantidad Solicitada:</strong><br>
+                                                                    <span class="badge badge-info">
+                                                                        <i class="fas fa-hashtag"></i>
+                                                                        {{ $detalle->cantidad }} unidades
+                                                                    </span>
+                                                                </div>
+                                                                @if($detalle->producto->cantidad < $detalle->cantidad)
+                                                                    <div class="stock-alert">
+                                                                        <i class="fas fa-exclamation-triangle"></i>
+                                                                        <strong>¡Stock insuficiente!</strong>
+                                                                        <p class="mb-0 mt-1 text-muted">
+                                                                            No hay suficiente inventario disponible
+                                                                        </p>
+                                                                    </div>
+                                                                @endif
+                                                            </div>
                                                         </div>
+                                                    </div>
+                                                    
+                                                    <div class="divider"></div>
+                                                    
+                                                    <div class="motivo-section">
+                                                        <strong><i class="fas fa-comment-dots"></i> Motivo de la Solicitud:</strong>
+                                                        <div class="motivo-text">{{ $motivo }}</div>
                                                     </div>
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                        <i class="fas fa-times"></i> Cerrar
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -191,6 +294,8 @@
 
     @include('layout.footer')
 @endsection
+
+
 
 @push('js')
 <script>

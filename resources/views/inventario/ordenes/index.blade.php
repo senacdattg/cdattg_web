@@ -20,12 +20,12 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    <x-create-card
-                        url="inventario.ordenes.prestamos_salidas"
-                        title="Nueva Orden"
-                        icon="fa-plus-circle"
-                        permission="CREAR ORDEN"
-                    />
+                    <div class="mb-3">
+                        <a href="{{ route('inventario.prestamos-salidas') }}" 
+                           class="btn btn-success">
+                            <i class="fas fa-plus-circle"></i> Nueva Solicitud
+                        </a>
+                    </div>
                     
                     <x-data-table
                         title="Lista de Órdenes"
@@ -35,53 +35,94 @@
                         searchValue="{{ request('search') }}"
                         :columns="[
                             ['label' => '#', 'width' => '5%'],
-                            ['label' => 'Descripción', 'width' => '25%'],
-                            ['label' => 'Tipo', 'width' => '15%'],
-                            ['label' => 'Fecha Devolución', 'width' => '15%'],
+                            ['label' => 'ID', 'width' => '5%'],
                             ['label' => 'Usuario', 'width' => '15%'],
+                            ['label' => 'Tipo', 'width' => '10%'],
+                            ['label' => 'Productos', 'width' => '10%'],
                             ['label' => 'Estado', 'width' => '10%'],
-                            ['label' => 'Opciones', 'width' => '15%', 'class' => 'text-center']
+                            ['label' => 'F. Devolución', 'width' => '12%'],
+                            ['label' => 'F. Creación', 'width' => '12%'],
+                            ['label' => 'Opciones', 'width' => '11%', 'class' => 'text-center']
                         ]"
                         :pagination="$ordenes->links()"
                     >
                         @forelse ($ordenes as $orden)
+                            @php
+                                // Obtener tipo de orden
+                                $tipoNombre = $orden->tipoOrden->parametro->name ?? 'N/A';
+                                $tipoClass = $tipoNombre === 'PRÉSTAMO' ? 'info' : 'warning';
+                                
+                                // Obtener estado del primer detalle (todas las órdenes comparten estado)
+                                $estadoNombre = $orden->detalles->first()->estadoOrden->parametro->name ?? 'N/A';
+                                $estadoClass = match($estadoNombre) {
+                                    'EN ESPERA' => 'warning',
+                                    'APROBADA' => 'success',
+                                    'RECHAZADA' => 'danger',
+                                    default => 'secondary'
+                                };
+                                
+                                // Contar productos
+                                $totalProductos = $orden->detalles->count();
+                            @endphp
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
-                                <td>{{ Str::limit($orden->descripcion_orden, 50) }}</td>
+                                <td><span class="badge badge-secondary">{{ $orden->id }}</span></td>
                                 <td>
-                                    <span class="badge badge-secondary">
-                                        {{ $orden->tipoOrden->parametro->name ?? 'N/A' }}
+                                    <i class="fas fa-user-circle text-primary"></i>
+                                    {{ $orden->userCreate->name ?? 'N/A' }}
+                                </td>
+                                <td>
+                                    <span class="badge badge-{{ $tipoClass }}">
+                                        <i class="fas fa-{{ $tipoNombre === 'PRÉSTAMO' ? 'handshake' : 'sign-out-alt' }}"></i>
+                                        {{ $tipoNombre }}
                                     </span>
                                 </td>
-                                <td>{{ $orden->fecha_devolucion ? $orden->fecha_devolucion->format('d/m/Y') : 'N/A' }}</td>
                                 <td>
                                     <span class="badge badge-primary">
-                                        <i class="fas fa-user-circle"></i> {{ $orden->userCreate->name ?? 'Usuario' }}
+                                        <i class="fas fa-boxes"></i> {{ $totalProductos }} 
+                                        {{ $totalProductos === 1 ? 'producto' : 'productos' }}
                                     </span>
                                 </td>
                                 <td>
-                                    <x-status-badge
-                                        status="true"
-                                        activeText="ACTIVA"
-                                        inactiveText="INACTIVA"
-                                    />
+                                    <span class="badge badge-{{ $estadoClass }}">
+                                        <i class="fas fa-{{ $estadoNombre === 'EN ESPERA' ? 'clock' : ($estadoNombre === 'APROBADA' ? 'check-circle' : 'times-circle') }}"></i>
+                                        {{ $estadoNombre }}
+                                    </span>
+                                </td>
+                                <td>
+                                    @if($orden->fecha_devolucion)
+                                        <span class="badge badge-light">
+                                            <i class="fas fa-calendar-alt"></i>
+                                            {{ $orden->fecha_devolucion->format('d/m/Y') }}
+                                        </span>
+                                    @else
+                                        <span class="text-muted">N/A</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <span class="badge badge-light">
+                                        <i class="fas fa-calendar-plus"></i>
+                                        {{ $orden->created_at->format('d/m/Y H:i') }}
+                                    </span>
                                 </td>
                                 <td class="text-center">
-                                    <x-action-buttons
-                                        show="true"
-                                        edit="true"
-                                        delete="true"
-                                        showUrl="{{ route('inventario.ordenes.show', $orden) }}"
-                                        editUrl="#"
-                                        deleteUrl="#"
-                                        showTitle="Ver orden"
-                                        editTitle="Editar orden"
-                                        deleteTitle="Eliminar orden"
-                                    />
+                                    <a href="{{ route('inventario.ordenes.show', $orden) }}" 
+                                       class="btn btn-sm btn-info" 
+                                       title="Ver detalles">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    @if($estadoNombre === 'EN ESPERA')
+                                        <a href="{{ route('inventario.aprobaciones.pendientes') }}" 
+                                           class="btn btn-sm btn-warning" 
+                                           title="Gestionar">
+                                            <i class="fas fa-tasks"></i>
+                                        </a>
+                                    @endif
+                                </td>
                             </tr>
                         @empty
                             <x-table-empty
-                                colspan="7"
+                                colspan="9"
                                 message="No hay órdenes registradas"
                                 icon="fas fa-list"
                             />
@@ -92,9 +133,6 @@
         </div>
     </section>
 
-    {{-- Modal de confirmación de eliminación --}}
-    <x-confirm-delete-modal />
-    
     {{-- Alertas --}}
     @include('layout.alertas')
 @endsection
@@ -105,12 +143,5 @@
 @endsection
 
 @push('css')
-    @vite([
-        'public/css/inventario/shared/base.css',
-    ])
-@endpush
-
-@push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    @vite(['resources/js/pages/formularios-generico.js'])
+    @vite(['public/css/inventario/shared/base.css'])
 @endpush

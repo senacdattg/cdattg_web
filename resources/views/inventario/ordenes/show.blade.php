@@ -17,14 +17,14 @@
 @endsection
 
 @section('content')
-    <div class="container-fluid">
+    <div class="container-fluid orden-show-card">
         <div class="row">
             <div class="col-12">
                 <div class="card">
-                    <div class="card-header bg-gradient">
+                    <div class="card-header">
                         <h3 class="card-title">
-                            <i class="fas fa-file-alt"></i>
-                            Información de la Orden
+                            <i class="fas fa-file-invoice"></i>
+                            Información de la Orden #{{ $orden->id }}
                         </h3>
                     </div>
 
@@ -33,118 +33,164 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="info-group">
-                                    <label><i class="fas fa-hashtag"></i> ID:</label>
-                                    <span>{{ $orden->id }}</span>
+                                    <label><i class="fas fa-hashtag"></i> ID de Orden:</label>
+                                    <span class="badge badge-secondary">#{{ $orden->id }}</span>
                                 </div>
                                 <div class="info-group">
-                                    <label><i class="fas fa-tag"></i> Tipo:</label>
-                                    <span class="badge badge-secondary">
-                                        {{ $orden->tipoOrden->parametro->name ?? 'N/A' }}
+                                    <label><i class="fas fa-exchange-alt"></i> Tipo de Orden:</label>
+                                    @php
+                                        $tipoNombre = $orden->tipoOrden->parametro->name ?? 'N/A';
+                                        $tipoClass = $tipoNombre === 'PRÉSTAMO' ? 'warning' : 'info';
+                                    @endphp
+                                    <span class="badge badge-{{ $tipoClass }}">
+                                        <i class="fas fa-{{ $tipoNombre === 'PRÉSTAMO' ? 'handshake' : 'sign-out-alt' }}"></i>
+                                        {{ $tipoNombre }}
                                     </span>
                                 </div>
                                 <div class="info-group">
-                                    <label><i class="fas fa-calendar"></i> Fecha Creación:</label>
+                                    <label><i class="fas fa-calendar-plus"></i> Fecha Creación:</label>
                                     <span>{{ $orden->created_at->format('d/m/Y H:i') }}</span>
                                 </div>
                                 @if($orden->fecha_devolucion)
                                     <div class="info-group">
                                         <label><i class="fas fa-calendar-check"></i> Fecha Devolución:</label>
-                                        <span>{{ $orden->fecha_devolucion->format('d/m/Y') }}</span>
+                                        <span class="badge badge-warning">
+                                            <i class="fas fa-clock"></i>
+                                            {{ $orden->fecha_devolucion->format('d/m/Y') }}
+                                        </span>
                                     </div>
                                 @endif
                             </div>
                             <div class="col-md-6">
                                 <div class="info-group">
-                                    <label><i class="fas fa-user"></i> Solicitante:</label>
+                                    <label><i class="fas fa-user-circle"></i> Solicitante:</label>
                                     <span>{{ $orden->userCreate->name }}</span>
                                 </div>
                                 <div class="info-group">
                                     <label><i class="fas fa-envelope"></i> Email:</label>
                                     <span>{{ $orden->userCreate->email }}</span>
                                 </div>
+                                @php
+                                    // Extraer información de la descripción
+                                    $descripcion = $orden->descripcion_orden ?? '';
+                                    preg_match('/Programa de Formación:\s*(.+?)[\n\r]/i', $descripcion, $matchPrograma);
+                                    preg_match('/Rol:\s*(.+?)[\n\r]/i', $descripcion, $matchRol);
+                                    $programa = $matchPrograma[1] ?? 'N/A';
+                                    $rol = $matchRol[1] ?? 'N/A';
+                                @endphp
                                 <div class="info-group">
                                     <label><i class="fas fa-graduation-cap"></i> Programa:</label>
-                                    <span>{{ $orden->programa_formacion }}</span>
+                                    <span>{{ $programa }}</span>
                                 </div>
                                 <div class="info-group">
-                                    <label><i class="fas fa-ticket-alt"></i> Ficha:</label>
-                                    <span>{{ $orden->ficha }}</span>
+                                    <label><i class="fas fa-id-badge"></i> Rol:</label>
+                                    <span>{{ $rol }}</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="description-box mt-4">
-                            <label><i class="fas fa-align-left"></i> Descripción:</label>
-                            <p>{{ $orden->descripcion_orden }}</p>
+                        <div class="description-box">
+                            <label><i class="fas fa-comment-dots"></i> Motivo de la Solicitud:</label>
+                            @php
+                                preg_match('/MOTIVO:\s*(.+?)$/s', $descripcion, $matchMotivo);
+                                $motivo = isset($matchMotivo[1]) ? trim($matchMotivo[1]) : $orden->descripcion_orden;
+                            @endphp
+                            <p>{{ $motivo }}</p>
                         </div>
 
                         {{-- Lista de productos --}}
-                        <div class="products-section mt-4">
-                            <h4><i class="fas fa-box"></i> Productos Solicitados</h4>
+                        <div class="products-section">
+                            <h4><i class="fas fa-boxes"></i> Productos Solicitados</h4>
                             <div class="table-responsive">
                                 <table class="table table-striped">
-                                    <thead class="thead-dark">
+                                    <thead>
                                         <tr>
-                                            <th>#</th>
-                                            <th>Producto</th>
-                                            <th>Cantidad</th>
-                                            <th>Estado</th>
-                                            <th class="text-center">Acciones</th>
+                                            <th width="8%">#</th>
+                                            <th width="35%">Producto</th>
+                                            <th width="12%" class="text-center">Cantidad</th>
+                                            <th width="15%">Estado</th>
+                                            <th width="30%" class="text-center">Información</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @forelse($orden->detalles as $detalle)
                                             <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $detalle->producto->nombre }}</td>
-                                                <td>{{ $detalle->cantidad }}</td>
+                                                <td><strong>{{ $loop->iteration }}</strong></td>
+                                                <td>
+                                                    <i class="fas fa-box text-primary"></i>
+                                                    {{ $detalle->producto->producto ?? 'N/A' }}
+                                                </td>
+                                                <td class="text-center">
+                                                    <span class="badge badge-info">
+                                                        <i class="fas fa-hashtag"></i>
+                                                        {{ $detalle->cantidad }}
+                                                    </span>
+                                                </td>
                                                 <td>
                                                     @php
-                                                        $estadoClass = [
-                                                            'PENDIENTE' => 'warning',
-                                                            'APROBADO' => 'success',
-                                                            'RECHAZADO' => 'danger'
-                                                        ][$detalle->estado] ?? 'secondary';
+                                                        $estadoNombre = $detalle->estadoOrden->parametro->name ?? 'N/A';
+                                                        $estadoClass = match($estadoNombre) {
+                                                            'EN ESPERA' => 'warning',
+                                                            'APROBADA' => 'success',
+                                                            'RECHAZADA' => 'danger',
+                                                            default => 'secondary'
+                                                        };
+                                                        $estadoIcon = match($estadoNombre) {
+                                                            'EN ESPERA' => 'clock',
+                                                            'APROBADA' => 'check-circle',
+                                                            'RECHAZADA' => 'times-circle',
+                                                            default => 'question-circle'
+                                                        };
                                                     @endphp
                                                     <span class="badge badge-{{ $estadoClass }}">
-                                                        {{ $detalle->estado }}
+                                                        <i class="fas fa-{{ $estadoIcon }}"></i>
+                                                        {{ $estadoNombre }}
                                                     </span>
                                                 </td>
                                                 <td class="text-center">
-                                                    @if($detalle->estado === 'PENDIENTE' && auth()->user()->can('APROBAR ORDEN'))
-                                                        <button 
-                                                            class="btn btn-sm btn-success aprobar-detalle" 
-                                                            data-detalle-id="{{ $detalle->id }}"
-                                                            data-toggle="tooltip" 
-                                                            title="Aprobar"
-                                                        >
-                                                            <i class="fas fa-check"></i>
-                                                        </button>
-                                                        <button 
-                                                            class="btn btn-sm btn-danger rechazar-detalle"
-                                                            data-detalle-id="{{ $detalle->id }}"
-                                                            data-toggle="tooltip" 
-                                                            title="Rechazar"
-                                                        >
-                                                            <i class="fas fa-times"></i>
-                                                        </button>
-                                                    @elseif($detalle->estado === 'APROBADO')
-                                                        <span class="badge badge-success">
-                                                            <i class="fas fa-check"></i> 
-                                                            Aprobado por {{ $detalle->aprobaciones->last()->aprobador->name ?? 'N/A' }}
-                                                        </span>
-                                                    @elseif($detalle->estado === 'RECHAZADO')
-                                                        <span class="badge badge-danger">
-                                                            <i class="fas fa-times"></i>
-                                                            Rechazado por {{ $detalle->aprobaciones->last()->aprobador->name ?? 'N/A' }}
-                                                        </span>
+                                                    @if($estadoNombre === 'EN ESPERA')
+                                                        <a href="{{ route('inventario.aprobaciones.pendientes') }}" 
+                                                           class="btn btn-sm btn-info"
+                                                           data-toggle="tooltip" 
+                                                           title="Ir a gestionar la aprobación">
+                                                            <i class="fas fa-tasks"></i> Gestionar Aprobación
+                                                        </a>
+                                                    @elseif($estadoNombre === 'APROBADA')
+                                                        <div class="estado-info">
+                                                            <span class="badge badge-success">
+                                                                <i class="fas fa-user-check"></i>
+                                                                Aprobada
+                                                            </span>
+                                                            @if($detalle->aprobacion)
+                                                                <small>
+                                                                    Por: {{ $detalle->aprobacion->aprobador->name ?? 'Admin' }}
+                                                                    <br>
+                                                                    {{ $detalle->aprobacion->created_at->format('d/m/Y H:i') }}
+                                                                </small>
+                                                            @endif
+                                                        </div>
+                                                    @elseif($estadoNombre === 'RECHAZADA')
+                                                        <div class="estado-info">
+                                                            <span class="badge badge-danger">
+                                                                <i class="fas fa-user-times"></i>
+                                                                Rechazada
+                                                            </span>
+                                                            @if($detalle->aprobacion)
+                                                                <small>
+                                                                    Por: {{ $detalle->aprobacion->aprobador->name ?? 'Admin' }}
+                                                                    <br>
+                                                                    {{ $detalle->aprobacion->created_at->format('d/m/Y H:i') }}
+                                                                </small>
+                                                            @endif
+                                                        </div>
                                                     @endif
                                                 </td>
                                             </tr>
                                         @empty
                                             <tr>
                                                 <td colspan="5" class="text-center">
-                                                    <i class="fas fa-info-circle"></i>
+                                                    <i class="fas fa-inbox"></i>
+                                                    <br>
                                                     No hay productos en esta orden
                                                 </td>
                                             </tr>
@@ -157,7 +203,7 @@
 
                     <div class="card-footer text-right">
                         <a href="{{ route('inventario.ordenes.index') }}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Volver
+                            <i class="fas fa-arrow-left"></i> Volver al Listado
                         </a>
                     </div>
                 </div>
@@ -214,35 +260,7 @@
 
 @push('css')
     @vite(['public/css/inventario/shared/base.css'])
-    <style>
-        .info-group {
-            margin-bottom: 1rem;
-        }
-        .info-group label {
-            font-weight: bold;
-            margin-right: 0.5rem;
-        }
-        .description-box {
-            background: #f8f9fa;
-            padding: 1rem;
-            border-radius: 0.25rem;
-        }
-        .description-box label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 0.5rem;
-        }
-        .description-box p {
-            margin-bottom: 0;
-        }
-        .products-section {
-            border-top: 1px solid #dee2e6;
-            padding-top: 1rem;
-        }
-        .products-section h4 {
-            margin-bottom: 1rem;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('css/inventario/orden.css') }}">
 @endpush
 
 @push('scripts')

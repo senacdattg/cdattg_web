@@ -841,6 +841,12 @@ return [
                             'can'  => 'VER ORDEN',
                         ],
                         [
+                            'text' => 'Solicitar Préstamo/Salida',
+                            'url'  => 'inventario/ordenes/prestamos-salidas',
+                            'icon' => 'fa-solid fa-plus',
+                            'can'  => 'VER ORDEN',
+                        ],
+                        [
                             'text' => 'Órdenes Pendientes',
                             'url'  => 'inventario/ordenes/pendientes',
                             'icon' => 'fa-solid fa-hourglass-half',
@@ -856,38 +862,6 @@ return [
                             'text' => 'Órdenes Rechazadas',
                             'url'  => 'inventario/ordenes/rechazadas',
                             'icon' => 'fa-solid fa-times-circle',
-                            'can'  => 'VER ORDEN',
-                        ],
-                    ],
-                ],
-                [
-                    'text' => 'Préstamos y Salidas',
-                    'url'  => 'inventario/ordenes/prestamos-salidas',
-                    'icon' => 'fa-solid fa-exchange-alt',
-                    'can'  => 'VER ORDEN',
-                    'submenu' => [
-                        [
-                            'text' => 'Solicitar',
-                            'url'  => 'inventario/ordenes/solicitar',
-                            'icon' => 'fa-solid fa-plus',
-                            'can'  => 'CREAR ORDEN',
-                        ],
-                        [
-                            'text' => 'Préstamos',
-                            'url'  => 'inventario/ordenes/prestamos',
-                            'icon' => 'fa-solid fa-sign-in-alt',
-                            'can'  => 'VER ORDEN',
-                        ],
-                        [
-                            'text' => 'Salidas',
-                            'url'  => 'inventario/ordenes/salidas',
-                            'icon' => 'fa-solid fa-sign-out-alt',
-                            'can'  => 'VER ORDEN',
-                        ],
-                        [
-                            'text' => 'Devoluciones',
-                            'url'  => 'inventario/ordenes/devoluciones',
-                            'icon' => 'fa-solid fa-undo',
                             'can'  => 'VER ORDEN',
                         ],
                     ],

@@ -20,6 +20,12 @@ Route::prefix('inventario')
         // Rutas adicionales para órdenes
         Route::get('ordenes', [OrdenController::class, 'index'])
             ->name('ordenes.index');
+        Route::get('ordenes/pendientes', [OrdenController::class, 'pendientes'])
+            ->name('ordenes.pendientes');
+        Route::get('ordenes/completadas', [OrdenController::class, 'completadas'])
+            ->name('ordenes.completadas');
+        Route::get('ordenes/rechazadas', [OrdenController::class, 'rechazadas'])
+            ->name('ordenes.rechazadas');
         Route::get('ordenes/{orden}', [OrdenController::class, 'show'])
             ->name('ordenes.show');
         Route::put('ordenes/{orden}', [OrdenController::class, 'update'])

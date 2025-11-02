@@ -148,22 +148,26 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-6">
+                                    <div class="col-md-6" id="grupo-programa-formacion">
                                         <div class="form-group-modern">
                                             <label for="programa_formacion">
                                                 <i class="fas fa-graduation-cap"></i>
-                                                Nombre del programa formación
+                                                Programa de Formación
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <input
-                                                type="text"
+                                            <select
                                                 class="form-control-modern @error('programa_formacion') is-invalid @enderror"
-                                                id="programa_formacion"
+                                                id="programa_formacon"
                                                 name="programa_formacion"
-                                                value="{{ old('programa_formacion') }}"
-                                                placeholder="Ej: ADSI, Electricidad, etc."
                                                 required
                                             >
+                                                <option value="">Seleccionar programa...</option>
+                                                @foreach($programas as $programa)
+                                                    <option value="{{ $programa->nombre }}" {{ old('programa_formacion') == $programa->nombre ? 'selected' : '' }}>
+                                                        {{ $programa->codigo }} - {{ $programa->nombre }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
                                             @error('programa_formacion')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -172,7 +176,6 @@
                                 </div>
                             </div>
 
-                            {{-- 📅 Detalles y Fechas --}}
                             <div class="form-section">
                                 <h4 class="form-section-title">
                                     <i class="fas fa-clipboard-list"></i> Detalles y Fechas
@@ -226,7 +229,6 @@
                                 </div>
                             </div>
 
-                            {{-- 📝 Motivo --}}
                             <div class="form-section">
                                 <h4 class="form-section-title">
                                     <i class="fas fa-comment-alt"></i> Motivo
@@ -256,10 +258,8 @@
                             </div>
                         </div>
 
-                        {{-- 🔒 Campo oculto del carrito --}}
                         <input type="hidden" name="carrito" id="carrito">
 
-                        {{-- 🚀 Botones --}}
                         <div class="form-actions-container">
                             <a href="{{ route('inventario.ordenes.index') }}" class="btn-modern btn-modern-secondary">
                                 <i class="fas fa-times"></i> Cancelar
