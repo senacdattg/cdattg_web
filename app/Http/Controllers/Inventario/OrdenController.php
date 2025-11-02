@@ -7,6 +7,7 @@ use App\Models\Inventario\Orden;
 use App\Models\Inventario\DetalleOrden;
 use App\Models\Inventario\Producto;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use App\Models\ParametroTema;
 
 class OrdenController extends InventarioController
@@ -15,7 +16,7 @@ class OrdenController extends InventarioController
     {
         parent::__construct();
         $this->middleware('can:VER ORDEN')->only(['index', 'show']);
-        $this->middleware('can:CREAR ORDEN')->only(['store', 'storePrestamos']);
+        $this->middleware('can:CREAR ORDEN')->only(['store', 'storePrestamos', 'prestamosSalidas']);
         $this->middleware('can:EDITAR ORDEN')->only('update');
     }
 
@@ -103,134 +104,155 @@ class OrdenController extends InventarioController
     }
 
     /**
+     * Mostrar formulario de solicitud de préstamo/salida
+     */
+    public function prestamosSalidas()
+    {
+        return view('inventario.ordenes.prestamos_salidas');
+    }
+
+    /**
      * Store a newly created resource in storage (Préstamos y Salidas).
      */
     public function storePrestamos(Request $request)
     {
         $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'documento' => 'required|string|max:50',
-            'rol' => 'required|in:estudiante,instructor,coordinador,administrativo',
+            'rol' => 'required|string|max:100',
             'programa_formacion' => 'required|string|max:255',
-            'ficha' => 'required|string|max:50',
             'tipo' => 'required|in:prestamo,salida',
-            'fecha_adquirido' => 'required|date',
-            'fecha_devolucion' => 'required|date|after:fecha_adquirido',
-            'descripcion' => 'required|string'
+            'fecha_devolucion' => 'required_if:tipo,prestamo|nullable|date|after:today',
+            'descripcion' => 'required|string',
+            'carrito' => 'required|json' // El carrito viene como JSON desde el frontend
         ]);
 
         try {
             DB::beginTransaction();
 
-            // Determinar el tipo de orden basado en el valor del formulario
-            $tipoOrden = $validated['tipo'] === 'prestamo' ? 'PRESTAMO' : 'SALIDA';
-
-            // Buscar o crear el parámetro de tipo de orden
-            $parametroTipoOrden = ParametroTema::where('codigo', $tipoOrden)->first();
-            if (!$parametroTipoOrden) {
-                throw new \Exception("Tipo de orden '{$tipoOrden}' no encontrado en parámetros.");
+            // Decodificar el carrito
+            $carrito = json_decode($validated['carrito'], true);
+            
+            if (empty($carrito) || !is_array($carrito)) {
+                throw new \Exception('El carrito está vacío. Agregue productos antes de crear la solicitud.');
             }
+
+            // Determinar el tipo de orden (PRESTAMO o SALIDA)
+            $codigoTipoOrden = strtoupper($validated['tipo']);
+
+            // Buscar el parámetro de tipo de orden (tema: TIPOS DE ORDEN)
+            $parametroTipoOrden = ParametroTema::whereHas('tema', function ($q) {
+                    $q->whereRaw('UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(name, "Á", "A"), "É", "E"), "Í", "I"), "Ó", "O"), "Ú", "U")) = ?', ['TIPOS DE ORDEN']);
+                })
+                ->whereHas('parametro', function ($q) use ($codigoTipoOrden) {
+                    $nombreNormalizado = str_replace(
+                        ['Á', 'É', 'Í', 'Ó', 'Ú'],
+                        ['A', 'E', 'I', 'O', 'U'],
+                        strtoupper($codigoTipoOrden)
+                    );
+                    $q->whereRaw('UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(name, "Á", "A"), "É", "E"), "Í", "I"), "Ó", "O"), "Ú", "U")) = ?', [$nombreNormalizado]);
+                })
+                ->first();
+
+            if (!$parametroTipoOrden) {
+                throw new \Exception("Tipo de orden '{$codigoTipoOrden}' no encontrado. Verifique los parámetros del sistema.");
+            }
+
+            // Buscar parámetro de estado 'EN ESPERA' (tema: ESTADOS DE ORDEN)
+            $estadoEnEspera = ParametroTema::whereHas('tema', function ($q) {
+                    $q->whereRaw('UPPER(name) = ?', ['ESTADOS DE ORDEN']);
+                })
+                ->whereHas('parametro', function ($q) {
+                    $q->whereRaw('UPPER(name) = ?', ['EN ESPERA']);
+                })
+                ->first();
+
+            if (!$estadoEnEspera) {
+                throw new \Exception("Estado 'EN ESPERA' no encontrado. Verifique los parámetros del sistema.");
+            }
+
+
+            // Obtener datos del usuario
+            $usuario = Auth::user();
+            $solicitante = $usuario->name ?? 'Usuario';
+            $email = $usuario->email ?? '';
+
+            // Crear descripción detallada
+            $descripcionDetallada = sprintf(
+                "SOLICITUD DE %s\n\n" .
+                "SOLICITANTE:\n" .
+                "Nombre: %s\n" .
+                "Email: %s\n" .
+                "Rol: %s\n" .
+                "Programa de Formación: %s\n\n" .
+                "DETALLES:\n" .
+                "Tipo: %s\n" .
+                "%s\n" .
+                "MOTIVO:\n%s",
+                strtoupper($validated['tipo']),
+                $solicitante,
+                $email,
+                $validated['rol'],
+                $validated['programa_formacion'],
+                ucfirst($validated['tipo']),
+                $validated['tipo'] === 'prestamo' && !empty($validated['fecha_devolucion']) 
+                    ? "Fecha de Devolución: {$validated['fecha_devolucion']}\n" 
+                    : "Sin fecha de devolución\n",
+                $validated['descripcion']
+            );
 
             // Crear la orden
             $orden = new Orden([
-                'descripcion_orden' => sprintf(
-                    "%s - %s (%s) - %s: %s",
-                    ucfirst($validated['tipo']),
-                    $validated['nombre'],
-                    $validated['documento'],
-                    $validated['rol'],
-                    $validated['programa_formacion']
-                ),
+                'descripcion_orden' => $descripcionDetallada,
                 'tipo_orden_id' => $parametroTipoOrden->id,
-                'fecha_devolucion' => $validated['fecha_devolucion']
+                'fecha_devolucion' => $validated['tipo'] === 'prestamo' ? $validated['fecha_devolucion'] : null
             ]);
             
             $this->setUserIds($orden);
             $orden->save();
 
-            // Crear detalles para cada producto en el carrito (no descontar stock aún)
-            $carrito = session('carrito', []);
-            if (empty($carrito) || count($carrito) === 0) {
-                throw new \Exception('El carrito está vacío. Agregue productos antes de crear el préstamo/salida.');
-            }
-
-            // Buscar parámetro de estado PENDIENTE para los detalles
-            $estadoPendiente = ParametroTema::where('codigo', 'PENDIENTE')->first();
-            if (!$estadoPendiente) {
-                throw new \Exception("Parámetro 'PENDIENTE' no encontrado en 'parametros_temas'. Por favor agregue el parámetro con código 'PENDIENTE'.");
-            }
-
+            // Procesar productos del carrito
             foreach ($carrito as $item) {
-                // Soportar estructuras de array u objeto del carrito
-                $productoId = null;
-                $cantidad = 1;
-
-                if (is_array($item)) {
-                    $productoId = $item['producto_id'] ?? $item['id'] ?? null;
-                    $cantidad = (int)($item['cantidad'] ?? 1);
-                } elseif (is_object($item)) {
-                    $productoId = $item->producto_id ?? $item->id ?? null;
-                    $cantidad = (int)($item->cantidad ?? 1);
-                }
+                $productoId = $item['id'] ?? $item['producto_id'] ?? null;
+                $cantidad = (int)($item['cantidad'] ?? 1);
 
                 if (!$productoId) {
-                    continue; // saltar si no podemos identificar producto
+                    continue;
                 }
 
-                $producto = Producto::findOrFail($productoId);
+                $producto = Producto::find($productoId);
+                
+                if (!$producto) {
+                    throw new \Exception("Producto con ID {$productoId} no encontrado.");
+                }
 
-                // Crear detalle en estado pendiente (se mantendrá hasta aprobación)
+                // Validar stock disponible
+                if ($producto->cantidad < $cantidad) {
+                    throw new \Exception(
+                        "Stock insuficiente para '{$producto->producto}'. " .
+                        "Disponible: {$producto->cantidad}, Solicitado: {$cantidad}"
+                    );
+                }
+
+                // Crear detalle en estado EN ESPERA (no descontar stock aún)
                 $detalle = new DetalleOrden([
                     'orden_id' => $orden->id,
                     'producto_id' => $producto->id,
                     'cantidad' => $cantidad,
-                    'estado_orden_id' => $estadoPendiente->id
+                    'estado_orden_id' => $estadoEnEspera->id
                 ]);
                 $this->setUserIds($detalle);
                 $detalle->save();
             }
 
-            // Vaciar carrito de sesión tras crear la orden
-            session()->forget('carrito');
-
-            // Guardar información adicional del beneficiario en la descripción detallada
-            $descripcionDetallada = sprintf(
-                "BENEFICIARIO:\n" .
-                "Nombre: %s\n" .
-                "Documento: %s\n" .
-                "Rol: %s\n" .
-                "Programa: %s\n" .
-                "Ficha: %s\n" .
-                "Tipo: %s\n" .
-                "Fecha Adquisición: %s\n" .
-                "Fecha Devolución: %s\n\n" .
-                "OBSERVACIONES:\n%s",
-                $validated['nombre'],
-                $validated['documento'],
-                ucfirst($validated['rol']),
-                $validated['programa_formacion'],
-                $validated['ficha'],
-                ucfirst($validated['tipo']),
-                $validated['fecha_adquirido'],
-                $validated['fecha_devolucion'],
-                $validated['descripcion']
-            );
-
-            // Actualizar la descripción de la orden con los detalles
-            $orden->update([
-                'descripcion_orden' => $descripcionDetallada
-            ]);
-
             DB::commit();
 
             return redirect()->route('inventario.ordenes.index')
-                ->with('success', 'Préstamo/Salida creado exitosamente.');
+                ->with('success', 'Solicitud creada exitosamente. Está pendiente de aprobación por el administrador.');
 
         } catch (\Exception $e) {
             DB::rollBack();
             return back()
                 ->withInput()
-                ->with('error', 'Error al crear el préstamo/salida: ' . $e->getMessage());
+                ->with('error', 'Error al crear la solicitud: ' . $e->getMessage());
         }
     }
 
@@ -360,25 +382,6 @@ class OrdenController extends InventarioController
     }
 
     /**
-     * Mostrar vista de préstamos y salidas
-     */
-    public function prestamosSalidas()
-    {
-        $ordenes = Orden::with([
-            'tipoOrden.parametro',
-            'userCreate.persona',
-            'userUpdate.persona',
-            'detalles.producto',
-            'detalles.estadoOrden.parametro'
-        ])
-        ->latest()
-        ->get();
-        return view('inventario.ordenes.prestamos_salidas', compact(
-            'ordenes',
-        ));
-    }
-
-    /**
      * Display the specified resource.
      */
     public function show(Orden $orden)
@@ -388,7 +391,7 @@ class OrdenController extends InventarioController
             'userCreate',
             'detalles.producto',
             'detalles.estadoOrden.parametro',
-            'detalles.aprobaciones.aprobador'
+            'detalles.aprobacion.aprobador'
         ]);
 
         return view('inventario.ordenes.show', compact('orden'));
