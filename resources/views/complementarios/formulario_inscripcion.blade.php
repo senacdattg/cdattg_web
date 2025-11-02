@@ -3,6 +3,92 @@
 @section('css')
     @vite(['resources/css/formulario_inscripcion.css'])
 @endsection
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Configurar conversión a mayúsculas
+    setupUppercaseConversion();
+
+    // Configurar validación de números
+    setupNumberValidation();
+
+    // Configurar carga dinámica de municipios
+    setupMunicipioLoading();
+});
+
+function setupUppercaseConversion() {
+    const camposTexto = [
+        'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido'
+    ];
+
+    camposTexto.forEach(campoId => {
+        const campo = document.getElementById(campoId);
+        if (campo) {
+            campo.addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+        }
+    });
+}
+
+function setupNumberValidation() {
+    const camposNumericos = ['numero_documento', 'telefono', 'celular'];
+
+    camposNumericos.forEach(campoId => {
+        const campo = document.getElementById(campoId);
+        if (campo) {
+            campo.addEventListener('keypress', soloNumeros);
+        }
+    });
+}
+
+function soloNumeros(event) {
+    const key = event.key;
+    if (event.ctrlKey || event.altKey || event.metaKey) {
+        return true;
+    }
+    if (!/^\d$/.test(key)) {
+        event.preventDefault();
+        return false;
+    }
+    return true;
+}
+
+function setupMunicipioLoading() {
+    const departamentoSelect = document.getElementById('departamento_id');
+    if (departamentoSelect) {
+        departamentoSelect.addEventListener('change', function() {
+            loadMunicipiosForDepartamento(this.value);
+        });
+    }
+}
+
+function loadMunicipiosForDepartamento(departamentoId) {
+    const municipioSelect = document.getElementById('municipio_id');
+    if (!municipioSelect) return;
+
+    if (departamentoId) {
+        fetch(`/municipios/${departamentoId}`)
+            .then(response => response.json())
+            .then(data => {
+                municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
+                data.forEach(municipio => {
+                    const option = document.createElement('option');
+                    option.value = municipio.id;
+                    option.textContent = municipio.municipio;
+                    municipioSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error cargando municipios:', error);
+                municipioSelect.innerHTML = '<option value="">Error cargando municipios</option>';
+            });
+    } else {
+        municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
+    }
+}
+</script>
+@endsection
 @section('content')
 
      <div class="container-fluid mt-4">
@@ -47,168 +133,10 @@
                                 @csrf
                                 <input type="hidden" name="programa_id" value="{{ $programa->id }}">
 
-                                <div class="card card-success mb-4">
-                                    <div class="card-header">
-                                        <h5 class="mb-0"><i class="fas fa-id-card mr-2"></i> Datos personales </h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="tipo_documento" class="form-label">Tipo de Documento *</label>
-                                                <select class="form-control" id="tipo_documento" name="tipo_documento" required>
-                                                    <option value="">Seleccione...</option>
-                                                    <option value="1" {{ old('tipo_documento', session('user_data')['tipo_documento'] ?? '') == '1' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
-                                                    <option value="2" {{ old('tipo_documento', session('user_data')['tipo_documento'] ?? '') == '2' ? 'selected' : '' }}>Tarjeta de Identidad</option>
-                                                    <option value="3" {{ old('tipo_documento', session('user_data')['tipo_documento'] ?? '') == '3' ? 'selected' : '' }}>Cédula de Extranjería</option>
-                                                    <option value="4" {{ old('tipo_documento', session('user_data')['tipo_documento'] ?? '') == '4' ? 'selected' : '' }}>Pasaporte</option>
-                                                </select>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="numero_documento" class="form-label">Número de Documento *</label>
-                                                <input type="text" class="form-control" id="numero_documento"
-                                                    name="numero_documento" value="{{ old('numero_documento', session('user_data')['numero_documento'] ?? '') }}" required>
-                                            </div>
-                                        </div>
-                                    </div>
-                             
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="primer_nombre" class="form-label">Primer Nombre *</label>
-                                                <input type="text" class="form-control" id="primer_nombre" name="primer_nombre"
-                                                    value="{{ old('primer_nombre', session('user_data')['primer_nombre'] ?? '') }}" required>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="segundo_nombre" class="form-label">Segundo Nombre</label>
-                                                <input type="text" class="form-control" id="segundo_nombre"
-                                                    name="segundo_nombre" value="{{ old('segundo_nombre', session('user_data')['segundo_nombre'] ?? '') }}">
-                                            </div>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="primer_apellido" class="form-label">Primer Apellido *</label>
-                                                <input type="text" class="form-control" id="primer_apellido"
-                                                    name="primer_apellido" value="{{ old('primer_apellido', session('user_data')['primer_apellido'] ?? '') }}" required>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="segundo_apellido" class="form-label">Segundo Apellido</label>
-                                                <input type="text" class="form-control" id="segundo_apellido"
-                                                    name="segundo_apellido" value="{{ old('segundo_apellido', session('user_data')['segundo_apellido'] ?? '') }}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="card card-success mb-4">
-                                    <div class="card-header">
-                                        <h5 class="mb-0"><i class="fas fa-birthday-cake mr-2"></i>Información Personal</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento *</label>
-                                                <input type="date" class="form-control" id="fecha_nacimiento"
-                                                    name="fecha_nacimiento" value="{{ old('fecha_nacimiento', session('user_data')['fecha_nacimiento'] ?? '') }}" required>
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="genero" class="form-label">Género *</label>
-                                                <select class="form-control" id="genero" name="genero" required>
-                                                    <option value="">Seleccione...</option>
-                                                    <option value="1" {{ old('genero', session('user_data')['genero'] ?? '') == '1' ? 'selected' : '' }}>Masculino</option>
-                                                    <option value="2" {{ old('genero', session('user_data')['genero'] ?? '') == '2' ? 'selected' : '' }}>Femenino</option>
-                                                    <option value="3" {{ old('genero', session('user_data')['genero'] ?? '') == '3' ? 'selected' : '' }}>Otro</option>
-                                                    <option value="4" {{ old('genero', session('user_data')['genero'] ?? '') == '4' ? 'selected' : '' }}>Prefiero no decir</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div class="row">
-                                            <div class="col-md-6 mb-3">
-                                                <label for="telefono" class="form-label">Teléfono Fijo</label>
-                                                <input type="tel" class="form-control" id="telefono" name="telefono" value="{{ old('telefono', session('user_data')['telefono'] ?? '') }}">
-                                            </div>
-                                            <div class="col-md-6 mb-3">
-                                                <label for="celular" class="form-label">Celular *</label>
-                                                <input type="tel" class="form-control" id="celular" name="celular"
-                                                    value="{{ old('celular', session('user_data')['celular'] ?? '') }}" required>
-                                            </div>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label for="email" class="form-label">Correo Electrónico *</label>
-                                            <input type="email" class="form-control" id="email" name="email" value="{{ old('email', session('user_data')['email'] ?? '') }}" required>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="card card-success mb-4">
-                                    <div class="card-header">
-                                        <h5 class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i>Ubicación</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row">
-                                            <div class="col-md-4 mb-3">
-                                                <label for="pais_id" class="form-label">País *</label>
-                                                <select class="form-control" id="pais_id" name="pais_id" required>
-                                                    <option value="">Seleccione...</option>
-                                                    @foreach ($paises as $pais)
-                                                        <option value="{{ $pais->id }}" {{ old('pais_id', session('user_data')['pais_id'] ?? '') == $pais->id ? 'selected' : '' }}>{{ $pais->pais }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="departamento_id" class="form-label">Departamento *</label>
-                                                <select class="form-control" id="departamento_id" name="departamento_id"
-                                                    required>
-                                                    <option value="">Seleccione...</option>
-                                                    @foreach ($departamentos as $departamento)
-                                                        <option value="{{ $departamento->id }}" {{ old('departamento_id', session('user_data')['departamento_id'] ?? '') == $departamento->id ? 'selected' : '' }}>{{ $departamento->departamento }}
-                                                        </option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                            <div class="col-md-4 mb-3">
-                                                <label for="municipio_id" class="form-label">Municipio *</label>
-                                                <select class="form-control" id="municipio_id" name="municipio_id" required>
-                                                    <option value="">Seleccione...</option>
-                                                </select>
-                                                <script>
-                                                    // Pre-seleccionar municipio si hay datos de usuario
-                                                    document.addEventListener('DOMContentLoaded', function() {
-                                                        const userData = @json(session('user_data', []));
-                                                        if (userData.municipio_id) {
-                                                            // Cargar municipios del departamento seleccionado
-                                                            const departamentoId = userData.departamento_id || document.getElementById('departamento_id').value;
-                                                            if (departamentoId) {
-                                                                fetch(`/municipios/${departamentoId}`)
-                                                                    .then(response => response.json())
-                                                                    .then(data => {
-                                                                        const municipioSelect = document.getElementById('municipio_id');
-                                                                        municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
-                                                                        data.forEach(municipio => {
-                                                                            const option = document.createElement('option');
-                                                                            option.value = municipio.id;
-                                                                            option.textContent = municipio.municipio;
-                                                                            if (municipio.id == userData.municipio_id) {
-                                                                                option.selected = true;
-                                                                            }
-                                                                            municipioSelect.appendChild(option);
-                                                                        });
-                                                                    });
-                                                            }
-                                                        }
-                                                    });
-                                                </script>
-                                            </div>
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label for="direccion" class="form-label">Dirección *</label>
-                                            <input type="text" class="form-control" id="direccion" name="direccion" value="{{ old('direccion', session('user_data')['direccion'] ?? '') }}" required>
-                                        </div>
-                                    </div>
-                                </div>
+                               @include('complementarios.components.form-datos-personales', [
+                                   'context' => 'inscripcion',
+                                   'userData' => session('user_data', [])
+                               ])
 
                                 <hr class="my-4">
 
@@ -327,150 +255,6 @@
         </div>
     </div>
 
-<script>
-    // Cargar municipios según departamento seleccionado
-    document.getElementById('departamento_id').addEventListener('change', function() {
-        const departamentoId = this.value;
-        const municipioSelect = document.getElementById('municipio_id');
-
-        if (departamentoId) {
-            fetch(`/municipios/${departamentoId}`)
-                .then(response => response.json())
-                .then(data => {
-                    municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
-                    data.forEach(municipio => {
-                        const option = document.createElement('option');
-                        option.value = municipio.id;
-                        option.textContent = municipio.municipio;
-                        municipioSelect.appendChild(option);
-                    });
-                })
-                .catch(error => console.error('Error:', error));
-        } else {
-            municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
-        }
-    });
-
-    // Convertir nombres y apellidos a mayúsculas
-    const camposTexto = ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido'];
-    camposTexto.forEach(campo => {
-        document.getElementById(campo).addEventListener('input', function() {
-            this.value = this.value.toUpperCase();
-        });
-    });
-
-    // Validar que solo contengan números
-    function soloNumeros(event) {
-        const key = event.key;
-        // Permitir teclas de control (backspace, delete, tab, etc.)
-        if (event.ctrlKey || event.altKey || event.metaKey) {
-            return true;
-        }
-        // Permitir solo números
-        if (!/^\d$/.test(key)) {
-            event.preventDefault();
-            return false;
-        }
-        return true;
-    }
-
-    // Aplicar validación de solo números a los campos
-    document.getElementById('numero_documento').addEventListener('keypress', soloNumeros);
-    document.getElementById('telefono').addEventListener('keypress', soloNumeros);
-    document.getElementById('celular').addEventListener('keypress', soloNumeros);
-
-    // Funcionalidad del formulario de dirección estructurada
-    document.getElementById('toggleAddressForm').addEventListener('click', function() {
-        const addressForm = document.getElementById('addressForm');
-        const isVisible = addressForm.classList.contains('show');
-        if (isVisible) {
-            $('#addressForm').collapse('hide');
-        } else {
-            $('#addressForm').collapse('show');
-        }
-    });
-
-    document.getElementById('saveAddress').addEventListener('click', function() {
-        const carrera = document.getElementById('carrera').value.trim();
-        const calle = document.getElementById('calle').value.trim();
-        const numeroCasa = document.getElementById('numero_casa').value.trim();
-        const numeroApartamento = document.getElementById('numero_apartamento').value.trim();
-
-        // Validar campos obligatorios
-        if (!carrera || !calle || !numeroCasa) {
-            alert('Por favor complete todos los campos obligatorios: Carrera, Calle y Número Casa.');
-            return;
-        }
-
-        // Construir la dirección
-        let direccion = `Carrera ${carrera} Calle ${calle} #${numeroCasa}`;
-        if (numeroApartamento) {
-            direccion += ` Apt ${numeroApartamento}`;
-        }
-
-        // Asignar al campo principal
-        document.getElementById('direccion').value = direccion;
-
-        // Ocultar el formulario
-        $('#addressForm').collapse('hide');
-
-        // Limpiar campos
-        document.querySelectorAll('.address-field').forEach(field => field.value = '');
-    });
-
-    document.getElementById('cancelAddress').addEventListener('click', function() {
-        // Ocultar el formulario
-        $('#addressForm').collapse('hide');
-
-        // Limpiar campos
-        document.querySelectorAll('.address-field').forEach(field => field.value = '');
-    });
-
-    // Validar solo números en campos de dirección
-    const addressNumericFields = ['carrera', 'calle', 'numero_casa', 'numero_apartamento'];
-    addressNumericFields.forEach(fieldId => {
-        const element = document.getElementById(fieldId);
-        if (element) {
-            element.addEventListener('keypress', soloNumeros);
-        }
-    });
-
-    // Validación del formulario
-    document.getElementById('formInscripcion').addEventListener('submit', function(e) {
-        // Validar términos y condiciones
-        if (!document.getElementById('acepto_terminos').checked) {
-            alert('Debe aceptar los términos y condiciones para continuar.');
-            e.preventDefault();
-            return;
-        }
-
-        // Validar que el número de documento solo contenga números
-        const numeroDocumento = document.getElementById('numero_documento').value;
-        if (!/^\d+$/.test(numeroDocumento)) {
-            alert('El número de documento solo puede contener números.');
-            e.preventDefault();
-            return;
-        }
-
-        // Validar que teléfono fijo solo contenga números (si está lleno)
-        const telefono = document.getElementById('telefono').value;
-        if (telefono && !/^\d+$/.test(telefono)) {
-            alert('El teléfono fijo solo puede contener números.');
-            e.preventDefault();
-            return;
-        }
-
-        // Validar que celular solo contenga números
-        const celular = document.getElementById('celular').value;
-        if (!/^\d+$/.test(celular)) {
-            alert('El celular solo puede contener números.');
-            e.preventDefault();
-            return;
-        }
-
-        // El formulario se enviará al servidor si todas las validaciones pasan
-    });
-</script>
 @include('layout.footer')
 @endsection
 
