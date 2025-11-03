@@ -60,7 +60,6 @@
                                                 <label for="tipo_documento">Tipo de Documento *</label>
                                                 <select class="form-control" name="tipo_documento" id="tipo_documento"
                                                     required>
-                                                    <option value="">Seleccione...</option>
                                                     <option value="1"
                                                         {{ old('tipo_documento') == '1' ? 'selected' : '' }}>Cédula de
                                                         Ciudadanía</option>
