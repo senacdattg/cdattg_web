@@ -8,8 +8,9 @@
         'title' => 'Historial de Mis Préstamos',
         'subtitle' => 'Registro completo de todos tus préstamos',
         'breadcrumb' => [
-            ['text' => 'Mis Préstamos', 'url' => route('inventario.prestamos.mis')],
-            ['text' => 'Historial', 'active' => true]
+            ['label' => 'Inicio', 'url' => '#'],
+            ['label' => 'Inventario', 'active' => true],
+            ['label' => 'Historial Prestamos', 'active' => true]
         ]
     ])
 
@@ -106,4 +107,17 @@
         </div>
     </div>
 </div>
+
+    @include('layout.alertas')
 @endsection
+
+@section('footer')
+    {{-- Footer SENA --}}
+    @include('layout.footer')
+@endsection
+
+@push('css')
+    @vite([
+        'public/css/inventario/shared/base.css',
+    ])
+@endpush
