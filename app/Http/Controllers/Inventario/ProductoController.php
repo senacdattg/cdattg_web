@@ -442,10 +442,10 @@ class ProductoController extends InventarioController
 
         // Cargar marca y categoria DIRECTAMENTE desde Parametro sin usar la relación del modelo
         if ($producto->marca_id) {
-            $producto->marca = Parametro::find($producto->marca_id);
+            $producto->setRelation('marca', Parametro::find($producto->marca_id));
         }
         if ($producto->categoria_id) {
-            $producto->categoria = Parametro::find($producto->categoria_id);
+            $producto->setRelation('categoria', Parametro::find($producto->categoria_id));
         }
 
         return view('inventario.productos._detalles-modal', compact('producto'));
