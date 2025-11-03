@@ -53,14 +53,14 @@ class ComplementarioController extends Controller
         $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion'])->get();
         $modalidades = \App\Models\ParametroTema::where('tema_id', 5)->with('parametro')->get();
         $jornadas = \App\Models\JornadaFormacion::all();
-        return view('complementarios.gestion_programas_complementarios', compact('programas', 'modalidades', 'jornadas'));
+        return view('complementarios.gestion_complementarios.index', compact('programas', 'modalidades', 'jornadas'));
     }
 
     public function create()
     {
         $modalidades = \App\Models\ParametroTema::where('tema_id', 5)->with('parametro')->get();
         $jornadas = \App\Models\JornadaFormacion::all();
-        return view('complementarios.create', compact('modalidades', 'jornadas'));
+        return view('complementarios.gestion_complementarios.create', compact('modalidades', 'jornadas'));
     }
     public function estadisticas()
     {

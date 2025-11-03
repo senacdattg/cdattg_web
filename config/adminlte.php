@@ -769,7 +769,7 @@ return [
             'can' => 'VER PROGRAMA DE CARACTERIZACION',
             'submenu' => [
                 [
-                    'text' => 'Gestión de programas',
+                    'text' => 'Gestión complementarios',
                     'icon' => 'fas fa-graduation-cap',
                     'classes' => 'text-sm',
                     'submenu' => [
