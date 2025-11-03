@@ -146,7 +146,19 @@
             </div>
         </div>
     </section>
+  @include('layout.alertas')
 @endsection
+
+@section('footer')
+    {{-- Footer SENA --}}
+    @include('layout.footer')
+@endsection
+
+@push('css')
+    @vite([
+        'public/css/inventario/shared/base.css',
+    ])
+@endpush
 
 @section('js')
 <!-- SweetAlert2 -->
