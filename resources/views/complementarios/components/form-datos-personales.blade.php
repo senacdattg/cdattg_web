@@ -154,7 +154,60 @@
 
             <div class="mb-3">
                 <label for="direccion" class="form-label">Dirección *</label>
-                <input type="text" class="form-control" id="direccion" name="direccion" value="{{ old('direccion', $userData['direccion'] ?? '') }}" required>
+                <input type="text" class="form-control" id="direccion" name="direccion" value="{{ old('direccion', $userData['direccion'] ?? '') }}" placeholder="Dirección completa" required readonly>
+                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
+                    <i class="fas fa-edit"></i> Ingresar Dirección
+                </button>
+            </div>
+            <div id="addressForm" class="collapse mt-3" aria-labelledby="addressFormLabel">
+                <div class="card card-outline-secondary">
+                    <div class="card-header">
+                        <h5 id="addressFormLabel" class="mb-0">Ingresar Dirección</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label for="carrera">Carrera *</label>
+                                    <input type="text" class="form-control address-field" id="carrera"
+                                        placeholder="Ej: 1" data-required="true">
+                                </div>
+                                <div class="form-group">
+                                    <label for="calle">Calle *</label>
+                                    <input type="text" class="form-control address-field" id="calle"
+                                        placeholder="Ej: 2" data-required="true">
+                                </div>
+                                <div class="form-group">
+                                    <label for="numero_casa">Número Casa *</label>
+                                    <input type="text" class="form-control address-field" id="numero_casa"
+                                        placeholder="Ej: 3" data-required="true">
+                                </div>
+                                <div class="form-group">
+                                    <label for="numero_apartamento">Número Apartamento</label>
+                                    <input type="text" class="form-control address-field" id="numero_apartamento"
+                                        placeholder="Ej: 4 (opcional)">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 d-flex align-items-center">
+                                <div class="w-100">
+                                    <p class="mb-2"><strong>Ejemplo de formato:</strong></p>
+                                    <p class="text-muted">Carrera 1 Calle 2 #3 Apt 4</p>
+                                    <p class="text-muted small">Los campos marcados con * son obligatorios.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-success btn-sm mr-2" id="saveAddress">
+                                    <i class="fas fa-save"></i> Guardar Dirección
+                                </button>
+                                <button type="button" class="btn btn-secondary btn-sm" id="cancelAddress">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -313,7 +366,60 @@
 
             <div class="mb-3">
                 <label for="direccion" class="form-label">Dirección *</label>
-                <input type="text" class="form-control" id="direccion" name="direccion" value="{{ old('direccion', $userData['direccion'] ?? '') }}" required>
+                <input type="text" class="form-control" id="direccion" name="direccion" value="{{ old('direccion', $userData['direccion'] ?? '') }}" placeholder="Dirección completa" required readonly>
+                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
+                    <i class="fas fa-edit"></i> Ingresar Dirección
+                </button>
+            </div>
+            <div id="addressForm" class="collapse mt-3" aria-labelledby="addressFormLabel">
+                <div class="card card-outline-secondary">
+                    <div class="card-header">
+                        <h5 id="addressFormLabel" class="mb-0">Ingresar Dirección</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12 col-md-6">
+                                <div class="form-group">
+                                    <label for="carrera">Carrera *</label>
+                                    <input type="text" class="form-control address-field" id="carrera"
+                                        placeholder="Ej: 1" data-required="true">
+                                </div>
+                                <div class="form-group">
+                                    <label for="calle">Calle *</label>
+                                    <input type="text" class="form-control address-field" id="calle"
+                                        placeholder="Ej: 2" data-required="true">
+                                </div>
+                                <div class="form-group">
+                                    <label for="numero_casa">Número Casa *</label>
+                                    <input type="text" class="form-control address-field" id="numero_casa"
+                                        placeholder="Ej: 3" data-required="true">
+                                </div>
+                                <div class="form-group">
+                                    <label for="numero_apartamento">Número Apartamento</label>
+                                    <input type="text" class="form-control address-field" id="numero_apartamento"
+                                        placeholder="Ej: 4 (opcional)">
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 d-flex align-items-center">
+                                <div class="w-100">
+                                    <p class="mb-2"><strong>Ejemplo de formato:</strong></p>
+                                    <p class="text-muted">Carrera 1 Calle 2 #3 Apt 4</p>
+                                    <p class="text-muted small">Los campos marcados con * son obligatorios.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-success btn-sm mr-2" id="saveAddress">
+                                    <i class="fas fa-save"></i> Guardar Dirección
+                                </button>
+                                <button type="button" class="btn btn-secondary btn-sm" id="cancelAddress">
+                                    <i class="fas fa-times"></i> Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
