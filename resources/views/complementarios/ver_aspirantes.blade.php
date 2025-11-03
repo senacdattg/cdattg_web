@@ -12,6 +12,9 @@
             <button class="btn btn-primary" id="btn-nuevo-aspirante" @if(isset($existingProgress) && $existingProgress) disabled @endif onclick="console.log('Botón Nuevo Aspirante clickeado'); $('#modalNuevoAspirante').modal('show');">
                 <i class="fas fa-plus me-1"></i>Nuevo Aspirante
             </button>
+            <button class="btn btn-success" id="btn-descargar-excel" @if(isset($existingProgress) && $existingProgress) disabled @endif>
+                <i class="fas fa-download me-1"></i>Descargar Excel
+            </button>
             <a href="{{ route('gestion-aspirantes') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-1"></i> Volver
             </a>
