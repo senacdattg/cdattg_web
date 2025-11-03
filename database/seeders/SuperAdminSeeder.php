@@ -161,6 +161,7 @@ class SuperAdminSeeder extends Seeder
             'EDITAR PRESTAMO',
             'DEVOLVER PRESTAMO',
             'APROBAR PRESTAMO',
+            'DEVOLVER PRESTAMO',
             // Entradas
             'VER ENTRADA',
             'CREAR ENTRADA',

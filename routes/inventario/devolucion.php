@@ -26,4 +26,11 @@ Route::prefix('inventario')
         // Historial de todas las devoluciones
         Route::get('devoluciones-historial', [DevolucionController::class, 'historial'])
             ->name('devoluciones.historial');
+        // Mis Préstamos - para usuarios finales
+        Route::get('mis-prestamos', [DevolucionController::class, 'misPrestamos'])
+            ->name('prestamos.mis');
+
+        // Historial de préstamos del usuario
+        Route::get('historial-prestamos', [DevolucionController::class, 'historialPrestamos'])
+            ->name('prestamos.historial');
     });
