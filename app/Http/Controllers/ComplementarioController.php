@@ -559,6 +559,12 @@ class ComplementarioController extends Controller
 
             // Asignar rol de aspirante
             $user->assignRole('ASPIRANTE');
+        } else {
+            // Si el usuario ya existe, verificar si tiene rol VISITANTE y cambiarlo a ASPIRANTE
+            if ($existingUser->hasRole('VISITANTE')) {
+                $existingUser->removeRole('VISITANTE');
+                $existingUser->assignRole('ASPIRANTE');
+            }
         }
 
         // Redirigir a la segunda fase (subida de documentos)
