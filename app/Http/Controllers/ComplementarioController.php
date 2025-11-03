@@ -20,6 +20,9 @@ use Illuminate\Support\Facades\Storage;
 use App\Jobs\ValidarSofiaJob;
 use App\Models\SofiaValidationProgress;
 use Spatie\Permission\Models\Role;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ComplementarioController extends Controller
 {
@@ -1020,6 +1023,90 @@ class ComplementarioController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error interno del servidor. Por favor intente nuevamente.'
+            ], 500);
+        }
+    }
+
+    /**
+     * Exportar aspirantes a Excel
+     */
+    public function exportarAspirantesExcel($complementarioId)
+    {
+        try {
+            // Verificar que el programa existe
+            $programa = ComplementarioOfertado::findOrFail($complementarioId);
+
+            // Obtener todos los aspirantes del programa con sus datos de persona y caracterización
+            $aspirantes = AspiranteComplementario::with(['persona.caracterizacion', 'persona.tipoDocumento'])
+                ->where('complementario_id', $complementarioId)
+                ->get();
+
+            // Crear nueva hoja de cálculo
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Establecer encabezados
+            $sheet->setCellValue('A1', 'Tipo Documento');
+            $sheet->setCellValue('B1', 'Número Documento');
+            $sheet->setCellValue('C1', 'Caracterización');
+
+            // Estilo para encabezados
+            $headerStyle = [
+                'font' => [
+                    'bold' => true,
+                    'color' => ['rgb' => 'FFFFFF'],
+                ],
+                'fill' => [
+                    'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                    'startColor' => ['rgb' => '007BFF'],
+                ],
+            ];
+            $sheet->getStyle('A1:C1')->applyFromArray($headerStyle);
+
+            // Llenar datos
+            $row = 2;
+            foreach ($aspirantes as $aspirante) {
+                $tipoDocumento = $aspirante->persona->tipoDocumento ? $aspirante->persona->tipoDocumento->name : 'N/A';
+                $numeroDocumento = $aspirante->persona->numero_documento;
+                $caracterizacion = $aspirante->persona->caracterizacion ? $aspirante->persona->caracterizacion->nombre : 'Sin caracterización';
+
+                $sheet->setCellValue('A' . $row, $tipoDocumento);
+                $sheet->setCellValue('B' . $row, $numeroDocumento);
+                $sheet->setCellValue('C' . $row, $caracterizacion);
+
+                $row++;
+            }
+
+            // Auto-ajustar columnas
+            foreach (range('A', 'C') as $column) {
+                $sheet->getColumnDimension($column)->setAutoSize(true);
+            }
+
+            // Crear nombre del archivo
+            $fileName = 'aspirantes_' . str_replace(' ', '_', $programa->nombre) . '_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+
+            // Crear respuesta de descarga
+            $response = new StreamedResponse(function () use ($spreadsheet) {
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('php://output');
+            });
+
+            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $response->headers->set('Content-Disposition', 'attachment;filename="' . $fileName . '"');
+            $response->headers->set('Cache-Control', 'max-age=0');
+
+            return $response;
+
+        } catch (\Exception $e) {
+            \Log::error('Error exportando aspirantes a Excel: ' . $e->getMessage(), [
+                'complementario_id' => $complementarioId,
+                'user_id' => auth()->id(),
+                'exception' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al generar el archivo Excel. Por favor intente nuevamente.'
             ], 500);
         }
     }
