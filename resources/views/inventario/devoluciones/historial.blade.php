@@ -1,22 +1,43 @@
-@extends('inventario.layouts.base')
+@extends('adminlte::page')
 
 @section('title', 'Historial de Devoluciones')
 
+@section('content_header')
+    <x-page-header
+        icon="fas fa-history"
+        title="Historial de Devoluciones"
+        subtitle="Registro completo de todas las devoluciones realizadas"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => '#'],
+            ['label' => 'Inventario', 'active' => true],
+            ['label' => 'Devoluciones', 'active' => true]
+        ]"
+    />
+@endsection
+
 @section('content')
-<div class="container-fluid">
-    @include('inventario._components.page-header', [
-        'title' => 'Historial de Devoluciones',
-        'subtitle' => 'Registro completo de todas las devoluciones realizadas',
-        'breadcrumb' => [
-            ['text' => 'Inventario', 'url' => route('inventario.dashboard')],
-            ['text' => 'Devoluciones', 'active' => true]
-        ]
-    ])
+    <section class="content mt-4">
+        <div class="container-fluid">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
 
-    @include('inventario._components.alerts')
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
 
-    <div class="row">
-        <div class="col-12">
+            <div class="row">
+                <div class="col-12">
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Historial Completo</h5>
@@ -63,12 +84,14 @@
                                             <td>{{ $devolucion->userCreate->name ?? 'Usuario no encontrado' }}</td>
                                             <td>
                                                 <a href="{{ route('inventario.devoluciones.show', $devolucion->id) }}"
-                                                   class="btn btn-sm btn-info">
-                                                    <i class="fas fa-eye"></i> Ver
+                                                   class="btn btn-sm btn-info"
+                                                   title="Ver detalles">
+                                                    <i class="fas fa-eye"></i>
                                                 </a>
                                                 <a href="{{ route('inventario.ordenes.show', $devolucion->detalleOrden->orden->id) }}"
-                                                   class="btn btn-sm btn-secondary">
-                                                    <i class="fas fa-external-link-alt"></i> Orden
+                                                   class="btn btn-sm btn-secondary"
+                                                   title="Ver orden">
+                                                    <i class="fas fa-external-link-alt"></i>
                                                 </a>
                                             </td>
                                         </tr>
@@ -78,32 +101,32 @@
                         </div>
 
                         @if($devoluciones instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator)
-                            <div class="d-flex justify-content-center">
+                            <div class="d-flex justify-content-center mt-3">
                                 {{ $devoluciones->links() }}
                             </div>
                         @endif
                     @else
-                        @include('inventario._components.empty-state', [
-                            'title' => 'No hay devoluciones registradas',
-                            'message' => 'Aún no se han realizado devoluciones en el sistema.',
-                            'icon' => 'fas fa-history'
-                        ])
+                        <div class="text-center py-5">
+                            <i class="fas fa-history fa-4x text-muted mb-3"></i>
+                            <h5>No hay devoluciones registradas</h5>
+                            <p class="text-muted">Aún no se han realizado devoluciones en el sistema.</p>
+                        </div>
                     @endif
                 </div>
             </div>
         </div>
     </div>
-</div>
+        </div>
+    </section>
+    {{-- Alertas --}}
     @include('layout.alertas')
-@endsection
-
-@section('footer')
+    
     {{-- Footer SENA --}}
     @include('layout.footer')
 @endsection
 
 @push('css')
     @vite([
-        'public/css/inventario/shared/base.css',
+        'public/css/inventario/shared/base.css',    
     ])
 @endpush

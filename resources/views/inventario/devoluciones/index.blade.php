@@ -1,22 +1,43 @@
-@extends('inventario.layouts.base')
+@extends('adminlte::page')
 
 @section('title', 'Préstamos Pendientes de Devolución')
 
+@section('content_header')
+    <x-page-header
+        icon="fas fa-undo"
+        title="Préstamos Pendientes de Devolución"
+        subtitle="Lista de préstamos que requieren devolución"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => '#'],
+            ['label' => 'Inventario', 'active' => true],
+            ['label' => 'Devoluciones', 'active' => true]
+        ]"
+    />
+@endsection
+
 @section('content')
-<div class="container-fluid">
-    @include('inventario._components.page-header', [
-        'title' => 'Préstamos Pendientes de Devolución',
-        'subtitle' => 'Lista de préstamos que requieren devolución',
-        'breadcrumb' => [
-            ['text' => 'Inventario', 'url' => route('inventario.dashboard')],
-            ['text' => 'Devoluciones', 'active' => true]
-        ]
-    ])
+    <section class="content mt-4">
+        <div class="container-fluid">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
 
-    @include('inventario._components.alerts')
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
 
-    <div class="row">
-        <div class="col-12">
+            <div class="row">
+                <div class="col-12">
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Préstamos Pendientes</h5>
@@ -89,32 +110,33 @@
                         </div>
 
                         @if($prestamos instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator)
-                            <div class="d-flex justify-content-center">
+                            <div class="d-flex justify-content-center mt-3">
                                 {{ $prestamos->links() }}
                             </div>
                         @endif
                     @else
-                        @include('inventario._components.empty-state', [
-                            'title' => 'No hay préstamos pendientes',
-                            'message' => 'Todos los préstamos han sido devueltos completamente.',
-                            'icon' => 'fas fa-check-circle'
-                        ])
+                        <div class="text-center py-5">
+                            <i class="fas fa-check-circle fa-4x text-muted mb-3"></i>
+                            <h5>No hay préstamos pendientes</h5>
+                            <p class="text-muted">Todos los préstamos han sido devueltos completamente.</p>
+                        </div>
                     @endif
                 </div>
             </div>
         </div>
     </div>
-</div>
-    @include('layout.alertas')
-@endsection
+        </div>
+    </section>
 
-@section('footer')
+   {{-- Alertas --}}
+    @include('layout.alertas')
+    
     {{-- Footer SENA --}}
     @include('layout.footer')
 @endsection
 
 @push('css')
     @vite([
-        'public/css/inventario/shared/base.css',
+        'public/css/inventario/shared/base.css',    
     ])
 @endpush

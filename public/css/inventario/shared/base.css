@@ -88,6 +88,10 @@ body .content-wrapper {
     margin-right: 0 !important;
 }
 
+#razon {
+    color: #343a40 !important;
+}
+
 #producto {
     width: 95% !important;
 }
