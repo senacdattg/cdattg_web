@@ -145,7 +145,7 @@ function loadMunicipiosForDepartamento(departamentoId) {
                                         <h5 class="mb-0"><i class="fas fa-tags mr-2"></i>Caracterización</h5>
                                     </div>
                                     <div class="card-body">
-                                        <p class="text-muted mb-3">Seleccione las categorías que correspondan a su situación:</p>
+                                        <p class="text-muted mb-3">Seleccione una categoría que corresponda a su situación:</p>
 
                                         @foreach ($categoriasConHijos as $categoria)
                                             <div class="card card-outline card-success mb-3">
@@ -157,8 +157,8 @@ function loadMunicipiosForDepartamento(departamentoId) {
                                                         @foreach ($categoria['hijos'] as $hijo)
                                                             <div class="col-12 mb-2">
                                                                 <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox"
-                                                                        name="categorias[]" value="{{ $hijo->id }}"
+                                                                    <input class="form-check-input" type="radio"
+                                                                        name="caracterizacion_id" value="{{ $hijo->id }}"
                                                                         id="categoria_{{ $hijo->id }}">
                                                                     <label class="form-check-label"
                                                                         for="categoria_{{ $hijo->id }}">
