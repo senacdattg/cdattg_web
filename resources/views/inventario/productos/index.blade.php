@@ -26,6 +26,12 @@
                         icon="fa-plus-circle"
                         permission="CREAR PRODUCTO"
                     />
+                    <!-- Botón para escanear código de barras -->
+                    <div class="mt-3 text-right">
+                        <button class="btn btn-secondary btn-lg" data-toggle="modal" data-target="#modalEscanear">
+                            <i class="fas fa-barcode"></i> Escanear Código de Barras
+                        </button>
+                    </div>
 
                     <x-data-table
                         title="Lista de Productos"
@@ -156,6 +162,29 @@
         </div>
     </section>
 
+    <!-- Modal para escanear código de barras -->
+    <div class="modal fade" id="modalEscanear" tabindex="-1" role="dialog" aria-labelledby="modalEscanearLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="modalEscanearLabel">
+                        <i class="fas fa-barcode"></i> Escanear Código de Barras
+                    </h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body text-center">
+                    <p>Escanea el código de barras del producto usando el lector.</p>
+                    <input type="text" id="inputCodigoBarras" class="form-control form-control-lg text-center" 
+                        placeholder="Esperando código..." autocomplete="off" autofocus>
+                    <div id="resultadoBusqueda" class="mt-3"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Modal de confirmación de eliminación --}}
     <x-confirm-delete-modal />
 
@@ -178,3 +207,4 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite(['resources/js/pages/formularios-generico.js'])
 @endpush
+<script src="{{ asset('js/inventario/escaner.js') }}"></script>
