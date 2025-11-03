@@ -569,7 +569,15 @@ class ComplementarioController extends Controller
             // Procesar el archivo y subirlo a Google Drive
             if ($request->hasFile('documento_identidad')) {
                 $file = $request->file('documento_identidad');
-                $fileName = $aspirante->persona->numero_documento . '.' . $file->getClientOriginalExtension();
+                
+                // Crear nombre de archivo con formato: tipo_documento_NumeroDocumento_PrimerNombre_PrimerApellido_timestamp.pdf
+                $tipoDocumento = $aspirante->persona->tipo_documento;
+                $numeroDocumento = $aspirante->persona->numero_documento;
+                $primerNombre = $aspirante->persona->primer_nombre;
+                $primerApellido = $aspirante->persona->primer_apellido;
+                $timestamp = now()->format('d-m-y-H-i-s');
+                
+                $fileName = "{$tipoDocumento}_{$numeroDocumento}_{$primerNombre}_{$primerApellido}_{$timestamp}.{$file->getClientOriginalExtension()}";
 
                 Log::info('Attempting to upload file to Google Drive', [
                     'file_name' => $fileName,
