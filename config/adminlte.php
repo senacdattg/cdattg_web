@@ -769,25 +769,21 @@ return [
             'can' => 'VER PROGRAMA DE CARACTERIZACION',
             'submenu' => [
                 [
-                    'text' => 'Gestion Programas',
-                    'url' => 'gestion-programas-complementarios',
-                    'icon' => 'fas fa-tasks',
-                    'can' => [
-                        'VER PROGRAMA DE CARACTERIZACION',
-                        'CREAR PROGRAMA DE CARACTERIZACION',
-                        'EDITAR PROGRAMA DE CARACTERIZACION',
-                        'ELIMINAR PROGRAMA DE CARACTERIZACION',
-                    ],
-                ],
-                [
-                    'text' => 'Crear Programa',
-                    'url' => 'complementarios-ofertados/create',
-                    'icon' => 'fas fa-plus-circle',
-                    'can' => [
-                        'VER PROGRAMA DE CARACTERIZACION',
-                        'CREAR PROGRAMA DE CARACTERIZACION',
-                        'EDITAR PROGRAMA DE CARACTERIZACION',
-                        'ELIMINAR PROGRAMA DE CARACTERIZACION',
+                    'text' => 'Gestión de programas',
+                    'icon' => 'fas fa-graduation-cap',
+                    'submenu' => [
+                        [
+                            'text' => 'Ver complementarios',
+                            'url' => 'gestion-programas-complementarios',
+                            'icon' => 'fas fa-list',
+                            'can' => 'VER PROGRAMA COMPLEMENTARIO',
+                        ],
+                        [
+                            'text' => 'Crear complementario',
+                            'url' => 'complementarios-ofertados/create',
+                            'icon' => 'fas fa-plus',
+                            'can' => 'CREAR PROGRAMA COMPLEMENTARIO',
+                        ],
                     ],
                 ],
                 [
