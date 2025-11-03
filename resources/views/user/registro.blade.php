@@ -27,6 +27,14 @@
                         </div>
                     </div>
 
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <a href="{{ url('/') }}" class="btn btn-outline-secondary btn-block">
+                                <i class="fas fa-arrow-left mr-2"></i>Volver
+                            </a>
+                        </div>
+                    </div>
+
                     <script>
                         // Mostrar preloader al enviar el formulario
                         document.getElementById('registroForm').addEventListener('submit', function() {
@@ -44,6 +52,9 @@
 
                             // Configurar carga dinámica de municipios
                             setupMunicipioLoading();
+
+                            // Configurar funcionalidad de dirección estructurada
+                            setupAddressForm();
                         });
 
                         function setupUppercaseConversion() {
@@ -117,13 +128,88 @@
                                 municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
                             }
                         }
+
+                        function setupAddressForm() {
+                            const toggleButton = document.getElementById('toggleAddressForm');
+                            if (toggleButton) {
+                                toggleButton.addEventListener('click', function() {
+                                    const addressForm = document.getElementById('addressForm');
+                                    const isVisible = addressForm.classList.contains('show');
+                                    const button = this;
+                                    if (isVisible) {
+                                        $('#addressForm').collapse('hide');
+                                        button.setAttribute('aria-expanded', 'false');
+                                    } else {
+                                        $('#addressForm').collapse('show');
+                                        button.setAttribute('aria-expanded', 'true');
+                                    }
+                                });
+                            }
+
+                            const saveButton = document.getElementById('saveAddress');
+                            if (saveButton) {
+                                saveButton.addEventListener('click', function() {
+                                    const carrera = document.getElementById('carrera').value.trim();
+                                    const calle = document.getElementById('calle').value.trim();
+                                    const numeroCasa = document.getElementById('numero_casa').value.trim();
+                                    const numeroApartamento = document.getElementById('numero_apartamento').value.trim();
+
+                                    // Validar campos obligatorios
+                                    if (!carrera || !calle || !numeroCasa) {
+                                        alert('Por favor complete todos los campos obligatorios: Carrera, Calle y Número Casa.');
+                                        return;
+                                    }
+
+                                    // Construir la dirección
+                                    let direccion = `Carrera ${carrera} Calle ${calle} #${numeroCasa}`;
+                                    if (numeroApartamento) {
+                                        direccion += ` Apt ${numeroApartamento}`;
+                                    }
+
+                                    // Asignar al campo principal
+                                    document.getElementById('direccion').value = direccion;
+
+                                    // Ocultar el formulario
+                                    $('#addressForm').collapse('hide');
+
+                                    // Limpiar campos
+                                    document.querySelectorAll('.address-field').forEach(field => field.value = '');
+                                });
+                            }
+
+                            const cancelButton = document.getElementById('cancelAddress');
+                            if (cancelButton) {
+                                cancelButton.addEventListener('click', function() {
+                                    // Ocultar el formulario
+                                    $('#addressForm').collapse('hide');
+
+                                    // Limpiar campos
+                                    document.querySelectorAll('.address-field').forEach(field => field.value = '');
+                                });
+                            }
+
+                            // Validar solo números en campos de dirección
+                            const addressNumericFields = ['carrera', 'calle', 'numero_casa', 'numero_apartamento'];
+                            addressNumericFields.forEach(fieldId => {
+                                const element = document.getElementById(fieldId);
+                                if (element) {
+                                    element.addEventListener('keypress', function(event) {
+                                        const key = event.key;
+                                        if (event.ctrlKey || event.altKey || event.metaKey) {
+                                            return true;
+                                        }
+                                        if (!/^\d$/.test(key)) {
+                                            event.preventDefault();
+                                            return false;
+                                        }
+                                        return true;
+                                    });
+                                }
+                            });
+                        }
                     </script>
 
-                    <div class="row justify-content-sm-center">
-                        <div class="col-6">
-                            <button type="submit" class="btn btn-primary btn-block">Registrarme</button>
-                        </div>
-                    </div>
+                    
                 </form>
                 <hr>
                 {{-- <a href="{{ route('login') }}" class="text-center">Ya tengo una cuenta</a> --}}

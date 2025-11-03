@@ -88,6 +88,15 @@ class RegisterController extends Controller
         // Asignar rol de visitante
         $user->assignRole('VISITANTE');
 
+        // Verificar si el usuario ya tiene alguna inscripción en programas complementarios
+        $tieneInscripciones = \App\Models\AspiranteComplementario::where('persona_id', $persona->id)->exists();
+
+        // Si ya tiene inscripciones, cambiar el rol a ASPIRANTE
+        if ($tieneInscripciones) {
+            $user->removeRole('VISITANTE');
+            $user->assignRole('ASPIRANTE');
+        }
+
         // Autenticar al usuario automáticamente
         Auth::login($user);
 
