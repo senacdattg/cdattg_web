@@ -60,9 +60,15 @@ class DetalleOrden extends Model
     }
 
     // Verificar si está completamente devuelto
-    public function Devuelto()
+    public function estaCompletamenteDevuelto()
     {
         return $this->getCantidadDevuelta() >= $this->cantidad;
+    }
+
+    // Alias para compatibilidad
+    public function Devuelto()
+    {
+        return $this->estaCompletamenteDevuelto();
     }
 
     // Obtener cantidad pendiente de devolución

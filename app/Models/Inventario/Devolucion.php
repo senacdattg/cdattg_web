@@ -18,6 +18,7 @@ class Devolucion extends Model
         'detalle_orden_id',
         'cantidad_devuelta',
         'fecha_devolucion',
+        'estado_id',
         'observaciones',
         'user_create_id',
         'user_update_id'
@@ -42,7 +43,7 @@ class Devolucion extends Model
             $detalleOrden = DetalleOrden::with('producto')->findOrFail($detalleOrdenId);
 
             // Validar que no se devuelva más de lo prestado
-            $cantidadPendiente = $detalleOrden->cantidad_pendiente;
+            $cantidadPendiente = $detalleOrden->getCantidadPendiente();
             if ($cantidadDevuelta > $cantidadPendiente) {
                 throw new \Exception("No puedes devolver más de lo prestado. Cantidad pendiente: {$cantidadPendiente}");
             }
@@ -52,6 +53,7 @@ class Devolucion extends Model
                 'detalle_orden_id' => $detalleOrdenId,
                 'cantidad_devuelta' => $cantidadDevuelta,
                 'fecha_devolucion' => now(),
+                'estado_id' => 1, // Estado por defecto (completado)
                 'observaciones' => $observaciones,
                 'user_create_id' => Auth::id(),
                 'user_update_id' => Auth::id()
@@ -70,24 +72,30 @@ class Devolucion extends Model
     public function fueATiempo()
     {
         $fechaEsperada = $this->detalleOrden->orden->fecha_devolucion;
-        
+
         if (!$fechaEsperada) {
-            return null; 
+            return null;
         }
 
         return $this->fecha_devolucion->lte($fechaEsperada);
     }
 
-    
+
     //Obtener días de retraso en la devolución
     public function getDiasRetraso()
     {
         $fechaEsperada = $this->detalleOrden->orden->fecha_devolucion;
-        
+
         if (!$fechaEsperada || $this->fueATiempo()) {
             return 0;
         }
 
         return $this->fecha_devolucion->diffInDays($fechaEsperada);
+    }
+
+    // Alias para compatibilidad con el controlador
+    public function getDiasRetrasoDevolucion()
+    {
+        return $this->getDiasRetraso();
     }
 }

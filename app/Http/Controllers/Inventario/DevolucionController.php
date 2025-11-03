@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Inventario;
 use App\Models\Inventario\DetalleOrden;
 use App\Models\Inventario\Devolucion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class DevolucionController extends InventarioController
 {
@@ -100,5 +101,39 @@ class DevolucionController extends InventarioController
         ])->findOrFail($id);
 
         return view('inventario.devoluciones.show', compact('devolucion'));
+    }
+    // Mostrar préstamos activos del usuario actual
+    public function misPrestamos()
+    {
+        $userId = Auth::id();
+
+        $prestamos = DetalleOrden::with(['orden.tipoOrden', 'producto', 'devoluciones'])
+            ->whereHas('orden', function ($query) use ($userId) {
+                $query->where('user_create_id', $userId)
+                      ->whereNotNull('fecha_devolucion'); // Solo préstamos
+            })
+            ->where('estado_orden_id', 1) // Estado aprobado
+            ->paginate(10)
+            ->filter(function ($detalle) {
+                return !$detalle->estaCompletamenteDevuelto();
+            });
+
+        return view('inventario.prestamos.mis', compact('prestamos'));
+    }
+
+    // Historial de préstamos del usuario
+    public function historialPrestamos()
+    {
+        $userId = Auth::id();
+
+        $prestamos = DetalleOrden::with(['orden.tipoOrden', 'producto', 'devoluciones'])
+            ->whereHas('orden', function ($query) use ($userId) {
+                $query->where('user_create_id', $userId)
+                      ->whereNotNull('fecha_devolucion'); // Solo préstamos
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(15);
+
+        return view('inventario.prestamos.historial', compact('prestamos'));
     }
 }

@@ -900,6 +900,44 @@ return [
                     ],
                 ],
                 [
+                    'text' => 'Devoluciones',
+                    'icon' => 'fa-solid fa-undo',
+                    'can'  => 'DEVOLVER PRESTAMO',
+                    'submenu' => [
+                        [
+                            'text' => 'Préstamos Pendientes',
+                            'url'  => 'inventario/devoluciones',
+                            'icon' => 'fa-solid fa-clock',
+                            'can'  => 'DEVOLVER PRESTAMO',
+                        ],
+                        [
+                            'text' => 'Historial Devoluciones',
+                            'url'  => 'inventario/devoluciones-historial',
+                            'icon' => 'fa-solid fa-history',
+                            'can'  => 'DEVOLVER PRESTAMO',
+                        ],
+                    ],
+                ],
+                [
+                    'text' => 'Mis Préstamos',
+                    'icon' => 'fa-solid fa-hand-holding',
+                    'can'  => 'VER ORDEN',
+                    'submenu' => [
+                        [
+                            'text' => 'Préstamos Activos',
+                            'url'  => 'inventario/mis-prestamos',
+                            'icon' => 'fa-solid fa-list',
+                            'can'  => 'VER ORDEN',
+                        ],
+                        [
+                            'text' => 'Historial Personal',
+                            'url'  => 'inventario/historial-prestamos',
+                            'icon' => 'fa-solid fa-history',
+                            'can'  => 'VER ORDEN',
+                        ],
+                    ],
+                ],
+                [
                     'text' => 'Configuración',
                     'icon' => 'fa-solid fa-cog',
                     'can'  => 'VER CATEGORIA',
