@@ -1,4 +1,4 @@
-@props(['context' => 'registro', 'userData' => [], 'step' => 1])
+@props(['context' => 'registro', 'userData' => [], 'step' => 1, 'tiposDocumento' => []])
 
 @if($context === 'registro')
     {{-- Versión completa sin pasos para registro --}}
@@ -11,10 +11,28 @@
                 <div class="col-md-6 mb-3">
                     <label for="tipo_documento" class="form-label">Tipo de Documento *</label>
                     <select class="form-control" id="tipo_documento" name="tipo_documento" required>
+<<<<<<< HEAD
                         <option value="1" {{ old('tipo_documento', $userData['tipo_documento'] ?? '1') == '1' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
                         <option value="2" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '2' ? 'selected' : '' }}>Tarjeta de Identidad</option>
                         <option value="3" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '3' ? 'selected' : '' }}>Cédula de Extranjería</option>
                         <option value="4" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '4' ? 'selected' : '' }}>Pasaporte</option>
+=======
+                        <option value="">Seleccione...</option>
+                        @if($tiposDocumento && $tiposDocumento->count() > 0)
+                            @foreach($tiposDocumento as $tipo)
+                                <option value="{{ $tipo->id }}" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == $tipo->id ? 'selected' : '' }}>
+                                    {{ ucwords(strtolower(str_replace('_', ' ', $tipo->name))) }}
+                                </option>
+                            @endforeach
+                        @else
+                            <option value="3" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '3' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
+                            <option value="4" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '4' ? 'selected' : '' }}>Cédula de Extranjería</option>
+                            <option value="5" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '5' ? 'selected' : '' }}>Pasaporte</option>
+                            <option value="6" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '6' ? 'selected' : '' }}>Tarjeta de Identidad</option>
+                            <option value="7" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '7' ? 'selected' : '' }}>Registro Civil</option>
+                            <option value="8" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '8' ? 'selected' : '' }}>Sin Identificación</option>
+                        @endif
+>>>>>>> 1fa35276 (implementacion de tema parametro para el llamado de el tipo de documento en el formulario de registro e inscripcion e implementacion en el controlador de complementario)
                     </select>
                 </div>
                 <div class="col-md-6 mb-3">
@@ -144,10 +162,28 @@
                 <div class="col-md-6 mb-3">
                     <label for="tipo_documento" class="form-label">Tipo de Documento *</label>
                     <select class="form-control" id="tipo_documento" name="tipo_documento" required>
+<<<<<<< HEAD
                         <option value="1" {{ old('tipo_documento', $userData['tipo_documento'] ?? '1') == '1' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
                         <option value="2" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '2' ? 'selected' : '' }}>Tarjeta de Identidad</option>
                         <option value="3" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '3' ? 'selected' : '' }}>Cédula de Extranjería</option>
                         <option value="4" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '4' ? 'selected' : '' }}>Pasaporte</option>
+=======
+                        <option value="">Seleccione...</option>
+                        @if($tiposDocumento && $tiposDocumento->count() > 0)
+                            @foreach($tiposDocumento as $tipo)
+                                <option value="{{ $tipo->id }}" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == $tipo->id ? 'selected' : '' }}>
+                                    {{ ucwords(strtolower(str_replace('_', ' ', $tipo->name))) }}
+                                </option>
+                            @endforeach
+                        @else
+                            <option value="3" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '3' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
+                            <option value="4" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '4' ? 'selected' : '' }}>Cédula de Extranjería</option>
+                            <option value="5" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '5' ? 'selected' : '' }}>Pasaporte</option>
+                            <option value="6" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '6' ? 'selected' : '' }}>Tarjeta de Identidad</option>
+                            <option value="7" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '7' ? 'selected' : '' }}>Registro Civil</option>
+                            <option value="8" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '8' ? 'selected' : '' }}>Sin Identificación</option>
+                        @endif
+>>>>>>> 1fa35276 (implementacion de tema parametro para el llamado de el tipo de documento en el formulario de registro e inscripcion e implementacion en el controlador de complementario)
                     </select>
                 </div>
                 <div class="col-md-6 mb-3">
