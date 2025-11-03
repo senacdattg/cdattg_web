@@ -4,6 +4,8 @@
 
 @section('css')
     <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.6.2/dist/select2-bootstrap4.min.css" rel="stylesheet" />
     <style>
         .form-section {
             background: #f8f9fa;
@@ -47,6 +49,67 @@
             right: 30px;
             z-index: 1000;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        /* Ajuste visual Select2 para que coincida con .form-control compacta */
+        .select2-container { width: 100% !important; }
+        .select2-container--bootstrap4 .select2-selection--single {
+            font-size: 0.9rem;
+            background-color: #fff;
+            color: #495057;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+            /* el padding lo maneja el elemento renderizado para igualar a un select nativo */
+            padding: 0;
+            height: calc(2.25rem + 2px); /* igual altura que .form-control */
+            display: block;
+            overflow: hidden; /* evita que el texto se salga debajo del control */
+        }
+        .select2-container--bootstrap4 .select2-selection--single .select2-selection__rendered {
+            padding: 0.5rem 2rem 0.5rem 0.75rem; /* mismo padding que .form-control */
+            margin: 0;
+            line-height: 1.5; /* igual line-height que .form-control */
+            width: 100%;
+        }
+        .select2-container--bootstrap4 .select2-selection--single .select2-selection__placeholder {
+            line-height: 1.5;
+            color: #6c757d;
+        }
+        .select2-container--bootstrap4 .select2-selection--single .select2-selection__arrow {
+            height: 2.25rem; /* alto igual al control */
+            right: 0.75rem;
+            top: 0;
+            transform: none;
+        }
+        /* Ocultar botón de limpiar para igualar al campo Estado (sin "x") */
+        .select2-container--bootstrap4 .select2-selection__clear {
+            display: none !important;
+        }
+        /* Dropdown consistente con .form-control */
+        .select2-container--bootstrap4 .select2-dropdown {
+            border-color: #ced4da;
+            border-radius: 0.25rem;
+        }
+        /* Estados de focus/abierto como .form-control:focus */
+        .select2-container--bootstrap4.select2-container--focus .select2-selection,
+        .select2-container--bootstrap4.select2-container--open .select2-selection {
+            border-color: #80bdff;
+            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+        }
+        /* Estado inválido coherente con Bootstrap cuando el select original tiene is-invalid */
+        select.is-invalid + .select2 .select2-selection {
+            border-color: #dc3545 !important;
+        }
+        /* Fuente consistente en opciones y optgroups */
+        .select2-container--bootstrap4 .select2-results__option {
+            font-size: 0.9rem;
+        }
+        .select2-container--bootstrap4 .select2-results__group {
+            font-weight: 600;
+        }
+        /* Placeholder */
+        .select2-container--bootstrap4 .select2-selection__placeholder {
+            color: #6c757d;
         }
     </style>
 @endsection
@@ -165,7 +228,7 @@
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
-                                        
+
                                         <div class="form-group">
                                             <label for="jornada_id" class="form-label required-field">Jornada</label>
                                             <select name="jornada_id" id="jornada_id" class="form-control @error('jornada_id') is-invalid @enderror" required>
@@ -177,6 +240,33 @@
                                                 @endforeach
                                             </select>
                                             @error('jornada_id')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label for="ambiente_id" class="form-label required-field">Ambiente</label>
+                                            <select name="ambiente_id" id="ambiente_id" class="form-control select2bs4 w-100 @error('ambiente_id') is-invalid @enderror" data-placeholder="Seleccione una opción" required>
+                                                <option value="">Seleccione un ambiente</option>
+                                                @isset($ambientes)
+                                                    @php $ambientesGrouped = $ambientes->groupBy('piso_id'); @endphp
+                                                    @foreach($ambientesGrouped as $pisoId => $grupo)
+                                                        @php $label = optional($grupo->first()->piso)->piso ?? "Piso {$pisoId}"; @endphp
+                                                        <optgroup label="{{ $label }}">
+                                                            @foreach($grupo as $ambiente)
+                                                                <option value="{{ $ambiente->id }}" {{ old('ambiente_id') == $ambiente->id ? 'selected' : '' }}>
+                                                                    {{ $ambiente->title }}
+                                                                </option>
+                                                            @endforeach
+                                                        </optgroup>
+                                                    @endforeach
+                                                @else
+                                                    <optgroup label="Ambientes">
+                                                        <option value="" disabled>No hay ambientes disponibles</option>
+                                                    </optgroup>
+                                                @endisset
+                                            </select>
+                                            @error('ambiente_id')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
                                         </div>
@@ -227,8 +317,31 @@
 @endsection
 
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar Select2 si está disponible
+            if (typeof $ !== 'undefined' && $.fn.select2) {
+                $('.select2bs4').select2({
+                    theme: 'bootstrap4',
+                    placeholder: function() {
+                        return $(this).data('placeholder') || 'Seleccione una opción';
+                    },
+                    language: 'es',
+                    width: '100%',
+                    allowClear: false
+                });
+
+                // Quitar estado inválido cuando cambie el valor
+                $('.select2bs4').on('change', function() {
+                    if ($(this).val()) {
+                        $(this).removeClass('is-invalid');
+                    }
+                });
+            } else {
+                console.warn('Select2 no está disponible');
+            }
+
             // Validación del formulario
             const form = document.getElementById('programaForm');
             const saveBtn = document.getElementById('saveBtn');
