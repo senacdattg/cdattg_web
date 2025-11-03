@@ -380,13 +380,6 @@ return [
             'url' => 'home',
             'icon' => 'fas fa-fw fa-tachometer-alt',
         ],
-        [
-            'text' => 'Notificaciones',
-            'url' => 'notifications',
-            'icon' => 'fas fa-fw fa-bell',
-            'can' => 'superadministrador',
-        ],
-
         // ========================================
         // MÓDULO: CONFIGURACIÓN DEL SISTEMA
         // ========================================
