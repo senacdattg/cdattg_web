@@ -13,6 +13,7 @@ use App\Models\Pais;
 use App\Models\Persona;
 use App\Models\AspiranteComplementario;
 use App\Models\User;
+use App\Models\Ambiente;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -60,7 +61,8 @@ class ComplementarioController extends Controller
     {
         $modalidades = \App\Models\ParametroTema::where('tema_id', 5)->with('parametro')->get();
         $jornadas = \App\Models\JornadaFormacion::all();
-        return view('complementarios.gestion_complementarios.create', compact('modalidades', 'jornadas'));
+        $ambientes = Ambiente::with('piso')->where('status', 1)->orderBy('piso_id')->orderBy('title')->get();
+        return view('complementarios.gestion_complementarios.create', compact('modalidades', 'jornadas', 'ambientes'));
     }
     public function estadisticas()
     {
