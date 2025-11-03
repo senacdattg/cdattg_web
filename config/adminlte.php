@@ -753,6 +753,17 @@ return [
                     ],
                 ],
                 [
+                    'text' => 'Crear Programa',
+                    'url' => 'complementarios-ofertados/create',
+                    'icon' => 'fas fa-plus-circle',
+                    'can' => [
+                        'VER PROGRAMA DE CARACTERIZACION',
+                        'CREAR PROGRAMA DE CARACTERIZACION',
+                        'EDITAR PROGRAMA DE CARACTERIZACION',
+                        'ELIMINAR PROGRAMA DE CARACTERIZACION',
+                    ],
+                ],
+                [
                     'text' => 'Gestion de aspirantes',
                     'url' => 'gestion-aspirantes',
                     'icon' => 'fas fa-users',
@@ -948,4 +959,3 @@ return [
         'public/css/app.css',
     ],
 ];
-
