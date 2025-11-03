@@ -196,7 +196,7 @@
                                     <div class="row mb-4">
                                         <div class="col-12">
                                             <h4 class="text-secondary mb-3">
-                                                <i class="fas fa-map-marker-alt mr-2"></i>Ubicación
+                                                <i class="fas fa-map-marker-alt mr-2"></i>Ubicación Actual
                                             </h4>
                                         </div>
                                         <div class="col-12 col-md-4">
