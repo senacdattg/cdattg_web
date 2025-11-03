@@ -1,0 +1,149 @@
+/**
+ * Estilos para el módulo de notificaciones
+ * Sistema de notificaciones compacto y eficiente
+ */
+
+/* Estilos generales para las notificaciones */
+.list-group-item {
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+}
+
+/* Notificaciones no leídas */
+.list-group-item.list-group-item-light {
+    background-color: #f8f9fc;
+    border-left-color: #007bff;
+}
+
+/* Hover effect */
+.list-group-item:hover {
+    background-color: #f1f3f5;
+    transform: translateX(2px);
+}
+
+/* Títulos compactos */
+.list-group-item h6 {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+    color: #2c3e50;
+}
+
+/* Texto del cuerpo */
+.list-group-item .small {
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: #495057;
+}
+
+/* Iconos */
+.list-group-item i.fa-lg {
+    font-size: 1.5rem;
+}
+
+/* Badges */
+.list-group-item .badge {
+    font-size: 0.75rem;
+    padding: 0.25em 0.5em;
+    font-weight: 500;
+}
+
+/* Botones de acción compactos */
+.list-group-item .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.2;
+}
+
+/* Timestamp */
+.list-group-item small.text-muted {
+    font-size: 0.75rem;
+    color: #6c757d !important;
+}
+
+/* Footer de paginación */
+.card-footer {
+    background-color: #f8f9fa;
+    padding: 0.75rem 1rem;
+}
+
+/* Ajustes para dispositivos móviles */
+@media (max-width: 768px) {
+    .list-group-item {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .list-group-item h6 {
+        font-size: 0.875rem;
+    }
+    
+    .list-group-item .small {
+        font-size: 0.8rem;
+    }
+    
+    .list-group-item i.fa-lg {
+        font-size: 1.25rem;
+    }
+    
+    .list-group-item .btn-sm {
+        padding: 0.15rem 0.35rem;
+        font-size: 0.7rem;
+    }
+}
+
+/* Animación de eliminación */
+@keyframes fadeOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+}
+
+.list-group-item.removing {
+    animation: fadeOutRight 0.3s ease forwards;
+}
+
+/* Estado de carga */
+.loading-notification {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Badge de contador en el header */
+.card-title .badge {
+    vertical-align: middle;
+    margin-left: 0.5rem;
+}
+
+/* Botones del header */
+.card-tools .btn-sm {
+    font-size: 0.875rem;
+}
+
+.text {
+    color: #555 !important;
+}
+
+.text strong {
+   color: #555 !important;
+}
+
+/* Separador visual entre notificaciones */
+.list-group-item + .list-group-item {
+    border-top-width: 1px;
+}
+
+/* Notificaciones vacías */
+.text-center.py-5 {
+    padding: 3rem 1rem !important;
+}
+
+.text-center.py-5 i {
+    font-size: 4rem;
+    color: #dee2e6;
+}

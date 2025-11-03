@@ -10,6 +10,8 @@ use App\Models\Inventario\Orden;
 use App\Models\ParametroTema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\OrdenAprobadaNotification;
+use App\Notifications\OrdenRechazadaNotification;
 
 class AprobacionController extends InventarioController
 {
@@ -122,6 +124,12 @@ class AprobacionController extends InventarioController
             $producto->user_update_id = Auth::id();
             $producto->save();
 
+            // Enviar notificación al solicitante de la orden
+            $solicitante = $detalleOrden->orden->userCreate;
+            if ($solicitante) {
+                $solicitante->notify(new OrdenAprobadaNotification($detalleOrden, Auth::user()));
+            }
+
             DB::commit();
 
             return redirect()->back()
@@ -203,6 +211,16 @@ class AprobacionController extends InventarioController
             $orden->descripcion_orden .= "Fecha: " . now()->format('d/m/Y H:i') . "\n";
             $orden->user_update_id = Auth::id();
             $orden->save();
+
+            // Enviar notificación al solicitante de la orden
+            $solicitante = $detalleOrden->orden->userCreate;
+            if ($solicitante) {
+                $solicitante->notify(new OrdenRechazadaNotification(
+                    $detalleOrden, 
+                    Auth::user(), 
+                    $validated['motivo_rechazo']
+                ));
+            }
 
             DB::commit();
 

@@ -7,9 +7,13 @@ use App\Models\Inventario\Orden;
 use App\Models\Inventario\DetalleOrden;
 use App\Models\Inventario\Producto;
 use App\Models\ProgramaFormacion;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Notification;
 use App\Models\ParametroTema;
+use App\Notifications\NuevaOrdenNotification;
+use App\Notifications\StockBajoNotification;
 
 class OrdenController extends InventarioController
 {
@@ -354,6 +358,11 @@ class OrdenController extends InventarioController
 
             // Limpiar el carrito después de crear la orden exitosamente
             session()->forget('carrito_data');
+            // Notificar a superadministradores sobre la nueva orden
+            $superadmins = User::role('SUPER ADMINISTRADOR')->get();
+            if ($superadmins->isNotEmpty()) {
+                Notification::send($superadmins, new NuevaOrdenNotification($orden));
+            }
 
             return redirect()->route('inventario.ordenes.index')
                 ->with('success', 'Solicitud creada exitosamente. Está pendiente de aprobación por el administrador.')
