@@ -18,3 +18,7 @@ Route::post('/programas-complementarios/{complementarioId}/agregar-aspirante', [
 Route::delete('/programas-complementarios/{complementarioId}/aspirante/{aspiranteId}', [ComplementarioController::class, 'eliminarAspirante'])
     ->name('programas-complementarios.eliminar-aspirante')
     ->middleware('auth');
+
+Route::get('/programas-complementarios/{complementarioId}/exportar-excel', [ComplementarioController::class, 'exportarAspirantesExcel'])
+    ->name('programas-complementarios.exportar-excel')
+    ->middleware('auth');
