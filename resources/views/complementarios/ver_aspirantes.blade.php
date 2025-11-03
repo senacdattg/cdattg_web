@@ -30,12 +30,12 @@
                         <input type="text" class="form-control form-control-lg" placeholder="Buscar por nombre o número de identidad">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                     <label class="form-label fw-bold">Programa</label>
                     <select class="form-select form-select-lg bg-light">
                         <option selected>{{ $programa->nombre }}</option>
                     </select>
-                </div>
+                </div> -->
                 <div class="col-md-3">
                     <label class="form-label fw-bold">Año</label>
                     <select class="form-select form-select-lg bg-light">
