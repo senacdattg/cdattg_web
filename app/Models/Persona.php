@@ -37,6 +37,7 @@ class Persona extends Model
         'estado_sofia',
         'user_create_id',
         'user_edit_id',
+        'caracterizacion_id',
     ];
 
     protected static function boot()
@@ -239,5 +240,13 @@ class Persona extends Model
     public function userUpdatedBy()
     {
         return $this->belongsTo(User::class, 'user_edit_id');
+    }
+
+    /**
+     * Relación con la caracterización complementaria.
+     */
+    public function caracterizacion()
+    {
+        return $this->belongsTo(CategoriaCaracterizacionComplementario::class, 'caracterizacion_id');
     }
 }

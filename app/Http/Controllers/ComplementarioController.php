@@ -272,10 +272,10 @@ class ComplementarioController extends Controller
             'municipio_id', 'direccion'
         ]));
 
-        // Guardar caracterización si se proporcionó
-        if ($request->categorias) {
-            // Aquí iría la lógica para guardar la caracterización
-            // Dependiendo de cómo esté estructurada la tabla de caracterización
+        // Guardar caracterización si se proporcionó (solo la primera categoría seleccionada)
+        if ($request->categorias && is_array($request->categorias) && count($request->categorias) > 0) {
+            $persona->caracterizacion_id = $request->categorias[0];
+            $persona->save();
         }
 
         return redirect()->route('inscripcion.general')->with('success', '¡Registro exitoso! Sus datos han sido guardados correctamente.');
