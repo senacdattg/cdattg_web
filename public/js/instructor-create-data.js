@@ -188,15 +188,10 @@ window.personasData = [
         "email": "MARIOALEXANDERCANOLA@GMAIL.COM"
     },
     {
-        "id": 38,
-        "nombre": "DIEGO  PARMENIO",
-        "documento": "12121212",
-        "email": "CAMILA@GMAIL.COM"
-    },
-    {
-        "id": 39,
-        "nombre": "ALVARO  OSPINA",
-        "documento": "1122123456",
-        "email": "ALVARO@PRUEBA.COM"
+
+        "id": 40,
+        "nombre": "ZSFZS  XCZXC",
+        "documento": "1120588339",
+        "email": "W@W.COM"
     }
 ];
