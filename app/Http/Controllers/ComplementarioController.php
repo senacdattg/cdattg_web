@@ -221,10 +221,11 @@ class ComplementarioController extends Controller
         $paises = Pais::all();
         $departamentos = Departamento::all();
 
-        // Obtener tipos de documento dinámicamente
+        // Obtener tipos de documento y géneros dinámicamente
         $tiposDocumento = $this->getTiposDocumento();
+        $generos = $this->getGeneros();
 
-        return view('complementarios.inscripcion_general', compact('categoriasConHijos', 'paises', 'departamentos', 'tiposDocumento'));
+        return view('complementarios.inscripcion_general', compact('categoriasConHijos', 'paises', 'departamentos', 'tiposDocumento', 'generos'));
     }
 
     /**
@@ -287,10 +288,11 @@ class ComplementarioController extends Controller
             $programa->icono = $this->getIconoForPrograma($programa->nombre);
         });
 
-        // Obtener tipos de documento dinámicamente
+        // Obtener tipos de documento y géneros dinámicamente
         $tiposDocumento = $this->getTiposDocumento();
+        $generos = $this->getGeneros();
 
-        return view('complementarios.programas_publicos', compact('programas', 'tiposDocumento'));
+        return view('complementarios.programas_publicos', compact('programas', 'tiposDocumento', 'generos'));
     }
 
     public function formularioInscripcion($id)
@@ -311,10 +313,11 @@ class ComplementarioController extends Controller
         $paises = Pais::all();
         $departamentos = Departamento::all();
 
-        // Obtener tipos de documento dinámicamente
+        // Obtener tipos de documento y géneros dinámicamente
         $tiposDocumento = $this->getTiposDocumento();
+        $generos = $this->getGeneros();
 
-        return view('complementarios.formulario_inscripcion', compact('programa', 'categoriasConHijos', 'paises', 'departamentos', 'tiposDocumento'));
+        return view('complementarios.formulario_inscripcion', compact('programa', 'categoriasConHijos', 'paises', 'departamentos', 'tiposDocumento', 'generos'));
     }
 
     public function edit($id)
@@ -856,10 +859,11 @@ class ComplementarioController extends Controller
                 ->get();
         }
 
-        // Obtener tipos de documento dinámicamente
+        // Obtener tipos de documento y géneros dinámicamente
         $tiposDocumento = $this->getTiposDocumento();
+        $generos = $this->getGeneros();
 
-        return view('personas.show', compact('persona', 'aspirantes', 'user', 'tiposDocumento'));
+        return view('personas.show', compact('persona', 'aspirantes', 'user', 'tiposDocumento', 'generos'));
     }
 
     /**
@@ -884,6 +888,30 @@ class ComplementarioController extends Controller
 
         // Obtener parámetros activos del tema
         return $temaTipoDocumento->parametros()
+            ->where('parametros_temas.status', 1)
+            ->orderBy('parametros.name')
+            ->get(['parametros.id', 'parametros.name']);
+    }
+
+    /**
+     * Método auxiliar para obtener géneros dinámicamente desde el tema-parametro
+     */
+    private function getGeneros()
+    {
+        // Buscar el tema "GENERO"
+        $temaGenero = \App\Models\Tema::where('name', 'GENERO')->first();
+
+        if (!$temaGenero) {
+            // Fallback: devolver valores hardcodeados si no se encuentra el tema
+            return collect([
+                ['id' => 9, 'name' => 'MASCULINO'],
+                ['id' => 10, 'name' => 'FEMENINO'],
+                ['id' => 11, 'name' => 'NO DEFINE'],
+            ]);
+        }
+
+        // Obtener parámetros activos del tema
+        return $temaGenero->parametros()
             ->where('parametros_temas.status', 1)
             ->orderBy('parametros.name')
             ->get(['parametros.id', 'parametros.name']);

@@ -96,10 +96,11 @@ class RegisterController extends Controller
 
     public function mostrarFormulario()
     {
-        // Obtener tipos de documento dinámicamente
+        // Obtener tipos de documento y géneros dinámicamente
         $tiposDocumento = $this->getTiposDocumento();
+        $generos = $this->getGeneros();
 
-        return view('user.registro', compact('tiposDocumento'));
+        return view('user.registro', compact('tiposDocumento', 'generos'));
     }
 
     /**
@@ -124,6 +125,30 @@ class RegisterController extends Controller
 
         // Obtener parámetros activos del tema
         return $temaTipoDocumento->parametros()
+            ->where('parametros_temas.status', 1)
+            ->orderBy('parametros.name')
+            ->get(['parametros.id', 'parametros.name']);
+    }
+
+    /**
+     * Método auxiliar para obtener géneros dinámicamente desde el tema-parametro
+     */
+    private function getGeneros()
+    {
+        // Buscar el tema "GENERO"
+        $temaGenero = \App\Models\Tema::where('name', 'GENERO')->first();
+
+        if (!$temaGenero) {
+            // Fallback: devolver valores hardcodeados si no se encuentra el tema
+            return collect([
+                ['id' => 9, 'name' => 'MASCULINO'],
+                ['id' => 10, 'name' => 'FEMENINO'],
+                ['id' => 11, 'name' => 'NO DEFINE'],
+            ]);
+        }
+
+        // Obtener parámetros activos del tema
+        return $temaGenero->parametros()
             ->where('parametros_temas.status', 1)
             ->orderBy('parametros.name')
             ->get(['parametros.id', 'parametros.name']);
