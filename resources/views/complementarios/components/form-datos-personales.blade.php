@@ -114,7 +114,7 @@
 
     <div class="card card-success mb-4">
         <div class="card-header">
-            <h5 class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i>Ubicación</h5>
+            <h5 class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i>Ubicación Actual</h5>
         </div>
         <div class="card-body">
             <div class="mb-3">
@@ -266,7 +266,7 @@
 
     <div class="card card-success mb-4">
         <div class="card-header">
-            <h5 class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i>Ubicación</h5>
+            <h5 class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i>Ubicación Actual</h5>
         </div>
         <div class="card-body">
             <div class="row">
