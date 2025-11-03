@@ -23,6 +23,7 @@ class Producto extends Model
         'unidad_medida_id',
         'cantidad',
         'codigo_barras',
+        'codigo_barras_sena',
         'estado_producto_id',
         'categoria_id',
         'marca_id',
