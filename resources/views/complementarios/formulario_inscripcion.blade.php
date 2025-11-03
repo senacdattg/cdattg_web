@@ -266,9 +266,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                         </div>
 
                                         <div class="form-check mb-4">
-                                            <input class="form-check-input" type="checkbox" id="acepto_terminos" required>
+                                            <input class="form-check-input" type="checkbox" id="acepto_terminos" name="acepto_terminos" required>
                                             <label class="form-check-label" for="acepto_terminos">
-                                                Acepto los términos y condiciones del proceso de inscripción *
+                                                Acepto los <a href="#" data-toggle="modal" data-target="#modalTerminos">términos y condiciones</a> del proceso de inscripción *
                                             </label>
                                         </div>
 
@@ -343,5 +343,6 @@ document.addEventListener('DOMContentLoaded', function() {
     </div>
 
 @include('layout.footer')
+@include('components.modal-terminos')
 @endsection
 
