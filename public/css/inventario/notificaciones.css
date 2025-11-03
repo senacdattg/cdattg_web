@@ -147,3 +147,91 @@
     font-size: 4rem;
     color: #dee2e6;
 }
+
+/* Fondo general */
+body {
+    background: linear-gradient(to bottom, #CACCCE, #CACCCE);
+    margin: 0;
+    min-height: 100vh;
+}
+
+h1 {
+    color: #fdfdfd !important;
+}
+
+P {
+    color: #fdfdfd !important;
+}
+li {
+    color: #fdfdfd !important;
+}
+
+.bg-light {
+    background-color: #72cd79 !important;
+}
+.text-muted {
+    color: #fdfdfd !important;
+}
+
+.text-dark {
+    color: #fdfdfd !important;
+}
+.dashboard-header
+{
+    background-color: #00041d05 !important;
+    color: #ffffff !important;
+}
+
+[class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link.active, [class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link.active:focus, [class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link.active:hover
+{
+    background-color: #007bff !important;
+    color: #343a40 !important;
+}
+
+#inventario .text-gray-800 {
+    color: #f2f3f4 !important;
+}
+
+#municipio_id {
+    padding: .375rem .75rem !important;
+}
+
+/* Fondo específico solo para el módulo de inventario */
+body .content-wrapper {
+  background: linear-gradient(to bottom, 
+    #000627 0%, 
+    #5E6771 50%, 
+    #CACCCE 100%
+  );
+  padding: 60px 20px 20px;
+  min-height: 100vh;
+}
+
+/* Estilos del navbar */
+.main-header.navbar { 
+    background-color: #00041D !important;
+}
+
+.main-header.navbar .nav-link {
+    color: #ffffff !important;
+}
+
+.main-header.navbar .nav-link:hover {
+    color: #30d668 !important; 
+}
+
+.main-header.navbar .navbar-brand {
+    color: #ffffff !important;
+}
+
+.main-header.navbar .user-menu .nav-link {
+    color: #ffffff !important;
+}
+
+.main-header.navbar .nav-item i {
+    color: #ffffff !important;
+}
+.row {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
