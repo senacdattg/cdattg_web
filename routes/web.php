@@ -54,6 +54,10 @@ Route::middleware('auth')->group(function () {
     }
 
     Route::post('/verify-document', [AsistenceQrController::class, 'verifyDocument'])->name('api.verifyDocument');
+
+    Route::prefix('inventario')->name('inventario.')->group(function () {
+        Route::get('productos/{id}/etiqueta', [App\Http\Controllers\Inventario\ProductoController::class, 'etiqueta'])->name('productos.etiqueta');
+    });
 });
 
 // Route::get('/perfil', [ProfileController::class, 'index'])->name('profile.index');
