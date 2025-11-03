@@ -450,4 +450,13 @@ class ProductoController extends InventarioController
 
         return view('inventario.productos._detalles-modal', compact('producto'));
     }
+
+    /**
+     * Vista imprimible de la etiqueta con código de barras SENA (JS en cliente)
+     */
+    public function etiqueta(string $id)
+    {
+        $producto = Producto::findOrFail($id);
+        return view('inventario.productos.etiqueta', compact('producto'));
+    }
 }

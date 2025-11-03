@@ -115,6 +115,16 @@
                                         </div>
                                     </div>
 
+                                    <div class="col-md-6">
+                                        <div class="form-group-modern">
+                                            <label>
+                                                <i class="fas fa-barcode"></i>
+                                                Código SENA (11 dígitos)
+                                            </label>
+                                            <input type="text" class="form-control-modern" value="{{ old('codigo_barras_sena') }}" readonly placeholder="Se asignará automáticamente" />
+                                        </div>
+                                    </div>
+
                                     <div class="col-md-12">
                                         <div class="form-group-modern">
                                             <label for="descripcion">
