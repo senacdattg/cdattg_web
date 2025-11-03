@@ -93,6 +93,9 @@ class RolePermissionSeeder extends Seeder
             'CAMBIAR ESTADO PERSONA',
             // Permisos para aspirantes complementarios
             'VER ESTADISTICAS',
+            // Permisos para programas complementarios
+            'VER PROGRAMA COMPLEMENTARIO',
+            'CREAR PROGRAMA COMPLEMENTARIO',
             'VER MI PERFIL',
             'ELIMINAR ASPIRANTE COMPLEMENTARIO',
         ];
@@ -152,6 +155,8 @@ class RolePermissionSeeder extends Seeder
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
             'VER ESTADISTICAS',
+            'VER PROGRAMA COMPLEMENTARIO',
+            'CREAR PROGRAMA COMPLEMENTARIO',
             'ELIMINAR ASPIRANTE COMPLEMENTARIO',
         ]);
 
@@ -170,6 +175,8 @@ class RolePermissionSeeder extends Seeder
             'EDITAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
             'VER ESTADISTICAS',
+            'VER PROGRAMA COMPLEMENTARIO',
+            'CREAR PROGRAMA COMPLEMENTARIO',
             'ELIMINAR ASPIRANTE COMPLEMENTARIO',
         ]);
 
