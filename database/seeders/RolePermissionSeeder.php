@@ -192,12 +192,6 @@ class RolePermissionSeeder extends Seeder
             // Permisos para notificaciones
             'VER NOTIFICACIONES',
             'MARCAR NOTIFICACIONES LEIDAS',
-            // Permisos para notificaciones
-            'VER NOTIFICACIONES',
-            'MARCAR NOTIFICACIONES LEIDAS',
-            // Permisos para notificaciones
-            'VER NOTIFICACIONES',
-            'MARCAR NOTIFICACIONES LEIDAS',
         ];
 
         // Crear cada permiso si no existe
