@@ -1,4 +1,4 @@
-@props(['context' => 'registro', 'userData' => [], 'step' => 1, 'tiposDocumento' => []])
+@props(['context' => 'registro', 'userData' => [], 'step' => 1, 'tiposDocumento' => [], 'generos' => []])
 
 @if($context === 'registro')
     {{-- Versión completa sin pasos para registro --}}
@@ -91,10 +91,17 @@
                 <label for="genero" class="form-label">Género *</label>
                 <select class="form-control" id="genero" name="genero" required>
                     <option value="">Seleccione...</option>
-                    <option value="1" {{ old('genero', $userData['genero'] ?? '') == '1' ? 'selected' : '' }}>Masculino</option>
-                    <option value="2" {{ old('genero', $userData['genero'] ?? '') == '2' ? 'selected' : '' }}>Femenino</option>
-                    <option value="3" {{ old('genero', $userData['genero'] ?? '') == '3' ? 'selected' : '' }}>Otro</option>
-                    <option value="4" {{ old('genero', $userData['genero'] ?? '') == '4' ? 'selected' : '' }}>Prefiero no decir</option>
+                    @if($generos && $generos->count() > 0)
+                        @foreach($generos as $genero)
+                            <option value="{{ $genero->id }}" {{ old('genero', $userData['genero'] ?? '') == $genero->id ? 'selected' : '' }}>
+                                {{ ucwords(strtolower(str_replace('_', ' ', $genero->name))) }}
+                            </option>
+                        @endforeach
+                    @else
+                        <option value="9" {{ old('genero', $userData['genero'] ?? '') == '9' ? 'selected' : '' }}>Masculino</option>
+                        <option value="10" {{ old('genero', $userData['genero'] ?? '') == '10' ? 'selected' : '' }}>Femenino</option>
+                        <option value="11" {{ old('genero', $userData['genero'] ?? '') == '11' ? 'selected' : '' }}>No Define</option>
+                    @endif
                 </select>
             </div>
 
@@ -238,10 +245,17 @@
                 <label for="genero" class="form-label">Género *</label>
                 <select class="form-control" id="genero" name="genero" required>
                     <option value="">Seleccione...</option>
-                    <option value="1" {{ old('genero', $userData['genero'] ?? '') == '1' ? 'selected' : '' }}>Masculino</option>
-                    <option value="2" {{ old('genero', $userData['genero'] ?? '') == '2' ? 'selected' : '' }}>Femenino</option>
-                    <option value="3" {{ old('genero', $userData['genero'] ?? '') == '3' ? 'selected' : '' }}>Otro</option>
-                    <option value="4" {{ old('genero', $userData['genero'] ?? '') == '4' ? 'selected' : '' }}>Prefiero no decir</option>
+                    @if($generos && $generos->count() > 0)
+                        @foreach($generos as $genero)
+                            <option value="{{ $genero->id }}" {{ old('genero', $userData['genero'] ?? '') == $genero->id ? 'selected' : '' }}>
+                                {{ ucwords(strtolower(str_replace('_', ' ', $genero->name))) }}
+                            </option>
+                        @endforeach
+                    @else
+                        <option value="9" {{ old('genero', $userData['genero'] ?? '') == '9' ? 'selected' : '' }}>Masculino</option>
+                        <option value="10" {{ old('genero', $userData['genero'] ?? '') == '10' ? 'selected' : '' }}>Femenino</option>
+                        <option value="11" {{ old('genero', $userData['genero'] ?? '') == '11' ? 'selected' : '' }}>No Define</option>
+                    @endif
                 </select>
             </div>
 
