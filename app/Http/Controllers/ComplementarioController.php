@@ -52,6 +52,13 @@ class ComplementarioController extends Controller
         $jornadas = \App\Models\JornadaFormacion::all();
         return view('complementarios.gestion_programas_complementarios', compact('programas', 'modalidades', 'jornadas'));
     }
+
+    public function create()
+    {
+        $modalidades = \App\Models\ParametroTema::where('tema_id', 5)->with('parametro')->get();
+        $jornadas = \App\Models\JornadaFormacion::all();
+        return view('complementarios.create', compact('modalidades', 'jornadas'));
+    }
     public function estadisticas()
     {
         $departamentos = Departamento::select('id', 'departamento')->get();
@@ -284,6 +291,45 @@ class ComplementarioController extends Controller
             $programa->icono = $this->getIconoForPrograma($programa->nombre);
         });
         return view('complementarios.programas_publicos', compact('programas'));
+    }
+
+    public function verProgramas()
+    {
+        $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion'])->get();
+        $programas->each(function($programa) {
+            $programa->icono = $this->getIconoForPrograma($programa->nombre);
+            $programa->badge_class = $this->getBadgeClassForEstado($programa->estado);
+            $programa->estado_label = $this->getEstadoLabel($programa->estado);
+        });
+        return view('complementarios.ver_programas', compact('programas'));
+    }
+
+    /**
+     * Obtener la clase CSS para el badge según el estado del programa
+     */
+    private function getBadgeClassForEstado($estado)
+    {
+        $badgeClasses = [
+            0 => 'bg-secondary', // Sin Oferta
+            1 => 'bg-success',   // Con Oferta
+            2 => 'bg-warning',   // Cupos Llenos
+        ];
+
+        return $badgeClasses[$estado] ?? 'bg-secondary';
+    }
+
+    /**
+     * Obtener el label del estado del programa
+     */
+    private function getEstadoLabel($estado)
+    {
+        $estados = [
+            0 => 'Sin Oferta',
+            1 => 'Con Oferta',
+            2 => 'Cupos Llenos',
+        ];
+
+        return $estados[$estado] ?? 'Desconocido';
     }
 
     public function formularioInscripcion($id)
