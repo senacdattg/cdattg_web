@@ -119,11 +119,7 @@
                         }
                     </script>
 
-                    <div class="row justify-content-sm-center">
-                        <div class="col-6">
-                            <button type="submit" class="btn btn-primary btn-block">Registrarme</button>
-                        </div>
-                    </div>
+                    
                 </form>
                 <hr>
                 {{-- <a href="{{ route('login') }}" class="text-center">Ya tengo una cuenta</a> --}}
