@@ -118,20 +118,7 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-6">
-                                        <div class="form-group-modern">
-                                            <label>
-                                                <i class="fas fa-barcode"></i>
-                                                Código SENA (11 dígitos)
-                                            </label>
-                                            <input type="text" class="form-control-modern" value="{{ $producto->codigo_barras_sena ?? '' }}" readonly />
-                                            <div class="mt-2">
-                                                @if($producto->codigo_barras_sena)
-                                                    <svg id="barcode-preview" style="width:100%"></svg>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
+                                    
 
                                     <div class="col-md-12">
                                         <div class="form-group-modern">
@@ -457,9 +444,6 @@
                 reader.readAsDataURL(file);
             }
         });
-        // Render barcode preview
-        @if($producto->codigo_barras_sena)
-        JsBarcode("#barcode-preview", "{{ $producto->codigo_barras_sena }}", { format: "code128", width: 2, height: 50, displayValue: false });
-        @endif
+        // Render barcode preview consolidado (si deseas mostrarlo, podríamos añadir un contenedor en el futuro)
     </script>
 @endpush

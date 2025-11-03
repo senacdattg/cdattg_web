@@ -18,12 +18,12 @@
     <div class="label">
         <div class="title">{{ $producto->producto }}</div>
         <svg id="barcode" class="barcode"></svg>
-        <div class="code">{{ $producto->codigo_barras_sena ?? 'SIN CODIGO' }}</div>
+        <div class="code">{{ $producto->codigo_barras ?? 'SIN CODIGO' }}</div>
     </div>
 
     <script>
         function renderAndPrint() {
-            var value = "{{ $producto->codigo_barras_sena ?? '' }}";
+            var value = "{{ $producto->codigo_barras ?? '' }}";
             if (!value) {
                 window.print();
                 return;

@@ -35,9 +35,8 @@
                         searchValue="{{ request('search') }}"
                         :columns="[
                             ['label' => '#', 'width' => '3%'],
-                            ['label' => 'Producto', 'width' => '18%'],
-                            ['label' => 'Código', 'width' => '10%'],
-                            ['label' => 'Código SENA', 'width' => '12%'],
+                            ['label' => 'Producto', 'width' => '20%'],
+                            ['label' => 'Código', 'width' => '14%'],
                             ['label' => 'Categoría', 'width' => '10%'],
                             ['label' => 'Marca', 'width' => '10%'],
                             ['label' => 'Cantidad', 'width' => '8%'],
@@ -45,7 +44,7 @@
                             ['label' => 'Estado', 'width' => '8%'],
                             ['label' => 'Contrato', 'width' => '6%'],
                             ['label' => 'Proveedor', 'width' => '7%'],
-                            ['label' => 'Opciones', 'width' => '10%', 'class' => 'text-center']
+                            ['label' => 'Opciones', 'width' => '6%', 'class' => 'text-center']
                         ]"
                         :pagination="$productos->links()"
                     >
@@ -60,16 +59,9 @@
                                     </small>
                                 </td>
                                 <td>
-                                    <span class="badge badge-secondary">
-                                        {{ $producto->codigo_barras ?? 'N/A' }}
-                                    </span>
-                                </td>
-                                <td>
-                                    @if($producto->codigo_barras_sena)
-                                        <div>
-                                            <small>{{ $producto->codigo_barras_sena }}</small>
-                                        </div>
-                                        <div>
+                                    @if($producto->codigo_barras)
+                                        <div><span class="badge badge-secondary">{{ $producto->codigo_barras }}</span></div>
+                                        <div class="mt-1">
                                             <a class="btn btn-xs btn-outline-primary" target="_blank" href="{{ route('inventario.productos.etiqueta', $producto->id) }}">
                                                 <i class="fas fa-print"></i> Imprimir
                                             </a>
@@ -153,7 +145,7 @@
                             </tr>
                         @empty
                             <x-table-empty
-                                colspan="11"
+                                colspan="10"
                                 message="No hay productos registrados"
                                 icon="fas fa-box"
                             />
