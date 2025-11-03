@@ -184,7 +184,7 @@ class RolePermissionSeeder extends Seeder
             'GESTIONAR RESULTADOS COMPETENCIA',
             'CAMBIAR ESTADO COMPETENCIA',
             // Permisos para aspirantes complementarios
-            'VER MI PERFIL',
+            'VER ESTADISTICAS',
         ];
 
         // Crear cada permiso si no existe
@@ -319,6 +319,7 @@ class RolePermissionSeeder extends Seeder
             'ELIMINAR COMPETENCIA',
             'GESTIONAR RESULTADOS COMPETENCIA',
             'CAMBIAR ESTADO COMPETENCIA',
+            'VER ESTADISTICAS',
         ]);
 
         // Asignar permisos al rol ADMINISTRADOR
@@ -335,6 +336,7 @@ class RolePermissionSeeder extends Seeder
             'VER PERSONA',
             'EDITAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+            'VER ESTADISTICAS',
         ]);
 
         // Asignar permisos al rol INSTRUCTOR
