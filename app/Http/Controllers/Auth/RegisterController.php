@@ -96,6 +96,36 @@ class RegisterController extends Controller
 
     public function mostrarFormulario()
     {
-        return view('user.registro');
+        // Obtener tipos de documento dinámicamente
+        $tiposDocumento = $this->getTiposDocumento();
+
+        return view('user.registro', compact('tiposDocumento'));
+    }
+
+    /**
+     * Método auxiliar para obtener tipos de documento dinámicamente desde el tema-parametro
+     */
+    private function getTiposDocumento()
+    {
+        // Buscar el tema "TIPO DE DOCUMENTO"
+        $temaTipoDocumento = \App\Models\Tema::where('name', 'TIPO DE DOCUMENTO')->first();
+
+        if (!$temaTipoDocumento) {
+            // Fallback: devolver valores hardcodeados si no se encuentra el tema
+            return collect([
+                ['id' => 3, 'name' => 'CEDULA DE CIUDADANIA'],
+                ['id' => 4, 'name' => 'CEDULA DE EXTRANJERIA'],
+                ['id' => 5, 'name' => 'PASAPORTE'],
+                ['id' => 6, 'name' => 'TARJETA DE IDENTIDAD'],
+                ['id' => 7, 'name' => 'REGISTRO CIVIL'],
+                ['id' => 8, 'name' => 'SIN IDENTIFICACION'],
+            ]);
+        }
+
+        // Obtener parámetros activos del tema
+        return $temaTipoDocumento->parametros()
+            ->where('parametros_temas.status', 1)
+            ->orderBy('parametros.name')
+            ->get(['parametros.id', 'parametros.name']);
     }
 }
