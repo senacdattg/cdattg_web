@@ -13,6 +13,7 @@ use App\Models\Tema;
 use App\Models\Inventario\ContratoConvenio;
 use App\Models\Ambiente;
 use App\Models\Inventario\Proveedor;
+use App\Notifications\StockBajoNotification;
 
 
 class ProductoController extends InventarioController
@@ -243,8 +244,21 @@ class ProductoController extends InventarioController
         // Añadir user_update_id
         $validated['user_update_id'] = Auth::id();
 
+        // Guardar la cantidad anterior para comparar
+        $cantidadAnterior = $producto->cantidad;
+
         // Actualizar el producto usando el método update de Eloquent
         $producto->update($validated);
+
+        // Verificar si el stock cambió y si está bajo
+        if ($cantidadAnterior != $producto->cantidad && $producto->cantidad <= 10) {
+            $superadmins = User::role('SUPER ADMINISTRADOR')->get();
+            if ($superadmins->isNotEmpty()) {
+                foreach ($superadmins as $admin) {
+                    $admin->notify(new StockBajoNotification($producto, $producto->cantidad, 10));
+                }
+            }
+        }
 
         // Redireccionar con mensaje de éxito
         return redirect()->route('inventario.productos.show', $producto->id)

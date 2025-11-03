@@ -311,6 +311,27 @@ return [
         ],
         [
             'type' => 'navbar-notification',
+            'id' => 'notificaciones-dropdown',
+            'icon' => 'fas fa-bell',
+            'icon_color' => 'warning',
+            'topnav_right' => true,
+            'dropdown_mode' => 'sliding',
+            'dropdown_flabel' => 'Notificaciones',
+            'update_cfg' => [
+                'url' => 'inventario/notificaciones/unread',
+                'period' => 30,
+                'method' => 'GET',
+            ],
+            'submenu' => [
+                [
+                    'text' => 'Ver todas las notificaciones',
+                    'url' => 'inventario/notificaciones',
+                    'icon' => 'fas fa-bell text-primary',
+                ],
+            ],
+        ],
+        [
+            'type' => 'navbar-notification',
             'id' => 'my-notification',
             'icon' => 'fas fa-user-circle',
             'text' => 'Usuario',
@@ -796,6 +817,12 @@ return [
                     'url'  => 'inventario/dashboard',
                     'icon' => 'fa-solid fa-chart-bar',
                     'can'  => 'VER PRODUCTO',
+                ],
+                [
+                    'text' => 'Notificaciones',
+                    'url'  => 'inventario/notificaciones',
+                    'icon' => 'fa-solid fa-bell',
+                    'can'  => 'VER NOTIFICACION',
                 ],
                 [
                     'text' => 'Productos',

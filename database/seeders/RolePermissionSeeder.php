@@ -154,6 +154,8 @@ class RolePermissionSeeder extends Seeder
             'VER DEVOLUCION',
             'CREAR DEVOLUCION',
             'PROCESAR DEVOLUCION',
+            // Notificaciones
+            'VER NOTIFICACION',
             // Dashboard
             'VER DASHBOARD INVENTARIO',
             // Permisos para redes de conocimiento
@@ -306,6 +308,7 @@ class RolePermissionSeeder extends Seeder
             'VER DEVOLUCION',
             'CREAR DEVOLUCION',
             'PROCESAR DEVOLUCION',
+            'VER NOTIFICACION',
             'VER DASHBOARD INVENTARIO',
             'CREAR RED CONOCIMIENTO',
             'EDITAR RED CONOCIMIENTO',
@@ -423,6 +426,7 @@ class RolePermissionSeeder extends Seeder
             'CREAR SALIDA',
             'VER DEVOLUCION',
             'CREAR DEVOLUCION',
+            'VER NOTIFICACION',
         ]);
 
         // Asignar permisos al rol APRENDIZ

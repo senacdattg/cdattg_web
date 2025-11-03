@@ -1,0 +1,158 @@
+@extends('adminlte::page')
+
+@section('title', 'Notificaciones')
+
+@section('css')
+<!-- Estilos personalizados para notificaciones -->
+<link rel="stylesheet" href="{{ asset('css/inventario/notificaciones.css') }}">
+@endsection
+
+@section('content_header')
+    <x-page-header
+        icon="fas fa-bell"
+        title="Notificaciones"
+        subtitle="Administra tus notificaciones del sistema"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => '#'],
+            ['label' => 'Inventario', 'active' => true],
+            ['label' => 'Notificaciones', 'active' => true]
+        ]"
+    />
+@endsection
+
+@section('content')
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-bell mr-1"></i> Mis Notificaciones
+                                @if($notificaciones->count() > 0)
+                                    <span class="badge badge-primary">{{ $notificaciones->total() }}</span>
+                                @endif
+                            </h3>
+                            <div class="card-tools">
+                                <button type="button" class="btn btn-sm btn-primary mr-1" id="marcar-todas-leidas" title="Marcar todas como leídas">
+                                    <i class="fas fa-check-double"></i> Marcar leídas
+                                </button>
+                                <button type="button" class="btn btn-sm btn-danger" id="vaciar-notificaciones" title="Eliminar todas las notificaciones">
+                                    <i class="fas fa-trash-alt"></i> Vaciar todo
+                                </button>
+                            </div>
+                        </div>
+                        <div class="card-body p-0">
+                            @if($notificaciones->count() > 0)
+                                <div class="list-group list-group-flush">
+                                    @foreach($notificaciones as $notificacion)
+                                        @php
+                                            $tipo = $notificacion->tipo;
+                                            $icon = 'fa-bell';
+                                            $color = 'info';
+                                            
+                                            if(str_contains($tipo, 'StockBajo')) {
+                                                $icon = 'fa-exclamation-triangle';
+                                                $color = 'warning';
+                                            } elseif(str_contains($tipo, 'Aprobada')) {
+                                                $icon = 'fa-check-circle';
+                                                $color = 'success';
+                                            } elseif(str_contains($tipo, 'Rechazada')) {
+                                                $icon = 'fa-times-circle';
+                                                $color = 'danger';
+                                            } elseif(str_contains($tipo, 'NuevaOrden')) {
+                                                $icon = 'fa-file-alt';
+                                                $color = 'primary';
+                                            }
+                                            
+                                            // Decodificar datos si es string
+                                            $datos = is_string($notificacion->datos) 
+                                                ? json_decode($notificacion->datos, true) 
+                                                : $notificacion->datos;
+                                        @endphp
+                                        
+                                        <div class="list-group-item {{ is_null($notificacion->leida_en) ? 'list-group-item-light' : '' }}">
+                                            <div class="d-flex w-100 justify-content-between align-items-start">
+                                                <div class="d-flex">
+                                                    <div class="mr-3">
+                                                        <i class="fas {{ $icon }} text-{{ $color }} fa-lg"></i>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <h6 class="mb-1">
+                                                            @if(str_contains($tipo, 'StockBajo'))
+                                                                Stock Bajo
+                                                            @elseif(str_contains($tipo, 'Aprobada'))
+                                                                Aprobada
+                                                            @elseif(str_contains($tipo, 'Rechazada'))
+                                                                Rechazada
+                                                            @elseif(str_contains($tipo, 'NuevaOrden'))
+                                                                Nueva Orden
+                                                            @endif
+                                                            <small class="text-muted">• {{ $notificacion->created_at->diffForHumans() }}</small>
+                                                        </h6>
+
+                                                        <p id="text" class="mb-1 small">
+                                                            @if(str_contains($tipo, 'StockBajo'))
+                                                                <strong>{{ $datos['producto_nombre'] ?? ($datos['producto']['producto'] ?? 'N/A') }}</strong>
+                                                                - Stock: <span class="badge badge-{{ ($datos['stock_actual'] ?? 0) == 0 ? 'danger' : 'warning' }}">{{ $datos['stock_actual'] ?? 0 }}</span>
+                                                            @elseif(str_contains($tipo, 'Aprobada'))
+                                                                <strong>{{ $datos['producto']['producto'] ?? 'N/A' }}</strong>
+                                                                ({{ $datos['cantidad'] ?? 0 }} und.) - Por: {{ $datos['aprobador']['name'] ?? 'N/A' }}
+                                                            @elseif(str_contains($tipo, 'Rechazada'))
+                                                                <strong>{{ $datos['producto']['producto'] ?? 'N/A' }}</strong>
+                                                                - Rechazado por: {{ $datos['aprobador']['name'] ?? 'N/A' }}
+                                                                @if(isset($datos['motivo_rechazo']))
+                                                                    <br><em class="text-muted">{{ \Str::limit($datos['motivo_rechazo'], 50) }}</em>
+                                                                @endif
+                                                            @elseif(str_contains($tipo, 'NuevaOrden'))
+                                                                <strong>Orden #{{ $datos['orden_id'] ?? 'N/A' }}</strong> - {{ $datos['tipo_orden'] ?? 'N/A' }}
+                                                                <br>{{ $datos['solicitante']['name'] ?? 'N/A' }}
+                                                                <span class="badge badge-info">{{ $datos['solicitante']['rol'] ?? 'N/A' }}</span>
+                                                            @endif
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="ml-2">
+                                                    @if(is_null($notificacion->leida_en))
+                                                        <button class="btn btn-sm btn-outline-primary mark-read mb-1" data-id="{{ $notificacion->id }}" title="Marcar como leída">
+                                                            <i class="fas fa-check"></i>
+                                                        </button>
+                                                    @else
+                                                        <span class="badge badge-success mb-1" title="Leída">
+                                                            <i class="fas fa-check"></i>
+                                                        </span>
+                                                    @endif
+                                                    <button class="btn btn-sm btn-outline-danger delete-notification d-block" data-id="{{ $notificacion->id }}" title="Eliminar">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                                
+                                <div class="card-footer">
+                                    {{ $notificaciones->links() }}
+                                </div>
+                            @else
+                                <div class="text-center py-5">
+                                    <i class="fas fa-bell-slash fa-4x text-muted mb-3"></i>
+                                    <h5 class="text-muted">No tienes notificaciones</h5>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+@endsection
+
+@section('js')
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- Script de notificaciones -->
+<script src="{{ asset('js/inventario/notificaciones.js') }}"></script>
+@endsection
+
+
