@@ -269,14 +269,8 @@ class ComplementarioController extends Controller
             'tipo_documento', 'numero_documento', 'primer_nombre', 'segundo_nombre',
             'primer_apellido', 'segundo_apellido', 'fecha_nacimiento', 'genero',
             'telefono', 'celular', 'email', 'pais_id', 'departamento_id',
-            'municipio_id', 'direccion'
+            'municipio_id', 'direccion', 'caracterizacion_id'
         ]));
-
-        // Guardar caracterización si se proporcionó (solo la primera categoría seleccionada)
-        if ($request->categorias && is_array($request->categorias) && count($request->categorias) > 0) {
-            $persona->caracterizacion_id = $request->categorias[0];
-            $persona->save();
-        }
 
         return redirect()->route('inscripcion.general')->with('success', '¡Registro exitoso! Sus datos han sido guardados correctamente.');
     }
@@ -457,8 +451,7 @@ class ComplementarioController extends Controller
             'municipio_id' => 'required|exists:municipios,id',
             'direccion' => 'required|string|max:191',
             'observaciones' => 'nullable|string',
-            'categorias' => 'nullable|array',
-            'categorias.*' => 'exists:categorias_caracterizacion_complementarios,id',
+            'caracterizacion_id' => 'nullable|exists:categorias_caracterizacion_complementarios,id',
         ]);
 
         // Verificar si ya existe una persona con el mismo documento o email
