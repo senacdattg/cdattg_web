@@ -69,7 +69,7 @@ async function validarCedula(cedula, maxRetries = 3) {
       await page.getByRole("button", { name: "placeholder" }).click();
       await page.getByRole("button", { name: "2025" }).click();
       await page.getByRole("button", { name: "2005" }).click();
-      await page.getByRole("button", { name: "Octubre" }).click();
+      await page.getByRole("button", { name: "Noviembre" }).click();
       await page.getByRole("button", { name: "Abril" }).click();
       await page.getByRole("button", { name: "9", exact: true }).click();
 

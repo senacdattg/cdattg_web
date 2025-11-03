@@ -304,7 +304,7 @@
                                             <h4 class="text-dark mb-3">
                                                 <i class="fas fa-tags mr-2"></i>Caracterización
                                             </h4>
-                                            <p class="text-muted mb-3">Seleccione las categorías que correspondan a su
+                                            <p class="text-muted mb-3">Seleccione una categoría que corresponda a su
                                                 situación (opcional):</p>
                                         </div>
                                         @foreach ($categoriasConHijos as $categoria)
@@ -312,10 +312,10 @@
                                                 <h5 class="text-primary mb-2">{{ $categoria['nombre'] }}</h5>
                                                 @foreach ($categoria['hijos'] as $hijo)
                                                     <div class="form-check mb-2">
-                                                        <input class="form-check-input" type="checkbox"
-                                                            id="categoria_{{ $hijo->id }}" name="categorias[]"
+                                                        <input class="form-check-input" type="radio"
+                                                            id="categoria_{{ $hijo->id }}" name="caracterizacion_id"
                                                             value="{{ $hijo->id }}"
-                                                            {{ in_array($hijo->id, old('categorias', [])) ? 'checked' : '' }}>
+                                                            {{ old('caracterizacion_id') == $hijo->id ? 'checked' : '' }}>
                                                         <label class="form-check-label"
                                                             for="categoria_{{ $hijo->id }}">
                                                             {{ $hijo->nombre }}

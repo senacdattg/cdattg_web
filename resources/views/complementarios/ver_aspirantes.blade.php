@@ -30,13 +30,13 @@
                         <input type="text" class="form-control form-control-lg" placeholder="Buscar por nombre o número de identidad">
                     </div>
                 </div>
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                     <label class="form-label fw-bold">Programa</label>
                     <select class="form-select form-select-lg bg-light">
                         <option selected>{{ $programa->nombre }}</option>
                     </select>
-                </div>
-                <div class="col-md-3">
+                </div> -->
+                <!-- <div class="col-md-3">
                     <label class="form-label fw-bold">Año</label>
                     <select class="form-select form-select-lg bg-light">
                         <option selected>Todos los años</option>
@@ -46,7 +46,7 @@
                         <option>2022</option>
                         <option>2021</option>
                     </select>
-                </div>
+                </div> -->
                 <div class="col-md-2 d-flex align-items-end">
                     <button class="btn btn-outline-secondary btn-lg w-100">
                         <i class="fas fa-filter me-1"></i>Filtrar
@@ -102,10 +102,10 @@
                             </td>
                             <td><span class="badge {{ $aspirante->persona->estado_sofia_badge_class }}">{{ $aspirante->persona->estado_sofia_label }}</span></td>
                             <td>
-                                <button class="btn btn-warning btn-sm me-1 aspirante-action-btn" title="Editar" @if(isset($existingProgress) && $existingProgress) disabled @endif>
+                                <!-- <button class="btn btn-warning btn-sm me-1 aspirante-action-btn" title="Editar" @if(isset($existingProgress) && $existingProgress) disabled @endif>
                                     <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="btn btn-danger btn-sm aspirante-action-btn" title="Eliminar" @if(isset($existingProgress) && $existingProgress) disabled @endif>
+                                </button> -->
+                                <button class="btn btn-danger btn-sm aspirante-action-btn" title="Eliminar" data-aspirante-id="{{ $aspirante->id }}" @if(isset($existingProgress) && $existingProgress) disabled @endif>
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </td>
@@ -564,6 +564,61 @@
             });
         }
 
+
+        // Event listener para botones de eliminar aspirante
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.aspirante-action-btn') && e.target.querySelector('.fa-trash')) {
+                e.preventDefault();
+                const button = e.target.closest('.aspirante-action-btn');
+                const aspiranteId = button.dataset.aspiranteId;
+
+                if (!aspiranteId) {
+                    showAlert('error', 'ID del aspirante no encontrado.');
+                    return;
+                }
+
+                // Confirmación antes de eliminar
+                if (!confirm('¿Está seguro de que desea eliminar este aspirante del programa? Esta acción no se puede deshacer.')) {
+                    return;
+                }
+
+                // Deshabilitar botón mientras procesa
+                const originalHTML = button.innerHTML;
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+
+                // Hacer petición AJAX
+                fetch(`/programas-complementarios/{{ $programa->id }}/aspirante/${aspiranteId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showAlert('success', data.message);
+                        // Recargar la página para actualizar la tabla
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
+                    } else {
+                        showAlert('error', data.message);
+                        // Restaurar botón
+                        button.disabled = false;
+                        button.innerHTML = originalHTML;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showAlert('error', 'Error de conexión. Intente nuevamente.');
+                    // Restaurar botón
+                    button.disabled = false;
+                    button.innerHTML = originalHTML;
+                });
+            }
+        });
 
         // Función para mostrar alertas
         function showAlert(type, message) {

@@ -740,6 +740,7 @@ return [
         [
             'text' => 'Complementarios',
             'icon' => 'fa-solid fa-folder-open',
+            'can' => 'VER PROGRAMA DE CARACTERIZACION',
             'submenu' => [
                 [
                     'text' => 'Gestion Programas',
@@ -778,12 +779,7 @@ return [
                     'text' => 'Estadisticas',
                     'url' => 'estadisticas',
                     'icon' => 'fas fa-chart-line',
-                    'can' => [
-                        'VER PROGRAMA DE CARACTERIZACION',
-                        'CREAR PROGRAMA DE CARACTERIZACION',
-                        'EDITAR PROGRAMA DE CARACTERIZACION',
-                        'ELIMINAR PROGRAMA DE CARACTERIZACION',
-                    ],
+                    'can' => 'VER ESTADISTICAS',
                 ],
                 [
                     'text' => 'Procesar documentos',

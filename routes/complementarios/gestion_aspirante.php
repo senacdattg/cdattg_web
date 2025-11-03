@@ -14,3 +14,7 @@ Route::get('/programas-complementarios/{curso}', [ComplementarioController::clas
 Route::post('/programas-complementarios/{complementarioId}/agregar-aspirante', [ComplementarioController::class, 'agregarAspirante'])
     ->name('programas-complementarios.agregar-aspirante')
     ->middleware('auth');
+
+Route::delete('/programas-complementarios/{complementarioId}/aspirante/{aspiranteId}', [ComplementarioController::class, 'eliminarAspirante'])
+    ->name('programas-complementarios.eliminar-aspirante')
+    ->middleware('auth');

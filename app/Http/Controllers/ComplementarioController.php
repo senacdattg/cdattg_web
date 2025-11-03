@@ -228,7 +228,11 @@ class ComplementarioController extends Controller
         $paises = Pais::all();
         $departamentos = Departamento::all();
 
-        return view('complementarios.inscripcion_general', compact('categoriasConHijos', 'paises', 'departamentos'));
+        // Obtener tipos de documento y géneros dinámicamente
+        $tiposDocumento = $this->getTiposDocumento();
+        $generos = $this->getGeneros();
+
+        return view('complementarios.inscripcion_general', compact('categoriasConHijos', 'paises', 'departamentos', 'tiposDocumento', 'generos'));
     }
 
     /**
@@ -254,8 +258,7 @@ class ComplementarioController extends Controller
             'municipio_id' => 'required|exists:municipios,id',
             'direccion' => 'required|string|max:191',
             'observaciones' => 'nullable|string',
-            'categorias' => 'nullable|array',
-            'categorias.*' => 'exists:categorias_caracterizacion_complementarios,id',
+            'caracterizacion_id' => 'nullable|exists:categorias_caracterizacion_complementarios,id',
         ]);
 
         // Verificar si ya existe una persona con el mismo documento o email
@@ -272,14 +275,8 @@ class ComplementarioController extends Controller
             'tipo_documento', 'numero_documento', 'primer_nombre', 'segundo_nombre',
             'primer_apellido', 'segundo_apellido', 'fecha_nacimiento', 'genero',
             'telefono', 'celular', 'email', 'pais_id', 'departamento_id',
-            'municipio_id', 'direccion'
+            'municipio_id', 'direccion', 'caracterizacion_id'
         ]));
-
-        // Guardar caracterización si se proporcionó
-        if ($request->categorias) {
-            // Aquí iría la lógica para guardar la caracterización
-            // Dependiendo de cómo esté estructurada la tabla de caracterización
-        }
 
         return redirect()->route('inscripcion.general')->with('success', '¡Registro exitoso! Sus datos han sido guardados correctamente.');
     }
@@ -290,7 +287,12 @@ class ComplementarioController extends Controller
         $programas->each(function($programa) {
             $programa->icono = $this->getIconoForPrograma($programa->nombre);
         });
-        return view('complementarios.programas_publicos', compact('programas'));
+
+        // Obtener tipos de documento y géneros dinámicamente
+        $tiposDocumento = $this->getTiposDocumento();
+        $generos = $this->getGeneros();
+
+        return view('complementarios.programas_publicos', compact('programas', 'tiposDocumento', 'generos'));
     }
 
     public function verProgramas()
@@ -350,7 +352,11 @@ class ComplementarioController extends Controller
         $paises = Pais::all();
         $departamentos = Departamento::all();
 
-        return view('complementarios.formulario_inscripcion', compact('programa', 'categoriasConHijos', 'paises', 'departamentos'));
+        // Obtener tipos de documento y géneros dinámicamente
+        $tiposDocumento = $this->getTiposDocumento();
+        $generos = $this->getGeneros();
+
+        return view('complementarios.formulario_inscripcion', compact('programa', 'categoriasConHijos', 'paises', 'departamentos', 'tiposDocumento', 'generos'));
     }
 
     public function edit($id)
@@ -490,8 +496,7 @@ class ComplementarioController extends Controller
             'municipio_id' => 'required|exists:municipios,id',
             'direccion' => 'required|string|max:191',
             'observaciones' => 'nullable|string',
-            'categorias' => 'nullable|array',
-            'categorias.*' => 'exists:categorias_caracterizacion_complementarios,id',
+            'caracterizacion_id' => 'nullable|exists:categorias_caracterizacion_complementarios,id',
         ]);
 
         // Verificar si ya existe una persona con el mismo documento o email
@@ -508,7 +513,7 @@ class ComplementarioController extends Controller
                 'tipo_documento', 'numero_documento', 'primer_nombre', 'segundo_nombre',
                 'primer_apellido', 'segundo_apellido', 'fecha_nacimiento', 'genero',
                 'telefono', 'celular', 'email', 'pais_id', 'departamento_id',
-                'municipio_id', 'direccion'
+                'municipio_id', 'direccion', 'caracterizacion_id'
             ]));
         } else {
             // Crear nueva persona
@@ -516,7 +521,7 @@ class ComplementarioController extends Controller
                 'tipo_documento', 'numero_documento', 'primer_nombre', 'segundo_nombre',
                 'primer_apellido', 'segundo_apellido', 'fecha_nacimiento', 'genero',
                 'telefono', 'celular', 'email', 'pais_id', 'departamento_id',
-                'municipio_id', 'direccion', 'status'
+                'municipio_id', 'direccion', 'caracterizacion_id', 'status'
             ]) + ['user_create_id' => 1, 'user_edit_id' => 1]);
         }
 
@@ -900,6 +905,122 @@ class ComplementarioController extends Controller
                 ->get();
         }
 
-        return view('personas.show', compact('persona', 'aspirantes', 'user'));
+        // Obtener tipos de documento y géneros dinámicamente
+        $tiposDocumento = $this->getTiposDocumento();
+        $generos = $this->getGeneros();
+
+        return view('personas.show', compact('persona', 'aspirantes', 'user', 'tiposDocumento', 'generos'));
+    }
+
+    /**
+     * Método auxiliar para obtener tipos de documento dinámicamente desde el tema-parametro
+     */
+    private function getTiposDocumento()
+    {
+        // Buscar el tema "TIPO DE DOCUMENTO"
+        $temaTipoDocumento = \App\Models\Tema::where('name', 'TIPO DE DOCUMENTO')->first();
+
+        if (!$temaTipoDocumento) {
+            // Fallback: devolver valores hardcodeados si no se encuentra el tema
+            return collect([
+                ['id' => 3, 'name' => 'CEDULA DE CIUDADANIA'],
+                ['id' => 4, 'name' => 'CEDULA DE EXTRANJERIA'],
+                ['id' => 5, 'name' => 'PASAPORTE'],
+                ['id' => 6, 'name' => 'TARJETA DE IDENTIDAD'],
+                ['id' => 7, 'name' => 'REGISTRO CIVIL'],
+                ['id' => 8, 'name' => 'SIN IDENTIFICACION'],
+            ]);
+        }
+
+        // Obtener parámetros activos del tema
+        return $temaTipoDocumento->parametros()
+            ->where('parametros_temas.status', 1)
+            ->orderBy('parametros.name')
+            ->get(['parametros.id', 'parametros.name']);
+    }
+
+    /**
+     * Método auxiliar para obtener géneros dinámicamente desde el tema-parametro
+     */
+    private function getGeneros()
+    {
+        // Buscar el tema "GENERO"
+        $temaGenero = \App\Models\Tema::where('name', 'GENERO')->first();
+
+        if (!$temaGenero) {
+            // Fallback: devolver valores hardcodeados si no se encuentra el tema
+            return collect([
+                ['id' => 9, 'name' => 'MASCULINO'],
+                ['id' => 10, 'name' => 'FEMENINO'],
+                ['id' => 11, 'name' => 'NO DEFINE'],
+            ]);
+        }
+
+        // Obtener parámetros activos del tema
+        return $temaGenero->parametros()
+            ->where('parametros_temas.status', 1)
+            ->orderBy('parametros.name')
+            ->get(['parametros.id', 'parametros.name']);
+    }
+    /**
+     * Eliminar aspirante de un programa complementario
+     */
+    public function eliminarAspirante($complementarioId, $aspiranteId)
+    {
+        try {
+            // Verificar que el programa existe
+            $programa = ComplementarioOfertado::findOrFail($complementarioId);
+
+            // Verificar que el aspirante existe y pertenece al programa
+            $aspirante = AspiranteComplementario::where('id', $aspiranteId)
+                ->where('complementario_id', $complementarioId)
+                ->with('persona')
+                ->firstOrFail();
+
+            // Verificar permisos del usuario (solo administradores pueden eliminar)
+            if (!auth()->user()->can('ELIMINAR ASPIRANTE COMPLEMENTARIO')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No tiene permisos para eliminar aspirantes.'
+                ], 403);
+            }
+
+            // Guardar información del aspirante antes de eliminar para el mensaje
+            $personaNombre = $aspirante->persona->primer_nombre . ' ' . $aspirante->persona->primer_apellido;
+            $numeroDocumento = $aspirante->persona->numero_documento;
+
+            // Eliminar el aspirante
+            $aspirante->delete();
+
+            \Log::info('Aspirante eliminado exitosamente', [
+                'aspirante_id' => $aspiranteId,
+                'complementario_id' => $complementarioId,
+                'persona_id' => $aspirante->persona_id,
+                'user_id' => auth()->id()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Aspirante eliminado exitosamente. ' . $personaNombre . ' (' . $numeroDocumento . ') ya no está inscrito en el programa.'
+            ]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Aspirante o programa no encontrado.'
+            ], 404);
+        } catch (\Exception $e) {
+            \Log::error('Error eliminando aspirante: ' . $e->getMessage(), [
+                'complementario_id' => $complementarioId,
+                'aspirante_id' => $aspiranteId,
+                'user_id' => auth()->id(),
+                'exception' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error interno del servidor. Por favor intente nuevamente.'
+            ], 500);
+        }
     }
 }
