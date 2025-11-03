@@ -196,7 +196,7 @@ class SuperAdminSeeder extends Seeder
             'programa.search',
 
             // Permisos para notificaciones
-            'VER NOTIFICACIONES',
+            'VER NOTIFICACION',
         ];
 
         // Crear cada permiso si no existe
