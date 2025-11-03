@@ -23,10 +23,9 @@ Route::prefix('inventario')
         Route::get('productos/buscar', [ProductoController::class, 'buscar'])
             ->name('productos.buscar');
         
-        // Ruta original para búsqueda por código de barras
-        Route::get('productos/buscar/{codigo}', [ProductoController::class, 'buscarPorCodigo'])
-            ->name('productos.buscar-codigo');
-        
+        // Ruta para búsqueda por código de barras
+        Route::get('/productos/buscar/{codigo}', [ProductoController::class, 'buscarPorCodigo']);
+            
         // Rutas administrativas (estilo admin) - resource al final
         Route::resource('productos', ProductoController::class);
     });
