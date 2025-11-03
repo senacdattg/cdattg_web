@@ -924,4 +924,65 @@ class ComplementarioController extends Controller
             ->orderBy('parametros.name')
             ->get(['parametros.id', 'parametros.name']);
     }
+    /**
+     * Eliminar aspirante de un programa complementario
+     */
+    public function eliminarAspirante($complementarioId, $aspiranteId)
+    {
+        try {
+            // Verificar que el programa existe
+            $programa = ComplementarioOfertado::findOrFail($complementarioId);
+
+            // Verificar que el aspirante existe y pertenece al programa
+            $aspirante = AspiranteComplementario::where('id', $aspiranteId)
+                ->where('complementario_id', $complementarioId)
+                ->with('persona')
+                ->firstOrFail();
+
+            // Verificar permisos del usuario (solo administradores pueden eliminar)
+            if (!auth()->user()->can('ELIMINAR ASPIRANTE COMPLEMENTARIO')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No tiene permisos para eliminar aspirantes.'
+                ], 403);
+            }
+
+            // Guardar información del aspirante antes de eliminar para el mensaje
+            $personaNombre = $aspirante->persona->primer_nombre . ' ' . $aspirante->persona->primer_apellido;
+            $numeroDocumento = $aspirante->persona->numero_documento;
+
+            // Eliminar el aspirante
+            $aspirante->delete();
+
+            \Log::info('Aspirante eliminado exitosamente', [
+                'aspirante_id' => $aspiranteId,
+                'complementario_id' => $complementarioId,
+                'persona_id' => $aspirante->persona_id,
+                'user_id' => auth()->id()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Aspirante eliminado exitosamente. ' . $personaNombre . ' (' . $numeroDocumento . ') ya no está inscrito en el programa.'
+            ]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Aspirante o programa no encontrado.'
+            ], 404);
+        } catch (\Exception $e) {
+            \Log::error('Error eliminando aspirante: ' . $e->getMessage(), [
+                'complementario_id' => $complementarioId,
+                'aspirante_id' => $aspiranteId,
+                'user_id' => auth()->id(),
+                'exception' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error interno del servidor. Por favor intente nuevamente.'
+            ], 500);
+        }
+    }
 }
