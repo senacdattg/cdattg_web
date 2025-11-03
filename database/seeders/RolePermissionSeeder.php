@@ -92,7 +92,7 @@ class RolePermissionSeeder extends Seeder
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
             // Permisos para aspirantes complementarios
-            'VER MI PERFIL',
+            'VER ESTADISTICAS',
         ];
 
         // Crear cada permiso si no existe
@@ -149,6 +149,7 @@ class RolePermissionSeeder extends Seeder
             'EDITAR PERSONA',
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+            'VER ESTADISTICAS',
         ]);
 
         // Asignar permisos al rol ADMINISTRADOR
@@ -165,6 +166,7 @@ class RolePermissionSeeder extends Seeder
             'VER PERSONA',
             'EDITAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+            'VER ESTADISTICAS',
         ]);
 
         // Asignar permisos al rol INSTRUCTOR
