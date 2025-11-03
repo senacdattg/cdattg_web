@@ -867,14 +867,8 @@ return [
                             'can'  => 'VER ORDEN',
                         ],
                         [
-                            'text' => 'Solicitar Préstamo/Salida',
-                            'url'  => 'inventario/ordenes/prestamos-salidas',
-                            'icon' => 'fa-solid fa-plus',
-                            'can'  => 'VER ORDEN',
-                        ],
-                        [
-                            'text' => 'Órdenes Pendientes',
-                            'url'  => 'inventario/ordenes/pendientes',
+                            'text' => 'Aprobaciones Pendientes',
+                            'url'  => 'inventario/aprobaciones/pendientes',
                             'icon' => 'fa-solid fa-hourglass-half',
                             'can'  => 'VER ORDEN',
                         ],

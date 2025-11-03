@@ -1,23 +1,44 @@
-@extends('inventario.layouts.base')
+@extends('adminlte::page')
 
 @section('title', 'Registrar Devolución')
 
+@section('content_header')
+    <x-page-header
+        icon="fas fa-undo"
+        title="Registrar Devolución"
+        subtitle="Devolver productos prestados"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => '#'],
+            ['label' => 'Inventario', 'active' => true],
+            ['label' => 'Devoluciones', 'url' => route('inventario.devoluciones.index')],
+            ['label' => 'Registrar', 'active' => true]
+        ]"
+    />
+@endsection
+
 @section('content')
-<div class="container-fluid">
-    @include('inventario._components.page-header', [
-        'title' => 'Registrar Devolución',
-        'subtitle' => 'Devolver productos prestados',
-        'breadcrumb' => [
-            ['text' => 'Inventario', 'url' => route('inventario.dashboard')],
-            ['text' => 'Devoluciones', 'url' => route('inventario.devoluciones.index')],
-            ['text' => 'Registrar', 'active' => true]
-        ]
-    ])
+    <section class="content mt-4">
+        <div class="container-fluid">
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
 
-    @include('inventario._components.alerts')
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    {{ session('error') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
 
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Información del Préstamo</h5>
@@ -128,17 +149,17 @@
             </div>
         </div>
     </div>
-</div>
+        </div>
+    </section>
+   {{-- Alertas --}}
     @include('layout.alertas')
-@endsection
-
-@section('footer')
+    
     {{-- Footer SENA --}}
     @include('layout.footer')
 @endsection
 
 @push('css')
     @vite([
-        'public/css/inventario/shared/base.css',
+        'public/css/inventario/shared/base.css',    
     ])
 @endpush
