@@ -188,7 +188,6 @@ class RolePermissionSeeder extends Seeder
             // Permisos para programas complementarios
             'VER PROGRAMA COMPLEMENTARIO',
             'CREAR PROGRAMA COMPLEMENTARIO',
-            'VER MI PERFIL',
             'ELIMINAR ASPIRANTE COMPLEMENTARIO',
         ];
 
