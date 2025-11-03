@@ -159,11 +159,16 @@ h1 {
     color: #fdfdfd !important;
 }
 
-P {
-    color: #fdfdfd !important;
-}
 li {
     color: #fdfdfd !important;
+}
+
+#text strong {
+    color: #5f5b5b !important;
+}
+
+#text p {
+    color: #5f5b5b !important;
 }
 
 .bg-light {

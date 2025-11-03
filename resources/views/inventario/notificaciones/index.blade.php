@@ -93,7 +93,7 @@
 
                                                         <p id="text" class="mb-1 small">
                                                             @if(str_contains($tipo, 'StockBajo'))
-                                                                <strong>{{ $datos['producto_nombre'] ?? ($datos['producto']['producto'] ?? 'N/A') }}</strong>
+                                                                <strong id="producto_nombre">{{ $datos['producto_nombre'] ?? ($datos['producto']['producto'] ?? 'N/A') }}</strong>
                                                                 - Stock: <span class="badge badge-{{ ($datos['stock_actual'] ?? 0) == 0 ? 'danger' : 'warning' }}">{{ $datos['stock_actual'] ?? 0 }}</span>
                                                             @elseif(str_contains($tipo, 'Aprobada'))
                                                                 <strong>{{ $datos['producto']['producto'] ?? 'N/A' }}</strong>
@@ -154,11 +154,6 @@
     @include('layout.footer')
 @endsection
 
-@push('css')
-    @vite([
-        'public/css/inventario/shared/base.css',
-    ])
-@endpush
 
 @section('js')
 <!-- SweetAlert2 -->
