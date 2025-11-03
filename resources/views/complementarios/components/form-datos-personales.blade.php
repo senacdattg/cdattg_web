@@ -96,7 +96,7 @@
 
     <div class="card card-success mb-4">
         <div class="card-header">
-            <h5 class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i>Ubicación</h5>
+            <h5 class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i>Ubicación Actual</h5>
         </div>
         <div class="card-body">
             <div class="mb-3">
@@ -144,7 +144,6 @@
                 <div class="col-md-6 mb-3">
                     <label for="tipo_documento" class="form-label">Tipo de Documento *</label>
                     <select class="form-control" id="tipo_documento" name="tipo_documento" required>
-                        <option value="">Seleccione...</option>
                         <option value="1" {{ old('tipo_documento', $userData['tipo_documento'] ?? '1') == '1' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
                         <option value="2" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '2' ? 'selected' : '' }}>Tarjeta de Identidad</option>
                         <option value="3" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '3' ? 'selected' : '' }}>Cédula de Extranjería</option>
@@ -231,7 +230,7 @@
 
     <div class="card card-success mb-4">
         <div class="card-header">
-            <h5 class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i>Ubicación</h5>
+            <h5 class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i>Ubicación Actual</h5>
         </div>
         <div class="card-body">
             <div class="row">

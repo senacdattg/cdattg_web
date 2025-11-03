@@ -125,7 +125,7 @@ function loadMunicipiosForDepartamento(departamentoId) {
                 <div class="col-md-8">
                     <div class="card card-success">
                         <div class="card-header">
-                            <h5 class="mb-0"><i class="fas fa-user mr-2"></i>Información Personales</h5>
+                            <h5 class="mb-0"><i class="fas fa-user mr-2"></i>Información Personal</h5>
                         </div>
                         <div class="card-body">
                             <form id="formInscripcion" method="POST"
