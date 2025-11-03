@@ -8,7 +8,7 @@
             <h1><i class="fas fa-graduation-cap me-3"></i>Gestión de Programas de Formación</h1>
             <p>Administre los programas de formación complementaria disponibles</p>
         </div>
-        <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#newProgramModal">
+        <a href="{{ route('complementarios-ofertados.create') }}" class="btn btn-primary">
             <i class="fas fa-plus-circle"></i> Nuevo Programa
         </a>
     </div>
@@ -23,7 +23,7 @@
                 <div class="col-md-8">
                     <div class="input-group mb-3">
                         <span class="input-group-text" id="basic-addon1"><i class="fas fa-search"></i></span>
-                        <input type="text" class="form-control" placeholder="Buscar programa por nombre o código"
+                        <input type="text" class="form-control" placeholder="Buscar programa por nombre o cรณdigo"
                             aria-label="Search">
                     </div>
                 </div>
@@ -41,7 +41,7 @@
                     <div class="btn-group" role="group">
                         <button type="button" class="btn btn-outline-primary">Todos</button>
                         <button type="button" class="btn btn-outline-success">Con cupos disponibles</button>
-                        <button type="button" class="btn btn-outline-warning">Próximos a iniciar</button>
+                        <button type="button" class="btn btn-outline-warning">Prรณximos a iniciar</button>
                     </div>
                 </div>
             </div>
@@ -64,7 +64,7 @@
                     <p class="card-text">{{ $programa->descripcion }}</p>
                     <div class="d-flex justify-content-center mt-3 pt-3 border-top">
                         <div>
-                            <small class="text-muted">Duración</small>
+                            <small class="text-muted">Duraciรณn</small>
                             <p class="mb-0"><strong>{{ $programa->duracion }} horas</strong></p>
                         </div>
                     </div>
@@ -91,85 +91,6 @@
         @endforelse
     </div>
 
-    <!-- New Program Modal -->
-    <div class="modal fade" id="newProgramModal" tabindex="-1" aria-labelledby="newProgramModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="newProgramModalLabel">
-                        <i class="fas fa-plus-circle me-3"></i>Nuevo Programa de Formación
-                    </h5>
-                    <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Complete el formulario para registrar un nuevo programa de formación</p>
-                    <form id="newProgramForm">
-                        <div class="mb-3">
-                            <label for="nombre" class="form-label">Nombre del Programa</label>
-                            <input type="text" class="form-control" id="nombre" name="nombre" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="codigo" class="form-label">Código del Programa</label>
-                            <input type="text" class="form-control" id="codigo" name="codigo" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="descripcion" class="form-label">Descripción</label>
-                            <textarea class="form-control" id="descripcion" name="descripcion" rows="3" required></textarea>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="duracion" class="form-label">Duración (horas)</label>
-                                    <input type="number" class="form-control" id="duracion"
-                                        name="duracion" required min="1">
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="cupos" class="form-label">Cupos</label>
-                                    <input type="number" class="form-control" id="cupos"
-                                        name="cupos" required min="1">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mb-3">
-                            <label for="modalidad_id" class="form-label">Modalidad</label>
-                            <select class="form-select" id="modalidad_id" name="modalidad_id" required>
-                                @foreach($modalidades as $mod)
-                                <option value="{{ $mod->id }}">{{ $mod->parametro->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="jornada_id" class="form-label">Jornada</label>
-                            <select class="form-select" id="jornada_id" name="jornada_id" required>
-                                @foreach($jornadas as $jor)
-                                <option value="{{ $jor->id }}">{{ $jor->jornada }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="estado" class="form-label">Estado</label>
-                            <select class="form-select" id="estado" name="estado" required>
-                                <option value="0">Sin Oferta</option>
-                                <option value="1">Con Oferta</option>
-                                <option value="2">Cupos Llenos</option>
-                            </select>
-                        </div>
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                                Cancelar
-                            </button>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Guardar Programa
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <!-- Edit Program Modal -->
     <div class="modal fade" id="editProgramModal" tabindex="-1" aria-labelledby="editProgramModalLabel"
@@ -178,12 +99,12 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editProgramModalLabel">
-                        <i class="fas fa-edit me-3"></i>Editar Programa de Formación
+                        <i class="fas fa-edit me-3"></i>Editar Programa de Formaciรณn
                     </h5>
                     <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Modifique los datos del programa de formación</p>
+                    <p>Modifique los datos del programa de formaciรณn</p>
                     <form id="editProgramForm">
                         <input type="hidden" id="edit_programa_id" name="programa_id">
                         <div class="mb-3">
@@ -191,17 +112,17 @@
                             <input type="text" class="form-control" id="edit_nombre" name="nombre" required>
                         </div>
                         <div class="mb-3">
-                            <label for="edit_codigo" class="form-label">Código del Programa</label>
+                            <label for="edit_codigo" class="form-label">Cรณdigo del Programa</label>
                             <input type="text" class="form-control" id="edit_codigo" name="codigo" required>
                         </div>
                         <div class="mb-3">
-                            <label for="edit_descripcion" class="form-label">Descripción</label>
+                            <label for="edit_descripcion" class="form-label">Descripciรณn</label>
                             <textarea class="form-control" id="edit_descripcion" name="descripcion" rows="3" required></textarea>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="edit_duracion" class="form-label">Duración (horas)</label>
+                                    <label for="edit_duracion" class="form-label">Duraciรณn (horas)</label>
                                     <input type="number" class="form-control" id="edit_duracion"
                                         name="duracion" required min="1">
                                 </div>
@@ -259,7 +180,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="viewProgramModalLabel">
-                        <i class="fas fa-eye me-3"></i>Detalles del Programa de Formación
+                        <i class="fas fa-eye me-3"></i>Detalles del Programa de Formaciรณn
                     </h5>
                     <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -273,19 +194,19 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Código del Programa</label>
+                                <label class="form-label fw-bold">Cรณdigo del Programa</label>
                                 <p id="view_codigo" class="form-control-plaintext"></p>
                             </div>
                         </div>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Descripción</label>
+                        <label class="form-label fw-bold">Descripciรณn</label>
                         <p id="view_descripcion" class="form-control-plaintext"></p>
                     </div>
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Duración (horas)</label>
+                                <label class="form-label fw-bold">Duraciรณn (horas)</label>
                                 <p id="view_duracion" class="form-control-plaintext"></p>
                             </div>
                         </div>
@@ -315,7 +236,7 @@
                         <p id="view_estado" class="form-control-plaintext"></p>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Días de Formación</label>
+                        <label class="form-label fw-bold">Dรญas de Formaciรณn</label>
                         <p id="view_dias" class="form-control-plaintext"></p>
                     </div>
                 </div>
@@ -344,71 +265,6 @@
                 console.log("Bootstrap modal available");
             } else {
                 console.warn("Bootstrap modal not available.");
-            }
-
-            // Store reference to the button that opens the modal
-            let newProgramButton = null;
-            let previousActiveElement = null;
-
-            // Log button click for debugging and store reference
-            const newProgramButtons = document.querySelectorAll('[data-target="#newProgramModal"]');
-            if (newProgramButtons.length > 0) {
-                newProgramButton = newProgramButtons[0];
-                newProgramButton.addEventListener('click', function() {
-                    console.log('Nuevo Programa button clicked');
-                });
-            }
-
-            // Handle modal focus management
-            $('#newProgramModal').on('show.bs.modal', function() {
-                previousActiveElement = document.activeElement;
-            }).on('hidden.bs.modal', function() {
-                // Restore focus to the element that opened the modal
-                if (newProgramButton) {
-                    $(newProgramButton).focus();
-                } else if (previousActiveElement) {
-                    $(previousActiveElement).focus();
-                }
-
-                // Ensure no element inside the hidden modal retains focus
-                const focusedElement = document.activeElement;
-                if (focusedElement && $(this).find(focusedElement).length) {
-                    $(focusedElement).blur();
-                }
-            }).on('keydown', function(e) {
-                if (e.key === 'Tab' && !$(this).hasClass('show')) {
-                    e.preventDefault();
-                }
-            });
-
-            // Handle form submission
-            const newProgramForm = document.getElementById('newProgramForm');
-            if (newProgramForm) {
-                newProgramForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-
-                    const formData = new FormData(newProgramForm);
-                    fetch('{{ route("complementarios-ofertados.store") }}', {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert(data.message);
-                            location.reload(); // Reload to show new program
-                        } else {
-                            alert('Error: ' + (data.message || 'Unknown error'));
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred while saving the program.');
-                    });
-                });
             }
 
             // Handle edit form submission
