@@ -95,7 +95,7 @@
                                 preg_match('/MOTIVO:\s*(.+?)$/s', $descripcion, $matchMotivo);
                                 $motivo = isset($matchMotivo[1]) ? trim($matchMotivo[1]) : $orden->descripcion_orden;
                             @endphp
-                            <p>{{ $motivo }}</p>
+                            <p id="razon">{{ $motivo }}</p>
                         </div>
 
                         {{-- Lista de productos --}}
