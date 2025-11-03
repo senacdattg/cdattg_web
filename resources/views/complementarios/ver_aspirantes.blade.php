@@ -36,7 +36,7 @@
                         <option selected>{{ $programa->nombre }}</option>
                     </select>
                 </div> -->
-                <div class="col-md-3">
+                <!-- <div class="col-md-3">
                     <label class="form-label fw-bold">Año</label>
                     <select class="form-select form-select-lg bg-light">
                         <option selected>Todos los años</option>
@@ -46,7 +46,7 @@
                         <option>2022</option>
                         <option>2021</option>
                     </select>
-                </div>
+                </div> -->
                 <div class="col-md-2 d-flex align-items-end">
                     <button class="btn btn-outline-secondary btn-lg w-100">
                         <i class="fas fa-filter me-1"></i>Filtrar
@@ -102,9 +102,9 @@
                             </td>
                             <td><span class="badge {{ $aspirante->persona->estado_sofia_badge_class }}">{{ $aspirante->persona->estado_sofia_label }}</span></td>
                             <td>
-                                <button class="btn btn-warning btn-sm me-1 aspirante-action-btn" title="Editar" @if(isset($existingProgress) && $existingProgress) disabled @endif>
+                                <!-- <button class="btn btn-warning btn-sm me-1 aspirante-action-btn" title="Editar" @if(isset($existingProgress) && $existingProgress) disabled @endif>
                                     <i class="fas fa-edit"></i>
-                                </button>
+                                </button> -->
                                 <button class="btn btn-danger btn-sm aspirante-action-btn" title="Eliminar" @if(isset($existingProgress) && $existingProgress) disabled @endif>
                                     <i class="fas fa-trash"></i>
                                 </button>
