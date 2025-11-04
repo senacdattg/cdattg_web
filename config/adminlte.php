@@ -816,17 +816,18 @@ return [
         [
             'text' => 'Inventario',
             'icon' => 'fa-solid fa-boxes-stacked',
+            'can'  => ['VER PRODUCTO', 'VER CATALOGO PRODUCTO', 'VER CATEGORIA', 'VER MARCA', 'VER PROVEEDOR', 'VER CONTRATO', 'VER ORDEN'],
             'submenu' => [
                 [
                     'text' => 'Dashboard',
                     'url'  => 'inventario/dashboard',
                     'icon' => 'fa-solid fa-chart-bar',
-                    'can'  => 'VER PRODUCTO',
+                    'can'  => 'VER DASHBOARD INVENTARIO',
                 ],
                 [
                     'text' => 'Productos',
                     'icon' => 'fa-solid fa-box',
-                    'can'  => 'VER PRODUCTO',
+                    'can'  => ['VER PRODUCTO', 'VER CATALOGO PRODUCTO'],
                     'submenu' => [
                         [
                             'text' => 'Lista de Productos',
@@ -852,7 +853,7 @@ return [
                     'text' => 'Carrito Sena',
                     'url'  => 'inventario/carrito-sena',
                     'icon' => 'fa-solid fa-cart-plus',
-                    'can'  => ['VER CARRITO', 'VER PRODUCTO'],
+                    'can'  => 'VER CARRITO',
                 ],
                 [
                     'text' => 'Órdenes',
@@ -870,7 +871,7 @@ return [
                             'text' => 'Aprobaciones Pendientes',
                             'url'  => 'inventario/aprobaciones/pendientes',
                             'icon' => 'fa-solid fa-hourglass-half',
-                            'can'  => 'VER ORDEN',
+                            'can'  => 'APROBAR ORDEN',
                         ],
                         [
                             'text' => 'Órdenes Aprobadas',
@@ -901,14 +902,14 @@ return [
                             'text' => 'Historial Devoluciones',
                             'url'  => 'inventario/devoluciones-historial',
                             'icon' => 'fa-solid fa-history',
-                            'can'  => 'DEVOLVER PRESTAMO',
+                            'can'  => 'VER DEVOLUCION',
                         ],
                     ],
                 ],
                 [
                     'text' => 'Configuración',
                     'icon' => 'fa-solid fa-cog',
-                    'can'  => 'VER CATEGORIA',
+                    'can'  => ['VER CATEGORIA', 'VER MARCA', 'VER PROVEEDOR', 'VER CONTRATO'],
                     'submenu' => [
                         [
                             'text' => 'Categorías',

@@ -16,7 +16,7 @@ class ContratoConvenioController extends InventarioController
         $this->middleware('can:VER CONTRATO')->only('index', 'show');
         $this->middleware('can:CREAR CONTRATO')->only('create', 'store');
         $this->middleware('can:EDITAR CONTRATO')->only('edit', 'update');
-        $this->middleware('can:ELIMINAR PRODUCTO')->only('destroy');
+        $this->middleware('can:ELIMINAR CONTRATO')->only('destroy');
     }
 
     public function index()

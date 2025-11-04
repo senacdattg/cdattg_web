@@ -22,6 +22,14 @@ class ProductoController extends InventarioController
     {
         parent::__construct();
         $this->middleware('auth');
+        
+        // Middlewares de permisos de inventario
+        $this->middleware('can:VER PRODUCTO')->only(['index', 'show']);
+        $this->middleware('can:VER CATALOGO PRODUCTO')->only(['catalogo']);
+        $this->middleware('can:BUSCAR PRODUCTO')->only(['buscar']);
+        $this->middleware('can:CREAR PRODUCTO')->only(['create', 'store']);
+        $this->middleware('can:EDITAR PRODUCTO')->only(['edit', 'update']);
+        $this->middleware('can:ELIMINAR PRODUCTO')->only(['destroy']);
     }
     /**
      * Display a listing of the resource.
