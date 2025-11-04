@@ -96,13 +96,23 @@
                                                                 <strong id="producto_nombre">{{ $datos['producto_nombre'] ?? ($datos['producto']['producto'] ?? 'N/A') }}</strong>
                                                                 - Stock: <span class="badge badge-{{ ($datos['stock_actual'] ?? 0) == 0 ? 'danger' : 'warning' }}">{{ $datos['stock_actual'] ?? 0 }}</span>
                                                             @elseif(str_contains($tipo, 'Aprobada'))
-                                                                <strong>{{ $datos['producto']['producto'] ?? 'N/A' }}</strong>
-                                                                ({{ $datos['cantidad'] ?? 0 }} und.) - Por: {{ $datos['aprobador']['name'] ?? 'N/A' }}
+                                                                Tu solicitud de <strong>{{ $datos['cantidad'] ?? 0 }} {{ ($datos['cantidad'] ?? 0) > 1 ? 'unidades' : 'unidad' }}</strong> de 
+                                                                <strong>{{ $datos['producto']['producto'] ?? 'N/A' }}</strong> ha sido aprobada.
+                                                                <br><small class="text-muted">
+                                                                    <i class="fas fa-user-check"></i> Aprobado por: <strong>{{ $datos['aprobador']['name'] ?? 'N/A' }}</strong>
+                                                                    | <i class="fas fa-shopping-cart"></i> Orden #{{ $datos['orden_id'] ?? 'N/A' }}
+                                                                </small>
                                                             @elseif(str_contains($tipo, 'Rechazada'))
-                                                                <strong>{{ $datos['producto']['producto'] ?? 'N/A' }}</strong>
-                                                                - Rechazado por: {{ $datos['aprobador']['name'] ?? 'N/A' }}
+                                                                Tu solicitud de <strong>{{ $datos['cantidad'] ?? 0 }} {{ ($datos['cantidad'] ?? 0) > 1 ? 'unidades' : 'unidad' }}</strong> de 
+                                                                <strong>{{ $datos['producto']['producto'] ?? 'N/A' }}</strong> ha sido rechazada.
+                                                                <br><small class="text-muted">
+                                                                    <i class="fas fa-user-times"></i> Rechazado por: <strong>{{ $datos['aprobador']['name'] ?? 'N/A' }}</strong>
+                                                                    | <i class="fas fa-shopping-cart"></i> Orden #{{ $datos['orden_id'] ?? 'N/A' }}
+                                                                </small>
                                                                 @if(isset($datos['motivo_rechazo']))
-                                                                    <br><em class="text-muted">{{ \Str::limit($datos['motivo_rechazo'], 50) }}</em>
+                                                                    <br><span class="badge badge-warning mt-1">
+                                                                        <i class="fas fa-info-circle"></i> Motivo: {{ \Str::limit($datos['motivo_rechazo'], 60) }}
+                                                                    </span>
                                                                 @endif
                                                             @elseif(str_contains($tipo, 'NuevaOrden'))
                                                                 <strong>Orden #{{ $datos['orden_id'] ?? 'N/A' }}</strong> - {{ $datos['tipo_orden'] ?? 'N/A' }}

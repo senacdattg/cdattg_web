@@ -31,7 +31,9 @@ class NotificationServiceProvider extends ServiceProvider
                         return [
                             'id' => $notification->id,
                             'tipo' => get_class($notification),
-                            'datos' => json_encode($this->getData($notifiable, $notification)),
+                            'notificable_type' => get_class($notifiable),
+                            'notificable_id' => $notifiable->getKey(),
+                            'datos' => $this->getData($notifiable, $notification),
                             'leida_en' => null,
                         ];
                     }

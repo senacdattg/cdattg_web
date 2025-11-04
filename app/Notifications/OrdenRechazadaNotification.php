@@ -76,9 +76,15 @@ class OrdenRechazadaNotification extends Notification implements ShouldQueue
         return [
             'orden_id' => $this->detalleOrden->orden->id,
             'detalle_orden_id' => $this->detalleOrden->id,
-            'producto' => $this->detalleOrden->producto->producto,
+            'producto' => [
+                'id' => $this->detalleOrden->producto->id,
+                'producto' => $this->detalleOrden->producto->producto,
+            ],
             'cantidad' => $this->detalleOrden->cantidad,
-            'aprobador' => $this->aprobador->name,
+            'aprobador' => [
+                'id' => $this->aprobador->id,
+                'name' => $this->aprobador->name,
+            ],
             'motivo_rechazo' => $this->motivoRechazo,
             'tipo' => 'orden_rechazada',
         ];
