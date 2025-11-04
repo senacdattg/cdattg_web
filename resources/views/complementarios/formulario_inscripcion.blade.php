@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                                @include('complementarios.components.form-datos-personales', [
                                    'context' => 'inscripcion',
-                                   'userData' => session('user_data', [])
+                                   'userData' => $userData ?? []
                                ])
 
                                 <hr class="my-4" style="border-color: #dee2e6;">
