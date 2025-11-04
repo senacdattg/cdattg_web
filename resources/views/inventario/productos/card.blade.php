@@ -11,9 +11,6 @@
             <small class="text-muted">Vista moderna de productos disponibles</small>
         </div>
         <div>
-            <a href="{{ route('inventario.productos.index') }}" class="btn btn-secondary">
-                <i class="fas fa-list"></i> Vista Administrativa
-            </a>
             <a href="{{ route('inventario.carrito.ecommerce') }}" class="btn btn-primary">
                 <i class="fas fa-shopping-cart"></i> Ver Carrito 
                 <span class="badge badge-light" id="cart-count">0</span>
