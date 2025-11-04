@@ -6,11 +6,11 @@
 @section('content')
     
 
-    <div class="container-fluid mt-4 px-2 px-md-4">
+    <div class="container-fluid mt-4 px-2 px-md-4" style="background-color: #ebf1f4; min-height: 100vh;">
         <div class="row justify-content-center">
             <div class="col-12">
                 <div class="text-center mb-4">
-                    <h2 class="text-success">Información del Programa</h2>
+                    <h2 class="text-primary" style="color: #007bff !important;">Información del Programa</h2>
                     <p class="text-muted">Detalles del programa seleccionado</p>
                 </div>
                 <div class="d-flex justify-content-center">
@@ -26,7 +26,7 @@
     <div class="modal fade" id="inscripcionModal" tabindex="-1" role="dialog" aria-labelledby="inscripcionModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <div class="modal-header bg-success text-white">
+                <div class="modal-header" style="background-color: #007bff; color: #ffffff;">
                     <h5 class="modal-title" id="inscripcionModalLabel">
                         <i class="fas fa-user-plus mr-2"></i>Inscripción al Programa
                     </h5>
@@ -38,14 +38,14 @@
                     <h6 class="mb-4">¿Ya tienes una cuenta en el sistema?</h6>
                     <div class="row">
                         <div class="col-6">
-                            <button type="button" class="btn btn-primary btn-block" onclick="redirectToLogin()">
+                            <button type="button" class="btn btn-primary btn-block" onclick="redirectToLogin()" style="background-color: #007bff; border-color: #007bff;">
                                 <i class="fas fa-sign-in-alt fa-2x mb-2"></i><br>
                                 <strong>Iniciar Sesión</strong><br>
                                 <small>Ya tengo cuenta</small>
                             </button>
                         </div>
                         <div class="col-6">
-                            <button type="button" class="btn btn-success btn-block" onclick="redirectToRegistro()">
+                            <button type="button" class="btn btn-primary btn-block" onclick="redirectToRegistro()" style="background-color: #007bff; border-color: #007bff;">
                                 <i class="fas fa-user-plus fa-2x mb-2"></i><br>
                                 <strong>Registrarme</strong><br>
                                 <small>Soy nuevo</small>
