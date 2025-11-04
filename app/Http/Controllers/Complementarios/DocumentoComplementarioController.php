@@ -66,7 +66,7 @@ class DocumentoComplementarioController extends Controller
                 $file = $request->file('documento_identidad');
 
                 // Crear nombre de archivo con formato: tipo_documento_NumeroDocumento_PrimerNombre_PrimerApellido_timestamp.pdf
-                $tipoDocumento = $aspirante->persona->tipo_documento;
+                $tipoDocumento = $aspirante->persona->tipoDocumento->name ?? 'DOC';
                 $numeroDocumento = $aspirante->persona->numero_documento;
                 $primerNombre = $aspirante->persona->primer_nombre;
                 $primerApellido = $aspirante->persona->primer_apellido;
