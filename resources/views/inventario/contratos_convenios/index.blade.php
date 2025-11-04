@@ -124,6 +124,12 @@
                             />
                         @endforelse
                     </x-data-table>
+                    <div class="float-left pt-2">
+                        <small class="text-muted">
+                            Mostrando {{ $contratosConvenios->firstItem() ?? 0 }} a {{ $contratosConvenios->lastItem() ?? 0 }} 
+                            de {{ $contratosConvenios->total() }} contratos/convenios  
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>

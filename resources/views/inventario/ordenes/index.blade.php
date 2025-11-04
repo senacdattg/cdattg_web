@@ -138,6 +138,12 @@
                             />
                         @endforelse
                     </x-data-table>
+                    <div class="float-left pt-2">
+                        <small class="text-muted">
+                            Mostrando {{ $ordenes->firstItem() ?? 0 }} a {{ $ordenes->lastItem() ?? 0 }} 
+                            de {{ $ordenes->total() }} órdenes
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>

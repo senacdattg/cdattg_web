@@ -80,7 +80,12 @@
                             />
                         @endforelse
                     </x-data-table>
-                </div>
+                    <div class="float-left pt-2">
+                        <small class="text-muted">
+                            Mostrando {{ $marcas->firstItem() ?? 0 }} a {{ $marcas->lastItem() ?? 0 }} 
+                            de {{ $marcas->total() }} marcas
+                        </small>
+                    </div>
             </div>
         </div>
     </section>

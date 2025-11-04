@@ -21,7 +21,7 @@ class NotificacionController extends InventarioController
     public function index()
     {
         $notificaciones = Auth::user()->notifications()
-            ->paginate(15);
+            ->paginate(10);
         
         return view('inventario.notificaciones.index', compact('notificaciones'));
     }

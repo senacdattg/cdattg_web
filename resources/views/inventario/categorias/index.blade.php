@@ -81,6 +81,12 @@
                             />
                         @endforelse
                     </x-data-table>
+                    <div class="float-left pt-2">
+                        <small class="text-muted">
+                            Mostrando {{ $categorias->firstItem() ?? 0 }} a {{ $categorias->lastItem() ?? 0 }} 
+                            de {{ $categorias->total() }} categorías
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>

@@ -29,7 +29,7 @@
                         <div class="card-header">
                             <h3 class="card-title">
                                 <i class="fas fa-bell mr-1"></i> Mis Notificaciones
-                                @if($notificaciones->count() > 0)
+                                @if($notificaciones->total() > 0)
                                     <span class="badge badge-primary">{{ $notificaciones->total() }}</span>
                                 @endif
                             </h3>
@@ -91,9 +91,9 @@
                                                             <small class="text-muted">• {{ $notificacion->created_at->diffForHumans() }}</small>
                                                         </h6>
 
-                                                        <p id="text" class="mb-1 small">
+                                                        <p class="mb-1 small">
                                                             @if(str_contains($tipo, 'StockBajo'))
-                                                                <strong id="producto_nombre">{{ $datos['producto_nombre'] ?? ($datos['producto']['producto'] ?? 'N/A') }}</strong>
+                                                                <strong>{{ $datos['producto_nombre'] ?? ($datos['producto']['producto'] ?? 'N/A') }}</strong>
                                                                 - Stock: <span class="badge badge-{{ ($datos['stock_actual'] ?? 0) == 0 ? 'danger' : 'warning' }}">{{ $datos['stock_actual'] ?? 0 }}</span>
                                                             @elseif(str_contains($tipo, 'Aprobada'))
                                                                 Tu solicitud de <strong>{{ $datos['cantidad'] ?? 0 }} {{ ($datos['cantidad'] ?? 0) > 1 ? 'unidades' : 'unidad' }}</strong> de 
@@ -109,10 +109,11 @@
                                                                     <i class="fas fa-user-times"></i> Rechazado por: <strong>{{ $datos['aprobador']['name'] ?? 'N/A' }}</strong>
                                                                     | <i class="fas fa-shopping-cart"></i> Orden #{{ $datos['orden_id'] ?? 'N/A' }}
                                                                 </small>
-                                                                @if(isset($datos['motivo_rechazo']))
-                                                                    <br><span class="badge badge-warning mt-1">
-                                                                        <i class="fas fa-info-circle"></i> Motivo: {{ \Str::limit($datos['motivo_rechazo'], 60) }}
-                                                                    </span>
+                                                                @if(isset($datos['motivo_rechazo']) && !empty(trim($datos['motivo_rechazo'])))
+                                                                    <div class="alert alert-warning mt-2 mb-0 py-2">
+                                                                        <strong><i class="fas fa-info-circle"></i> Motivo del rechazo:</strong>
+                                                                        <p class="mb-0 mt-1">{{ $datos['motivo_rechazo'] }}</p>
+                                                                    </div>
                                                                 @endif
                                                             @elseif(str_contains($tipo, 'NuevaOrden'))
                                                                 <strong>Orden #{{ $datos['orden_id'] ?? 'N/A' }}</strong> - {{ $datos['tipo_orden'] ?? 'N/A' }}
@@ -141,8 +142,16 @@
                                     @endforeach
                                 </div>
                                 
-                                <div class="card-footer">
-                                    {{ $notificaciones->links() }}
+                                <div class="card-footer clearfix">
+                                    <div class="float-right">
+                                        {{ $notificaciones->links('pagination::bootstrap-4') }}
+                                    </div>
+                                    <div class="float-left pt-2">
+                                        <small class="text-muted">
+                                            Mostrando {{ $notificaciones->firstItem() ?? 0 }} a {{ $notificaciones->lastItem() ?? 0 }} 
+                                            de {{ $notificaciones->total() }} notificaciones
+                                        </small>
+                                    </div>
                                 </div>
                             @else
                                 <div class="text-center py-5">

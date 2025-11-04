@@ -157,6 +157,12 @@
                             />
                         @endforelse
                     </x-data-table>
+                    <div class="float-left pt-2">
+                        <small class="text-muted">
+                            Mostrando {{ $productos->firstItem() ?? 0 }} a {{ $productos->lastItem() ?? 0 }} 
+                            de {{ $productos->total() }} productos
+                        </small>
+                    </div>
                 </div>
             </div>
         </div>
