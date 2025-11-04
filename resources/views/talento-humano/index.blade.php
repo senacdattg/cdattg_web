@@ -200,10 +200,13 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="direccion">Dirección *</label>
-                                <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Dirección completa" required readonly>
-                                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
-                                    <i class="fas fa-edit"></i> Ingresar Dirección
-                                </button>
+                                <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Dirección completa" required>
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
+                                        <i class="fas fa-edit"></i> Ingresar Dirección Estructurada
+                                    </button>
+                                    <small class="text-muted ms-2">O ingrese la dirección libremente arriba</small>
+                                </div>
                             </div>
                             <div id="addressForm" class="collapse mt-3" aria-labelledby="addressFormLabel">
                                 <div class="card card-outline-secondary">
@@ -507,6 +510,114 @@
                 municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
             }
         }
+
+        // Cargar municipios según departamento seleccionado
+        document.getElementById('departamento_id').addEventListener('change', function() {
+            const departamentoId = this.value;
+            loadMunicipios(departamentoId);
+        });
+
+        // Convertir nombres y apellidos a mayúsculas
+        const camposTexto = ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido'];
+        camposTexto.forEach(campo => {
+            const elemento = document.getElementsByName(campo)[0];
+            if (elemento) {
+                elemento.addEventListener('input', function() {
+                    this.value = this.value.toUpperCase();
+                });
+            }
+        });
+
+        // Validar que solo contengan números
+        function soloNumeros(event) {
+            const key = event.key;
+            if (event.ctrlKey || event.altKey || event.metaKey) {
+                return true;
+            }
+            if (!/^\d$/.test(key)) {
+                event.preventDefault();
+                return false;
+            }
+            return true;
+        }
+
+        // Aplicar validación de solo números
+        const camposNumericos = ['numero_documento', 'telefono', 'celular'];
+        camposNumericos.forEach(campo => {
+            const elemento = document.getElementsByName(campo)[0];
+            if (elemento) {
+                elemento.addEventListener('keypress', soloNumeros);
+            }
+        });
+
+        // Funcionalidad del formulario de dirección estructurada
+        document.getElementById('toggleAddressForm').addEventListener('click', function() {
+            const addressForm = document.getElementById('addressForm');
+            const isVisible = addressForm.classList.contains('show');
+            const button = this;
+            if (isVisible) {
+                $('#addressForm').collapse('hide');
+                button.setAttribute('aria-expanded', 'false');
+            } else {
+                $('#addressForm').collapse('show');
+                button.setAttribute('aria-expanded', 'true');
+            }
+        });
+
+        document.getElementById('saveAddress').addEventListener('click', function() {
+            const carrera = document.getElementById('carrera').value.trim();
+            const calle = document.getElementById('calle').value.trim();
+            const numeroCasa = document.getElementById('numero_casa').value.trim();
+            const numeroApartamento = document.getElementById('numero_apartamento').value.trim();
+
+            // Validar campos obligatorios
+            if (!carrera || !calle || !numeroCasa) {
+                showAlert('warning', 'Por favor complete todos los campos obligatorios: Carrera, Calle y Número Casa.');
+                return;
+            }
+
+            // Construir la dirección
+            let direccion = `Carrera ${carrera} Calle ${calle} #${numeroCasa}`;
+            if (numeroApartamento) {
+                direccion += ` Apt ${numeroApartamento}`;
+            }
+
+            // Asignar al campo principal
+            document.getElementById('direccion').value = direccion;
+
+            // Ocultar el formulario
+            $('#addressForm').collapse('hide');
+
+            // Limpiar campos
+            document.querySelectorAll('.address-field').forEach(field => field.value = '');
+        });
+
+        document.getElementById('cancelAddress').addEventListener('click', function() {
+            // Ocultar el formulario
+            $('#addressForm').collapse('hide');
+
+            // Limpiar campos
+            document.querySelectorAll('.address-field').forEach(field => field.value = '');
+        });
+
+        // Validar solo números en campos de dirección
+        const addressNumericFields = ['carrera', 'calle', 'numero_casa', 'numero_apartamento'];
+        addressNumericFields.forEach(fieldId => {
+            const element = document.getElementById(fieldId);
+            if (element) {
+                element.addEventListener('keypress', function(event) {
+                    const key = event.key;
+                    if (event.ctrlKey || event.altKey || event.metaKey) {
+                        return true;
+                    }
+                    if (!/^\d$/.test(key)) {
+                        event.preventDefault();
+                        return false;
+                    }
+                    return true;
+                });
+            }
+        });
 
         // Event listeners para botones de acción
         document.getElementById('btn-crear-persona').addEventListener('click', async function() {
