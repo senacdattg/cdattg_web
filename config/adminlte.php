@@ -912,36 +912,60 @@ return [
                         ],
                     ],
                 ],
+                        [
+            'text' => 'Configuración',
+            'icon' => 'fa-solid fa-cog',
+            'can'  => 'VER CATEGORIA',
+            'submenu' => [
                 [
-                    'text' => 'Configuración',
-                    'icon' => 'fa-solid fa-cog',
+                    'text' => 'Categorías',
+                    'url'  => 'inventario/categorias',
+                    'icon' => 'fa-solid fa-tags',
                     'can'  => 'VER CATEGORIA',
-                    'submenu' => [
-                        [
-                            'text' => 'Categorías',
-                            'url'  => 'inventario/categorias',
-                            'icon' => 'fa-solid fa-tags',
-                            'can'  => 'VER CATEGORIA',
-                        ],
-                        [
-                            'text' => 'Marcas',
-                            'url'  => 'inventario/marcas',
-                            'icon' => 'fa-solid fa-trademark',
-                            'can'  => 'VER MARCA',
-                        ],
-                        [
-                            'text' => 'Proveedores',
-                            'url'  => 'inventario/proveedores',
-                            'icon' => 'fa-solid fa-truck',
-                            'can'  => 'VER PROVEEDOR',
-                        ],
-                        [
-                            'text' => 'Contratos/Convenios',
-                            'url'  => 'inventario/contratos-convenios',
-                            'icon' => 'fa-solid fa-file-contract',
-                            'can'  => 'VER CONTRATO',
-                        ],
-                    ],
+                ],
+                [
+                    'text' => 'Marcas',
+                    'url'  => 'inventario/marcas',
+                    'icon' => 'fa-solid fa-trademark',
+                    'can'  => 'VER MARCA',
+                ],
+                [
+                    'text' => 'Proveedores',
+                    'url'  => 'inventario/proveedores',
+                    'icon' => 'fa-solid fa-truck',
+                    'can'  => 'VER PROVEEDOR',
+                ],
+                [
+                    'text' => 'Contratos/Convenios',
+                    'url'  => 'inventario/contratos-convenios',
+                    'icon' => 'fa-solid fa-file-contract',
+                    'can'  => 'VER CONTRATO',
+                ],
+            ],
+        ], 
+
+        // ========================================
+        // MÓDULO: TALENTO HUMANO
+        // ========================================
+        [
+            'header' => 'TALENTO HUMANO',
+        ],
+        [
+            'text' => 'Talento Humano',
+            'icon' => 'fas fa-fw fa-users',
+            'can' => 'VER TALENTO HUMANO',
+            'submenu' => [
+                [
+                    'text' => 'Ver Talento Humano',
+                    'url' => 'talento-humano',
+                    'icon' => 'fas fa-fw fa-list',
+                    'can' => 'VER TALENTO HUMANO',
+                ],
+                [
+                    'text' => 'Crear Talento Humano',
+                    'url' => 'talento-humano/create',
+                    'icon' => 'fas fa-fw fa-plus',
+                    'can' => 'CREAR TALENTO HUMANO',
                 ],
             ],
         ],
@@ -1105,4 +1129,7 @@ return [
         'css/custom.css',
         'public/css/app.css',
     ],
+],
+],
 ];
+
