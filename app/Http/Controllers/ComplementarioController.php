@@ -50,7 +50,57 @@ class ComplementarioController extends Controller
         return view('complementarios.ver_aspirantes', compact('curso'));
     }
     public function verPrograma($programa)
-    { 
-        return view('complementarios.ver_programa_complementario', compact('programa'));
+    {
+        $programas = [
+            'auxiliar-cocina' => [
+                'nombre' => 'Auxiliar de Cocina',
+                'descripcion' => 'Fundamentos de cocina, manipulación de alimentos y técnicas básicas de preparación.',
+                'duracion' => '40 horas',
+                'icono' => 'fas fa-utensils'
+            ],
+            'Acabados-en-Madera' => [
+                'nombre' => 'Acabados en Madera',
+                'descripcion' => 'Técnicas de acabado, barnizado y restauración de muebles de madera.',
+                'duracion' => '60 horas',
+                'icono' => 'fas fa-hammer'
+            ],
+            'Confección-de-Prendas' => [
+                'nombre' => 'Confección de Prendas',
+                'descripcion' => 'Técnicas básicas de corte, confección y terminado de prendas de vestir.',
+                'duracion' => '50 horas',
+                'icono' => 'fas fa-cut'
+            ],
+            'Mecánica-Básica-Automotriz' => [
+                'nombre' => 'Mecánica Básica Automotriz',
+                'descripcion' => 'Mantenimiento preventivo y diagnóstico básico de vehículos.',
+                'duracion' => '90 horas',
+                'icono' => 'fas fa-car'
+            ],
+            'Cultivos-de-Huertas-Urbanas' => [
+                'nombre' => 'Cultivos de Huertas Urbanas',
+                'descripcion' => 'Técnicas de cultivo y mantenimiento de huertas en espacios urbanos.',
+                'duracion' => '120 horas',
+                'icono' => 'fas fa-spa'
+            ],
+            'Normatividad-Laboral' => [
+                'nombre' => 'Normatividad Laboral',
+                'descripcion' => 'Actualización en normatividad laboral y seguridad social.',
+                'duracion' => '60 horas',
+                'icono' => 'fas fa-gavel'
+            ]
+        ];
+
+        $programaData = $programas[$programa] ?? null;
+
+        if (!$programaData) {
+            abort(404);
+        }
+
+        return view('complementarios.ver_programa_publico', compact('programaData'));
+    }
+
+    public function programasPublicos()
+    {
+        return view('complementarios.programas_publicos');
     }
 }

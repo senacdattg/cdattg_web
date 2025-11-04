@@ -11,7 +11,11 @@
         "vite": "^6.2.2"
     },
     "dependencies": {
+<<<<<<< HEAD
         "laravel-echo": "^2.2.0",
+=======
+        "laravel-echo": "^2.2.4",
+>>>>>>> e71d76a (git merge)
         "pusher-js": "^8.4.0",
         "sweetalert2": "^11.6.13"
     }
