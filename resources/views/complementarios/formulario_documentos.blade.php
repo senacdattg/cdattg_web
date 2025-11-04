@@ -98,39 +98,41 @@
                                     <h3 class="widget-user-username">Información del Programa</h3>
                                     <h5 class="widget-user-desc">{{ $programa->nombre }}</h5>
                                 </div>
-                        <div class="card-footer">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="description-block">
-                                        <span class="description-text">DESCRIPCIÓN</span>
-                                        <p class="text-muted mb-3">{{ $programa->descripcion }}</p>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <div class="description-block">
-                                                    <span class="description-text">DURACIÓN</span>
-                                                    <h5 class="description-header">{{ $programa->duracion }} horas</h5>
+                                <div class="card-footer">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="description-block">
+                                                <span class="description-text">DESCRIPCIÓN</span>
+                                                <p class="text-muted mb-3">{{ $programa->descripcion }}</p>
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <div class="description-block">
+                                                            <span class="description-text">DURACIÓN</span>
+                                                            <h5 class="description-header">{{ $programa->duracion }} horas</h5>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <div class="description-block">
+                                                            <span class="description-text">MODALIDAD</span>
+                                                            <h5 class="description-header">
+                                                                {{ $programa->modalidad->parametro->name ?? 'N/A' }}</h5>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="description-block">
-                                                    <span class="description-text">MODALIDAD</span>
-                                                    <h5 class="description-header">
-                                                        {{ $programa->modalidad->parametro->name ?? 'N/A' }}</h5>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <div class="description-block">
-                                                    <span class="description-text">JORNADA</span>
-                                                    <h5 class="description-header">
-                                                        {{ $programa->jornada->jornada ?? 'N/A' }}</h5>
-                                                </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="description-block">
-                                                    <span class="description-text">CUPO</span>
-                                                    <h5 class="description-header">{{ $programa->cupos }}</h5>
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <div class="description-block">
+                                                            <span class="description-text">JORNADA</span>
+                                                            <h5 class="description-header">
+                                                                {{ $programa->jornada->jornada ?? 'N/A' }}</h5>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <div class="description-block">
+                                                            <span class="description-text">CUPO</span>
+                                                            <h5 class="description-header">{{ $programa->cupos }}</h5>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -138,7 +140,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
                         </div>
                     </div>
                 </div>

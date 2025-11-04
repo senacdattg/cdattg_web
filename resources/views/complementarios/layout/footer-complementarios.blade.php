@@ -27,6 +27,7 @@
     bottom: 0;
     width: 100%;
     margin-top: auto;
+    margin-left: 0 !important; /* Evita desplazamiento por estilos de AdminLTE */
 }
 
 @media (max-width: 768px) {
