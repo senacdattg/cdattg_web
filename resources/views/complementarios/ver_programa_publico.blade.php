@@ -2,6 +2,18 @@
 @section('title', 'Información del Programa | SENA')
 @section('css')
     @vite(['resources/css/formulario_inscripcion.css'])
+    <style>
+    .btn-register {
+        background-color: #3f474e;
+        border-color: #3f474e;
+        color: #fff;
+    }
+    .btn-register:hover, .btn-register:focus {
+        background-color: #343a40;
+        border-color: #343a40;
+        color: #fff;
+    }
+    </style>
 @endsection
 @section('content')
     
@@ -45,7 +57,7 @@
                             </button>
                         </div>
                         <div class="col-6">
-                            <button type="button" class="btn btn-primary btn-block" onclick="redirectToRegistro()">
+                            <button type="button" class="btn btn-register btn-block" onclick="redirectToRegistro()">
                                 <i class="fas fa-user-plus fa-2x mb-2"></i><br>
                                 <strong>Registrarme</strong><br>
                                 <small>Soy nuevo</small>
