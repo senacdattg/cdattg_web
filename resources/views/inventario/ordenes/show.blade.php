@@ -202,8 +202,8 @@
                     </div>
 
                     <div class="card-footer text-right">
-                        <a href="{{ route('inventario.ordenes.index') }}" class="btn btn-secondary">
-                            <i class="fas fa-arrow-left"></i> Volver al Listado
+                        <a href="{{ url()->previous() }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Volver
                         </a>
                     </div>
                 </div>

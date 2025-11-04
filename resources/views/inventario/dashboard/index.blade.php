@@ -43,7 +43,7 @@
                     <div class="icon">
                         <i class="fas fa-calendar-alt"></i>
                     </div>
-                    <a href="#" class="small-box-footer">
+                    <a href="{{ route('inventario.productos.index') }}" class="small-box-footer">
                         Más información <i class="fas fa-arrow-circle-right"></i>
                     </a>
                 </div>
@@ -58,7 +58,7 @@
                     <div class="icon">
                         <i class="fas fa-exclamation-triangle"></i>
                     </div>
-                    <a href="#" class="small-box-footer">
+                    <a href="{{ route('inventario.productos.index') }}" class="small-box-footer">
                         Más información <i class="fas fa-arrow-circle-right"></i>
                     </a>
                 </div>

@@ -83,15 +83,10 @@
                                             </td>
                                             <td>{{ $devolucion->userCreate->name ?? 'Usuario no encontrado' }}</td>
                                             <td>
-                                                <a href="{{ route('inventario.devoluciones.show', $devolucion->id) }}"
-                                                   class="btn btn-sm btn-info"
-                                                   title="Ver detalles">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
                                                 <a href="{{ route('inventario.ordenes.show', $devolucion->detalleOrden->orden->id) }}"
-                                                   class="btn btn-sm btn-secondary"
+                                                   class="btn btn-sm btn-info"
                                                    title="Ver orden">
-                                                    <i class="fas fa-external-link-alt"></i>
+                                                    <i class="fas fa-eye"></i>
                                                 </a>
                                             </td>
                                         </tr>
