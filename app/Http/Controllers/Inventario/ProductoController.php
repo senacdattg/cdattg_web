@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Inventario\Producto;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\ParametroTema;
 use App\Models\Parametro;
@@ -102,7 +103,7 @@ class ProductoController extends InventarioController
             'peso' => 'required|numeric|min:0',
             'unidad_medida_id' => 'required|exists:parametros_temas,id',
             'cantidad' => 'required|integer|min:1',
-            'codigo_barras' => ['required', 'regex:/^(?:\d{11}|\d{13})$/'],
+            'codigo_barras' => ['nullable','string'],
             'estado_producto_id' => 'required|exists:parametros_temas,id',
             'categoria_id' => 'required|exists:parametros,id',
             'marca_id' => 'required|exists:parametros,id',
@@ -122,12 +123,45 @@ class ProductoController extends InventarioController
             $validated['imagen'] = 'img/inventario/producto-default.png';
         }
 
+        // Normalizar/autoasignar código de barras (11 dígitos incrementales si no llega uno válido)
+        $validated['codigo_barras'] = $this->resolveBarcodeForCreate($request->input('codigo_barras'));
+
         $validated['user_create_id'] = Auth::id();
         $validated['user_update_id'] = Auth::id();
 
         Producto::create($validated);
 
         return redirect()->route('inventario.productos.index')->with('success', 'Producto creado correctamente.');
+    }
+
+    private function resolveBarcodeForCreate(?string $raw): string
+    {
+        $digits = preg_replace('/\D/', '', (string) $raw);
+        if (strlen($digits) === 11) {
+            return $digits;
+        }
+        return $this->generateNextBarcode();
+    }
+
+    private function generateNextBarcode(): string
+    {
+        return DB::transaction(function () {
+            $max = DB::table('productos')->whereNotNull('codigo_barras')->max('codigo_barras');
+            $onlyDigits = preg_replace('/\D/', '', (string) $max);
+            $num = $onlyDigits === '' ? 0 : (int) $onlyDigits;
+            $next = $num + 1;
+            $code = str_pad((string)$next, 11, '0', STR_PAD_LEFT);
+
+            // Asegurar no colisiona (reintento simple)
+            for ($i = 0; $i < 3; $i++) {
+                $exists = DB::table('productos')->where('codigo_barras', $code)->exists();
+                if (!$exists) {
+                    return $code;
+                }
+                $code = str_pad((string)($next + $i + 1), 11, '0', STR_PAD_LEFT);
+            }
+            return $code;
+        }, 3);
     }
 
     /**
@@ -218,7 +252,7 @@ class ProductoController extends InventarioController
             'peso' => 'required|numeric|min:0',
             'unidad_medida_id' => 'required|exists:parametros_temas,id',
             'cantidad' => 'required|integer|min:0',            
-            'codigo_barras' => ['required', 'regex:/^(?:\d{11}|\d{13})$/'],
+            'codigo_barras' => ['nullable','string'],
             'estado_producto_id' => 'required|exists:parametros_temas,id',
             'categoria_id' => 'required|exists:parametros,id',
             'marca_id' => 'required|exists:parametros,id',
@@ -239,6 +273,22 @@ class ProductoController extends InventarioController
             $nombreArchivo = time() . '.' . $request->imagen->extension();
             $request->imagen->move(public_path('img/inventario'), $nombreArchivo);
             $validated['imagen'] = 'img/inventario/' . $nombreArchivo;
+        }
+
+        // Normalizar/autoasignar código si llega un valor no válido de 11 dígitos
+        if ($request->has('codigo_barras')) {
+            $raw = $request->input('codigo_barras');
+            // Si el usuario deja vacío, no modificar el existente
+            if ($raw !== null && $raw !== '') {
+                $digits = preg_replace('/\D/', '', (string) $raw);
+                if (strlen($digits) === 11) {
+                    $validated['codigo_barras'] = $digits;
+                } else {
+                    $validated['codigo_barras'] = $this->generateNextBarcode();
+                }
+            } else {
+                unset($validated['codigo_barras']);
+            }
         }
 
         // Añadir user_update_id

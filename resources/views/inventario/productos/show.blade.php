@@ -111,6 +111,16 @@
                                 <i class="fas fa-barcode"></i>
                                 <strong>Código de Barras:</strong>
                                 <span class="badge-modern badge-secondary">{{ $producto->codigo_barras }}</span>
+                                @if($producto->codigo_barras)
+                                    <div class="mt-2">
+                                        <svg id="barcode-show" style="width:100%"></svg>
+                                        <div class="mt-1">
+                                            <a target="_blank" class="btn btn-xs btn-outline-primary" href="{{ route('inventario.productos.etiqueta', $producto->id) }}">
+                                                <i class="fas fa-print"></i> Imprimir etiqueta
+                                            </a>
+                                        </div>
+                                    </div>
+                                @endif
                             </li>
                             
                             <li>
@@ -274,6 +284,7 @@
 @push('js')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="{{ asset('js/inventario/imagen.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
     <script>
         // Confirmación de eliminación
         document.querySelectorAll('.formulario-eliminar').forEach(form => {
@@ -298,5 +309,10 @@
                 });
             });
         });
+
+        // Render del código de barras
+        @if($producto->codigo_barras)
+        JsBarcode("#barcode-show", "{{ $producto->codigo_barras }}", { format: "code128", width: 2, height: 60, displayValue: false });
+        @endif
     </script>
 @endpush
