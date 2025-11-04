@@ -133,6 +133,16 @@ class SuperAdminSeeder extends Seeder
             'programa.edit',
             'programa.delete',
             'programa.search',
+
+            // Permisos para aspirantes complementarios
+            'VER ESTADISTICAS',
+            // Permisos para programas complementarios
+            'VER PROGRAMA COMPLEMENTARIO',
+            'CREAR PROGRAMA COMPLEMENTARIO',
+            'ELIMINAR ASPIRANTE COMPLEMENTARIO',
+            // Permisos para talento humano
+            'VER TALENTO HUMANO',
+            'CREAR TALENTO HUMANO',
         ];
 
         // Crear cada permiso si no existe
