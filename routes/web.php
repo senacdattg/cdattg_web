@@ -47,7 +47,8 @@ Route::middleware('auth')->group(function () {
         'tema_parametro',
         'ubicacion',
         'actividades',
-        'complementarios'
+        'complementarios',
+        'talento-humano'
     ];
     foreach ($protectedFolders as $folder) {
         if ($folder === 'inventario') {
