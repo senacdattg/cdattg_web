@@ -192,6 +192,10 @@ class RolePermissionSeeder extends Seeder
             // Permisos para talento humano
             'VER TALENTO HUMANO',
             'CREAR TALENTO HUMANO',
+            'VER FICHAS ASIGNADAS',
+            'GESTIONAR DIAS FICHA',
+            'GESTIONAR APRENDICES FICHA',
+            'CAMBIAR ESTADO FICHA',
         ];
 
         // Crear cada permiso si no existe
@@ -378,8 +382,8 @@ class RolePermissionSeeder extends Seeder
             'VER INSTRUCTOR',
             'VER FICHAS ASIGNADAS',
             // Permisos para fichas de caracterización (limitados a fichas asignadas)
-            'VER FICHA CARACTERIZACION',
-            'EDITAR FICHA CARACTERIZACION',
+            'VER FICHA DE CARACTERIZACION',
+            'EDITAR FICHA DE CARACTERIZACION',
             'GESTIONAR DIAS FICHA',
             'GESTIONAR APRENDICES FICHA',
             'CAMBIAR ESTADO FICHA',
