@@ -189,6 +189,9 @@ class RolePermissionSeeder extends Seeder
             'VER PROGRAMA COMPLEMENTARIO',
             'CREAR PROGRAMA COMPLEMENTARIO',
             'ELIMINAR ASPIRANTE COMPLEMENTARIO',
+            // Permisos para talento humano
+            'VER TALENTO HUMANO',
+            'CREAR TALENTO HUMANO',
         ];
 
         // Crear cada permiso si no existe
@@ -327,6 +330,8 @@ class RolePermissionSeeder extends Seeder
             'VER PROGRAMA COMPLEMENTARIO',
             'CREAR PROGRAMA COMPLEMENTARIO',
             'ELIMINAR ASPIRANTE COMPLEMENTARIO',
+            'VER TALENTO HUMANO',
+            'CREAR TALENTO HUMANO',
         ]);
 
         // Asignar permisos al rol ADMINISTRADOR
@@ -347,6 +352,8 @@ class RolePermissionSeeder extends Seeder
             'VER PROGRAMA COMPLEMENTARIO',
             'CREAR PROGRAMA COMPLEMENTARIO',
             'ELIMINAR ASPIRANTE COMPLEMENTARIO',
+            'VER TALENTO HUMANO',
+            'CREAR TALENTO HUMANO',
         ]);
 
         // Asignar permisos al rol INSTRUCTOR
