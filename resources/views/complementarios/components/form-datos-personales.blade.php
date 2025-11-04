@@ -2,7 +2,7 @@
 
 @if($context === 'registro')
     {{-- Versión completa sin pasos para registro --}}
-    <div class="card card-success mb-4">
+    <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-user mr-2"></i>Información Personal Básica</h5>
         </div>
@@ -69,7 +69,7 @@
         </div>
     </div>
 
-    <div class="card card-success mb-4">
+    <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-birthday-cake mr-2"></i>Información Personal Adicional</h5>
         </div>
@@ -112,7 +112,7 @@
         </div>
     </div>
 
-    <div class="card card-success mb-4">
+    <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i>Ubicación Actual</h5>
         </div>
@@ -191,7 +191,7 @@
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                <button type="button" class="btn btn-success btn-sm mr-2" id="saveAddress">
+                                <button type="button" class="btn btn-primary btn-sm mr-2" id="saveAddress">
                                     <i class="fas fa-save"></i> Guardar Dirección
                                 </button>
                                 <button type="button" class="btn btn-secondary btn-sm" id="cancelAddress">
@@ -206,7 +206,7 @@
     </div>
 @else
     {{-- Versión completa para inscripción --}}
-    <div class="card card-success mb-4">
+    <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-id-card mr-2"></i> Datos personales </h5>
         </div>
@@ -269,7 +269,7 @@
         </div>
     </div>
 
-    <div class="card card-success mb-4">
+    <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-birthday-cake mr-2"></i>Información Personal</h5>
         </div>
@@ -317,7 +317,7 @@
         </div>
     </div>
 
-    <div class="card card-success mb-4">
+    <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i>Ubicación Actual</h5>
         </div>
@@ -396,7 +396,7 @@
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                <button type="button" class="btn btn-success btn-sm mr-2" id="saveAddress">
+                                <button type="button" class="btn btn-primary btn-sm mr-2" id="saveAddress">
                                     <i class="fas fa-save"></i> Guardar Dirección
                                 </button>
                                 <button type="button" class="btn btn-secondary btn-sm" id="cancelAddress">

@@ -1,5 +1,5 @@
 <!-- Footer -->
-<footer class="main-footer" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); color: white; border-top: none;">
+<footer class="main-footer" style="background-color: #ffffff; color: #343a40; border-top: 1px solid #dee2e6;">
     <div class="container-fluid">
         <div class="row">
             <div class="col-md-6">
