@@ -361,7 +361,35 @@ class ComplementarioController extends Controller
         $tiposDocumento = $this->getTiposDocumento();
         $generos = $this->getGeneros();
 
-        return view('complementarios.formulario_inscripcion', compact('programa', 'categoriasConHijos', 'paises', 'departamentos', 'tiposDocumento', 'generos'));
+        // Inicializar datos del usuario
+        $userData = [];
+
+        // Si el usuario está autenticado, cargar sus datos existentes
+        if (Auth::check()) {
+            $user = Auth::user();
+            if ($user->persona) {
+                $persona = $user->persona;
+                $userData = [
+                    'tipo_documento' => $persona->tipo_documento,
+                    'numero_documento' => $persona->numero_documento,
+                    'primer_nombre' => $persona->primer_nombre,
+                    'segundo_nombre' => $persona->segundo_nombre,
+                    'primer_apellido' => $persona->primer_apellido,
+                    'segundo_apellido' => $persona->segundo_apellido,
+                    'email' => $persona->email,
+                    'fecha_nacimiento' => $persona->fecha_nacimiento,
+                    'genero' => $persona->genero,
+                    'telefono' => $persona->telefono,
+                    'celular' => $persona->celular,
+                    'pais_id' => $persona->pais_id,
+                    'departamento_id' => $persona->departamento_id,
+                    'municipio_id' => $persona->municipio_id,
+                    'direccion' => $persona->direccion,
+                ];
+            }
+        }
+
+        return view('complementarios.formulario_inscripcion', compact('programa', 'categoriasConHijos', 'paises', 'departamentos', 'tiposDocumento', 'generos', 'userData'));
     }
 
     public function edit($id)
