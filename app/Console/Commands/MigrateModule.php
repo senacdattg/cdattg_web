@@ -12,7 +12,7 @@ class MigrateModule extends Command
      *
      * @var string
      */
-    protected $signature = 'migrate:batch 
+    protected $signature = 'migrate:module
                             {module? : El nombre del módulo a migrar (batch_01_sistema_base, batch_02_permisos, etc.)}
                             {--all : Ejecutar todos los módulos en orden}
                             {--fresh : Ejecutar fresh antes de migrar}
