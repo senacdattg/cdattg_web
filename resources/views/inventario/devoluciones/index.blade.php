@@ -53,8 +53,7 @@
                                         <th>Cantidad Devuelta</th>
                                         <th>Cantidad Pendiente</th>
                                         <th>Fecha Préstamo</th>
-                                        <th>Fecha Devolución Esperada</th>
-                                        <th>Estado</th>
+                                        <th>Fecha Devolución</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -73,26 +72,9 @@
                                                     {{ $detalle->getCantidadPendiente() }}
                                                 </span>
                                             </td>
-                                            <td>{{ $detalle->orden->fecha_prestamo ? $detalle->orden->fecha_prestamo->format('d/m/Y') : 'Sin fecha' }}</td>
-                                            <td>
-                                                @if($detalle->orden->fecha_devolucion)
-                                                    {{ $detalle->orden->fecha_devolucion->format('d/m/Y') }}
-                                                    @if($detalle->Vencido())
-                                                        <br><small class="text-danger">{{ $detalle->getDiasRetraso() }} días de retraso</small>
-                                                    @else
-                                                        <br><small class="text-success">{{ $detalle->getDiasRestantes() }} días restantes</small>
-                                                    @endif
-                                                @else
-                                                    <span class="text-muted">Sin fecha</span>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                @if($detalle->Vencido())
-                                                    <span class="badge badge-danger">Vencido</span>
-                                                @else
-                                                    <span class="badge badge-success">En tiempo</span>
-                                                @endif
-                                            </td>
+                                            <td>{{ $detalle->orden->created_at ? $detalle->orden->created_at->format('d/m/Y') : 'Sin fecha' }}</td>
+                                            <td>{{ $detalle->orden->fecha_devolucion ? $detalle->orden->fecha_devolucion->format('d/m/Y') : 'Sin fecha' }}</td>
+                                            
                                             <td>
                                                 <a href="{{ route('inventario.devoluciones.create', $detalle->id) }}"
                                                    class="btn btn-sm btn-primary">

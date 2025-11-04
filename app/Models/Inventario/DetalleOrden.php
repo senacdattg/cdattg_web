@@ -76,38 +76,4 @@ class DetalleOrden extends Model
     {
         return $this->cantidad - $this->getCantidadDevuelta();
     }
-
-    // Verificar si el préstamo está vencido
-    public function Vencido()
-    {
-        if (!$this->orden->fecha_devolucion) {
-            return false;
-        }
-
-        return now()->gt($this->orden->fecha_devolucion) && !$this->Devuelto();
-    }
-
-    // Obtener días de retraso
-    public function getDiasRetraso()
-    {
-        if (!$this->Vencido()) {
-            return 0;
-        }
-
-        return now()->diffInDays($this->orden->fecha_devolucion);
-    }
-
-    // Obtener días restantes para devolución
-    public function getDiasRestantes()
-    {
-        if (!$this->orden->fecha_devolucion) {
-            return null;
-        }
-
-        if ($this->Vencido()) {
-            return 0;
-        }
-
-        return now()->diffInDays($this->orden->fecha_devolucion, false);
-    }
 }
