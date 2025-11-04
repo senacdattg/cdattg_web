@@ -177,6 +177,19 @@ return [
         'orden' => 15,
     ],
 
+    'batch_16_inventario' => [
+        'descripcion' => 'Módulo de inventario',
+        'dependencias' => ['batch_01_sistema_base','batch_02_permisos', 'batch_03_parametros', 'batch_05_personas', 'batch_06_infraestructura'],
+        'tablas' => [
+            'productos',
+            'ordenes',
+            'proveedores',
+            'contratos_convenios',
+            'detalle_ordenes',
+            'devoluciones',
+        ],
+        'orden' => 16,
+    ],
     'batch_17_complementarios' => [
         'descripcion' => 'Módulo de Complementarios - Cursos complementarios, aspirantes y caracterización',
         'dependencias' => ['batch_05_personas', 'batch_03_parametros', 'batch_11_jornadas_horarios'],

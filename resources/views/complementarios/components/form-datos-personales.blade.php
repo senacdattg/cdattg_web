@@ -1,5 +1,6 @@
 @props(['context' => 'registro', 'userData' => [], 'step' => 1, 'tiposDocumento' => [], 'generos' => []])
 
+<<<<<<< HEAD
 @php
     $selectedTipo = old('tipo_documento', $userData['tipo_documento'] ?? null);
     if (!$selectedTipo) {
@@ -15,6 +16,11 @@
 @if($context === 'registro')
     {{-- Versión completa sin pasos para registro --}}
     <div class="card mb-4">
+=======
+@if($context === 'registro')
+    {{-- Versión completa sin pasos para registro --}}
+    <div class="card card-success mb-4">
+>>>>>>> develop
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-user mr-2"></i>Información Personal Básica</h5>
         </div>
@@ -23,19 +29,36 @@
                 <div class="col-md-6 mb-3">
                     <label for="tipo_documento" class="form-label">Tipo de Documento *</label>
                     <select class="form-control" id="tipo_documento" name="tipo_documento" required>
+<<<<<<< HEAD
                         @if($tiposDocumento && $tiposDocumento->count() > 0)
                             @foreach($tiposDocumento as $tipo)
                                 <option value="{{ $tipo->id }}" {{ (string)$selectedTipo === (string)$tipo->id ? 'selected' : '' }}>
+=======
+
+                        <option value="">Seleccione...</option>
+                        @if($tiposDocumento && $tiposDocumento->count() > 0)
+                            @foreach($tiposDocumento as $tipo)
+                                <option value="{{ $tipo->id }}" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == $tipo->id ? 'selected' : '' }}>
+>>>>>>> develop
                                     {{ ucwords(strtolower(str_replace('_', ' ', $tipo->name))) }}
                                 </option>
                             @endforeach
                         @else
+<<<<<<< HEAD
                             <option value="3" {{ (string)$selectedTipo === '3' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
                             <option value="4" {{ (string)$selectedTipo === '4' ? 'selected' : '' }}>Cédula de Extranjería</option>
                             <option value="5" {{ (string)$selectedTipo === '5' ? 'selected' : '' }}>Pasaporte</option>
                             <option value="6" {{ (string)$selectedTipo === '6' ? 'selected' : '' }}>Tarjeta de Identidad</option>
                             <option value="7" {{ (string)$selectedTipo === '7' ? 'selected' : '' }}>Registro Civil</option>
                             <option value="8" {{ (string)$selectedTipo === '8' ? 'selected' : '' }}>Sin Identificación</option>
+=======
+                            <option value="3" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '3' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
+                            <option value="4" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '4' ? 'selected' : '' }}>Cédula de Extranjería</option>
+                            <option value="5" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '5' ? 'selected' : '' }}>Pasaporte</option>
+                            <option value="6" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '6' ? 'selected' : '' }}>Tarjeta de Identidad</option>
+                            <option value="7" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '7' ? 'selected' : '' }}>Registro Civil</option>
+                            <option value="8" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '8' ? 'selected' : '' }}>Sin Identificación</option>
+>>>>>>> develop
                         @endif
                     </select>
                 </div>
@@ -80,7 +103,11 @@
         </div>
     </div>
 
+<<<<<<< HEAD
     <div class="card mb-4">
+=======
+    <div class="card card-success mb-4">
+>>>>>>> develop
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-birthday-cake mr-2"></i>Información Personal Adicional</h5>
         </div>
@@ -123,7 +150,11 @@
         </div>
     </div>
 
+<<<<<<< HEAD
     <div class="card mb-4">
+=======
+    <div class="card card-success mb-4">
+>>>>>>> develop
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i>Ubicación Actual</h5>
         </div>
@@ -202,7 +233,11 @@
                         </div>
                         <div class="row">
                             <div class="col-12">
+<<<<<<< HEAD
                                 <button type="button" class="btn btn-primary btn-sm mr-2" id="saveAddress">
+=======
+                                <button type="button" class="btn btn-success btn-sm mr-2" id="saveAddress">
+>>>>>>> develop
                                     <i class="fas fa-save"></i> Guardar Dirección
                                 </button>
                                 <button type="button" class="btn btn-secondary btn-sm" id="cancelAddress">
@@ -217,7 +252,11 @@
     </div>
 @else
     {{-- Versión completa para inscripción --}}
+<<<<<<< HEAD
     <div class="card mb-4">
+=======
+    <div class="card card-success mb-4">
+>>>>>>> develop
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-id-card mr-2"></i> Datos personales </h5>
         </div>
@@ -226,19 +265,36 @@
                 <div class="col-md-6 mb-3">
                     <label for="tipo_documento" class="form-label">Tipo de Documento *</label>
                     <select class="form-control" id="tipo_documento" name="tipo_documento" required>
+<<<<<<< HEAD
                         @if($tiposDocumento && $tiposDocumento->count() > 0)
                             @foreach($tiposDocumento as $tipo)
                                 <option value="{{ $tipo->id }}" {{ (string)$selectedTipo === (string)$tipo->id ? 'selected' : '' }}>
+=======
+
+                        <option value="">Seleccione...</option>
+                        @if($tiposDocumento && $tiposDocumento->count() > 0)
+                            @foreach($tiposDocumento as $tipo)
+                                <option value="{{ $tipo->id }}" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == $tipo->id ? 'selected' : '' }}>
+>>>>>>> develop
                                     {{ ucwords(strtolower(str_replace('_', ' ', $tipo->name))) }}
                                 </option>
                             @endforeach
                         @else
+<<<<<<< HEAD
                             <option value="3" {{ (string)$selectedTipo === '3' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
                             <option value="4" {{ (string)$selectedTipo === '4' ? 'selected' : '' }}>Cédula de Extranjería</option>
                             <option value="5" {{ (string)$selectedTipo === '5' ? 'selected' : '' }}>Pasaporte</option>
                             <option value="6" {{ (string)$selectedTipo === '6' ? 'selected' : '' }}>Tarjeta de Identidad</option>
                             <option value="7" {{ (string)$selectedTipo === '7' ? 'selected' : '' }}>Registro Civil</option>
                             <option value="8" {{ (string)$selectedTipo === '8' ? 'selected' : '' }}>Sin Identificación</option>
+=======
+                            <option value="3" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '3' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
+                            <option value="4" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '4' ? 'selected' : '' }}>Cédula de Extranjería</option>
+                            <option value="5" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '5' ? 'selected' : '' }}>Pasaporte</option>
+                            <option value="6" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '6' ? 'selected' : '' }}>Tarjeta de Identidad</option>
+                            <option value="7" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '7' ? 'selected' : '' }}>Registro Civil</option>
+                            <option value="8" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '8' ? 'selected' : '' }}>Sin Identificación</option>
+>>>>>>> develop
                         @endif
                     </select>
                 </div>
@@ -279,7 +335,11 @@
         </div>
     </div>
 
+<<<<<<< HEAD
     <div class="card mb-4">
+=======
+    <div class="card card-success mb-4">
+>>>>>>> develop
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-birthday-cake mr-2"></i>Información Personal</h5>
         </div>
@@ -327,7 +387,11 @@
         </div>
     </div>
 
+<<<<<<< HEAD
     <div class="card mb-4">
+=======
+    <div class="card card-success mb-4">
+>>>>>>> develop
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i>Ubicación Actual</h5>
         </div>
@@ -406,7 +470,11 @@
                         </div>
                         <div class="row">
                             <div class="col-12">
+<<<<<<< HEAD
                                 <button type="button" class="btn btn-primary btn-sm mr-2" id="saveAddress">
+=======
+                                <button type="button" class="btn btn-success btn-sm mr-2" id="saveAddress">
+>>>>>>> develop
                                     <i class="fas fa-save"></i> Guardar Dirección
                                 </button>
                                 <button type="button" class="btn btn-secondary btn-sm" id="cancelAddress">

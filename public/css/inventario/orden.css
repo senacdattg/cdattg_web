@@ -1,0 +1,437 @@
+/* ============================================
+   VISTA SHOW DE ORDEN - DISEÑO MODERNO
+   ============================================ */
+
+/* Card Principal */
+.orden-show-card .card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(243, 242, 242, 0.1);
+    overflow: hidden;
+}
+
+/* Header del Card con Gradiente */
+.orden-show-card .card-header {
+    background: linear-gradient(135deg, #66ea8b 0%, #4ba261 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    border: none;
+    position: relative;
+}
+
+.orden-show-card .card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="rgba(255,255,255,0.05)"/></svg>');
+    background-size: 80px 80px;
+    opacity: 0.3;
+}
+
+.orden-show-card .card-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+    z-index: 1;
+}
+
+.orden-show-card .card-title i {
+    font-size: 1.75rem;
+}
+
+/* Body del Card */
+.orden-show-card .card-body {
+    padding: 2rem;
+    background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+}
+
+/* Grupo de Información */
+.orden-show-card .info-group {
+    margin-bottom: 1.25rem;
+    padding: 0.75rem 1rem;
+    background: white;
+    border-radius: 10px;
+    border-left: 4px solid #66ea8e;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.orden-show-card .info-group:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transform: translateX(5px);
+}
+
+.orden-show-card .info-group label {
+    font-weight: 700;
+    color: #495057;
+    margin-right: 0.75rem;
+    margin-bottom: 0.25rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.orden-show-card .info-group label i {
+    color: #66ea83;
+    font-size: 1rem;
+}
+
+.orden-show-card .info-group span {
+    color: #242627b6;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* Caja de Descripción */
+.orden-show-card .description-box {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 1.5rem;
+    border-radius: 12px;
+    border-left: 4px solid #66ea99;
+    margin-top: 2rem;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.08);
+}
+
+.orden-show-card .description-box label {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #495057;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.orden-show-card .description-box label i {
+    color: #66eaa1;
+    font-size: 1.25rem;
+}
+
+.orden-show-card .description-box p {
+    margin-bottom: 0;
+    color: #495057;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Sección de Productos */
+.orden-show-card .products-section {
+    border-top: 3px solid #66ea92;
+    padding-top: 2rem;
+    margin-top: 2rem;
+}
+
+.orden-show-card .products-section h4 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #495057;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.orden-show-card .products-section h4 i {
+    color: #66eaa1;
+    font-size: 1.5rem;
+}
+
+.orden-show-card .products-section h4::after {
+    content: '';
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(to right, #3abf5b, transparent);
+    margin-left: 1rem;
+}
+
+/* Tabla de Productos Mejorada */
+.orden-show-card .table-responsive {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.orden-show-card .table {
+    margin-bottom: 0;
+    background: white;
+}
+
+.orden-show-card .table thead {
+    background: linear-gradient(135deg, #28714e 0%, #31c666 100%);
+    color: white;
+}
+
+.orden-show-card .table thead th {
+    border: none;
+    padding: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.5px;
+}
+
+.orden-show-card .table tbody tr {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.orden-show-card .table tbody tr:hover {
+    background: linear-gradient(to right, #f8f9fa, #ffffff);
+    transform: scale(1.01);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.orden-show-card .table tbody td {
+    padding: 1rem;
+    vertical-align: middle;
+    font-size: 0.95rem;
+    color: #495057;
+}
+
+.orden-show-card .table tbody tr:last-child {
+    border-bottom: none;
+}
+
+/* Badges Mejorados */
+.orden-show-card .badge {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.orden-show-card .badge-secondary {
+    background: linear-gradient(135deg, #00bc8c 0%, #2c8f1c 100%);
+}
+
+.orden-show-card .badge-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    color: #000;
+}
+
+.orden-show-card .badge-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.orden-show-card .badge-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
+.orden-show-card .badge-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+}
+
+/* Botones en la Tabla */
+.orden-show-card .btn-sm {
+    padding: 0.5rem 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.orden-show-card .btn-sm:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.orden-show-card .btn-info {
+    background: linear-gradient(135deg, #17b865 0%, #13963c 100%);
+    border: none;
+}
+
+.orden-show-card .btn-info:hover {
+    background: linear-gradient(135deg, #13964e 0%, #118b25 100%);
+}
+
+/* Footer del Card */
+.orden-show-card .card-footer {
+    background: #f8f9fa;
+    border-top: 2px solid #e9ecef;
+    padding: 1.5rem 2rem;
+    border-radius: 0 0 15px 15px;
+}
+
+.orden-show-card .card-footer .btn {
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+}
+
+.orden-show-card .card-footer .btn-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    border: none;
+}
+
+.orden-show-card .card-footer .btn-secondary:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #4e555b 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Tabla Vacía */
+.orden-show-card .table tbody td[colspan] {
+    text-align: center;
+    padding: 3rem;
+    color: #6c757d;
+    font-size: 1.1rem;
+}
+
+.orden-show-card .table tbody td[colspan] i {
+    font-size: 3rem;
+    color: #dee2e6;
+    display: block;
+    margin-bottom: 1rem;
+}
+
+/* Divisor Visual */
+.orden-show-card .divider {
+    height: 2px;
+    background: linear-gradient(to right, transparent, #27a357, transparent);
+    margin: 2rem 0;
+    border-radius: 2px;
+}
+
+/* Grid de Información Responsivo */
+.orden-show-card .row {
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+}
+
+.orden-show-card .row > [class*="col-"] {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+}
+
+/* Animaciones */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.orden-show-card .info-group,
+.orden-show-card .description-box,
+.orden-show-card .products-section {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+/* Scrollbar Personalizado para Descripción */
+.orden-show-card .description-box p::-webkit-scrollbar {
+    width: 8px;
+}
+
+.orden-show-card .description-box p::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.orden-show-card .description-box p::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #66ea7c, #19a54c);
+    border-radius: 4px;
+}
+
+.orden-show-card .description-box p::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #4ba271, #66ea9b);
+}
+
+/* Estados de Aprobación con Información */
+.orden-show-card .estado-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.orden-show-card .estado-info .badge {
+    margin-bottom: 0.25rem;
+}
+
+.orden-show-card .estado-info small {
+    color: #6c757d;
+    font-size: 0.75rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .orden-show-card .card-body {
+        padding: 1.25rem;
+    }
+    
+    .orden-show-card .card-header,
+    .orden-show-card .card-footer {
+        padding: 1rem 1.25rem;
+    }
+    
+    .orden-show-card .info-group {
+        padding: 0.5rem 0.75rem;
+    }
+    
+    .orden-show-card .description-box {
+        padding: 1rem;
+    }
+    
+    .orden-show-card .table {
+        font-size: 0.85rem;
+    }
+    
+    .orden-show-card .table thead th,
+    .orden-show-card .table tbody td {
+        padding: 0.75rem 0.5rem;
+    }
+}
+
+/* Efectos de Hover Mejorados */
+.orden-show-card .info-group label i {
+    transition: all 0.3s ease;
+}
+
+.orden-show-card .info-group:hover label i {
+    transform: scale(1.2) rotate(5deg);
+    color: #37b258;
+}
+
+/* Badge con Pulso para Estados Pendientes */
+.orden-show-card .badge-warning {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.8;
+    }
+}

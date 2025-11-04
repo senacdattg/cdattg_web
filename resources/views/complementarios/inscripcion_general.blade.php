@@ -24,7 +24,11 @@
 
                         <!-- Alertas -->
                         @if (session('success'))
+<<<<<<< HEAD
                             <div class="alert alert-info alert-dismissible">
+=======
+                            <div class="alert alert-success alert-dismissible">
+>>>>>>> develop
                                 <button type="button" class="close" data-dismiss="alert"
                                     aria-hidden="true">&times;</button>
                                 <i class="icon fas fa-check"></i> {{ session('success') }}
@@ -39,8 +43,13 @@
                             </div>
                         @endif
 
+<<<<<<< HEAD
                         <div class="card">
                             <div class="card-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
+=======
+                        <div class="card card-primary">
+                            <div class="card-header">
+>>>>>>> develop
                                 <h3 class="card-title">Registro de datos personales y caracterización</h3>
                             </div>
 
@@ -51,7 +60,11 @@
                                     <!-- Documento de Identidad -->
                                     <div class="row mb-4">
                                         <div class="col-12">
+<<<<<<< HEAD
                                             <h4 class="text-dark mb-3">
+=======
+                                            <h4 class="text-primary mb-3">
+>>>>>>> develop
                                                 <i class="fas fa-id-card mr-2"></i>Documento de Identidad
                                             </h4>
                                         </div>
@@ -88,7 +101,11 @@
                                     <!-- Nombres y Apellidos -->
                                     <div class="row mb-4">
                                         <div class="col-12">
+<<<<<<< HEAD
                                             <h4 class="text-dark mb-3">
+=======
+                                            <h4 class="text-success mb-3">
+>>>>>>> develop
                                                 <i class="fas fa-user mr-2"></i>Nombres y Apellidos
                                             </h4>
                                         </div>
@@ -129,7 +146,11 @@
                                     <!-- Información Personal -->
                                     <div class="row mb-4">
                                         <div class="col-12">
+<<<<<<< HEAD
                                             <h4 class="text-dark mb-3">
+=======
+                                            <h4 class="text-warning mb-3">
+>>>>>>> develop
                                                 <i class="fas fa-info-circle mr-2"></i>Información Personal
                                             </h4>
                                         </div>
@@ -162,7 +183,11 @@
                                     <!-- Contacto -->
                                     <div class="row mb-4">
                                         <div class="col-12">
+<<<<<<< HEAD
                                             <h4 class="text-dark mb-3">
+=======
+                                            <h4 class="text-danger mb-3">
+>>>>>>> develop
                                                 <i class="fas fa-phone mr-2"></i>Información de Contacto
                                             </h4>
                                         </div>
@@ -195,7 +220,11 @@
                                     <!-- Ubicación -->
                                     <div class="row mb-4">
                                         <div class="col-12">
+<<<<<<< HEAD
                                             <h4 class="text-dark mb-3">
+=======
+                                            <h4 class="text-secondary mb-3">
+>>>>>>> develop
                                                 <i class="fas fa-map-marker-alt mr-2"></i>Ubicación Actual
                                             </h4>
                                         </div>
@@ -284,7 +313,11 @@
                                                         </div>
                                                         <div class="row">
                                                             <div class="col-12">
+<<<<<<< HEAD
                                                                 <button type="button" class="btn btn-primary btn-sm mr-2" id="saveAddress">
+=======
+                                                                <button type="button" class="btn btn-success btn-sm mr-2" id="saveAddress">
+>>>>>>> develop
                                                                     <i class="fas fa-save"></i> Guardar Dirección
                                                                 </button>
                                                                 <button type="button" class="btn btn-secondary btn-sm" id="cancelAddress">

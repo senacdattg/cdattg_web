@@ -1,0 +1,406 @@
+/**
+ * card.css - Estilos para la vista de catálogo de productos tipo ecommerce
+ * Diseño moderno y responsivo para tarjetas de productos
+ */
+
+/* ========================================
+   Variables CSS
+   ======================================== */
+:root {
+    --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --card-hover-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    --primary-color: #007bff;
+    --success-color: #28a745;
+    --warning-color: #ffc107;
+    --danger-color: #dc3545;
+    --info-color: #17a2b8;
+    --border-radius: 8px;
+    --transition-speed: 0.3s;
+}
+
+/* ========================================
+   Contenedor del Grid de Productos
+   ======================================== */
+#products-grid {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========================================
+   Tarjetas de Productos
+   ======================================== */
+.product-card {
+    transition: transform var(--transition-speed) ease;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-card .card {
+    border: 1px solid #e0e0e0;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    transition: all var(--transition-speed) ease;
+}
+
+.product-card .card:hover {
+    border-color: var(--primary-color);
+}
+
+.hover-shadow {
+    box-shadow: var(--card-shadow);
+    transition: box-shadow var(--transition-speed) ease;
+}
+
+.hover-shadow:hover {
+    box-shadow: var(--card-hover-shadow);
+}
+
+/* ========================================
+   Contenedor de Imagen del Producto
+   ======================================== */
+.product-image-container {
+    position: relative;
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-speed) ease;
+}
+
+.product-card:hover .product-image {
+    transform: scale(1.1);
+}
+
+/* ========================================
+   Placeholder para productos sin imagen
+   ======================================== */
+.no-image-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+
+.no-image-placeholder i {
+    opacity: 0.3;
+}
+
+.no-image-placeholder p {
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+/* ========================================
+   Badge de Stock
+   ======================================== */
+.stock-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 5px 12px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    text-transform: uppercase;
+    z-index: 10;
+}
+
+/* ========================================
+   Cuerpo de la Tarjeta
+   ======================================== */
+.card-body {
+    padding: 1.25rem;
+}
+
+.card-title {
+    font-size: 1rem;
+    line-height: 1.4;
+    color: #333;
+    margin-bottom: 0.75rem;
+    min-height: 2.8rem;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-text {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    min-height: 3.75rem;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ========================================
+   Botones de Acción
+   ======================================== */
+.btn-view-details {
+    transition: all var(--transition-speed) ease;
+}
+
+.btn-view-details:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
+}
+
+.btn-add-to-cart {
+    transition: all var(--transition-speed) ease;
+}
+
+.btn-add-to-cart:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.btn-add-to-cart:active {
+    transform: scale(0.95);
+}
+
+/* ========================================
+   Filtros y Búsqueda
+   ======================================== */
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* ========================================
+   Badge de Contador del Carrito
+   ======================================== */
+#cart-count {
+    position: relative;
+    top: -2px;
+    min-width: 20px;
+    padding: 3px 6px;
+    border-radius: 10px;
+    animation: pulse 0.5s ease;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.3);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* ========================================
+   Modal de Detalles del Producto
+   ======================================== */
+#productDetailModal .modal-content {
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+#productDetailModal .modal-header {
+    background: linear-gradient(135deg, var(--info-color) 0%, #138496 100%);
+    color: white;
+    border: none;
+}
+
+#productDetailModal .modal-header .close {
+    color: white;
+    opacity: 0.8;
+    text-shadow: none;
+}
+
+#productDetailModal .modal-header .close:hover {
+    opacity: 1;
+}
+
+/* ========================================
+   Alertas y Mensajes
+   ======================================== */
+.alert {
+    border-radius: var(--border-radius);
+    border: none;
+    box-shadow: var(--card-shadow);
+}
+
+.alert i {
+    margin-right: 8px;
+}
+
+/* ========================================
+   Efectos de Loading
+   ======================================== */
+.fa-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+
+/* Tablets */
+@media (max-width: 992px) {
+    .product-image-container {
+        height: 180px;
+    }
+
+    .card-title {
+        font-size: 0.95rem;
+    }
+
+    .card-text {
+        font-size: 0.8rem;
+    }
+}
+
+/* Móviles */
+@media (max-width: 768px) {
+    .product-image-container {
+        height: 200px;
+    }
+
+    .card-body {
+        padding: 1rem;
+    }
+
+    .card-title {
+        font-size: 0.9rem;
+        min-height: auto;
+    }
+
+    .card-text {
+        min-height: auto;
+    }
+
+    .btn-group {
+        flex-direction: column;
+    }
+
+    .btn-group .btn {
+        width: 100% !important;
+        border-radius: 4px !important;
+        margin-bottom: 5px;
+    }
+
+    .btn-group .btn:last-child {
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .product-card {
+        margin-bottom: 1rem;
+    }
+
+    .stock-badge {
+        font-size: 0.65rem;
+        padding: 4px 8px;
+    }
+}
+
+/* ========================================
+   Utilidades Adicionales
+   ======================================== */
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.text-truncate-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ========================================
+   Estados de Stock
+   ======================================== */
+.badge-danger {
+    background-color: var(--danger-color);
+}
+
+.badge-warning {
+    background-color: var(--warning-color);
+    color: #212529;
+}
+
+.badge-success {
+    background-color: var(--success-color);
+}
+
+.badge-info {
+    background-color: var(--info-color);
+}
+
+/* ========================================
+   Transiciones Suaves
+   ======================================== */
+* {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+button,
+.btn {
+    transition: all var(--transition-speed) ease;
+}
+
+/* ========================================
+   Mejoras de Accesibilidad
+   ======================================== */
+.btn:focus,
+.form-control:focus,
+.custom-select:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* ========================================
+   Print Styles
+   ======================================== */
+@media print {
+    .btn-group,
+    .card-header,
+    .stock-badge {
+        display: none !important;
+    }
+
+    .product-card {
+        page-break-inside: avoid;
+    }
+}

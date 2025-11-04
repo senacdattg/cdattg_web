@@ -1,0 +1,338 @@
+/* ============================================
+   MODAL DE ORDEN - DISEÑO MODERNO
+   ============================================ */
+
+/* Modal Principal */
+.modal-orden .modal-dialog {
+    max-width: 900px;
+}
+
+.modal-orden .modal-content {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+/* Header del Modal */
+.modal-orden .modal-header {
+    background: linear-gradient(135deg, #66ea99 0%, #4ba252 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    border: none;
+    position: relative;
+}
+
+.modal-orden .modal-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="rgba(255,255,255,0.05)"/></svg>');
+    background-size: 100px 100px;
+    opacity: 0.3;
+}
+
+.modal-orden .modal-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+    z-index: 1;
+}
+
+.modal-orden .modal-title i {
+    font-size: 1.75rem;
+    animation: pulse 2s infinite;
+}
+
+.modal-orden .close {
+    color: white;
+    opacity: 0.9;
+    text-shadow: none;
+    font-size: 2rem;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.modal-orden .close:hover {
+    opacity: 1;
+    transform: rotate(90deg);
+}
+
+/* Body del Modal */
+.modal-orden .modal-body {
+    padding: 2rem;
+    background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+}
+
+/* Tarjetas de Información */
+.modal-orden .info-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    height: 100%;
+    transition: all 0.3s ease;
+    border: 1px solid #e9ecef;
+}
+
+.modal-orden .info-card:hover {
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+}
+
+.modal-orden .info-card h6 {
+    color: #495057;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 3px solid #23bb60;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-orden .info-card h6::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(to bottom, #66ea99, #328744);
+    border-radius: 2px;
+}
+
+/* Items de Información */
+.modal-orden .info-item {
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    background: #f8f9fa;
+    transition: all 0.2s ease;
+}
+
+.modal-orden .info-item:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+}
+
+.modal-orden .info-item:last-child {
+    margin-bottom: 0;
+}
+
+.modal-orden .info-item strong {
+    color: #495057;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.modal-orden .info-item strong i {
+    color: #299a42;
+    font-size: 0.9rem;
+}
+
+.modal-orden .info-item .text-muted {
+    color: #6c757d !important;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+/* Motivo Especial */
+.modal-orden .motivo-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #219356;
+    margin-top: 0.5rem;
+}
+
+.modal-orden .motivo-section strong {
+    color: #495057;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.modal-orden .motivo-text {
+    color: #495057;
+    white-space: pre-wrap;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    padding: 0.5rem;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #dee2e6;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+/* Badges Mejorados */
+.modal-orden .badge {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-orden .badge-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    color: #000;
+}
+
+.modal-orden .badge-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.modal-orden .badge-danger {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
+.modal-orden .badge-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+}
+
+/* Alerta de Stock Insuficiente */
+.modal-orden .stock-alert {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%);
+    border-left: 4px solid #dc3545;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+    animation: shake 0.5s;
+}
+
+.modal-orden .stock-alert i {
+    color: #dc3545;
+    font-size: 1.25rem;
+    margin-right: 0.5rem;
+}
+
+.modal-orden .stock-alert strong {
+    color: #721c24;
+}
+
+/* Footer del Modal */
+.modal-orden .modal-footer {
+    background: #f8f9fa;
+    border-top: 2px solid #e9ecef;
+    padding: 1.25rem 2rem;
+}
+
+.modal-orden .modal-footer .btn {
+    padding: 0.625rem 1.5rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-orden .modal-footer .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Divisor Visual */
+.modal-orden .divider {
+    height: 2px;
+    background: linear-gradient(to right, transparent, #667eea, transparent);
+    margin: 1.5rem 0;
+    border-radius: 2px;
+}
+
+/* Animaciones */
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-5px);
+    }
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.modal-orden .modal-body > * {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Scrollbar Personalizado */
+.modal-orden .motivo-text::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-orden .motivo-text::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.modal-orden .motivo-text::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #66ea8e, #4ba27e);
+    border-radius: 4px;
+}
+
+.modal-orden .motivo-text::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #f2ebf4, #66eaa1);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .modal-orden .modal-dialog {
+        margin: 0.5rem;
+    }
+    
+    .modal-orden .modal-body {
+        padding: 1.25rem;
+    }
+    
+    .modal-orden .info-card {
+        margin-bottom: 1rem;
+    }
+    
+    .modal-orden .modal-title {
+        font-size: 1.25rem;
+    }
+}
+
+/* Efectos de Hover en Iconos */
+.modal-orden .info-item strong i {
+    transition: all 0.3s ease;
+}
+
+.modal-orden .info-item:hover strong i {
+    transform: scale(1.2);
+    color: #4ba255;
+}

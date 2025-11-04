@@ -422,6 +422,82 @@
                             </li>
                         </ul>
                     </li>
+                {{-- Módulo de Inventario --}}
+                @can('VER PRODUCTO')
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-boxes"></i>
+                            <p>
+                                Inventario
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('inventario.dashboard') }}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Dashboard</p>
+                                </a>
+                            </li>
+                            @can('VER PRODUCTO')
+                                <li class="nav-item">
+                                    <a href="{{ route('inventario.productos.index') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Productos</p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('VER ORDEN')
+                                <li class="nav-item">
+                                    <a href="{{ route('inventario.ordenes.index') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Órdenes</p>
+                                    </a>
+                                </li>
+                            @endcan
+                            @can('DEVOLVER PRESTAMO')
+                                <li class="nav-item">
+                                    <a href="{{ route('inventario.devoluciones.index') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Devoluciones</p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('inventario.devoluciones.historial') }}" class="nav-link">
+                                        <i class="far fa-circle nav-icon"></i>
+                                        <p>Historial Devoluciones</p>
+                                    </a>
+                                </li>
+                            @endcan
+                        </ul>
+                    </li>
+                @endcan
+
+                {{-- Mis Préstamos --}}
+                @can('VER ORDEN')
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">
+                            <i class="nav-icon fas fa-hand-holding"></i>
+                            <p>
+                                Mis Préstamos
+                                <i class="right fas fa-angle-left"></i>
+                            </p>
+                        </a>
+                        <ul class="nav nav-treeview">
+                            <li class="nav-item">
+                                <a href="{{ route('inventario.prestamos.mis') }}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Mis Préstamos Activos</p>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('inventario.prestamos.historial') }}" class="nav-link">
+                                    <i class="far fa-circle nav-icon"></i>
+                                    <p>Historial de Préstamos</p>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
                 @endcan
 
             </ul>

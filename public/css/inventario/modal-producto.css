@@ -1,0 +1,267 @@
+/* Modal de Producto - Estilos Limpios */
+
+/* Contenedor del modal */
+#productDetailModal {
+    animation: fadeInModal 0.3s ease-in-out;
+}
+
+@keyframes fadeInModal {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Tarjeta del modal */
+#productDetailModal > div {
+    animation: slideInUp 0.4s ease-out;
+    padding: 0;
+    background: linear-gradient(to bottom, #2d5016 0%, #3d6b1f 100%);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes slideInUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+#descripcion {
+    color: #555 !important;
+
+}
+/* Contenedor de imagen */
+.modal-img-container {
+    text-align: center;
+    margin-bottom: 0;
+    background: white;
+    padding: 20px;
+    border-bottom: 3px solid #28a745;
+}
+
+.modal-img {
+    max-height: 200px;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.modal-img:hover {
+    transform: scale(1.05);
+}
+
+/* Div interno - contenedor de contenido */
+#productDetailModal > div > div:first-child {
+    padding: 30px;
+    background: white;
+}
+
+/* Título */
+.modal-title {
+    color: #2d5016;
+    font-weight: bold;
+    margin: 0 0 20px 0;
+    font-size: 22px;
+    text-transform: uppercase;
+    border-bottom: 2px solid #28a745;
+    padding-bottom: 10px;
+    text-align: left;
+}
+
+/* Tabla */
+.modal-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    font-size: 14px;
+    background: white;
+}
+
+.modal-table tr {
+    border-bottom: 1px solid #e0e0e0;
+    transition: background-color 0.2s ease;
+}
+
+.modal-table tr:last-child {
+    border-bottom: none;
+}
+
+.modal-table tr:hover {
+    background-color: #f5f5f5;
+}
+
+.modal-table td {
+    padding: 12px;
+    text-align: left;
+}
+
+.modal-table tr td:first-child {
+    font-weight: bold;
+    color: #2d5016;
+    width: 35%;
+    background-color: #f0f8f0;
+}
+
+/* Badges */
+.modal-badge {
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.modal-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.badge-success {
+    background: #28a745;
+}
+
+.badge-danger {
+    background: #dc3545;
+}
+
+.badge-secondary {
+    background: #6c757d;
+}
+
+/* Descripción */
+.modal-description {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border-left: 4px solid #28a745;
+    transition: all 0.3s ease;
+}
+
+.modal-description:hover {
+    background: #ecf0f1;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.modal-description strong {
+    font-size: 12px;
+    color: #2d5016;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.modal-description p {
+    margin: 0;
+    font-size: 13px;
+    color: #555;
+}
+
+/* Botones */
+.modal-buttons {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #ddd;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.modal-btn {
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.modal-btn-success {
+    background: #28a745;
+}
+
+.modal-btn-success:hover {
+    background: #218838;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.modal-btn-secondary {
+    background: #6c757d;
+}
+
+.modal-btn-secondary:hover {
+    background: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+}
+
+.modal-btn-disabled {
+    background: #6c757d;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.modal-btn i {
+    margin-right: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #productDetailModal > div {
+        width: 95% !important;
+        max-width: 95% !important;
+    }
+
+    #productDetailModal > div > div:first-child {
+        padding: 20px;
+    }
+
+    .modal-title {
+        font-size: 18px;
+    }
+
+    .modal-table td {
+        padding: 10px;
+        font-size: 13px;
+    }
+
+    .modal-btn {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    #productDetailModal > div > div:first-child {
+        padding: 15px;
+    }
+
+    .modal-title {
+        font-size: 16px;
+        margin-bottom: 15px;
+    }
+
+    .modal-table {
+        font-size: 12px;
+    }
+
+    .modal-table td {
+        padding: 8px;
+    }
+
+    .modal-buttons {
+        flex-direction: column;
+    }
+
+    .modal-btn {
+        width: 100%;
+    }
+}
