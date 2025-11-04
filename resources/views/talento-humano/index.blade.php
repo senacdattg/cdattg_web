@@ -326,6 +326,13 @@
         border-color: #007bff;
         box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
     }
+    .form-control.is-invalid {
+        border-color: #dc3545;
+    }
+    .form-control.is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
     .btn {
         border-radius: 0.375rem;
     }
@@ -622,6 +629,12 @@
         // Event listeners para botones de acción
         document.getElementById('btn-crear-persona').addEventListener('click', async function() {
             const form = document.getElementById('personaForm');
+
+            // Validar campos obligatorios antes de enviar
+            if (!validateRequiredFields()) {
+                return;
+            }
+
             const formData = new FormData(form);
 
             // Deshabilitar botón
@@ -637,6 +650,15 @@
                     },
                     body: formData
                 });
+
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error response:', errorText);
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
 
                 const data = await response.json();
 
@@ -661,6 +683,51 @@
                 this.innerHTML = originalText;
             }
         });
+
+        // Función para validar campos obligatorios
+        function validateRequiredFields() {
+            const requiredFields = [
+                { id: 'tipo_documento', name: 'Tipo de Documento' },
+                { id: 'numero_documento', name: 'Número de Documento' },
+                { id: 'primer_nombre', name: 'Primer Nombre' },
+                { id: 'primer_apellido', name: 'Primer Apellido' },
+                { id: 'fecha_nacimiento', name: 'Fecha de Nacimiento' },
+                { id: 'genero', name: 'Género' },
+                { id: 'celular', name: 'Celular' },
+                { id: 'email', name: 'Correo Electrónico' },
+                { id: 'pais_id', name: 'País' },
+                { id: 'departamento_id', name: 'Departamento' },
+                { id: 'municipio_id', name: 'Municipio' },
+                { id: 'direccion', name: 'Dirección' }
+            ];
+
+            let isValid = true;
+            let firstInvalidField = null;
+
+            requiredFields.forEach(field => {
+                const element = document.getElementById(field.id);
+                if (!element || !element.value.trim()) {
+                    element.classList.add('is-invalid');
+                    if (!firstInvalidField) {
+                        firstInvalidField = element;
+                    }
+                    isValid = false;
+                } else {
+                    element.classList.remove('is-invalid');
+                }
+            });
+
+            if (!isValid) {
+                showAlert('warning', 'Por favor complete todos los campos obligatorios marcados con *.');
+                if (firstInvalidField) {
+                    firstInvalidField.focus();
+                    firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+                return false;
+            }
+
+            return true;
+        }
 
         document.getElementById('btn-cancelar').addEventListener('click', function() {
             formContainer.style.display = 'none';
