@@ -14,6 +14,13 @@ class CarritoController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        
+        // Middlewares de permisos de carrito
+        $this->middleware('can:VER CARRITO')->only(['index']);
+        $this->middleware('can:AGREGAR CARRITO')->only(['agregar', 'store']);
+        $this->middleware('can:ACTUALIZAR CARRITO')->only(['actualizar', 'update']);
+        $this->middleware('can:ELIMINAR CARRITO')->only(['eliminar', 'destroy']);
+        $this->middleware('can:VACIAR CARRITO')->only(['vaciar']);
     }
 
     /**

@@ -372,6 +372,53 @@ class RolePermissionSeeder extends Seeder
             'ELIMINAR ASPIRANTE COMPLEMENTARIO',
             'VER TALENTO HUMANO',
             'CREAR TALENTO HUMANO',
+            // Permisos de inventario para ADMINISTRADOR (todos menos APROBAR ORDEN)
+            'CREAR PRODUCTO',
+            'VER PRODUCTO',
+            'EDITAR PRODUCTO',
+            'ELIMINAR PRODUCTO',
+            'VER CATALOGO PRODUCTO',
+            'BUSCAR PRODUCTO',
+            'VER CARRITO',
+            'AGREGAR CARRITO',
+            'ACTUALIZAR CARRITO',
+            'ELIMINAR CARRITO',
+            'VACIAR CARRITO',
+            'CREAR CATEGORIA',
+            'VER CATEGORIA',
+            'EDITAR CATEGORIA',
+            'ELIMINAR CATEGORIA',
+            'CREAR MARCA',
+            'VER MARCA',
+            'EDITAR MARCA',
+            'ELIMINAR MARCA',
+            'CREAR CONTRATO',
+            'VER CONTRATO',
+            'EDITAR CONTRATO',
+            'ELIMINAR CONTRATO',
+            'CREAR PROVEEDOR',
+            'VER PROVEEDOR',
+            'EDITAR PROVEEDOR',
+            'ELIMINAR PROVEEDOR',
+            'VER ORDEN',
+            'CREAR ORDEN',
+            'EDITAR ORDEN',
+            'ELIMINAR ORDEN',
+            // NO incluir APROBAR ORDEN para que solo el SUPER ADMIN pueda aprobar
+            'COMPLETAR ORDEN',
+            'VER PRESTAMO',
+            'CREAR PRESTAMO',
+            'EDITAR PRESTAMO',
+            'DEVOLVER PRESTAMO',
+            'APROBAR PRESTAMO',
+            'VER ENTRADA',
+            'CREAR ENTRADA',
+            'VER SALIDA',
+            'CREAR SALIDA',
+            'VER DEVOLUCION',
+            'CREAR DEVOLUCION',
+            'PROCESAR DEVOLUCION',
+            'VER DASHBOARD INVENTARIO',
         ]);
 
         // Asignar permisos al rol INSTRUCTOR
@@ -399,8 +446,7 @@ class RolePermissionSeeder extends Seeder
             'CAMBIAR ESTADO RAP',
             // Permisos para competencias
             'VER COMPETENCIA',
-            // Permisos de inventario para INSTRUCTOR (limitados)
-            'VER PRODUCTO',
+            // Permisos de inventario para INSTRUCTOR (solo catálogo y carrito, NO lista de productos ni configuraciones)
             'VER CATALOGO PRODUCTO',
             'BUSCAR PRODUCTO',
             'VER CARRITO',
@@ -408,17 +454,8 @@ class RolePermissionSeeder extends Seeder
             'ACTUALIZAR CARRITO',
             'ELIMINAR CARRITO',
             'VACIAR CARRITO',
-            'VER CATEGORIA',
-            'VER MARCA',
-            'VER ORDEN',
             'CREAR ORDEN',
-            'VER PRESTAMO',
-            'CREAR PRESTAMO',
             'DEVOLVER PRESTAMO',
-            'VER SALIDA',
-            'CREAR SALIDA',
-            'VER DEVOLUCION',
-            'CREAR DEVOLUCION',
             'VER NOTIFICACION',
         ]);
 
@@ -430,6 +467,21 @@ class RolePermissionSeeder extends Seeder
         // Asignar permisos al rol VISITANTE
         $visitante->givePermissionTo([
             'VER PERSONA',
+        ]);
+        // Asignar permisos al rol APRENDIZ
+        // Los aprendices tienen acceso limitado solo a consultar su propia información
+        $aprendiz->syncPermissions([
+            // Permisos de inventario para APRENDIZ (solo catálogo y carrito, NO lista de productos ni configuraciones)
+            'VER CATALOGO PRODUCTO',
+            'BUSCAR PRODUCTO',
+            'VER CARRITO',
+            'AGREGAR CARRITO',
+            'ACTUALIZAR CARRITO',
+            'ELIMINAR CARRITO',
+            'VACIAR CARRITO',
+            'CREAR ORDEN',
+            'DEVOLVER PRESTAMO',
+            'VER NOTIFICACION',
         ]);
     }
 }

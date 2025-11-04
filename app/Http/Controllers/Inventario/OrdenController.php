@@ -20,9 +20,12 @@ class OrdenController extends InventarioController
     public function __construct()
     {
         parent::__construct();
-        $this->middleware('can:VER ORDEN')->only(['index', 'show', 'prestamosSalidas', 'storePrestamos']);
-        $this->middleware('can:CREAR ORDEN')->only(['store']);
-        $this->middleware('can:EDITAR ORDEN')->only('update');
+        $this->middleware('can:VER ORDEN')->only(['index', 'show', 'prestamosSalidas']);
+        $this->middleware('can:CREAR ORDEN')->only(['store', 'storePrestamos']);
+        $this->middleware('can:EDITAR ORDEN')->only(['update']);
+        $this->middleware('can:ELIMINAR ORDEN')->only(['destroy']);
+        $this->middleware('can:APROBAR ORDEN')->only(['aprobar']);
+        $this->middleware('can:COMPLETAR ORDEN')->only(['completar']);
     }
 
     /**

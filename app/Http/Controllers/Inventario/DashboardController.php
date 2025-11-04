@@ -13,6 +13,7 @@ class DashboardController extends Controller
     public function __construct()
     {
         $this->middleware('auth');
+        $this->middleware('can:VER DASHBOARD INVENTARIO')->only(['index']);
     }
 
     public function index()

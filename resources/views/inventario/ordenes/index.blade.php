@@ -20,14 +20,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    <div class="mb-3">
-                        <a href="{{ route('inventario.prestamos-salidas') }}"
-                           class="btn btn-success">
-                            <i class="fas fa-plus-circle"></i> Nueva Solicitud
-                        </a>
-                    </div>
-
-                    {{-- Script para limpiar carrito si viene de una orden exitosa --}}
+                   {{-- Script para limpiar carrito si viene de una orden exitosa --}}
                     @if(session('clear_cart'))
                         <script>
                             // Limpiar carrito del localStorage después de crear orden exitosamente

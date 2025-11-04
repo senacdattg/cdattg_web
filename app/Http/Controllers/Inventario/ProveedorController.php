@@ -15,7 +15,7 @@ class ProveedorController extends InventarioController
         $this->middleware('can:VER PROVEEDOR')->only('index', 'show');
         $this->middleware('can:CREAR PROVEEDOR')->only('create', 'store');
         $this->middleware('can:EDITAR PROVEEDOR')->only('edit', 'update');
-        $this->middleware('can:ELIMINAR PRODUCTO')->only('destroy');
+        $this->middleware('can:ELIMINAR PROVEEDOR')->only('destroy');
     }
 
     public function index()
