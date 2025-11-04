@@ -310,6 +310,15 @@ class AprobacionController extends InventarioController
                 $detalle->producto->save();
             }
 
+            // Enviar notificación al solicitante de la orden
+            $solicitante = $orden->userCreate;
+            if ($solicitante) {
+                // Enviar una notificación por cada detalle aprobado
+                foreach ($detallesPendientes as $detalle) {
+                    $solicitante->notify(new OrdenAprobadaNotification($detalle, Auth::user()));
+                }
+            }
+
             DB::commit();
 
             return redirect()->back()
@@ -328,7 +337,7 @@ class AprobacionController extends InventarioController
     public function rechazarOrden(Request $request, $ordenId)
     {
         $validated = $request->validate([
-            'motivo_rechazo' => 'required|string|max=1000'
+            'motivo_rechazo' => 'required|string|max:1000'
         ]);
 
         try {
@@ -394,6 +403,19 @@ class AprobacionController extends InventarioController
             $orden->descripcion_orden .= "Fecha: " . now()->format('d/m/Y H:i') . "\n";
             $orden->user_update_id = Auth::id();
             $orden->save();
+
+            // Enviar notificación al solicitante de la orden
+            $solicitante = $orden->userCreate;
+            if ($solicitante) {
+                // Enviar una notificación por cada detalle rechazado
+                foreach ($detallesPendientes as $detalle) {
+                    $solicitante->notify(new OrdenRechazadaNotification(
+                        $detalle, 
+                        Auth::user(), 
+                        $validated['motivo_rechazo']
+                    ));
+                }
+            }
 
             DB::commit();
 
