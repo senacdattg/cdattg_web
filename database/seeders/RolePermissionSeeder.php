@@ -16,6 +16,7 @@ class RolePermissionSeeder extends Seeder
         $instructor         = Role::firstOrCreate(['name' => 'INSTRUCTOR']);
         $visitante          = Role::firstOrCreate(['name' => 'VISITANTE']);
         $aprendiz           = Role::firstOrCreate(['name' => 'APRENDIZ']);
+        $aspirante          = Role::firstOrCreate(['name' => 'ASPIRANTE']);
 
         // Definir  un arreglo de permisos para cada grupo
         $permisos = [   
@@ -70,18 +71,11 @@ class RolePermissionSeeder extends Seeder
             'VER INSTRUCTOR',
             'EDITAR INSTRUCTOR',
             'ELIMINAR INSTRUCTOR',
-            'GESTIONAR ESPECIALIDADES INSTRUCTOR',
-            'VER FICHAS ASIGNADAS',
-            'CAMBIAR ESTADO INSTRUCTOR',
             // Permisos para fichas de caracterización
-            'CREAR FICHA CARACTERIZACION',
-            'EDITAR FICHA CARACTERIZACION',
-            'VER FICHA CARACTERIZACION',
-            'ELIMINAR FICHA CARACTERIZACION',
-            'GESTIONAR INSTRUCTORES FICHA',
-            'GESTIONAR DIAS FICHA',
-            'GESTIONAR APRENDICES FICHA',
-            'CAMBIAR ESTADO FICHA',
+            'CREAR FICHA DE CARACTERIZACION',
+            'EDITAR FICHA DE CARACTERIZACION',
+            'VER FICHA DE CARACTERIZACION',
+            'ELIMINAR FICHA DE CARACTERIZACION',
             // Permisos para roles y permisos
             'ASIGNAR PERMISOS',
             // Permisos para asistencia
@@ -189,6 +183,15 @@ class RolePermissionSeeder extends Seeder
             'ELIMINAR COMPETENCIA',
             'GESTIONAR RESULTADOS COMPETENCIA',
             'CAMBIAR ESTADO COMPETENCIA',
+            // Permisos para aspirantes complementarios
+            'VER ESTADISTICAS',
+            // Permisos para programas complementarios
+            'VER PROGRAMA COMPLEMENTARIO',
+            'CREAR PROGRAMA COMPLEMENTARIO',
+            'ELIMINAR ASPIRANTE COMPLEMENTARIO',
+            // Permisos para talento humano
+            'VER TALENTO HUMANO',
+            'CREAR TALENTO HUMANO',
         ];
 
         // Crear cada permiso si no existe
@@ -235,28 +238,11 @@ class RolePermissionSeeder extends Seeder
             'VER AMBIENTE',
             'EDITAR AMBIENTE',
             'ELIMINAR AMBIENTE',
-            // Permisos para instructores
-            'CREAR INSTRUCTOR',
-            'VER INSTRUCTOR',
-            'EDITAR INSTRUCTOR',
-            'ELIMINAR INSTRUCTOR',
-            'GESTIONAR ESPECIALIDADES INSTRUCTOR',
-            'VER FICHAS ASIGNADAS',
-            'CAMBIAR ESTADO INSTRUCTOR',
             'ASIGNAR PERMISOS',
             'VER PROGRAMA DE CARACTERIZACION',
             'CREAR PROGRAMA DE CARACTERIZACION',
             'EDITAR PROGRAMA DE CARACTERIZACION',
             'ELIMINAR PROGRAMA DE CARACTERIZACION',
-            // Permisos para fichas de caracterización
-            'CREAR FICHA CARACTERIZACION',
-            'EDITAR FICHA CARACTERIZACION',
-            'VER FICHA CARACTERIZACION',
-            'ELIMINAR FICHA CARACTERIZACION',
-            'GESTIONAR INSTRUCTORES FICHA',
-            'GESTIONAR DIAS FICHA',
-            'GESTIONAR APRENDICES FICHA',
-            'CAMBIAR ESTADO FICHA',
             'CREAR PERSONA',
             'VER PERSONA',
             'EDITAR PERSONA',
@@ -339,28 +325,24 @@ class RolePermissionSeeder extends Seeder
             'ELIMINAR COMPETENCIA',
             'GESTIONAR RESULTADOS COMPETENCIA',
             'CAMBIAR ESTADO COMPETENCIA',
+            'VER ESTADISTICAS',
+            'VER PROGRAMA COMPLEMENTARIO',
+            'CREAR PROGRAMA COMPLEMENTARIO',
+            'ELIMINAR ASPIRANTE COMPLEMENTARIO',
+            'VER TALENTO HUMANO',
+            'CREAR TALENTO HUMANO',
         ]);
 
         // Asignar permisos al rol ADMINISTRADOR
         $administrador->givePermissionTo([
-            // Permisos para fichas de caracterización
-            'CREAR FICHA CARACTERIZACION',
-            'EDITAR FICHA CARACTERIZACION',
-            'VER FICHA CARACTERIZACION',
-            'ELIMINAR FICHA CARACTERIZACION',
-            'GESTIONAR INSTRUCTORES FICHA',
-            'GESTIONAR DIAS FICHA',
-            'GESTIONAR APRENDICES FICHA',
-            'CAMBIAR ESTADO FICHA',
-            // Permisos para instructores
+            'CREAR FICHA DE CARACTERIZACION',
+            'EDITAR FICHA DE CARACTERIZACION',
+            'VER FICHA DE CARACTERIZACION',
+            'ELIMINAR FICHA DE CARACTERIZACION',
             'CREAR INSTRUCTOR',
             'VER INSTRUCTOR',
             'EDITAR INSTRUCTOR',
             'ELIMINAR INSTRUCTOR',
-            'GESTIONAR ESPECIALIDADES INSTRUCTOR',
-            'VER FICHAS ASIGNADAS',
-            'CAMBIAR ESTADO INSTRUCTOR',
-            // Permisos para personas
             'CREAR PERSONA',
             'VER PERSONA',
             'EDITAR PERSONA',
@@ -380,6 +362,12 @@ class RolePermissionSeeder extends Seeder
             'programa.show',
             'programa.search',
             'VER NOTIFICACION',
+            'VER ESTADISTICAS',
+            'VER PROGRAMA COMPLEMENTARIO',
+            'CREAR PROGRAMA COMPLEMENTARIO',
+            'ELIMINAR ASPIRANTE COMPLEMENTARIO',
+            'VER TALENTO HUMANO',
+            'CREAR TALENTO HUMANO',
         ]);
 
         // Asignar permisos al rol INSTRUCTOR
@@ -430,11 +418,14 @@ class RolePermissionSeeder extends Seeder
             'VER NOTIFICACION',
         ]);
 
-        // Asignar permisos al rol APRENDIZ
-        // Los aprendices tienen acceso limitado solo a consultar su propia información
-        $aprendiz->givePermissionTo([
-            // Por ahora, el rol aprendiz no tiene permisos específicos
-            // Se controla el acceso mediante políticas y middleware
+        // Asignar permisos al rol ASPIRANTE
+        $aspirante->givePermissionTo([
+            'VER PERSONA',
+        ]);
+
+        // Asignar permisos al rol VISITANTE
+        $visitante->givePermissionTo([
+            'VER PERSONA',
         ]);
     }
 }

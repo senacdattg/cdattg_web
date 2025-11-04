@@ -86,6 +86,14 @@ class DatabaseSeeder extends Seeder
             ProductoSeeder::class, // Crear productos para agregar al módulo de inventario
             DetalleOrdenSeeder::class, // Crear detalles de ordenes
             AprobacionSeeder::class, // Crear aprobaciones de ordenes
+            // Complementarios ofertados
+            ComplementariosOfertadosSeeder::class,
+
+            // Aspirantes complementarios
+            AspirantesComplementariosSeeder::class,
+
+            // Categorias de caracterizacion para complementarios
+            CategoriaCaracterizacionComplementariosSeeder::class,
         ]);
     }
 }

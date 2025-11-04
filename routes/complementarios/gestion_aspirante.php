@@ -1,0 +1,24 @@
+<?php
+
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ComplementarioController;
+
+Route::get('/gestion-aspirantes', [ComplementarioController::class, 'gestionAspirantes'])
+    ->name('gestion-aspirantes')
+    ->middleware('auth');
+
+Route::get('/programas-complementarios/{curso}', [ComplementarioController::class, 'verAspirantes'])
+    ->name('programas-complementarios.ver-aspirantes')
+    ->middleware('auth');
+
+Route::post('/programas-complementarios/{complementarioId}/agregar-aspirante', [ComplementarioController::class, 'agregarAspirante'])
+    ->name('programas-complementarios.agregar-aspirante')
+    ->middleware('auth');
+
+Route::delete('/programas-complementarios/{complementarioId}/aspirante/{aspiranteId}', [ComplementarioController::class, 'eliminarAspirante'])
+    ->name('programas-complementarios.eliminar-aspirante')
+    ->middleware('auth');
+
+Route::get('/programas-complementarios/{complementarioId}/exportar-excel', [ComplementarioController::class, 'exportarAspirantesExcel'])
+    ->name('programas-complementarios.exportar-excel')
+    ->middleware('auth');

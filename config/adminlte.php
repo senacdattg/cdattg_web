@@ -341,8 +341,9 @@ return [
             'submenu' => [
                 [
                     'text' => 'Mi Perfil',
-                    'url' => 'perfil',
+                    'url' => '/mi-perfil',
                     'icon' => 'fas fa-user-circle text-info',
+                    'can' => 'VER MI PERFIL',
                 ],
                 [
                     'text' => 'Cambiar Contraseña',
@@ -390,7 +391,7 @@ return [
         // MÓDULO: CONFIGURACIÓN DEL SISTEMA
         // ========================================
         [
-            'header' => 'CONFIGURACIÓN',
+            
         ],
         [
             'text' => 'Sistema',
@@ -428,7 +429,7 @@ return [
         // MÓDULO: INFRAESTRUCTURA
         // ========================================
         [
-            'header' => 'INFRAESTRUCTURA',
+            
         ],
         [
             'text' => 'Regionales',
@@ -523,7 +524,7 @@ return [
         // MÓDULO: GESTIÓN ACADÉMICA
         // ========================================
         [
-            'header' => 'GESTIÓN ACADÉMICA',
+            
         ],
         [
             'text' => 'Programas de Formación',
@@ -612,7 +613,7 @@ return [
         // MÓDULO: FICHAS Y CARACTERIZACIÓN
         // ========================================
         [
-            'header' => 'FICHAS Y CARACTERIZACIÓN',
+            
         ],
         [
             'text' => 'Fichas de Caracterización',
@@ -657,7 +658,7 @@ return [
         // MÓDULO: PERSONAL
         // ========================================
         [
-            'header' => 'PERSONAL',
+            
         ],
         [
             'text' => 'Instructores',
@@ -708,7 +709,7 @@ return [
         // MÓDULO: ASISTENCIA
         // ========================================
         [
-            'header' => 'ASISTENCIA',
+            
         ],
         [
             'text' => 'Tomar Asistencia',
@@ -740,7 +741,7 @@ return [
         // MÓDULO: CARNETS
         // ========================================
         [
-            'header' => 'CARNETS',
+            
         ],
         [
             'text' => 'Gestión de Carnets',
@@ -765,21 +766,34 @@ return [
         [
             'text' => 'Complementarios',
             'icon' => 'fa-solid fa-folder-open',
+
+            'can' => 'VER PROGRAMA DE CARACTERIZACION',
             'submenu' => [
                 [
-                    'text' => 'Gestion complementarios',
-                    'url' => 'programa',
-                    'icon' => 'fas fa-tasks',
-                    'can' => [
-                        'VER PROGRAMA DE CARACTERIZACION',
-                        'CREAR PROGRAMA DE CARACTERIZACION',
-                        'EDITAR PROGRAMA DE CARACTERIZACION',
-                        'ELIMINAR PROGRAMA DE CARACTERIZACION',
+                    'text' => 'Gestión complementarios',
+                    'icon' => 'fas fa-graduation-cap',
+                    'classes' => 'text-sm',
+                    'submenu' => [
+                        [
+                            'text' => 'Ver complementarios',
+                            'url' => 'gestion-programas-complementarios',
+                            'icon' => 'fas fa-list',
+                            'can' => 'VER PROGRAMA COMPLEMENTARIO',
+                            'classes' => 'text-sm',
+                        ],
+                        [
+                            'text' => 'Crear complementario',
+                            'url' => 'complementarios-ofertados/create',
+                            'icon' => 'fas fa-plus',
+                            'can' => 'CREAR PROGRAMA COMPLEMENTARIO',
+                            'classes' => 'text-sm',
+                        ],
                     ],
                 ],
                 [
                     'text' => 'Gestion de aspirantes',
-                    'url' => 'programa',
+
+                    'url' => 'gestion-aspirantes',
                     'icon' => 'fas fa-users',
                     'can' => [
                         'VER PROGRAMA DE CARACTERIZACION',
@@ -790,18 +804,14 @@ return [
                 ],
                 [
                     'text' => 'Estadisticas',
-                    'url' => 'fichaCaracterizacion',
+
+                    'url' => 'estadisticas',
                     'icon' => 'fas fa-chart-line',
-                    'can' => [
-                        'VER PROGRAMA DE CARACTERIZACION',
-                        'CREAR PROGRAMA DE CARACTERIZACION',
-                        'EDITAR PROGRAMA DE CARACTERIZACION',
-                        'ELIMINAR PROGRAMA DE CARACTERIZACION',
-                    ],
+                    'can' => 'VER ESTADISTICAS',
                 ],
                 [
                     'text' => 'Procesar documentos',
-                    'url' => 'programa',
+                    'url' => 'procesar-documentos',
                     'icon' => 'fas fa-file-signature',
                     'can' => [
                         'VER PROGRAMA DE CARACTERIZACION',
@@ -939,6 +949,32 @@ return [
             ],
         ],
 
+
+        // ========================================
+        // MÓDULO: TALENTO HUMANO
+        // ========================================
+        [
+            'header' => 'TALENTO HUMANO',
+        ],
+        [
+            'text' => 'Talento Humano',
+            'icon' => 'fas fa-fw fa-users',
+            'can' => 'VER TALENTO HUMANO',
+            'submenu' => [
+                [
+                    'text' => 'Ver Talento Humano',
+                    'url' => 'talento-humano',
+                    'icon' => 'fas fa-fw fa-list',
+                    'can' => 'VER TALENTO HUMANO',
+                ],
+                [
+                    'text' => 'Crear Talento Humano',
+                    'url' => 'talento-humano/create',
+                    'icon' => 'fas fa-fw fa-plus',
+                    'can' => 'CREAR TALENTO HUMANO',
+                ],
+            ],
+        ],
     ],
 
     /*

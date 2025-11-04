@@ -8,6 +8,24 @@ window.personasData = [
         "email": "SUPERADMIN@SUPERADMIN.COM"
     },
     {
+        "id": 2,
+        "nombre": "ADMIN  PRUEBA",
+        "documento": "654321123",
+        "email": "ADMIN@ADMIN.COM"
+    },
+    {
+        "id": 3,
+        "nombre": "INSTRUCTOR  PRUEBA",
+        "documento": "123456789",
+        "email": "INSTRUCTOR@INSTRUCTOR.COM"
+    },
+    {
+        "id": 4,
+        "nombre": "JOHN EDUARD VELEZ VASCA",
+        "documento": "1007397197",
+        "email": "EDUARDVELEZ066@GMAIL.COM"
+    },
+    {
         "id": 5,
         "nombre": "SAMUEL RENE YEPES RIVERA",
         "documento": "1029142202",
@@ -170,9 +188,10 @@ window.personasData = [
         "email": "MARIOALEXANDERCANOLA@GMAIL.COM"
     },
     {
-        "id": 38,
-        "nombre": "LAURA PATRICIA GóMEZ TORRES",
-        "documento": "44556677",
-        "email": "LAURA.GOMEZ@SENA.EDU.CO"
+
+        "id": 40,
+        "nombre": "ZSFZS  XCZXC",
+        "documento": "1120588339",
+        "email": "W@W.COM"
     }
 ];

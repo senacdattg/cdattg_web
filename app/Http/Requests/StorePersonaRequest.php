@@ -22,7 +22,7 @@ class StorePersonaRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'tipo_documento'      => 'required',
+            'tipo_documento'      => 'required|exists:parametros_temas,id',
             'numero_documento'    => 'required|unique:personas,numero_documento',
             'primer_nombre'       => 'required|string',
             'segundo_nombre'      => 'nullable|string',
@@ -49,6 +49,7 @@ class StorePersonaRequest extends FormRequest
     {
         return [
             'tipo_documento.required'      => 'El tipo de documento es obligatorio.',
+            'tipo_documento.exists'        => 'El tipo de documento seleccionado no es válido.',
             'numero_documento.required'    => 'El número de documento es obligatorio.',
             'numero_documento.unique'      => 'El número de documento ya está registrado.',
             'primer_nombre.required'       => 'El primer nombre es obligatorio.',

@@ -1,0 +1,165 @@
+/* Estilos específicos para la página de programas públicos */
+
+/* Layout principal - Ancho completo */
+.container-fluid {
+    max-width: 100% !important;
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.col-12 {
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Body y html para ancho completo */
+.layout-fullwidth {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.content-wrapper {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+}
+
+.content {
+    width: 100% !important;
+    padding: 0 !important;
+}
+
+/* Header responsivo */
+@media (max-width: 768px) {
+    .navbar-brand {
+        font-size: 14px !important;
+    }
+    .navbar-brand img {
+        height: 30px !important;
+    }
+    .user-avatar-circle {
+        width: 30px !important;
+        height: 30px !important;
+        font-size: 12px !important;
+    }
+}
+
+/* Cards de programas */
+.card .card-body .card-title {
+    display: block !important;
+    margin-bottom: 0.5rem !important;
+    text-align: center !important;
+    width: 100% !important;
+    font-size: 1.1rem !important;
+}
+
+.card .card-body .badge {
+    display: block !important;
+    margin: 0.5rem auto !important;
+    width: fit-content !important;
+    text-align: center !important;
+}
+
+.card .card-body .card-title + .badge {
+    margin-top: 0.5rem !important;
+}
+
+/* Grid responsivo para las tarjetas */
+@media (max-width: 576px) {
+    .col-12.col-md-6.col-lg-4 {
+        margin-bottom: 1rem;
+    }
+
+    .card-body {
+        padding: 1rem 0.5rem;
+    }
+
+    .card-body .mb-3 {
+        margin-bottom: 1rem !important;
+    }
+
+    .card-title {
+        font-size: 1rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    .card-text {
+        font-size: 0.9rem !important;
+    }
+
+    .btn {
+        font-size: 0.9rem !important;
+        padding: 0.5rem 1rem !important;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+    .col-12.col-md-6.col-lg-4 {
+        margin-bottom: 1.5rem;
+    }
+
+    .card-body {
+        padding: 1.5rem 1rem;
+    }
+}
+
+@media (min-width: 769px) and (max-width: 992px) {
+    .col-12.col-md-6.col-lg-4 {
+        margin-bottom: 2rem;
+    }
+}
+
+/* Espaciado general */
+.row.justify-content-center {
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.card.card-success {
+    margin-bottom: 2rem;
+}
+
+/* Header de la card principal */
+.card-header {
+    padding: 1rem 1.5rem;
+}
+
+.card-header h3.card-title {
+    font-size: 1.25rem;
+    margin-bottom: 0;
+}
+
+/* Footer de las tarjetas pequeñas */
+.card-footer {
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+}
+
+/* Iconos */
+.fa-3x {
+    font-size: 2.5rem !important;
+}
+
+/* Botones */
+.btn-success {
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+/* Texto */
+.text-success {
+    color: #28a745 !important;
+}
+
+.text-muted {
+    color: #6c757d !important;
+}
