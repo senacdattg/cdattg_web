@@ -380,6 +380,12 @@ return [
             'url' => 'home',
             'icon' => 'fas fa-fw fa-tachometer-alt',
         ],
+        [
+            'text' => 'Notificaciones',
+            'url'  => 'inventario/notificaciones',
+            'icon' => 'fa-solid fa-bell',
+            'can'  => 'VER NOTIFICACION',
+        ],
         // ========================================
         // MÓDULO: CONFIGURACIÓN DEL SISTEMA
         // ========================================
@@ -816,12 +822,6 @@ return [
                     'url'  => 'inventario/dashboard',
                     'icon' => 'fa-solid fa-chart-bar',
                     'can'  => 'VER PRODUCTO',
-                ],
-                [
-                    'text' => 'Notificaciones',
-                    'url'  => 'inventario/notificaciones',
-                    'icon' => 'fa-solid fa-bell',
-                    'can'  => 'VER NOTIFICACION',
                 ],
                 [
                     'text' => 'Productos',

@@ -35,7 +35,7 @@ class ProductoController extends InventarioController
             'contratoConvenio',
             'ambiente',
             'proveedor'
-        ])->paginate(10);
+        ])->paginate(7);
 
         // Cargar marca y categoria directamente para cada producto
         $productos->each(function($producto) {
