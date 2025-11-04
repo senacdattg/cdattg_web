@@ -46,7 +46,8 @@ Route::middleware('auth')->group(function () {
         'tema_parametro',
         'ubicacion',
         'actividades',
-        'complementarios'
+        'complementarios',
+        'talento-humano'
     ];
 
     // Incluir rutas de guías de aprendizaje
