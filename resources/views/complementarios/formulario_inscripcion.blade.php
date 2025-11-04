@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Configurar carga dinámica de municipios
     setupMunicipioLoading();
+
+    // Configurar manejo de caracterización
+    setupCaracterizacionHandling();
 });
 
 function setupUppercaseConversion() {
@@ -85,6 +88,58 @@ function loadMunicipiosForDepartamento(departamentoId) {
             });
     } else {
         municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
+    }
+}
+
+function setupCaracterizacionHandling() {
+    const caracterizacionRadios = document.querySelectorAll('input[name="caracterizacion_id"]');
+    let ningunaRadio = null;
+    
+    // Buscar el radio button de "NINGUNA"
+    caracterizacionRadios.forEach(radio => {
+        const label = document.querySelector(`label[for="${radio.id}"]`);
+        if (label && label.textContent.trim().toUpperCase() === 'NINGUNA') {
+            ningunaRadio = radio;
+        }
+    });
+
+    // Si no se encuentra "NINGUNA", salir
+    if (!ningunaRadio) return;
+
+    // Establecer "NINGUNA" como seleccionada por defecto
+    ningunaRadio.checked = true;
+
+    // Agregar event listeners a todos los radio buttons
+    caracterizacionRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this !== ningunaRadio && this.checked) {
+                // Si se selecciona cualquier opción que no sea "NINGUNA", deseleccionar "NINGUNA"
+                ningunaRadio.checked = false;
+            } else if (this === ningunaRadio && this.checked) {
+                // Si se selecciona "NINGUNA", deseleccionar todas las demás opciones
+                caracterizacionRadios.forEach(otherRadio => {
+                    if (otherRadio !== ningunaRadio) {
+                        otherRadio.checked = false;
+                    }
+                });
+            }
+        });
+    });
+
+    // Manejar el evento de reset del formulario
+    const form = document.getElementById('formInscripcion');
+    if (form) {
+        form.addEventListener('reset', function() {
+            // Después del reset, volver a seleccionar "NINGUNA"
+            setTimeout(() => {
+                ningunaRadio.checked = true;
+                caracterizacionRadios.forEach(radio => {
+                    if (radio !== ningunaRadio) {
+                        radio.checked = false;
+                    }
+                });
+            }, 0);
+        });
     }
 }
 
@@ -345,4 +400,3 @@ document.addEventListener('DOMContentLoaded', function() {
 @include('layout.footer')
 @include('components.modal-terminos')
 @endsection
-
