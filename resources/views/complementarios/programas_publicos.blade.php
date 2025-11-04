@@ -7,7 +7,8 @@
         .hero-banner {
             position: relative;
             overflow: hidden;
-            background: linear-gradient(120deg, #007bff 0%, #0056b3 100%);
+            background: linear-gradient(180deg, #ffffff 0%, #ebf1f4 100%);
+            border: 1px solid #dee2e6;
         }
         .hero-banner::after,
         .hero-banner::before {
@@ -41,9 +42,9 @@
             text-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
         }
         .hero-badge {
-            background: rgba(255,255,255,0.18);
-            border: 1px solid rgba(255,255,255,0.35);
-            color: #fff;
+            background: #ffffff;
+            border: 1px solid #007bff;
+            color: #007bff;
         }
         @media (max-width: 767.98px) {
             .hero-figure {
@@ -74,7 +75,7 @@
                     <div class="col-12 col-md-5 text-center mb-4 mb-md-0">
                         <img src="{{ asset('img/flor_guaviare.png') }}" class="img-fluid hero-figure" alt="Imagen representativa SENA">
                     </div>
-                    <div class="col-12 col-md-7 text-white">
+                    <div class="col-12 col-md-7 text-dark">
                         <span class="badge hero-badge mb-2">Formación Complementaria</span>
                         <h1 class="display-4 font-weight-bold mb-2">Programas Complementarios</h1>
                         <p class="lead mb-0">Descubre nuestros programas de formación complementaria disponibles</p>
@@ -87,8 +88,8 @@
         <div class="row justify-content-center">
             <div class="col-lg-10 col-xl-10">
 
-                <div class="card programs-card border-0 shadow-sm" style="background-color: #ffffff; border-color: #343a40;">
-                    <div class="card-header d-flex align-items-center justify-content-between" style="background-color: #007bff; color: #ffffff;">
+                <div class="card programs-card border-0 shadow-sm" style="background-color: #ffffff; border-color: #dee2e6;">
+                    <div class="card-header d-flex align-items-center justify-content-between" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
                         <h3 class="card-title mb-0">
                             <i class="fas fa-graduation-cap mr-2"></i>Programas Complementarios
                         </h3>
@@ -108,5 +109,5 @@
         </div>
     </div>
 
-    @include('layout.footer')
+    @include('complementarios.layout.footer-complementarios')
 @endsection

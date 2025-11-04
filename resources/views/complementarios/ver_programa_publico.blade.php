@@ -10,7 +10,7 @@
         <div class="row justify-content-center">
             <div class="col-12">
                 <div class="text-center mb-4">
-                    <h2 class="text-primary" style="color: #007bff !important;">Información del Programa</h2>
+                    <h2 class="text-dark">Información del Programa</h2>
                     <p class="text-muted">Detalles del programa seleccionado</p>
                 </div>
                 <div class="d-flex justify-content-center">
@@ -26,11 +26,11 @@
     <div class="modal fade" id="inscripcionModal" tabindex="-1" role="dialog" aria-labelledby="inscripcionModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <div class="modal-header" style="background-color: #007bff; color: #ffffff;">
+                <div class="modal-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
                     <h5 class="modal-title" id="inscripcionModalLabel">
                         <i class="fas fa-user-plus mr-2"></i>Inscripción al Programa
                     </h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -38,14 +38,14 @@
                     <h6 class="mb-4">¿Ya tienes una cuenta en el sistema?</h6>
                     <div class="row">
                         <div class="col-6">
-                            <button type="button" class="btn btn-primary btn-block" onclick="redirectToLogin()" style="background-color: #007bff; border-color: #007bff;">
+                            <button type="button" class="btn btn-primary btn-block" onclick="redirectToLogin()">
                                 <i class="fas fa-sign-in-alt fa-2x mb-2"></i><br>
                                 <strong>Iniciar Sesión</strong><br>
                                 <small>Ya tengo cuenta</small>
                             </button>
                         </div>
                         <div class="col-6">
-                            <button type="button" class="btn btn-primary btn-block" onclick="redirectToRegistro()" style="background-color: #007bff; border-color: #007bff;">
+                            <button type="button" class="btn btn-primary btn-block" onclick="redirectToRegistro()">
                                 <i class="fas fa-user-plus fa-2x mb-2"></i><br>
                                 <strong>Registrarme</strong><br>
                                 <small>Soy nuevo</small>
@@ -63,7 +63,7 @@
         </div>
     </div>
 
-@include('layout.footer')
+@include('complementarios.layout.footer-complementarios')
 @endsection
 
 <script>
