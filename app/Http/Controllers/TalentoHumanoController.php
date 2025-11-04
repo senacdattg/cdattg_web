@@ -37,11 +37,12 @@ class TalentoHumanoController extends Controller
             return $this->crearPersona($request);
         }
 
+        // Para consultas, el campo se llama 'cedula' desde el formulario inicial
         $request->validate([
             'cedula' => 'required|string|max:20'
         ]);
 
-        $cedula = trim($request->cedula);
+        $cedula = trim($request->input('cedula', $request->input('numero_documento', '')));
 
         // Buscar persona por número de documento
         $persona = Persona::with([
@@ -93,12 +94,6 @@ class TalentoHumanoController extends Controller
     public function crearPersona(Request $request)
     {
         try {
-            // Log para debugging
-            \Log::info('Creando persona - Request data:', $request->all());
-
-            // Cambiar el action_type para identificar que es creación
-            $request->merge(['action_type' => 'crear']);
-
             // Validar los datos del formulario
             $request->validate([
                 'tipo_documento' => 'required|integer',
@@ -129,7 +124,7 @@ class TalentoHumanoController extends Controller
                 return response()->json([
                     'success' => false,
                     'message' => 'Ya existe una persona registrada con este número de documento o correo electrónico.'
-                ]);
+                ])->header('Content-Type', 'application/json');
             }
 
             // Crear nueva persona
@@ -167,14 +162,14 @@ class TalentoHumanoController extends Controller
                     'direccion' => $persona->direccion,
                     'caracterizacion_id' => $persona->caracterizacion_id,
                 ]
-            ]);
+            ])->header('Content-Type', 'application/json');
 
         } catch (\Illuminate\Validation\ValidationException $e) {
             \Log::error('Validation error:', $e->errors());
             return response()->json([
                 'success' => false,
                 'message' => 'Error de validación: ' . implode(', ', array_flatten($e->errors()))
-            ], 422);
+            ], 422)->header('Content-Type', 'application/json');
         } catch (\Exception $e) {
             \Log::error('Error creando persona:', [
                 'message' => $e->getMessage(),
@@ -185,7 +180,7 @@ class TalentoHumanoController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error interno del servidor: ' . $e->getMessage()
-            ], 500);
+            ], 500)->header('Content-Type', 'application/json');
         }
     }
 

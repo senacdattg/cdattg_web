@@ -360,16 +360,20 @@
             btnConsultar.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Consultando...';
 
             try {
+                console.log('Sending cedula:', cedula);
+
+                const formData = new FormData();
+                formData.append('cedula', cedula);
+
                 const response = await fetch('/talento-humano/consultar', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                        'Accept': 'application/json'
                     },
-                    body: JSON.stringify({
-                        cedula: cedula
-                    })
+                    body: formData
                 });
+
 
                 const data = await response.json();
 
@@ -635,6 +639,9 @@
                 return;
             }
 
+            // Cambiar action_type a 'crear' antes de enviar
+            document.getElementById('action_type').value = 'crear';
+
             const formData = new FormData(form);
 
             // Deshabilitar botón
@@ -646,7 +653,8 @@
                 const response = await fetch('/talento-humano/consultar', {
                     method: 'POST',
                     headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content'),
+                        'Accept': 'application/json'
                     },
                     body: formData
                 });
