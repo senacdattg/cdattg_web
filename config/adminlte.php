@@ -154,8 +154,8 @@ return [
 
     'layout_topnav' => null,
     'layout_boxed' => null,
-    'layout_fixed_sidebar' => null,
-    'layout_fixed_navbar' => null,
+    'layout_fixed_sidebar' => true,
+    'layout_fixed_navbar' => true,
     'layout_fixed_footer' => null,
     'layout_dark_mode' => null,
 
@@ -311,6 +311,27 @@ return [
         ],
         [
             'type' => 'navbar-notification',
+            'id' => 'notificaciones-dropdown',
+            'icon' => 'fas fa-bell',
+            'icon_color' => 'warning',
+            'topnav_right' => true,
+            'dropdown_mode' => 'sliding',
+            'dropdown_flabel' => 'Notificaciones',
+            'update_cfg' => [
+                'url' => 'inventario/notificaciones/unread',
+                'period' => 30,
+                'method' => 'GET',
+            ],
+            'submenu' => [
+                [
+                    'text' => 'Ver todas las notificaciones',
+                    'url' => 'inventario/notificaciones',
+                    'icon' => 'fas fa-bell text-primary',
+                ],
+            ],
+        ],
+        [
+            'type' => 'navbar-notification',
             'id' => 'my-notification',
             'icon' => 'fas fa-user-circle',
             'text' => 'Usuario',
@@ -359,7 +380,12 @@ return [
             'url' => 'home',
             'icon' => 'fas fa-fw fa-tachometer-alt',
         ],
-
+        [
+            'text' => 'Notificaciones',
+            'url'  => 'inventario/notificaciones',
+            'icon' => 'fa-solid fa-bell',
+            'can'  => 'VER NOTIFICACION',
+        ],
         // ========================================
         // MÓDULO: CONFIGURACIÓN DEL SISTEMA
         // ========================================
@@ -735,6 +761,184 @@ return [
                 ],
             ],
         ],
+        // Gestion de complementarios
+        [
+            'text' => 'Complementarios',
+            'icon' => 'fa-solid fa-folder-open',
+            'submenu' => [
+                [
+                    'text' => 'Gestion complementarios',
+                    'url' => 'programa',
+                    'icon' => 'fas fa-tasks',
+                    'can' => [
+                        'VER PROGRAMA DE CARACTERIZACION',
+                        'CREAR PROGRAMA DE CARACTERIZACION',
+                        'EDITAR PROGRAMA DE CARACTERIZACION',
+                        'ELIMINAR PROGRAMA DE CARACTERIZACION',
+                    ],
+                ],
+                [
+                    'text' => 'Gestion de aspirantes',
+                    'url' => 'programa',
+                    'icon' => 'fas fa-users',
+                    'can' => [
+                        'VER PROGRAMA DE CARACTERIZACION',
+                        'CREAR PROGRAMA DE CARACTERIZACION',
+                        'EDITAR PROGRAMA DE CARACTERIZACION',
+                        'ELIMINAR PROGRAMA DE CARACTERIZACION',
+                    ],
+                ],
+                [
+                    'text' => 'Estadisticas',
+                    'url' => 'fichaCaracterizacion',
+                    'icon' => 'fas fa-chart-line',
+                    'can' => [
+                        'VER PROGRAMA DE CARACTERIZACION',
+                        'CREAR PROGRAMA DE CARACTERIZACION',
+                        'EDITAR PROGRAMA DE CARACTERIZACION',
+                        'ELIMINAR PROGRAMA DE CARACTERIZACION',
+                    ],
+                ],
+                [
+                    'text' => 'Procesar documentos',
+                    'url' => 'programa',
+                    'icon' => 'fas fa-file-signature',
+                    'can' => [
+                        'VER PROGRAMA DE CARACTERIZACION',
+                        'CREAR PROGRAMA DE CARACTERIZACION',
+                        'EDITAR PROGRAMA DE CARACTERIZACION',
+                        'ELIMINAR PROGRAMA DE CARACTERIZACION',
+                    ]
+                ],
+            ],
+        ],
+        // Inventario
+        [
+            'text' => 'Inventario',
+            'icon' => 'fa-solid fa-boxes-stacked',
+            'submenu' => [
+                [
+                    'text' => 'Dashboard',
+                    'url'  => 'inventario/dashboard',
+                    'icon' => 'fa-solid fa-chart-bar',
+                    'can'  => 'VER PRODUCTO',
+                ],
+                [
+                    'text' => 'Productos',
+                    'icon' => 'fa-solid fa-box',
+                    'can'  => 'VER PRODUCTO',
+                    'submenu' => [
+                        [
+                            'text' => 'Lista de Productos',
+                            'url'  => 'inventario/productos',
+                            'icon' => 'fa-solid fa-list',
+                            'can'  => 'VER PRODUCTO',
+                        ],
+                        [
+                            'text' => 'Catálogo de Productos',
+                            'url'  => 'inventario/productos/catalogo',
+                            'icon' => 'fa-solid fa-th',
+                            'can'  => 'VER CATALOGO PRODUCTO',
+                        ],
+                        [
+                            'text' => 'Crear Producto',
+                            'url'  => 'inventario/productos/create',
+                            'icon' => 'fa-solid fa-plus',
+                            'can'  => 'CREAR PRODUCTO',
+                        ],
+                    ],
+                ],
+                [
+                    'text' => 'Carrito Sena',
+                    'url'  => 'inventario/carrito-sena',
+                    'icon' => 'fa-solid fa-cart-plus',
+                    'can'  => ['VER CARRITO', 'VER PRODUCTO'],
+                ],
+                [
+                    'text' => 'Órdenes',
+                    'url'  => 'inventario/ordenes',
+                    'icon' => 'fa-solid fa-file-invoice',
+                    'can'  => 'VER ORDEN',
+                    'submenu' => [
+                        [
+                            'text' => 'Todas las Órdenes',
+                            'url'  => 'inventario/ordenes',
+                            'icon' => 'fa-solid fa-list',
+                            'can'  => 'VER ORDEN',
+                        ],
+                        [
+                            'text' => 'Aprobaciones Pendientes',
+                            'url'  => 'inventario/aprobaciones/pendientes',
+                            'icon' => 'fa-solid fa-hourglass-half',
+                            'can'  => 'VER ORDEN',
+                        ],
+                        [
+                            'text' => 'Órdenes Aprobadas',
+                            'url'  => 'inventario/ordenes/completadas',
+                            'icon' => 'fa-solid fa-check-circle',
+                            'can'  => 'VER ORDEN',
+                        ],
+                        [
+                            'text' => 'Órdenes Rechazadas',
+                            'url'  => 'inventario/ordenes/rechazadas',
+                            'icon' => 'fa-solid fa-times-circle',
+                            'can'  => 'VER ORDEN',
+                        ],
+                    ],
+                ],
+                [
+                    'text' => 'Devoluciones',
+                    'icon' => 'fa-solid fa-undo',
+                    'can'  => 'DEVOLVER PRESTAMO',
+                    'submenu' => [
+                        [
+                            'text' => 'Préstamos Pendientes',
+                            'url'  => 'inventario/devoluciones',
+                            'icon' => 'fa-solid fa-clock',
+                            'can'  => 'DEVOLVER PRESTAMO',
+                        ],
+                        [
+                            'text' => 'Historial Devoluciones',
+                            'url'  => 'inventario/devoluciones-historial',
+                            'icon' => 'fa-solid fa-history',
+                            'can'  => 'DEVOLVER PRESTAMO',
+                        ],
+                    ],
+                ],
+                [
+                    'text' => 'Configuración',
+                    'icon' => 'fa-solid fa-cog',
+                    'can'  => 'VER CATEGORIA',
+                    'submenu' => [
+                        [
+                            'text' => 'Categorías',
+                            'url'  => 'inventario/categorias',
+                            'icon' => 'fa-solid fa-tags',
+                            'can'  => 'VER CATEGORIA',
+                        ],
+                        [
+                            'text' => 'Marcas',
+                            'url'  => 'inventario/marcas',
+                            'icon' => 'fa-solid fa-trademark',
+                            'can'  => 'VER MARCA',
+                        ],
+                        [
+                            'text' => 'Proveedores',
+                            'url'  => 'inventario/proveedores',
+                            'icon' => 'fa-solid fa-truck',
+                            'can'  => 'VER PROVEEDOR',
+                        ],
+                        [
+                            'text' => 'Contratos/Convenios',
+                            'url'  => 'inventario/contratos-convenios',
+                            'icon' => 'fa-solid fa-file-contract',
+                            'can'  => 'VER CONTRATO',
+                        ],
+                    ],
+                ],
+            ],
+        ],
+
     ],
 
     /*
@@ -896,4 +1100,3 @@ return [
         'public/css/app.css',
     ],
 ];
-

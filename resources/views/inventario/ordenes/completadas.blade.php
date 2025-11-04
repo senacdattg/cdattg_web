@@ -1,0 +1,37 @@
+@extends('adminlte::page')
+
+@section('title', 'Órdenes Aprobadas')
+
+@section('content_header')
+    <x-page-header
+        icon="fas fa-check-circle"
+        title="Órdenes Aprobadas"
+        subtitle="Órdenes completadas y aprobadas"
+        :breadcrumb="[
+            ['label' => 'Inicio', 'url' => '#'],
+            ['label' => 'Inventario', 'active' => true],
+            ['label' => 'Órdenes', 'url' => route('inventario.ordenes.index')],
+            ['label' => 'Aprobadas', 'active' => true]
+        ]"
+    />
+@endsection
+
+@section('content')
+    @include('inventario._components.filtros', ['estado' => 'APROBADA'])
+@endsection
+
+@section('footer')
+    @include('layout.footer')
+@endsection
+
+@push('css')
+    @vite(['public/css/inventario/shared/base.css'])
+@endpush
+
+@section('footer')
+    @include('layout.footer')
+@endsection
+
+@push('css')
+    @vite(['public/css/inventario/shared/base.css'])    
+@endpush

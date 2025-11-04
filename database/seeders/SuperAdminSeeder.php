@@ -114,6 +114,67 @@ class SuperAdminSeeder extends Seeder
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
             
+            // Permisos para inventario
+            // Productos
+            'CREAR PRODUCTO',
+            'VER PRODUCTO',
+            'EDITAR PRODUCTO',
+            'ELIMINAR PRODUCTO',
+            'VER CATALOGO PRODUCTO',
+            'BUSCAR PRODUCTO',
+            // Carrito
+            'VER CARRITO',
+            'AGREGAR CARRITO',
+            'ACTUALIZAR CARRITO',
+            'ELIMINAR CARRITO',
+            'VACIAR CARRITO',
+            // Categorías
+            'CREAR CATEGORIA',
+            'VER CATEGORIA',
+            'EDITAR CATEGORIA',
+            'ELIMINAR CATEGORIA',
+            // Marcas
+            'CREAR MARCA',
+            'VER MARCA',
+            'EDITAR MARCA',
+            'ELIMINAR MARCA',
+            // Contratos y Convenios
+            'CREAR CONTRATO',
+            'VER CONTRATO',
+            'EDITAR CONTRATO',
+            'ELIMINAR CONTRATO',
+            // Proveedores
+            'CREAR PROVEEDOR',
+            'VER PROVEEDOR',
+            'EDITAR PROVEEDOR',
+            'ELIMINAR PROVEEDOR',
+            // Ordenes
+            'VER ORDEN',
+            'CREAR ORDEN',
+            'EDITAR ORDEN',
+            'ELIMINAR ORDEN',
+            'APROBAR ORDEN',
+            'COMPLETAR ORDEN',
+            // Préstamos
+            'VER PRESTAMO',
+            'CREAR PRESTAMO',
+            'EDITAR PRESTAMO',
+            'DEVOLVER PRESTAMO',
+            'APROBAR PRESTAMO',
+            'DEVOLVER PRESTAMO',
+            // Entradas
+            'VER ENTRADA',
+            'CREAR ENTRADA',
+            // Salidas
+            'VER SALIDA',
+            'CREAR SALIDA',
+            // Devoluciones
+            'VER DEVOLUCION',
+            'CREAR DEVOLUCION',
+            'PROCESAR DEVOLUCION',
+            // Dashboard
+            'VER DASHBOARD INVENTARIO',
+            
             // Permisos para redes de conocimiento
             'CREAR RED CONOCIMIENTO',
             'EDITAR RED CONOCIMIENTO',
@@ -133,6 +194,9 @@ class SuperAdminSeeder extends Seeder
             'programa.edit',
             'programa.delete',
             'programa.search',
+
+            // Permisos para notificaciones
+            'VER NOTIFICACION',
         ];
 
         // Crear cada permiso si no existe

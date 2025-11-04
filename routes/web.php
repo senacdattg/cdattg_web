@@ -33,32 +33,31 @@ Route::middleware('auth')->group(function () {
         'caracterizacion',
         'entrada_salida',
         'infraestructura',
+        'inventario',
         'jornada_carnet',
         'personas',
         'tema_parametro',
-        'ubicacion',
-        'actividades'
+        'ubicacion'
     ];
 
-    // Incluir rutas de guías de aprendizaje
-    include_once routes_path('web_guias_aprendizaje.php');
-    
-    // Incluir rutas de resultados de aprendizaje
-    include_once routes_path('web_resultados_aprendizaje.php');
-    
-    // Incluir rutas de competencias
-    include_once routes_path('web_competencias.php');
-
     foreach ($protectedFolders as $folder) {
-        foreach (glob(routes_path($folder) . '/*.php') as $routeFile) {
-            include_once $routeFile;
+        if ($folder === 'inventario') {
+            // Cargar todas las rutas del inventario
+            foreach (glob(routes_path($folder) . '/*.php') as $routeFile) {
+                include_once $routeFile;
+            }
+        } else {
+            foreach (glob(routes_path($folder) . '/*.php') as $routeFile) {
+                include_once $routeFile;
+            }
         }
     }
 
     Route::post('/verify-document', [AsistenceQrController::class, 'verifyDocument'])->name('api.verifyDocument');
-    
-    // Incluir rutas específicas de instructores
-    include_once routes_path('web_instructores.php');
+
+    Route::prefix('inventario')->name('inventario.')->group(function () {
+        Route::get('productos/{id}/etiqueta', [App\Http\Controllers\Inventario\ProductoController::class, 'etiqueta'])->name('productos.etiqueta');
+    });
 });
 
 // Route::get('/perfil', [ProfileController::class, 'index'])->name('profile.index');

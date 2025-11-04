@@ -8,10 +8,36 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\Inventario\Notificacion;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
+
+    /**
+     * Especificar la tabla de notificaciones personalizada
+     */
+    public function notifications()
+    {
+        return $this->morphMany(Notificacion::class, 'notificable', 'notificable_type', 'notificable_id')
+            ->orderBy('created_at', 'desc');
+    }
+
+    /**
+     * Obtener las notificaciones leídas de la entidad.
+     */
+    public function readNotifications()
+    {
+        return $this->notifications()->whereNotNull('leida_en');
+    }
+
+    /**
+     * Obtener las notificaciones no leídas de la entidad.
+     */
+    public function unreadNotifications()
+    {
+        return $this->notifications()->whereNull('leida_en');
+    }
 
     protected $fillable = [
         'email',
@@ -43,6 +69,17 @@ class User extends Authenticatable implements MustVerifyEmail
     public function persona()
     {
         return $this->belongsTo(Persona::class, 'persona_id');
+    }
+
+    // accesor para obtener el nombre completo del usuario
+    public function getNameAttribute()
+    {
+        if ($this->persona) {
+            $nombre = trim($this->persona->primer_nombre . ' ' . $this->persona->segundo_nombre);
+            $apellido = trim($this->persona->primer_apellido . ' ' . $this->persona->segundo_apellido);
+            return trim($nombre . ' ' . $apellido);
+        }
+        return 'Usuario sin nombre';
     }
 
     public function entradaSalida()
@@ -109,4 +146,5 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(FichaCaracterizacion::class);
     }
+
 }
