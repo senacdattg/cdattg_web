@@ -127,7 +127,9 @@ async function loadProductDetails(productId) {
         const productData = {
             id: productId,
             name: doc.querySelector('h3')?.textContent.trim() || 'Producto',
-            image: doc.querySelector('img')?.src || '',
+            image: doc.querySelector('.product-image-wrapper img')?.src || 
+                   doc.querySelector('img[alt]')?.src || 
+                   '/img/no-image.png',
             stock: parseInt(doc.querySelector('.stat-card-value')?.textContent) || 
                    parseInt(Array.from(doc.querySelectorAll('.badge')).find(el => el.textContent.includes('unidades'))?.textContent) || 0,
             code: doc.querySelector('.badge-secondary')?.textContent.trim() || '',
