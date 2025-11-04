@@ -27,8 +27,8 @@ services:
       - node_modules:/var/www/html/node_modules
     networks:
       - cdattg_network
-    # Limpiar npm cache y reinstalar si hay problemas
-    command: sh -c "rm -rf node_modules package-lock.json && npm cache clean --force && npm install && npm run dev"
+    # Limpiar npm cache y reinstalar si hay problemas (sin eliminar node_modules del volumen)
+    command: sh -c "npm cache clean --force && npm install && npm run dev"
     ports:
       - "5173:5173"
 
