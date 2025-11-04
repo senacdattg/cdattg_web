@@ -7,7 +7,7 @@
         .hero-banner {
             position: relative;
             overflow: hidden;
-            background: linear-gradient(120deg, #5b86e5 0%, #36d1dc 100%);
+            background: linear-gradient(120deg, #0e265c 0%, #071a3a 100%);
         }
         .hero-banner::after,
         .hero-banner::before {
@@ -21,7 +21,7 @@
             height: 60vw;
             right: -20vw;
             top: -15vw;
-            background: radial-gradient(circle at center, rgba(255,255,255,0.18), rgba(255,255,255,0) 60%);
+            background: radial-gradient(circle at center, rgba(255,255,255,0.12), rgba(255,255,255,0) 60%);
             transform: rotate(18deg);
         }
         .hero-banner::before {
@@ -29,7 +29,7 @@
             height: 40vw;
             left: -15vw;
             bottom: -10vw;
-            background: radial-gradient(circle at center, rgba(255,255,255,0.1), rgba(255,255,255,0) 60%);
+            background: radial-gradient(circle at center, rgba(255,255,255,0.06), rgba(255,255,255,0) 60%);
         }
         .hero-figure {
             max-height: 320px;
