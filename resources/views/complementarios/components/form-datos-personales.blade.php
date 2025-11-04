@@ -1,5 +1,17 @@
 @props(['context' => 'registro', 'userData' => [], 'step' => 1, 'tiposDocumento' => [], 'generos' => []])
 
+@php
+    $selectedTipo = old('tipo_documento', $userData['tipo_documento'] ?? null);
+    if (!$selectedTipo) {
+        if (isset($tiposDocumento) && $tiposDocumento && $tiposDocumento->count() > 0) {
+            $cedula = $tiposDocumento->first(function($t) { return stripos($t->name, 'CIUDAD') !== false && stripos($t->name, 'CEDULA') !== false; });
+            if ($cedula) { $selectedTipo = $cedula->id; }
+        } else {
+            $selectedTipo = '3'; // Fallback: Cédula de Ciudadanía
+        }
+    }
+@endphp
+
 @if($context === 'registro')
     {{-- Versión completa sin pasos para registro --}}
     <div class="card mb-4">
@@ -11,20 +23,19 @@
                 <div class="col-md-6 mb-3">
                     <label for="tipo_documento" class="form-label">Tipo de Documento *</label>
                     <select class="form-control" id="tipo_documento" name="tipo_documento" required>
-                        <option value="">Seleccione...</option>
                         @if($tiposDocumento && $tiposDocumento->count() > 0)
                             @foreach($tiposDocumento as $tipo)
-                                <option value="{{ $tipo->id }}" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == $tipo->id ? 'selected' : '' }}>
+                                <option value="{{ $tipo->id }}" {{ (string)$selectedTipo === (string)$tipo->id ? 'selected' : '' }}>
                                     {{ ucwords(strtolower(str_replace('_', ' ', $tipo->name))) }}
                                 </option>
                             @endforeach
                         @else
-                            <option value="3" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '3' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
-                            <option value="4" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '4' ? 'selected' : '' }}>Cédula de Extranjería</option>
-                            <option value="5" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '5' ? 'selected' : '' }}>Pasaporte</option>
-                            <option value="6" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '6' ? 'selected' : '' }}>Tarjeta de Identidad</option>
-                            <option value="7" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '7' ? 'selected' : '' }}>Registro Civil</option>
-                            <option value="8" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '8' ? 'selected' : '' }}>Sin Identificación</option>
+                            <option value="3" {{ (string)$selectedTipo === '3' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
+                            <option value="4" {{ (string)$selectedTipo === '4' ? 'selected' : '' }}>Cédula de Extranjería</option>
+                            <option value="5" {{ (string)$selectedTipo === '5' ? 'selected' : '' }}>Pasaporte</option>
+                            <option value="6" {{ (string)$selectedTipo === '6' ? 'selected' : '' }}>Tarjeta de Identidad</option>
+                            <option value="7" {{ (string)$selectedTipo === '7' ? 'selected' : '' }}>Registro Civil</option>
+                            <option value="8" {{ (string)$selectedTipo === '8' ? 'selected' : '' }}>Sin Identificación</option>
                         @endif
                     </select>
                 </div>
@@ -215,20 +226,19 @@
                 <div class="col-md-6 mb-3">
                     <label for="tipo_documento" class="form-label">Tipo de Documento *</label>
                     <select class="form-control" id="tipo_documento" name="tipo_documento" required>
-                        <option value="">Seleccione...</option>
                         @if($tiposDocumento && $tiposDocumento->count() > 0)
                             @foreach($tiposDocumento as $tipo)
-                                <option value="{{ $tipo->id }}" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == $tipo->id ? 'selected' : '' }}>
+                                <option value="{{ $tipo->id }}" {{ (string)$selectedTipo === (string)$tipo->id ? 'selected' : '' }}>
                                     {{ ucwords(strtolower(str_replace('_', ' ', $tipo->name))) }}
                                 </option>
                             @endforeach
                         @else
-                            <option value="3" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '3' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
-                            <option value="4" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '4' ? 'selected' : '' }}>Cédula de Extranjería</option>
-                            <option value="5" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '5' ? 'selected' : '' }}>Pasaporte</option>
-                            <option value="6" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '6' ? 'selected' : '' }}>Tarjeta de Identidad</option>
-                            <option value="7" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '7' ? 'selected' : '' }}>Registro Civil</option>
-                            <option value="8" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '8' ? 'selected' : '' }}>Sin Identificación</option>
+                            <option value="3" {{ (string)$selectedTipo === '3' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
+                            <option value="4" {{ (string)$selectedTipo === '4' ? 'selected' : '' }}>Cédula de Extranjería</option>
+                            <option value="5" {{ (string)$selectedTipo === '5' ? 'selected' : '' }}>Pasaporte</option>
+                            <option value="6" {{ (string)$selectedTipo === '6' ? 'selected' : '' }}>Tarjeta de Identidad</option>
+                            <option value="7" {{ (string)$selectedTipo === '7' ? 'selected' : '' }}>Registro Civil</option>
+                            <option value="8" {{ (string)$selectedTipo === '8' ? 'selected' : '' }}>Sin Identificación</option>
                         @endif
                     </select>
                 </div>
