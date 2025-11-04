@@ -37,11 +37,12 @@
     <div id="form-container" class="mt-4" style="display: none;">
         <div class="card card-primary">
             <div class="card-header">
-                <h3 class="card-title">Información de la Persona</h3>
+                <h3 class="card-title" id="form-title">Información de la Persona</h3>
             </div>
             <div class="card-body">
-                <form id="personaForm">
+                <form id="personaForm" action="{{ route('talento-humano.consultar') }}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    <input type="hidden" id="action_type" name="action_type" value="consultar">
 
                     <!-- Documento de Identidad -->
                     <div class="row mb-4">
@@ -52,8 +53,8 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="form-group">
-                                <label for="tipo_documento">Tipo de Documento</label>
-                                <select class="form-control" name="tipo_documento" id="tipo_documento" disabled>
+                                <label for="tipo_documento">Tipo de Documento *</label>
+                                <select class="form-control" name="tipo_documento" id="tipo_documento" required>
                                     <option value="">Seleccione...</option>
                                     @foreach ($tiposDocumento ?? [] as $tipo)
                                         <option value="{{ $tipo->id }}">
@@ -65,8 +66,8 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="form-group">
-                                <label for="numero_documento">Número de Documento</label>
-                                <input type="text" class="form-control" id="numero_documento" name="numero_documento" readonly>
+                                <label for="numero_documento">Número de Documento *</label>
+                                <input type="text" class="form-control" id="numero_documento" name="numero_documento" required>
                             </div>
                         </div>
                     </div>
@@ -80,26 +81,26 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="form-group">
-                                <label for="primer_nombre">Primer Nombre</label>
-                                <input type="text" class="form-control" id="primer_nombre" name="primer_nombre" readonly>
+                                <label for="primer_nombre">Primer Nombre *</label>
+                                <input type="text" class="form-control" id="primer_nombre" name="primer_nombre" required>
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="form-group">
                                 <label for="segundo_nombre">Segundo Nombre</label>
-                                <input type="text" class="form-control" id="segundo_nombre" name="segundo_nombre" readonly>
+                                <input type="text" class="form-control" id="segundo_nombre" name="segundo_nombre">
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="form-group">
-                                <label for="primer_apellido">Primer Apellido</label>
-                                <input type="text" class="form-control" id="primer_apellido" name="primer_apellido" readonly>
+                                <label for="primer_apellido">Primer Apellido *</label>
+                                <input type="text" class="form-control" id="primer_apellido" name="primer_apellido" required>
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="form-group">
                                 <label for="segundo_apellido">Segundo Apellido</label>
-                                <input type="text" class="form-control" id="segundo_apellido" name="segundo_apellido" readonly>
+                                <input type="text" class="form-control" id="segundo_apellido" name="segundo_apellido">
                             </div>
                         </div>
                     </div>
@@ -113,14 +114,14 @@
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="form-group">
-                                <label for="fecha_nacimiento">Fecha de Nacimiento</label>
-                                <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" readonly>
+                                <label for="fecha_nacimiento">Fecha de Nacimiento *</label>
+                                <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required>
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="form-group">
-                                <label for="genero">Género</label>
-                                <select class="form-control" id="genero" name="genero" disabled>
+                                <label for="genero">Género *</label>
+                                <select class="form-control" id="genero" name="genero" required>
                                     <option value="">Seleccione...</option>
                                     @foreach ($generos ?? [] as $genero)
                                         <option value="{{ $genero->id }}">
@@ -142,19 +143,19 @@
                         <div class="col-12 col-md-6">
                             <div class="form-group">
                                 <label for="telefono">Teléfono Fijo</label>
-                                <input type="tel" class="form-control" id="telefono" name="telefono" readonly>
+                                <input type="tel" class="form-control" id="telefono" name="telefono">
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
                             <div class="form-group">
-                                <label for="celular">Celular</label>
-                                <input type="tel" class="form-control" id="celular" name="celular" readonly>
+                                <label for="celular">Celular *</label>
+                                <input type="tel" class="form-control" id="celular" name="celular" required>
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                                <label for="email">Correo Electrónico</label>
-                                <input type="email" class="form-control" id="email" name="email" readonly>
+                                <label for="email">Correo Electrónico *</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
                             </div>
                         </div>
                     </div>
@@ -168,8 +169,8 @@
                         </div>
                         <div class="col-12 col-md-4">
                             <div class="form-group">
-                                <label for="pais_id">País</label>
-                                <select class="form-control" name="pais_id" id="pais_id" disabled>
+                                <label for="pais_id">País *</label>
+                                <select class="form-control" name="pais_id" id="pais_id" required>
                                     <option value="">Seleccione...</option>
                                     @foreach ($paises ?? [] as $pais)
                                         <option value="{{ $pais->id }}">{{ $pais->pais }}</option>
@@ -179,8 +180,8 @@
                         </div>
                         <div class="col-12 col-md-4">
                             <div class="form-group">
-                                <label for="departamento_id">Departamento</label>
-                                <select class="form-control" name="departamento_id" id="departamento_id" disabled>
+                                <label for="departamento_id">Departamento *</label>
+                                <select class="form-control" name="departamento_id" id="departamento_id" required>
                                     <option value="">Seleccione...</option>
                                     @foreach ($departamentos ?? [] as $departamento)
                                         <option value="{{ $departamento->id }}">{{ $departamento->departamento }}</option>
@@ -190,16 +191,69 @@
                         </div>
                         <div class="col-12 col-md-4">
                             <div class="form-group">
-                                <label for="municipio_id">Municipio</label>
-                                <select class="form-control" name="municipio_id" id="municipio_id" disabled>
+                                <label for="municipio_id">Municipio *</label>
+                                <select class="form-control" name="municipio_id" id="municipio_id" required>
                                     <option value="">Seleccione...</option>
                                 </select>
                             </div>
                         </div>
                         <div class="col-12">
                             <div class="form-group">
-                                <label for="direccion">Dirección</label>
-                                <input type="text" class="form-control" id="direccion" name="direccion" readonly>
+                                <label for="direccion">Dirección *</label>
+                                <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Dirección completa" required readonly>
+                                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
+                                    <i class="fas fa-edit"></i> Ingresar Dirección
+                                </button>
+                            </div>
+                            <div id="addressForm" class="collapse mt-3" aria-labelledby="addressFormLabel">
+                                <div class="card card-outline-secondary">
+                                    <div class="card-header">
+                                        <h5 id="addressFormLabel" class="mb-0">Ingresar Dirección</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-12 col-md-6">
+                                                <div class="form-group">
+                                                    <label for="carrera">Carrera *</label>
+                                                    <input type="text" class="form-control address-field" id="carrera"
+                                                        placeholder="Ej: 1" data-required="true">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="calle">Calle *</label>
+                                                    <input type="text" class="form-control address-field" id="calle"
+                                                        placeholder="Ej: 2" data-required="true">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="numero_casa">Número Casa *</label>
+                                                    <input type="text" class="form-control address-field" id="numero_casa"
+                                                        placeholder="Ej: 3" data-required="true">
+                                                </div>
+                                                <div class="form-group">
+                                                    <label for="numero_apartamento">Número Apartamento</label>
+                                                    <input type="text" class="form-control address-field" id="numero_apartamento"
+                                                        placeholder="Ej: 4 (opcional)">
+                                                </div>
+                                            </div>
+                                            <div class="col-12 col-md-6 d-flex align-items-center">
+                                                <div class="w-100">
+                                                    <p class="mb-2"><strong>Ejemplo de formato:</strong></p>
+                                                    <p class="text-muted">Carrera 1 Calle 2 #3 Apt 4</p>
+                                                    <p class="text-muted small">Los campos marcados con * son obligatorios.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <button type="button" class="btn btn-success btn-sm mr-2" id="saveAddress">
+                                                    <i class="fas fa-save"></i> Guardar Dirección
+                                                </button>
+                                                <button type="button" class="btn btn-secondary btn-sm" id="cancelAddress">
+                                                    <i class="fas fa-times"></i> Cancelar
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -210,7 +264,7 @@
                             <h4 class="text-dark mb-3">
                                 <i class="fas fa-tags mr-2"></i>Caracterización
                             </h4>
-                            <p class="text-muted mb-3">Categoría de caracterización:</p>
+                            <p class="text-muted mb-3">Seleccione una categoría que corresponda a su situación (opcional):</p>
                         </div>
                         @foreach ($categoriasConHijos ?? [] as $categoria)
                             <div class="col-12 mb-4">
@@ -219,7 +273,7 @@
                                     <div class="form-check mb-2">
                                         <input class="form-check-input" type="radio"
                                                id="categoria_{{ $hijo->id }}" name="caracterizacion_id"
-                                               value="{{ $hijo->id }}" disabled>
+                                               value="{{ $hijo->id }}">
                                         <label class="form-check-label" for="categoria_{{ $hijo->id }}">
                                             {{ $hijo->nombre }}
                                         </label>
@@ -228,7 +282,32 @@
                             </div>
                         @endforeach
                     </div>
+
+                    <!-- Observaciones -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h4 class="text-muted mb-3">
+                                <i class="fas fa-comment mr-2"></i>Observaciones
+                            </h4>
+                            <div class="form-group">
+                                <label for="observaciones">Información Adicional</label>
+                                <textarea class="form-control" id="observaciones" name="observaciones" rows="3"
+                                    placeholder="Información adicional que considere relevante..."></textarea>
+                            </div>
+                        </div>
+                    </div>
                 </form>
+            </div>
+            <div class="card-footer">
+                <button type="button" class="btn btn-secondary" id="btn-cancelar" style="display: none;">
+                    <i class="fas fa-times me-1"></i>Cancelar
+                </button>
+                <button type="button" class="btn btn-primary" id="btn-crear-persona" style="display: none;">
+                    <i class="fas fa-save me-1"></i>Crear Persona
+                </button>
+                <button type="button" class="btn btn-success" id="btn-guardar-cambios" style="display: none;">
+                    <i class="fas fa-save me-1"></i>Guardar Cambios
+                </button>
             </div>
         </div>
     </div>
@@ -285,14 +364,29 @@
                 const data = await response.json();
 
                 if (data.success) {
-                    // Mostrar formulario y llenar datos
+                    // Mostrar formulario en modo solo lectura
                     formContainer.style.display = 'block';
+                    document.getElementById('form-title').textContent = 'Información de la Persona';
+                    setFormReadOnly(true);
                     fillFormData(data.data);
                     showAlert('success', data.message);
                 } else {
-                    // Ocultar formulario si no se encuentra
-                    formContainer.style.display = 'none';
-                    showAlert('error', data.message);
+                    if (data.show_form) {
+                        // Mostrar formulario para crear nueva persona
+                        formContainer.style.display = 'block';
+                        document.getElementById('form-title').textContent = 'Crear Nueva Persona';
+                        setFormReadOnly(false);
+                        // Pre-llenar el número de documento
+                        document.getElementById('numero_documento').value = cedula;
+                        // Mostrar botones de acción
+                        document.getElementById('btn-crear-persona').style.display = 'inline-block';
+                        document.getElementById('btn-cancelar').style.display = 'inline-block';
+                        showAlert('info', data.message);
+                    } else {
+                        // Ocultar formulario
+                        formContainer.style.display = 'none';
+                        showAlert('error', data.message);
+                    }
                 }
 
             } catch (error) {
@@ -343,6 +437,35 @@
             }
         }
 
+        function setFormReadOnly(readOnly) {
+            const form = document.getElementById('personaForm');
+            const inputs = form.querySelectorAll('input, select, textarea');
+            const radios = form.querySelectorAll('input[type="radio"]');
+
+            inputs.forEach(input => {
+                if (readOnly) {
+                    input.setAttribute('readonly', 'readonly');
+                    input.setAttribute('disabled', 'disabled');
+                } else {
+                    input.removeAttribute('readonly');
+                    input.removeAttribute('disabled');
+                }
+            });
+
+            radios.forEach(radio => {
+                if (readOnly) {
+                    radio.setAttribute('disabled', 'disabled');
+                } else {
+                    radio.removeAttribute('disabled');
+                }
+            });
+
+            // Ocultar/mostrar botones según el modo
+            document.getElementById('btn-crear-persona').style.display = readOnly ? 'none' : 'inline-block';
+            document.getElementById('btn-guardar-cambios').style.display = 'none';
+            document.getElementById('btn-cancelar').style.display = readOnly ? 'none' : 'inline-block';
+        }
+
         function clearFormData() {
             // Limpiar todos los campos del formulario
             const form = document.getElementById('personaForm');
@@ -354,6 +477,11 @@
                     input.value = '';
                 }
             });
+
+            // Ocultar botones de acción
+            document.getElementById('btn-crear-persona').style.display = 'none';
+            document.getElementById('btn-guardar-cambios').style.display = 'none';
+            document.getElementById('btn-cancelar').style.display = 'none';
         }
 
         function loadMunicipios(departamentoId, selectedMunicipioId = null) {
@@ -380,13 +508,61 @@
             }
         }
 
+        // Event listeners para botones de acción
+        document.getElementById('btn-crear-persona').addEventListener('click', async function() {
+            const form = document.getElementById('personaForm');
+            const formData = new FormData(form);
+
+            // Deshabilitar botón
+            const originalText = this.innerHTML;
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Creando...';
+
+            try {
+                const response = await fetch('/talento-humano/consultar', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Cambiar a modo solo lectura
+                    setFormReadOnly(true);
+                    document.getElementById('form-title').textContent = 'Información de la Persona';
+                    // Ocultar botones de acción
+                    document.getElementById('btn-crear-persona').style.display = 'none';
+                    document.getElementById('btn-cancelar').style.display = 'none';
+                    showAlert('success', data.message);
+                } else {
+                    showAlert('error', data.message);
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('error', 'Error de conexión. Intente nuevamente.');
+            } finally {
+                // Restaurar botón
+                this.disabled = false;
+                this.innerHTML = originalText;
+            }
+        });
+
+        document.getElementById('btn-cancelar').addEventListener('click', function() {
+            formContainer.style.display = 'none';
+            clearFormData();
+        });
+
         function showAlert(type, message) {
             // Crear elemento de alerta
             const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type === 'success' ? 'success' : type === 'warning' ? 'warning' : 'danger'} alert-dismissible fade show position-fixed`;
+            alertDiv.className = `alert alert-${type === 'success' ? 'success' : type === 'warning' ? 'warning' : type === 'info' ? 'info' : 'danger'} alert-dismissible fade show position-fixed`;
             alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
             alertDiv.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : 'exclamation-triangle'} me-2"></i>
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : type === 'info' ? 'info-circle' : 'exclamation-triangle'} me-2"></i>
                 ${message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;
