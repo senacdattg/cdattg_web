@@ -261,7 +261,7 @@
                         <input type="hidden" name="carrito" id="carrito">
 
                         <div class="form-actions-container">
-                            <a href="{{ route('inventario.ordenes.index') }}" class="btn-modern btn-modern-secondary">
+                            <a href="{{ route('inventario.productos.catalogo') }}" class="btn-modern btn-modern-secondary">
                                 <i class="fas fa-times"></i> Cancelar
                             </a>
                             <button type="submit" class="btn-modern btn-modern-success">

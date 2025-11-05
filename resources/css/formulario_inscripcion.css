@@ -1,34 +1,66 @@
- /* Colores del SENA inspirados en Betowa */
- .btn-success {
-     background-color: #019701;
-     border-color: #008000;
- }
- .btn-success:hover {
-     background-color: #006400;
-     border-color: #006400;
- }
- .card-success .card-header {
-     background-color: #32aa32;
-     color: #000;
- }
- .bg-success {
-     background-color: #008000 !important;
- }
- .form-control:focus {
-     border-color: #008000;
-     box-shadow: 0 0 0 0.2rem rgba(0, 128, 0, 0.25);
- }
- .card-success {
-     border-color: #008000;
- }
- .text-success {
-     color: #008000 !important;
- }
- .alert-info {
-     background-color: #FFD700;
-     color: #000;
-     border-color: #FFD700;
- }
+/* Paleta minimalista complementarios */
+:root {
+    --bg-light: #ebf1f4;
+    --accent: #007bff;
+    --card: #ffffff;
+    --text-dark: #343a40;
+    --border: #dee2e6;
+}
+
+/* Botones tipo success (evitar verde) */
+.btn-success {
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
+}
+.btn-success:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+/* Headers de cards “success” sin bloques de color (override AdminLTE) */
+.card-success .card-header {
+    background-color: var(--card) !important;
+    color: var(--text-dark) !important;
+    border-left: 4px solid var(--accent) !important;
+}
+/* Mayor especificidad para AdminLTE */
+.card.card-success:not(.card-outline) > .card-header,
+.card.card-success:not(.card-outline) .card-header {
+    background-color: var(--card) !important;
+    color: var(--text-dark) !important;
+    border-left: 4px solid var(--accent) !important;
+}
+
+/* Fondos success muy claros para evitar el verde */
+.bg-success {
+    background-color: var(--bg-light) !important;
+    color: var(--text-dark) !important;
+}
+
+/* Focus de formularios con azul de acento */
+.form-control:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Borde de cards success neutro */
+.card-success {
+    border-color: var(--border) !important;
+}
+
+/* Textos “success” en gris oscuro, no verde */
+.text-success {
+    color: var(--text-dark) !important;
+}
+
+/* Alertas info en azul suave */
+.alert-info {
+    background-color: #e7f1ff;
+    color: #084298;
+    border-color: #cee1ff;
+}
+
 
 /* Responsividad para móviles */
 @media (max-width: 768px) {
@@ -206,3 +238,4 @@
     margin-left: auto;
     margin-right: auto;
 }
+

@@ -17,6 +17,7 @@ class ComplementarioOfertado extends Model
         'estado',
         'modalidad_id',
         'jornada_id',
+        'ambiente_id',
     ];
 
     public function modalidad()
@@ -27,6 +28,11 @@ class ComplementarioOfertado extends Model
     public function jornada()
     {
         return $this->belongsTo(JornadaFormacion::class, 'jornada_id');
+    }
+
+    public function ambiente()
+    {
+        return $this->belongsTo(Ambiente::class, 'ambiente_id');
     }
 
     public function diasFormacion()

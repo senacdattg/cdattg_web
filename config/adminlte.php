@@ -766,7 +766,6 @@ return [
         [
             'text' => 'Complementarios',
             'icon' => 'fa-solid fa-folder-open',
-
             'can' => 'VER PROGRAMA DE CARACTERIZACION',
             'submenu' => [
                 [
@@ -792,7 +791,6 @@ return [
                 ],
                 [
                     'text' => 'Gestion de aspirantes',
-
                     'url' => 'gestion-aspirantes',
                     'icon' => 'fas fa-users',
                     'can' => [
@@ -804,7 +802,6 @@ return [
                 ],
                 [
                     'text' => 'Estadisticas',
-
                     'url' => 'estadisticas',
                     'icon' => 'fas fa-chart-line',
                     'can' => 'VER ESTADISTICAS',
@@ -822,6 +819,7 @@ return [
                 ],
             ],
         ],
+
         // Inventario
         [
             'text' => 'Inventario',
@@ -1137,3 +1135,6 @@ return [
         'public/css/app.css',
     ],
 ];
+
+
+

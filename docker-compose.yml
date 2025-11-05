@@ -1,13 +1,38 @@
 services:
+<<<<<<< HEAD
   app:
     build:
       context: .
       dockerfile: docker/Dockerfile.app
     container_name: cdattg_app
+=======
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: cdattg_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-cdattg_db}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-password}
+      MYSQL_USER: ${DB_USERNAME:-cdattg_user}
+    ports:
+      - "${DB_PORT:-3307}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - cdattg_network
+
+  # Node.js for Vite
+  node:
+    image: node:24-alpine
+    container_name: cdattg_node
+>>>>>>> 586c4740b8b65448b2c567f7a5c100cc94914e8b
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
       - ./:/var/www/html
+<<<<<<< HEAD
       - ./docker/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
     ports:
       - "8080:8080"
@@ -114,3 +139,23 @@ volumes:
 networks:
   app-network:
     driver: bridge
+=======
+      - node_modules:/var/www/html/node_modules
+    networks:
+      - cdattg_network
+    # Limpiar npm cache y reinstalar si hay problemas (sin eliminar node_modules del volumen)
+    command: sh -c "npm cache clean --force && npm install && npm run dev"
+    ports:
+      - "5173:5173"
+
+volumes:
+  mysql_data:
+    driver: local
+  node_modules:
+    driver: local
+
+networks:
+  cdattg_network:
+    driver: bridge
+
+>>>>>>> 586c4740b8b65448b2c567f7a5c100cc94914e8b

@@ -192,6 +192,7 @@ class RolePermissionSeeder extends Seeder
             // Permisos para talento humano
             'VER TALENTO HUMANO',
             'CREAR TALENTO HUMANO',
+
             'VER FICHAS ASIGNADAS',
             'GESTIONAR DIAS FICHA',
             'GESTIONAR APRENDICES FICHA',
@@ -252,6 +253,7 @@ class RolePermissionSeeder extends Seeder
             'EDITAR PERSONA',
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+
             // Permisos de inventario para SUPER ADMINISTRADOR
             'CREAR PRODUCTO',
             'VER PRODUCTO',
@@ -351,6 +353,7 @@ class RolePermissionSeeder extends Seeder
             'VER PERSONA',
             'EDITAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+
             // Permisos para redes de conocimiento
             'CREAR RED CONOCIMIENTO',
             'EDITAR RED CONOCIMIENTO',
@@ -372,6 +375,7 @@ class RolePermissionSeeder extends Seeder
             'ELIMINAR ASPIRANTE COMPLEMENTARIO',
             'VER TALENTO HUMANO',
             'CREAR TALENTO HUMANO',
+
             // Permisos de inventario para ADMINISTRADOR (todos menos APROBAR ORDEN)
             'CREAR PRODUCTO',
             'VER PRODUCTO',
@@ -419,11 +423,13 @@ class RolePermissionSeeder extends Seeder
             'CREAR DEVOLUCION',
             'PROCESAR DEVOLUCION',
             'VER DASHBOARD INVENTARIO',
+
         ]);
 
         // Asignar permisos al rol INSTRUCTOR
         $instructor->givePermissionTo([
             'TOMAR ASISTENCIA',
+
             'VER APRENDIZ',
             // Permisos para instructores (solo los que le corresponden)
             'VER INSTRUCTOR',
@@ -467,6 +473,7 @@ class RolePermissionSeeder extends Seeder
         // Asignar permisos al rol VISITANTE
         $visitante->givePermissionTo([
             'VER PERSONA',
+
         ]);
         // Asignar permisos al rol APRENDIZ
         // Los aprendices tienen acceso limitado solo a consultar su propia información

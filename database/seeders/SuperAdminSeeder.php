@@ -197,6 +197,15 @@ class SuperAdminSeeder extends Seeder
 
             // Permisos para notificaciones
             'VER NOTIFICACION',
+            // Permisos para aspirantes complementarios
+            'VER ESTADISTICAS',
+            // Permisos para programas complementarios
+            'VER PROGRAMA COMPLEMENTARIO',
+            'CREAR PROGRAMA COMPLEMENTARIO',
+            'ELIMINAR ASPIRANTE COMPLEMENTARIO',
+            // Permisos para talento humano
+            'VER TALENTO HUMANO',
+            'CREAR TALENTO HUMANO',
         ];
 
         // Crear cada permiso si no existe

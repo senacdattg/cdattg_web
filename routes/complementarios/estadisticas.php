@@ -1,12 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ComplementarioController;
+use App\Http\Controllers\Complementarios\EstadisticaComplementarioController;
 
-Route::get('/estadisticas', [ComplementarioController::class, 'estadisticas'])
+Route::get('/estadisticas', [EstadisticaComplementarioController::class, 'estadisticas'])
     ->name('estadisticas')
     ->middleware('auth');
 
-Route::get('/estadisticas/api', [ComplementarioController::class, 'apiEstadisticas'])
+Route::get('/estadisticas/api', [EstadisticaComplementarioController::class, 'apiEstadisticas'])
     ->name('estadisticas.api')
     ->middleware('auth');
