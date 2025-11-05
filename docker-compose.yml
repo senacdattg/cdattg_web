@@ -1,0 +1,89 @@
+# version: '3.8'  # Removido - obsoleto en Docker Compose v2
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.app
+    container_name: cdattg_app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+      - ./docker/supervisord.conf:/etc/supervisor/conf.d/supervisord.conf
+    environment:
+      - APP_ENV=production
+      - DB_HOST=db
+      - DB_DATABASE=cdattg
+      - REDIS_HOST=redis
+      - QUEUE_CONNECTION=redis
+    depends_on:
+      - db
+      - redis
+    networks:
+      - app-network
+
+  nginx:
+    image: nginx:alpine
+    container_name: cdattg_nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+      - "8443:443"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - app-network
+
+  db:
+    image: mysql:8.0
+    container_name: cdattg_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: cdattg
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+      MYSQL_USER: ${DB_USERNAME:-cdattg_user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-password}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./docker/mysql-init:/docker-entrypoint-initdb.d:ro
+    # ports:
+    #   - "3306:3306"  # Comentado para evitar conflictos
+    networks:
+      - app-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: cdattg_redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    networks:
+      - app-network
+
+  playwright:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.playwright
+    container_name: cdattg_playwright
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
+volumes:
+  db_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge
