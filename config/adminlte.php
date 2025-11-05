@@ -791,7 +791,6 @@ return [
                 ],
                 [
                     'text' => 'Gestion de aspirantes',
-
                     'url' => 'gestion-aspirantes',
                     'icon' => 'fas fa-users',
                     'can' => [
@@ -803,7 +802,6 @@ return [
                 ],
                 [
                     'text' => 'Estadisticas',
-
                     'url' => 'estadisticas',
                     'icon' => 'fas fa-chart-line',
                     'can' => 'VER ESTADISTICAS',
@@ -1137,3 +1135,6 @@ return [
         'public/css/app.css',
     ],
 ];
+
+
+

@@ -45,13 +45,11 @@ Route::middleware('auth')->group(function () {
         'jornada_carnet',
         'personas',
         'tema_parametro',
-
         'ubicacion',
         'actividades',
         'complementarios',
         'talento-humano'
     ];
-
     foreach ($protectedFolders as $folder) {
         if ($folder === 'inventario') {
             // Cargar todas las rutas del inventario

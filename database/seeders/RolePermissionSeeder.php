@@ -423,6 +423,7 @@ class RolePermissionSeeder extends Seeder
             'CREAR DEVOLUCION',
             'PROCESAR DEVOLUCION',
             'VER DASHBOARD INVENTARIO',
+
         ]);
 
         // Asignar permisos al rol INSTRUCTOR

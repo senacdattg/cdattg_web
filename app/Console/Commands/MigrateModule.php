@@ -48,7 +48,6 @@ class MigrateModule extends Command
         'batch_15_logs_auditoria' => 'Logs y Auditoría',
         'batch_16_inventario' => 'Módulo de inventario',
         'batch_17_complementarios' => 'Módulo de Complementarios (cursos complementarios, aspirantes, caracterización)',
-
     ];
 
     /**

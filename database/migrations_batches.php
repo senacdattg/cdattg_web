@@ -189,7 +189,6 @@ return [
             'devoluciones',
         ],
         'orden' => 16,
-    ],
     'batch_17_complementarios' => [
         'descripcion' => 'Módulo de Complementarios - Cursos complementarios, aspirantes y caracterización',
         'dependencias' => ['batch_05_personas', 'batch_03_parametros', 'batch_11_jornadas_horarios', 'batch_06_infraestructura'],
@@ -201,5 +200,6 @@ return [
             'persona_caracterizacion',
         ],
         'orden' => 17,
-    ],
+        ],
+    ]
 ];
