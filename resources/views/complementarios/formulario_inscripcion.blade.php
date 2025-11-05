@@ -4,9 +4,245 @@
     @vite(['resources/css/formulario_inscripcion.css'])
 @endsection
 @section('scripts')
-<script src="{{ asset('js/complementarios/formulario-inscripcion.js') }}"></script>
-@endsection
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Configurar conversión a mayúsculas
+    setupUppercaseConversion();
 
+    // Configurar validación de números
+    setupNumberValidation();
+
+    // Configurar carga dinámica de municipios
+    setupMunicipioLoading();
+
+    // Configurar manejo de caracterización
+    setupCaracterizacionHandling();
+});
+
+function setupUppercaseConversion() {
+    const camposTexto = [
+        'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido'
+    ];
+
+    camposTexto.forEach(campoId => {
+        const campo = document.getElementById(campoId);
+        if (campo) {
+            campo.addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+        }
+    });
+}
+
+function setupNumberValidation() {
+    const camposNumericos = ['numero_documento', 'telefono', 'celular'];
+
+    camposNumericos.forEach(campoId => {
+        const campo = document.getElementById(campoId);
+        if (campo) {
+            campo.addEventListener('keypress', soloNumeros);
+        }
+    });
+}
+
+function soloNumeros(event) {
+    const key = event.key;
+    if (event.ctrlKey || event.altKey || event.metaKey) {
+        return true;
+    }
+    if (!/^\d$/.test(key)) {
+        event.preventDefault();
+        return false;
+    }
+    return true;
+}
+
+function setupMunicipioLoading() {
+    const departamentoSelect = document.getElementById('departamento_id');
+    if (departamentoSelect) {
+        departamentoSelect.addEventListener('change', function() {
+            loadMunicipiosForDepartamento(this.value);
+        });
+    }
+}
+
+function loadMunicipiosForDepartamento(departamentoId) {
+    const municipioSelect = document.getElementById('municipio_id');
+    if (!municipioSelect) return;
+
+    if (departamentoId) {
+        fetch(`/municipios/${departamentoId}`)
+            .then(response => response.json())
+            .then(data => {
+                municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
+                data.forEach(municipio => {
+                    const option = document.createElement('option');
+                    option.value = municipio.id;
+                    option.textContent = municipio.municipio;
+                    municipioSelect.appendChild(option);
+                });
+            })
+            .catch(error => {
+                console.error('Error cargando municipios:', error);
+                municipioSelect.innerHTML = '<option value="">Error cargando municipios</option>';
+            });
+    } else {
+        municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
+    }
+}
+
+function setupCaracterizacionHandling() {
+    const caracterizacionRadios = document.querySelectorAll('input[name="caracterizacion_id"]');
+    let ningunaRadio = null;
+    
+    // Buscar el radio button de "NINGUNA"
+    caracterizacionRadios.forEach(radio => {
+        const label = document.querySelector(`label[for="${radio.id}"]`);
+        if (label && label.textContent.trim().toUpperCase() === 'NINGUNA') {
+            ningunaRadio = radio;
+        }
+    });
+
+    // Si no se encuentra "NINGUNA", salir
+    if (!ningunaRadio) return;
+
+    // Establecer "NINGUNA" como seleccionada por defecto
+    ningunaRadio.checked = true;
+
+    // Agregar event listeners a todos los radio buttons
+    caracterizacionRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this !== ningunaRadio && this.checked) {
+                // Si se selecciona cualquier opción que no sea "NINGUNA", deseleccionar "NINGUNA"
+                ningunaRadio.checked = false;
+            } else if (this === ningunaRadio && this.checked) {
+                // Si se selecciona "NINGUNA", deseleccionar todas las demás opciones
+                caracterizacionRadios.forEach(otherRadio => {
+                    if (otherRadio !== ningunaRadio) {
+                        otherRadio.checked = false;
+                    }
+                });
+            }
+        });
+    });
+
+    // Manejar el evento de reset del formulario
+    const form = document.getElementById('formInscripcion');
+    if (form) {
+        form.addEventListener('reset', function() {
+            // Después del reset, volver a seleccionar "NINGUNA"
+            setTimeout(() => {
+                ningunaRadio.checked = true;
+                caracterizacionRadios.forEach(radio => {
+                    if (radio !== ningunaRadio) {
+                        radio.checked = false;
+                    }
+                });
+            }, 0);
+        });
+    }
+}
+
+// Funcionalidad del formulario de dirección estructurada
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleButton = document.getElementById('toggleAddressForm');
+    if (toggleButton) {
+        toggleButton.addEventListener('click', function() {
+            const addressForm = document.getElementById('addressForm');
+            const isVisible = addressForm.classList.contains('show');
+            const button = this;
+            if (isVisible) {
+                $('#addressForm').collapse('hide');
+                button.setAttribute('aria-expanded', 'false');
+            } else {
+                $('#addressForm').collapse('show');
+                button.setAttribute('aria-expanded', 'true');
+            }
+        });
+    }
+
+    const saveButton = document.getElementById('saveAddress');
+    if (saveButton) {
+        saveButton.addEventListener('click', function() {
+            const tipoVia = document.getElementById('tipo_via') ? document.getElementById('tipo_via').value.trim() : '';
+            const numeroVia = document.getElementById('numero_via') ? document.getElementById('numero_via').value.trim() : '';
+            const letraVia = document.getElementById('letra_via') ? document.getElementById('letra_via').value.trim() : '';
+            const viaSecundaria = document.getElementById('via_secundaria') ? document.getElementById('via_secundaria').value.trim() : '';
+            const numeroCasa = document.getElementById('numero_casa') ? document.getElementById('numero_casa').value.trim() : '';
+            const complementos = document.getElementById('complementos') ? document.getElementById('complementos').value.trim() : '';
+            const barrio = document.getElementById('barrio') ? document.getElementById('barrio').value.trim() : '';
+
+            // Validar campos obligatorios
+            if (!tipoVia || !numeroVia || !numeroCasa) {
+                alert('Por favor complete todos los campos obligatorios: Tipo de vía, Número de vía y Número de casa.');
+                return;
+            }
+
+            // Construir la dirección
+            let direccion = `${tipoVia} ${numeroVia}`;
+            if (letraVia) {
+                direccion += letraVia;
+            }
+            direccion += ` #${numeroCasa}`;
+            if (viaSecundaria) {
+                direccion += ` ${viaSecundaria}`;
+            }
+            if (complementos) {
+                direccion += ` ${complementos}`;
+            }
+            if (barrio) {
+                direccion += `, ${barrio}`;
+            }
+
+            // Asignar al campo principal
+            document.getElementById('direccion').value = direccion;
+
+            // Ocultar el formulario
+            $('#addressForm').collapse('hide');
+
+            // Limpiar campos
+            document.querySelectorAll('.address-field').forEach(field => {
+                if (field.type === 'select-one') {
+                    field.selectedIndex = 0;
+                } else {
+                    field.value = '';
+                }
+            });
+        });
+    }
+
+    const cancelButton = document.getElementById('cancelAddress');
+    if (cancelButton) {
+        cancelButton.addEventListener('click', function() {
+            // Ocultar el formulario
+            $('#addressForm').collapse('hide');
+
+            // Limpiar campos
+            document.querySelectorAll('.address-field').forEach(field => field.value = '');
+        });
+    }
+
+    // Validar solo números en campos de dirección
+    const addressNumericFields = ['numero_via', 'numero_casa'];
+    addressNumericFields.forEach(fieldId => {
+        const element = document.getElementById(fieldId);
+        if (element) {
+            element.addEventListener('keypress', function(event) {
+                const key = event.key;
+                if (event.ctrlKey || event.altKey || event.metaKey) {
+                    return true;
+                }
+                if (!/^\d$/.test(key)) {
+                    event.preventDefault();
+                    return false;
+                }
+                return true;
+            });
+        }
+    });
+});
+</script>
+@endsection
 @section('content')
 
      <div class="container-fluid mt-4" style="background-color: #ebf1f4; min-height: 100vh;">
