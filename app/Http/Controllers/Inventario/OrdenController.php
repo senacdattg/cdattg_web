@@ -367,7 +367,7 @@ class OrdenController extends InventarioController
                 Notification::send($superadmins, new NuevaOrdenNotification($orden));
             }
 
-            return redirect()->route('inventario.ordenes.index')
+            return redirect()->route('inventario.productos.catalogo')
                 ->with('success', 'Solicitud creada exitosamente. Está pendiente de aprobación por el administrador.')
                 ->with('clear_cart', true);
 
