@@ -1,65 +1,45 @@
-FROM php:8.3-fpm-alpine
+FROM php:8.3-fpm
 
-# Instalar dependencias del sistema
-RUN apk add --no-cache \
-    git \
-    curl \
-    libpng-dev \
-    oniguruma-dev \
-    libxml2-dev \
-    libzip-dev \
-    zip \
-    unzip \
-    nodejs \
-    npm \
-    supervisor \
-    mysql-client \
-    icu-dev \
-    libjpeg-turbo-dev \
-    freetype-dev \
-    libwebp-dev
+# Actualizar e instalar dependencias de sistema (Debian/Ubuntu)
+RUN apt-get update -y \
+    && apt-get install -y --no-install-recommends \
+       git curl bash supervisor unzip zip \
+       libpng-dev libonig-dev libxml2-dev libzip-dev libicu-dev \
+       libjpeg-dev libfreetype6-dev libwebp-dev \
+       pkg-config ca-certificates \
+       nodejs npm \
+    && rm -rf /var/lib/apt/lists/*
 
-# Instalar extensiones PHP
+# Extensiones PHP (gd con jpeg/freetype/webp)
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd zip intl
+    && docker-php-ext-install -j$(nproc) pdo_mysql mbstring exif pcntl bcmath gd zip intl \
+    && apt-get update -y && apt-get install -y --no-install-recommends $PHPIZE_DEPS \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && apt-get purge -y --auto-remove $PHPIZE_DEPS \
+    && rm -rf /var/lib/apt/lists/*
 
 # Instalar Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Crear directorios necesarios
+RUN mkdir -p /var/www/html \
+    && mkdir -p /var/log/supervisor \
+    && chown -R www-data:www-data /var/www/html /var/log/supervisor
+
 # Configurar directorio de trabajo
 WORKDIR /var/www/html
 
-# Copiar archivos de configuración
-COPY composer.json package.json package-lock.json ./
-COPY composer.lock* ./
+# Copiar script de inicialización
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
-# Instalar dependencias PHP
-RUN composer install --no-dev --optimize-autoloader --no-interaction
-
-# Instalar dependencias Node.js y build assets
-RUN npm ci && npm run build
-
-# Copiar código fuente (excluyendo vendor que se instala con composer)
-COPY app/ ./app/
-COPY bootstrap/ ./bootstrap/
-COPY config/ ./config/
-COPY database/ ./database/
-COPY public/ ./public/
-COPY resources/ ./resources/
-COPY routes/ ./routes/
-COPY storage/ ./storage/
-COPY artisan composer.json composer.lock package.json package-lock.json ./
-
-# Configurar permisos
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html/storage \
-    && chmod -R 755 /var/www/html/bootstrap/cache
-
-# Configurar supervisor para queues
+# Copiar configuración de supervisor
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Exponer puerto
-EXPOSE 9000
+# Exponer puertos
+EXPOSE 9000 8080
 
-# Comando de inicio
+# Usar script de inicialización
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
