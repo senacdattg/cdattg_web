@@ -11,7 +11,10 @@
                 <div class="col-md-6 mb-3">
                     <label for="tipo_documento" class="form-label">Tipo de Documento *</label>
                     <select class="form-control" id="tipo_documento" name="tipo_documento" required>
-
+                        <option value="1" {{ old('tipo_documento', $userData['tipo_documento'] ?? '1') == '1' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
+                        <option value="2" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '2' ? 'selected' : '' }}>Tarjeta de Identidad</option>
+                        <option value="3" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '3' ? 'selected' : '' }}>Cédula de Extranjería</option>
+                        <option value="4" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '4' ? 'selected' : '' }}>Pasaporte</option>
                         <option value="">Seleccione...</option>
                         @if($tiposDocumento && $tiposDocumento->count() > 0)
                             @foreach($tiposDocumento as $tipo)
@@ -216,7 +219,10 @@
                 <div class="col-md-6 mb-3">
                     <label for="tipo_documento" class="form-label">Tipo de Documento *</label>
                     <select class="form-control" id="tipo_documento" name="tipo_documento" required>
-
+                        <option value="1" {{ old('tipo_documento', $userData['tipo_documento'] ?? '1') == '1' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
+                        <option value="2" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '2' ? 'selected' : '' }}>Tarjeta de Identidad</option>
+                        <option value="3" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '3' ? 'selected' : '' }}>Cédula de Extranjería</option>
+                        <option value="4" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '4' ? 'selected' : '' }}>Pasaporte</option>
                         <option value="">Seleccione...</option>
                         @if($tiposDocumento && $tiposDocumento->count() > 0)
                             @foreach($tiposDocumento as $tipo)

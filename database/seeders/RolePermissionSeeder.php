@@ -252,6 +252,7 @@ class RolePermissionSeeder extends Seeder
             'EDITAR PERSONA',
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+
             // Permisos de inventario para SUPER ADMINISTRADOR
             'CREAR PRODUCTO',
             'VER PRODUCTO',
@@ -419,11 +420,13 @@ class RolePermissionSeeder extends Seeder
             'CREAR DEVOLUCION',
             'PROCESAR DEVOLUCION',
             'VER DASHBOARD INVENTARIO',
+
         ]);
 
         // Asignar permisos al rol INSTRUCTOR
         $instructor->givePermissionTo([
             'TOMAR ASISTENCIA',
+
             'VER APRENDIZ',
             // Permisos para instructores (solo los que le corresponden)
             'VER INSTRUCTOR',

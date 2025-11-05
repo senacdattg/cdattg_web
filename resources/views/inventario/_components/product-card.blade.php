@@ -40,6 +40,13 @@
                 </span>
             @endif
         </div>
+
+        @if(!empty($producto->codigo_barras))
+            <div class="mt-2">
+                <small class="text-muted">Código: {{ $producto->codigo_barras }}</small>
+                <svg class="barcode-inline" id="barcode-card-{{ $producto->id }}" style="width:100%"></svg>
+            </div>
+        @endif
         
         @if($showActions)
             <div class="product-actions">
@@ -75,3 +82,15 @@
         @endif
     </div>
 </div>
+@push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            @if(!empty($producto->codigo_barras))
+            try {
+                JsBarcode('#barcode-card-{{ $producto->id }}', '{{ $producto->codigo_barras }}', {format:'code128', width:1.6, height:40, displayValue:false});
+            } catch(e) {}
+            @endif
+        });
+    </script>
+@endpush
