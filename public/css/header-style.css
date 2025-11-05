@@ -11,6 +11,7 @@
     font-weight: bold;
     font-size: 14px;
     color: #343a40;
+
     text-transform: uppercase;
     transition: all 0.3s ease;
 }
@@ -68,3 +69,4 @@
     display: block;
     width: 100%;
 }
+

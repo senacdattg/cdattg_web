@@ -29,5 +29,5 @@ class ComplementarioController extends Controller
 {
     // Esta clase está completamente vacía y solo mantiene compatibilidad.
     // Todos los métodos han sido movidos a controladores especializados.
-    // La refactorización está completa y funcional.
+    // La refactorización está completa y funcional.
 }

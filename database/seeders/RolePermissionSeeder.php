@@ -18,7 +18,7 @@ class RolePermissionSeeder extends Seeder
         $aprendiz           = Role::firstOrCreate(['name' => 'APRENDIZ']);
         $aspirante          = Role::firstOrCreate(['name' => 'ASPIRANTE']);
 
-        // Definir un arreglo de permisos para cada grupo
+        // Definir  un arreglo de permisos para cada grupo
         $permisos = [   
             // Permisos para parámetros
             'CREAR PARAMETRO',
@@ -91,6 +91,98 @@ class RolePermissionSeeder extends Seeder
             'EDITAR PERSONA',
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+            // Permisos para inventario
+            // Productos
+            'CREAR PRODUCTO',
+            'VER PRODUCTO',
+            'EDITAR PRODUCTO',
+            'ELIMINAR PRODUCTO',
+            'VER CATALOGO PRODUCTO',
+            'BUSCAR PRODUCTO',
+            // Carrito
+            'VER CARRITO',
+            'AGREGAR CARRITO',
+            'ACTUALIZAR CARRITO',
+            'ELIMINAR CARRITO',
+            'VACIAR CARRITO',
+            // Categorías
+            'CREAR CATEGORIA',
+            'VER CATEGORIA',
+            'EDITAR CATEGORIA',
+            'ELIMINAR CATEGORIA',
+            // Marcas
+            'CREAR MARCA',
+            'VER MARCA',
+            'EDITAR MARCA',
+            'ELIMINAR MARCA',
+            // Contratos y Convenios
+            'CREAR CONTRATO',
+            'VER CONTRATO',
+            'EDITAR CONTRATO',
+            'ELIMINAR CONTRATO',
+            // Proveedores
+            'CREAR PROVEEDOR',
+            'VER PROVEEDOR',
+            'EDITAR PROVEEDOR',
+            'ELIMINAR PROVEEDOR',
+            // Ordenes
+            'VER ORDEN',
+            'CREAR ORDEN',
+            'EDITAR ORDEN',
+            'ELIMINAR ORDEN',
+            'APROBAR ORDEN',
+            'COMPLETAR ORDEN',
+            // Préstamos
+            'VER PRESTAMO',
+            'CREAR PRESTAMO',
+            'EDITAR PRESTAMO',
+            'DEVOLVER PRESTAMO',
+            'APROBAR PRESTAMO',
+            // Entradas
+            'VER ENTRADA',
+            'CREAR ENTRADA',
+            // Salidas
+            'VER SALIDA',
+            'CREAR SALIDA',
+            // Devoluciones
+            'VER DEVOLUCION',
+            'CREAR DEVOLUCION',
+            'PROCESAR DEVOLUCION',
+            // Notificaciones
+            'VER NOTIFICACION',
+            // Dashboard
+            'VER DASHBOARD INVENTARIO',
+            // Permisos para redes de conocimiento
+            'CREAR RED CONOCIMIENTO',
+            'EDITAR RED CONOCIMIENTO',
+            'VER RED CONOCIMIENTO',
+            'ELIMINAR RED CONOCIMIENTO',
+            // Permisos para aprendices
+            'VER APRENDIZ',
+            'CREAR APRENDIZ',
+            'EDITAR APRENDIZ',
+            'ELIMINAR APRENDIZ',
+            // Permisos para programas de formación
+            'programa.index',
+            'programa.show',
+            'programa.create',
+            'programa.edit',
+            'programa.delete',
+            'programa.search',
+            // Permisos para resultados de aprendizaje
+            'VER RESULTADO APRENDIZAJE',
+            'CREAR RESULTADO APRENDIZAJE',
+            'EDITAR RESULTADO APRENDIZAJE',
+            'ELIMINAR RESULTADO APRENDIZAJE',
+            'GESTIONAR COMPETENCIAS RAP',
+            'CAMBIAR ESTADO RAP',
+            // Permisos para competencias
+            'VER COMPETENCIA',
+            'CREAR COMPETENCIA',
+            'EDITAR COMPETENCIA',
+            'ELIMINAR COMPETENCIA',
+            'GESTIONAR RESULTADOS COMPETENCIA',
+            'CAMBIAR ESTADO COMPETENCIA',
             // Permisos para aspirantes complementarios
             'VER ESTADISTICAS',
             // Permisos para programas complementarios
@@ -100,6 +192,11 @@ class RolePermissionSeeder extends Seeder
             // Permisos para talento humano
             'VER TALENTO HUMANO',
             'CREAR TALENTO HUMANO',
+
+            'VER FICHAS ASIGNADAS',
+            'GESTIONAR DIAS FICHA',
+            'GESTIONAR APRENDICES FICHA',
+            'CAMBIAR ESTADO FICHA',
         ];
 
         // Crear cada permiso si no existe
@@ -156,6 +253,84 @@ class RolePermissionSeeder extends Seeder
             'EDITAR PERSONA',
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+
+            // Permisos de inventario para SUPER ADMINISTRADOR
+            'CREAR PRODUCTO',
+            'VER PRODUCTO',
+            'EDITAR PRODUCTO',
+            'ELIMINAR PRODUCTO',
+            'VER CATALOGO PRODUCTO',
+            'BUSCAR PRODUCTO',
+            'VER CARRITO',
+            'AGREGAR CARRITO',
+            'ACTUALIZAR CARRITO',
+            'ELIMINAR CARRITO',
+            'VACIAR CARRITO',
+            'CREAR CATEGORIA',
+            'VER CATEGORIA',
+            'EDITAR CATEGORIA',
+            'ELIMINAR CATEGORIA',
+            'CREAR MARCA',
+            'VER MARCA',
+            'EDITAR MARCA',
+            'ELIMINAR MARCA',
+            'CREAR CONTRATO',
+            'VER CONTRATO',
+            'EDITAR CONTRATO',
+            'ELIMINAR CONTRATO',
+            'CREAR PROVEEDOR',
+            'VER PROVEEDOR',
+            'EDITAR PROVEEDOR',
+            'ELIMINAR PROVEEDOR',
+            'VER ORDEN',
+            'CREAR ORDEN',
+            'EDITAR ORDEN',
+            'ELIMINAR ORDEN',
+            'APROBAR ORDEN',
+            'COMPLETAR ORDEN',
+            'VER PRESTAMO',
+            'CREAR PRESTAMO',
+            'EDITAR PRESTAMO',
+            'DEVOLVER PRESTAMO',
+            'APROBAR PRESTAMO',
+            'VER ENTRADA',
+            'CREAR ENTRADA',
+            'VER SALIDA',
+            'CREAR SALIDA',
+            'VER DEVOLUCION',
+            'CREAR DEVOLUCION',
+            'PROCESAR DEVOLUCION',
+            'VER NOTIFICACION',
+            'VER DASHBOARD INVENTARIO',
+            'CREAR RED CONOCIMIENTO',
+            'EDITAR RED CONOCIMIENTO',
+            'VER RED CONOCIMIENTO',
+            'ELIMINAR RED CONOCIMIENTO',
+            'VER APRENDIZ',
+            'CREAR APRENDIZ',
+            'EDITAR APRENDIZ',
+            'ELIMINAR APRENDIZ',
+            // Permisos para programas de formación
+            'programa.index',
+            'programa.show',
+            'programa.create',
+            'programa.edit',
+            'programa.delete',
+            'programa.search',
+            // Permisos para resultados de aprendizaje
+            'VER RESULTADO APRENDIZAJE',
+            'CREAR RESULTADO APRENDIZAJE',
+            'EDITAR RESULTADO APRENDIZAJE',
+            'ELIMINAR RESULTADO APRENDIZAJE',
+            'GESTIONAR COMPETENCIAS RAP',
+            'CAMBIAR ESTADO RAP',
+            // Permisos para competencias
+            'VER COMPETENCIA',
+            'CREAR COMPETENCIA',
+            'EDITAR COMPETENCIA',
+            'ELIMINAR COMPETENCIA',
+            'GESTIONAR RESULTADOS COMPETENCIA',
+            'CAMBIAR ESTADO COMPETENCIA',
             'VER ESTADISTICAS',
             'VER PROGRAMA COMPLEMENTARIO',
             'CREAR PROGRAMA COMPLEMENTARIO',
@@ -178,17 +353,115 @@ class RolePermissionSeeder extends Seeder
             'VER PERSONA',
             'EDITAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+
+            // Permisos para redes de conocimiento
+            'CREAR RED CONOCIMIENTO',
+            'EDITAR RED CONOCIMIENTO',
+            'VER RED CONOCIMIENTO',
+            'ELIMINAR RED CONOCIMIENTO',
+            // Permisos para aprendices
+            'VER APRENDIZ',
+            'CREAR APRENDIZ',
+            'EDITAR APRENDIZ',
+            'ELIMINAR APRENDIZ',
+            // Permisos para programas de formación (solo lectura y búsqueda para administradores)
+            'programa.index',
+            'programa.show',
+            'programa.search',
+            'VER NOTIFICACION',
             'VER ESTADISTICAS',
             'VER PROGRAMA COMPLEMENTARIO',
             'CREAR PROGRAMA COMPLEMENTARIO',
             'ELIMINAR ASPIRANTE COMPLEMENTARIO',
             'VER TALENTO HUMANO',
             'CREAR TALENTO HUMANO',
+
+            // Permisos de inventario para ADMINISTRADOR (todos menos APROBAR ORDEN)
+            'CREAR PRODUCTO',
+            'VER PRODUCTO',
+            'EDITAR PRODUCTO',
+            'ELIMINAR PRODUCTO',
+            'VER CATALOGO PRODUCTO',
+            'BUSCAR PRODUCTO',
+            'VER CARRITO',
+            'AGREGAR CARRITO',
+            'ACTUALIZAR CARRITO',
+            'ELIMINAR CARRITO',
+            'VACIAR CARRITO',
+            'CREAR CATEGORIA',
+            'VER CATEGORIA',
+            'EDITAR CATEGORIA',
+            'ELIMINAR CATEGORIA',
+            'CREAR MARCA',
+            'VER MARCA',
+            'EDITAR MARCA',
+            'ELIMINAR MARCA',
+            'CREAR CONTRATO',
+            'VER CONTRATO',
+            'EDITAR CONTRATO',
+            'ELIMINAR CONTRATO',
+            'CREAR PROVEEDOR',
+            'VER PROVEEDOR',
+            'EDITAR PROVEEDOR',
+            'ELIMINAR PROVEEDOR',
+            'VER ORDEN',
+            'CREAR ORDEN',
+            'EDITAR ORDEN',
+            'ELIMINAR ORDEN',
+            // NO incluir APROBAR ORDEN para que solo el SUPER ADMIN pueda aprobar
+            'COMPLETAR ORDEN',
+            'VER PRESTAMO',
+            'CREAR PRESTAMO',
+            'EDITAR PRESTAMO',
+            'DEVOLVER PRESTAMO',
+            'APROBAR PRESTAMO',
+            'VER ENTRADA',
+            'CREAR ENTRADA',
+            'VER SALIDA',
+            'CREAR SALIDA',
+            'VER DEVOLUCION',
+            'CREAR DEVOLUCION',
+            'PROCESAR DEVOLUCION',
+            'VER DASHBOARD INVENTARIO',
         ]);
 
         // Asignar permisos al rol INSTRUCTOR
         $instructor->givePermissionTo([
             'TOMAR ASISTENCIA',
+
+            'VER APRENDIZ',
+            // Permisos para instructores (solo los que le corresponden)
+            'VER INSTRUCTOR',
+            'VER FICHAS ASIGNADAS',
+            // Permisos para fichas de caracterización (limitados a fichas asignadas)
+            'VER FICHA DE CARACTERIZACION',
+            'EDITAR FICHA DE CARACTERIZACION',
+            'GESTIONAR DIAS FICHA',
+            'GESTIONAR APRENDICES FICHA',
+            'CAMBIAR ESTADO FICHA',
+            // Permisos para programas de formación (solo consulta para instructores)
+            'programa.index',
+            'programa.show',
+            'programa.search',
+            // Permisos para resultados de aprendizaje
+            'VER RESULTADO APRENDIZAJE',
+            'CREAR RESULTADO APRENDIZAJE',
+            'EDITAR RESULTADO APRENDIZAJE',
+            'GESTIONAR COMPETENCIAS RAP',
+            'CAMBIAR ESTADO RAP',
+            // Permisos para competencias
+            'VER COMPETENCIA',
+            // Permisos de inventario para INSTRUCTOR (solo catálogo y carrito, NO lista de productos ni configuraciones)
+            'VER CATALOGO PRODUCTO',
+            'BUSCAR PRODUCTO',
+            'VER CARRITO',
+            'AGREGAR CARRITO',
+            'ACTUALIZAR CARRITO',
+            'ELIMINAR CARRITO',
+            'VACIAR CARRITO',
+            'CREAR ORDEN',
+            'DEVOLVER PRESTAMO',
+            'VER NOTIFICACION',
         ]);
 
         // Asignar permisos al rol ASPIRANTE
@@ -199,6 +472,22 @@ class RolePermissionSeeder extends Seeder
         // Asignar permisos al rol VISITANTE
         $visitante->givePermissionTo([
             'VER PERSONA',
+
+        ]);
+        // Asignar permisos al rol APRENDIZ
+        // Los aprendices tienen acceso limitado solo a consultar su propia información
+        $aprendiz->syncPermissions([
+            // Permisos de inventario para APRENDIZ (solo catálogo y carrito, NO lista de productos ni configuraciones)
+            'VER CATALOGO PRODUCTO',
+            'BUSCAR PRODUCTO',
+            'VER CARRITO',
+            'AGREGAR CARRITO',
+            'ACTUALIZAR CARRITO',
+            'ELIMINAR CARRITO',
+            'VACIAR CARRITO',
+            'CREAR ORDEN',
+            'DEVOLVER PRESTAMO',
+            'VER NOTIFICACION',
         ]);
     }
 }

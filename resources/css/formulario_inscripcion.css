@@ -61,6 +61,7 @@
     border-color: #cee1ff;
 }
 
+
 /* Responsividad para móviles */
 @media (max-width: 768px) {
     .container-fluid {
@@ -237,3 +238,4 @@
     margin-left: auto;
     margin-right: auto;
 }
+

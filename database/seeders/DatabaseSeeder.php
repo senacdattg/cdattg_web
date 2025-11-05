@@ -16,14 +16,12 @@ class DatabaseSeeder extends Seeder
             // Primero los roles y permisos generales
             RolePermissionSeeder::class,
             
-            // Permisos específicos de FichaCaracterizacion
-            FichaCaracterizacionPermissionsSeeder::class,
-            
-            // Permisos específicos de Guías de Aprendizaje
-            GuiasAprendizajePermissionsSeeder::class,
-            
-            // Permisos específicos de Resultados de Aprendizaje
-            ResultadosAprendizajePermissionsSeeder::class,
+            // NOTA: Estos seeders de permisos están comentados porque todos los permisos
+            // ya están definidos en RolePermissionSeeder usando syncPermissions()
+            // Si se ejecutan, causarán conflictos al usar givePermissionTo()
+            // FichaCaracterizacionPermissionsSeeder::class,
+            // GuiasAprendizajePermissionsSeeder::class,
+            // ResultadosAprendizajePermissionsSeeder::class,
 
             // Luego los datos geográficos
             PaisSeeder::class,
@@ -79,6 +77,14 @@ class DatabaseSeeder extends Seeder
             ResultadosGuiasSeeder::class,
             CompetenciaProgramaSeeder::class,
 
+
+            //Inventario:
+            OrdenSeeder::class, //Crear ordenes
+            ProveedoresSeeder::class, //Crear proveedores
+            ContratosConveniosSeeder::class, //Crear contratos y convenios
+            ProductoSeeder::class, // Crear productos para agregar al módulo de inventario
+            DetalleOrdenSeeder::class, // Crear detalles de ordenes
+            AprobacionSeeder::class, // Crear aprobaciones de ordenes
             // Complementarios ofertados
             ComplementariosOfertadosSeeder::class,
 

@@ -1,0 +1,284 @@
+/**
+ * imagen.css - Estilos para el modal de imagen expandible
+ * Modal moderno con controles y efectos visuales
+ */
+
+/* ========================================
+   Modal de Imagen Moderno
+   ======================================== */
+.image-modal-modern {
+    background: transparent;
+    border: none;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+}
+
+.image-modal-header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: none;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.image-modal-header .modal-title {
+    margin: 0;
+    font-weight: 600;
+}
+
+.modal-header-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.modal-header-controls .btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.modal-header-controls .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ========================================
+   Body del Modal
+   ======================================== */
+.image-modal-body {
+    background: #0f0f0f;
+    padding: 0;
+    position: relative;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+}
+
+.image-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    padding: 20px;
+    cursor: default;
+    position: relative;
+}
+
+.image-container.draggable {
+    cursor: move;
+}
+
+.image-container.dragging {
+    cursor: grabbing;
+}
+
+.expanded-image {
+    max-width: 100%;
+    max-height: 70vh;
+    object-fit: contain;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 4px;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+}
+
+/* ========================================
+   Información de la Imagen
+   ======================================== */
+.image-modal-info {
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.5);
+    text-align: center;
+    font-size: 0.875rem;
+    font-family: 'Courier New', monospace;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.image-modal-info span {
+    display: inline-flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.image-modal-info i {
+    color: #667eea;
+}
+
+/* ========================================
+   Footer del Modal
+   ======================================== */
+.image-modal-footer {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: none;
+    padding: 15px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.image-modal-footer .btn {
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.image-modal-footer .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+}
+
+.image-modal-footer .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.image-modal-footer .btn-secondary {
+    background: #4a5568;
+    border: none;
+}
+
+.image-modal-footer .btn-secondary:hover {
+    background: #2d3748;
+    transform: translateY(-2px);
+}
+
+/* ========================================
+   Animaciones
+   ======================================== */
+.modal.fade .image-modal-modern {
+    transform: scale(0.9);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal.show .image-modal-modern {
+    transform: scale(1);
+    opacity: 1;
+}
+
+/* ========================================
+   Loading Spinner
+   ======================================== */
+.image-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 2rem;
+    z-index: 10;
+}
+
+.image-loading i {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* ========================================
+   Indicadores Visuales
+   ======================================== */
+.zoom-indicator {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(10px);
+}
+
+.zoom-indicator i {
+    color: #667eea;
+}
+
+/* ========================================
+   Responsive Design
+   ======================================== */
+@media (max-width: 768px) {
+    .modal-header-controls {
+        gap: 4px;
+    }
+    
+    .modal-header-controls .btn {
+        padding: 4px 8px;
+        font-size: 0.875rem;
+    }
+    
+    .expanded-image {
+        max-height: 60vh;
+    }
+    
+    .image-modal-body {
+        min-height: 400px;
+    }
+    
+    .image-modal-info {
+        font-size: 0.75rem;
+        padding: 8px 15px;
+    }
+    
+    .zoom-indicator {
+        font-size: 0.75rem;
+        padding: 6px 12px;
+        top: 10px;
+        right: 10px;
+    }
+}
+
+@media (max-width: 576px) {
+    .image-modal-header {
+        padding: 12px 15px;
+    }
+    
+    .image-modal-footer {
+        padding: 12px 15px;
+    }
+    
+    .image-modal-footer .btn {
+        padding: 6px 15px;
+        font-size: 0.875rem;
+    }
+}
+
+/* ========================================
+   Mejoras de Accesibilidad
+   ======================================== */
+.image-modal-modern *:focus {
+    outline: 2px solid #667eea;
+    outline-offset: 2px;
+}
+
+.image-modal-modern button:focus {
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.3);
+}
+
+/* ========================================
+   Efectos Adicionales
+   ======================================== */
+.modal-backdrop.show {
+    opacity: 0.8;
+    backdrop-filter: blur(3px);
+}
+
+.image-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+    pointer-events: none;
+}
