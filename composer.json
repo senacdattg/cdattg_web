@@ -18,8 +18,6 @@
         "laravel/reverb": "^1.6",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.8",
-
-        "maatwebsite/excel": "*",
         "masbug/flysystem-google-drive-ext": "^2.4",
         "phpoffice/phpspreadsheet": "^2.1",
         "pusher/pusher-php-server": "^7.2",
