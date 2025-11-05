@@ -104,8 +104,7 @@
                                                        id="codigo_barras" 
                                                        name="codigo_barras" 
                                                        value="{{ old('codigo_barras', $producto->codigo_barras) }}"
-                                                       placeholder="Escanear o ingresar"
-                                                       required>
+                                                       placeholder="Escanear o ingresar (opcional)">
                                                 <div class="input-group-append">
                                                     <button type="button" class="btn btn-info" id="scan-btn">
                                                         <i class="fas fa-qrcode"></i>
