@@ -159,6 +159,14 @@
                                 <option value="2">Cupos Llenos</option>
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <label for="edit_ambiente_id" class="form-label">Ambiente</label>
+                            <select class="form-select" id="edit_ambiente_id" name="ambiente_id" required>
+                                @foreach($ambientes as $ambiente)
+                                <option value="{{ $ambiente->id }}">{{ $ambiente->title }} - {{ $ambiente->piso->piso ?? 'N/A' }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                             <button type="button" class="btn btn-secondary" data-dismiss="modal">
                                 Cancelar
@@ -234,6 +242,10 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Estado</label>
                         <p id="view_estado" class="form-control-plaintext"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Ambiente</label>
+                        <p id="view_ambiente" class="form-control-plaintext"></p>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Dรญas de Formaciรณn</label>
@@ -330,6 +342,11 @@
                     const estados = {0: 'Sin Oferta', 1: 'Con Oferta', 2: 'Cupos Llenos'};
                     document.getElementById('view_estado').textContent = estados[data.estado] || 'N/A';
 
+                    // Ambiente
+                    const ambientes = @json($ambientes);
+                    const ambiente = ambientes.find(a => a.id == data.ambiente_id);
+                    document.getElementById('view_ambiente').textContent = ambiente ? `${ambiente.title} - ${ambiente.piso?.piso ?? 'N/A'}` : 'N/A';
+
                     // Dias
                     if (data.dias && data.dias.length > 0) {
                         const diasText = data.dias.map(dia => {
@@ -370,6 +387,7 @@
                     document.getElementById('edit_modalidad_id').value = data.modalidad_id;
                     document.getElementById('edit_jornada_id').value = data.jornada_id;
                     document.getElementById('edit_estado').value = data.estado;
+                    document.getElementById('edit_ambiente_id').value = data.ambiente_id;
 
                     // Show the edit modal
                     $('#editProgramModal').modal('show');

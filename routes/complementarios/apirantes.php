@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ComplementarioController;
+use App\Http\Controllers\Complementarios\AspiranteComplementarioController;
 
-Route::get('/aspirantes/{curso}', [ComplementarioController::class, 'verAspirantes'])
+Route::get('/aspirantes/{curso}', [AspiranteComplementarioController::class, 'verAspirantes'])
     ->name('aspirantes.ver')
     ->middleware('auth');
 

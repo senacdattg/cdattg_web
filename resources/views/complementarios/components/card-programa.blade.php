@@ -1,7 +1,8 @@
 @props(['programaData'])
 
-<div class="card card-success">
-    <div class="card-header">
+<div class="card">
+    <div class="card-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
+
         <h3 class="card-title">
             <i class="fas fa-graduation-cap mr-2"></i>{{ $programaData['nombre'] }}
         </h3>
@@ -15,9 +16,10 @@
         <div class="row">
             <div class="col-md-8">
                 <div class="text-center mb-5">
-                    <i class="{{ $programaData['icono'] }} fa-5x text-success mb-4"></i>
+                    <i class="{{ $programaData['icono'] }} fa-5x text-primary mb-4"></i>
                     <h2 class="mb-3">{{ $programaData['nombre'] }}</h2>
-                    <span class="badge badge-success">Con Oferta</span>
+                    <span class="badge badge-primary">Con Oferta</span>
+
                 </div>
 
                 <h5 class="mb-3">Descripción</h5>
@@ -37,7 +39,8 @@
 
             <div class="col-md-4">
                 <div class="card card-widget widget-user">
-                    <div class="widget-user-header bg-success">
+                    <div class="widget-user-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
+
                         <h3 class="widget-user-username">Inscripción</h3>
                         <h5 class="widget-user-desc">Programa Disponible</h5>
                     </div>
@@ -49,11 +52,12 @@
                                     <p class="text-muted mb-3">Realiza tu inscripción ahora mismo</p>
                                     @auth
                                     <a href="{{ route('programas-complementarios.inscripcion', ['id' => $programaData['id']]) }}"
-                                        class="btn btn-success btn-block" data-show-preloader>
+                                        class="btn btn-primary btn-block" data-show-preloader>
                                         <i class="fas fa-user-plus mr-1"></i> Inscribirse
                                     </a>
                                     @else
-                                    <button type="button" class="btn btn-success btn-block"
+                                    <button type="button" class="btn btn-primary btn-block"
+
                                             onclick="openInscripcionModal({{ $programaData['id'] }}, '{{ $programaData['nombre'] }}')">
                                         <i class="fas fa-user-plus mr-1"></i> Inscribirse
                                     </button>

@@ -77,6 +77,7 @@ class DatabaseSeeder extends Seeder
             ResultadosGuiasSeeder::class,
             CompetenciaProgramaSeeder::class,
 
+
             //Inventario:
             OrdenSeeder::class, //Crear ordenes
             ProveedoresSeeder::class, //Crear proveedores

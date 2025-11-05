@@ -14,6 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Configurar carga dinámica de municipios
     setupMunicipioLoading();
+
+    // Configurar manejo de caracterización
+    setupCaracterizacionHandling();
 });
 
 function setupUppercaseConversion() {
@@ -25,7 +28,19 @@ function setupUppercaseConversion() {
         const campo = document.getElementById(campoId);
         if (campo) {
             campo.addEventListener('input', function() {
-                this.value = this.value.toUpperCase();
+                // Convertir a mayúsculas y remover números
+                this.value = this.value.toUpperCase().replace(/[0-9]/g, '');
+            });
+
+            // Validación en tiempo real - prevenir números durante escritura
+            campo.addEventListener('keypress', function(e) {
+                const char = String.fromCharCode(e.which);
+                // Permitir letras, espacios, guiones, tildes y teclas de control
+                if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]$/.test(char) && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                    e.preventDefault();
+                    return false;
+                }
+                return true;
             });
         }
     });
@@ -88,6 +103,58 @@ function loadMunicipiosForDepartamento(departamentoId) {
     }
 }
 
+function setupCaracterizacionHandling() {
+    const caracterizacionRadios = document.querySelectorAll('input[name="caracterizacion_id"]');
+    let ningunaRadio = null;
+    
+    // Buscar el radio button de "NINGUNA"
+    caracterizacionRadios.forEach(radio => {
+        const label = document.querySelector(`label[for="${radio.id}"]`);
+        if (label && label.textContent.trim().toUpperCase() === 'NINGUNA') {
+            ningunaRadio = radio;
+        }
+    });
+
+    // Si no se encuentra "NINGUNA", salir
+    if (!ningunaRadio) return;
+
+    // Establecer "NINGUNA" como seleccionada por defecto
+    ningunaRadio.checked = true;
+
+    // Agregar event listeners a todos los radio buttons
+    caracterizacionRadios.forEach(radio => {
+        radio.addEventListener('change', function() {
+            if (this !== ningunaRadio && this.checked) {
+                // Si se selecciona cualquier opción que no sea "NINGUNA", deseleccionar "NINGUNA"
+                ningunaRadio.checked = false;
+            } else if (this === ningunaRadio && this.checked) {
+                // Si se selecciona "NINGUNA", deseleccionar todas las demás opciones
+                caracterizacionRadios.forEach(otherRadio => {
+                    if (otherRadio !== ningunaRadio) {
+                        otherRadio.checked = false;
+                    }
+                });
+            }
+        });
+    });
+
+    // Manejar el evento de reset del formulario
+    const form = document.getElementById('formInscripcion');
+    if (form) {
+        form.addEventListener('reset', function() {
+            // Después del reset, volver a seleccionar "NINGUNA"
+            setTimeout(() => {
+                ningunaRadio.checked = true;
+                caracterizacionRadios.forEach(radio => {
+                    if (radio !== ningunaRadio) {
+                        radio.checked = false;
+                    }
+                });
+            }, 0);
+        });
+    }
+}
+
 // Funcionalidad del formulario de dirección estructurada
 document.addEventListener('DOMContentLoaded', function() {
     const toggleButton = document.getElementById('toggleAddressForm');
@@ -109,21 +176,34 @@ document.addEventListener('DOMContentLoaded', function() {
     const saveButton = document.getElementById('saveAddress');
     if (saveButton) {
         saveButton.addEventListener('click', function() {
-            const carrera = document.getElementById('carrera').value.trim();
-            const calle = document.getElementById('calle').value.trim();
-            const numeroCasa = document.getElementById('numero_casa').value.trim();
-            const numeroApartamento = document.getElementById('numero_apartamento').value.trim();
+            const tipoVia = document.getElementById('tipo_via') ? document.getElementById('tipo_via').value.trim() : '';
+            const numeroVia = document.getElementById('numero_via') ? document.getElementById('numero_via').value.trim() : '';
+            const letraVia = document.getElementById('letra_via') ? document.getElementById('letra_via').value.trim() : '';
+            const viaSecundaria = document.getElementById('via_secundaria') ? document.getElementById('via_secundaria').value.trim() : '';
+            const numeroCasa = document.getElementById('numero_casa') ? document.getElementById('numero_casa').value.trim() : '';
+            const complementos = document.getElementById('complementos') ? document.getElementById('complementos').value.trim() : '';
+            const barrio = document.getElementById('barrio') ? document.getElementById('barrio').value.trim() : '';
 
             // Validar campos obligatorios
-            if (!carrera || !calle || !numeroCasa) {
-                alert('Por favor complete todos los campos obligatorios: Carrera, Calle y Número Casa.');
+            if (!tipoVia || !numeroVia || !numeroCasa) {
+                alert('Por favor complete todos los campos obligatorios: Tipo de vía, Número de vía y Número de casa.');
                 return;
             }
 
             // Construir la dirección
-            let direccion = `Carrera ${carrera} Calle ${calle} #${numeroCasa}`;
-            if (numeroApartamento) {
-                direccion += ` Apt ${numeroApartamento}`;
+            let direccion = `${tipoVia} ${numeroVia}`;
+            if (letraVia) {
+                direccion += letraVia;
+            }
+            direccion += ` #${numeroCasa}`;
+            if (viaSecundaria) {
+                direccion += ` ${viaSecundaria}`;
+            }
+            if (complementos) {
+                direccion += ` ${complementos}`;
+            }
+            if (barrio) {
+                direccion += `, ${barrio}`;
             }
 
             // Asignar al campo principal
@@ -133,7 +213,13 @@ document.addEventListener('DOMContentLoaded', function() {
             $('#addressForm').collapse('hide');
 
             // Limpiar campos
-            document.querySelectorAll('.address-field').forEach(field => field.value = '');
+            document.querySelectorAll('.address-field').forEach(field => {
+                if (field.type === 'select-one') {
+                    field.selectedIndex = 0;
+                } else {
+                    field.value = '';
+                }
+            });
         });
     }
 
@@ -149,7 +235,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Validar solo números en campos de dirección
-    const addressNumericFields = ['carrera', 'calle', 'numero_casa', 'numero_apartamento'];
+    const addressNumericFields = ['numero_via', 'numero_casa'];
     addressNumericFields.forEach(fieldId => {
         const element = document.getElementById(fieldId);
         if (element) {
@@ -171,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
 @endsection
 @section('content')
 
-     <div class="container-fluid mt-4">
+     <div class="container-fluid mt-4" style="background-color: #ebf1f4; min-height: 100vh;">
          @if(session('user_data'))
              <div class="alert alert-info alert-dismissible">
                  <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
@@ -182,16 +268,16 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="row justify-content-center">
             <div class="col-lg-10 col-xl-8">
                 <div class="text-center mb-4">
-                    <h2 class="text-success">Formulario de Inscripción</h2>
+                    <h2 class="text-dark">Formulario de Inscripción</h2>
                     <p class="text-muted">Complete sus datos para inscribirse</p>
                 </div>
-                <div class="card card-success">
-                    <div class="card-header">
+                <div class="card" style="background-color: #ffffff; border-color: #dee2e6;">
+                    <div class="card-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
                         <h3 class="card-title">
                             <i class="fas fa-user-plus mr-2"></i>Formulario de Inscripción
                         </h3>
                         <div class="card-tools">
-                            <a href="{{ route('programas-complementarios.publicos') }}" class="btn btn-outline-secondary btn-sm">
+                            <a href="{{ route('programas-complementarios.publicos') }}" class="btn btn-outline-primary btn-sm">
                                 <i class="fas fa-arrow-left mr-1"></i> Volver a Programas
                             </a>
                         </div>
@@ -203,8 +289,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
             <div class="row">
                 <div class="col-md-8">
-                    <div class="card card-success">
-                        <div class="card-header">
+                    <div class="card" style="background-color: #ffffff; border-color: #dee2e6;">
+                        <div class="card-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
                             <h5 class="mb-0"><i class="fas fa-user mr-2"></i>Información Personal</h5>
                         </div>
                         <div class="card-body">
@@ -215,21 +301,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
                                @include('complementarios.components.form-datos-personales', [
                                    'context' => 'inscripcion',
-                                   'userData' => session('user_data', [])
+                                   'userData' => $userData ?? []
                                ])
 
-                                <hr class="my-4">
+                                <hr class="my-4" style="border-color: #dee2e6;">
 
-                                <div class="card card-success mb-4">
-                                    <div class="card-header">
+                                <div class="card mb-4" style="background-color: #ffffff; border-color: #dee2e6;">
+                                    <div class="card-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
                                         <h5 class="mb-0"><i class="fas fa-tags mr-2"></i>Caracterización</h5>
                                     </div>
                                     <div class="card-body">
                                         <p class="text-muted mb-3">Seleccione una categoría que corresponda a su situación:</p>
 
                                         @foreach ($categoriasConHijos as $categoria)
-                                            <div class="card card-outline card-success mb-3">
-                                                <div class="card-header">
+                                            <div class="card card-outline mb-3" style="border-color: #dee2e6;">
+                                                <div class="card-header" style="background-color: #f8f9fa; color: #343a40;">
                                                     <h6 class="mb-0">{{ $categoria['nombre'] }}</h6>
                                                 </div>
                                                 <div class="card-body">
@@ -254,27 +340,27 @@ document.addEventListener('DOMContentLoaded', function() {
                                     </div>
                                 </div>
 
-                                <div class="card card-success mb-4">
-                                    <div class="card-header">
+                                <div class="card mb-4" style="background-color: #ffffff; border-color: #dee2e6;">
+                                    <div class="card-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
                                         <h5 class="mb-0"><i class="fas fa-sticky-note mr-2"></i>Observaciones y Términos</h5>
                                     </div>
                                     <div class="card-body">
                                         <div class="mb-3">
-                                            <label for="observaciones" class="form-label">Observaciones</label>
+                                            <label for="observaciones" class="form-label" style="color: #343a40;">Observaciones</label>
                                             <textarea class="form-control" id="observaciones" name="observaciones" rows="3"
                                                 placeholder="Información adicional que considere relevante..."></textarea>
                                         </div>
 
                                         <div class="form-check mb-4">
                                             <input class="form-check-input" type="checkbox" id="acepto_terminos" name="acepto_terminos" required>
-                                            <label class="form-check-label" for="acepto_terminos">
-                                                Acepto los <a href="#" data-toggle="modal" data-target="#modalTerminos">términos y condiciones</a> del proceso de inscripción *
+                                            <label class="form-check-label" for="acepto_terminos" style="color: #343a40;">
+                                                Acepto los <a href="#" data-toggle="modal" data-target="#modalTerminos" style="color: #007bff;">términos y condiciones</a> del proceso de inscripción *
                                             </label>
                                         </div>
 
                                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                             <button type="reset" class="btn btn-outline-secondary me-md-2">Limpiar</button>
-                                            <button type="submit" class="btn btn-success">Enviar Inscripción</button>
+                                            <button type="submit" class="btn btn-primary">Enviar Inscripción</button>
                                         </div>
 
                                         <script>
@@ -292,27 +378,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 <div class="col-md-4">
                     <div class="card card-widget widget-user">
-                        <div class="widget-user-header bg-success">
+                        <div class="widget-user-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
                             <h3 class="widget-user-username">Información del Programa</h3>
                             <h5 class="widget-user-desc">{{ $programa->nombre }}</h5>
                         </div>
-                        <div class="card-footer">
+                        <div class="card-footer" style="background-color: #ffffff;">
                             <div class="row">
                                 <div class="col-sm-12">
                                     <div class="description-block">
-                                        <span class="description-text">DESCRIPCIÓN</span>
+                                        <span class="description-text" style="color: #343a40;">DESCRIPCIÓN</span>
                                         <p class="text-muted mb-3">{{ $programa->descripcion }}</p>
                                         <div class="row">
                                             <div class="col-6">
                                                 <div class="description-block">
-                                                    <span class="description-text">DURACIÓN</span>
-                                                    <h5 class="description-header">{{ $programa->duracion }} horas</h5>
+                                                    <span class="description-text" style="color: #343a40;">DURACIÓN</span>
+                                                    <h5 class="description-header" style="color: #007bff;">{{ $programa->duracion }} horas</h5>
                                                 </div>
                                             </div>
                                             <div class="col-6">
                                                 <div class="description-block">
-                                                    <span class="description-text">MODALIDAD</span>
-                                                    <h5 class="description-header">
+                                                    <span class="description-text" style="color: #343a40;">MODALIDAD</span>
+                                                    <h5 class="description-header" style="color: #007bff;">
                                                         {{ $programa->modalidad->parametro->name ?? 'N/A' }}</h5>
                                                 </div>
                                             </div>
@@ -320,15 +406,15 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <div class="row">
                                             <div class="col-6">
                                                 <div class="description-block">
-                                                    <span class="description-text">JORNADA</span>
-                                                    <h5 class="description-header">
+                                                    <span class="description-text" style="color: #343a40;">JORNADA</span>
+                                                    <h5 class="description-header" style="color: #007bff;">
                                                         {{ $programa->jornada->jornada ?? 'N/A' }}</h5>
                                                 </div>
                                             </div>
                                             <div class="col-6">
                                                 <div class="description-block">
-                                                    <span class="description-text">CUPO</span>
-                                                    <h5 class="description-header">{{ $programa->cupos }}</h5>
+                                                    <span class="description-text" style="color: #343a40;">CUPO</span>
+                                                    <h5 class="description-header" style="color: #007bff;">{{ $programa->cupos }}</h5>
                                                 </div>
                                             </div>
                                         </div>
@@ -342,7 +428,6 @@ document.addEventListener('DOMContentLoaded', function() {
         </div>
     </div>
 
-@include('layout.footer')
+@include('complementarios.layout.footer-complementarios')
 @include('components.modal-terminos')
 @endsection
-

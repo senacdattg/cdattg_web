@@ -1,4 +1,12 @@
 /* Estilos específicos para la página de programas públicos */
+/* Paleta complementarios */
+:root {
+    --bg-light: #ebf1f4;
+    --accent: #007bff;
+    --card: #ffffff;
+    --text-dark: #343a40;
+    --border: #dee2e6;
+}
 
 /* Layout principal - Ancho completo */
 .container-fluid {
@@ -144,20 +152,22 @@
     font-size: 2.5rem !important;
 }
 
-/* Botones */
+/* Botones (outline con acento, sin verde) */
 .btn-success {
-    background-color: #28a745;
-    border-color: #28a745;
+    background-color: transparent;
+    border-color: var(--accent);
+    color: var(--accent);
 }
 
 .btn-success:hover {
-    background-color: #218838;
-    border-color: #1e7e34;
+    background-color: var(--accent);
+    border-color: var(--accent);
+    color: #ffffff;
 }
 
 /* Texto */
 .text-success {
-    color: #28a745 !important;
+    color: var(--accent) !important;
 }
 
 .text-muted {
