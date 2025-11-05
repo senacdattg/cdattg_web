@@ -179,7 +179,7 @@ return [
 
     'batch_17_complementarios' => [
         'descripcion' => 'Módulo de Complementarios - Cursos complementarios, aspirantes y caracterización',
-        'dependencias' => ['batch_05_personas', 'batch_03_parametros', 'batch_11_jornadas_horarios'],
+        'dependencias' => ['batch_05_personas', 'batch_03_parametros', 'batch_11_jornadas_horarios', 'batch_06_infraestructura'],
         'tablas' => [
             'complementarios_ofertados',
             'complementarios_ofertados_dias_formacion',
@@ -190,4 +190,3 @@ return [
         'orden' => 17,
     ],
 ];
-

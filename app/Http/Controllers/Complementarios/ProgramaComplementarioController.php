@@ -24,10 +24,11 @@ class ProgramaComplementarioController extends Controller
      */
     public function gestionProgramasComplementarios()
     {
-        $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion'])->get();
+        $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion', 'ambiente'])->get();
         $modalidades = \App\Models\ParametroTema::where('tema_id', 5)->with('parametro')->get();
         $jornadas = \App\Models\JornadaFormacion::all();
-        return view('complementarios.gestion_complementarios.index', compact('programas', 'modalidades', 'jornadas'));
+        $ambientes = Ambiente::with('piso')->where('status', 1)->orderBy('piso_id')->orderBy('title')->get();
+        return view('complementarios.gestion_complementarios.index', compact('programas', 'modalidades', 'jornadas', 'ambientes'));
     }
 
     /**
@@ -102,7 +103,7 @@ class ProgramaComplementarioController extends Controller
      */
     public function edit($id)
     {
-        $programa = ComplementarioOfertado::with(['modalidad', 'jornada', 'diasFormacion'])->findOrFail($id);
+        $programa = ComplementarioOfertado::with(['modalidad', 'jornada', 'diasFormacion', 'ambiente'])->findOrFail($id);
 
         $dias = $programa->diasFormacion->map(function ($dia) {
             return [
@@ -122,6 +123,7 @@ class ProgramaComplementarioController extends Controller
             'estado' => $programa->estado,
             'modalidad_id' => $programa->modalidad_id,
             'jornada_id' => $programa->jornada_id,
+            'ambiente_id' => $programa->ambiente_id,
             'dias' => $dias,
         ]);
     }
@@ -140,6 +142,7 @@ class ProgramaComplementarioController extends Controller
             'estado' => 'required|integer|in:0,1,2',
             'modalidad_id' => 'required|exists:parametros_temas,id',
             'jornada_id' => 'required|exists:jornadas_formacion,id',
+            'ambiente_id' => 'required|exists:ambientes,id',
             'dias' => 'nullable|array',
             'dias.*.dia_id' => 'exists:parametros_temas,id',
             'dias.*.hora_inicio' => 'nullable|date_format:H:i',
@@ -147,7 +150,7 @@ class ProgramaComplementarioController extends Controller
         ]);
 
         $programa = ComplementarioOfertado::create($request->only([
-            'codigo', 'nombre', 'descripcion', 'duracion', 'cupos', 'estado', 'modalidad_id', 'jornada_id'
+            'codigo', 'nombre', 'descripcion', 'duracion', 'cupos', 'estado', 'modalidad_id', 'jornada_id', 'ambiente_id'
         ]));
 
         if ($request->dias) {
@@ -178,6 +181,7 @@ class ProgramaComplementarioController extends Controller
             'estado' => 'required|integer|in:0,1,2',
             'modalidad_id' => 'required|exists:parametros_temas,id',
             'jornada_id' => 'required|exists:jornadas_formacion,id',
+            'ambiente_id' => 'required|exists:ambientes,id',
             'dias' => 'nullable|array',
             'dias.*.dia_id' => 'exists:parametros_temas,id',
             'dias.*.hora_inicio' => 'nullable|date_format:H:i',
@@ -185,7 +189,7 @@ class ProgramaComplementarioController extends Controller
         ]);
 
         $programa->update($request->only([
-            'codigo', 'nombre', 'descripcion', 'duracion', 'cupos', 'estado', 'modalidad_id', 'jornada_id'
+            'codigo', 'nombre', 'descripcion', 'duracion', 'cupos', 'estado', 'modalidad_id', 'jornada_id', 'ambiente_id'
         ]));
 
         $programa->diasFormacion()->detach();
