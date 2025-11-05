@@ -309,7 +309,7 @@ function setupAddressForm() {
     }
 
     // Validación de números en campos de dirección
-    const addressNumericFields = ['carrera', 'calle', 'numero_casa', 'numero_apartamento'];
+    const addressNumericFields = ['numero_via', 'numero_casa'];
     addressNumericFields.forEach(fieldId => {
         const element = document.getElementById(fieldId);
         if (element) {
@@ -320,21 +320,66 @@ function setupAddressForm() {
 
 // Guardar dirección estructurada
 function saveAddress() {
-    const carrera = document.getElementById('carrera').value.trim();
-    const calle = document.getElementById('calle').value.trim();
-    const numeroCasa = document.getElementById('numero_casa').value.trim();
-    const numeroApartamento = document.getElementById('numero_apartamento').value.trim();
+    const tipoVia = document.getElementById('tipo_via') ? document.getElementById('tipo_via').value.trim() : '';
+    const numeroVia = document.getElementById('numero_via') ? document.getElementById('numero_via').value.trim() : '';
+    const letraVia = document.getElementById('letra_via') ? document.getElementById('letra_via').value.trim() : '';
+    const viaSecundaria = document.getElementById('via_secundaria') ? document.getElementById('via_secundaria').value.trim() : '';
+    const numeroCasa = document.getElementById('numero_casa') ? document.getElementById('numero_casa').value.trim() : '';
+    const complementos = document.getElementById('complementos') ? document.getElementById('complementos').value.trim() : '';
+    const barrio = document.getElementById('barrio') ? document.getElementById('barrio').value.trim() : '';
 
-    // Validar campos obligatorios
-    if (!carrera || !calle || !numeroCasa) {
-        alert('Por favor complete todos los campos obligatorios: Carrera, Calle y Número Casa.');
-        return;
+    // Verificar si estamos en un formulario con campos antiguos (carrera, calle)
+    const carrera = document.getElementById('carrera') ? document.getElementById('carrera').value.trim() : '';
+    const calle = document.getElementById('calle') ? document.getElementById('calle').value.trim() : '';
+    const numeroApartamento = document.getElementById('numero_apartamento') ? document.getElementById('numero_apartamento').value.trim() : '';
+
+    // Validar campos obligatorios - verificar si usar campos nuevos o antiguos
+    let isValid = false;
+    let direccion = '';
+
+    if (tipoVia && numeroVia && numeroCasa) {
+        // Usar campos nuevos (tipo_via, numero_via, etc.)
+        isValid = true;
+
+        // Construir la dirección con campos nuevos
+        direccion = `${tipoVia} ${numeroVia}`;
+
+        // Agregar letra de vía si existe
+        if (letraVia) {
+            direccion += letraVia;
+        }
+
+        // Agregar número de casa
+        direccion += ` #${numeroCasa}`;
+
+        // Agregar vía secundaria si existe
+        if (viaSecundaria) {
+            direccion += ` ${viaSecundaria}`;
+        }
+
+        // Agregar complementos si existen
+        if (complementos) {
+            direccion += ` ${complementos}`;
+        }
+
+        // Agregar barrio si existe
+        if (barrio) {
+            direccion += `, ${barrio}`;
+        }
+    } else if (carrera && calle && numeroCasa) {
+        // Usar campos antiguos (carrera, calle, etc.)
+        isValid = true;
+
+        // Construir la dirección con campos antiguos
+        direccion = `Carrera ${carrera} Calle ${calle} #${numeroCasa}`;
+        if (numeroApartamento) {
+            direccion += ` Apt ${numeroApartamento}`;
+        }
     }
 
-    // Construir la dirección
-    let direccion = `Carrera ${carrera} Calle ${calle} #${numeroCasa}`;
-    if (numeroApartamento) {
-        direccion += ` Apt ${numeroApartamento}`;
+    if (!isValid) {
+        alert('Por favor complete todos los campos obligatorios: Tipo de vía, Número de vía y Número de casa.');
+        return;
     }
 
     // Asignar al campo principal
@@ -343,8 +388,27 @@ function saveAddress() {
     // Ocultar el formulario
     $('#addressForm').collapse('hide');
 
-    // Limpiar campos
-    document.querySelectorAll('.address-field').forEach(field => field.value = '');
+    // Limpiar campos - limpiar tanto campos nuevos como antiguos
+    document.querySelectorAll('.address-field').forEach(field => {
+        if (field.type === 'select-one') {
+            field.selectedIndex = 0;
+        } else {
+            field.value = '';
+        }
+    });
+
+    // También limpiar campos antiguos si existen
+    const oldFields = ['carrera', 'calle', 'numero_apartamento'];
+    oldFields.forEach(fieldId => {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            if (field.type === 'select-one') {
+                field.selectedIndex = 0;
+            } else {
+                field.value = '';
+            }
+        }
+    });
 }
 
 // Cancelar edición de dirección

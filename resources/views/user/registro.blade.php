@@ -149,21 +149,34 @@
                             const saveButton = document.getElementById('saveAddress');
                             if (saveButton) {
                                 saveButton.addEventListener('click', function() {
-                                    const carrera = document.getElementById('carrera').value.trim();
-                                    const calle = document.getElementById('calle').value.trim();
-                                    const numeroCasa = document.getElementById('numero_casa').value.trim();
-                                    const numeroApartamento = document.getElementById('numero_apartamento').value.trim();
+                                    const tipoVia = document.getElementById('tipo_via') ? document.getElementById('tipo_via').value.trim() : '';
+                                    const numeroVia = document.getElementById('numero_via') ? document.getElementById('numero_via').value.trim() : '';
+                                    const letraVia = document.getElementById('letra_via') ? document.getElementById('letra_via').value.trim() : '';
+                                    const viaSecundaria = document.getElementById('via_secundaria') ? document.getElementById('via_secundaria').value.trim() : '';
+                                    const numeroCasa = document.getElementById('numero_casa') ? document.getElementById('numero_casa').value.trim() : '';
+                                    const complementos = document.getElementById('complementos') ? document.getElementById('complementos').value.trim() : '';
+                                    const barrio = document.getElementById('barrio') ? document.getElementById('barrio').value.trim() : '';
 
                                     // Validar campos obligatorios
-                                    if (!carrera || !calle || !numeroCasa) {
-                                        alert('Por favor complete todos los campos obligatorios: Carrera, Calle y Número Casa.');
+                                    if (!tipoVia || !numeroVia || !numeroCasa) {
+                                        alert('Por favor complete todos los campos obligatorios: Tipo de vía, Número de vía y Número de casa.');
                                         return;
                                     }
 
                                     // Construir la dirección
-                                    let direccion = `Carrera ${carrera} Calle ${calle} #${numeroCasa}`;
-                                    if (numeroApartamento) {
-                                        direccion += ` Apt ${numeroApartamento}`;
+                                    let direccion = `${tipoVia} ${numeroVia}`;
+                                    if (letraVia) {
+                                        direccion += letraVia;
+                                    }
+                                    direccion += ` #${numeroCasa}`;
+                                    if (viaSecundaria) {
+                                        direccion += ` ${viaSecundaria}`;
+                                    }
+                                    if (complementos) {
+                                        direccion += ` ${complementos}`;
+                                    }
+                                    if (barrio) {
+                                        direccion += `, ${barrio}`;
                                     }
 
                                     // Asignar al campo principal
@@ -173,7 +186,13 @@
                                     $('#addressForm').collapse('hide');
 
                                     // Limpiar campos
-                                    document.querySelectorAll('.address-field').forEach(field => field.value = '');
+                                    document.querySelectorAll('.address-field').forEach(field => {
+                                        if (field.type === 'select-one') {
+                                            field.selectedIndex = 0;
+                                        } else {
+                                            field.value = '';
+                                        }
+                                    });
                                 });
                             }
 
@@ -189,7 +208,7 @@
                             }
 
                             // Validar solo números en campos de dirección
-                            const addressNumericFields = ['carrera', 'calle', 'numero_casa', 'numero_apartamento'];
+                            const addressNumericFields = ['numero_via', 'numero_casa'];
                             addressNumericFields.forEach(fieldId => {
                                 const element = document.getElementById(fieldId);
                                 if (element) {

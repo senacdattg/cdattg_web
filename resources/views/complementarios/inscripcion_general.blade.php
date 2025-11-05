@@ -252,33 +252,63 @@
                                                     </div>
                                                     <div class="card-body">
                                                         <div class="row">
-                                                            <div class="col-12 col-md-6">
+                                                            <div class="col-12">
                                                                 <div class="form-group">
-                                                                    <label for="carrera">Carrera *</label>
-                                                                    <input type="text" class="form-control address-field" id="carrera"
-                                                                        placeholder="Ej: 1" data-required="true">
+                                                                    <label for="tipo_via">1. Tipo de vía principal *</label>
+                                                                    <select class="form-control address-field" id="tipo_via" data-required="true">
+                                                                        <option value="">Seleccione...</option>
+                                                                        <option value="Carrera">Carrera</option>
+                                                                        <option value="Calle">Calle</option>
+                                                                        <option value="Transversal">Transversal</option>
+                                                                        <option value="Diagonal">Diagonal</option>
+                                                                        <option value="Avenida">Avenida</option>
+                                                                        <option value="Autopista">Autopista</option>
+                                                                        <option value="Circular">Circular</option>
+                                                                        <option value="Vía">Vía</option>
+                                                                        <option value="Pasaje">Pasaje</option>
+                                                                        <option value="Manzana">Manzana</option>
+                                                                    </select>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="calle">Calle *</label>
-                                                                    <input type="text" class="form-control address-field" id="calle"
-                                                                        placeholder="Ej: 2" data-required="true">
+                                                                    <label for="numero_via">2. Número o nombre de vía principal *</label>
+                                                                    <input type="text" class="form-control address-field" id="numero_via"
+                                                                        placeholder="Ej: 9A, 7 Bis, 45" data-required="true">
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="numero_casa">Número Casa *</label>
+                                                                    <label for="letra_via">3. Letra o complemento de vía principal</label>
+                                                                    <input type="text" class="form-control address-field" id="letra_via"
+                                                                        placeholder="Ej: A, B, Bis (opcional)" maxlength="5">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="via_secundaria">4. Vía secundaria o intersección</label>
+                                                                    <input type="text" class="form-control address-field" id="via_secundaria"
+                                                                        placeholder="Ej: Calle 12, Transversal 22B (opcional)">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="numero_casa">5. Número de casa o edificio *</label>
                                                                     <input type="text" class="form-control address-field" id="numero_casa"
-                                                                        placeholder="Ej: 3" data-required="true">
+                                                                        placeholder="Ej: 34-15, 45-20, 12" data-required="true">
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="numero_apartamento">Número Apartamento</label>
-                                                                    <input type="text" class="form-control address-field" id="numero_apartamento"
-                                                                        placeholder="Ej: 4 (opcional)">
+                                                                    <label for="complementos">6. Complementos</label>
+                                                                    <input type="text" class="form-control address-field" id="complementos"
+                                                                        placeholder="Ej: Apto 301, Bloque 2, Oficina 5 (opcional)">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="barrio">7. Barrio o vereda</label>
+                                                                    <input type="text" class="form-control address-field" id="barrio"
+                                                                        placeholder="Ej: Centro, La Candelaria (opcional)">
                                                                 </div>
                                                             </div>
-                                                            <div class="col-12 col-md-6 d-flex align-items-center">
-                                                                <div class="w-100">
-                                                                    <p class="mb-2"><strong>Ejemplo de formato:</strong></p>
-                                                                    <p class="text-muted">Carrera 1 Calle 2 #3 Apt 4</p>
-                                                                    <p class="text-muted small">Los campos marcados con * son obligatorios.</p>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <div class="alert alert-info">
+                                                                    <small>
+                                                                        <strong>Ejemplo de formato:</strong><br>
+                                                                        <span class="text-muted">Carrera 9A #34-15 Apto 301, Barrio Centro</span><br>
+                                                                        <span class="text-muted">Los campos marcados con * son obligatorios.</span>
+                                                                    </small>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -433,21 +463,44 @@
         });
 
         document.getElementById('saveAddress').addEventListener('click', function() {
-            const carrera = document.getElementById('carrera').value.trim();
-            const calle = document.getElementById('calle').value.trim();
-            const numeroCasa = document.getElementById('numero_casa').value.trim();
-            const numeroApartamento = document.getElementById('numero_apartamento').value.trim();
+            const tipoVia = document.getElementById('tipo_via') ? document.getElementById('tipo_via').value.trim() : '';
+            const numeroVia = document.getElementById('numero_via') ? document.getElementById('numero_via').value.trim() : '';
+            const letraVia = document.getElementById('letra_via') ? document.getElementById('letra_via').value.trim() : '';
+            const viaSecundaria = document.getElementById('via_secundaria') ? document.getElementById('via_secundaria').value.trim() : '';
+            const numeroCasa = document.getElementById('numero_casa') ? document.getElementById('numero_casa').value.trim() : '';
+            const complementos = document.getElementById('complementos') ? document.getElementById('complementos').value.trim() : '';
+            const barrio = document.getElementById('barrio') ? document.getElementById('barrio').value.trim() : '';
 
             // Validar campos obligatorios
-            if (!carrera || !calle || !numeroCasa) {
-                alert('Por favor complete todos los campos obligatorios: Carrera, Calle y Número Casa.');
+            if (!tipoVia || !numeroVia || !numeroCasa) {
+                alert('Por favor complete todos los campos obligatorios: Tipo de vía, Número de vía y Número de casa.');
                 return;
             }
 
             // Construir la dirección
-            let direccion = `Carrera ${carrera} Calle ${calle} #${numeroCasa}`;
-            if (numeroApartamento) {
-                direccion += ` Apt ${numeroApartamento}`;
+            let direccion = `${tipoVia} ${numeroVia}`;
+
+            // Agregar letra de vía si existe
+            if (letraVia) {
+                direccion += letraVia;
+            }
+
+            // Agregar número de casa
+            direccion += ` #${numeroCasa}`;
+
+            // Agregar vía secundaria si existe
+            if (viaSecundaria) {
+                direccion += ` ${viaSecundaria}`;
+            }
+
+            // Agregar complementos si existen
+            if (complementos) {
+                direccion += ` ${complementos}`;
+            }
+
+            // Agregar barrio si existe
+            if (barrio) {
+                direccion += `, ${barrio}`;
             }
 
             // Asignar al campo principal
@@ -457,7 +510,13 @@
             $('#addressForm').collapse('hide');
 
             // Limpiar campos
-            document.querySelectorAll('.address-field').forEach(field => field.value = '');
+            document.querySelectorAll('.address-field').forEach(field => {
+                if (field.type === 'select-one') {
+                    field.selectedIndex = 0;
+                } else {
+                    field.value = '';
+                }
+            });
         });
 
         document.getElementById('cancelAddress').addEventListener('click', function() {
@@ -469,7 +528,7 @@
         });
 
         // Validar solo números en campos de dirección
-        const addressNumericFields = ['carrera', 'calle', 'numero_casa', 'numero_apartamento'];
+        const addressNumericFields = ['numero_via', 'numero_casa'];
         addressNumericFields.forEach(fieldId => {
             const element = document.getElementById(fieldId);
             if (element) {
