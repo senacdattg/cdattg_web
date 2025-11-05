@@ -28,7 +28,19 @@ function setupUppercaseConversion() {
         const campo = document.getElementById(campoId);
         if (campo) {
             campo.addEventListener('input', function() {
-                this.value = this.value.toUpperCase();
+                // Convertir a mayúsculas y remover números
+                this.value = this.value.toUpperCase().replace(/[0-9]/g, '');
+            });
+
+            // Validación en tiempo real - prevenir números durante escritura
+            campo.addEventListener('keypress', function(e) {
+                const char = String.fromCharCode(e.which);
+                // Permitir letras, espacios, guiones, tildes y teclas de control
+                if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]$/.test(char) && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                    e.preventDefault();
+                    return false;
+                }
+                return true;
             });
         }
     });
