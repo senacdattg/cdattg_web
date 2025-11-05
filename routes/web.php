@@ -15,11 +15,7 @@ use App\Http\Controllers\GoogleDriveController;
 |
 */
 
-<<<<<<< HEAD
 Route::get('/', [App\Http\Controllers\Complementarios\ProgramaComplementarioController::class, 'programasPublicos'])->name('home');
-=======
-Route::get('/', [App\Http\Controllers\ComplementarioController::class, 'programasPublicos'])->name('home');
->>>>>>> develop
 
 // Google Drive OAuth helper routes (para renovar refresh_token y probar conexión)
 Route::get('/google-drive-connect', [GoogleDriveController::class, 'connect'])->name('google.drive.connect');
@@ -31,15 +27,9 @@ foreach (glob(routes_path('autenticacion/public') . '/*.php') as $routeFile) {
     include_once $routeFile;
 }
 
-<<<<<<< HEAD
 Route::get('/inscripcion', [App\Http\Controllers\Complementarios\InscripcionComplementarioController::class, 'inscripcionGeneral'])->name('inscripcion.general');
 Route::post('/inscripcion', [App\Http\Controllers\Complementarios\InscripcionComplementarioController::class, 'procesarInscripcionGeneral'])->name('inscripcion.procesar');
 Route::get('/programas/{id}', [App\Http\Controllers\Complementarios\ProgramaComplementarioController::class, 'verPrograma'])->name('programa_complementario.ver');
-=======
-Route::get('/inscripcion', [App\Http\Controllers\ComplementarioController::class, 'inscripcionGeneral'])->name('inscripcion.general');
-Route::post('/inscripcion', [App\Http\Controllers\ComplementarioController::class, 'procesarInscripcionGeneral'])->name('inscripcion.procesar');
-Route::get('/programas/{id}', [App\Http\Controllers\ComplementarioController::class, 'verPrograma'])->name('programa_complementario.ver');
->>>>>>> develop
 
 // Rutas protegidas
 Route::middleware('auth')->group(function () {
@@ -86,7 +76,6 @@ Route::middleware('auth')->group(function () {
 // Route::put('/perfil', [ProfileController::class, 'update'])->name('profile.update');
 // Route::post('/cambiar-password', [ProfileController::class, 'changePassword'])->name('password.change');
 
-<<<<<<< HEAD
 Route::get('/programas-complementarios', [App\Http\Controllers\Complementarios\ProgramaComplementarioController::class, 'programasPublicos'])->name('programas-complementarios.publicos');
 Route::get('/programas-complementarios/{id}/inscripcion', [App\Http\Controllers\Complementarios\InscripcionComplementarioController::class, 'formularioInscripcion'])->name('programas-complementarios.inscripcion');
 Route::post('/programas-complementarios/{id}/inscripcion', [App\Http\Controllers\Complementarios\InscripcionComplementarioController::class, 'procesarInscripcion'])->name('programas-complementarios.procesar-inscripcion');
@@ -97,18 +86,6 @@ Route::get('/sofia-validation-progress/{progressId}', [App\Http\Controllers\Comp
 
 Route::middleware('auth')->group(function () {
     Route::get('/mi-perfil', [App\Http\Controllers\Complementarios\PerfilComplementarioController::class, 'Perfil'])->name('aspirantes.perfil');
-=======
-Route::get('/programas-complementarios', [App\Http\Controllers\ComplementarioController::class, 'programasPublicos'])->name('programas-complementarios.publicos');
-Route::get('/programas-complementarios/{id}/inscripcion', [App\Http\Controllers\ComplementarioController::class, 'formularioInscripcion'])->name('programas-complementarios.inscripcion');
-Route::post('/programas-complementarios/{id}/inscripcion', [App\Http\Controllers\ComplementarioController::class, 'procesarInscripcion'])->name('programas-complementarios.procesar-inscripcion');
-Route::get('/programas-complementarios/{id}/documentos', [App\Http\Controllers\ComplementarioController::class, 'formularioDocumentos'])->name('programas-complementarios.documentos');
-Route::post('/programas-complementarios/{id}/documentos', [App\Http\Controllers\ComplementarioController::class, 'subirDocumento'])->name('programas-complementarios.subir-documentos');
-Route::post('/programas-complementarios/{id}/validar-sofia', [App\Http\Controllers\ComplementarioController::class, 'validarSofia'])->name('programas-complementarios.validar-sofia');
-Route::get('/sofia-validation-progress/{progressId}', [App\Http\Controllers\ComplementarioController::class, 'getValidationProgress'])->name('sofia-validation.progress');
-
-Route::middleware('auth')->group(function () {
-    Route::get('/mi-perfil', [App\Http\Controllers\ComplementarioController::class, 'Perfil'])->name('aspirantes.perfil');
->>>>>>> develop
 });
 Route::get('/departamentos/{pais}', [DepartamentoController::class, 'getByPais'])->name('departamentos.by.pais');
 Route::get('/municipios/{departamento}', [MunicipioController::class, 'getByDepartamento'])->name('municipios.by.departamento');
