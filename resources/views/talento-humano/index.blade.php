@@ -576,10 +576,10 @@
         });
 
         document.getElementById('saveAddress').addEventListener('click', function() {
-            const carrera = document.getElementById('carrera').value.trim();
-            const calle = document.getElementById('calle').value.trim();
-            const numeroCasa = document.getElementById('numero_casa').value.trim();
-            const numeroApartamento = document.getElementById('numero_apartamento').value.trim();
+            const carrera = document.getElementById('carrera') ? document.getElementById('carrera').value.trim() : '';
+            const calle = document.getElementById('calle') ? document.getElementById('calle').value.trim() : '';
+            const numeroCasa = document.getElementById('numero_casa') ? document.getElementById('numero_casa').value.trim() : '';
+            const numeroApartamento = document.getElementById('numero_apartamento') ? document.getElementById('numero_apartamento').value.trim() : '';
 
             // Validar campos obligatorios
             if (!carrera || !calle || !numeroCasa) {

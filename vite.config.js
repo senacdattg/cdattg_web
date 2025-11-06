@@ -15,11 +15,17 @@ export default defineConfig({
                 'dias_formacion_css': 'resources/css/dias-formacion.css',
                 'dashboard_superadmin': 'resources/css/dashboards/dashboard-superadmin.css',
                 'caracter_selecter': 'resources/css/Asistencia/caracter_selecter.css',
-                //'navbar': 'resources/css/shared/navbar.css',
-                //'inventario_listas_css': 'resources/css/inventario/inventario_listas.css',
-                //'inventario_base_css': 'resources/css/inventario/shared/base.css',
-                //'inventario_sidebar_fix': 'resources/css/inventario/sidebar-fix.css',
-                
+
+                // Complementarios CSS files
+                'formulario_inscripcion_css': 'resources/css/formulario_inscripcion.css',
+                'gestion_aspirantes_css': 'resources/css/complementario/gestion_aspirantes.css',
+                'ver_aspirantes_css': 'resources/css/complementario/ver_aspirantes.css',
+                'procesar_documentos_css': 'resources/css/complementario/procesar_documentos.css',
+                // 'navbar': 'resources/css/shared/navbar.css',
+                // 'inventario_listas_css': 'resources/css/inventario/inventario_listas.css',
+                // 'inventario_base_css': 'resources/css/inventario/shared/base.css',
+                // 'inventario_sidebar_fix': 'resources/css/inventario/sidebar-fix.css',
+
                 // JavaScript files
                 'app': 'resources/js/app.js',
                 'dashboard': 'resources/js/dashboard.js',
@@ -29,14 +35,18 @@ export default defineConfig({
                 'charts-scripts': 'resources/js/dashboards/superadmin/charts-scripts.js',
                 'widgets': 'resources/js/dashboards/superadmin/widgets.js',
                 'municipios': 'resources/js/municipios.js',
-                
-                // Inventario files
-                //'inventario_js': 'resources/js/inventario/inventario_listas.js',
-                //'marcas': 'resources/js/inventario/marcas.js',
-                //'categorias': 'resources/js/inventario/categorias.js',
-                //'proveedores': 'resources/js/inventario/proveedores.js',
-                //'contratos_convenios': 'resources/js/inventario/contratos_convenios.js',
-                //'paginacion': 'resources/js/inventario/paginacion.js',
+
+                // Complementarios files
+                'formulario_inscripcion': 'resources/js/complementarios/formulario-inscripcion.js',
+                'estadisticas_complementarios': 'resources/js/complementarios/estadisticas.js',
+
+                // Inventario files (comentados porque los archivos no existen)
+                // 'inventario_js': 'resources/js/inventario/inventario_listas.js',
+                // 'marcas': 'resources/js/inventario/marcas.js',
+                // 'categorias': 'resources/js/inventario/categorias.js',
+                // 'proveedores': 'resources/js/inventario/proveedores.js',
+                // 'contratos_convenios': 'resources/js/inventario/contratos_convenios.js',
+                // 'paginacion': 'resources/js/inventario/paginacion.js',
             },
             refresh: true,
         }),
