@@ -185,6 +185,13 @@
                 @endforelse
             </div>
 
+            {{-- Paginación --}}
+            <div class="row">
+                <div class="col-12 d-flex justify-content-center" id="catalog-pagination">
+                    {{ $productos->links() }}
+                </div>
+            </div>
+
             {{-- Mensaje cuando no hay resultados de búsqueda --}}
             <div class="row d-none" id="no-results">
                 <div class="col-12">

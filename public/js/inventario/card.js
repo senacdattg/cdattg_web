@@ -10,6 +10,13 @@ const STORAGE_KEY = 'inventario_carrito';
 // Estado del carrito
 let cart = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
+// Estado de la vista del catálogo
+let originalGridHTML = '';
+let originalPaginationHTML = '';
+let showingSearchResults = false;
+let currentFetchController = null;
+let currentFetchedProducts = [];
+
 /**
  * Helper para mostrar/ocultar modales compatible con Bootstrap 4 y 5
  */
@@ -60,6 +67,7 @@ function agregarAlCarritoDesdeModal(productId, productName, productStock) {
  * Inicialización cuando el DOM está listo
  */
 document.addEventListener('DOMContentLoaded', function() {
+    captureInitialState();
     initializeCardView();
     updateCartCount();
 });
@@ -77,6 +85,22 @@ function initializeCardView() {
 }
 
 /**
+ * Guardar el estado inicial renderizado por Blade
+ */
+function captureInitialState() {
+    const grid = document.getElementById('products-grid');
+    const pagination = document.getElementById('catalog-pagination');
+
+    if (grid) {
+        originalGridHTML = grid.innerHTML;
+    }
+
+    if (pagination) {
+        originalPaginationHTML = pagination.innerHTML;
+    }
+}
+
+/**
  * Configurar búsqueda de productos
  */
 function setupSearchFilter() {
@@ -88,7 +112,7 @@ function setupSearchFilter() {
     searchInput.addEventListener('input', function(e) {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
-            filterProducts();
+            handleFiltersChange();
         }, 300);
     });
 }
@@ -101,7 +125,7 @@ function setupCategoryFilter() {
     if (!categorySelect) return;
 
     categorySelect.addEventListener('change', function() {
-        filterProducts();
+        handleFiltersChange();
     });
 }
 
@@ -113,7 +137,7 @@ function setupBrandFilter() {
     if (!brandSelect) return;
 
     brandSelect.addEventListener('change', function() {
-        filterProducts();
+        handleFiltersChange();
     });
 }
 
@@ -125,81 +149,313 @@ function setupSortFilter() {
     if (!sortSelect) return;
 
     sortSelect.addEventListener('change', function() {
-        sortProducts(this.value);
+        handleFiltersChange();
     });
 }
 
 /**
- * Filtrar productos según criterios de búsqueda
+ * Gestionar filtros: decide cuándo usar búsqueda AJAX y cuándo restaurar la vista inicial
  */
-function filterProducts() {
-    const searchTerm = document.getElementById('search-product')?.value.toLowerCase() || '';
+function handleFiltersChange() {
+    const searchTerm = document.getElementById('search-product')?.value.trim() || '';
     const categoryId = document.getElementById('filter-category')?.value || '';
     const brandId = document.getElementById('filter-brand')?.value || '';
+    const sortBy = document.getElementById('sort-by')?.value || 'name';
 
-    const productCards = document.querySelectorAll('.product-card');
-    let visibleCount = 0;
+    const hasActiveFilters = Boolean(searchTerm) || Boolean(categoryId) || Boolean(brandId);
 
-    productCards.forEach(card => {
-        const name = card.dataset.name || '';
-        const code = card.dataset.code || '';
-        const category = card.dataset.category || '';
-        const brand = card.dataset.brand || '';
-
-        // Verificar criterios de filtrado
-        const matchesSearch = !searchTerm || 
-                            name.includes(searchTerm) || 
-                            code.includes(searchTerm);
-        const matchesCategory = !categoryId || category === categoryId;
-        const matchesBrand = !brandId || brand === brandId;
-
-        // Mostrar u ocultar producto
-        if (matchesSearch && matchesCategory && matchesBrand) {
-            card.style.display = '';
-            visibleCount++;
-        } else {
-            card.style.display = 'none';
+    if (!hasActiveFilters) {
+        if (showingSearchResults) {
+            restoreInitialState();
         }
-    });
+        sortProducts(sortBy);
+        setPaginationVisibility(true);
+        return;
+    }
 
-    // Mostrar mensaje si no hay resultados
-    toggleNoResults(visibleCount === 0);
+    fetchAndRenderProducts({ searchTerm, categoryId, brandId, sortBy });
+}
+
+/**
+ * Restaurar la grilla original renderizada por Blade
+ */
+function restoreInitialState() {
+    const grid = document.getElementById('products-grid');
+    const pagination = document.getElementById('catalog-pagination');
+
+    if (grid && originalGridHTML) {
+        grid.innerHTML = originalGridHTML;
+    }
+
+    if (pagination && originalPaginationHTML !== '') {
+        pagination.innerHTML = originalPaginationHTML;
+        pagination.style.display = '';
+    }
+
+    showingSearchResults = false;
+    currentFetchedProducts = [];
+    setupProductActions();
+    toggleNoResults(false);
+}
+
+/**
+ * Consultar al backend para traer los productos filtrados
+ */
+async function fetchAndRenderProducts({ searchTerm, categoryId, brandId, sortBy }) {
+    const grid = document.getElementById('products-grid');
+    if (!grid) return;
+
+    toggleNoResults(false);
+    setPaginationVisibility(false);
+
+    if (currentFetchController) {
+        currentFetchController.abort();
+    }
+
+    currentFetchController = new AbortController();
+    const params = new URLSearchParams();
+
+    if (searchTerm) params.append('search', searchTerm);
+    if (categoryId) params.append('category_id', categoryId);
+    if (brandId) params.append('brand_id', brandId);
+
+    grid.innerHTML = `
+        <div class="col-12 text-center py-5">
+            <i class="fas fa-spinner fa-spin fa-3x mb-3"></i>
+            <p>Buscando productos...</p>
+        </div>
+    `;
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/productos/buscar?${params.toString()}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            signal: currentFetchController.signal
+        });
+
+        if (!response.ok) {
+            throw new Error('No se pudo obtener la información de productos');
+        }
+
+        const data = await response.json();
+        const productos = Array.isArray(data.productos) ? data.productos : [];
+
+        currentFetchedProducts = sortProductData(productos, sortBy);
+        renderProducts(currentFetchedProducts, true);
+        showingSearchResults = true;
+    } catch (error) {
+        if (error.name === 'AbortError') {
+            return;
+        }
+
+        console.error('Error al buscar productos:', error);
+        grid.innerHTML = `
+            <div class="col-12">
+                <div class="alert alert-danger text-center">
+                    <i class="fas fa-exclamation-triangle fa-2x mb-3"></i>
+                    <p>Error al buscar productos.</p>
+                    <small>${error.message}</small>
+                </div>
+            </div>
+        `;
+    }
 }
 
 /**
  * Ordenar productos
  */
 function sortProducts(sortBy) {
+    if (showingSearchResults) {
+        currentFetchedProducts = sortProductData(currentFetchedProducts, sortBy);
+        renderProducts(currentFetchedProducts, true);
+        return;
+    }
+
     const grid = document.getElementById('products-grid');
     if (!grid) return;
 
     const cards = Array.from(grid.querySelectorAll('.product-card'));
     
-    cards.sort((a, b) => {
-        switch(sortBy) {
-            case 'name':
-                return a.dataset.name.localeCompare(b.dataset.name);
-            
-            case 'stock-asc':
-                const stockA = parseInt(a.querySelector('.badge-success, .badge-warning, .badge-danger')?.textContent) || 0;
-                const stockB = parseInt(b.querySelector('.badge-success, .badge-warning, .badge-danger')?.textContent) || 0;
-                return stockA - stockB;
-            
-            case 'stock-desc':
-                const stockDescA = parseInt(a.querySelector('.badge-success, .badge-warning, .badge-danger')?.textContent) || 0;
-                const stockDescB = parseInt(b.querySelector('.badge-success, .badge-warning, .badge-danger')?.textContent) || 0;
-                return stockDescB - stockDescA;
-            
-            case 'newest':
-                return parseInt(b.dataset.id) - parseInt(a.dataset.id);
-            
-            default:
-                return 0;
-        }
-    });
+    cards.sort((a, b) => compareCards(a, b, sortBy));
 
     // Reorganizar elementos
     cards.forEach(card => grid.appendChild(card));
+}
+
+function sortProductData(products, sortBy) {
+    const sorted = [...products];
+
+    sorted.sort((a, b) => {
+        switch (sortBy) {
+            case 'stock-asc':
+                return (a.cantidad || 0) - (b.cantidad || 0);
+            case 'stock-desc':
+                return (b.cantidad || 0) - (a.cantidad || 0);
+            case 'newest':
+                return (b.id || 0) - (a.id || 0);
+            case 'name':
+            default:
+                return (a.producto || '').toLowerCase().localeCompare((b.producto || '').toLowerCase());
+        }
+    });
+
+    return sorted;
+}
+
+function compareCards(a, b, sortBy) {
+    switch (sortBy) {
+        case 'stock-asc':
+            return extractCardStock(a) - extractCardStock(b);
+        case 'stock-desc':
+            return extractCardStock(b) - extractCardStock(a);
+        case 'newest':
+            return parseInt(b.dataset.id) - parseInt(a.dataset.id);
+        case 'name':
+        default:
+            return (a.dataset.name || '').localeCompare(b.dataset.name || '');
+    }
+}
+
+function extractCardStock(card) {
+    const stockBadge = card.querySelector('.badge-success, .badge-warning, .badge-danger');
+    if (!stockBadge) return 0;
+    const matches = stockBadge.textContent.match(/\d+/);
+    return matches ? parseInt(matches[0], 10) : 0;
+}
+
+function renderProducts(products, skipSort = false) {
+    const grid = document.getElementById('products-grid');
+    if (!grid) return;
+
+    if (!Array.isArray(products) || products.length === 0) {
+        grid.innerHTML = '';
+        toggleNoResults(true);
+        return;
+    }
+
+    toggleNoResults(false);
+
+    if (!skipSort) {
+        const sortBy = document.getElementById('sort-by')?.value || 'name';
+        products = sortProductData(products, sortBy);
+    }
+
+    const cardsHTML = products.map(product => createProductCardHTML(product)).join('');
+    grid.innerHTML = cardsHTML;
+
+    setupProductActions();
+}
+
+function createProductCardHTML(product) {
+    const stockClass = getStockClass(product.cantidad);
+    const categoriaNombre = product?.categoria?.name || 'Sin categoría';
+    const marcaNombre = product?.marca?.name || '';
+    const descripcion = product.descripcion || 'Sin descripción disponible';
+    const codigoBarras = product.codigo_barras || 'S/N';
+    const imagenSrc = product.imagen_url || product.imagen || null;
+    const productoNombre = product.producto || '';
+
+    return `
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4 product-card"
+             data-id="${product.id}"
+             data-category="${product.categoria_id || ''}"
+             data-brand="${product.marca_id || ''}"
+             data-name="${productoNombre.toLowerCase()}"
+             data-code="${(product.codigo_barras || '').toLowerCase()}">
+            <div class="card h-100 shadow-sm hover-shadow">
+                <div class="product-image-container">
+                    ${imagenSrc ? `
+                        <img src="${imagenSrc}" class="card-img-top product-image" alt="${productoNombre}">
+                    ` : `
+                        <div class="no-image-placeholder">
+                            <i class="fas fa-box fa-4x text-muted"></i>
+                            <p class="text-muted mt-2">Sin imagen</p>
+                        </div>
+                    `}
+                    <span class="badge stock-badge stock-badge-${stockClass}"></span>
+                </div>
+                <div class="card-body d-flex flex-column">
+                    <div class="mb-2">
+                        <small class="text-muted">
+                            <i class="fas fa-tag"></i> ${categoriaNombre}
+                        </small>
+                        ${marcaNombre ? `
+                            <br>
+                            <small class="text-muted">
+                                <i class="fas fa-copyright"></i> ${marcaNombre}
+                            </small>
+                        ` : ''}
+                    </div>
+                    <h5 class="card-title font-weight-bold mb-2">
+                        ${truncateText(productoNombre, 50)}
+                    </h5>
+                    <p class="card-text text-muted small flex-grow-1">
+                        ${truncateText(descripcion, 80)}
+                    </p>
+                    <div class="mb-2">
+                        <small class="text-muted">
+                            <i class="fas fa-barcode"></i>
+                            <span class="badge badge-secondary">${codigoBarras}</span>
+                        </small>
+                    </div>
+                    <div class="mb-3">
+                        <strong>Stock: </strong>
+                        <span class="badge badge-${stockClass}">
+                            ${product.cantidad || 0} unidades
+                        </span>
+                    </div>
+                    <div class="btn-group d-flex" role="group">
+                        <button type="button"
+                                class="btn btn-sm btn-info btn-view-details w-50"
+                                data-id="${product.id}"
+                                title="Ver detalles">
+                            <i class="fas fa-eye"></i> Detalles
+                        </button>
+                        ${(product.cantidad || 0) > 0 ? `
+                            <button type="button"
+                                    class="btn btn-sm btn-success btn-add-to-cart w-50"
+                                    data-id="${product.id}"
+                                    data-name="${productoNombre}"
+                                    data-stock="${product.cantidad}"
+                                    title="Agregar al carrito">
+                                <i class="fas fa-cart-plus"></i> Agregar
+                            </button>
+                        ` : `
+                            <button type="button" class="btn btn-sm btn-secondary w-50" disabled>
+                                <i class="fas fa-ban"></i> Agotado
+                            </button>
+                        `}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function truncateText(text, maxLength) {
+    const value = text || '';
+    if (value.length <= maxLength) {
+        return value;
+    }
+    return `${value.slice(0, maxLength)}...`;
+}
+
+function getStockClass(quantity) {
+    const qty = quantity || 0;
+    if (qty <= 0) {
+        return 'danger';
+    }
+    if (qty <= 5) {
+        return 'warning';
+    }
+    return 'success';
+}
+
+function setPaginationVisibility(show) {
+    const pagination = document.getElementById('catalog-pagination');
+    if (!pagination) return;
+    pagination.style.display = show ? '' : 'none';
 }
 
 /**
@@ -398,12 +654,12 @@ function clearFilters() {
     if (brandSelect) brandSelect.value = '';
     if (sortSelect) sortSelect.value = 'name';
 
-    filterProducts();
+    handleFiltersChange();
 }
 
 // Exportar funciones para uso externo si es necesario
 window.inventarioCard = {
-    filterProducts,
+    handleFiltersChange,
     sortProducts,
     clearFilters,
     addToCart,
