@@ -26,16 +26,27 @@ class MarcaController extends InventarioController
         $this->temaMarcas = Tema::where('name', 'MARCAS')->first();
     }
 
-    public function index()
+    public function index(Request $request)
     {
         if (!$this->temaMarcas) {
             return back()->with('error', 'No existe el tema "MARCAS" en la base de datos.');
         }
 
-        $marcas = $this->temaMarcas->parametros()
+        $search = $request->input('search');
+
+        $marcasQuery = $this->temaMarcas->parametros()
             ->with(['userCreate.persona', 'userUpdate.persona'])
-            ->wherePivot('status', 1)
-            ->paginate(10);
+            ->wherePivot('status', 1);
+
+        if (!empty($search)) {
+            $marcasQuery->where(function ($query) use ($search) {
+                $query->where('parametros.name', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $marcas = $marcasQuery
+            ->paginate(10)
+            ->appends($request->only('search'));
 
         // Cargar conteo de productos manualmente para cada marca
         $marcas->each(function($marca) {

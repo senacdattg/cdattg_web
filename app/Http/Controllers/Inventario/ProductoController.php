@@ -35,16 +35,28 @@ class ProductoController extends InventarioController
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $productos = Producto::with([
+        $search = $request->input('search');
+
+        $query = Producto::with([
             'tipoProducto.parametro',
             'unidadMedida.parametro',
             'estado.parametro',
             'contratoConvenio',
             'ambiente',
             'proveedor'
-        ])->paginate(7);
+        ]);
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $q->where('producto', 'LIKE', "%{$search}%")
+                  ->orWhere('codigo_barras', 'LIKE', "%{$search}%")
+                  ->orWhere('descripcion', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $productos = $query->paginate(10)->appends($request->only('search'));
 
         // Cargar marca y categoria directamente para cada producto
         $productos->each(function($producto) {

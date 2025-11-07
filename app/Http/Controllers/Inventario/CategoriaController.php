@@ -26,16 +26,27 @@ class CategoriaController extends InventarioController
         $this->temacategorias = Tema::where('name', 'CATEGORIAS')->first();
     }
 
-    public function index()
+    public function index(Request $request)
     {
         if (!$this->temacategorias) {
             return back()->with('error', 'No existe el tema "CATEGORIAS" en la base de datos.');
         }
 
-        $categorias = $this->temacategorias->parametros()
+        $search = $request->input('search');
+
+        $categoriasQuery = $this->temacategorias->parametros()
             ->with(['userCreate.persona', 'userUpdate.persona'])
-            ->wherePivot('status', 1)
-            ->paginate(10);
+            ->wherePivot('status', 1);
+
+        if (!empty($search)) {
+            $categoriasQuery->where(function ($query) use ($search) {
+                $query->where('parametros.name', 'LIKE', "%{$search}%");
+            });
+        }
+
+        $categorias = $categoriasQuery
+            ->paginate(10)
+            ->appends($request->only('search'));
 
         // Cargar conteo de productos manualmente para cada categoría
         $categorias->each(function($categoria) {

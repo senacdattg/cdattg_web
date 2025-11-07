@@ -31,16 +31,40 @@ class OrdenController extends InventarioController
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $ordenes = Orden::with([
+        $search = $request->input('search');
+
+        $ordenesQuery = Orden::with([
             'tipoOrden.parametro',
             'userCreate',
             'detalles.producto',
             'detalles.estadoOrden.parametro'
-        ])
-        ->latest()
-        ->paginate(15);
+        ])->latest();
+
+        if (!empty($search)) {
+            $ordenesQuery->where(function ($query) use ($search) {
+                $query->where('descripcion_orden', 'LIKE', "%{$search}%")
+                    ->orWhereHas('userCreate', function ($userQuery) use ($search) {
+                        $userQuery->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('tipoOrden.parametro', function ($tipoQuery) use ($search) {
+                        $tipoQuery->where('name', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('detalles.producto', function ($productoQuery) use ($search) {
+                        $productoQuery->where('producto', 'LIKE', "%{$search}%")
+                            ->orWhere('codigo_barras', 'LIKE', "%{$search}%");
+                    });
+
+                if (is_numeric($search)) {
+                    $query->orWhere('id', (int) $search);
+                }
+            });
+        }
+
+        $ordenes = $ordenesQuery
+            ->paginate(15)
+            ->appends($request->only('search'));
         
         return view('inventario.ordenes.index', compact('ordenes'));
     }

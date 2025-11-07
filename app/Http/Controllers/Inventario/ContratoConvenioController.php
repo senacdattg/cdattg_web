@@ -19,14 +19,30 @@ class ContratoConvenioController extends InventarioController
         $this->middleware('can:ELIMINAR CONTRATO')->only('destroy');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $contratosConvenios = ContratoConvenio::with([
+        $search = $request->input('search');
+
+        $contratosConveniosQuery = ContratoConvenio::with([
             'proveedor', 
             'estado.parametro', 
             'userCreate.persona', 
             'userUpdate.persona'
-        ])->latest()->paginate(10);
+        ])->latest();
+
+        if (!empty($search)) {
+            $contratosConveniosQuery->where(function ($query) use ($search) {
+                $query->where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('codigo', 'LIKE', "%{$search}%")
+                    ->orWhereHas('proveedor', function ($proveedorQuery) use ($search) {
+                        $proveedorQuery->where('proveedor', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        $contratosConvenios = $contratosConveniosQuery
+            ->paginate(10)
+            ->appends($request->only('search'));
         
         $estados = ParametroTema::with(['parametro', 'tema'])
             ->whereHas('tema', fn($q) => $q->where('name', 'ESTADOS'))
