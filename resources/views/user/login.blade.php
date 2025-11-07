@@ -58,7 +58,7 @@
                         <label for="email">Usuario</label>
                         <div class="input-group">
                             <input type="email" class="form-control @error('email') is-invalid @enderror" name="email"
-                                id="email" placeholder="Correo Institucional" value="{{ old('email') }}" required
+                                id="email" placeholder="Correo" value="{{ old('email') }}" required
                                 autofocus>
                             <div class="input-group-append">
                                 <div class="input-group-text">
