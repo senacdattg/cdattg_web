@@ -72,13 +72,22 @@ function soloNumeros(event) {
 function setupMunicipioLoading() {
     const departamentoSelect = document.getElementById('departamento_id');
     if (departamentoSelect) {
+        // Cargar municipios cuando cambia el departamento
         departamentoSelect.addEventListener('change', function() {
             loadMunicipiosForDepartamento(this.value);
         });
+        
+        // Cargar municipios automáticamente si hay un departamento seleccionado al cargar la página
+        const departamentoId = departamentoSelect.value;
+        if (departamentoId) {
+            // Obtener el municipio_id del usuario si existe
+            const municipioId = @json($userData['municipio_id'] ?? null);
+            loadMunicipiosForDepartamento(departamentoId, municipioId);
+        }
     }
 }
 
-function loadMunicipiosForDepartamento(departamentoId) {
+function loadMunicipiosForDepartamento(departamentoId, municipioIdToSelect = null) {
     const municipioSelect = document.getElementById('municipio_id');
     if (!municipioSelect) return;
 
@@ -91,6 +100,10 @@ function loadMunicipiosForDepartamento(departamentoId) {
                     const option = document.createElement('option');
                     option.value = municipio.id;
                     option.textContent = municipio.municipio;
+                    // Seleccionar el municipio si coincide con el municipio_id del usuario
+                    if (municipioIdToSelect && municipio.id == municipioIdToSelect) {
+                        option.selected = true;
+                    }
                     municipioSelect.appendChild(option);
                 });
             })
