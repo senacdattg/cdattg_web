@@ -88,7 +88,9 @@
             <div class="mb-3">
                 <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento *</label>
                 <input type="date" class="form-control" id="fecha_nacimiento"
-                        name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $userData['fecha_nacimiento'] ?? '') }}" required>
+                        name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $userData['fecha_nacimiento'] ?? '') }}" 
+                        max="{{ date('Y-m-d', strtotime('-14 years')) }}" required>
+                <small class="form-text text-muted">Debe tener al menos 14 años para registrarse.</small>
             </div>
 
             <div class="mb-3">
@@ -390,7 +392,9 @@
             <div class="mb-3">
                 <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento *</label>
                 <input type="date" class="form-control" id="fecha_nacimiento"
-                       name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $userData['fecha_nacimiento'] ?? '') }}" required>
+                       name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $userData['fecha_nacimiento'] ?? '') }}" 
+                       max="{{ date('Y-m-d', strtotime('-14 years')) }}" required>
+                <small class="form-text text-muted">Debe tener al menos 14 años para registrarse.</small>
             </div>
 
             <div class="mb-3">

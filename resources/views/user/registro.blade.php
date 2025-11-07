@@ -55,6 +55,9 @@
 
                             // Configurar funcionalidad de dirección estructurada
                             setupAddressForm();
+
+                            // Configurar validación de edad mínima
+                            setupEdadMinimaValidation();
                         });
 
                         function setupUppercaseConversion() {
@@ -246,6 +249,82 @@
                                     });
                                 }
                             });
+                        }
+
+                        function setupEdadMinimaValidation() {
+                            const fechaNacimientoInput = document.getElementById('fecha_nacimiento');
+                            if (!fechaNacimientoInput) return;
+
+                            // Calcular la fecha máxima permitida (hace 14 años)
+                            const hoy = new Date();
+                            const fechaMaxima = new Date();
+                            fechaMaxima.setFullYear(hoy.getFullYear() - 14);
+                            
+                            // Establecer el atributo max si no está ya establecido
+                            if (!fechaNacimientoInput.getAttribute('max')) {
+                                const fechaMaximaStr = fechaMaxima.toISOString().split('T')[0];
+                                fechaNacimientoInput.setAttribute('max', fechaMaximaStr);
+                            }
+
+                            // Validar cuando cambia la fecha
+                            fechaNacimientoInput.addEventListener('change', function() {
+                                const fechaSeleccionada = new Date(this.value);
+                                const edadMinima = new Date();
+                                edadMinima.setFullYear(edadMinima.getFullYear() - 14);
+
+                                if (fechaSeleccionada > edadMinima) {
+                                    this.setCustomValidity('Debe tener al menos 14 años para registrarse.');
+                                    this.classList.add('is-invalid');
+                                    
+                                    // Mostrar mensaje de error
+                                    let errorMessage = this.parentElement.querySelector('.invalid-feedback');
+                                    if (!errorMessage) {
+                                        errorMessage = document.createElement('div');
+                                        errorMessage.className = 'invalid-feedback';
+                                        this.parentElement.appendChild(errorMessage);
+                                    }
+                                    errorMessage.textContent = 'Debe tener al menos 14 años para registrarse.';
+                                } else {
+                                    this.setCustomValidity('');
+                                    this.classList.remove('is-invalid');
+                                    
+                                    // Remover mensaje de error
+                                    const errorMessage = this.parentElement.querySelector('.invalid-feedback');
+                                    if (errorMessage) {
+                                        errorMessage.remove();
+                                    }
+                                }
+                            });
+
+                            // Validar al enviar el formulario
+                            const form = document.getElementById('registroForm');
+                            if (form) {
+                                form.addEventListener('submit', function(e) {
+                                    const fechaSeleccionada = new Date(fechaNacimientoInput.value);
+                                    const edadMinima = new Date();
+                                    edadMinima.setFullYear(edadMinima.getFullYear() - 14);
+
+                                    if (fechaSeleccionada > edadMinima) {
+                                        e.preventDefault();
+                                        fechaNacimientoInput.focus();
+                                        fechaNacimientoInput.setCustomValidity('Debe tener al menos 14 años para registrarse.');
+                                        fechaNacimientoInput.classList.add('is-invalid');
+                                        
+                                        // Mostrar mensaje de error
+                                        let errorMessage = fechaNacimientoInput.parentElement.querySelector('.invalid-feedback');
+                                        if (!errorMessage) {
+                                            errorMessage = document.createElement('div');
+                                            errorMessage.className = 'invalid-feedback';
+                                            fechaNacimientoInput.parentElement.appendChild(errorMessage);
+                                        }
+                                        errorMessage.textContent = 'Debe tener al menos 14 años para registrarse.';
+                                        
+                                        // Mostrar alerta
+                                        alert('Debe tener al menos 14 años para registrarse.');
+                                        return false;
+                                    }
+                                });
+                            }
                         }
                     </script>
 
