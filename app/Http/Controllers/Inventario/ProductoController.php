@@ -56,7 +56,11 @@ class ProductoController extends InventarioController
             });
         }
 
-        $productos = $query->paginate(10)->appends($request->only('search'));
+        $productos = $query
+            ->paginate(10)
+            ->appends($request->only('search'));
+
+        $productos->withPath(route('inventario.productos.index'));
 
         // Cargar marca y categoria directamente para cada producto
         $productos->each(function($producto) {

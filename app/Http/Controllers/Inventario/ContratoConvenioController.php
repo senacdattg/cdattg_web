@@ -43,6 +43,8 @@ class ContratoConvenioController extends InventarioController
         $contratosConvenios = $contratosConveniosQuery
             ->paginate(10)
             ->appends($request->only('search'));
+
+        $contratosConvenios->withPath(route('inventario.contratos-convenios.index'));
         
         $estados = ParametroTema::with(['parametro', 'tema'])
             ->whereHas('tema', fn($q) => $q->where('name', 'ESTADOS'))

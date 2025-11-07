@@ -48,6 +48,8 @@ class CategoriaController extends InventarioController
             ->paginate(10)
             ->appends($request->only('search'));
 
+        $categorias->withPath(route('inventario.categorias.index'));
+
         // Cargar conteo de productos manualmente para cada categoría
         $categorias->each(function($categoria) {
             $categoria->productos_count = \App\Models\Inventario\Producto::where('categoria_id', $categoria->id)->count();
