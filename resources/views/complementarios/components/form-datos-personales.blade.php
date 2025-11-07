@@ -160,12 +160,13 @@
                 <label for="direccion" class="form-label">Dirección *</label>
                 <input type="text" class="form-control" id="direccion" name="direccion"
                        value="{{ old('direccion', $userData['direccion'] ?? '') }}" 
-                       placeholder="Ingrese su dirección completa" required>
-                <small class="form-text text-muted">O use el botón para ingresar una dirección estructurada</small>
+                       placeholder="Use el botón para ingresar una dirección estructurada" 
+                       readonly required>
+                <small class="form-text text-muted">Haga clic en el botón para ingresar una dirección estructurada</small>
             </div>
             
             <div class="mb-3">
-                <button type="button" class="btn btn-outline-secondary" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
+                <button type="button" class="btn btn-primary" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
                     <i class="fas fa-edit"></i> Ingresar Dirección Estructurada
                 </button>
             </div>
@@ -400,12 +401,13 @@
                 <label for="direccion" class="form-label">Dirección *</label>
                 <input type="text" class="form-control" id="direccion" name="direccion"
                        value="{{ old('direccion', $userData['direccion'] ?? '') }}" 
-                       placeholder="Ingrese su dirección completa" required>
-                <small class="form-text text-muted">O use el botón para ingresar una dirección estructurada</small>
+                       placeholder="Use el botón para ingresar una dirección estructurada" 
+                       readonly required>
+                <small class="form-text text-muted">Haga clic en el botón para ingresar una dirección estructurada</small>
             </div>
             
             <div class="mb-3">
-                <button type="button" class="btn btn-outline-secondary" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
+                <button type="button" class="btn btn-primary" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
                     <i class="fas fa-edit"></i> Ingresar Dirección Estructurada
                 </button>
             </div>

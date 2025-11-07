@@ -11,7 +11,7 @@
             <p class="card-text text-muted small mb-3">{{ $programa->descripcion }}</p>
             <div class="mt-3 pt-2 border-top">
                 <small class="text-muted">Duración</small>
-                <p class="mb-0 font-weight-bold small">{{ $programa->duracion }} horas</p>
+                <p class="mb-0 font-weight-bold small">{{ formatear_horas($programa->duracion) }} horas</p>
             </div>
         </div>
         <div class="card-footer bg-transparent py-2">

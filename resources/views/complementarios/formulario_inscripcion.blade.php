@@ -392,7 +392,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                             <div class="col-6">
                                                 <div class="description-block">
                                                     <span class="description-text" style="color: #343a40;">DURACIÓN</span>
-                                                    <h5 class="description-header" style="color: #007bff;">{{ $programa->duracion }} horas</h5>
+                                                    <h5 class="description-header" style="color: #007bff;">{{ formatear_horas($programa->duracion) }} horas</h5>
                                                 </div>
                                             </div>
                                             <div class="col-6">

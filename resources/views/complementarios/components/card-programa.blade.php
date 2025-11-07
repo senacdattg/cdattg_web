@@ -30,7 +30,7 @@
                         <div class="info-box bg-light">
                             <div class="info-box-content py-3">
                                 <span class="info-box-text">Duración</span>
-                                <span class="info-box-number">{{ $programaData['duracion'] }} horas</span>
+                                <span class="info-box-number">{{ formatear_horas($programaData['duracion']) }} horas</span>
                             </div>
                         </div>
                     </div>

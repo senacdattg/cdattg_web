@@ -64,8 +64,8 @@
                     <p class="card-text">{{ $programa->descripcion }}</p>
                     <div class="d-flex justify-content-center mt-3 pt-3 border-top">
                         <div>
-                            <small class="text-muted">Duraciรณn</small>
-                            <p class="mb-0"><strong>{{ $programa->duracion }} horas</strong></p>
+                            <small class="text-muted">Duración</small>
+                            <p class="mb-0"><strong>{{ formatear_horas($programa->duracion) }} horas</strong></p>
                         </div>
                     </div>
                 </div>
@@ -122,7 +122,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="edit_duracion" class="form-label">Duraciรณn (horas)</label>
+                                    <label for="edit_duracion" class="form-label">Duración (horas)</label>
                                     <input type="number" class="form-control" id="edit_duracion"
                                         name="duracion" required min="1">
                                 </div>
@@ -214,7 +214,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Duraciรณn (horas)</label>
+                                <label class="form-label fw-bold">Duración (horas)</label>
                                 <p id="view_duracion" class="form-control-plaintext"></p>
                             </div>
                         </div>
