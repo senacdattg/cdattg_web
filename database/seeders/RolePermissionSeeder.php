@@ -466,8 +466,10 @@ class RolePermissionSeeder extends Seeder
         ]);
 
         // Asignar permisos al rol ASPIRANTE
-        $aspirante->givePermissionTo([
-            'VER PERSONA',
+        // Los aspirantes NO deben tener acceso al módulo de personas
+        // Solo pueden ver su propio perfil a través de /mi-perfil
+        $aspirante->syncPermissions([
+            // Sin permisos de personas - solo pueden ver su propio perfil
         ]);
 
         // Asignar permisos al rol VISITANTE
