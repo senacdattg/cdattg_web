@@ -158,9 +158,15 @@
 
             <div class="mb-3">
                 <label for="direccion" class="form-label">Dirección *</label>
-                <input type="text" class="form-control" id="direccion" name="direccion" value="{{ old('direccion', $userData['direccion'] ?? '') }}" placeholder="Dirección completa" required readonly>
-                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
-                    <i class="fas fa-edit"></i> Ingresar Dirección
+                <input type="text" class="form-control" id="direccion" name="direccion"
+                       value="{{ old('direccion', $userData['direccion'] ?? '') }}" 
+                       placeholder="Ingrese su dirección completa" required>
+                <small class="form-text text-muted">O use el botón para ingresar una dirección estructurada</small>
+            </div>
+            
+            <div class="mb-3">
+                <button type="button" class="btn btn-outline-secondary" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
+                    <i class="fas fa-edit"></i> Ingresar Dirección Estructurada
                 </button>
             </div>
             <div id="addressForm" class="collapse mt-3" aria-labelledby="addressFormLabel">
@@ -392,9 +398,15 @@
 
             <div class="mb-3">
                 <label for="direccion" class="form-label">Dirección *</label>
-                <input type="text" class="form-control" id="direccion" name="direccion" value="{{ old('direccion', $userData['direccion'] ?? '') }}" placeholder="Dirección completa" required readonly>
-                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
-                    <i class="fas fa-edit"></i> Ingresar Dirección
+                <input type="text" class="form-control" id="direccion" name="direccion"
+                       value="{{ old('direccion', $userData['direccion'] ?? '') }}" 
+                       placeholder="Ingrese su dirección completa" required>
+                <small class="form-text text-muted">O use el botón para ingresar una dirección estructurada</small>
+            </div>
+            
+            <div class="mb-3">
+                <button type="button" class="btn btn-outline-secondary" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
+                    <i class="fas fa-edit"></i> Ingresar Dirección Estructurada
                 </button>
             </div>
             <div id="addressForm" class="collapse mt-3" aria-labelledby="addressFormLabel">
