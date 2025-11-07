@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         </div>
 
                                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                            <button type="reset" class="btn btn-outline-secondary me-md-2">Limpiar</button>
+                                            <button type="reset" class="btn btn-outline-secondary me-md-2 mr-3">Limpiar</button>
                                             <button type="submit" class="btn btn-primary">Enviar Inscripción</button>
                                         </div>
 
