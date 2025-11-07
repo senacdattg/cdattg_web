@@ -37,7 +37,7 @@ class PersonaController extends Controller
 
         // Restringir acceso a aspirantes - no pueden ver el módulo de personas
         $this->middleware(function ($request, $next) {
-            if (auth()->user()->hasRole('ASPIRANTE')) {
+            if ($request->user()?->hasRole('ASPIRANTE')) {
                 abort(403, 'No tienes permiso para acceder a este módulo.');
             }
             return $next($request);
