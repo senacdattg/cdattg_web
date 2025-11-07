@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Role;
 use App\Services\ComplementarioService;
+use Carbon\Carbon;
 
 class InscripcionComplementarioController extends Controller
 {
@@ -63,7 +64,18 @@ class InscripcionComplementarioController extends Controller
             'segundo_nombre' => 'nullable|string|max:191',
             'primer_apellido' => 'required|string|max:191',
             'segundo_apellido' => 'nullable|string|max:191',
-            'fecha_nacimiento' => 'required|date',
+            'fecha_nacimiento' => [
+                'required',
+                'date',
+                function ($attribute, $value, $fail) {
+                    $fechaNacimiento = Carbon::parse($value);
+                    $edadMinima = Carbon::now()->subYears(14);
+                    
+                    if ($fechaNacimiento->gt($edadMinima)) {
+                        $fail('Debe tener al menos 14 años para registrarse.');
+                    }
+                },
+            ],
             'genero' => 'required|integer',
             'telefono' => 'nullable|string|max:191',
             'celular' => 'required|string|max:191',
@@ -176,7 +188,18 @@ class InscripcionComplementarioController extends Controller
             'segundo_nombre' => 'nullable|string|max:191',
             'primer_apellido' => 'required|string|max:191',
             'segundo_apellido' => 'nullable|string|max:191',
-            'fecha_nacimiento' => 'required|date',
+            'fecha_nacimiento' => [
+                'required',
+                'date',
+                function ($attribute, $value, $fail) {
+                    $fechaNacimiento = Carbon::parse($value);
+                    $edadMinima = Carbon::now()->subYears(14);
+                    
+                    if ($fechaNacimiento->gt($edadMinima)) {
+                        $fail('Debe tener al menos 14 años para registrarse.');
+                    }
+                },
+            ],
             'genero' => 'required|integer',
             'telefono' => 'nullable|string|max:191',
             'celular' => 'required|string|max:191',

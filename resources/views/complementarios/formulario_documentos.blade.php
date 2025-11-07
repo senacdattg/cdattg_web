@@ -108,7 +108,7 @@
                                                     <div class="col-6">
                                                         <div class="description-block">
                                                             <span class="description-text">DURACIÓN</span>
-                                                            <h5 class="description-header">{{ $programa->duracion }} horas</h5>
+                                                            <h5 class="description-header">{{ formatear_horas($programa->duracion) }} horas</h5>
                                                         </div>
                                                     </div>
                                                     <div class="col-6">

@@ -162,7 +162,8 @@ class ProgramaComplementarioController extends Controller
             }
         }
 
-        return response()->json(['success' => true, 'message' => 'Programa creado exitosamente.']);
+        return redirect()->route('gestion-programas-complementarios')
+            ->with('success', 'Programa creado exitosamente.');
     }
 
     /**

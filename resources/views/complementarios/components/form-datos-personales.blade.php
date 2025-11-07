@@ -88,7 +88,9 @@
             <div class="mb-3">
                 <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento *</label>
                 <input type="date" class="form-control" id="fecha_nacimiento"
-                        name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $userData['fecha_nacimiento'] ?? '') }}" required>
+                        name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $userData['fecha_nacimiento'] ?? '') }}" 
+                        max="{{ date('Y-m-d', strtotime('-14 years')) }}" required>
+                <small class="form-text text-muted">Debe tener al menos 14 años para registrarse.</small>
             </div>
 
             <div class="mb-3">
@@ -158,9 +160,16 @@
 
             <div class="mb-3">
                 <label for="direccion" class="form-label">Dirección *</label>
-                <input type="text" class="form-control" id="direccion" name="direccion" value="{{ old('direccion', $userData['direccion'] ?? '') }}" placeholder="Dirección completa" required readonly>
-                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
-                    <i class="fas fa-edit"></i> Ingresar Dirección
+                <input type="text" class="form-control" id="direccion" name="direccion"
+                       value="{{ old('direccion', $userData['direccion'] ?? '') }}" 
+                       placeholder="Use el botón para ingresar una dirección estructurada" 
+                       readonly required>
+                <small class="form-text text-muted">Haga clic en el botón para ingresar una dirección estructurada</small>
+            </div>
+            
+            <div class="mb-3">
+                <button type="button" class="btn btn-primary" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
+                    <i class="fas fa-edit"></i> Ingresar Dirección Estructurada
                 </button>
             </div>
             <div id="addressForm" class="collapse mt-3" aria-labelledby="addressFormLabel">
@@ -193,14 +202,80 @@
                                         placeholder="Ej: 9A, 7 Bis, 45" data-required="true">
                                 </div>
                                 <div class="form-group">
-                                    <label for="letra_via">3. Letra o complemento de vía principal</label>
-                                    <input type="text" class="form-control address-field" id="letra_via"
-                                        placeholder="Ej: A, B, Bis (opcional)" maxlength="5">
+                                    <label for="letra_via">3. Letra principal de la vía</label>
+                                    <select class="form-control address-field" id="letra_via">
+                                        <option value="">(Sin letra)</option>
+                                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                                        <option>E</option><option>F</option><option>G</option><option>H</option>
+                                        <option>I</option><option>J</option><option>K</option><option>L</option>
+                                        <option>M</option><option>N</option><option>O</option><option>P</option>
+                                        <option>Q</option><option>R</option><option>S</option><option>T</option>
+                                        <option>U</option><option>V</option><option>W</option><option>X</option>
+                                        <option>Y</option><option>Z</option>
+                                    </select>
+                                </div>
+                                <div class="form-group form-check">
+                                    <input type="checkbox" class="form-check-input" id="bis">
+                                    <label class="form-check-label" for="bis">Sufijo BIS</label>
                                 </div>
                                 <div class="form-group">
-                                    <label for="via_secundaria">4. Vía secundaria o intersección</label>
+                                    <label for="letra_sufijo">Letra Sufijo</label>
+                                    <select class="form-control address-field" id="letra_sufijo">
+                                        <option value="">(Sin sufijo)</option>
+                                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                                        <option>E</option><option>F</option><option>G</option><option>H</option>
+                                        <option>I</option><option>J</option><option>K</option><option>L</option>
+                                        <option>M</option><option>N</option><option>O</option><option>P</option>
+                                        <option>Q</option><option>R</option><option>S</option><option>T</option>
+                                        <option>U</option><option>V</option><option>W</option><option>X</option>
+                                        <option>Y</option><option>Z</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cuadrante">Cuadrante</label>
+                                    <select class="form-control address-field" id="cuadrante">
+                                        <option value="">(Sin cuadrante)</option>
+                                        <option value="N">Norte (N)</option>
+                                        <option value="S">Sur (S)</option>
+                                        <option value="E">Este (E)</option>
+                                        <option value="O">Oeste (O)</option>
+                                        <option value="NE">Noreste (NE)</option>
+                                        <option value="NO">Noroeste (NO)</option>
+                                        <option value="SE">Sureste (SE)</option>
+                                        <option value="SO">Suroeste (SO)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="via_secundaria">4. Número de la vía secundaria / intersección</label>
                                     <input type="text" class="form-control address-field" id="via_secundaria"
-                                        placeholder="Ej: Calle 12, Transversal 22B (opcional)">
+                                        placeholder="Ej: 12, 22B (opcional)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="letra_via_secundaria">Letra asociada a la vía secundaria</label>
+                                    <select class="form-control address-field" id="letra_via_secundaria">
+                                        <option value="">(Sin letra)</option>
+                                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                                        <option>E</option><option>F</option><option>G</option><option>H</option>
+                                        <option>I</option><option>J</option><option>K</option><option>L</option>
+                                        <option>M</option><option>N</option><option>O</option><option>P</option>
+                                        <option>Q</option><option>R</option><option>S</option><option>T</option>
+                                        <option>U</option><option>V</option><option>W</option><option>X</option>
+                                        <option>Y</option><option>Z</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cuadrante_secundario">Cuadrante vía secundaria</label>
+                                    <select class="form-control address-field" id="cuadrante_secundario">
+                                        <option value="">(Sin cuadrante)</option>
+                                        <option value="N">Norte (N)</option>
+                                        <option value="S">Sur (S)</option>
+                                        <option value="E">Este (E)</option>
+                                        <option value="O">Oeste (O)</option>
+                                        <option value="NE">Noreste (NE)</option>
+                                        <option value="NO">Noroeste (NO)</option>
+                                        <option value="SE">Sureste (SE)</option>
+                                        <option value="SO">Suroeste (SO)</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
                                     <label for="numero_casa">5. Número de casa o edificio *</label>
@@ -224,7 +299,7 @@
                                 <div class="alert alert-info">
                                     <small>
                                         <strong>Ejemplo de formato:</strong><br>
-                                        <span class="text-muted">Carrera 9A #34-15 Apto 301, Barrio Centro</span><br>
+                                        <span class="text-muted">Carrera 9A BIS #34-15 Este Apto 301, Barrio Centro</span><br>
                                         <span class="text-muted">Los campos marcados con * son obligatorios.</span>
                                     </small>
                                 </div>
@@ -317,7 +392,9 @@
             <div class="mb-3">
                 <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento *</label>
                 <input type="date" class="form-control" id="fecha_nacimiento"
-                       name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $userData['fecha_nacimiento'] ?? '') }}" required>
+                       name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $userData['fecha_nacimiento'] ?? '') }}" 
+                       max="{{ date('Y-m-d', strtotime('-14 years')) }}" required>
+                <small class="form-text text-muted">Debe tener al menos 14 años para registrarse.</small>
             </div>
 
             <div class="mb-3">
@@ -392,9 +469,16 @@
 
             <div class="mb-3">
                 <label for="direccion" class="form-label">Dirección *</label>
-                <input type="text" class="form-control" id="direccion" name="direccion" value="{{ old('direccion', $userData['direccion'] ?? '') }}" placeholder="Dirección completa" required readonly>
-                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
-                    <i class="fas fa-edit"></i> Ingresar Dirección
+                <input type="text" class="form-control" id="direccion" name="direccion"
+                       value="{{ old('direccion', $userData['direccion'] ?? '') }}" 
+                       placeholder="Use el botón para ingresar una dirección estructurada" 
+                       readonly required>
+                <small class="form-text text-muted">Haga clic en el botón para ingresar una dirección estructurada</small>
+            </div>
+            
+            <div class="mb-3">
+                <button type="button" class="btn btn-primary" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
+                    <i class="fas fa-edit"></i> Ingresar Dirección Estructurada
                 </button>
             </div>
             <div id="addressForm" class="collapse mt-3" aria-labelledby="addressFormLabel">
@@ -458,7 +542,7 @@
                                 <div class="alert alert-info">
                                     <small>
                                         <strong>Ejemplo de formato:</strong><br>
-                                        <span class="text-muted">Carrera 9A #34-15 Apto 301, Barrio Centro</span><br>
+                                        <span class="text-muted">Carrera 9A BIS #34-15 Este Apto 301, Barrio Centro</span><br>
                                         <span class="text-muted">Los campos marcados con * son obligatorios.</span>
                                     </small>
                                 </div>

@@ -96,6 +96,15 @@
                     </div>
 
                 </form>
+
+                {{-- Botón para volver a la página principal --}}
+                <div class="row mt-3 d-flex justify-content-center">
+                    <div class="col-6">
+                        <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-block">
+                            <i class="fas fa-arrow-left mr-2"></i>Volver al Inicio
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

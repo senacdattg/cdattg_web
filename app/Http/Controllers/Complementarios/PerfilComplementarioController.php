@@ -28,10 +28,7 @@ class PerfilComplementarioController extends Controller
             return redirect('/login')->with('error', 'Debe iniciar sesión para acceder a su perfil.');
         }
 
-        // Verificar que el usuario tenga permisos para ver personas
-        if (!$user->can('VER PERSONA')) {
-            return redirect()->route('home')->with('error', 'Acceso no autorizado.');
-        }
+        // No se requiere permiso 'VER PERSONA' porque solo se muestra la información propia del usuario
 
         // Obtener la persona del usuario
         $persona = $user->persona;

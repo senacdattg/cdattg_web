@@ -9,6 +9,7 @@ use App\Models\Persona;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class RegisterController extends Controller
 {
@@ -34,7 +35,18 @@ class RegisterController extends Controller
             'segundo_nombre' => 'nullable|string|max:191',
             'primer_apellido' => 'required|string|max:191',
             'segundo_apellido' => 'nullable|string|max:191',
-            'fecha_nacimiento' => 'required|date',
+            'fecha_nacimiento' => [
+                'required',
+                'date',
+                function ($attribute, $value, $fail) {
+                    $fechaNacimiento = Carbon::parse($value);
+                    $edadMinima = Carbon::now()->subYears(14);
+                    
+                    if ($fechaNacimiento->gt($edadMinima)) {
+                        $fail('Debe tener al menos 14 años para registrarse.');
+                    }
+                },
+            ],
             'genero' => 'required|integer',
             'telefono' => 'nullable|string|max:191',
             'celular' => 'required|string|max:191',
@@ -61,21 +73,34 @@ class RegisterController extends Controller
         Log::info('RegisterController - Datos procesados', ['processed_data' => $validatedData]);
 
         // Verificar si ya existe una persona con el mismo documento o email
-        $personaExistente = Persona::where('numero_documento', $request->numero_documento)
-            ->orWhere('email', $request->email)
+        $personaExistente = Persona::where('numero_documento', $validatedData['documento'])
+            ->orWhere('email', $validatedData['email'])
             ->first();
 
         if ($personaExistente) {
             return back()->withInput()->with('error', 'Ya existe una persona registrada con este número de documento o correo electrónico.');
         }
 
-        // Crear nueva persona
-        $persona = Persona::create($request->only([
-            'tipo_documento', 'numero_documento', 'primer_nombre', 'segundo_nombre',
-            'primer_apellido', 'segundo_apellido', 'fecha_nacimiento', 'genero',
-            'telefono', 'celular', 'email', 'pais_id', 'departamento_id',
-            'municipio_id', 'direccion'
-        ]) + ['user_create_id' => 1, 'user_edit_id' => 1]);
+        // Crear nueva persona usando los datos validados
+        $persona = Persona::create([
+            'tipo_documento' => $validatedData['tipo_documento'],
+            'numero_documento' => $validatedData['documento'],
+            'primer_nombre' => $validatedData['primer_nombre'],
+            'segundo_nombre' => $validatedData['segundo_nombre'] ?? null,
+            'primer_apellido' => $validatedData['primer_apellido'],
+            'segundo_apellido' => $validatedData['segundo_apellido'] ?? null,
+            'fecha_nacimiento' => $validatedData['fecha_nacimiento'],
+            'genero' => $validatedData['genero'],
+            'telefono' => $validatedData['telefono'] ?? null,
+            'celular' => $validatedData['celular'],
+            'email' => $validatedData['email'],
+            'pais_id' => $validatedData['pais_id'],
+            'departamento_id' => $validatedData['departamento_id'],
+            'municipio_id' => $validatedData['municipio_id'],
+            'direccion' => $validatedData['direccion'],
+            'user_create_id' => 1,
+            'user_edit_id' => 1
+        ]);
 
         // Crear cuenta de usuario automáticamente
         $user = User::create([

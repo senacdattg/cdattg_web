@@ -35,6 +35,14 @@ class PersonaController extends Controller
         $this->ubicacionService = $ubicacionService;
         $this->temaRepo = $temaRepo;
 
+        // Restringir acceso a aspirantes - no pueden ver el módulo de personas
+        $this->middleware(function ($request, $next) {
+            if (auth()->user()->hasRole('ASPIRANTE')) {
+                abort(403, 'No tienes permiso para acceder a este módulo.');
+            }
+            return $next($request);
+        });
+
         $this->middleware('can:VER PERSONA')->only(['index', 'show']);
         $this->middleware('can:CREAR PERSONA')->only(['create', 'store']);
         $this->middleware('can:EDITAR PERSONA')->only(['edit', 'update']);

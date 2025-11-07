@@ -17,6 +17,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Configurar manejo de caracterización
     setupCaracterizacionHandling();
+
+    // Configurar validación de edad mínima
+    setupEdadMinimaValidation();
 });
 
 function setupUppercaseConversion() {
@@ -72,13 +75,22 @@ function soloNumeros(event) {
 function setupMunicipioLoading() {
     const departamentoSelect = document.getElementById('departamento_id');
     if (departamentoSelect) {
+        // Cargar municipios cuando cambia el departamento
         departamentoSelect.addEventListener('change', function() {
             loadMunicipiosForDepartamento(this.value);
         });
+        
+        // Cargar municipios automáticamente si hay un departamento seleccionado al cargar la página
+        const departamentoId = departamentoSelect.value;
+        if (departamentoId) {
+            // Obtener el municipio_id del usuario si existe
+            const municipioId = @json($userData['municipio_id'] ?? null);
+            loadMunicipiosForDepartamento(departamentoId, municipioId);
+        }
     }
 }
 
-function loadMunicipiosForDepartamento(departamentoId) {
+function loadMunicipiosForDepartamento(departamentoId, municipioIdToSelect = null) {
     const municipioSelect = document.getElementById('municipio_id');
     if (!municipioSelect) return;
 
@@ -91,6 +103,10 @@ function loadMunicipiosForDepartamento(departamentoId) {
                     const option = document.createElement('option');
                     option.value = municipio.id;
                     option.textContent = municipio.municipio;
+                    // Seleccionar el municipio si coincide con el municipio_id del usuario
+                    if (municipioIdToSelect && municipio.id == municipioIdToSelect) {
+                        option.selected = true;
+                    }
                     municipioSelect.appendChild(option);
                 });
             })
@@ -100,6 +116,82 @@ function loadMunicipiosForDepartamento(departamentoId) {
             });
     } else {
         municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
+    }
+}
+
+function setupEdadMinimaValidation() {
+    const fechaNacimientoInput = document.getElementById('fecha_nacimiento');
+    if (!fechaNacimientoInput) return;
+
+    // Calcular la fecha máxima permitida (hace 14 años)
+    const hoy = new Date();
+    const fechaMaxima = new Date();
+    fechaMaxima.setFullYear(hoy.getFullYear() - 14);
+    
+    // Establecer el atributo max si no está ya establecido
+    if (!fechaNacimientoInput.getAttribute('max')) {
+        const fechaMaximaStr = fechaMaxima.toISOString().split('T')[0];
+        fechaNacimientoInput.setAttribute('max', fechaMaximaStr);
+    }
+
+    // Validar cuando cambia la fecha
+    fechaNacimientoInput.addEventListener('change', function() {
+        const fechaSeleccionada = new Date(this.value);
+        const edadMinima = new Date();
+        edadMinima.setFullYear(edadMinima.getFullYear() - 14);
+
+        if (fechaSeleccionada > edadMinima) {
+            this.setCustomValidity('Debe tener al menos 14 años para registrarse.');
+            this.classList.add('is-invalid');
+            
+            // Mostrar mensaje de error
+            let errorMessage = this.parentElement.querySelector('.invalid-feedback');
+            if (!errorMessage) {
+                errorMessage = document.createElement('div');
+                errorMessage.className = 'invalid-feedback';
+                this.parentElement.appendChild(errorMessage);
+            }
+            errorMessage.textContent = 'Debe tener al menos 14 años para registrarse.';
+        } else {
+            this.setCustomValidity('');
+            this.classList.remove('is-invalid');
+            
+            // Remover mensaje de error
+            const errorMessage = this.parentElement.querySelector('.invalid-feedback');
+            if (errorMessage) {
+                errorMessage.remove();
+            }
+        }
+    });
+
+    // Validar al enviar el formulario
+    const form = document.getElementById('formInscripcion');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const fechaSeleccionada = new Date(fechaNacimientoInput.value);
+            const edadMinima = new Date();
+            edadMinima.setFullYear(edadMinima.getFullYear() - 14);
+
+            if (fechaSeleccionada > edadMinima) {
+                e.preventDefault();
+                fechaNacimientoInput.focus();
+                fechaNacimientoInput.setCustomValidity('Debe tener al menos 14 años para registrarse.');
+                fechaNacimientoInput.classList.add('is-invalid');
+                
+                // Mostrar mensaje de error
+                let errorMessage = fechaNacimientoInput.parentElement.querySelector('.invalid-feedback');
+                if (!errorMessage) {
+                    errorMessage = document.createElement('div');
+                    errorMessage.className = 'invalid-feedback';
+                    fechaNacimientoInput.parentElement.appendChild(errorMessage);
+                }
+                errorMessage.textContent = 'Debe tener al menos 14 años para registrarse.';
+                
+                // Mostrar alerta
+                alert('Debe tener al menos 14 años para registrarse.');
+                return false;
+            }
+        });
     }
 }
 
@@ -359,7 +451,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         </div>
 
                                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                            <button type="reset" class="btn btn-outline-secondary me-md-2">Limpiar</button>
+                                            <button type="reset" class="btn btn-outline-secondary me-md-2 mr-3">Limpiar</button>
                                             <button type="submit" class="btn btn-primary">Enviar Inscripción</button>
                                         </div>
 
@@ -392,7 +484,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                             <div class="col-6">
                                                 <div class="description-block">
                                                     <span class="description-text" style="color: #343a40;">DURACIÓN</span>
-                                                    <h5 class="description-header" style="color: #007bff;">{{ $programa->duracion }} horas</h5>
+                                                    <h5 class="description-header" style="color: #007bff;">{{ formatear_horas($programa->duracion) }} horas</h5>
                                                 </div>
                                             </div>
                                             <div class="col-6">
