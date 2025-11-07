@@ -65,6 +65,8 @@ class OrdenController extends InventarioController
         $ordenes = $ordenesQuery
             ->paginate(15)
             ->appends($request->only('search'));
+
+        $ordenes->withPath(route('inventario.ordenes.index'));
         
         return view('inventario.ordenes.index', compact('ordenes'));
     }

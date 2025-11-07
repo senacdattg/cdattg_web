@@ -48,6 +48,8 @@ class MarcaController extends InventarioController
             ->paginate(10)
             ->appends($request->only('search'));
 
+        $marcas->withPath(route('inventario.marcas.index'));
+
         // Cargar conteo de productos manualmente para cada marca
         $marcas->each(function($marca) {
             $marca->productos_count = \App\Models\Inventario\Producto::where('marca_id', $marca->id)->count();

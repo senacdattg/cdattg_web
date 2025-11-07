@@ -52,6 +52,8 @@ class ProveedorController extends InventarioController
             ->paginate(10)
             ->appends($request->only('search'));
 
+        $proveedores->withPath(route('inventario.proveedores.index'));
+
         return view('inventario.proveedores.index', compact('proveedores'));
     }
 
