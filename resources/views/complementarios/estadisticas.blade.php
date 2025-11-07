@@ -14,7 +14,9 @@
             <div class="card shadow-sm text-center">
                 <div class="card-body">
                     <div class="h2 mb-2 text-primary"><i class="fas fa-users"></i></div>
-                    <div class="h4 mb-0" id="total-aspirantes">{{ number_format($estadisticas['total_aspirantes']) }}</div>
+                    <div class="h4 mb-0" id="total-aspirantes">
+                        {{ number_format($estadisticas['total_aspirantes']) }}
+                    </div>
                     <small class="text-muted">Total Aspirantes</small>
                 </div>
             </div>
@@ -23,7 +25,9 @@
             <div class="card shadow-sm text-center">
                 <div class="card-body">
                     <div class="h2 mb-2 text-success"><i class="fas fa-user-check"></i></div>
-                    <div class="h4 mb-0" id="aspirantes-aceptados">{{ number_format($estadisticas['aspirantes_aceptados']) }}</div>
+                    <div class="h4 mb-0" id="aspirantes-aceptados">
+                        {{ number_format($estadisticas['aspirantes_aceptados']) }}
+                    </div>
                     <small class="text-muted">Aspirantes Aceptados</small>
                 </div>
             </div>
@@ -32,7 +36,9 @@
             <div class="card shadow-sm text-center">
                 <div class="card-body">
                     <div class="h2 mb-2 text-warning"><i class="fas fa-user-clock"></i></div>
-                    <div class="h4 mb-0" id="aspirantes-pendientes">{{ number_format($estadisticas['aspirantes_pendientes']) }}</div>
+                    <div class="h4 mb-0" id="aspirantes-pendientes">
+                        {{ number_format($estadisticas['aspirantes_pendientes']) }}
+                    </div>
                     <small class="text-muted">Aspirantes Pendientes</small>
                 </div>
             </div>
@@ -41,7 +47,9 @@
             <div class="card shadow-sm text-center">
                 <div class="card-body">
                     <div class="h2 mb-2 text-info"><i class="fas fa-graduation-cap"></i></div>
-                    <div class="h4 mb-0" id="programas-activos">{{ number_format($estadisticas['programas_activos']) }}</div>
+                    <div class="h4 mb-0" id="programas-activos">
+                        {{ number_format($estadisticas['programas_activos']) }}
+                    </div>
                     <small class="text-muted">Programas Activos</small>
                 </div>
             </div>
