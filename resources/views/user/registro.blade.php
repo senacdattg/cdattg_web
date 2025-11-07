@@ -113,10 +113,15 @@
                                 departamentoSelect.addEventListener('change', function() {
                                     loadMunicipiosForDepartamento(this.value);
                                 });
+                                // Cargar municipios en carga inicial si ya hay un departamento seleccionado (por old())
+                                const oldMunicipioId = "{{ old('municipio_id') }}";
+                                if (departamentoSelect.value) {
+                                    loadMunicipiosForDepartamento(departamentoSelect.value, oldMunicipioId || null);
+                                }
                             }
                         }
 
-                        function loadMunicipiosForDepartamento(departamentoId) {
+                        function loadMunicipiosForDepartamento(departamentoId, selectedMunicipioId = null) {
                             const municipioSelect = document.getElementById('municipio_id');
                             if (!municipioSelect) return;
 
@@ -131,6 +136,10 @@
                                             option.textContent = municipio.municipio;
                                             municipioSelect.appendChild(option);
                                         });
+                                        // Preseleccionar municipio si viene de old() tras validación
+                                        if (selectedMunicipioId) {
+                                            municipioSelect.value = selectedMunicipioId;
+                                        }
                                     })
                                     .catch(error => {
                                         console.error('Error cargando municipios:', error);
