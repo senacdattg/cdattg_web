@@ -200,14 +200,80 @@
                                         placeholder="Ej: 9A, 7 Bis, 45" data-required="true">
                                 </div>
                                 <div class="form-group">
-                                    <label for="letra_via">3. Letra o complemento de vía principal</label>
-                                    <input type="text" class="form-control address-field" id="letra_via"
-                                        placeholder="Ej: A, B, Bis (opcional)" maxlength="5">
+                                    <label for="letra_via">3. Letra principal de la vía</label>
+                                    <select class="form-control address-field" id="letra_via">
+                                        <option value="">(Sin letra)</option>
+                                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                                        <option>E</option><option>F</option><option>G</option><option>H</option>
+                                        <option>I</option><option>J</option><option>K</option><option>L</option>
+                                        <option>M</option><option>N</option><option>O</option><option>P</option>
+                                        <option>Q</option><option>R</option><option>S</option><option>T</option>
+                                        <option>U</option><option>V</option><option>W</option><option>X</option>
+                                        <option>Y</option><option>Z</option>
+                                    </select>
+                                </div>
+                                <div class="form-group form-check">
+                                    <input type="checkbox" class="form-check-input" id="bis">
+                                    <label class="form-check-label" for="bis">Sufijo BIS</label>
                                 </div>
                                 <div class="form-group">
-                                    <label for="via_secundaria">4. Vía secundaria o intersección</label>
+                                    <label for="letra_sufijo">Letra Sufijo</label>
+                                    <select class="form-control address-field" id="letra_sufijo">
+                                        <option value="">(Sin sufijo)</option>
+                                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                                        <option>E</option><option>F</option><option>G</option><option>H</option>
+                                        <option>I</option><option>J</option><option>K</option><option>L</option>
+                                        <option>M</option><option>N</option><option>O</option><option>P</option>
+                                        <option>Q</option><option>R</option><option>S</option><option>T</option>
+                                        <option>U</option><option>V</option><option>W</option><option>X</option>
+                                        <option>Y</option><option>Z</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cuadrante">Cuadrante</label>
+                                    <select class="form-control address-field" id="cuadrante">
+                                        <option value="">(Sin cuadrante)</option>
+                                        <option value="N">Norte (N)</option>
+                                        <option value="S">Sur (S)</option>
+                                        <option value="E">Este (E)</option>
+                                        <option value="O">Oeste (O)</option>
+                                        <option value="NE">Noreste (NE)</option>
+                                        <option value="NO">Noroeste (NO)</option>
+                                        <option value="SE">Sureste (SE)</option>
+                                        <option value="SO">Suroeste (SO)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="via_secundaria">4. Número de la vía secundaria / intersección</label>
                                     <input type="text" class="form-control address-field" id="via_secundaria"
-                                        placeholder="Ej: Calle 12, Transversal 22B (opcional)">
+                                        placeholder="Ej: 12, 22B (opcional)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="letra_via_secundaria">Letra asociada a la vía secundaria</label>
+                                    <select class="form-control address-field" id="letra_via_secundaria">
+                                        <option value="">(Sin letra)</option>
+                                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                                        <option>E</option><option>F</option><option>G</option><option>H</option>
+                                        <option>I</option><option>J</option><option>K</option><option>L</option>
+                                        <option>M</option><option>N</option><option>O</option><option>P</option>
+                                        <option>Q</option><option>R</option><option>S</option><option>T</option>
+                                        <option>U</option><option>V</option><option>W</option><option>X</option>
+                                        <option>Y</option><option>Z</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cuadrante_secundario">Cuadrante vía secundaria</label>
+                                    <select class="form-control address-field" id="cuadrante_secundario">
+                                        <option value="">(Sin cuadrante)</option>
+                                        <option value="N">Norte (N)</option>
+                                        <option value="S">Sur (S)</option>
+                                        <option value="E">Este (E)</option>
+                                        <option value="O">Oeste (O)</option>
+                                        <option value="NE">Noreste (NE)</option>
+                                        <option value="NO">Noroeste (NO)</option>
+                                        <option value="SE">Sureste (SE)</option>
+                                        <option value="SO">Suroeste (SO)</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
                                     <label for="numero_casa">5. Número de casa o edificio *</label>
@@ -231,7 +297,7 @@
                                 <div class="alert alert-info">
                                     <small>
                                         <strong>Ejemplo de formato:</strong><br>
-                                        <span class="text-muted">Carrera 9A #34-15 Apto 301, Barrio Centro</span><br>
+                                        <span class="text-muted">Carrera 9A BIS #34-15 Este Apto 301, Barrio Centro</span><br>
                                         <span class="text-muted">Los campos marcados con * son obligatorios.</span>
                                     </small>
                                 </div>
@@ -472,7 +538,7 @@
                                 <div class="alert alert-info">
                                     <small>
                                         <strong>Ejemplo de formato:</strong><br>
-                                        <span class="text-muted">Carrera 9A #34-15 Apto 301, Barrio Centro</span><br>
+                                        <span class="text-muted">Carrera 9A BIS #34-15 Este Apto 301, Barrio Centro</span><br>
                                         <span class="text-muted">Los campos marcados con * son obligatorios.</span>
                                     </small>
                                 </div>

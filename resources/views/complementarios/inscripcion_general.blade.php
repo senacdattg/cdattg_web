@@ -275,14 +275,80 @@
                                                                         placeholder="Ej: 9A, 7 Bis, 45" data-required="true">
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="letra_via">3. Letra o complemento de vía principal</label>
-                                                                    <input type="text" class="form-control address-field" id="letra_via"
-                                                                        placeholder="Ej: A, B, Bis (opcional)" maxlength="5">
+                                                                    <label for="letra_via">3. Letra principal de la vía</label>
+                                                                    <select class="form-control address-field" id="letra_via">
+                                                                        <option value="">(Sin letra)</option>
+                                                                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                                                                        <option>E</option><option>F</option><option>G</option><option>H</option>
+                                                                        <option>I</option><option>J</option><option>K</option><option>L</option>
+                                                                        <option>M</option><option>N</option><option>O</option><option>P</option>
+                                                                        <option>Q</option><option>R</option><option>S</option><option>T</option>
+                                                                        <option>U</option><option>V</option><option>W</option><option>X</option>
+                                                                        <option>Y</option><option>Z</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group form-check">
+                                                                    <input type="checkbox" class="form-check-input" id="bis">
+                                                                    <label class="form-check-label" for="bis">Sufijo BIS</label>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="via_secundaria">4. Vía secundaria o intersección</label>
+                                                                    <label for="letra_sufijo">Letra Sufijo</label>
+                                                                    <select class="form-control address-field" id="letra_sufijo">
+                                                                        <option value="">(Sin sufijo)</option>
+                                                                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                                                                        <option>E</option><option>F</option><option>G</option><option>H</option>
+                                                                        <option>I</option><option>J</option><option>K</option><option>L</option>
+                                                                        <option>M</option><option>N</option><option>O</option><option>P</option>
+                                                                        <option>Q</option><option>R</option><option>S</option><option>T</option>
+                                                                        <option>U</option><option>V</option><option>W</option><option>X</option>
+                                                                        <option>Y</option><option>Z</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="cuadrante">Cuadrante</label>
+                                                                    <select class="form-control address-field" id="cuadrante">
+                                                                        <option value="">(Sin cuadrante)</option>
+                                                                        <option value="N">Norte (N)</option>
+                                                                        <option value="S">Sur (S)</option>
+                                                                        <option value="E">Este (E)</option>
+                                                                        <option value="O">Oeste (O)</option>
+                                                                        <option value="NE">Noreste (NE)</option>
+                                                                        <option value="NO">Noroeste (NO)</option>
+                                                                        <option value="SE">Sureste (SE)</option>
+                                                                        <option value="SO">Suroeste (SO)</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="via_secundaria">4. Número de la vía secundaria / intersección</label>
                                                                     <input type="text" class="form-control address-field" id="via_secundaria"
-                                                                        placeholder="Ej: Calle 12, Transversal 22B (opcional)">
+                                                                        placeholder="Ej: 12, 22B (opcional)">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="letra_via_secundaria">Letra asociada a la vía secundaria</label>
+                                                                    <select class="form-control address-field" id="letra_via_secundaria">
+                                                                        <option value="">(Sin letra)</option>
+                                                                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                                                                        <option>E</option><option>F</option><option>G</option><option>H</option>
+                                                                        <option>I</option><option>J</option><option>K</option><option>L</option>
+                                                                        <option>M</option><option>N</option><option>O</option><option>P</option>
+                                                                        <option>Q</option><option>R</option><option>S</option><option>T</option>
+                                                                        <option>U</option><option>V</option><option>W</option><option>X</option>
+                                                                        <option>Y</option><option>Z</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="cuadrante_secundario">Cuadrante vía secundaria</label>
+                                                                    <select class="form-control address-field" id="cuadrante_secundario">
+                                                                        <option value="">(Sin cuadrante)</option>
+                                                                        <option value="N">Norte (N)</option>
+                                                                        <option value="S">Sur (S)</option>
+                                                                        <option value="E">Este (E)</option>
+                                                                        <option value="O">Oeste (O)</option>
+                                                                        <option value="NE">Noreste (NE)</option>
+                                                                        <option value="NO">Noroeste (NO)</option>
+                                                                        <option value="SE">Sureste (SE)</option>
+                                                                        <option value="SO">Suroeste (SO)</option>
+                                                                    </select>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="numero_casa">5. Número de casa o edificio *</label>
@@ -463,13 +529,30 @@
         });
 
         document.getElementById('saveAddress').addEventListener('click', function() {
-            const tipoVia = document.getElementById('tipo_via') ? document.getElementById('tipo_via').value.trim() : '';
-            const numeroVia = document.getElementById('numero_via') ? document.getElementById('numero_via').value.trim() : '';
-            const letraVia = document.getElementById('letra_via') ? document.getElementById('letra_via').value.trim() : '';
-            const viaSecundaria = document.getElementById('via_secundaria') ? document.getElementById('via_secundaria').value.trim() : '';
-            const numeroCasa = document.getElementById('numero_casa') ? document.getElementById('numero_casa').value.trim() : '';
-            const complementos = document.getElementById('complementos') ? document.getElementById('complementos').value.trim() : '';
-            const barrio = document.getElementById('barrio') ? document.getElementById('barrio').value.trim() : '';
+            const getVal = id => (document.getElementById(id) ? document.getElementById(id).value.trim() : '');
+            const getCheck = id => (document.getElementById(id) ? document.getElementById(id).checked : false);
+            const getSelectText = id => {
+                const el = document.getElementById(id);
+                if (!el || el.selectedIndex < 0) return '';
+                const text = el.options[el.selectedIndex].text || '';
+                const idx = text.indexOf(' (');
+                return idx > -1 ? text.substring(0, idx) : text;
+            };
+
+            const tipoVia = getVal('tipo_via');
+            const numeroVia = getVal('numero_via');
+            const letraVia = getVal('letra_via');
+            const bis = getCheck('bis');
+            const letraSufijo = getVal('letra_sufijo');
+            const cuadrante = getSelectText('cuadrante');
+
+            const viaSecundaria = getVal('via_secundaria');
+            const letraViaSec = getVal('letra_via_secundaria');
+            const cuadranteSec = getSelectText('cuadrante_secundario');
+
+            const numeroCasa = getVal('numero_casa');
+            const complementos = getVal('complementos');
+            const barrio = getVal('barrio');
 
             // Validar campos obligatorios
             if (!tipoVia || !numeroVia || !numeroCasa) {
@@ -479,29 +562,21 @@
 
             // Construir la dirección
             let direccion = `${tipoVia} ${numeroVia}`;
+            if (letraVia) direccion += `${letraVia}`;
+            if (bis) direccion += ' BIS';
+            if (letraSufijo) direccion += `${letraSufijo}`;
+            if (cuadrante) direccion += ` ${cuadrante}`;
 
-            // Agregar letra de vía si existe
-            if (letraVia) {
-                direccion += letraVia;
-            }
-
-            // Agregar número de casa
             direccion += ` #${numeroCasa}`;
 
-            // Agregar vía secundaria si existe
             if (viaSecundaria) {
                 direccion += ` ${viaSecundaria}`;
+                if (letraViaSec) direccion += `${letraViaSec}`;
+                if (cuadranteSec) direccion += ` ${cuadranteSec}`;
             }
 
-            // Agregar complementos si existen
-            if (complementos) {
-                direccion += ` ${complementos}`;
-            }
-
-            // Agregar barrio si existe
-            if (barrio) {
-                direccion += `, ${barrio}`;
-            }
+            if (complementos) direccion += ` ${complementos}`;
+            if (barrio) direccion += `, ${barrio}`;
 
             // Asignar al campo principal
             document.getElementById('direccion').value = direccion;
@@ -517,6 +592,8 @@
                     field.value = '';
                 }
             });
+            const bisEl = document.getElementById('bis');
+            if (bisEl) bisEl.checked = false;
         });
 
         document.getElementById('cancelAddress').addEventListener('click', function() {
