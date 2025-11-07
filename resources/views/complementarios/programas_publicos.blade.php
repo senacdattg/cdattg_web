@@ -84,6 +84,53 @@
             </div>
         </section>
 
+        <!-- Alertas de sesión -->
+        <div class="container-fluid px-2 px-md-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-10 col-xl-10">
+                    @if (session('success'))
+                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 20px;">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            <strong>¡Éxito!</strong> {{ session('success') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+
+                    @if (session('error'))
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 20px;">
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                            <strong>Error:</strong> {{ session('error') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+
+                    @if (session('warning'))
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert" style="margin-top: 20px;">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>
+                            <strong>Advertencia:</strong> {{ session('warning') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+
+                    @if (session('info'))
+                        <div class="alert alert-info alert-dismissible fade show" role="alert" style="margin-top: 20px;">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <strong>Información:</strong> {{ session('info') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+
         <!-- Programas -->
         <div class="row justify-content-center">
             <div class="col-lg-10 col-xl-10">
