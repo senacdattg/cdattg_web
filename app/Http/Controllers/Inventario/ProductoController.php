@@ -415,17 +415,34 @@ class ProductoController extends InventarioController
      */
     public function buscar(Request $request)
     {
-        $search = $request->input('search', '');
+        $search = $request->input('search');
         $categoryId = $request->input('category_id');
         $brandId = $request->input('brand_id');
 
         $query = Producto::with([
-            'categoria',
-            'marca',
-            'estado.parametro'
-        ]);
+            'tipoProducto.parametro',
+            'unidadMedida.parametro',
+            'estado.parametro',
+            'contratoConvenio',
+            'ambiente'
+        ])
+        ->where('cantidad', '>', 0)
+        ->orderBy('producto', 'asc');
 
-        // Filtro por búsqueda
+        // Excluir productos con estado "AGOTADO"
+        $parametroAgotado = Parametro::find(43);
+        if ($parametroAgotado) {
+            $estadoAgotadoTema = ParametroTema::where('parametro_id', 43)
+                ->whereHas('tema', function($query) {
+                    $query->where('name', 'ESTADOS DE PRODUCTO');
+                })
+                ->first();
+
+            if ($estadoAgotadoTema) {
+                $query->where('estado_producto_id', '!=', $estadoAgotadoTema->id);
+            }
+        }
+
         if (!empty($search)) {
             $query->where(function($q) use ($search) {
                 $q->where('producto', 'LIKE', "%{$search}%")
@@ -434,17 +451,25 @@ class ProductoController extends InventarioController
             });
         }
 
-        // Filtro por categoría
         if ($categoryId) {
             $query->where('categoria_id', $categoryId);
         }
 
-        // Filtro por marca
         if ($brandId) {
             $query->where('marca_id', $brandId);
         }
 
         $productos = $query->get();
+
+        $productos->each(function($producto) {
+            if ($producto->marca_id) {
+                $producto->marca = Parametro::find($producto->marca_id);
+            }
+            if ($producto->categoria_id) {
+                $producto->categoria = Parametro::find($producto->categoria_id);
+            }
+            $producto->imagen_url = $producto->imagen ? asset($producto->imagen) : null;
+        });
 
         return response()->json([
             'success' => true,
