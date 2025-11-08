@@ -21,6 +21,7 @@
         "masbug/flysystem-google-drive-ext": "^2.4",
         "phpoffice/phpspreadsheet": "^2.1",
         "pusher/pusher-php-server": "^7.2",
+        "setasign/fpdi": "^2.6",
         "spatie/laravel-permission": "^6.4",
         "symfony/var-dumper": "^7.3"
     },
