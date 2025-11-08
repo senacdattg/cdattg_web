@@ -75,6 +75,7 @@
                             <th>Fecha Solicitud</th>
                             <th>Estado</th>
                             <th>SenaSofiaPlus</th>
+                            <th>Condocumento</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -103,6 +104,17 @@
                             <td><span class="badge {{ $aspirante->persona->estado_sofia_badge_class }}">
                                 {{ $aspirante->persona->estado_sofia_label }}</span></td>
                             <td>
+                                @if($aspirante->persona->condocumento == 1)
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle me-1"></i>Subido
+                                    </span>
+                                @else
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-times-circle me-1"></i>No subido
+                                    </span>
+                                @endif
+                            </td>
+                            <td>
                                 <!-- <button class="btn btn-warning btn-sm me-1 aspirante-action-btn" title="Editar"
                                     @if(isset($existingProgress) && $existingProgress) disabled @endif>
                                     <i class="fas fa-edit"></i>
@@ -116,7 +128,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="text-center">
+                            <td colspan="9" class="text-center">
                                 <div class="alert alert-info mb-0">
                                     <i class="fas fa-info-circle me-2"></i>
                                     No hay aspirantes registrados para este programa.
