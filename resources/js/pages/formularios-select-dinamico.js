@@ -38,8 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
         municipioSelector: '#municipio_id',
         sedeSelector: '#sede_id',
         ambienteSelector: '#ambiente_id',
-        programaSelector: '#programa_formacion_id',
-        baseUrl: '/api'
+        programaSelector: '#programa_formacion_id'
     });
 
     // Validación de formulario

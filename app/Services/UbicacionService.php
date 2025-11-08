@@ -5,7 +5,7 @@ namespace App\Services;
 use App\Repositories\PaisRepository;
 use App\Repositories\DepartamentoRepository;
 use App\Repositories\MunicipioRepository;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
 
 class UbicacionService
 {
@@ -55,7 +55,16 @@ class UbicacionService
      */
     public function obtenerDepartamentosPorPais(int $paisId): Collection
     {
-        return $this->departamentoRepo->obtenerPorPais($paisId);
+        return $this->departamentoRepo->obtenerPorPais($paisId)
+            ->map(function ($departamento) {
+                $nombre = data_get($departamento, 'nombre', data_get($departamento, 'departamento', ''));
+                return [
+                    'id' => data_get($departamento, 'id'),
+                    'nombre' => $nombre,
+                    'name' => $nombre,
+                    'pais_id' => data_get($departamento, 'pais_id'),
+                ];
+            });
     }
 
     /**
@@ -66,7 +75,16 @@ class UbicacionService
      */
     public function obtenerMunicipiosPorDepartamento(int $departamentoId): Collection
     {
-        return $this->municipioRepo->obtenerPorDepartamento($departamentoId);
+        return $this->municipioRepo->obtenerPorDepartamento($departamentoId)
+            ->map(function ($municipio) {
+                $nombre = $municipio->municipio ?? $municipio->nombre ?? '';
+                return [
+                    'id' => data_get($municipio, 'id'),
+                    'nombre' => $nombre,
+                    'name' => $nombre,
+                    'departamento_id' => data_get($municipio, 'departamento_id'),
+                ];
+            });
     }
 
     /**

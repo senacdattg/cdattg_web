@@ -85,6 +85,9 @@ class DepartamentoController extends Controller
     public function getByPais($paisId)
     {
         $departamentos = $this->ubicacionService->obtenerDepartamentosPorPais($paisId);
-        return response()->json($departamentos);
+        return response()->json([
+            'success' => true,
+            'data' => $departamentos,
+        ]);
     }
 }

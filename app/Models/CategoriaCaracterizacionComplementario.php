@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class CategoriaCaracterizacionComplementario extends Model
 {
@@ -48,5 +49,15 @@ class CategoriaCaracterizacionComplementario extends Model
     public function getActiveChildren()
     {
         return $this->children()->where('activo', 1)->get();
+    }
+
+    public function personas(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Persona::class,
+            'persona_caracterizacion',
+            'categoria_caracterizacion_id',
+            'persona_id'
+        )->withTimestamps();
     }
 }

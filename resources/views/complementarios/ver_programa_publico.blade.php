@@ -35,10 +35,12 @@
     </div>
 
     <!-- Modal de Inscripción -->
-    <div class="modal fade" id="inscripcionModal" tabindex="-1" role="dialog" aria-labelledby="inscripcionModalLabel" aria-hidden="true">
+    <div class="modal fade" id="inscripcionModal" tabindex="-1" role="dialog"
+        aria-labelledby="inscripcionModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <div class="modal-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
+                <div class="modal-header" style="background-color: #ffffff; color: #343a40;
+                    border-left: 4px solid #007bff;">
                     <h5 class="modal-title" id="inscripcionModalLabel">
                         <i class="fas fa-user-plus mr-2"></i>Inscripción al Programa
                     </h5>

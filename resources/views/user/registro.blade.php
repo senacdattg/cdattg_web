@@ -77,7 +77,8 @@
                                     campo.addEventListener('keypress', function(e) {
                                         const char = String.fromCharCode(e.which);
                                         // Permitir letras, espacios, guiones, tildes y teclas de control
-                                        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]$/.test(char) && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                                        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]$/.test(char) &&
+                                            !e.ctrlKey && !e.altKey && !e.metaKey) {
                                             e.preventDefault();
                                             return false;
                                         }
@@ -146,10 +147,12 @@
                                     })
                                     .catch(error => {
                                         console.error('Error cargando municipios:', error);
-                                        municipioSelect.innerHTML = '<option value="">Error cargando municipios</option>';
+                                        municipioSelect.innerHTML = '<option value="">' +
+                                            'Error cargando municipios</option>';
                                     });
                             } else {
-                                municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
+                                municipioSelect.innerHTML = '<option value="">Seleccione...' +
+                                    '</option>';
                             }
                         }
 
@@ -173,17 +176,25 @@
                             const saveButton = document.getElementById('saveAddress');
                             if (saveButton) {
                                 saveButton.addEventListener('click', function() {
-                                    const tipoVia = document.getElementById('tipo_via') ? document.getElementById('tipo_via').value.trim() : '';
-                                    const numeroVia = document.getElementById('numero_via') ? document.getElementById('numero_via').value.trim() : '';
-                                    const letraVia = document.getElementById('letra_via') ? document.getElementById('letra_via').value.trim() : '';
-                                    const viaSecundaria = document.getElementById('via_secundaria') ? document.getElementById('via_secundaria').value.trim() : '';
-                                    const numeroCasa = document.getElementById('numero_casa') ? document.getElementById('numero_casa').value.trim() : '';
-                                    const complementos = document.getElementById('complementos') ? document.getElementById('complementos').value.trim() : '';
-                                    const barrio = document.getElementById('barrio') ? document.getElementById('barrio').value.trim() : '';
+                                    const tipoVia = document.getElementById('tipo_via') ?
+                                        document.getElementById('tipo_via').value.trim() : '';
+                                    const numeroVia = document.getElementById('numero_via') ?
+                                        document.getElementById('numero_via').value.trim() : '';
+                                    const letraVia = document.getElementById('letra_via') ?
+                                        document.getElementById('letra_via').value.trim() : '';
+                                    const viaSecundaria = document.getElementById('via_secundaria') ?
+                                        document.getElementById('via_secundaria').value.trim() : '';
+                                    const numeroCasa = document.getElementById('numero_casa') ?
+                                        document.getElementById('numero_casa').value.trim() : '';
+                                    const complementos = document.getElementById('complementos') ?
+                                        document.getElementById('complementos').value.trim() : '';
+                                    const barrio = document.getElementById('barrio') ?
+                                        document.getElementById('barrio').value.trim() : '';
 
                                     // Validar campos obligatorios
                                     if (!tipoVia || !numeroVia || !numeroCasa) {
-                                        alert('Por favor complete todos los campos obligatorios: Tipo de vía, Número de vía y Número de casa.');
+                                        alert('Por favor complete todos los campos obligatorios: ' +
+                                            'Tipo de vía, Número de vía y Número de casa.');
                                         return;
                                     }
 
@@ -307,11 +318,13 @@
                                     if (fechaSeleccionada > edadMinima) {
                                         e.preventDefault();
                                         fechaNacimientoInput.focus();
-                                        fechaNacimientoInput.setCustomValidity('Debe tener al menos 14 años para registrarse.');
+                                        fechaNacimientoInput.setCustomValidity(
+                                            'Debe tener al menos 14 años para registrarse.');
                                         fechaNacimientoInput.classList.add('is-invalid');
                                         
                                         // Mostrar mensaje de error
-                                        let errorMessage = fechaNacimientoInput.parentElement.querySelector('.invalid-feedback');
+                                        let errorMessage =
+                                            fechaNacimientoInput.parentElement.querySelector('.invalid-feedback');
                                         if (!errorMessage) {
                                             errorMessage = document.createElement('div');
                                             errorMessage.className = 'invalid-feedback';

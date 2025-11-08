@@ -132,7 +132,7 @@ class TemaSeeder extends Seeder
             'user_edit_id'   => 1,
         ]);
         $syncData = [];
-        foreach (range(30, 41) as $id) {
+        foreach (range(30, 49) as $id) {
             $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
         }
         $tema->parametros()->sync($syncData);
@@ -146,7 +146,7 @@ class TemaSeeder extends Seeder
             'user_edit_id'   => 1,
         ]);
         $syncData = [];
-        foreach ([42, 43] as $id) {
+        foreach ([50, 51] as $id) {
             $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
         }
         $tema->parametros()->sync($syncData);
@@ -160,7 +160,7 @@ class TemaSeeder extends Seeder
             'user_edit_id'   => 1,
         ]);
         $syncData = [];
-        foreach ([44, 45] as $id) {
+        foreach ([52, 53] as $id) {
             $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
         }
         $tema->parametros()->sync($syncData);
@@ -174,7 +174,7 @@ class TemaSeeder extends Seeder
             'user_edit_id'   => 1,
         ]);
         $syncData = [];
-        foreach ([46, 47, 48] as $id) {
+        foreach ([54, 55, 56] as $id) {
             $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
         }
         $tema->parametros()->sync($syncData);
@@ -188,7 +188,7 @@ class TemaSeeder extends Seeder
             'user_edit_id'   => 1,
         ]);
         $syncData = [];
-        foreach ([49, 50] as $id) {
+        foreach ([57, 58] as $id) {
             $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
         }
         $tema->parametros()->sync($syncData);
@@ -202,7 +202,7 @@ class TemaSeeder extends Seeder
             'user_edit_id'   => 1,
         ]);
         $syncData = [];
-        foreach (range(51, 59) as $id) {
+        foreach (range(59, 67) as $id) {
             $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
         }
         $tema->parametros()->sync($syncData);
@@ -216,7 +216,7 @@ class TemaSeeder extends Seeder
             'user_edit_id'   => 1,
         ]);
         $syncData = [];
-        foreach (range(60, 179) as $id) {
+        foreach (range(68, 187) as $id) {
             $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
         }
         $tema->parametros()->sync($syncData);
