@@ -41,7 +41,6 @@ class StockBajoNotification extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $nivelAlerta = $this->stockActual == 0 ? 'CRÍTICO' : 'BAJO';
-        $color = $this->stockActual == 0 ? 'error' : 'warning';
 
         return (new MailMessage)
             ->subject('⚠️ Alerta de Stock ' . $nivelAlerta . ' - ' . $this->producto->producto)
