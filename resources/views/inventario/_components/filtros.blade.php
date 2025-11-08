@@ -50,7 +50,10 @@
                 <div class="card-body">
                     @if($ordenes && count($ordenes) > 0)
                         <div class="table-responsive">
-                            <table class="table table-hover table-striped">
+                            <table class="table table-hover table-striped" aria-describedby="ordenes-description">
+                                <caption id="ordenes-description" class="sr-only">
+                                    Listado de órdenes con información de usuario, tipo, estado, fecha, cantidad de ítems y acciones disponibles.
+                                </caption>
                                 <thead>
                                     <tr>
                                         <th style="width: 5%">#</th>
