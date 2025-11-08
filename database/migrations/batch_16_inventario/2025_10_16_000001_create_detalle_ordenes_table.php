@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('orden_id');
             
             // Relación con producto
-            $table->unsignedBigInteger('producto_id'); 
+            $table->unsignedBigInteger('producto_id');
             
             // Estado del detalle de la orden
             $table->unsignedBigInteger('estado_orden_id');
