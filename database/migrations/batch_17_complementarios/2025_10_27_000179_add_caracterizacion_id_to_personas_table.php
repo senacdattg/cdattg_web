@@ -11,9 +11,9 @@ class AddCaracterizacionIdToPersonasTable extends Migration
      */
     public function up(): void
     {
-        Schema::table('personas', function (Blueprint $table) {
-            $table->foreignId('caracterizacion_id')->nullable()->constrained('categorias_caracterizacion_complementarios')->onDelete('set null');
-        });
+        // Esta columna ya no se usa, ahora se maneja con la tabla persona_caracterizacion
+        // Se mantiene la migración por compatibilidad pero no modifica la tabla
+        return;
     }
 
     /**

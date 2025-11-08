@@ -38,7 +38,7 @@ class StorePersonaRequest extends FormRequest
             'municipio_id'        => 'required|exists:municipios,id',
             'direccion'           => 'required|string|max:255',
             'caracterizacion_ids'   => 'nullable|array',
-            'caracterizacion_ids.*' => 'integer|exists:categorias_caracterizacion_complementarios,id',
+            'caracterizacion_ids.*' => 'integer|exists:parametros,id',
         ];
     }
 
