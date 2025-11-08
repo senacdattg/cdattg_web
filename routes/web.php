@@ -51,15 +51,8 @@ Route::middleware('auth')->group(function () {
         'talento-humano'
     ];
     foreach ($protectedFolders as $folder) {
-        if ($folder === 'inventario') {
-            // Cargar todas las rutas del inventario
-            foreach (glob(routes_path($folder) . '/*.php') as $routeFile) {
-                include_once $routeFile;
-            }
-        } else {
-            foreach (glob(routes_path($folder) . '/*.php') as $routeFile) {
-                include_once $routeFile;
-            }
+        foreach (glob(routes_path($folder) . '/*.php') as $routeFile) {
+            include_once $routeFile;
         }
     }
 
