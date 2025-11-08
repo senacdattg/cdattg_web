@@ -120,6 +120,9 @@
                                 {{-- Lista de productos de la orden --}}
                                 <div class="mt-3">
                                     <table class="table table-sm table-borderless">
+                                        <caption id="ordenes-description" class="sr-only">
+                                            Listado de órdenes pendientes de aprobación con información de producto, stock, solicitado, estado y acciones disponibles.
+                                        </caption>
                                         <thead>
                                             <tr class="table-light">
                                                 <th width="40%">Producto</th>
