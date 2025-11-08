@@ -207,7 +207,7 @@ class TemaSeeder extends Seeder
         ]);
         $syncData = [];
         foreach (range(188, 235) as $id) {
-            $syncData[$id] = ['status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1];
+            $syncData[$id] = ['status' => 1];
         }
         $tema->parametros()->sync($syncData);
     }

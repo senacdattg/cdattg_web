@@ -32,36 +32,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
-            RolePermissionSeeder::class,
-            PaisSeeder::class,
-            DepartamentoSeeder::class,
-            MunicipioSeeder::class,
-            ParametroSeeder::class,
-            TemaSeeder::class,
-            PersonaSeeder::class,
-            UpdatePersonaSeeder::class,
-            SuperAdminSeeder::class,
-            UsersTableSeeder::class,
-            RegionalSeeder::class,
-            CentroFormacionSeeder::class,
-            SedeSeeder::class,
-            BloqueSeeder::class,
-            PisoSeeder::class,
-            AmbienteSeeder::class,
-            RedConocimientoSeeder::class,
-            ProgramasFormacionSeeder::class,
-            JornadaFormacionSeeder::class,
-            UpdatePersonasUserFieldsSeeder::class,
-            CompetenciaSeeder::class,
-            ResultadosAprendizajeSeeder::class,
-            ResultadosCompetenciasSeeder::class,
-            GuiasAprendizajeSeeder::class,
-            ResultadosGuiasSeeder::class,
-            CompetenciaProgramaSeeder::class,
-            CategoriaCaracterizacionComplementariosSeeder::class,
-        ]);
-
         $this->truncateGeneratedData();
 
         $this->call([
@@ -93,10 +63,10 @@ class DatabaseSeeder extends Seeder
             CompetenciaProgramaSeeder::class,
             ProductoSeeder::class, // Crear productos para agregar al módulo de inventario
             // Complementarios ofertados
-            ComplementariosOfertadosSeeder::class,
+            // ComplementariosOfertadosSeeder::class,
 
             // Aspirantes complementarios
-            AspirantesComplementariosSeeder::class,
+            // AspirantesComplementariosSeeder::class,
 
             // Categorias de caracterizacion para complementarios
             // CategoriaCaracterizacionComplementariosSeeder::class,
