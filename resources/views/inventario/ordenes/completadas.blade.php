@@ -25,7 +25,7 @@
 @endsection
 
 @push('css')
-    @vite(['public/css/inventario/shared/base.css'])
+    @vite(['resources/css/inventario/shared/base.css'])
 @endpush
 
 @section('footer')
@@ -33,5 +33,6 @@
 @endsection
 
 @push('css')
-    @vite(['public/css/inventario/shared/base.css'])    
+    @vite(['resources/css/inventario/shared/base.css'])    
 @endpush
+

@@ -104,7 +104,7 @@
 
 @push('css')
     @vite([
-        'public/css/inventario/shared/base.css',
+        'resources/css/inventario/shared/base.css',
     ])
 @endpush
 
@@ -112,3 +112,4 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite(['resources/js/pages/formularios-generico.js'])
 @endpush
+

@@ -61,3 +61,4 @@
         <li><strong>Scroll del mouse</strong> - Zoom continuo</li>
     </ul>
 </div>
+

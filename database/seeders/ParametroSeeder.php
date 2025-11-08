@@ -65,9 +65,9 @@ class ParametroSeeder extends Seeder
             ['id' => 33, 'name' => 'ARROBA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 34, 'name' => 'QUINTAL', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 35, 'name' => 'ONZA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-            ['id' => 36, 'name' => 'MILILITRO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-            ['id' => 37, 'name' => 'LITRO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-            ['id' => 38, 'name' => 'GALÓN', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 36, 'name' => 'MILILITROS', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 37, 'name' => 'LITROS', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 38, 'name' => 'GALONES', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 39, 'name' => 'ONZA LÍQUIDA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 40, 'name' => 'BARRIL', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 41, 'name' => 'UNIDADES', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
@@ -79,7 +79,7 @@ class ParametroSeeder extends Seeder
             ['id' => 47, 'name' => 'TABLETAS', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 48, 'name' => 'TEST', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 49, 'name' => 'SACKETS', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-
+            
             // Estados de producto
             ['id' => 50, 'name' => 'DISPONIBLE', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 51, 'name' => 'AGOTADO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
@@ -92,7 +92,7 @@ class ParametroSeeder extends Seeder
             ['id' => 54, 'name' => 'EN ESPERA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 55, 'name' => 'APROBADA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 56, 'name' => 'RECHAZADA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-
+            
             // Estados de aprobaciones
             ['id' => 57, 'name' => 'ENTREGADA', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 58, 'name' => 'EN PRÉSTAMO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
@@ -117,7 +117,7 @@ class ParametroSeeder extends Seeder
             ['id' => 73, 'name' => 'MILLIPORE', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 74, 'name' => 'BOECO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 75, 'name' => 'BRAND', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
-            ['id' => 76, 'name' => 'DURAN', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
+            ['id' => 76, 'name' => 'DURAN', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1], 
             ['id' => 77, 'name' => 'PANREAC', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 78, 'name' => 'BRIXCO', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
             ['id' => 79, 'name' => 'CLOROX', 'status' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],
