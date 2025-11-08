@@ -86,8 +86,8 @@ class DatabaseSeeder extends Seeder
             // Aspirantes complementarios
             AspirantesComplementariosSeeder::class,
 
-            // Categorias de caracterizacion para complementarios
-            CategoriaCaracterizacionComplementariosSeeder::class,
+            // Categorias de caracterizacion para complementarios - REMOVIDO: ahora se maneja en ParametroSeeder
+            // CategoriaCaracterizacionComplementariosSeeder::class,
         ]);
     }
 }

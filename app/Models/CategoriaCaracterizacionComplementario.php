@@ -56,7 +56,7 @@ class CategoriaCaracterizacionComplementario extends Model
         return $this->belongsToMany(
             Persona::class,
             'persona_caracterizacion',
-            'categoria_caracterizacion_id',
+            'parametro_id',
             'persona_id'
         )->withTimestamps();
     }
