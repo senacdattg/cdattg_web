@@ -99,7 +99,7 @@ class DocumentoComplementarioController extends Controller
                 $aspirante->update([
                     'documento_identidad_path' => $path,
                     'documento_identidad_nombre' => $fileName,
-                    'estado' => 2, // Estado "Documento subido"
+                    'estado' => 1, // Estado "En proceso" - se mantiene hasta que se evalúe
                 ]);
             }
 

@@ -44,6 +44,11 @@ class ComplementarioOfertado extends Model
                     ->withPivot('hora_inicio', 'hora_fin');
     }
 
+    public function aspirantes()
+    {
+        return $this->hasMany(AspiranteComplementario::class, 'complementario_id');
+    }
+
     public function getEstadoLabelAttribute()
     {
         return match ($this->estado) {

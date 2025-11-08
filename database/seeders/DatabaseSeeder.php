@@ -92,8 +92,14 @@ class DatabaseSeeder extends Seeder
             ResultadosGuiasSeeder::class,
             CompetenciaProgramaSeeder::class,
             ProductoSeeder::class, // Crear productos para agregar al módulo de inventario
+            // Complementarios ofertados
+            ComplementariosOfertadosSeeder::class,
+
+            // Aspirantes complementarios
+            AspirantesComplementariosSeeder::class,
+
             // Categorias de caracterizacion para complementarios
-            CategoriaCaracterizacionComplementariosSeeder::class,
+            // CategoriaCaracterizacionComplementariosSeeder::class,
         ]);
 
         $adminUser = User::where('email', 'admin@admin.com')->first() ?? User::first();

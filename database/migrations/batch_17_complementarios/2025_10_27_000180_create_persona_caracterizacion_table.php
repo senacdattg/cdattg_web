@@ -17,12 +17,12 @@ return new class extends Migration
             $table->foreignId('persona_id')
                 ->constrained('personas')
                 ->cascadeOnDelete();
-            $table->foreignId('categoria_caracterizacion_id')
-                ->constrained('categorias_caracterizacion_complementarios')
+            $table->foreignId('parametro_id')
+                ->constrained('parametros')
                 ->cascadeOnDelete();
             $table->timestamps();
 
-            $table->unique(['persona_id', 'categoria_caracterizacion_id'], 'persona_caracterizacion_unique');
+            $table->unique(['persona_id', 'parametro_id'], 'persona_caracterizacion_unique');
         });
     }
 

@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Esta tabla ya no se usa, los datos se manejan en la tabla parametros con tema_id = 16
-        // Se mantiene la migración por compatibilidad pero no crea la tabla
-        return;
+        Schema::table('personas', function (Blueprint $table) {
+            $table->boolean('condocumento')->default(0)->after('estado_sofia');
+        });
     }
 
     /**
@@ -21,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categorias_caracterizacion_complementarios');
+        Schema::table('personas', function (Blueprint $table) {
+            $table->dropColumn('condocumento');
+        });
     }
 };

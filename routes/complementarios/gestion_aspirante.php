@@ -11,14 +11,30 @@ Route::get('/programas-complementarios/{curso}', [AspiranteComplementarioControl
     ->name('programas-complementarios.ver-aspirantes')
     ->middleware('auth');
 
-Route::post('/programas-complementarios/{complementarioId}/agregar-aspirante', [AspiranteComplementarioController::class, 'agregarAspirante'])
+Route::post(
+    '/programas-complementarios/{complementarioId}/agregar-aspirante',
+    [AspiranteComplementarioController::class, 'agregarAspirante']
+)
     ->name('programas-complementarios.agregar-aspirante')
     ->middleware('auth');
 
-Route::delete('/programas-complementarios/{complementarioId}/aspirante/{aspiranteId}', [AspiranteComplementarioController::class, 'eliminarAspirante'])
+Route::delete(
+    '/programas-complementarios/{complementarioId}/aspirante/{aspiranteId}',
+    [AspiranteComplementarioController::class, 'eliminarAspirante']
+)
     ->name('programas-complementarios.eliminar-aspirante')
     ->middleware('auth');
 
-Route::get('/programas-complementarios/{complementarioId}/exportar-excel', [AspiranteComplementarioController::class, 'exportarAspirantesExcel'])
+Route::get(
+    '/programas-complementarios/{complementarioId}/exportar-excel',
+    [AspiranteComplementarioController::class, 'exportarAspirantesExcel']
+)
     ->name('programas-complementarios.exportar-excel')
+    ->middleware('auth');
+
+Route::get(
+    '/programas-complementarios/{complementarioId}/descargar-cedulas',
+    [AspiranteComplementarioController::class, 'descargarCedulas']
+)
+    ->name('programas-complementarios.descargar-cedulas')
     ->middleware('auth');

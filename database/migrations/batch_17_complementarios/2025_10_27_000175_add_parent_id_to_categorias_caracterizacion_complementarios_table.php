@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('categorias_caracterizacion_complementarios', function (Blueprint $table) {
-            $table->foreignId('parent_id')->nullable()->constrained('categorias_caracterizacion_complementarios')->onDelete('cascade');
-        });
+        // Esta tabla ya no se usa, los datos se manejan en la tabla parametros con tema_id = 16
+        // Se mantiene la migración por compatibilidad pero no modifica la tabla
+        return;
     }
 
     /**
