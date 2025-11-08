@@ -18,9 +18,11 @@ class ProveedorController extends InventarioController
         $this->middleware('can:ELIMINAR PROVEEDOR')->only('destroy');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $proveedores = Proveedor::with([
+        $search = $request->input('search');
+
+        $proveedoresQuery = Proveedor::with([
                 'userCreate.persona',
                 'userUpdate.persona',
                 'estado.parametro',
@@ -28,8 +30,30 @@ class ProveedorController extends InventarioController
                 'municipio'
             ])
             ->withCount('contratosConvenios')
-            ->latest()
-            ->paginate(10);
+            ->latest();
+
+        if (!empty($search)) {
+            $proveedoresQuery->where(function ($query) use ($search) {
+                $query->where('proveedor', 'LIKE', "%{$search}%")
+                    ->orWhere('nit', 'LIKE', "%{$search}%")
+                    ->orWhere('email', 'LIKE', "%{$search}%")
+                    ->orWhere('telefono', 'LIKE', "%{$search}%")
+                    ->orWhere('contacto', 'LIKE', "%{$search}%")
+                    ->orWhereHas('departamento', function ($departamentoQuery) use ($search) {
+                        $departamentoQuery->where('departamento', 'LIKE', "%{$search}%");
+                    })
+                    ->orWhereHas('municipio', function ($municipioQuery) use ($search) {
+                        $municipioQuery->where('municipio', 'LIKE', "%{$search}%");
+                    });
+            });
+        }
+
+        $proveedores = $proveedoresQuery
+            ->paginate(10)
+            ->appends($request->only('search'));
+
+        $proveedores->withPath(route('inventario.proveedores.index'));
+
         return view('inventario.proveedores.index', compact('proveedores'));
     }
 

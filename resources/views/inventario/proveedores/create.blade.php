@@ -7,7 +7,7 @@
 @endsection
 
 @push('css')
-    @vite(['public/css/inventario/shared/base.css'])
+    @vite(['resources/css/inventario/shared/base.css'])
 @endpush
 
 @section('content_header')
@@ -239,3 +239,4 @@
         initFiltroMunicipios({{ json_encode(old('municipio_id')) }});
     });
 </script>
+

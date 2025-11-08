@@ -22,3 +22,4 @@
 @stop
 
 @stack('scripts')
+
