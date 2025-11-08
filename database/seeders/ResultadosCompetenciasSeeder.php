@@ -3,16 +3,20 @@
 namespace Database\Seeders;
 
 use App\Models\ResultadosCompetencia;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Database\Seeders\Concerns\TruncatesTables;
 
 class ResultadosCompetenciasSeeder extends Seeder
 {
+    use TruncatesTables;
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $this->truncateModel(ResultadosCompetencia::class);
+
         $resultadosCompetencias = [
             [
                 

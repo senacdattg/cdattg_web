@@ -13,19 +13,14 @@ class UpdatePersonaSeeder extends Seeder
      */
     public function run(): void
     {
-        Persona::where('id', 1)->update([
-            'tipo_documento' => 8,
-            'genero' => 11,
+        Persona::whereKey(1)->update([
+            'tipo_documento' => 3,
+            'genero' => 9,
         ]);
 
-
-        Persona::where('id', 2)->update([
-            'tipo_documento' => 8,
-            'genero' => 11,
-        ]);
-        Persona::where('id', 3)->update([
-            'tipo_documento' => 8,
-            'genero' => 11,
+        Persona::whereKey(2)->update([
+            'tipo_documento' => 3,
+            'genero' => 10,
         ]);
     }
 }

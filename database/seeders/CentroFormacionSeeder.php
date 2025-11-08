@@ -4,14 +4,19 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\CentroFormacion;
+use Database\Seeders\Concerns\TruncatesTables;
 
 class CentroFormacionSeeder extends Seeder
 {
+    use TruncatesTables;
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $this->truncateModel(CentroFormacion::class);
+
         CentroFormacion::create([
             'regional_id'    => 1,
             'nombre'         => 'Centro de Desarrollo Agroindustrial, Turístico y Tecnológico del Guaviare Regional Guaviare',

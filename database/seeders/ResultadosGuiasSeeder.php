@@ -2,17 +2,21 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\GuiasResultados;
+use Database\Seeders\Concerns\TruncatesTables;
 
 class ResultadosGuiasSeeder extends Seeder
 {
+    use TruncatesTables;
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $this->truncateModel(GuiasResultados::class);
+
         $resultados_guias = [
             [
                 'id' => 1,

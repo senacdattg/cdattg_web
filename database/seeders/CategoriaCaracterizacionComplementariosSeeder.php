@@ -2,18 +2,22 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Database\Seeders\Concerns\TruncatesTables;
 
 class CategoriaCaracterizacionComplementariosSeeder extends Seeder
 {
+    use TruncatesTables;
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $this->truncateTable('categorias_caracterizacion_complementarios');
+
         $data = [
             'Grupos poblacionales' => [
                 'AFROCOLOMBIANO',

@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->boolean('status')->default(1);
-            $table->foreignId('user_create_id')->constrained('users');
-            $table->foreignId('user_edit_id')->constrained('users');
+            $table->foreignId('user_create_id')->nullable()->constrained('users');
+            $table->foreignId('user_edit_id')->nullable()->constrained('users');
             $table->timestamps();
         });
     }

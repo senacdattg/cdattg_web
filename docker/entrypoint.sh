@@ -1,61 +1,109 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
 echo "🚀 Iniciando contenedor de aplicación..."
 
-# Cambiar al directorio de trabajo
 cd /var/www/html
 
-# Esperar a que la base de datos esté lista (si está en docker-compose)
-if [ -n "$DB_HOST" ]; then
-    echo "⏳ Esperando a que MySQL esté listo..."
-    until php -r "try { new PDO('mysql:host=$DB_HOST;port=3306', '$DB_USERNAME', '$DB_PASSWORD'); exit(0); } catch (PDOException \$e) { exit(1); }" 2>/dev/null; do
-        echo "Esperando conexión a MySQL..."
+wait_for_db=${WAIT_FOR_DB:-true}
+
+if [ "${wait_for_db,,}" != "false" ] && [ -n "${DB_HOST:-}" ]; then
+    echo "⏳ Esperando a que MySQL (${DB_HOST}:${DB_PORT:-3306}) esté listo..."
+    until php -r "try {
+            \$pdo = new PDO('mysql:host=${DB_HOST};port=${DB_PORT:-3306}', '${DB_USERNAME:-root}', '${DB_PASSWORD:-root}');
+            \$stmt = \$pdo->query(\"SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '${DB_DATABASE:-cdattg}' LIMIT 1\");
+            if (!\$stmt || !\$stmt->fetch()) {
+                throw new Exception('database not ready');
+            }
+            exit(0);
+        } catch (Throwable \$e) {
+            fwrite(STDERR, \$e->getMessage());
+            exit(1);
+        }" 2>/dev/null; do
         sleep 2
+        echo "   esperando conexión a MySQL..."
     done
-    echo "✅ MySQL está listo"
+    echo "✅ MySQL disponible"
+    sleep 2
 fi
 
-# Instalar dependencias si no existen
-if [ ! -d "vendor" ]; then
-    echo "📦 Instalando dependencias PHP..."
-    composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist || {
-        echo "⚠️ Error instalando dependencias PHP, intentando de nuevo..."
-        composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts || true
+ensure_permissions() {
+    local path="$1"
+    if [ -d "$path" ]; then
+        local owner
+        owner=$(stat -c '%U:%G' "$path" 2>/dev/null || echo "")
+        if [ "$owner" != "www-data:www-data" ]; then
+            chown -R www-data:www-data "$path"
+        fi
+        chmod -R 775 "$path"
+    fi
+}
+
+ensure_permissions storage
+ensure_permissions bootstrap/cache
+
+should_run() {
+    case "${1:-}" in
+        1|true|TRUE|True|yes|YES|Yes) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+if should_run "${RUN_MIGRATIONS:-false}"; then
+    if should_run "${RUN_MIGRATIONS_FRESH:-false}"; then
+        echo "🗄️ Ejecutando migraciones de módulos (fresh)..."
+        php artisan migrate:module --all --fresh || {
+            echo "❌ Migraciones fresh de módulos fallaron";
+            exit 1;
+        }
+    else
+        echo "🗄️ Ejecutando migraciones de módulos..."
+        php artisan migrate:module --all || {
+            echo "❌ Migraciones de módulos fallaron";
+            exit 1;
+        }
+    fi
+fi
+
+if should_run "${RUN_SEEDERS:-false}"; then
+    echo "🌱 Ejecutando seeders..."
+    php artisan db:seed --force || {
+        echo "❌ Seeders fallaron";
+        exit 1;
     }
 fi
 
-if [ ! -d "node_modules" ]; then
-    echo "📦 Instalando dependencias Node.js..."
-    npm ci --prefer-offline --no-audit || npm install --prefer-offline --no-audit || true
+if should_run "${CACHE_BOOTSTRAP:-false}"; then
+    echo "🧩 Refrescando caches de la aplicación..."
+    php artisan config:cache || true
+    php artisan route:cache || true
+    php artisan view:cache || true
 fi
 
-# Compilar assets si no existen
-if [ ! -d "public/build" ] && [ ! -d "public/dist" ]; then
-    echo "🔨 Compilando assets..."
-    npm run build || true
-fi
-
-# Ejecutar scripts de Composer si no se ejecutaron
-if [ ! -f "vendor/.composer-scripts-executed" ]; then
-    echo "📋 Ejecutando scripts de Composer..."
+if [ -f "artisan" ]; then
+    echo "📦 Descubriendo paquetes de Laravel..."
     php artisan package:discover --ansi || true
-    touch vendor/.composer-scripts-executed 2>/dev/null || true
 fi
 
-# Configurar permisos
-echo "🔐 Configurando permisos..."
-chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
-chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache 2>/dev/null || true
+# Ejecutar build de frontend si se solicita
+if should_run "${RUN_BUILD_ASSETS:-false}"; then
+    echo "🎨 Construyendo assets frontend con npm run build..."
+    if [ -f "package.json" ]; then
+        npm run build || {
+            echo "❌ Falló npm run build";
+            exit 1;
+        }
+    else
+        echo "⚠️ No se encontró package.json, omitiendo build de assets"
+    fi
+fi
 
-# Generar clave de aplicación si no existe
-if [ ! -f ".env" ] || ! grep -q "APP_KEY=" .env 2>/dev/null || grep -q "APP_KEY=$" .env 2>/dev/null; then
-    echo "🔑 Generando clave de aplicación..."
+if [ -z "${APP_KEY:-}" ] && { [ ! -f ".env" ] || ! grep -q "^APP_KEY=" .env 2>/dev/null || grep -q "^APP_KEY=$" .env 2>/dev/null; }; then
+    echo "🔑 Generando APP_KEY..."
     php artisan key:generate --force || true
 fi
 
 echo "✅ Inicialización completada"
 
-# Ejecutar el comando pasado como argumento
 exec "$@"
 

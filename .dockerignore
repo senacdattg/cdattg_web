@@ -1,0 +1,14 @@
+vendor/
+node_modules/
+storage/
+bootstrap/cache/
+public/build/
+.git/
+.gitignore
+.env
+.env.*
+*.log
+.idea/
+.vscode/
+tmp/
+

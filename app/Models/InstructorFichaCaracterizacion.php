@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-// Usar la clase Carbon para manejo de fechas y horas
-use Carbon\Carbon;
-
 
 class InstructorFichaCaracterizacion extends Model
 {
+    use HasFactory;
+
     protected $table = "instructor_fichas_caracterizacion";
 
     protected $fillable = [

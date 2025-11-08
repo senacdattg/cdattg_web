@@ -2,20 +2,24 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\ProgramaFormacion;
 use App\Models\RedConocimiento;
 use App\Models\Parametro;
 use App\Models\User;
+use Database\Seeders\Concerns\TruncatesTables;
 
 class ProgramasFormacionSeeder extends Seeder
 {
+    use TruncatesTables;
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $this->truncateModel(ProgramaFormacion::class);
+
         // Obtener el primer usuario administrador para auditoría
         $adminUser = User::first();
         $userId = $adminUser ? $adminUser->id : 1;
