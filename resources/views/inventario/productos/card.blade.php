@@ -185,6 +185,13 @@
                 @endforelse
             </div>
 
+            {{-- Paginación --}}
+            <div class="row">
+                <div class="col-12 d-flex justify-content-center" id="catalog-pagination">
+                    {{ $productos->links() }}
+                </div>
+            </div>
+
             {{-- Mensaje cuando no hay resultados de búsqueda --}}
             <div class="row d-none" id="no-results">
                 <div class="col-12">
@@ -206,8 +213,8 @@
                 <h5 style="margin:0; font-size:18px;">
                     <i class="fas fa-box"></i> Detalles del Producto
                 </h5>
-                <button onclick="closeProductModal()" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">
-                    ×
+                <button onclick="closeProductModal()" aria-label="Cerrar" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">
+                    &times;
                 </button>
             </div>
             
@@ -231,13 +238,15 @@
 @endsection
 
 @push('css')
-    <link rel="stylesheet" href="{{ asset('css/inventario/card.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/inventario/modal-producto.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/inventario/imagen.css') }}">
-    @vite(['public/css/inventario/shared/base.css'])
+    @vite([
+    'resources/css/inventario/shared/base.css', 
+    'resources/css/inventario/card.css', 
+    'resources/css/inventario/modal-producto.css', 
+    'resources/css/inventario/imagen.css'
+    ])
 @endpush
 
 @push('js')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="{{ asset('js/inventario/card.js') }}"></script>
+    @vite('resources/js/inventario/card.js')
 @endpush

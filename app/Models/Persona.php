@@ -38,6 +38,7 @@ class Persona extends Model
         'direccion',
         'status',
         'estado_sofia',
+        'condocumento',
         'user_create_id',
         'user_edit_id',
         'caracterizacion_id',

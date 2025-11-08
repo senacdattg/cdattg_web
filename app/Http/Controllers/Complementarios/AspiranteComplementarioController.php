@@ -8,9 +8,11 @@ use App\Models\ComplementarioOfertado;
 use App\Models\AspiranteComplementario;
 use App\Models\Persona;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use setasign\Fpdi\Fpdi;
 
 class AspiranteComplementarioController extends Controller
 {
@@ -255,6 +257,145 @@ class AspiranteComplementarioController extends Controller
                 'success' => false,
                 'message' => 'Error al generar el archivo Excel. Por favor intente nuevamente.'
             ], 500);
+        }
+    }
+
+    /**
+     * Descargar cédulas de aspirantes en un archivo PDF combinado
+     */
+    public function descargarCedulas($complementarioId)
+    {
+        try {
+            // Verificar que el programa existe
+            $programa = ComplementarioOfertado::findOrFail($complementarioId);
+
+            // Obtener todos los aspirantes del programa con personas que tengan documento
+            $aspirantes = AspiranteComplementario::with(['persona.tipoDocumento'])
+                ->where('complementario_id', $complementarioId)
+                ->whereHas('persona', function($query) {
+                    $query->where('condocumento', 1);
+                })
+                ->get()
+                ->sortBy(function($aspirante) {
+                    return $aspirante->persona->numero_documento;
+                });
+
+            if ($aspirantes->isEmpty()) {
+                return back()->with('error', 'No hay aspirantes con documentos de identidad para descargar.');
+            }
+
+            // Crear directorio temporal si no existe
+            $tempDir = storage_path('app/temp');
+            if (!file_exists($tempDir)) {
+                mkdir($tempDir, 0755, true);
+            }
+
+            // Crear instancia de FPDI para combinar PDFs
+            $pdf = new Fpdi();
+
+            $archivosAgregados = 0;
+            $archivosTemporales = [];
+
+            foreach ($aspirantes as $aspirante) {
+                try {
+                    $persona = $aspirante->persona;
+                    
+                    // Construir el patrón de búsqueda del archivo en Google Drive
+                    // Formato: tipo_documento_NumeroDocumento_PrimerNombre_PrimerApellido_*.pdf
+                    $tipoDocumento = $persona->tipoDocumento ? str_replace(' ', '_', $persona->tipoDocumento->name) : 'DOC';
+                    $numeroDocumento = $persona->numero_documento;
+                    $primerNombre = str_replace(' ', '_', $persona->primer_nombre);
+                    $primerApellido = str_replace(' ', '_', $persona->primer_apellido);
+                    
+                    // Listar archivos en Google Drive
+                    $files = Storage::disk('google')->files('documentos_aspirantes');
+                    
+                    // Buscar el archivo que coincida con el patrón
+                    $matchingFile = null;
+                    foreach ($files as $file) {
+                        $fileName = basename($file);
+                        if (strpos($fileName, "{$tipoDocumento}_{$numeroDocumento}_{$primerNombre}_{$primerApellido}_") === 0) {
+                            $matchingFile = $file;
+                            break;
+                        }
+                    }
+
+                    if ($matchingFile && Storage::disk('google')->exists($matchingFile)) {
+                        // Obtener el contenido del archivo
+                        $fileContent = Storage::disk('google')->get($matchingFile);
+                        
+                        // Guardar temporalmente para procesar con FPDI
+                        $tempFilePath = $tempDir . '/temp_' . $archivosAgregados . '_' . $numeroDocumento . '.pdf';
+                        file_put_contents($tempFilePath, $fileContent);
+                        $archivosTemporales[] = $tempFilePath;
+
+                        // Obtener el número de páginas del PDF
+                        $pageCount = $pdf->setSourceFile($tempFilePath);
+                        
+                        // Agregar cada página al PDF combinado
+                        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+                            $templateId = $pdf->importPage($pageNo);
+                            $size = $pdf->getTemplateSize($templateId);
+                            
+                            // Agregar página en orientación correcta
+                            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
+                            $pdf->useTemplate($templateId);
+                        }
+                        
+                        $archivosAgregados++;
+                    } else {
+                        Log::warning('Archivo no encontrado en Google Drive', [
+                            'aspirante_id' => $aspirante->id,
+                            'persona_id' => $persona->id,
+                            'numero_documento' => $numeroDocumento
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Error procesando archivo PDF: ' . $e->getMessage(), [
+                        'aspirante_id' => $aspirante->id,
+                        'persona_id' => $aspirante->persona_id ?? 'N/A',
+                        'exception' => $e->getTraceAsString()
+                    ]);
+                    // Continuar con el siguiente archivo
+                    continue;
+                }
+            }
+
+            if ($archivosAgregados === 0) {
+                // Limpiar archivos temporales
+                foreach ($archivosTemporales as $tempFile) {
+                    if (file_exists($tempFile)) {
+                        unlink($tempFile);
+                    }
+                }
+                return back()->with('error', 'No se pudieron descargar los documentos. Verifique que los archivos existan en Google Drive.');
+            }
+
+            // Generar nombre del archivo PDF
+            $pdfFileName = 'cedulas_' . str_replace(' ', '_', $programa->nombre) . '_' . now()->format('Y-m-d_H-i-s') . '.pdf';
+            $pdfPath = $tempDir . '/' . $pdfFileName;
+
+            // Guardar el PDF combinado
+            $pdf->Output('F', $pdfPath);
+
+            // Limpiar archivos temporales
+            foreach ($archivosTemporales as $tempFile) {
+                if (file_exists($tempFile)) {
+                    unlink($tempFile);
+                }
+            }
+
+            // Crear respuesta de descarga
+            return response()->download($pdfPath, $pdfFileName)->deleteFileAfterSend(true);
+
+        } catch (\Exception $e) {
+            Log::error('Error descargando cédulas: ' . $e->getMessage(), [
+                'complementario_id' => $complementarioId,
+                'user_id' => auth()->id(),
+                'exception' => $e->getTraceAsString()
+            ]);
+
+            return back()->with('error', 'Error al generar el archivo PDF. Por favor intente nuevamente.');
         }
     }
 }

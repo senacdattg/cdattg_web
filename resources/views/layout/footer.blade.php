@@ -46,6 +46,13 @@
                     soporte@cdattg.com
                 </div>
             </div>
+            <div class="mt-3">
+                <a href="https://sonarqube.dataguaviare.com.co/dashboard?id=academica_web" target="_blank"
+                    rel="noopener noreferrer">
+                    <img src="https://sonarqube.dataguaviare.com.co/api/project_badges/measure?project=academica_web&metric=alert_status&token=sqb_113dbf278cf78c52371734be0eb6518e945d4376"
+                        alt="Calidad SonarQube academica_web" class="img-fluid" style="max-height: 32px;">
+                </a>
+            </div>
         </div>
     </div>
 </footer>

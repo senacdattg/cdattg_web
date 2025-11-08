@@ -12,3 +12,4 @@
         onerror="this.onerror=null; this.src='{{ asset('img/no-image.png') }}'"
     >
 </div>
+
