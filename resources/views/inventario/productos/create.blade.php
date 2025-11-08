@@ -440,15 +440,17 @@
 @endsection
 
 @push('css')
-    @vite(['resources/css/inventario/shared/base.css'])
-    <link href="{{ asset('css/inventario/inventario.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/inventario/imagen.css') }}" rel="stylesheet">
+    @vite([
+        'resources/css/inventario/shared/base.css',
+        'resources/css/inventario/inventario.css',
+        'resources/css/inventario/imagen.css',
+    ])
 @endpush
 
 @push('js')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
-    <script src="{{ asset('js/inventario/imagen.js') }}"></script>
+    @vite('resources/js/inventario/imagen.js')
     <script>
         // Preview de imagen
         document.getElementById('imagen').addEventListener('change', function(e) {
