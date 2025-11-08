@@ -45,7 +45,15 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 RUN set -eux; \
-    npm ci;
+    echo "📦 Verificando archivos copiados..."; \
+    ls -lh package*.json || true; \
+    if [ -f package-lock.json ] && [ -s package-lock.json ]; then \
+        echo "✅ package-lock.json encontrado, usando npm ci..."; \
+        npm ci || (echo "⚠️ npm ci falló, usando npm install como fallback..."; npm install); \
+    else \
+        echo "⚠️ package-lock.json no encontrado o vacío, usando npm install..."; \
+        npm install; \
+    fi;
 
 COPY resources ./resources
 COPY vite.config.js ./vite.config.js
