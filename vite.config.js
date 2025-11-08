@@ -15,16 +15,6 @@ export default defineConfig({
                 'dias_formacion_css': 'resources/css/dias-formacion.css',
                 'dashboard_superadmin': 'resources/css/dashboards/dashboard-superadmin.css',
                 'caracter_selecter': 'resources/css/Asistencia/caracter_selecter.css',
-<<<<<<< HEAD
-                'navbar': 'resources/css/shared/navbar.css',
-                'inventario_listas_css': 'resources/css/inventario/inventario_listas.css',
-                'inventario_base_css': 'resources/css/inventario/shared/base.css',
-                'inventario_card_css': 'resources/css/inventario/card.css',
-                'inventario_modal_producto_css': 'resources/css/inventario/modal-producto.css',
-                'inventario_imagen_css': 'resources/css/inventario/imagen.css',
-                'inventario_sidebar_fix': 'resources/css/inventario/sidebar-fix.css',
-                
-=======
 
                 // Complementarios CSS files
                 'formulario_inscripcion_css': 'resources/css/formulario_inscripcion.css',
@@ -36,7 +26,6 @@ export default defineConfig({
                 // 'inventario_base_css': 'resources/css/inventario/shared/base.css',
                 // 'inventario_sidebar_fix': 'resources/css/inventario/sidebar-fix.css',
 
->>>>>>> develop
                 // JavaScript files
                 'app': 'resources/js/app.js',
                 'dashboard': 'resources/js/dashboard.js',
@@ -46,10 +35,6 @@ export default defineConfig({
                 'charts-scripts': 'resources/js/dashboards/superadmin/charts-scripts.js',
                 'widgets': 'resources/js/dashboards/superadmin/widgets.js',
                 'municipios': 'resources/js/municipios.js',
-<<<<<<< HEAD
-                'inventario_card': 'resources/js/inventario/card.js',
-                'inventario_carrito': 'resources/js/inventario/carrito.js',
-=======
 
                 // Complementarios files
                 'formulario_inscripcion': 'resources/js/complementarios/formulario-inscripcion.js',
@@ -65,7 +50,6 @@ export default defineConfig({
                 // 'proveedores': 'resources/js/inventario/proveedores.js',
                 // 'contratos_convenios': 'resources/js/inventario/contratos_convenios.js',
                 // 'paginacion': 'resources/js/inventario/paginacion.js',
->>>>>>> develop
             },
             refresh: true,
         }),
