@@ -36,7 +36,7 @@
                     </div>
 
                     <div class="row align-items-stretch mb-3">
-                        <div class="col-md-4 col-lg-3 mb-3">
+                        <div class="col-md-6 col-lg-3 mb-3">
                             <div class="card shadow-sm h-100 border-0" data-toggle="tooltip"
                                 title="Total de personas registradas en la base de datos.">
                                 <div class="card-body py-3">
@@ -47,7 +47,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 col-lg-3 mb-3">
+                        <div class="col-md-6 col-lg-3 mb-3">
                             <div class="card shadow-sm h-100 border-0" data-toggle="tooltip"
                                 title="Personas que coinciden con la búsqueda actual y los filtros aplicados.">
                                 <div class="card-body py-3">
@@ -58,7 +58,18 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 col-lg-6 mb-3">
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card shadow-sm h-100 border-0" data-toggle="tooltip"
+                                title="Cantidad de personas registradas en Sena Sofia Plus frente al total general.">
+                                <div class="card-body py-3">
+                                    <span class="text-muted text-uppercase small d-block mb-1">Registrados en SOFIA</span>
+                                    <h2 class="font-weight-bold text-info mb-0 display-4">
+                                        <span id="total-personas-sofia">—</span>
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-3 mb-3">
                             <div class="card shadow-sm h-100 border-0">
                                 <div class="card-body py-3">
                                     <label class="text-muted text-uppercase small mb-2" for="filtro-estado">Filtrar por
@@ -88,13 +99,16 @@
                         tableWrapperClass="table-responsive rounded personas-table-responsive" :columns="[
                             ['label' => '#', 'width' => '5%'],
                             ['label' => 'Nombres completos', 'width' => '25%'],
-                            ['label' => 'Número de Documento', 'width' => '20%'],
-                            ['label' => 'Correo Electrónico', 'width' => '25%'],
-                            ['label' => 'Estado', 'width' => '10%'],
+                            ['label' => 'Documento', 'width' => '13%'],
+                            ['label' => 'Correo', 'width' => '18%'],
+                            ['label' => 'Teléfono', 'width' => '10%'],
+                            ['label' => 'Celular', 'width' => '10%'],
+                            ['label' => 'Estado', 'width' => '7%'],
+                            ['label' => 'Estado Sofía', 'width' => '10%'],
                             ['label' => 'Opciones', 'width' => '15%', 'class' => 'text-center'],
                         ]">
                         <tr>
-                            <td colspan="6" class="text-center text-muted">Cargando registros...</td>
+                            <td colspan="9" class="text-center text-muted">Cargando registros...</td>
                         </tr>
                     </x-data-table>
                 </div>
@@ -123,9 +137,11 @@
             const $estadoFilter = $('#filtro-estado');
             const $totalGeneral = $('#total-personas');
             const $totalFiltrado = $('#total-personas-filtradas');
+            const $totalSofia = $('#total-personas-sofia');
 
             const formatNumber = function(value) {
-                return typeof value === 'number' ? value.toLocaleString('es-CO') : '0';
+                const numericValue = Number(value);
+                return Number.isFinite(numericValue) ? numericValue.toLocaleString('es-CO') : '0';
             };
 
             const personasTable = $('#personas-table').DataTable({
@@ -142,8 +158,17 @@
                         .then(function(response) {
                             const json = response.data;
 
-                            $totalGeneral.text(formatNumber(json.recordsTotal ?? 0));
-                            $totalFiltrado.text(formatNumber(json.recordsFiltered ?? 0));
+                            const totalGeneral = json.total_general ?? json.recordsTotal ?? 0;
+                            const totalFiltrado = json.total_filtrado ?? json.recordsFiltered ??
+                                totalGeneral;
+
+                            $totalGeneral.text(formatNumber(totalGeneral));
+                            $totalFiltrado.text(formatNumber(totalFiltrado));
+                            const totalSofiaRegistrados = Number(json.sofia_registrados_filtrados ??
+                                json.sofia_registrados_total ?? 0);
+                            $totalSofia.text(
+                                `${formatNumber(totalSofiaRegistrados)} / ${formatNumber(totalFiltrado)}`
+                            );
 
                             callback(json);
                         })
@@ -151,6 +176,7 @@
                             console.error('Error al cargar personas:', error);
                             $totalGeneral.text('0');
                             $totalFiltrado.text('0');
+                            $totalSofia.text('0 / 0');
                             callback({
                                 draw: data.draw,
                                 recordsTotal: 0,
@@ -192,8 +218,28 @@
                         className: 'align-middle'
                     },
                     {
+                        data: 'telefono',
+                        name: 'telefono',
+                        className: 'align-middle'
+                    },
+                    {
+                        data: 'celular',
+                        name: 'celular',
+                        className: 'align-middle'
+                    },
+                    {
                         data: 'estado',
                         name: 'estado',
+                        orderable: false,
+                        searchable: false,
+                        className: 'align-middle text-center',
+                        render: function(data) {
+                            return data;
+                        }
+                    },
+                    {
+                        data: 'estado_sofia',
+                        name: 'estado_sofia',
                         orderable: false,
                         searchable: false,
                         className: 'align-middle text-center',

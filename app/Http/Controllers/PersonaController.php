@@ -91,12 +91,18 @@ class PersonaController extends Controller
         $requiresFiltering = $searchValue || $estadoAplicado;
         $recordsFiltered = $requiresFiltering ? (clone $filteredQuery)->count() : $recordsTotal;
 
+        $registradosSofiaTotal = (clone $baseQuery)->where('estado_sofia', 1)->count();
+        $registradosSofiaFiltrados = (clone $filteredQuery)->where('estado_sofia', 1)->count();
+
         $columns = [
             0 => 'id',
             1 => 'primer_nombre',
             2 => 'numero_documento',
             3 => 'email',
-            4 => 'status',
+            4 => 'telefono',
+            5 => 'celular',
+            6 => 'status',
+            7 => 'estado_sofia',
         ];
 
         $orderColumnIndex = (int) $request->input('order.0.column', 0);
@@ -115,12 +121,22 @@ class PersonaController extends Controller
         $personas = $personasQuery->get();
 
         $data = $personas->map(function (Persona $persona, $index) use ($start) {
+            $badgeNoRegistrado = '<span class="badge badge-secondary">No registrado</span>';
+            $telefono = $persona->telefono ? e($persona->telefono) : $badgeNoRegistrado;
+            $celular = $persona->celular
+                ? '<a href="https://wa.me/' . e($persona->celular) . '" target="_blank" class="text-decoration-none">' .
+                    e($persona->celular) . ' <i class="fab fa-whatsapp text-success"></i></a>'
+                : $badgeNoRegistrado;
+
             return [
                 'index' => $start + $index + 1,
                 'nombre' => $persona->nombre_completo,
                 'numero_documento' => $persona->numero_documento,
                 'email' => $persona->email,
+                'telefono' => $telefono,
+                'celular' => $celular,
                 'estado' => view('personas.partials.estado', ['persona' => $persona])->render(),
+                'estado_sofia' => view('personas.partials.estado-sofia', ['persona' => $persona])->render(),
                 'acciones' => view('personas.partials.acciones', ['persona' => $persona])->render(),
             ];
         });
@@ -129,6 +145,10 @@ class PersonaController extends Controller
             'draw' => (int) $request->input('draw'),
             'recordsTotal' => $recordsTotal,
             'recordsFiltered' => $recordsFiltered,
+            'sofia_registrados_total' => $registradosSofiaTotal,
+            'sofia_registrados_filtrados' => $registradosSofiaFiltrados,
+            'total_general' => $recordsTotal,
+            'total_filtrado' => $recordsFiltered,
             'data' => $data,
         ]);
     }
