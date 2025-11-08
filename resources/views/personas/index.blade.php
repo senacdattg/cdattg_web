@@ -3,6 +3,13 @@
 @section('css')
     @vite(['resources/css/parametros.css'])
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap4.min.css">
+    <style>
+        @media (min-width: 992px) {
+            .personas-table-responsive {
+                overflow-x: visible;
+            }
+        }
+    </style>
 @endsection
 
 @section('content_header')
@@ -28,10 +35,59 @@
                         </div>
                     </div>
 
+                    <div class="row align-items-stretch mb-3">
+                        <div class="col-md-4 col-lg-3 mb-3">
+                            <div class="card shadow-sm h-100 border-0" data-toggle="tooltip"
+                                title="Total de personas registradas en la base de datos.">
+                                <div class="card-body py-3">
+                                    <span class="text-muted text-uppercase small d-block mb-1">Total registradas</span>
+                                    <h2 class="font-weight-bold text-primary mb-0 display-4">
+                                        <span id="total-personas">—</span>
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-lg-3 mb-3">
+                            <div class="card shadow-sm h-100 border-0" data-toggle="tooltip"
+                                title="Personas que coinciden con la búsqueda actual y los filtros aplicados.">
+                                <div class="card-body py-3">
+                                    <span class="text-muted text-uppercase small d-block mb-1">Resultados actuales</span>
+                                    <h2 class="font-weight-bold text-success mb-0 display-4">
+                                        <span id="total-personas-filtradas">—</span>
+                                    </h2>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 col-lg-6 mb-3">
+                            <div class="card shadow-sm h-100 border-0">
+                                <div class="card-body py-3">
+                                    <label class="text-muted text-uppercase small mb-2" for="filtro-estado">Filtrar por
+                                        estado</label>
+                                    <div class="input-group input-group-sm">
+                                        <select id="filtro-estado" class="form-control">
+                                            <option value="todos" selected>Todos</option>
+                                            <option value="activos">Activos</option>
+                                            <option value="inactivos">Inactivos</option>
+                                        </select>
+                                        <div class="input-group-append">
+                                            <button type="button" class="btn btn-outline-secondary"
+                                                id="btn-limpiar-filtros" title="Restablecer filtros">
+                                                <i class="fas fa-undo mr-1"></i> Limpiar
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <small class="text-muted d-block mt-2">Combina este filtro con la búsqueda de DataTable
+                                        para segmentar registros rápidamente.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <x-data-table title="Lista de Personas" :paginated="false" :searchable="false" tableId="personas-table"
-                        :columns="[
+                        tableClass="table table-center table-sm table-borderless table-striped mb-0"
+                        tableWrapperClass="table-responsive rounded personas-table-responsive" :columns="[
                             ['label' => '#', 'width' => '5%'],
-                            ['label' => 'Nombre y Apellido', 'width' => '25%'],
+                            ['label' => 'Nombres completos', 'width' => '25%'],
                             ['label' => 'Número de Documento', 'width' => '20%'],
                             ['label' => 'Correo Electrónico', 'width' => '25%'],
                             ['label' => 'Estado', 'width' => '10%'],
@@ -62,18 +118,39 @@
     <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap4.min.js"></script>
     <script>
         $(function() {
-            $('#personas-table').DataTable({
+            $('[data-toggle="tooltip"]').tooltip();
+
+            const $estadoFilter = $('#filtro-estado');
+            const $totalGeneral = $('#total-personas');
+            const $totalFiltrado = $('#total-personas-filtradas');
+
+            const formatNumber = function(value) {
+                return typeof value === 'number' ? value.toLocaleString('es-CO') : '0';
+            };
+
+            const personasTable = $('#personas-table').DataTable({
                 processing: true,
                 serverSide: true,
+                deferRender: true,
+                stateSave: true,
                 ajax: function(data, callback) {
                     axios.get('{{ route('personas.datatable') }}', {
-                            params: data
+                            params: Object.assign({}, data, {
+                                estado: $estadoFilter.val()
+                            })
                         })
                         .then(function(response) {
-                            callback(response.data);
+                            const json = response.data;
+
+                            $totalGeneral.text(formatNumber(json.recordsTotal ?? 0));
+                            $totalFiltrado.text(formatNumber(json.recordsFiltered ?? 0));
+
+                            callback(json);
                         })
                         .catch(function(error) {
                             console.error('Error al cargar personas:', error);
+                            $totalGeneral.text('0');
+                            $totalFiltrado.text('0');
                             callback({
                                 draw: data.draw,
                                 recordsTotal: 0,
@@ -83,7 +160,10 @@
                         });
                 },
                 language: {
-                    url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json',
+                    processing: '<span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span> Cargando personas...',
+                    emptyTable: 'No se encontraron personas registradas.',
+                    zeroRecords: 'No hay resultados para los filtros aplicados.'
                 },
                 pageLength: 10,
                 lengthMenu: [10, 25, 50, 100],
@@ -92,25 +172,31 @@
                 ],
                 columns: [{
                         data: 'index',
-                        name: 'index'
+                        name: 'id',
+                        searchable: false,
+                        className: 'align-middle text-muted'
                     },
                     {
                         data: 'nombre',
-                        name: 'nombre'
+                        name: 'primer_nombre',
+                        className: 'align-middle'
                     },
                     {
                         data: 'numero_documento',
-                        name: 'numero_documento'
+                        name: 'numero_documento',
+                        className: 'align-middle'
                     },
                     {
                         data: 'email',
-                        name: 'email'
+                        name: 'email',
+                        className: 'align-middle'
                     },
                     {
                         data: 'estado',
                         name: 'estado',
                         orderable: false,
                         searchable: false,
+                        className: 'align-middle text-center',
                         render: function(data) {
                             return data;
                         }
@@ -120,11 +206,30 @@
                         name: 'acciones',
                         orderable: false,
                         searchable: false,
+                        className: 'align-middle text-center',
                         render: function(data) {
                             return data;
                         }
                     },
-                ]
+                ],
+                columnDefs: [{
+                    targets: 0,
+                    orderable: true
+                }],
+                drawCallback: function() {
+                    $('[data-toggle="tooltip"]').tooltip();
+                },
+                dom: '<"row align-items-center mb-2 px-3 pt-3"<"col-sm-12 col-md-6 mb-2 mb-md-0"l><"col-sm-12 col-md-6 text-md-right"f>>rt<"row align-items-center mt-2 px-3 pb-3"<"col-sm-12 col-md-5 mb-2 mb-md-0"i><"col-sm-12 col-md-7"p>>'
+            });
+
+            $estadoFilter.on('change', function() {
+                personasTable.draw();
+            });
+
+            $('#btn-limpiar-filtros').on('click', function() {
+                $estadoFilter.val('todos');
+                personasTable.search('');
+                personasTable.draw();
             });
         });
     </script>

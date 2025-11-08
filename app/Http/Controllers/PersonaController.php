@@ -67,19 +67,29 @@ class PersonaController extends Controller
 
         $recordsTotal = (clone $baseQuery)->count();
 
-        if ($search = $request->input('search.value')) {
-            $baseQuery->where(function ($query) use ($search) {
-                $query->where('primer_nombre', 'like', "%{$search}%")
-                    ->orWhere('segundo_nombre', 'like', "%{$search}%")
-                    ->orWhere('primer_apellido', 'like', "%{$search}%")
-                    ->orWhere('segundo_apellido', 'like', "%{$search}%")
-                    ->orWhere('numero_documento', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
+        $filteredQuery = clone $baseQuery;
+
+        $searchValue = $request->input('search.value');
+        if ($searchValue) {
+            $filteredQuery->where(function ($query) use ($searchValue) {
+                $query->where('primer_nombre', 'like', "%{$searchValue}%")
+                    ->orWhere('segundo_nombre', 'like', "%{$searchValue}%")
+                    ->orWhere('primer_apellido', 'like', "%{$searchValue}%")
+                    ->orWhere('segundo_apellido', 'like', "%{$searchValue}%")
+                    ->orWhere('numero_documento', 'like', "%{$searchValue}%")
+                    ->orWhere('email', 'like', "%{$searchValue}%");
             });
         }
 
-        $filteredQuery = clone $baseQuery;
-        $recordsFiltered = $filteredQuery->count();
+        $estado = $request->input('estado');
+        $estadoAplicado = false;
+        if ($estado && $estado !== 'todos') {
+            $estadoAplicado = true;
+            $filteredQuery->where('status', $estado === 'activos' ? 1 : 0);
+        }
+
+        $requiresFiltering = $searchValue || $estadoAplicado;
+        $recordsFiltered = $requiresFiltering ? (clone $filteredQuery)->count() : $recordsTotal;
 
         $columns = [
             0 => 'id',
@@ -96,7 +106,7 @@ class PersonaController extends Controller
         $start = (int) $request->input('start', 0);
         $length = (int) $request->input('length', 10);
 
-        $personasQuery = $filteredQuery->orderBy($orderColumn, $orderDirection);
+        $personasQuery = (clone $filteredQuery)->orderBy($orderColumn, $orderDirection);
 
         if ($length !== -1) {
             $personasQuery->skip($start)->take($length);
