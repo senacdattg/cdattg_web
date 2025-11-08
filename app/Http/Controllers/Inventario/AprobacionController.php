@@ -15,6 +15,8 @@ use App\Notifications\OrdenRechazadaNotification;
 
 class AprobacionController extends InventarioController
 {
+    private const STATUS_PENDING = 'EN ESPERA';
+
     public function __construct()
     {
         parent::__construct();
@@ -28,7 +30,7 @@ class AprobacionController extends InventarioController
     {
         // Obtener estado EN ESPERA
         $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
-            $q->where('name', 'EN ESPERA');
+            $q->where('name', self::STATUS_PENDING);
         })
         ->whereHas('tema', function($q) {
             $q->where('name', 'ESTADOS DE ORDEN');
@@ -66,7 +68,7 @@ class AprobacionController extends InventarioController
 
             // Verificar que esté en estado EN ESPERA
             $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
-                $q->where('name', 'EN ESPERA');
+                $q->where('name', self::STATUS_PENDING);
             })
             ->whereHas('tema', function($q) {
                 $q->where('name', 'ESTADOS DE ORDEN');
@@ -158,7 +160,7 @@ class AprobacionController extends InventarioController
 
             // Verificar que esté en estado EN ESPERA
             $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
-                $q->where('name', 'EN ESPERA');
+                $q->where('name', self::STATUS_PENDING);
             })
             ->whereHas('tema', function($q) {
                 $q->where('name', 'ESTADOS DE ORDEN');
@@ -246,7 +248,7 @@ class AprobacionController extends InventarioController
 
             // Verificar que todos los detalles estén en estado EN ESPERA
             $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
-                $q->where('name', 'EN ESPERA');
+                $q->where('name', self::STATUS_PENDING);
             })
             ->whereHas('tema', function($q) {
                 $q->where('name', 'ESTADOS DE ORDEN');
@@ -347,7 +349,7 @@ class AprobacionController extends InventarioController
 
             // Verificar que todos los detalles estén en estado EN ESPERA
             $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
-                $q->where('name', 'EN ESPERA');
+                $q->where('name', self::STATUS_PENDING);
             })
             ->whereHas('tema', function($q) {
                 $q->where('name', 'ESTADOS DE ORDEN');

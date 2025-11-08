@@ -17,6 +17,10 @@ use App\Notifications\StockBajoNotification;
 
 class OrdenController extends InventarioController
 {
+    private const RULE_REQUIRED_STRING = 'required|string';
+    private const RULE_REQUIRED_ORDER_STATUS = 'required|exists:parametros_temas,id';
+    private const THEME_ORDER_STATES = 'ESTADOS DE ORDEN';
+
     public function __construct()
     {
         parent::__construct();
@@ -77,13 +81,13 @@ class OrdenController extends InventarioController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'descripcion_orden' => 'required|string',
-            'tipo_orden_id' => 'required|exists:parametros_temas,id',
+            'descripcion_orden' => self::RULE_REQUIRED_STRING,
+            'tipo_orden_id' => self::RULE_REQUIRED_ORDER_STATUS,
             'fecha_devolucion' => 'nullable|date|after:today',
             'productos' => 'required|array|min:1',
             'productos.*.producto_id' => 'required|exists:productos,id',
             'productos.*.cantidad' => 'required|integer|min:1',
-            'productos.*.estado_orden_id' => 'required|exists:parametros_temas,id'
+            'productos.*.estado_orden_id' => self::RULE_REQUIRED_ORDER_STATUS
         ]);
 
         try {
@@ -158,7 +162,7 @@ class OrdenController extends InventarioController
             $q->where('name', 'EN ESPERA');
         })
         ->whereHas('tema', function($q) {
-            $q->where('name', 'ESTADOS DE ORDEN');
+            $q->where('name', self::THEME_ORDER_STATES);
         })
         ->first();
 
@@ -190,7 +194,7 @@ class OrdenController extends InventarioController
             $q->where('name', 'APROBADA');
         })
         ->whereHas('tema', function($q) {
-            $q->where('name', 'ESTADOS DE ORDEN');
+            $q->where('name', self::THEME_ORDER_STATES);
         })
         ->first();
 
@@ -222,7 +226,7 @@ class OrdenController extends InventarioController
             $q->where('name', 'RECHAZADA');
         })
         ->whereHas('tema', function($q) {
-            $q->where('name', 'ESTADOS DE ORDEN');
+            $q->where('name', self::THEME_ORDER_STATES);
         })
         ->first();
 
@@ -255,7 +259,7 @@ class OrdenController extends InventarioController
             'programa_formacion' => 'required|string|max:255',
             'tipo' => 'required|in:prestamo,salida',
             'fecha_devolucion' => 'required_if:tipo,prestamo|nullable|date|after:today',
-            'descripcion' => 'required|string',
+            'descripcion' => self::RULE_REQUIRED_STRING,
             'carrito' => 'required|json' // El carrito viene como JSON desde el frontend
         ]);
 
@@ -278,36 +282,10 @@ class OrdenController extends InventarioController
             $codigoTipoOrden = $tipoMap[$validated['tipo']] ?? strtoupper($validated['tipo']);
 
             // Buscar el parámetro de tipo de orden (tema: TIPOS DE ORDEN)
-            $parametroTipoOrden = ParametroTema::whereHas('tema', function ($q) {
-                    $q->whereRaw('UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(name, "Á", "A"), "É", "E"), "Í", "I"), "Ó", "O"), "Ú", "U")) = ?', ['TIPOS DE ORDEN']);
-                })
-                ->whereHas('parametro', function ($q) use ($codigoTipoOrden) {
-                    // Normalizar sin acentos para la comparación
-                    $nombreNormalizado = str_replace(
-                        ['Á', 'É', 'Í', 'Ó', 'Ú'],
-                        ['A', 'E', 'I', 'O', 'U'],
-                        strtoupper($codigoTipoOrden)
-                    );
-                    $q->whereRaw('UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(name, "Á", "A"), "É", "E"), "Í", "I"), "Ó", "O"), "Ú", "U")) = ?', [$nombreNormalizado]);
-                })
-                ->first();
-
-            if (!$parametroTipoOrden) {
-                throw new \Exception("Tipo de orden '{$codigoTipoOrden}' no encontrado. Verifique los parámetros del sistema.");
-            }
+            $parametroTipoOrden = $this->findParametroTipoOrden($codigoTipoOrden);
 
             // Buscar parámetro de estado 'EN ESPERA' (tema: ESTADOS DE ORDEN)
-            $estadoEnEspera = ParametroTema::whereHas('tema', function ($q) {
-                    $q->whereRaw('UPPER(name) = ?', ['ESTADOS DE ORDEN']);
-                })
-                ->whereHas('parametro', function ($q) {
-                    $q->whereRaw('UPPER(name) = ?', ['EN ESPERA']);
-                })
-                ->first();
-
-            if (!$estadoEnEspera) {
-                throw new \Exception("Estado 'EN ESPERA' no encontrado. Verifique los parámetros del sistema.");
-            }
+            $estadoEnEspera = $this->findEstadoEnEspera();
 
 
             // Obtener datos del usuario
@@ -405,6 +383,45 @@ class OrdenController extends InventarioController
         }
     }
 
+    private function findParametroTipoOrden(string $codigoTipoOrden): ParametroTema
+    {
+        $parametroTipoOrden = ParametroTema::whereHas('tema', function ($q) {
+                $q->whereRaw('UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(name, "Á", "A"), "É", "E"), "Í", "I"), "Ó", "O"), "Ú", "U")) = ?', ['TIPOS DE ORDEN']);
+            })
+            ->whereHas('parametro', function ($q) use ($codigoTipoOrden) {
+                $nombreNormalizado = str_replace(
+                    ['Á', 'É', 'Í', 'Ó', 'Ú'],
+                    ['A', 'E', 'I', 'O', 'U'],
+                    strtoupper($codigoTipoOrden)
+                );
+                $q->whereRaw('UPPER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(name, "Á", "A"), "É", "E"), "Í", "I"), "Ó", "O"), "Ú", "U")) = ?', [$nombreNormalizado]);
+            })
+            ->first();
+
+        if (!$parametroTipoOrden) {
+            throw new \Exception("Tipo de orden '{$codigoTipoOrden}' no encontrado. Verifique los parámetros del sistema.");
+        }
+
+        return $parametroTipoOrden;
+    }
+
+    private function findEstadoEnEspera(): ParametroTema
+    {
+        $estadoEnEspera = ParametroTema::whereHas('tema', function ($q) {
+                $q->whereRaw('UPPER(name) = ?', [self::THEME_ORDER_STATES]);
+            })
+            ->whereHas('parametro', function ($q) {
+                $q->whereRaw('UPPER(name) = ?', ['EN ESPERA']);
+            })
+            ->first();
+
+        if (!$estadoEnEspera) {
+            throw new \Exception("Estado 'EN ESPERA' no encontrado. Verifique los parámetros del sistema.");
+        }
+
+        return $estadoEnEspera;
+    }
+
     /**
      * Update the specified resource in storage.
      */
@@ -421,13 +438,13 @@ class OrdenController extends InventarioController
         }
 
         $validated = $request->validate([
-            'descripcion_orden' => 'required|string',
-            'tipo_orden_id' => 'required|exists:parametros_temas,id',
+            'descripcion_orden' => self::RULE_REQUIRED_STRING,
+            'tipo_orden_id' => self::RULE_REQUIRED_ORDER_STATUS,
             'fecha_devolucion' => 'nullable|date|after:today',
             'productos' => 'required|array|min:1',
             'productos.*.producto_id' => 'required|exists:productos,id',
             'productos.*.cantidad' => 'required|integer|min:1',
-            'productos.*.estado_orden_id' => 'required|exists:parametros_temas,id'
+            'productos.*.estado_orden_id' => self::RULE_REQUIRED_ORDER_STATUS
         ]);
 
         try {

@@ -19,6 +19,7 @@ use App\Notifications\StockBajoNotification;
 
 class ProductoController extends InventarioController
 {
+
     public function __construct()
     {
         parent::__construct();
