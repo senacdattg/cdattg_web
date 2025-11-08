@@ -7,7 +7,7 @@
 @endsection
 
 @push('css')
-    @vite(['public/css/inventario/shared/base.css'])
+    @vite(['resources/css/inventario/shared/base.css'])
 @endpush
 
 @section('content_header')
@@ -124,3 +124,4 @@
 @section('footer')
     @include('layout.footer')
 @endsection
+

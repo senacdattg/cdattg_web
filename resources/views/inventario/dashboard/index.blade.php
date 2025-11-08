@@ -214,7 +214,7 @@
 
 @push('css')
     @vite([
-        'public/css/inventario/shared/base.css',
+        'resources/css/inventario/shared/base.css',
     ])
     <style>
         .chart-container {
@@ -299,3 +299,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
+

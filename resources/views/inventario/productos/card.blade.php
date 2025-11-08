@@ -241,7 +241,7 @@
     <link rel="stylesheet" href="{{ asset('css/inventario/card.css') }}">
     <link rel="stylesheet" href="{{ asset('css/inventario/modal-producto.css') }}">
     <link rel="stylesheet" href="{{ asset('css/inventario/imagen.css') }}">
-    @vite(['public/css/inventario/shared/base.css'])
+    @vite(['resources/css/inventario/shared/base.css'])
 @endpush
 
 @push('js')

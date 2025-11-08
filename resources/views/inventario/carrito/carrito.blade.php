@@ -214,7 +214,7 @@
 @endsection
 
 @push('css')
-    @vite(['public/css/inventario/shared/base.css'])
+    @vite(['resources/css/inventario/shared/base.css'])
     <link rel="stylesheet" href="{{ asset('css/inventario/carrito.css') }}">
     <style>
         .sticky-top {

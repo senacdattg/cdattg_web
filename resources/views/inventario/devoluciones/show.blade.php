@@ -152,6 +152,6 @@
 
 @push('css')
     @vite([
-        'public/css/inventario/shared/base.css',    
+        'resources/css/inventario/shared/base.css',    
     ])
 @endpush
