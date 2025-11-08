@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Inventario;
 
 use Illuminate\Http\Request;
+use App\Exceptions\OrdenException;
 use App\Models\Inventario\Orden;
 use App\Models\Inventario\DetalleOrden;
 use App\Models\Inventario\Producto;
@@ -108,7 +109,7 @@ class OrdenController extends InventarioController
 
                 // Validar stock disponible
                 if (!$producto->tieneStockDisponible($productoData['cantidad'])) {
-                    throw new \Exception(
+                    throw new OrdenException(
                         "Stock insuficiente para el producto '{$producto->producto}'. " .
                         "Disponible: {$producto->cantidad}, Solicitado: {$productoData['cantidad']}"
                     );
@@ -270,7 +271,7 @@ class OrdenController extends InventarioController
             $carrito = json_decode($validated['carrito'], true);
             
             if (empty($carrito) || !is_array($carrito)) {
-                throw new \Exception('El carrito está vacío. Agregue productos antes de crear la solicitud.');
+                throw new OrdenException('El carrito está vacío. Agregue productos antes de crear la solicitud.');
             }
 
             // Determinar el tipo de orden (PRÉSTAMO o SALIDA)
@@ -339,12 +340,12 @@ class OrdenController extends InventarioController
                 $producto = Producto::find($productoId);
                 
                 if (!$producto) {
-                    throw new \Exception("Producto con ID {$productoId} no encontrado.");
+                    throw new OrdenException("Producto con ID {$productoId} no encontrado.");
                 }
 
                 // Validar stock disponible
                 if ($producto->cantidad < $cantidad) {
-                    throw new \Exception(
+                    throw new OrdenException(
                         "Stock insuficiente para '{$producto->producto}'. " .
                         "Disponible: {$producto->cantidad}, Solicitado: {$cantidad}"
                     );
@@ -399,7 +400,7 @@ class OrdenController extends InventarioController
             ->first();
 
         if (!$parametroTipoOrden) {
-            throw new \Exception("Tipo de orden '{$codigoTipoOrden}' no encontrado. Verifique los parámetros del sistema.");
+                throw new OrdenException("Tipo de orden '{$codigoTipoOrden}' no encontrado. Verifique los parámetros del sistema.");
         }
 
         return $parametroTipoOrden;
@@ -416,7 +417,7 @@ class OrdenController extends InventarioController
             ->first();
 
         if (!$estadoEnEspera) {
-            throw new \Exception("Estado 'EN ESPERA' no encontrado. Verifique los parámetros del sistema.");
+                throw new OrdenException("Estado 'EN ESPERA' no encontrado. Verifique los parámetros del sistema.");
         }
 
         return $estadoEnEspera;
@@ -473,7 +474,7 @@ class OrdenController extends InventarioController
 
                 // Validar stock disponible
                 if (!$producto->tieneStockDisponible($productoData['cantidad'])) {
-                    throw new \Exception(
+                    throw new OrdenException(
                         "Stock insuficiente para el producto '{$producto->producto}'. " .
                         "Disponible: {$producto->cantidad}, Solicitado: {$productoData['cantidad']}"
                     );
