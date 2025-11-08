@@ -148,6 +148,9 @@ class MunicipioController extends Controller
     {
         $municipios = $this->ubicacionService->obtenerMunicipiosPorDepartamento($departamentoId);
 
-        return response()->json($municipios);
+        return response()->json([
+            'success' => true,
+            'data' => $municipios,
+        ]);
     }
 }

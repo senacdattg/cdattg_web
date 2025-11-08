@@ -23,7 +23,9 @@ class DepartamentoRepository
     public function obtenerTodos(): Collection
     {
         return $this->cache('todos', function () {
-            return Departamento::orderBy('nombre')->get();
+            return Departamento::select(['id', 'departamento as nombre', 'pais_id', 'status'])
+                ->orderBy('departamento')
+                ->get();
         }, 1440); // 24 horas
     }
 
@@ -36,8 +38,9 @@ class DepartamentoRepository
     public function obtenerPorPais(int $paisId): Collection
     {
         return $this->cache("pais.{$paisId}.departamentos", function () use ($paisId) {
-            return Departamento::where('pais_id', $paisId)
-                ->orderBy('nombre')
+            return Departamento::select(['id', 'departamento as nombre', 'pais_id'])
+                ->where('pais_id', $paisId)
+                ->orderBy('departamento')
                 ->get();
         }, 1440);
     }
