@@ -99,16 +99,22 @@ function loadMunicipiosForDepartamento(departamentoId, municipioIdToSelect = nul
             .then(response => response.json())
             .then(data => {
                 municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
-                data.forEach(municipio => {
-                    const option = document.createElement('option');
-                    option.value = municipio.id;
-                    option.textContent = municipio.municipio;
-                    // Seleccionar el municipio si coincide con el municipio_id del usuario
-                    if (municipioIdToSelect && municipio.id == municipioIdToSelect) {
-                        option.selected = true;
-                    }
-                    municipioSelect.appendChild(option);
-                });
+                if (data.success && data.data) {
+                    data.data.forEach(municipio => {
+                        const option = document.createElement('option');
+                        option.value = municipio.id;
+                        const label = municipio.nombre ?? municipio.municipio ?? municipio.name ?? '';
+                        option.textContent = label || `ID ${municipio.id}`;
+                        // Seleccionar el municipio si coincide con el municipio_id del usuario
+                        if (municipioIdToSelect && municipio.id == municipioIdToSelect) {
+                            option.selected = true;
+                        }
+                        municipioSelect.appendChild(option);
+                    });
+                } else {
+                    console.error('Estructura de datos inesperada:', data);
+                    municipioSelect.innerHTML = '<option value="">Error en estructura de datos</option>';
+                }
             })
             .catch(error => {
                 console.error('Error cargando municipios:', error);
