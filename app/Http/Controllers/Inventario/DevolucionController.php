@@ -109,8 +109,9 @@ class DevolucionController extends InventarioController
 
         $prestamos = DetalleOrden::with(['orden.tipoOrden', 'producto', 'devoluciones'])
             ->whereHas('orden', function ($query) use ($userId) {
+                // Solo préstamos
                 $query->where('user_create_id', $userId)
-                      ->whereNotNull('fecha_devolucion'); // Solo préstamos
+                      ->whereNotNull('fecha_devolucion');
             })
             ->where('estado_orden_id', 1) // Estado aprobado
             ->paginate(10)

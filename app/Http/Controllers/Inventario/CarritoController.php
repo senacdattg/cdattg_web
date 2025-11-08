@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Inventario;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Inventario\Producto;
@@ -44,34 +45,10 @@ class CarritoController extends Controller
         ]);
 
         try {
-            // Verificar stock de todos los productos
-            $erroresStock = [];
-            foreach ($validated['items'] as $item) {
-                $producto = Producto::find($item['producto_id']);
-                
-                if (!$producto) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Producto no encontrado'
-                    ], 404);
-                }
+            $availabilityResponse = $this->checkItemsAvailability($validated['items']);
 
-                if ($producto->cantidad < $item['cantidad']) {
-                    $erroresStock[] = [
-                        'producto' => $producto->producto,
-                        'solicitado' => $item['cantidad'],
-                        'disponible' => $producto->cantidad
-                    ];
-                }
-            }
-
-            // Si hay errores de stock, devolver error
-            if (!empty($erroresStock)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Stock insuficiente para algunos productos',
-                    'errores' => $erroresStock
-                ], 400);
+            if ($availabilityResponse) {
+                return $availabilityResponse;
             }
 
             // Aquí se debe crear la orden en la base de datos
@@ -206,5 +183,39 @@ class CarritoController extends Controller
                 'message' => 'Error al obtener contenido: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    private function checkItemsAvailability(array $items): ?JsonResponse
+    {
+        $erroresStock = [];
+
+        foreach ($items as $item) {
+            $producto = Producto::find($item['producto_id']);
+
+            if (!$producto) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Producto no encontrado'
+                ], 404);
+            }
+
+            if ($producto->cantidad < $item['cantidad']) {
+                $erroresStock[] = [
+                    'producto' => $producto->producto,
+                    'solicitado' => $item['cantidad'],
+                    'disponible' => $producto->cantidad
+                ];
+            }
+        }
+
+        if (!empty($erroresStock)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Stock insuficiente para algunos productos',
+                'errores' => $erroresStock
+            ], 400);
+        }
+
+        return null;
     }
 }
