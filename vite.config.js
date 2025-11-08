@@ -40,6 +40,9 @@ export default defineConfig({
                 'formulario_inscripcion': 'resources/js/complementarios/formulario-inscripcion.js',
                 'estadisticas_complementarios': 'resources/js/complementarios/estadisticas.js',
 
+                // Personas files
+                'personas-import': 'resources/js/pages/personas-import.js',
+
                 // Inventario files (comentados porque los archivos no existen)
                 // 'inventario_js': 'resources/js/inventario/inventario_listas.js',
                 // 'marcas': 'resources/js/inventario/marcas.js',
