@@ -20,6 +20,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let pollingInterval = null;
     let currentImportId = null;
 
+    const inicializarProgreso = () => {
+        panelProgreso?.classList.remove('d-none');
+        contadorProgreso.textContent = '0 / 0';
+        porcentajeProgreso.textContent = '0%';
+        barraProgreso.style.width = '0%';
+        estadoImportacion.textContent = 'PENDIENTE';
+        estadoImportacion.className = 'badge bg-secondary';
+        contadorExitosos.textContent = '0';
+        contadorDuplicados.textContent = '0';
+        contadorFaltantes.textContent = '0';
+        tablaIncidencias.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Sin incidencias registradas.</td></tr>';
+    };
+
     const actualizarIncidencias = (issues) => {
         tablaIncidencias.innerHTML = '';
 
@@ -44,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const actualizarProgreso = (datos) => {
         const { processed_rows, total_rows, success_count, duplicate_count, missing_contact_count, status } = datos.import;
 
-        panelProgreso.style.display = 'block';
+        panelProgreso?.classList.remove('d-none');
 
         const total = total_rows ?? 0;
         const procesados = processed_rows ?? 0;
@@ -171,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
             Swal.fire({ icon: 'info', title: 'Importación en marcha', text: 'El archivo se está procesando en segundo plano.' });
 
             btnRecargarIncidencias.disabled = true;
-            panelProgreso.style.display = 'block';
+            inicializarProgreso();
             monitorearImportacion(data.import_id);
         } catch (error) {
             Swal.fire({ icon: 'error', title: 'Error', text: error.message });
@@ -184,6 +197,35 @@ document.addEventListener('DOMContentLoaded', () => {
     btnRecargarIncidencias?.addEventListener('click', () => {
         if (currentImportId) {
             monitorearImportacion(currentImportId);
+        }
+    });
+
+    document.querySelectorAll('.form-eliminar-import').forEach((form) => {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const result = await Swal.fire({
+                icon: 'warning',
+                title: '¿Eliminar importación?',
+                text: 'Se eliminará el registro y el archivo cargado como evidencia.',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+            });
+
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+
+    document.querySelector('.custom-file-input')?.addEventListener('change', (event) => {
+        const input = event.target;
+        const label = input.nextElementSibling;
+
+        if (label) {
+            label.textContent = input.files?.length ? input.files[0].name : 'Elegir archivo...';
         }
     });
 

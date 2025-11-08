@@ -8,8 +8,10 @@ use App\Models\Persona;
 use App\Models\PersonaContactAlert;
 use App\Models\PersonaImport;
 use App\Models\PersonaImportIssue;
+use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -36,6 +38,10 @@ class PersonaImportService
         'CEDULA DE EXTRANJERIA' => 'CEDULA DE EXTRANJERIA',
         'PASAPORTE' => 'PASAPORTE',
         'PA' => 'PASAPORTE',
+        'PPT' => 'PERMISO POR PROTECCION TEMPORAL',
+        'PERMISO POR PROTECCION TEMPORAL' => 'PERMISO POR PROTECCION TEMPORAL',
+        'PERMISO POR PROTECCIÓN TEMPORAL' => 'PERMISO POR PROTECCION TEMPORAL',
+        'PERMISO PROTECCION TEMPORAL' => 'PERMISO POR PROTECCION TEMPORAL',
         'TI' => 'TARJETA DE IDENTIDAD',
         'T.I.' => 'TARJETA DE IDENTIDAD',
         'TARJETA DE IDENTIDAD' => 'TARJETA DE IDENTIDAD',
@@ -43,6 +49,7 @@ class PersonaImportService
         'R.C.' => 'REGISTRO CIVIL',
         'REGISTRO CIVIL' => 'REGISTRO CIVIL',
         'SIN DOCUMENTO' => 'SIN IDENTIFICACION',
+        'SIN' => 'SIN IDENTIFICACION',
         'SD' => 'SIN IDENTIFICACION',
         'S/D' => 'SIN IDENTIFICACION',
         'SIN IDENTIFICACION' => 'SIN IDENTIFICACION',
@@ -57,7 +64,13 @@ class PersonaImportService
 
     public function iniciarImportacion(UploadedFile $file, int $userId): PersonaImport
     {
-        $storedPath = $file->store('imports/personas', 'local');
+        $timestamp = now()->format('Ymd_His');
+        $extension = strtolower($file->getClientOriginalExtension() ?: 'xlsx');
+        $baseName = Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME));
+        $baseName = $baseName ? $baseName : 'archivo';
+        $fileName = "{$timestamp}_usuario{$userId}_{$baseName}.{$extension}";
+
+        $storedPath = $file->storeAs('carga_masiva', $fileName, 'local');
 
         $import = PersonaImport::create([
             'user_id' => $userId,
@@ -195,6 +208,10 @@ class PersonaImportService
                         'user_create_id' => $import->user_id,
                         'user_edit_id' => $import->user_id,
                     ]);
+
+                    if ($persona->email && $persona->numero_documento && !$persona->user) {
+                        $this->crearUsuarioVisitante($persona);
+                    }
 
                     $faltantes = [
                         'missing_email' => empty($data['email']),
@@ -380,8 +397,13 @@ class PersonaImportService
                 $esDuplicado = true;
                 $this->registrarIssue($import, $rowNumber, 'duplicate_email_in_file', $numeroDocumento, $email, $celular, $raw);
             } elseif (in_array($emailKey, $existsCaches['emails'], true)) {
-                $esDuplicado = true;
-                $this->registrarIssue($import, $rowNumber, 'duplicate_email_existing', $numeroDocumento, $email, $celular, $raw);
+                if ($this->limpiarCampoDuplicado('email', $emailKey, $numeroDocumento)) {
+                    $existsCaches['emails'] = array_values(array_diff($existsCaches['emails'], [$emailKey]));
+                    $this->emailSeen[$emailKey] = true;
+                } else {
+                    $esDuplicado = true;
+                    $this->registrarIssue($import, $rowNumber, 'duplicate_email_existing', $numeroDocumento, $email, $celular, $raw);
+                }
             } else {
                 $this->emailSeen[$emailKey] = true;
             }
@@ -392,8 +414,13 @@ class PersonaImportService
                 $esDuplicado = true;
                 $this->registrarIssue($import, $rowNumber, 'duplicate_celular_in_file', $numeroDocumento, $email, $celular, $raw);
             } elseif (in_array($celular, $existsCaches['celulares'], true)) {
-                $esDuplicado = true;
-                $this->registrarIssue($import, $rowNumber, 'duplicate_celular_existing', $numeroDocumento, $email, $celular, $raw);
+                if ($this->limpiarCampoDuplicado('celular', $celular, $numeroDocumento)) {
+                    $existsCaches['celulares'] = array_values(array_diff($existsCaches['celulares'], [$celular]));
+                    $this->celularSeen[$celular] = true;
+                } else {
+                    $esDuplicado = true;
+                    $this->registrarIssue($import, $rowNumber, 'duplicate_celular_existing', $numeroDocumento, $email, $celular, $raw);
+                }
             } else {
                 $this->celularSeen[$celular] = true;
             }
@@ -404,8 +431,13 @@ class PersonaImportService
                 $esDuplicado = true;
                 $this->registrarIssue($import, $rowNumber, 'duplicate_telefono_in_file', $numeroDocumento, $email, $celular, $raw);
             } elseif (in_array($telefono, $existsCaches['telefonos'], true)) {
-                $esDuplicado = true;
-                $this->registrarIssue($import, $rowNumber, 'duplicate_telefono_existing', $numeroDocumento, $email, $celular, $raw);
+                if ($this->limpiarCampoDuplicado('telefono', $telefono, $numeroDocumento)) {
+                    $existsCaches['telefonos'] = array_values(array_diff($existsCaches['telefonos'], [$telefono]));
+                    $this->telefonoSeen[$telefono] = true;
+                } else {
+                    $esDuplicado = true;
+                    $this->registrarIssue($import, $rowNumber, 'duplicate_telefono_existing', $numeroDocumento, $email, $celular, $raw);
+                }
             } else {
                 $this->telefonoSeen[$telefono] = true;
             }
@@ -415,6 +447,38 @@ class PersonaImportService
             'es_duplicado' => $esDuplicado,
             'tipo_documento_id' => $tipoDocumentoId,
         ];
+    }
+
+    private function limpiarCampoDuplicado(string $campo, string $valor, string $numeroDocumento): bool
+    {
+        $personas = Persona::where($campo, $valor)->get();
+
+        if ($personas->isEmpty()) {
+            return false;
+        }
+
+        $actualizado = false;
+
+        foreach ($personas as $persona) {
+            if ((string) $persona->numero_documento !== (string) $numeroDocumento) {
+                $persona->update([$campo => null]);
+                $actualizado = true;
+            }
+        }
+
+        return $actualizado;
+    }
+
+    private function crearUsuarioVisitante(Persona $persona): void
+    {
+        $user = User::create([
+            'email' => $persona->email,
+            'password' => Hash::make($persona->numero_documento),
+            'status' => 1,
+            'persona_id' => $persona->id,
+        ]);
+
+        $user->assignRole('VISITANTE');
     }
 
     private function registrarIssue(PersonaImport $import, int $rowNumber, string $issueType, ?string $documento, ?string $email, ?string $celular, array $raw): void

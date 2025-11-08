@@ -6,6 +6,10 @@ use App\Http\Requests\PersonaImportRequest;
 use App\Models\PersonaImport;
 use App\Services\PersonaImportService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 class PersonaImportController extends Controller
@@ -19,6 +23,7 @@ class PersonaImportController extends Controller
     public function create(): View
     {
         $importaciones = PersonaImport::query()
+            ->with(['user.persona'])
             ->withCount('issues')
             ->orderByDesc('created_at')
             ->limit(12)
@@ -50,13 +55,15 @@ class PersonaImportController extends Controller
             ->latest()
             ->limit(50)
             ->get()
-            ->map(fn($issue) => [
-                'row_number' => $issue->row_number,
-                'issue_type' => $issue->issue_type,
-                'numero_documento' => $issue->numero_documento,
-                'email' => $issue->email,
-                'celular' => $issue->celular,
-            ]);
+            ->map(function ($issue) {
+                return [
+                    'row_number' => $issue->row_number,
+                    'issue_type' => $this->traducirIssueType($issue->issue_type),
+                    'numero_documento' => $issue->numero_documento,
+                    'email' => $issue->email,
+                    'celular' => $issue->celular,
+                ];
+            });
 
         return response()->json([
             'import' => [
@@ -75,5 +82,46 @@ class PersonaImportController extends Controller
             ],
             'issues' => $issues,
         ]);
+    }
+
+    public function destroy(PersonaImport $personaImport): RedirectResponse
+    {
+        DB::transaction(function () use ($personaImport) {
+            $personaImport->issues()->delete();
+            $personaImport->contactAlerts()->delete();
+
+            if ($personaImport->path && $personaImport->disk) {
+                Storage::disk($personaImport->disk)->delete($personaImport->path);
+            }
+
+            $personaImport->delete();
+        });
+
+        return redirect()
+            ->route('personas.import.create')
+            ->with('success', 'La importación y su evidencia fueron eliminadas correctamente.');
+    }
+
+    private function traducirIssueType(?string $issueType): string
+    {
+        $labels = [
+            'missing_document' => 'Documento de identidad ausente',
+            'missing_required_fields' => 'Faltan nombres o apellidos obligatorios',
+            'duplicate_document_in_file' => 'Documento repetido en el archivo',
+            'duplicate_document_existing' => 'Documento ya registrado en el sistema',
+            'duplicate_email_in_file' => 'Correo repetido en el archivo',
+            'duplicate_email_existing' => 'Correo ya registrado en el sistema',
+            'duplicate_celular_in_file' => 'Celular repetido en el archivo',
+            'duplicate_celular_existing' => 'Celular ya registrado en el sistema',
+            'duplicate_telefono_in_file' => 'Teléfono repetido en el archivo',
+            'duplicate_telefono_existing' => 'Teléfono ya registrado en el sistema',
+            'persist_error' => 'Error guardando el registro',
+        ];
+
+        if ($issueType === null) {
+            return 'Incidencia sin clasificar';
+        }
+
+        return $labels[$issueType] ?? Str::headline(str_replace('_', ' ', $issueType));
     }
 }

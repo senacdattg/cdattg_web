@@ -17,7 +17,6 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\CategoriaCaracterizacionComplementario;
 
@@ -60,100 +59,6 @@ class PersonaController extends Controller
         return view('personas.index');
     }
 
-    public function datatable(Request $request): JsonResponse
-    {
-        $this->authorize('VER PERSONA');
-
-        $baseQuery = Persona::query()->with(['user']);
-
-        $recordsTotal = (clone $baseQuery)->count();
-
-        $filteredQuery = clone $baseQuery;
-
-        $searchValue = $request->input('search.value');
-        if ($searchValue) {
-            $filteredQuery->where(function ($query) use ($searchValue) {
-                $query->where('primer_nombre', 'like', "%{$searchValue}%")
-                    ->orWhere('segundo_nombre', 'like', "%{$searchValue}%")
-                    ->orWhere('primer_apellido', 'like', "%{$searchValue}%")
-                    ->orWhere('segundo_apellido', 'like', "%{$searchValue}%")
-                    ->orWhere('numero_documento', 'like', "%{$searchValue}%")
-                    ->orWhere('email', 'like', "%{$searchValue}%");
-            });
-        }
-
-        $estado = $request->input('estado');
-        $estadoAplicado = false;
-        if ($estado && $estado !== 'todos') {
-            $estadoAplicado = true;
-            $filteredQuery->where('status', $estado === 'activos' ? 1 : 0);
-        }
-
-        $requiresFiltering = $searchValue || $estadoAplicado;
-        $recordsFiltered = $requiresFiltering ? (clone $filteredQuery)->count() : $recordsTotal;
-
-        $registradosSofiaTotal = (clone $baseQuery)->where('estado_sofia', 1)->count();
-        $registradosSofiaFiltrados = (clone $filteredQuery)->where('estado_sofia', 1)->count();
-
-        $columns = [
-            0 => 'id',
-            1 => 'primer_nombre',
-            2 => 'numero_documento',
-            3 => 'email',
-            4 => 'telefono',
-            5 => 'celular',
-            6 => 'status',
-            7 => 'estado_sofia',
-        ];
-
-        $orderColumnIndex = (int) $request->input('order.0.column', 0);
-        $orderDirection = $request->input('order.0.dir', 'asc');
-        $orderColumn = $columns[$orderColumnIndex] ?? 'id';
-
-        $start = (int) $request->input('start', 0);
-        $length = (int) $request->input('length', 10);
-
-        $personasQuery = (clone $filteredQuery)->orderBy($orderColumn, $orderDirection);
-
-        if ($length !== -1) {
-            $personasQuery->skip($start)->take($length);
-        }
-
-        $personas = $personasQuery->get();
-
-        $data = $personas->map(function (Persona $persona, $index) use ($start) {
-            $badgeNoRegistrado = '<span class="badge badge-secondary">No registrado</span>';
-            $telefono = $persona->telefono ? e($persona->telefono) : $badgeNoRegistrado;
-            $celular = $persona->celular
-                ? '<a href="https://wa.me/' . e($persona->celular) . '" target="_blank" class="text-decoration-none">' .
-                    e($persona->celular) . ' <i class="fab fa-whatsapp text-success"></i></a>'
-                : $badgeNoRegistrado;
-
-            return [
-                'index' => $start + $index + 1,
-                'nombre' => $persona->nombre_completo,
-                'numero_documento' => $persona->numero_documento,
-                'email' => $persona->email,
-                'telefono' => $telefono,
-                'celular' => $celular,
-                'estado' => view('personas.partials.estado', ['persona' => $persona])->render(),
-                'estado_sofia' => view('personas.partials.estado-sofia', ['persona' => $persona])->render(),
-                'acciones' => view('personas.partials.acciones', ['persona' => $persona])->render(),
-            ];
-        });
-
-        return response()->json([
-            'draw' => (int) $request->input('draw'),
-            'recordsTotal' => $recordsTotal,
-            'recordsFiltered' => $recordsFiltered,
-            'sofia_registrados_total' => $registradosSofiaTotal,
-            'sofia_registrados_filtrados' => $registradosSofiaFiltrados,
-            'total_general' => $recordsTotal,
-            'total_filtrado' => $recordsFiltered,
-            'data' => $data,
-        ]);
-    }
-
     /**
      * Show the form for creating a new resource.
      */
@@ -161,9 +66,9 @@ class PersonaController extends Controller
     {
         $documentos = $this->temaRepo->obtenerTiposDocumento();
         $generos = $this->temaRepo->obtenerGeneros();
-        $paises = \App\Models\Pais::where('status', 1)->get();
-        $departamentos = \App\Models\Departamento::where('status', 1)->get();
-        $municipios = \App\Models\Municipio::where('status', 1)->get();
+        $paises = Pais::where('status', 1)->get();
+        $departamentos = Departamento::where('status', 1)->get();
+        $municipios = Municipio::where('status', 1)->get();
 
         return view('personas.create', compact('documentos', 'generos', 'paises', 'departamentos', 'municipios'));
     }
@@ -244,7 +149,7 @@ class PersonaController extends Controller
                 $data = $request->validated();
                 $caracterizacionesIds = collect($request->input('caracterizacion_ids', []))
                     ->filter()
-                    ->map(fn ($id) => (int) $id)
+                    ->map(fn($id) => (int) $id)
                     ->unique()
                     ->values();
 
@@ -273,6 +178,121 @@ class PersonaController extends Controller
     }
 
     /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Persona $persona)
+    {
+        try {
+            DB::transaction(function () use ($persona) {
+                $persona->delete();
+            });
+
+            return redirect()->route('personas.index')->with('success', 'Persona eliminada exitosamente');
+        } catch (QueryException $e) {
+            Log::error("Error al eliminar la persona (ID: {$persona->id}): " . $e->getMessage());
+
+            return redirect()->back()->with('error', 'No se pudo eliminar la persona. Es posible que tenga un usuario asociado.');
+        } catch (\Exception $e) {
+            Log::error("Error inesperado al eliminar la persona (ID: {$persona->id}): " . $e->getMessage());
+
+            return redirect()->back()->with('error', 'Ocurrió un error inesperado. Por favor, inténtelo de nuevo.');
+        }
+    }
+
+    public function datatable(Request $request): JsonResponse
+    {
+        $this->authorize('VER PERSONA');
+
+        $baseQuery = Persona::query()->with(['user']);
+
+        $recordsTotal = (clone $baseQuery)->count();
+
+        $filteredQuery = clone $baseQuery;
+
+        $searchValue = $request->input('search.value');
+        if ($searchValue) {
+            $filteredQuery->where(function ($query) use ($searchValue) {
+                $query->where('primer_nombre', 'like', "%{$searchValue}%")
+                    ->orWhere('segundo_nombre', 'like', "%{$searchValue}%")
+                    ->orWhere('primer_apellido', 'like', "%{$searchValue}%")
+                    ->orWhere('segundo_apellido', 'like', "%{$searchValue}%")
+                    ->orWhere('numero_documento', 'like', "%{$searchValue}%")
+                    ->orWhere('email', 'like', "%{$searchValue}%");
+            });
+        }
+
+        $estado = $request->input('estado');
+        $estadoAplicado = false;
+        if ($estado && $estado !== 'todos') {
+            $estadoAplicado = true;
+            $filteredQuery->where('status', $estado === 'activos' ? 1 : 0);
+        }
+
+        $requiresFiltering = $searchValue || $estadoAplicado;
+        $recordsFiltered = $requiresFiltering ? (clone $filteredQuery)->count() : $recordsTotal;
+
+        $registradosSofiaTotal = (clone $baseQuery)->where('estado_sofia', 1)->count();
+        $registradosSofiaFiltrados = (clone $filteredQuery)->where('estado_sofia', 1)->count();
+
+        $columns = [
+            0 => 'id',
+            1 => 'primer_nombre',
+            2 => 'numero_documento',
+            3 => 'email',
+            4 => 'telefono',
+            5 => 'celular',
+            6 => 'status',
+            7 => 'estado_sofia',
+        ];
+
+        $orderColumnIndex = (int) $request->input('order.0.column', 0);
+        $orderDirection = $request->input('order.0.dir', 'asc');
+        $orderColumn = $columns[$orderColumnIndex] ?? 'id';
+
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        $personasQuery = (clone $filteredQuery)->orderBy($orderColumn, $orderDirection);
+
+        if ($length !== -1) {
+            $personasQuery->skip($start)->take($length);
+        }
+
+        $personas = $personasQuery->get();
+
+        $data = $personas->map(function (Persona $persona, $index) use ($start) {
+            $badgeNoRegistrado = '<span class="badge bg-danger text-white px-2 py-1">No registrado</span>';
+            $email = $persona->email ? e($persona->email) : $badgeNoRegistrado;
+            $celular = $persona->celular
+                ? '<a href="https://wa.me/' . e($persona->celular) . '" target="_blank" class="text-decoration-none">' .
+                e($persona->celular) . ' <i class="fab fa-whatsapp text-success"></i></a>'
+                : $badgeNoRegistrado;
+
+            return [
+                'index' => $start + $index + 1,
+                'nombre' => $persona->nombre_completo,
+                'numero_documento' => $persona->numero_documento,
+                'email' => $email,
+                'celular' => $celular,
+                'estado' => view('personas.partials.estado', ['persona' => $persona])->render(),
+                'estado_sofia' => view('personas.partials.estado-sofia', ['persona' => $persona])->render(),
+                'acciones' => view('personas.partials.acciones', ['persona' => $persona])->render(),
+            ];
+        });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'sofia_registrados_total' => $registradosSofiaTotal,
+            'sofia_registrados_filtrados' => $registradosSofiaFiltrados,
+            'total_general' => $recordsTotal,
+            'total_filtrado' => $recordsFiltered,
+            'data' => $data,
+        ]);
+    }
+
+    /**
      * Cambia el estado de una persona.
      *
      * Este método alterna el estado de una persona entre activo (1) e inactivo (0).
@@ -296,44 +316,5 @@ class PersonaController extends Controller
 
             return redirect()->back()->with('error', 'No se pudo actualizar el estado.');
         }
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Persona $persona)
-    {
-        try {
-            DB::transaction(function () use ($persona) {
-                $persona->delete();
-            });
-
-            return redirect()->route('personas.index')->with('success', 'Persona eliminada exitosamente');
-        } catch (QueryException $e) {
-            Log::error("Error al eliminar la persona (ID: {$persona->id}): " . $e->getMessage());
-
-            return redirect()->back()->with('error', 'No se pudo eliminar la persona. Es posible que tenga un usuario asociado.');
-        } catch (\Exception $e) {
-            Log::error("Error inesperado al eliminar la persona (ID: {$persona->id}): " . $e->getMessage());
-
-            return redirect()->back()->with('error', 'Ocurrió un error inesperado. Por favor, inténtelo de nuevo.');
-        }
-    }
-
-    /**
-     * Crea un nuevo usuario basado en la información de una persona.
-     *
-     * @param Persona $persona La instancia de la persona de la cual se creará el usuario.
-     * @return void
-     */
-    function crearUsuarioPersona(Persona $persona)
-    {
-        $user = User::create([
-            'email' => $persona->email,
-            'password' => Hash::make($persona->numero_documento),
-            'persona_id' => $persona->id,
-        ]);
-
-        $user->assignRole('VISITANTE');
     }
 }
