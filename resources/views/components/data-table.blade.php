@@ -19,7 +19,8 @@
     'emptyMessage' => 'No hay registros disponibles',
     'emptyIcon' => 'fa-inbox',
     'emptyImage' => null,
-    'colspan' => null
+    'colspan' => null,
+    'tableId' => null,
 ])
 
 <div class="card {{ $cardClass }}">
@@ -71,7 +72,7 @@
     
     <div class="card-body p-0">
         <div class="table-responsive">
-            <table class="{{ $tableClass }}">
+            <table @if($tableId) id="{{ $tableId }}" @endif class="{{ $tableClass }}">
                 <thead class="thead-light">
                     <tr>
                         @foreach($columns as $column)

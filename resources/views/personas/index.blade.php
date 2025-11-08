@@ -2,6 +2,7 @@
 
 @section('css')
     @vite(['resources/css/parametros.css'])
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.8/css/dataTables.bootstrap4.min.css">
 @endsection
 
 @section('content_header')
@@ -27,73 +28,18 @@
                         </div>
                     </div>
 
-                    <x-data-table title="Lista de Personas" searchable="true" searchAction="{{ route('personas.index') }}"
-                        searchPlaceholder="Buscar persona..." searchValue="{{ request('search') }}" :columns="[
+                    <x-data-table title="Lista de Personas" :paginated="false" :searchable="false" tableId="personas-table"
+                        :columns="[
                             ['label' => '#', 'width' => '5%'],
                             ['label' => 'Nombre y Apellido', 'width' => '25%'],
                             ['label' => 'Número de Documento', 'width' => '20%'],
                             ['label' => 'Correo Electrónico', 'width' => '25%'],
                             ['label' => 'Estado', 'width' => '10%'],
                             ['label' => 'Opciones', 'width' => '15%', 'class' => 'text-center'],
-                        ]"
-                        :pagination="$personas->links()">
-                        @forelse ($personas as $persona)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $persona->nombre_completo }}</td>
-                                <td>{{ $persona->numero_documento }}</td>
-                                <td>{{ $persona->email }}</td>
-                                <td class="text-center">
-                                    <span class="badge badge-{{ $persona->status === 1 ? 'success' : 'danger' }}">
-                                        {{ $persona->status === 1 ? 'ACTIVO' : 'INACTIVO' }}
-                                    </span>
-                                </td>
-                                <td class="text-center">
-                                    <div class="btn-group" role="group">
-                                        @can('CAMBIAR ESTADO PERSONA')
-                                            <form class="d-inline"
-                                                action="{{ route('persona.cambiarEstadoPersona', $persona->id) }}"
-                                                method="POST" title="Cambiar Estado"
-                                                style="display: inline-block; margin-right: 2px;">
-                                                @csrf
-                                                @method('PUT')
-                                                <button type="submit" class="btn btn-sm btn-light">
-                                                    <i class="fas fa-sync text-success"></i>
-                                                </button>
-                                            </form>
-                                        @endcan
-                                        @can('VER PERSONA')
-                                            <a href="{{ route('personas.show', $persona->id) }}" class="btn btn-sm btn-light"
-                                                title="Ver" style="margin-right: 2px;">
-                                                <i class="fas fa-eye text-warning"></i>
-                                            </a>
-                                        @endcan
-                                        @can('EDITAR PERSONA')
-                                            <a href="{{ route('personas.edit', $persona->id) }}" class="btn btn-sm btn-light"
-                                                title="Editar" style="margin-right: 2px;">
-                                                <i class="fas fa-pencil-alt text-primary"></i>
-                                            </a>
-                                        @endcan
-                                        @can('ELIMINAR PERSONA')
-                                            <form class="d-inline eliminar-persona-form"
-                                                action="{{ route('personas.destroy', $persona->id) }}" method="POST"
-                                                title="Eliminar" style="display: inline-block;"
-                                                onsubmit="return confirm('¿Está seguro de eliminar esta persona?')">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="btn btn-sm btn-light">
-                                                    <i class="fas fa-trash-alt text-danger"></i>
-                                                </button>
-                                            </form>
-                                        @endcan
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="text-center">No hay personas registradas</td>
-                            </tr>
-                        @endforelse
+                        ]">
+                        <tr>
+                            <td colspan="6" class="text-center text-muted">Cargando registros...</td>
+                        </tr>
                     </x-data-table>
                 </div>
             </div>
@@ -111,4 +57,75 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     @vite(['resources/js/parametros.js'])
     @vite(['resources/js/pages/formularios-generico.js'])
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap4.min.js"></script>
+    <script>
+        $(function() {
+            $('#personas-table').DataTable({
+                processing: true,
+                serverSide: true,
+                ajax: function(data, callback) {
+                    axios.get('{{ route('personas.datatable') }}', {
+                            params: data
+                        })
+                        .then(function(response) {
+                            callback(response.data);
+                        })
+                        .catch(function(error) {
+                            console.error('Error al cargar personas:', error);
+                            callback({
+                                draw: data.draw,
+                                recordsTotal: 0,
+                                recordsFiltered: 0,
+                                data: []
+                            });
+                        });
+                },
+                language: {
+                    url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json'
+                },
+                pageLength: 10,
+                lengthMenu: [10, 25, 50, 100],
+                order: [
+                    [0, 'desc']
+                ],
+                columns: [{
+                        data: 'index',
+                        name: 'index'
+                    },
+                    {
+                        data: 'nombre',
+                        name: 'nombre'
+                    },
+                    {
+                        data: 'numero_documento',
+                        name: 'numero_documento'
+                    },
+                    {
+                        data: 'email',
+                        name: 'email'
+                    },
+                    {
+                        data: 'estado',
+                        name: 'estado',
+                        orderable: false,
+                        searchable: false,
+                        render: function(data) {
+                            return data;
+                        }
+                    },
+                    {
+                        data: 'acciones',
+                        name: 'acciones',
+                        orderable: false,
+                        searchable: false,
+                        render: function(data) {
+                            return data;
+                        }
+                    },
+                ]
+            });
+        });
+    </script>
 @endsection

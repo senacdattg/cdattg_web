@@ -14,6 +14,7 @@ use App\Models\Municipio;
 use App\Http\Requests\StorePersonaRequest;
 use App\Http\Requests\UpdatePersonaRequest;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -55,8 +56,71 @@ class PersonaController extends Controller
      */
     public function index()
     {
-        $personas = $this->personaService->listar(10);
-        return view('personas.index', compact('personas'));
+        return view('personas.index');
+    }
+
+    public function datatable(Request $request): JsonResponse
+    {
+        $this->authorize('VER PERSONA');
+
+        $baseQuery = Persona::query()->with(['user']);
+
+        $recordsTotal = (clone $baseQuery)->count();
+
+        if ($search = $request->input('search.value')) {
+            $baseQuery->where(function ($query) use ($search) {
+                $query->where('primer_nombre', 'like', "%{$search}%")
+                    ->orWhere('segundo_nombre', 'like', "%{$search}%")
+                    ->orWhere('primer_apellido', 'like', "%{$search}%")
+                    ->orWhere('segundo_apellido', 'like', "%{$search}%")
+                    ->orWhere('numero_documento', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $filteredQuery = clone $baseQuery;
+        $recordsFiltered = $filteredQuery->count();
+
+        $columns = [
+            0 => 'id',
+            1 => 'primer_nombre',
+            2 => 'numero_documento',
+            3 => 'email',
+            4 => 'status',
+        ];
+
+        $orderColumnIndex = (int) $request->input('order.0.column', 0);
+        $orderDirection = $request->input('order.0.dir', 'asc');
+        $orderColumn = $columns[$orderColumnIndex] ?? 'id';
+
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        $personasQuery = $filteredQuery->orderBy($orderColumn, $orderDirection);
+
+        if ($length !== -1) {
+            $personasQuery->skip($start)->take($length);
+        }
+
+        $personas = $personasQuery->get();
+
+        $data = $personas->map(function (Persona $persona, $index) use ($start) {
+            return [
+                'index' => $start + $index + 1,
+                'nombre' => $persona->nombre_completo,
+                'numero_documento' => $persona->numero_documento,
+                'email' => $persona->email,
+                'estado' => view('personas.partials.estado', ['persona' => $persona])->render(),
+                'acciones' => view('personas.partials.acciones', ['persona' => $persona])->render(),
+            ];
+        });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'data' => $data,
+        ]);
     }
 
     /**

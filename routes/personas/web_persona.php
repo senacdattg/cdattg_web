@@ -10,6 +10,8 @@ Route::middleware('can:CREAR PERSONA')->group(function () {
     Route::get('/personas/importar/{personaImport}/estado', [PersonaImportController::class, 'status'])->name('personas.import.status');
 });
 
+Route::middleware('can:VER PERSONA')->get('/personas/datatable', [PersonaController::class, 'datatable'])->name('personas.datatable');
+
 Route::resource('personas', PersonaController::class);
 
 Route::middleware('can:CAMBIAR ESTADO PERSONA')->group(function () {
