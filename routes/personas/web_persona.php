@@ -2,6 +2,15 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PersonaController;
+use App\Http\Controllers\PersonaImportController;
+
+Route::middleware('can:CREAR PERSONA')->group(function () {
+    Route::get('/personas/importar', [PersonaImportController::class, 'create'])->name('personas.import.create');
+    Route::post('/personas/importar', [PersonaImportController::class, 'store'])->name('personas.import.store');
+    Route::get('/personas/importar/{personaImport}/estado', [PersonaImportController::class, 'status'])->name('personas.import.status');
+});
+
+Route::middleware('can:VER PERSONA')->get('/personas/datatable', [PersonaController::class, 'datatable'])->name('personas.datatable');
 
 Route::resource('personas', PersonaController::class);
 

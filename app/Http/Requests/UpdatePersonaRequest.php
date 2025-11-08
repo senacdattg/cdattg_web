@@ -49,6 +49,8 @@ class UpdatePersonaRequest extends FormRequest
             'departamento_id'     => 'required|exists:departamentos,id',
             'municipio_id'        => 'required|exists:municipios,id',
             'direccion'           => 'required|string|max:255',
+            'caracterizacion_ids'   => 'nullable|array',
+            'caracterizacion_ids.*' => 'integer|exists:categorias_caracterizacion_complementarios,id',
         ];
     }
 
@@ -81,6 +83,9 @@ class UpdatePersonaRequest extends FormRequest
             'direccion.required'           => 'La dirección es obligatoria.',
             'direccion.string'             => 'La dirección debe ser una cadena de texto.',
             'direccion.max'                => 'La dirección no puede tener más de 255 caracteres.',
+            'caracterizacion_ids.array'    => 'Las caracterizaciones deben enviarse en una lista válida.',
+            'caracterizacion_ids.*.integer'=> 'El identificador de caracterización no es válido.',
+            'caracterizacion_ids.*.exists' => 'Alguna de las caracterizaciones seleccionadas no existe.',
         ];
     }
 }

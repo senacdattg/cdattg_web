@@ -14,10 +14,12 @@ use App\Models\Municipio;
 use App\Http\Requests\StorePersonaRequest;
 use App\Http\Requests\UpdatePersonaRequest;
 use Illuminate\Database\QueryException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\CategoriaCaracterizacionComplementario;
 
 class PersonaController extends Controller
 {
@@ -37,7 +39,7 @@ class PersonaController extends Controller
 
         // Restringir acceso a aspirantes - no pueden ver el módulo de personas
         $this->middleware(function ($request, $next) {
-            if (auth()->user()->hasRole('ASPIRANTE')) {
+            if ($request->user()?->hasRole('ASPIRANTE')) {
                 abort(403, 'No tienes permiso para acceder a este módulo.');
             }
             return $next($request);
@@ -55,8 +57,101 @@ class PersonaController extends Controller
      */
     public function index()
     {
-        $personas = $this->personaService->listar(10);
-        return view('personas.index', compact('personas'));
+        return view('personas.index');
+    }
+
+    public function datatable(Request $request): JsonResponse
+    {
+        $this->authorize('VER PERSONA');
+
+        $baseQuery = Persona::query()->with(['user']);
+
+        $recordsTotal = (clone $baseQuery)->count();
+
+        $filteredQuery = clone $baseQuery;
+
+        $searchValue = $request->input('search.value');
+        if ($searchValue) {
+            $filteredQuery->where(function ($query) use ($searchValue) {
+                $query->where('primer_nombre', 'like', "%{$searchValue}%")
+                    ->orWhere('segundo_nombre', 'like', "%{$searchValue}%")
+                    ->orWhere('primer_apellido', 'like', "%{$searchValue}%")
+                    ->orWhere('segundo_apellido', 'like', "%{$searchValue}%")
+                    ->orWhere('numero_documento', 'like', "%{$searchValue}%")
+                    ->orWhere('email', 'like', "%{$searchValue}%");
+            });
+        }
+
+        $estado = $request->input('estado');
+        $estadoAplicado = false;
+        if ($estado && $estado !== 'todos') {
+            $estadoAplicado = true;
+            $filteredQuery->where('status', $estado === 'activos' ? 1 : 0);
+        }
+
+        $requiresFiltering = $searchValue || $estadoAplicado;
+        $recordsFiltered = $requiresFiltering ? (clone $filteredQuery)->count() : $recordsTotal;
+
+        $registradosSofiaTotal = (clone $baseQuery)->where('estado_sofia', 1)->count();
+        $registradosSofiaFiltrados = (clone $filteredQuery)->where('estado_sofia', 1)->count();
+
+        $columns = [
+            0 => 'id',
+            1 => 'primer_nombre',
+            2 => 'numero_documento',
+            3 => 'email',
+            4 => 'telefono',
+            5 => 'celular',
+            6 => 'status',
+            7 => 'estado_sofia',
+        ];
+
+        $orderColumnIndex = (int) $request->input('order.0.column', 0);
+        $orderDirection = $request->input('order.0.dir', 'asc');
+        $orderColumn = $columns[$orderColumnIndex] ?? 'id';
+
+        $start = (int) $request->input('start', 0);
+        $length = (int) $request->input('length', 10);
+
+        $personasQuery = (clone $filteredQuery)->orderBy($orderColumn, $orderDirection);
+
+        if ($length !== -1) {
+            $personasQuery->skip($start)->take($length);
+        }
+
+        $personas = $personasQuery->get();
+
+        $data = $personas->map(function (Persona $persona, $index) use ($start) {
+            $badgeNoRegistrado = '<span class="badge badge-secondary">No registrado</span>';
+            $telefono = $persona->telefono ? e($persona->telefono) : $badgeNoRegistrado;
+            $celular = $persona->celular
+                ? '<a href="https://wa.me/' . e($persona->celular) . '" target="_blank" class="text-decoration-none">' .
+                    e($persona->celular) . ' <i class="fab fa-whatsapp text-success"></i></a>'
+                : $badgeNoRegistrado;
+
+            return [
+                'index' => $start + $index + 1,
+                'nombre' => $persona->nombre_completo,
+                'numero_documento' => $persona->numero_documento,
+                'email' => $persona->email,
+                'telefono' => $telefono,
+                'celular' => $celular,
+                'estado' => view('personas.partials.estado', ['persona' => $persona])->render(),
+                'estado_sofia' => view('personas.partials.estado-sofia', ['persona' => $persona])->render(),
+                'acciones' => view('personas.partials.acciones', ['persona' => $persona])->render(),
+            ];
+        });
+
+        return response()->json([
+            'draw' => (int) $request->input('draw'),
+            'recordsTotal' => $recordsTotal,
+            'recordsFiltered' => $recordsFiltered,
+            'sofia_registrados_total' => $registradosSofiaTotal,
+            'sofia_registrados_filtrados' => $registradosSofiaFiltrados,
+            'total_general' => $recordsTotal,
+            'total_filtrado' => $recordsFiltered,
+            'data' => $data,
+        ]);
     }
 
     /**
@@ -116,13 +211,26 @@ class PersonaController extends Controller
         $departamentos = Departamento::where('status', 1)->get();
         $municipios = Municipio::where('status', 1)->get();
 
+        $persona->loadMissing('caracterizacionesComplementarias');
+
+        $categoriasCaracterizacion = CategoriaCaracterizacionComplementario::with([
+            'children' => function ($query) {
+                $query->where('activo', 1)->orderBy('nombre');
+            },
+        ])
+            ->whereNull('parent_id')
+            ->where('activo', 1)
+            ->orderBy('nombre')
+            ->get();
+
         return view('personas.edit', [
             'persona' => $persona,
             'documentos' => $documentos,
             'generos' => $generos,
             'paises' => $paises,
             'departamentos' => $departamentos,
-            'municipios' => $municipios
+            'municipios' => $municipios,
+            'categoriasCaracterizacion' => $categoriasCaracterizacion,
         ]);
     }
 
@@ -134,7 +242,18 @@ class PersonaController extends Controller
         try {
             DB::transaction(function () use ($request, $persona) {
                 $data = $request->validated();
+                $caracterizacionesIds = collect($request->input('caracterizacion_ids', []))
+                    ->filter()
+                    ->map(fn ($id) => (int) $id)
+                    ->unique()
+                    ->values();
+
+                $data['caracterizacion_id'] = $caracterizacionesIds->first() ?: null;
+                unset($data['caracterizacion_ids']);
+
                 $persona->update($data);
+
+                $persona->caracterizacionesComplementarias()->sync($caracterizacionesIds);
 
                 if ($persona->user) {
                     $persona->user->update([
