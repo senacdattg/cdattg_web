@@ -819,6 +819,7 @@ return [
                 ],
             ],
         ],
+
         // Inventario
         [
             'text' => 'Inventario',

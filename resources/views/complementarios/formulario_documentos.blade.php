@@ -6,15 +6,15 @@
 @section('content')
     @include('complementarios.layout.header-complementarios')
 
-    <div class="container-fluid mt-4">
+    <div class="container-fluid mt-4" style="background-color: #ebf1f4; min-height: 100vh;">
         <div class="row justify-content-center">
             <div class="col-lg-10 col-xl-8">
                 <div class="text-center mb-4">
-                    <h2 class="text-success">Subir Documento de Identidad</h2>
+                    <h2 class="text-dark">Subir Documento de Identidad</h2>
                     <p class="text-muted">Complete el proceso de inscripción</p>
                 </div>
-                <div class="card card-success">
-                    <div class="card-header">
+                <div class="card" style="background-color: #ffffff; border-color: #dee2e6;">
+                    <div class="card-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
                         <h3 class="card-title">
                             <i class="fas fa-file-upload mr-2"></i>Subir Documento de Identidad
                         </h3>
@@ -30,8 +30,8 @@
                         </div>
 
             @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="fas fa-check-circle mr-2"></i>
+                <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <i class="fas fa-info-circle mr-2"></i>
                     {{ session('success') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
@@ -40,8 +40,8 @@
 
                         <div class="row">
                             <div class="col-md-8">
-                                <div class="card card-success">
-                                    <div class="card-header">
+                                <div class="card" style="background-color: #ffffff; border-color: #dee2e6;">
+                                    <div class="card-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
                                         <h5 class="mb-0"><i class="fas fa-id-card mr-2"></i>Documento de Identidad</h5>
                                     </div>
                                     <div class="card-body">
@@ -83,7 +83,7 @@
                                                     class="btn btn-outline-secondary me-md-2">
                                                     <i class="fas fa-arrow-left mr-1"></i> Volver Atrás
                                                 </a>
-                                                <button type="submit" class="btn btn-success" disabled id="btnEnviar">
+                                                <button type="submit" class="btn btn-primary" disabled id="btnEnviar">
                                                     <i class="fas fa-paper-plane mr-1"></i> Enviar Documento
                                                 </button>
                                             </div>
@@ -94,43 +94,45 @@
 
                         <div class="col-md-4">
                             <div class="card card-widget widget-user">
-                                <div class="widget-user-header bg-success">
+                                <div class="widget-user-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
                                     <h3 class="widget-user-username">Información del Programa</h3>
                                     <h5 class="widget-user-desc">{{ $programa->nombre }}</h5>
                                 </div>
-                        <div class="card-footer">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="description-block">
-                                        <span class="description-text">DESCRIPCIÓN</span>
-                                        <p class="text-muted mb-3">{{ $programa->descripcion }}</p>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <div class="description-block">
-                                                    <span class="description-text">DURACIÓN</span>
-                                                    <h5 class="description-header">{{ $programa->duracion }} horas</h5>
+                                <div class="card-footer">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div class="description-block">
+                                                <span class="description-text">DESCRIPCIÓN</span>
+                                                <p class="text-muted mb-3">{{ $programa->descripcion }}</p>
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <div class="description-block">
+                                                            <span class="description-text">DURACIÓN</span>
+                                                            <h5 class="description-header">{{ formatear_horas($programa->duracion) }} horas</h5>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <div class="description-block">
+                                                            <span class="description-text">MODALIDAD</span>
+                                                            <h5 class="description-header">
+                                                                {{ $programa->modalidad->parametro->name ?? 'N/A' }}</h5>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="description-block">
-                                                    <span class="description-text">MODALIDAD</span>
-                                                    <h5 class="description-header">
-                                                        {{ $programa->modalidad->parametro->name ?? 'N/A' }}</h5>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <div class="description-block">
-                                                    <span class="description-text">JORNADA</span>
-                                                    <h5 class="description-header">
-                                                        {{ $programa->jornada->jornada ?? 'N/A' }}</h5>
-                                                </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="description-block">
-                                                    <span class="description-text">CUPO</span>
-                                                    <h5 class="description-header">{{ $programa->cupos }}</h5>
+                                                <div class="row">
+                                                    <div class="col-6">
+                                                        <div class="description-block">
+                                                            <span class="description-text">JORNADA</span>
+                                                            <h5 class="description-header">
+                                                                {{ $programa->jornada->jornada ?? 'N/A' }}</h5>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-6">
+                                                        <div class="description-block">
+                                                            <span class="description-text">CUPO</span>
+                                                            <h5 class="description-header">{{ $programa->cupos }}</h5>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -138,7 +140,6 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
                         </div>
                     </div>
                 </div>
@@ -147,7 +148,7 @@
     </div>
 
 
-@include('layout.footer')
+@include('complementarios.layout.footer-complementarios')
 <script>
     // Habilitar botón de envío cuando se selecciona un archivo y se acepta la privacidad
     const documentoInput = document.getElementById('documento_identidad');

@@ -13,7 +13,8 @@ export class SelectDinamicoHandler {
             sedeSelector: '#sede_id',
             ambienteSelector: '#ambiente_id',
             programaSelector: '#programa_formacion_id',
-            baseUrl: '/api',
+            departamentosTemplate: null,
+            municipiosTemplate: null,
             ...options
         };
         
@@ -27,6 +28,12 @@ export class SelectDinamicoHandler {
     }
 
     init() {
+        const departamentoSelect = $(this.options.departamentoSelector);
+        const municipioSelect = $(this.options.municipioSelector);
+
+        this.options.departamentosTemplate = departamentoSelect.data('url-template') || this.options.departamentosTemplate || '/departamentos/__ID__';
+        this.options.municipiosTemplate = municipioSelect.data('url-template') || this.options.municipiosTemplate || '/municipios/__ID__';
+
         this.initPaisChange();
         this.initDepartamentoChange();
         this.initProgramaChange();
@@ -87,28 +94,33 @@ export class SelectDinamicoHandler {
         if (!paisId) {
             this.clearSelect(this.options.departamentoSelector, 'Seleccione un departamento...');
             this.clearSelect(this.options.municipioSelector, 'Primero seleccione un departamento...');
-            return;
+            return Promise.resolve();
         }
 
         const departamentoSelect = $(this.options.departamentoSelector);
         this.setLoadingState(departamentoSelect, 'Cargando departamentos...');
 
-        $.ajax({
-            url: `${this.options.baseUrl}/departamentos/${paisId}`,
-            method: 'GET',
-            success: (response) => {
-                if (response.success && response.data) {
-                    this.populateSelect(departamentoSelect, response.data, 'Seleccione un departamento...');
-                    this.clearSelect(this.options.municipioSelector, 'Primero seleccione un departamento...');
-                } else {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: this.buildUrl(this.options.departamentosTemplate, paisId),
+                method: 'GET',
+                success: (response) => {
+                    if (response.success && response.data) {
+                        this.populateSelect(departamentoSelect, response.data, 'Seleccione un departamento...');
+                        this.clearSelect(this.options.municipioSelector, 'Primero seleccione un departamento...');
+                        resolve(response);
+                    } else {
+                        this.setErrorState(departamentoSelect, 'Error al cargar departamentos');
+                        reject(new Error('Respuesta inválida'));
+                    }
+                },
+                error: (xhr, status, error) => {
+                    console.error('Error al cargar departamentos:', error);
                     this.setErrorState(departamentoSelect, 'Error al cargar departamentos');
+                    this.alertHandler.showError('Error al cargar los departamentos. Intente nuevamente.');
+                    reject(error);
                 }
-            },
-            error: (xhr, status, error) => {
-                console.error('Error al cargar departamentos:', error);
-                this.setErrorState(departamentoSelect, 'Error al cargar departamentos');
-                this.alertHandler.showError('Error al cargar los departamentos. Intente nuevamente.');
-            }
+            });
         });
     }
 
@@ -118,27 +130,32 @@ export class SelectDinamicoHandler {
     loadMunicipios(departamentoId) {
         if (!departamentoId) {
             this.clearSelect(this.options.municipioSelector, 'Seleccione un municipio...');
-            return;
+            return Promise.resolve();
         }
 
         const municipioSelect = $(this.options.municipioSelector);
         this.setLoadingState(municipioSelect, 'Cargando municipios...');
 
-        $.ajax({
-            url: `${this.options.baseUrl}/municipios/${departamentoId}`,
-            method: 'GET',
-            success: (response) => {
-                if (response.success && response.data) {
-                    this.populateSelect(municipioSelect, response.data, 'Seleccione un municipio...');
-                } else {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: this.buildUrl(this.options.municipiosTemplate, departamentoId),
+                method: 'GET',
+                success: (response) => {
+                    if (response.success && response.data) {
+                        this.populateSelect(municipioSelect, response.data, 'Seleccione un municipio...');
+                        resolve(response);
+                    } else {
+                        this.setErrorState(municipioSelect, 'Error al cargar municipios');
+                        reject(new Error('Respuesta inválida'));
+                    }
+                },
+                error: (xhr, status, error) => {
+                    console.error('Error al cargar municipios:', error);
                     this.setErrorState(municipioSelect, 'Error al cargar municipios');
+                    this.alertHandler.showError('Error al cargar los municipios. Intente nuevamente.');
+                    reject(error);
                 }
-            },
-            error: (xhr, status, error) => {
-                console.error('Error al cargar municipios:', error);
-                this.setErrorState(municipioSelect, 'Error al cargar municipios');
-                this.alertHandler.showError('Error al cargar los municipios. Intente nuevamente.');
-            }
+            });
         });
     }
 
@@ -225,18 +242,29 @@ export class SelectDinamicoHandler {
      */
     loadInitialValues() {
         // Cargar valores desde atributos data si existen
-        const paisId = $(this.options.paisSelector).data('initial-value');
-        const departamentoId = $(this.options.departamentoSelector).data('initial-value');
-        const municipioId = $(this.options.municipioSelector).data('initial-value');
+        const paisSelect = $(this.options.paisSelector);
+        const departamentoSelect = $(this.options.departamentoSelector);
+        const municipioSelect = $(this.options.municipioSelector);
+
+        const paisId = paisSelect.data('initial-value');
+        const departamentoId = departamentoSelect.data('initial-value');
+        const municipioId = municipioSelect.data('initial-value');
+
+        if (departamentoSelect.length) {
+            this.options.departamentosTemplate = departamentoSelect.data('url-template') || this.options.departamentosTemplate;
+        }
+        if (municipioSelect.length) {
+            this.options.municipiosTemplate = municipioSelect.data('url-template') || this.options.municipiosTemplate;
+        }
 
         if (paisId) {
-            $(this.options.paisSelector).val(paisId);
+            paisSelect.val(paisId);
             this.loadDepartamentos(paisId).then(() => {
                 if (departamentoId) {
-                    $(this.options.departamentoSelector).val(departamentoId);
+                    departamentoSelect.val(departamentoId);
                     this.loadMunicipios(departamentoId).then(() => {
                         if (municipioId) {
-                            $(this.options.municipioSelector).val(municipioId);
+                            municipioSelect.val(municipioId);
                         }
                     });
                 }
@@ -252,5 +280,15 @@ export class SelectDinamicoHandler {
         this.clearSelect(this.options.departamentoSelector, 'Primero seleccione un país...');
         this.clearSelect(this.options.municipioSelector, 'Primero seleccione un departamento...');
         this.clearSelect(this.options.ambienteSelector, 'Primero seleccione una sede...');
+    }
+
+    /**
+     * Construir URL desde plantilla y valor
+     */
+    buildUrl(template, value) {
+        if (!template) {
+            throw new Error('No se definió plantilla de URL para select dinámico');
+        }
+        return template.replace(/__ID__/g, value);
     }
 }

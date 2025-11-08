@@ -1,8 +1,20 @@
 @props(['context' => 'registro', 'userData' => [], 'step' => 1, 'tiposDocumento' => [], 'generos' => []])
 
+@php
+    $selectedTipo = old('tipo_documento', $userData['tipo_documento'] ?? null);
+    if (!$selectedTipo) {
+        if (isset($tiposDocumento) && $tiposDocumento && $tiposDocumento->count() > 0) {
+            $cedula = $tiposDocumento->first(function($t) { return stripos($t->name, 'CIUDAD') !== false && stripos($t->name, 'CEDULA') !== false; });
+            if ($cedula) { $selectedTipo = $cedula->id; }
+        } else {
+            $selectedTipo = '3'; // Fallback: Cédula de Ciudadanía
+        }
+    }
+@endphp
+
 @if($context === 'registro')
     {{-- Versión completa sin pasos para registro --}}
-    <div class="card card-success mb-4">
+    <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-user mr-2"></i>Información Personal Básica</h5>
         </div>
@@ -11,24 +23,19 @@
                 <div class="col-md-6 mb-3">
                     <label for="tipo_documento" class="form-label">Tipo de Documento *</label>
                     <select class="form-control" id="tipo_documento" name="tipo_documento" required>
-                        <option value="1" {{ old('tipo_documento', $userData['tipo_documento'] ?? '1') == '1' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
-                        <option value="2" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '2' ? 'selected' : '' }}>Tarjeta de Identidad</option>
-                        <option value="3" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '3' ? 'selected' : '' }}>Cédula de Extranjería</option>
-                        <option value="4" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '4' ? 'selected' : '' }}>Pasaporte</option>
-                        <option value="">Seleccione...</option>
                         @if($tiposDocumento && $tiposDocumento->count() > 0)
                             @foreach($tiposDocumento as $tipo)
-                                <option value="{{ $tipo->id }}" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == $tipo->id ? 'selected' : '' }}>
+                                <option value="{{ $tipo->id }}" {{ (string)$selectedTipo === (string)$tipo->id ? 'selected' : '' }}>
                                     {{ ucwords(strtolower(str_replace('_', ' ', $tipo->name))) }}
                                 </option>
                             @endforeach
                         @else
-                            <option value="3" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '3' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
-                            <option value="4" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '4' ? 'selected' : '' }}>Cédula de Extranjería</option>
-                            <option value="5" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '5' ? 'selected' : '' }}>Pasaporte</option>
-                            <option value="6" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '6' ? 'selected' : '' }}>Tarjeta de Identidad</option>
-                            <option value="7" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '7' ? 'selected' : '' }}>Registro Civil</option>
-                            <option value="8" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '8' ? 'selected' : '' }}>Sin Identificación</option>
+                            <option value="3" {{ (string)$selectedTipo === '3' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
+                            <option value="4" {{ (string)$selectedTipo === '4' ? 'selected' : '' }}>Cédula de Extranjería</option>
+                            <option value="5" {{ (string)$selectedTipo === '5' ? 'selected' : '' }}>Pasaporte</option>
+                            <option value="6" {{ (string)$selectedTipo === '6' ? 'selected' : '' }}>Tarjeta de Identidad</option>
+                            <option value="7" {{ (string)$selectedTipo === '7' ? 'selected' : '' }}>Registro Civil</option>
+                            <option value="8" {{ (string)$selectedTipo === '8' ? 'selected' : '' }}>Sin Identificación</option>
                         @endif
                     </select>
                 </div>
@@ -73,7 +80,7 @@
         </div>
     </div>
 
-    <div class="card card-success mb-4">
+    <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-birthday-cake mr-2"></i>Información Personal Adicional</h5>
         </div>
@@ -81,7 +88,9 @@
             <div class="mb-3">
                 <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento *</label>
                 <input type="date" class="form-control" id="fecha_nacimiento"
-                        name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $userData['fecha_nacimiento'] ?? '') }}" required>
+                        name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $userData['fecha_nacimiento'] ?? '') }}" 
+                        max="{{ date('Y-m-d', strtotime('-14 years')) }}" required>
+                <small class="form-text text-muted">Debe tener al menos 14 años para registrarse.</small>
             </div>
 
             <div class="mb-3">
@@ -116,7 +125,7 @@
         </div>
     </div>
 
-    <div class="card card-success mb-4">
+    <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i>Ubicación Actual</h5>
         </div>
@@ -151,9 +160,16 @@
 
             <div class="mb-3">
                 <label for="direccion" class="form-label">Dirección *</label>
-                <input type="text" class="form-control" id="direccion" name="direccion" value="{{ old('direccion', $userData['direccion'] ?? '') }}" placeholder="Dirección completa" required readonly>
-                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
-                    <i class="fas fa-edit"></i> Ingresar Dirección
+                <input type="text" class="form-control" id="direccion" name="direccion"
+                       value="{{ old('direccion', $userData['direccion'] ?? '') }}" 
+                       placeholder="Use el botón para ingresar una dirección estructurada" 
+                       readonly required>
+                <small class="form-text text-muted">Haga clic en el botón para ingresar una dirección estructurada</small>
+            </div>
+            
+            <div class="mb-3">
+                <button type="button" class="btn btn-primary" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
+                    <i class="fas fa-edit"></i> Ingresar Dirección Estructurada
                 </button>
             </div>
             <div id="addressForm" class="collapse mt-3" aria-labelledby="addressFormLabel">
@@ -163,39 +179,135 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-12 col-md-6">
+                            <div class="col-12">
                                 <div class="form-group">
-                                    <label for="carrera">Carrera *</label>
-                                    <input type="text" class="form-control address-field" id="carrera"
-                                        placeholder="Ej: 1" data-required="true">
+                                    <label for="tipo_via">1. Tipo de vía principal *</label>
+                                    <select class="form-control address-field" id="tipo_via" data-required="true">
+                                        <option value="">Seleccione...</option>
+                                        <option value="Carrera">Carrera</option>
+                                        <option value="Calle">Calle</option>
+                                        <option value="Transversal">Transversal</option>
+                                        <option value="Diagonal">Diagonal</option>
+                                        <option value="Avenida">Avenida</option>
+                                        <option value="Autopista">Autopista</option>
+                                        <option value="Circular">Circular</option>
+                                        <option value="Vía">Vía</option>
+                                        <option value="Pasaje">Pasaje</option>
+                                        <option value="Manzana">Manzana</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="calle">Calle *</label>
-                                    <input type="text" class="form-control address-field" id="calle"
-                                        placeholder="Ej: 2" data-required="true">
+                                    <label for="numero_via">2. Número o nombre de vía principal *</label>
+                                    <input type="text" class="form-control address-field" id="numero_via"
+                                        placeholder="Ej: 9A, 7 Bis, 45" data-required="true">
                                 </div>
                                 <div class="form-group">
-                                    <label for="numero_casa">Número Casa *</label>
+                                    <label for="letra_via">3. Letra principal de la vía</label>
+                                    <select class="form-control address-field" id="letra_via">
+                                        <option value="">(Sin letra)</option>
+                                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                                        <option>E</option><option>F</option><option>G</option><option>H</option>
+                                        <option>I</option><option>J</option><option>K</option><option>L</option>
+                                        <option>M</option><option>N</option><option>O</option><option>P</option>
+                                        <option>Q</option><option>R</option><option>S</option><option>T</option>
+                                        <option>U</option><option>V</option><option>W</option><option>X</option>
+                                        <option>Y</option><option>Z</option>
+                                    </select>
+                                </div>
+                                <div class="form-group form-check">
+                                    <input type="checkbox" class="form-check-input" id="bis">
+                                    <label class="form-check-label" for="bis">Sufijo BIS</label>
+                                </div>
+                                <div class="form-group">
+                                    <label for="letra_sufijo">Letra Sufijo</label>
+                                    <select class="form-control address-field" id="letra_sufijo">
+                                        <option value="">(Sin sufijo)</option>
+                                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                                        <option>E</option><option>F</option><option>G</option><option>H</option>
+                                        <option>I</option><option>J</option><option>K</option><option>L</option>
+                                        <option>M</option><option>N</option><option>O</option><option>P</option>
+                                        <option>Q</option><option>R</option><option>S</option><option>T</option>
+                                        <option>U</option><option>V</option><option>W</option><option>X</option>
+                                        <option>Y</option><option>Z</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cuadrante">Cuadrante</label>
+                                    <select class="form-control address-field" id="cuadrante">
+                                        <option value="">(Sin cuadrante)</option>
+                                        <option value="N">Norte (N)</option>
+                                        <option value="S">Sur (S)</option>
+                                        <option value="E">Este (E)</option>
+                                        <option value="O">Oeste (O)</option>
+                                        <option value="NE">Noreste (NE)</option>
+                                        <option value="NO">Noroeste (NO)</option>
+                                        <option value="SE">Sureste (SE)</option>
+                                        <option value="SO">Suroeste (SO)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="via_secundaria">4. Número de la vía secundaria / intersección</label>
+                                    <input type="text" class="form-control address-field" id="via_secundaria"
+                                        placeholder="Ej: 12, 22B (opcional)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="letra_via_secundaria">Letra asociada a la vía secundaria</label>
+                                    <select class="form-control address-field" id="letra_via_secundaria">
+                                        <option value="">(Sin letra)</option>
+                                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                                        <option>E</option><option>F</option><option>G</option><option>H</option>
+                                        <option>I</option><option>J</option><option>K</option><option>L</option>
+                                        <option>M</option><option>N</option><option>O</option><option>P</option>
+                                        <option>Q</option><option>R</option><option>S</option><option>T</option>
+                                        <option>U</option><option>V</option><option>W</option><option>X</option>
+                                        <option>Y</option><option>Z</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="cuadrante_secundario">Cuadrante vía secundaria</label>
+                                    <select class="form-control address-field" id="cuadrante_secundario">
+                                        <option value="">(Sin cuadrante)</option>
+                                        <option value="N">Norte (N)</option>
+                                        <option value="S">Sur (S)</option>
+                                        <option value="E">Este (E)</option>
+                                        <option value="O">Oeste (O)</option>
+                                        <option value="NE">Noreste (NE)</option>
+                                        <option value="NO">Noroeste (NO)</option>
+                                        <option value="SE">Sureste (SE)</option>
+                                        <option value="SO">Suroeste (SO)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="numero_casa">5. Número de casa o edificio *</label>
                                     <input type="text" class="form-control address-field" id="numero_casa"
-                                        placeholder="Ej: 3" data-required="true">
+                                        placeholder="Ej: 34-15, 45-20, 12" data-required="true">
                                 </div>
                                 <div class="form-group">
-                                    <label for="numero_apartamento">Número Apartamento</label>
-                                    <input type="text" class="form-control address-field" id="numero_apartamento"
-                                        placeholder="Ej: 4 (opcional)">
+                                    <label for="complementos">6. Complementos</label>
+                                    <input type="text" class="form-control address-field" id="complementos"
+                                        placeholder="Ej: Apto 301, Bloque 2, Oficina 5 (opcional)">
                                 </div>
-                            </div>
-                            <div class="col-12 col-md-6 d-flex align-items-center">
-                                <div class="w-100">
-                                    <p class="mb-2"><strong>Ejemplo de formato:</strong></p>
-                                    <p class="text-muted">Carrera 1 Calle 2 #3 Apt 4</p>
-                                    <p class="text-muted small">Los campos marcados con * son obligatorios.</p>
+                                <div class="form-group">
+                                    <label for="barrio">7. Barrio o vereda</label>
+                                    <input type="text" class="form-control address-field" id="barrio"
+                                        placeholder="Ej: Centro, La Candelaria (opcional)">
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                <button type="button" class="btn btn-success btn-sm mr-2" id="saveAddress">
+                                <div class="alert alert-info">
+                                    <small>
+                                        <strong>Ejemplo de formato:</strong><br>
+                                        <span class="text-muted">Carrera 9A BIS #34-15 Este Apto 301, Barrio Centro</span><br>
+                                        <span class="text-muted">Los campos marcados con * son obligatorios.</span>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-primary btn-sm mr-2" id="saveAddress">
                                     <i class="fas fa-save"></i> Guardar Dirección
                                 </button>
                                 <button type="button" class="btn btn-secondary btn-sm" id="cancelAddress">
@@ -210,7 +322,7 @@
     </div>
 @else
     {{-- Versión completa para inscripción --}}
-    <div class="card card-success mb-4">
+    <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-id-card mr-2"></i> Datos personales </h5>
         </div>
@@ -219,24 +331,19 @@
                 <div class="col-md-6 mb-3">
                     <label for="tipo_documento" class="form-label">Tipo de Documento *</label>
                     <select class="form-control" id="tipo_documento" name="tipo_documento" required>
-                        <option value="1" {{ old('tipo_documento', $userData['tipo_documento'] ?? '1') == '1' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
-                        <option value="2" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '2' ? 'selected' : '' }}>Tarjeta de Identidad</option>
-                        <option value="3" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '3' ? 'selected' : '' }}>Cédula de Extranjería</option>
-                        <option value="4" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '4' ? 'selected' : '' }}>Pasaporte</option>
-                        <option value="">Seleccione...</option>
                         @if($tiposDocumento && $tiposDocumento->count() > 0)
                             @foreach($tiposDocumento as $tipo)
-                                <option value="{{ $tipo->id }}" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == $tipo->id ? 'selected' : '' }}>
+                                <option value="{{ $tipo->id }}" {{ (string)$selectedTipo === (string)$tipo->id ? 'selected' : '' }}>
                                     {{ ucwords(strtolower(str_replace('_', ' ', $tipo->name))) }}
                                 </option>
                             @endforeach
                         @else
-                            <option value="3" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '3' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
-                            <option value="4" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '4' ? 'selected' : '' }}>Cédula de Extranjería</option>
-                            <option value="5" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '5' ? 'selected' : '' }}>Pasaporte</option>
-                            <option value="6" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '6' ? 'selected' : '' }}>Tarjeta de Identidad</option>
-                            <option value="7" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '7' ? 'selected' : '' }}>Registro Civil</option>
-                            <option value="8" {{ old('tipo_documento', $userData['tipo_documento'] ?? '') == '8' ? 'selected' : '' }}>Sin Identificación</option>
+                            <option value="3" {{ (string)$selectedTipo === '3' ? 'selected' : '' }}>Cédula de Ciudadanía</option>
+                            <option value="4" {{ (string)$selectedTipo === '4' ? 'selected' : '' }}>Cédula de Extranjería</option>
+                            <option value="5" {{ (string)$selectedTipo === '5' ? 'selected' : '' }}>Pasaporte</option>
+                            <option value="6" {{ (string)$selectedTipo === '6' ? 'selected' : '' }}>Tarjeta de Identidad</option>
+                            <option value="7" {{ (string)$selectedTipo === '7' ? 'selected' : '' }}>Registro Civil</option>
+                            <option value="8" {{ (string)$selectedTipo === '8' ? 'selected' : '' }}>Sin Identificación</option>
                         @endif
                     </select>
                 </div>
@@ -277,7 +384,7 @@
         </div>
     </div>
 
-    <div class="card card-success mb-4">
+    <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-birthday-cake mr-2"></i>Información Personal</h5>
         </div>
@@ -285,7 +392,9 @@
             <div class="mb-3">
                 <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento *</label>
                 <input type="date" class="form-control" id="fecha_nacimiento"
-                       name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $userData['fecha_nacimiento'] ?? '') }}" required>
+                       name="fecha_nacimiento" value="{{ old('fecha_nacimiento', $userData['fecha_nacimiento'] ?? '') }}" 
+                       max="{{ date('Y-m-d', strtotime('-14 years')) }}" required>
+                <small class="form-text text-muted">Debe tener al menos 14 años para registrarse.</small>
             </div>
 
             <div class="mb-3">
@@ -325,7 +434,7 @@
         </div>
     </div>
 
-    <div class="card card-success mb-4">
+    <div class="card mb-4">
         <div class="card-header">
             <h5 class="mb-0"><i class="fas fa-map-marker-alt mr-2"></i>Ubicación Actual</h5>
         </div>
@@ -360,9 +469,16 @@
 
             <div class="mb-3">
                 <label for="direccion" class="form-label">Dirección *</label>
-                <input type="text" class="form-control" id="direccion" name="direccion" value="{{ old('direccion', $userData['direccion'] ?? '') }}" placeholder="Dirección completa" required readonly>
-                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
-                    <i class="fas fa-edit"></i> Ingresar Dirección
+                <input type="text" class="form-control" id="direccion" name="direccion"
+                       value="{{ old('direccion', $userData['direccion'] ?? '') }}" 
+                       placeholder="Use el botón para ingresar una dirección estructurada" 
+                       readonly required>
+                <small class="form-text text-muted">Haga clic en el botón para ingresar una dirección estructurada</small>
+            </div>
+            
+            <div class="mb-3">
+                <button type="button" class="btn btn-primary" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
+                    <i class="fas fa-edit"></i> Ingresar Dirección Estructurada
                 </button>
             </div>
             <div id="addressForm" class="collapse mt-3" aria-labelledby="addressFormLabel">
@@ -372,39 +488,69 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <div class="col-12 col-md-6">
+                            <div class="col-12">
                                 <div class="form-group">
-                                    <label for="carrera">Carrera *</label>
-                                    <input type="text" class="form-control address-field" id="carrera"
-                                        placeholder="Ej: 1" data-required="true">
+                                    <label for="tipo_via">1. Tipo de vía principal *</label>
+                                    <select class="form-control address-field" id="tipo_via" data-required="true">
+                                        <option value="">Seleccione...</option>
+                                        <option value="Carrera">Carrera</option>
+                                        <option value="Calle">Calle</option>
+                                        <option value="Transversal">Transversal</option>
+                                        <option value="Diagonal">Diagonal</option>
+                                        <option value="Avenida">Avenida</option>
+                                        <option value="Autopista">Autopista</option>
+                                        <option value="Circular">Circular</option>
+                                        <option value="Vía">Vía</option>
+                                        <option value="Pasaje">Pasaje</option>
+                                        <option value="Manzana">Manzana</option>
+                                    </select>
                                 </div>
                                 <div class="form-group">
-                                    <label for="calle">Calle *</label>
-                                    <input type="text" class="form-control address-field" id="calle"
-                                        placeholder="Ej: 2" data-required="true">
+                                    <label for="numero_via">2. Número o nombre de vía principal *</label>
+                                    <input type="text" class="form-control address-field" id="numero_via"
+                                        placeholder="Ej: 9A, 7 Bis, 45" data-required="true">
                                 </div>
                                 <div class="form-group">
-                                    <label for="numero_casa">Número Casa *</label>
+                                    <label for="letra_via">3. Letra o complemento de vía principal</label>
+                                    <input type="text" class="form-control address-field" id="letra_via"
+                                        placeholder="Ej: A, B, Bis (opcional)" maxlength="5">
+                                </div>
+                                <div class="form-group">
+                                    <label for="via_secundaria">4. Vía secundaria o intersección</label>
+                                    <input type="text" class="form-control address-field" id="via_secundaria"
+                                        placeholder="Ej: Calle 12, Transversal 22B (opcional)">
+                                </div>
+                                <div class="form-group">
+                                    <label for="numero_casa">5. Número de casa o edificio *</label>
                                     <input type="text" class="form-control address-field" id="numero_casa"
-                                        placeholder="Ej: 3" data-required="true">
+                                        placeholder="Ej: 34-15, 45-20, 12" data-required="true">
                                 </div>
                                 <div class="form-group">
-                                    <label for="numero_apartamento">Número Apartamento</label>
-                                    <input type="text" class="form-control address-field" id="numero_apartamento"
-                                        placeholder="Ej: 4 (opcional)">
+                                    <label for="complementos">6. Complementos</label>
+                                    <input type="text" class="form-control address-field" id="complementos"
+                                        placeholder="Ej: Apto 301, Bloque 2, Oficina 5 (opcional)">
                                 </div>
-                            </div>
-                            <div class="col-12 col-md-6 d-flex align-items-center">
-                                <div class="w-100">
-                                    <p class="mb-2"><strong>Ejemplo de formato:</strong></p>
-                                    <p class="text-muted">Carrera 1 Calle 2 #3 Apt 4</p>
-                                    <p class="text-muted small">Los campos marcados con * son obligatorios.</p>
+                                <div class="form-group">
+                                    <label for="barrio">7. Barrio o vereda</label>
+                                    <input type="text" class="form-control address-field" id="barrio"
+                                        placeholder="Ej: Centro, La Candelaria (opcional)">
                                 </div>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                <button type="button" class="btn btn-success btn-sm mr-2" id="saveAddress">
+                                <div class="alert alert-info">
+                                    <small>
+                                        <strong>Ejemplo de formato:</strong><br>
+                                        <span class="text-muted">Carrera 9A BIS #34-15 Este Apto 301, Barrio Centro</span><br>
+                                        <span class="text-muted">Los campos marcados con * son obligatorios.</span>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <button type="button" class="btn btn-primary btn-sm mr-2" id="saveAddress">
                                     <i class="fas fa-save"></i> Guardar Dirección
                                 </button>
                                 <button type="button" class="btn btn-secondary btn-sm" id="cancelAddress">

@@ -2,15 +2,27 @@
 @section('title', 'Información del Programa | SENA')
 @section('css')
     @vite(['resources/css/formulario_inscripcion.css'])
+    <style>
+    .btn-register {
+        background-color: #3f474e;
+        border-color: #3f474e;
+        color: #fff;
+    }
+    .btn-register:hover, .btn-register:focus {
+        background-color: #343a40;
+        border-color: #343a40;
+        color: #fff;
+    }
+    </style>
 @endsection
 @section('content')
     
 
-    <div class="container-fluid mt-4 px-2 px-md-4">
+    <div class="container-fluid mt-4 px-2 px-md-4" style="background-color: #ebf1f4; min-height: 100vh;">
         <div class="row justify-content-center">
             <div class="col-12">
                 <div class="text-center mb-4">
-                    <h2 class="text-success">Información del Programa</h2>
+                    <h2 class="text-dark">Información del Programa</h2>
                     <p class="text-muted">Detalles del programa seleccionado</p>
                 </div>
                 <div class="d-flex justify-content-center">
@@ -26,11 +38,11 @@
     <div class="modal fade" id="inscripcionModal" tabindex="-1" role="dialog" aria-labelledby="inscripcionModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
-                <div class="modal-header bg-success text-white">
+                <div class="modal-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
                     <h5 class="modal-title" id="inscripcionModalLabel">
                         <i class="fas fa-user-plus mr-2"></i>Inscripción al Programa
                     </h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
@@ -45,7 +57,7 @@
                             </button>
                         </div>
                         <div class="col-6">
-                            <button type="button" class="btn btn-success btn-block" onclick="redirectToRegistro()">
+                            <button type="button" class="btn btn-register btn-block" onclick="redirectToRegistro()">
                                 <i class="fas fa-user-plus fa-2x mb-2"></i><br>
                                 <strong>Registrarme</strong><br>
                                 <small>Soy nuevo</small>
@@ -63,7 +75,7 @@
         </div>
     </div>
 
-@include('layout.footer')
+@include('complementarios.layout.footer-complementarios')
 @endsection
 
 <script>
