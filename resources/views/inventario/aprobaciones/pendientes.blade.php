@@ -15,7 +15,7 @@
     />
 @endsection
 @push('css')
-    @vite(['public/css/inventario/shared/base.css'])
+    @vite(['resources/css/inventario/shared/base.css'])
     <link rel="stylesheet" href="{{ asset('css/inventario/modal-orden.css') }}">
 @endpush
 
@@ -305,3 +305,4 @@
 <!-- Script de aprobaciones -->
 <script src="{{ asset('js/inventario/aprobaciones.js') }}"></script>
 @endpush
+

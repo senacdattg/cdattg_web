@@ -421,7 +421,7 @@
 @endsection
 
 @push('css')
-    @vite(['public/css/inventario/shared/base.css'])
+    @vite(['resources/css/inventario/shared/base.css'])
     <link href="{{ asset('css/inventario/inventario.css') }}" rel="stylesheet">
     <link href="{{ asset('css/inventario/imagen.css') }}" rel="stylesheet">
 @endpush
