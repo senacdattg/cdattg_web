@@ -19,6 +19,11 @@
                 @if(isset($existingProgress) && $existingProgress) style="pointer-events: none; opacity: 0.5;" @endif>
                 <i class="fas fa-download me-1"></i>Descargar Excel
             </a>
+            <a href="{{ route('programas-complementarios.descargar-cedulas', $programa->id) }}"
+                class="btn btn-info" id="btn-descargar-cedulas"
+                @if(isset($existingProgress) && $existingProgress) style="pointer-events: none; opacity: 0.5;" @endif>
+                <i class="fas fa-file-pdf me-1"></i>Descargar Cédulas
+            </a>
             <a href="{{ route('gestion-aspirantes') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-1"></i> Volver
             </a>

@@ -31,3 +31,10 @@ Route::get(
 )
     ->name('programas-complementarios.exportar-excel')
     ->middleware('auth');
+
+Route::get(
+    '/programas-complementarios/{complementarioId}/descargar-cedulas',
+    [AspiranteComplementarioController::class, 'descargarCedulas']
+)
+    ->name('programas-complementarios.descargar-cedulas')
+    ->middleware('auth');
