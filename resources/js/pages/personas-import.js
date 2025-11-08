@@ -67,12 +67,25 @@ document.addEventListener('DOMContentLoaded', () => {
         porcentajeProgreso.textContent = `${porcentaje}%`;
         barraProgreso.style.width = `${porcentaje}%`;
 
-        estadoImportacion.textContent = status.toUpperCase();
+        const statusLabels = {
+            'pending': 'PENDIENTE',
+            'processing': 'PROCESANDO...',
+            'completed': 'COMPLETADO',
+            'failed': 'FALLIDO'
+        };
+
+        estadoImportacion.textContent = statusLabels[status] || status.toUpperCase();
         estadoImportacion.className = 'badge';
+        
         if (status === 'completed') {
             estadoImportacion.classList.add('bg-success');
+            barraProgreso.classList.remove('progress-bar-animated');
         } else if (status === 'failed') {
             estadoImportacion.classList.add('bg-danger');
+            barraProgreso.classList.remove('progress-bar-animated');
+        } else if (status === 'processing') {
+            estadoImportacion.classList.add('bg-info');
+            barraProgreso.classList.add('progress-bar-animated');
         } else {
             estadoImportacion.classList.add('bg-secondary');
         }
@@ -142,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         ejecutarConsulta();
         detenerMonitoreo();
-        pollingInterval = setInterval(ejecutarConsulta, 3500);
+        pollingInterval = setInterval(ejecutarConsulta, 2000);
     };
 
     form?.addEventListener('submit', async (event) => {
@@ -160,7 +173,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const formData = new FormData(form);
-        const token = form.querySelector('input[name="_token"]').value;
+        const tokenElement = form.querySelector('input[name="_token"]');
+        
+        if (!tokenElement) {
+            Swal.fire({ icon: 'error', title: 'Error de seguridad', text: 'No se encontró el token CSRF. Por favor, recarga la página.' });
+            return;
+        }
+        
+        const token = tokenElement.value;
 
         btnIniciar.disabled = true;
         btnIniciar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Procesando...';
@@ -181,11 +201,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const data = await respuesta.json();
-            Swal.fire({ icon: 'info', title: 'Importación en marcha', text: 'El archivo se está procesando en segundo plano.' });
-
+            
             btnRecargarIncidencias.disabled = true;
             inicializarProgreso();
-            monitorearImportacion(data.import_id);
+            
+            Swal.fire({ 
+                icon: 'info', 
+                title: 'Importación iniciada', 
+                text: 'El archivo se está procesando. El progreso se actualizará automáticamente.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+
+            setTimeout(() => {
+                monitorearImportacion(data.import_id);
+            }, 500);
         } catch (error) {
             Swal.fire({ icon: 'error', title: 'Error', text: error.message });
         } finally {

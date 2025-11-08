@@ -90,6 +90,10 @@ class PersonaImportService
 
         $rutaArchivo = Storage::disk($import->disk)->path($import->path);
 
+        if (!file_exists($rutaArchivo)) {
+            throw new \RuntimeException("El archivo de importación no existe en la ruta: {$rutaArchivo}");
+        }
+
         $reader = IOFactory::createReaderForFile($rutaArchivo);
         $reader->setReadDataOnly(true);
 
@@ -179,12 +183,14 @@ class PersonaImportService
 
             $existsCaches = $this->consultarExistencias($chunkRecords);
 
+            $chunkCounter = 0;
             foreach ($chunkRecords as $record) {
                 $rowNumber = $record['row_number'];
                 $data = $record['data'];
                 $raw = $record['raw'];
 
                 $processed++;
+                $chunkCounter++;
 
                 $resultadoDuplicados = $this->validarDuplicados($data, $existsCaches, $import, $rowNumber, $raw);
 
@@ -252,6 +258,15 @@ class PersonaImportService
                         'raw_payload' => $data,
                     ]);
                 }
+
+                if ($chunkCounter % 50 === 0) {
+                    $import->update([
+                        'processed_rows' => $processed,
+                        'success_count' => $success,
+                        'duplicate_count' => $duplicates,
+                        'missing_contact_count' => $missingContact,
+                    ]);
+                }
             }
 
             $import->update([
@@ -276,6 +291,10 @@ class PersonaImportService
                 return [Str::upper($name) => (int) $id];
             })
             ->toArray();
+
+        if (empty($this->documentoCache)) {
+            Log::warning('No se encontraron tipos de documento en la base de datos');
+        }
     }
 
     private function resolverEncabezados(array $row): array
@@ -471,6 +490,15 @@ class PersonaImportService
 
     private function crearUsuarioVisitante(Persona $persona): void
     {
+        $existingUser = User::where('email', $persona->email)->first();
+        
+        if ($existingUser) {
+            if (!$existingUser->persona_id) {
+                $existingUser->update(['persona_id' => $persona->id]);
+            }
+            return;
+        }
+
         $user = User::create([
             'email' => $persona->email,
             'password' => Hash::make($persona->numero_documento),
@@ -478,7 +506,9 @@ class PersonaImportService
             'persona_id' => $persona->id,
         ]);
 
-        $user->assignRole('VISITANTE');
+        if (!$user->hasRole('VISITANTE')) {
+            $user->assignRole('VISITANTE');
+        }
     }
 
     private function registrarIssue(PersonaImport $import, int $rowNumber, string $issueType, ?string $documento, ?string $email, ?string $celular, array $raw): void

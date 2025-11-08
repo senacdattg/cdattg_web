@@ -36,15 +36,21 @@ class PersonaImportController extends Controller
 
     public function store(PersonaImportRequest $request): JsonResponse
     {
-        $import = $this->importService->iniciarImportacion(
-            $request->file('archivo_excel'),
-            $request->user()->id
-        );
+        try {
+            $import = $this->importService->iniciarImportacion(
+                $request->file('archivo_excel'),
+                $request->user()->id
+            );
 
-        return response()->json([
-            'message' => 'Importación encolada correctamente.',
-            'import_id' => $import->id,
-        ], 201);
+            return response()->json([
+                'message' => 'Importación encolada correctamente.',
+                'import_id' => $import->id,
+            ], 201);
+        } catch (\Throwable $e) {
+            return response()->json([
+                'message' => 'Error al iniciar la importación: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function status(PersonaImport $personaImport): JsonResponse
