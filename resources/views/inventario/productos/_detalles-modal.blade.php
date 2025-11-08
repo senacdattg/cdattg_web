@@ -26,62 +26,70 @@
 
     <!-- Tabla de información -->
     <table class="modal-table">
-        <tr>
-            <td>Código:</td>
-            <td>{{ $producto->codigo_barras ?? 'N/A' }}</td>
-        </tr>
-        <tr>
-            <td>Marca:</td>
-            <td>{{ $producto->marca?->name ?? 'Sin marca' }}</td>
-        </tr>
-        <tr>
-            <td>Categoría:</td>
-            <td>{{ $producto->categoria?->name ?? 'Sin categoría' }}</td>
-        </tr>
-        <tr>
-            <td>Tipo:</td>
-            <td>{{ $producto->tipoProducto?->parametro?->name ?? 'N/A' }}</td>
-        </tr>
-        <tr>
-            <td>Stock:</td>
-            <td>
-                <span class="modal-badge {{ $producto->cantidad > 0 ? 'badge-success' : 'badge-danger' }}">
-                    {{ $producto->cantidad }} unidades
-                </span>
-            </td>
-        </tr>
-        <tr>
-            <td>Peso:</td>
-            <td>
-                @if($producto->peso)
-                    {{ $producto->peso }} kg
-                @else
-                    N/A
-                @endif
-            </td>
-        </tr>
-        <tr>
-            <td>Estado:</td>
-            <td>
-                <span class="modal-badge {{ $producto->estado?->parametro?->name === 'DISPONIBLE' ? 'badge-success' : 'badge-danger' }}">
-                    {{ $producto->estado?->parametro?->name ?? 'N/A' }}
-                </span>
-            </td>
-        </tr>
-        <tr>
-            <td>Ambiente:</td>
-            <td>{{ $producto->ambiente?->title ?? 'N/A' }}</td>
-        </tr>
-        <tr>
-            <td>Proveedor:</td>
-            <td>{{ $producto->proveedor?->proveedor ?? 'N/A' }}</td>
-        </tr>
-        @if($producto->contratoConvenio)
-        <tr>
-            <td>Contrato/Convenio:</td>
-            <td>{{ $producto->contratoConvenio->name }}</td>
-        </tr>
-        @endif
+        <thead>
+            <tr>
+                <th>Detalle</th>
+                <th>Valor</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Código:</td>
+                <td>{{ $producto->codigo_barras ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td>Marca:</td>
+                <td>{{ $producto->marca?->name ?? 'Sin marca' }}</td>
+            </tr>
+            <tr>
+                <td>Categoría:</td>
+                <td>{{ $producto->categoria?->name ?? 'Sin categoría' }}</td>
+            </tr>
+            <tr>
+                <td>Tipo:</td>
+                <td>{{ $producto->tipoProducto?->parametro?->name ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td>Stock:</td>
+                <td>
+                    <span class="modal-badge {{ $producto->cantidad > 0 ? 'badge-success' : 'badge-danger' }}">
+                        {{ $producto->cantidad }} unidades
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>Peso:</td>
+                <td>
+                    @if($producto->peso)
+                        {{ $producto->peso }} kg
+                    @else
+                        N/A
+                    @endif
+                </td>
+            </tr>
+            <tr>
+                <td>Estado:</td>
+                <td>
+                    <span class="modal-badge {{ $producto->estado?->parametro?->name === 'DISPONIBLE' ? 'badge-success' : 'badge-danger' }}">
+                        {{ $producto->estado?->parametro?->name ?? 'N/A' }}
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                <td>Ambiente:</td>
+                <td>{{ $producto->ambiente?->title ?? 'N/A' }}</td>
+            </tr>
+            <tr>
+                <td>Proveedor:</td>
+                <td>{{ $producto->proveedor?->proveedor ?? 'N/A' }}</td>
+            </tr>
+            @if($producto->contratoConvenio)
+            <tr>
+                <td>Contrato/Convenio:</td>
+                <td>{{ $producto->contratoConvenio->name }}</td>
+            </tr>
+            @endif
+        </tbody>
     </table>
 
     <!-- Descripción -->
