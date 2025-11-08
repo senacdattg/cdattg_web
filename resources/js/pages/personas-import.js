@@ -20,6 +20,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let pollingInterval = null;
     let currentImportId = null;
 
+    const inicializarProgreso = () => {
+        panelProgreso?.classList.remove('d-none');
+        contadorProgreso.textContent = '0 / 0';
+        porcentajeProgreso.textContent = '0%';
+        barraProgreso.style.width = '0%';
+        estadoImportacion.textContent = 'PENDIENTE';
+        estadoImportacion.className = 'badge bg-secondary';
+        contadorExitosos.textContent = '0';
+        contadorDuplicados.textContent = '0';
+        contadorFaltantes.textContent = '0';
+        tablaIncidencias.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Sin incidencias registradas.</td></tr>';
+    };
+
     const actualizarIncidencias = (issues) => {
         tablaIncidencias.innerHTML = '';
 
@@ -44,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const actualizarProgreso = (datos) => {
         const { processed_rows, total_rows, success_count, duplicate_count, missing_contact_count, status } = datos.import;
 
-        panelProgreso.style.display = 'block';
+        panelProgreso?.classList.remove('d-none');
 
         const total = total_rows ?? 0;
         const procesados = processed_rows ?? 0;
@@ -54,12 +67,25 @@ document.addEventListener('DOMContentLoaded', () => {
         porcentajeProgreso.textContent = `${porcentaje}%`;
         barraProgreso.style.width = `${porcentaje}%`;
 
-        estadoImportacion.textContent = status.toUpperCase();
+        const statusLabels = {
+            'pending': 'PENDIENTE',
+            'processing': 'PROCESANDO...',
+            'completed': 'COMPLETADO',
+            'failed': 'FALLIDO'
+        };
+
+        estadoImportacion.textContent = statusLabels[status] || status.toUpperCase();
         estadoImportacion.className = 'badge';
+        
         if (status === 'completed') {
             estadoImportacion.classList.add('bg-success');
+            barraProgreso.classList.remove('progress-bar-animated');
         } else if (status === 'failed') {
             estadoImportacion.classList.add('bg-danger');
+            barraProgreso.classList.remove('progress-bar-animated');
+        } else if (status === 'processing') {
+            estadoImportacion.classList.add('bg-info');
+            barraProgreso.classList.add('progress-bar-animated');
         } else {
             estadoImportacion.classList.add('bg-secondary');
         }
@@ -129,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         ejecutarConsulta();
         detenerMonitoreo();
-        pollingInterval = setInterval(ejecutarConsulta, 3500);
+        pollingInterval = setInterval(ejecutarConsulta, 2000);
     };
 
     form?.addEventListener('submit', async (event) => {
@@ -147,7 +173,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const formData = new FormData(form);
-        const token = form.querySelector('input[name="_token"]').value;
+        const tokenElement = form.querySelector('input[name="_token"]');
+        
+        if (!tokenElement) {
+            Swal.fire({ icon: 'error', title: 'Error de seguridad', text: 'No se encontró el token CSRF. Por favor, recarga la página.' });
+            return;
+        }
+        
+        const token = tokenElement.value;
 
         btnIniciar.disabled = true;
         btnIniciar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Procesando...';
@@ -168,11 +201,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const data = await respuesta.json();
-            Swal.fire({ icon: 'info', title: 'Importación en marcha', text: 'El archivo se está procesando en segundo plano.' });
-
+            
             btnRecargarIncidencias.disabled = true;
-            panelProgreso.style.display = 'block';
-            monitorearImportacion(data.import_id);
+            inicializarProgreso();
+            
+            Swal.fire({ 
+                icon: 'info', 
+                title: 'Importación iniciada', 
+                text: 'El archivo se está procesando. El progreso se actualizará automáticamente.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+
+            setTimeout(() => {
+                monitorearImportacion(data.import_id);
+            }, 500);
         } catch (error) {
             Swal.fire({ icon: 'error', title: 'Error', text: error.message });
         } finally {
@@ -184,6 +227,35 @@ document.addEventListener('DOMContentLoaded', () => {
     btnRecargarIncidencias?.addEventListener('click', () => {
         if (currentImportId) {
             monitorearImportacion(currentImportId);
+        }
+    });
+
+    document.querySelectorAll('.form-eliminar-import').forEach((form) => {
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const result = await Swal.fire({
+                icon: 'warning',
+                title: '¿Eliminar importación?',
+                text: 'Se eliminará el registro y el archivo cargado como evidencia.',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true,
+            });
+
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    });
+
+    document.querySelector('.custom-file-input')?.addEventListener('change', (event) => {
+        const input = event.target;
+        const label = input.nextElementSibling;
+
+        if (label) {
+            label.textContent = input.files?.length ? input.files[0].name : 'Elegir archivo...';
         }
     });
 

@@ -7,9 +7,10 @@ use App\Repositories\UserRepository;
 use App\Models\Persona;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Auth\AuthenticationException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 
 class PersonaService
 {
@@ -57,13 +58,15 @@ class PersonaService
      */
     public function crear(array $datos): Persona
     {
-        return DB::transaction(function () use ($datos) {
-            $datos['user_create_id'] = auth()->id();
-            $datos['user_edit_id'] = auth()->id();
+        $userId = $this->obtenerIdUsuarioAutenticado();
+
+        return DB::transaction(function () use ($datos, $userId) {
+            $datos['user_create_id'] = $userId;
+            $datos['user_edit_id'] = $userId;
 
             $caracterizacionesIds = collect($datos['caracterizacion_ids'] ?? [])
                 ->filter()
-                ->map(fn ($id) => (int) $id)
+                ->map(fn($id) => (int) $id)
                 ->unique()
                 ->values();
 
@@ -79,11 +82,6 @@ class PersonaService
             // Crear usuario asociado
             $this->crearUsuarioPersona($persona);
 
-            Log::info('Persona creada', [
-                'persona_id' => $persona->id,
-                'documento' => $persona->numero_documento,
-            ]);
-
             return $persona;
         });
     }
@@ -97,16 +95,12 @@ class PersonaService
      */
     public function actualizar(int $id, array $datos): bool
     {
-        return DB::transaction(function () use ($id, $datos) {
-            $datos['user_edit_id'] = auth()->id();
-            
-            $actualizado = Persona::where('id', $id)->update($datos);
+        $userId = $this->obtenerIdUsuarioAutenticado();
 
-            if ($actualizado) {
-                Log::info('Persona actualizada', [
-                    'persona_id' => $id,
-                ]);
-            }
+        return DB::transaction(function () use ($id, $datos, $userId) {
+
+            $datos['user_edit_id'] = $userId;
+            $actualizado = Persona::where('id', $id)->update($datos);
 
             return $actualizado;
         });
@@ -135,29 +129,8 @@ class PersonaService
 
             $eliminado = $persona->delete();
 
-            if ($eliminado) {
-                Log::info('Persona eliminada', [
-                    'persona_id' => $id,
-                ]);
-            }
-
             return $eliminado;
         });
-    }
-
-    /**
-     * Crea usuario asociado a persona
-     *
-     * @param Persona $persona
-     * @return User
-     */
-    protected function crearUsuarioPersona(Persona $persona): User
-    {
-        return $this->userRepo->crear([
-            'email' => $persona->email,
-            'password' => Hash::make($persona->numero_documento),
-            'persona_id' => $persona->id,
-        ]);
     }
 
     /**
@@ -175,10 +148,35 @@ class PersonaService
         }
 
         $nuevoEstado = !$persona->user->status;
-        
+
         return $this->userRepo->actualizar($persona->user->id, [
             'status' => $nuevoEstado,
         ]);
     }
-}
 
+    /**
+     * Crea usuario asociado a persona
+     *
+     * @param Persona $persona
+     * @return User
+     */
+    protected function crearUsuarioPersona(Persona $persona): User
+    {
+        return $this->userRepo->crear([
+            'email' => $persona->email,
+            'password' => Hash::make($persona->numero_documento),
+            'persona_id' => $persona->id,
+        ]);
+    }
+
+    protected function obtenerIdUsuarioAutenticado(): int
+    {
+        $userId = Auth::id();
+
+        if ($userId === null) {
+            throw new AuthenticationException('Debe iniciar sesión para realizar esta acción.');
+        }
+
+        return $userId;
+    }
+}

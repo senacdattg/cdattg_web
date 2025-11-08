@@ -228,7 +228,7 @@ class Persona extends Model
     public function getEstadoSofiaBadgeClassAttribute()
     {
         return match ($this->estado_sofia) {
-            0 => 'bg-secondary',
+            0 => 'bg-danger',
             1 => 'bg-success',
             2 => 'bg-warning',
             default => 'bg-dark'
