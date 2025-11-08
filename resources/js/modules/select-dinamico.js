@@ -105,13 +105,27 @@ export class SelectDinamicoHandler {
                 url: this.buildUrl(this.options.departamentosTemplate, paisId),
                 method: 'GET',
                 success: (response) => {
+                    // Manejar diferentes estructuras de respuesta
+                    let departamentos = [];
+                    
                     if (response.success && response.data) {
-                        this.populateSelect(departamentoSelect, response.data, 'Seleccione un departamento...');
+                        // Estructura: {success: true, data: [...]}
+                        departamentos = response.data;
+                    } else if (Array.isArray(response)) {
+                        // Estructura: [...]
+                        departamentos = response;
+                    } else if (response && typeof response === 'object') {
+                        // Estructura: {departamentos: [...]} u otra variante
+                        departamentos = response.departamentos || response.data || [];
+                    }
+                    
+                    if (Array.isArray(departamentos) && departamentos.length > 0) {
+                        this.populateSelect(departamentoSelect, departamentos, 'Seleccione un departamento...');
                         this.clearSelect(this.options.municipioSelector, 'Primero seleccione un departamento...');
                         resolve(response);
                     } else {
-                        this.setErrorState(departamentoSelect, 'Error al cargar departamentos');
-                        reject(new Error('Respuesta inválida'));
+                        this.setErrorState(departamentoSelect, 'No hay departamentos disponibles');
+                        reject(new Error('No se encontraron departamentos'));
                     }
                 },
                 error: (xhr, status, error) => {
@@ -141,12 +155,26 @@ export class SelectDinamicoHandler {
                 url: this.buildUrl(this.options.municipiosTemplate, departamentoId),
                 method: 'GET',
                 success: (response) => {
+                    // Manejar diferentes estructuras de respuesta
+                    let municipios = [];
+                    
                     if (response.success && response.data) {
-                        this.populateSelect(municipioSelect, response.data, 'Seleccione un municipio...');
+                        // Estructura: {success: true, data: [...]}
+                        municipios = response.data;
+                    } else if (Array.isArray(response)) {
+                        // Estructura: [...]
+                        municipios = response;
+                    } else if (response && typeof response === 'object') {
+                        // Estructura: {municipios: [...]} u otra variante
+                        municipios = response.municipios || response.data || [];
+                    }
+                    
+                    if (Array.isArray(municipios) && municipios.length > 0) {
+                        this.populateSelect(municipioSelect, municipios, 'Seleccione un municipio...');
                         resolve(response);
                     } else {
-                        this.setErrorState(municipioSelect, 'Error al cargar municipios');
-                        reject(new Error('Respuesta inválida'));
+                        this.setErrorState(municipioSelect, 'No hay municipios disponibles');
+                        reject(new Error('No se encontraron municipios'));
                     }
                 },
                 error: (xhr, status, error) => {

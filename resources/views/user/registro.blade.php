@@ -134,12 +134,35 @@
                                     .then(response => response.json())
                                     .then(data => {
                                         municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
-                                        data.forEach(municipio => {
-                                            const option = document.createElement('option');
-                                            option.value = municipio.id;
-                                            option.textContent = municipio.municipio;
-                                            municipioSelect.appendChild(option);
-                                        });
+                                        
+                                        // Manejar diferentes estructuras de respuesta
+                                        let municipios = [];
+                                        
+                                        if (data.success && data.data) {
+                                            // Estructura: {success: true, data: [...]}
+                                            municipios = data.data;
+                                        } else if (Array.isArray(data)) {
+                                            // Estructura: [...]
+                                            municipios = data;
+                                        } else if (data && typeof data === 'object') {
+                                            // Estructura: {municipios: [...]} u otra variante
+                                            municipios = data.municipios || data.data || [];
+                                        }
+                                        
+                                        if (Array.isArray(municipios) && municipios.length > 0) {
+                                            municipios.forEach(municipio => {
+                                                const option = document.createElement('option');
+                                                option.value = municipio.id;
+                                                // Manejar diferentes nombres de campo para el municipio
+                                                const label = municipio.nombre ?? municipio.municipio ?? municipio.name ?? municipio.label ?? '';
+                                                option.textContent = label || `ID ${municipio.id}`;
+                                                municipioSelect.appendChild(option);
+                                            });
+                                        } else {
+                                            console.error('No se encontraron municipios o estructura inválida:', data);
+                                            municipioSelect.innerHTML = '<option value="">No hay municipios disponibles</option>';
+                                        }
+                                        
                                         // Preseleccionar municipio si viene de old() tras validación
                                         if (selectedMunicipioId) {
                                             municipioSelect.value = selectedMunicipioId;
