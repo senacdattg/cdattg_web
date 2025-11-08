@@ -11,94 +11,119 @@ document.addEventListener('DOMContentLoaded', function () {
  * Cargar datos del carrito desde sessionStorage
  */
 function cargarDatosCarrito() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const desdeCarrito = urlParams.get('desde_carrito');
-
-    if (desdeCarrito === 'true') {
-        const carritoDataString = sessionStorage.getItem('carrito_data');
-
-        if (carritoDataString) {
-            try {
-                const data = JSON.parse(carritoDataString);
-
-                // Elementos del DOM
-                const totalProductosEl = document.getElementById('carrito-total-productos');
-                const totalItemsEl = document.getElementById('carrito-total-items');
-                const carritoResumenStatsEl = document.getElementById('carrito-resumen-stats');
-                const carritoItemsCardEl = document.getElementById('carrito-items-card');
-                const carritoItemsTbodyEl = document.getElementById('carrito-items-tbody');
-
-                // Actualizar totales
-                if (totalProductosEl) totalProductosEl.textContent = data.totalProductos || 0;
-                if (totalItemsEl) totalItemsEl.textContent = data.totalItems || 0;
-
-                // Mostrar resumen si existe
-                if (carritoResumenStatsEl) carritoResumenStatsEl.style.display = 'grid';
-
-                // Llenar la tabla de productos
-                if (carritoItemsTbodyEl && data.items && data.items.length > 0) {
-                    let html = '';
-                    data.items.forEach(item => {
-                        const cantidad = item.quantity || item.cantidad || 1;
-                        html += `
-                            <tr>
-                                <td><strong>${item.name || 'Producto'}</strong></td>
-                                <td class="text-center">
-                                    <span class="badge badge-primary">${cantidad}</span>
-                                </td>
-                            </tr>
-                        `;
-                    });
-                    carritoItemsTbodyEl.innerHTML = html;
-
-                    if (carritoItemsCardEl) carritoItemsCardEl.classList.remove('d-none');
-                }
-
-                // Crear input oculto con el carrito (para el backend)
-                const form = document.querySelector('#form-solicitud');
-                if (form) {
-                    // Asegurar que cada item tenga la propiedad 'quantity' correcta
-                    const itemsProcesados = (data.items || []).map(item => ({
-                        ...item,
-                        quantity: item.quantity || item.cantidad || 1
-                    }));
-
-                    const inputHidden = document.createElement('input');
-                    inputHidden.type = 'hidden';
-                    inputHidden.name = 'carrito';
-                    inputHidden.value = JSON.stringify(itemsProcesados);
-                    form.appendChild(inputHidden);
-                }
-
-                // Mostrar alerta de éxito
-                if (typeof Swal !== 'undefined') {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Carrito cargado',
-                        html: `Se han cargado <strong>${data.totalProductos} producto(s)</strong> con <strong>${data.totalItems} ítems</strong><br><small class="text-muted">Completa los datos faltantes</small>`,
-                        timer: 3000,
-                        showConfirmButton: false
-                    });
-                }
-
-                // Limpiar sessionStorage (para evitar duplicados)
-                sessionStorage.removeItem('carrito_data');
-
-            } catch (error) {
-                console.error('Error al cargar datos del carrito:', error);
-                if (typeof Swal !== 'undefined') {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error',
-                        text: 'Error al cargar los datos del carrito: ' + error.message
-                    });
-                }
-            }
-        }
+    if (!debeCargarDesdeCarrito()) {
+        setupFechaDevolucionToggle();
+        return;
     }
 
-    // Configurar comportamiento de la fecha de devolución
+    const carritoDataString = obtenerDatosCarrito();
+    if (!carritoDataString) {
+        setupFechaDevolucionToggle();
+        return;
+    }
+
+    try {
+        const data = JSON.parse(carritoDataString);
+        aplicarDatosCarrito(data);
+        sessionStorage.removeItem('carrito_data');
+    } catch (error) {
+        manejarErrorCargaCarrito(error);
+    }
+
     setupFechaDevolucionToggle();
+}
+
+function debeCargarDesdeCarrito() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('desde_carrito') === 'true';
+}
+
+function obtenerDatosCarrito() {
+    return sessionStorage.getItem('carrito_data');
+}
+
+function aplicarDatosCarrito(data) {
+    actualizarTotalesCarrito(data);
+    mostrarResumenCarrito();
+    renderizarItemsCarrito(data);
+    inyectarHiddenCarrito(data);
+    mostrarAlertaCarritoCargado(data);
+}
+
+function actualizarTotalesCarrito(data) {
+    const totalProductosEl = document.getElementById('carrito-total-productos');
+    const totalItemsEl = document.getElementById('carrito-total-items');
+
+    if (totalProductosEl) totalProductosEl.textContent = data.totalProductos || 0;
+    if (totalItemsEl) totalItemsEl.textContent = data.totalItems || 0;
+}
+
+function mostrarResumenCarrito() {
+    const carritoResumenStatsEl = document.getElementById('carrito-resumen-stats');
+    if (carritoResumenStatsEl) carritoResumenStatsEl.style.display = 'grid';
+}
+
+function renderizarItemsCarrito(data) {
+    const carritoItemsTbodyEl = document.getElementById('carrito-items-tbody');
+    if (!carritoItemsTbodyEl || !Array.isArray(data.items) || data.items.length === 0) {
+        return;
+    }
+
+    const html = data.items.map(item => {
+        const cantidad = item.quantity || item.cantidad || 1;
+        return `
+            <tr>
+                <td><strong>${item.name || 'Producto'}</strong></td>
+                <td class="text-center">
+                    <span class="badge badge-primary">${cantidad}</span>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    carritoItemsTbodyEl.innerHTML = html;
+
+    const carritoItemsCardEl = document.getElementById('carrito-items-card');
+    if (carritoItemsCardEl) carritoItemsCardEl.classList.remove('d-none');
+}
+
+function inyectarHiddenCarrito(data) {
+    const form = document.querySelector('#form-solicitud');
+    if (!form) return;
+
+    const itemsProcesados = (data.items || []).map(item => ({
+        ...item,
+        quantity: item.quantity || item.cantidad || 1
+    }));
+
+    const inputHidden = document.createElement('input');
+    inputHidden.type = 'hidden';
+    inputHidden.name = 'carrito';
+    inputHidden.value = JSON.stringify(itemsProcesados);
+    form.appendChild(inputHidden);
+}
+
+function mostrarAlertaCarritoCargado(data) {
+    if (typeof Swal === 'undefined') return;
+
+    Swal.fire({
+        icon: 'success',
+        title: 'Carrito cargado',
+        html: `Se han cargado <strong>${data.totalProductos} producto(s)</strong> con <strong>${data.totalItems} ítems</strong><br><small class="text-muted">Completa los datos faltantes</small>`,
+        timer: 3000,
+        showConfirmButton: false
+    });
+}
+
+function manejarErrorCargaCarrito(error) {
+    console.error('Error al cargar datos del carrito:', error);
+    if (typeof Swal !== 'undefined') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Error al cargar los datos del carrito: ' + error.message
+        });
+    }
 }
 
 /**

@@ -403,6 +403,8 @@ function confirmEmptyCart() {
         if (result.isConfirmed) {
             cart = [];
             saveCart();
+            localStorage.removeItem(DRAFT_KEY);
+            sessionStorage.removeItem('carrito_data');
             showEmptyCart();
             updateCartSummary();
             
