@@ -70,6 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
     captureInitialState();
     initializeCardView();
     updateCartCount();
+    setupModalDismissHandlers();
 });
 
 /**
@@ -82,6 +83,32 @@ function initializeCardView() {
     setupSortFilter();
     setupProductActions();
     updateCartCount();
+}
+
+/**
+ * Configura los métodos para cerrar el modal de detalles
+ */
+function setupModalDismissHandlers() {
+    const modal = document.getElementById('productDetailModal');
+    if (modal && !modal.dataset.dismissInitialized) {
+        modal.addEventListener('click', function(event) {
+            if (event.target === modal) {
+                closeProductModal();
+            }
+        });
+        modal.dataset.dismissInitialized = 'true';
+    }
+
+    if (!document.body.dataset.productModalEscapeListener) {
+        document.addEventListener('keydown', handleProductModalEscape);
+        document.body.dataset.productModalEscapeListener = 'true';
+    }
+}
+
+function handleProductModalEscape(event) {
+    if (event.key === 'Escape') {
+        closeProductModal();
+    }
 }
 
 /**
@@ -665,3 +692,8 @@ window.inventarioCard = {
     addToCart,
     updateCartCount
 };
+
+// Exponer funciones utilizadas por atributos onclick en el HTML renderizado por Blade
+window.closeProductModal = closeProductModal;
+window.agregarAlCarritoDesdeModal = agregarAlCarritoDesdeModal;
+window.expandirImagen = expandirImagen;
