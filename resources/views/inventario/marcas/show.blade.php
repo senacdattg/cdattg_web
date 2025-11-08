@@ -81,6 +81,9 @@
                         <div class="card-body p-0">
                             <div class="table-responsive">
                                 <table class="table detail-table mb-0">
+                                    <caption id="marca-description" class="sr-only">
+                                        Lista de marcas con información de nombre, estado, descripción, total de productos y fechas de creación y actualización.
+                                    </caption>
                                     <tbody>
                                         <tr>
                                             <th class="py-3">Nombre</th>

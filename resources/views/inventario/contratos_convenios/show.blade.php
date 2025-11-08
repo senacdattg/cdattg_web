@@ -92,6 +92,9 @@
                         <div class="card-body p-0">
                             <div class="table-responsive">
                                 <table class="table detail-table mb-0">
+                                    <caption id="contrato-description" class="sr-only">
+                                        Lista de contratos/convenios con información de nombre, código, proveedor, fechas, estado y total de productos.
+                                    </caption>
                                     <tbody>
                                         <tr>
                                             <th class="py-3">Nombre</th>

@@ -83,6 +83,9 @@
                         <div class="card-body p-0" id="detalle">
                             <div class="table-responsive">
                                 <table class="table detail-table mb-0">
+                                    <caption id="proveedor-description" class="sr-only">
+                                        Lista de proveedores con información de nombre, NIT, correo electrónico, teléfono, dirección, departamento, municipio, contacto, estado, total de contratos/convenios y total de productos.
+                                    </caption>
                                     <tbody>
                                         <tr>
                                             <th class="py-3">Nombre del Proveedor</th>

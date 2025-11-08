@@ -50,6 +50,9 @@
                                 {{-- Tabla de productos (se llenará dinámicamente) --}}
                                 <div class="table-responsive d-none" id="cart-items-table">
                                     <table class="table table-hover">
+                                        <caption id="carrito-description" class="sr-only">
+                                            Vista del carrito de compras con información de producto, stock, cantidad y acciones disponibles.
+                                        </caption>
                                         <thead>
                                             <tr>
                                                 <th width="10%">Imagen</th>
@@ -215,7 +218,6 @@
 
 @push('css')
     @vite(['resources/css/inventario/shared/base.css'])
-    <link rel="stylesheet" href="{{ asset('css/inventario/carrito.css') }}">
     <style>
         .sticky-top {
             z-index: 1020;

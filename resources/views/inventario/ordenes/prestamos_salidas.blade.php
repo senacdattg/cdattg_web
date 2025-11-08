@@ -78,6 +78,9 @@
                                 <div class="card-body p-0">
                                     <div class="table-responsive">
                                         <table class="table table-sm table-hover mb-0">
+                                            <caption id="carrito-description" class="sr-only">
+                                                Lista de productos del carrito con información de producto y cantidad.
+                                            </caption>
                                             <thead class="table-light">
                                                 <tr>
                                                     <th>Producto</th>
