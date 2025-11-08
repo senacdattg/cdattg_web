@@ -1,0 +1,39 @@
+FROM node:18-alpine
+
+# Instalar Playwright y dependencias del sistema
+RUN apk add --no-cache \
+    chromium \
+    nss \
+    freetype \
+    freetype-dev \
+    harfbuzz \
+    ca-certificates \
+    ttf-freefont \
+    chromium-chromedriver
+
+# Configurar Playwright
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+ENV PLAYWRIGHT_BROWSERS_PATH=/usr/lib/playwright
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
+
+# Instalar Playwright
+RUN npm install -g playwright@^1.56.1
+
+# Crear directorio de trabajo
+WORKDIR /app
+
+# Copiar script de validación
+COPY resources/js/sofia-validator.js ./
+
+# Configurar usuario no-root
+RUN addgroup -g 1001 -S playwright \
+    && adduser -S playwright -u 1001
+
+USER playwright
+
+# Exponer puerto
+EXPOSE 3000
+
+# Comando de inicio
+CMD ["node", "sofia-validator.js"]

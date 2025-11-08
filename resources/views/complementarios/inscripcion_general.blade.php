@@ -24,7 +24,7 @@
 
                         <!-- Alertas -->
                         @if (session('success'))
-                            <div class="alert alert-success alert-dismissible">
+                            <div class="alert alert-info alert-dismissible">
                                 <button type="button" class="close" data-dismiss="alert"
                                     aria-hidden="true">&times;</button>
                                 <i class="icon fas fa-check"></i> {{ session('success') }}
@@ -39,8 +39,8 @@
                             </div>
                         @endif
 
-                        <div class="card card-primary">
-                            <div class="card-header">
+                        <div class="card">
+                            <div class="card-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
                                 <h3 class="card-title">Registro de datos personales y caracterización</h3>
                             </div>
 
@@ -51,7 +51,7 @@
                                     <!-- Documento de Identidad -->
                                     <div class="row mb-4">
                                         <div class="col-12">
-                                            <h4 class="text-primary mb-3">
+                                            <h4 class="text-dark mb-3">
                                                 <i class="fas fa-id-card mr-2"></i>Documento de Identidad
                                             </h4>
                                         </div>
@@ -88,7 +88,7 @@
                                     <!-- Nombres y Apellidos -->
                                     <div class="row mb-4">
                                         <div class="col-12">
-                                            <h4 class="text-success mb-3">
+                                            <h4 class="text-dark mb-3">
                                                 <i class="fas fa-user mr-2"></i>Nombres y Apellidos
                                             </h4>
                                         </div>
@@ -129,7 +129,7 @@
                                     <!-- Información Personal -->
                                     <div class="row mb-4">
                                         <div class="col-12">
-                                            <h4 class="text-warning mb-3">
+                                            <h4 class="text-dark mb-3">
                                                 <i class="fas fa-info-circle mr-2"></i>Información Personal
                                             </h4>
                                         </div>
@@ -138,7 +138,8 @@
                                                 <label for="fecha_nacimiento">Fecha de Nacimiento *</label>
                                                 <input type="date" class="form-control" id="fecha_nacimiento"
                                                     value="{{ old('fecha_nacimiento') }}" name="fecha_nacimiento"
-                                                    required>
+                                                    max="{{ date('Y-m-d', strtotime('-14 years')) }}" required>
+                                                <small class="form-text text-muted">Debe tener al menos 14 años para registrarse.</small>
                                             </div>
                                         </div>
                                         <div class="col-12 col-md-6">
@@ -162,7 +163,7 @@
                                     <!-- Contacto -->
                                     <div class="row mb-4">
                                         <div class="col-12">
-                                            <h4 class="text-danger mb-3">
+                                            <h4 class="text-dark mb-3">
                                                 <i class="fas fa-phone mr-2"></i>Información de Contacto
                                             </h4>
                                         </div>
@@ -195,7 +196,7 @@
                                     <!-- Ubicación -->
                                     <div class="row mb-4">
                                         <div class="col-12">
-                                            <h4 class="text-secondary mb-3">
+                                            <h4 class="text-dark mb-3">
                                                 <i class="fas fa-map-marker-alt mr-2"></i>Ubicación Actual
                                             </h4>
                                         </div>
@@ -252,39 +253,135 @@
                                                     </div>
                                                     <div class="card-body">
                                                         <div class="row">
-                                                            <div class="col-12 col-md-6">
+                                                            <div class="col-12">
                                                                 <div class="form-group">
-                                                                    <label for="carrera">Carrera *</label>
-                                                                    <input type="text" class="form-control address-field" id="carrera"
-                                                                        placeholder="Ej: 1" data-required="true">
+                                                                    <label for="tipo_via">1. Tipo de vía principal *</label>
+                                                                    <select class="form-control address-field" id="tipo_via" data-required="true">
+                                                                        <option value="">Seleccione...</option>
+                                                                        <option value="Carrera">Carrera</option>
+                                                                        <option value="Calle">Calle</option>
+                                                                        <option value="Transversal">Transversal</option>
+                                                                        <option value="Diagonal">Diagonal</option>
+                                                                        <option value="Avenida">Avenida</option>
+                                                                        <option value="Autopista">Autopista</option>
+                                                                        <option value="Circular">Circular</option>
+                                                                        <option value="Vía">Vía</option>
+                                                                        <option value="Pasaje">Pasaje</option>
+                                                                        <option value="Manzana">Manzana</option>
+                                                                    </select>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="calle">Calle *</label>
-                                                                    <input type="text" class="form-control address-field" id="calle"
-                                                                        placeholder="Ej: 2" data-required="true">
+                                                                    <label for="numero_via">2. Número o nombre de vía principal *</label>
+                                                                    <input type="text" class="form-control address-field" id="numero_via"
+                                                                        placeholder="Ej: 9A, 7 Bis, 45" data-required="true">
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="numero_casa">Número Casa *</label>
+                                                                    <label for="letra_via">3. Letra principal de la vía</label>
+                                                                    <select class="form-control address-field" id="letra_via">
+                                                                        <option value="">(Sin letra)</option>
+                                                                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                                                                        <option>E</option><option>F</option><option>G</option><option>H</option>
+                                                                        <option>I</option><option>J</option><option>K</option><option>L</option>
+                                                                        <option>M</option><option>N</option><option>O</option><option>P</option>
+                                                                        <option>Q</option><option>R</option><option>S</option><option>T</option>
+                                                                        <option>U</option><option>V</option><option>W</option><option>X</option>
+                                                                        <option>Y</option><option>Z</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group form-check">
+                                                                    <input type="checkbox" class="form-check-input" id="bis">
+                                                                    <label class="form-check-label" for="bis">Sufijo BIS</label>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="letra_sufijo">Letra Sufijo</label>
+                                                                    <select class="form-control address-field" id="letra_sufijo">
+                                                                        <option value="">(Sin sufijo)</option>
+                                                                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                                                                        <option>E</option><option>F</option><option>G</option><option>H</option>
+                                                                        <option>I</option><option>J</option><option>K</option><option>L</option>
+                                                                        <option>M</option><option>N</option><option>O</option><option>P</option>
+                                                                        <option>Q</option><option>R</option><option>S</option><option>T</option>
+                                                                        <option>U</option><option>V</option><option>W</option><option>X</option>
+                                                                        <option>Y</option><option>Z</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="cuadrante">Cuadrante</label>
+                                                                    <select class="form-control address-field" id="cuadrante">
+                                                                        <option value="">(Sin cuadrante)</option>
+                                                                        <option value="N">Norte (N)</option>
+                                                                        <option value="S">Sur (S)</option>
+                                                                        <option value="E">Este (E)</option>
+                                                                        <option value="O">Oeste (O)</option>
+                                                                        <option value="NE">Noreste (NE)</option>
+                                                                        <option value="NO">Noroeste (NO)</option>
+                                                                        <option value="SE">Sureste (SE)</option>
+                                                                        <option value="SO">Suroeste (SO)</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="via_secundaria">4. Número de la vía secundaria / intersección</label>
+                                                                    <input type="text" class="form-control address-field" id="via_secundaria"
+                                                                        placeholder="Ej: 12, 22B (opcional)">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="letra_via_secundaria">Letra asociada a la vía secundaria</label>
+                                                                    <select class="form-control address-field" id="letra_via_secundaria">
+                                                                        <option value="">(Sin letra)</option>
+                                                                        <option>A</option><option>B</option><option>C</option><option>D</option>
+                                                                        <option>E</option><option>F</option><option>G</option><option>H</option>
+                                                                        <option>I</option><option>J</option><option>K</option><option>L</option>
+                                                                        <option>M</option><option>N</option><option>O</option><option>P</option>
+                                                                        <option>Q</option><option>R</option><option>S</option><option>T</option>
+                                                                        <option>U</option><option>V</option><option>W</option><option>X</option>
+                                                                        <option>Y</option><option>Z</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="cuadrante_secundario">Cuadrante vía secundaria</label>
+                                                                    <select class="form-control address-field" id="cuadrante_secundario">
+                                                                        <option value="">(Sin cuadrante)</option>
+                                                                        <option value="N">Norte (N)</option>
+                                                                        <option value="S">Sur (S)</option>
+                                                                        <option value="E">Este (E)</option>
+                                                                        <option value="O">Oeste (O)</option>
+                                                                        <option value="NE">Noreste (NE)</option>
+                                                                        <option value="NO">Noroeste (NO)</option>
+                                                                        <option value="SE">Sureste (SE)</option>
+                                                                        <option value="SO">Suroeste (SO)</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="numero_casa">5. Número de casa o edificio *</label>
                                                                     <input type="text" class="form-control address-field" id="numero_casa"
-                                                                        placeholder="Ej: 3" data-required="true">
+                                                                        placeholder="Ej: 34-15, 45-20, 12" data-required="true">
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="numero_apartamento">Número Apartamento</label>
-                                                                    <input type="text" class="form-control address-field" id="numero_apartamento"
-                                                                        placeholder="Ej: 4 (opcional)">
+                                                                    <label for="complementos">6. Complementos</label>
+                                                                    <input type="text" class="form-control address-field" id="complementos"
+                                                                        placeholder="Ej: Apto 301, Bloque 2, Oficina 5 (opcional)">
                                                                 </div>
-                                                            </div>
-                                                            <div class="col-12 col-md-6 d-flex align-items-center">
-                                                                <div class="w-100">
-                                                                    <p class="mb-2"><strong>Ejemplo de formato:</strong></p>
-                                                                    <p class="text-muted">Carrera 1 Calle 2 #3 Apt 4</p>
-                                                                    <p class="text-muted small">Los campos marcados con * son obligatorios.</p>
+                                                                <div class="form-group">
+                                                                    <label for="barrio">7. Barrio o vereda</label>
+                                                                    <input type="text" class="form-control address-field" id="barrio"
+                                                                        placeholder="Ej: Centro, La Candelaria (opcional)">
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="row">
                                                             <div class="col-12">
-                                                                <button type="button" class="btn btn-success btn-sm mr-2" id="saveAddress">
+                                                                <div class="alert alert-info">
+                                                                    <small>
+                                                                        <strong>Ejemplo de formato:</strong><br>
+                                                                        <span class="text-muted">Carrera 9A #34-15 Apto 301, Barrio Centro</span><br>
+                                                                        <span class="text-muted">Los campos marcados con * son obligatorios.</span>
+                                                                    </small>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="row">
+                                                            <div class="col-12">
+                                                                <button type="button" class="btn btn-primary btn-sm mr-2" id="saveAddress">
                                                                     <i class="fas fa-save"></i> Guardar Dirección
                                                                 </button>
                                                                 <button type="button" class="btn btn-secondary btn-sm" id="cancelAddress">
@@ -433,22 +530,54 @@
         });
 
         document.getElementById('saveAddress').addEventListener('click', function() {
-            const carrera = document.getElementById('carrera').value.trim();
-            const calle = document.getElementById('calle').value.trim();
-            const numeroCasa = document.getElementById('numero_casa').value.trim();
-            const numeroApartamento = document.getElementById('numero_apartamento').value.trim();
+            const getVal = id => (document.getElementById(id) ? document.getElementById(id).value.trim() : '');
+            const getCheck = id => (document.getElementById(id) ? document.getElementById(id).checked : false);
+            const getSelectText = id => {
+                const el = document.getElementById(id);
+                if (!el || el.selectedIndex < 0) return '';
+                const text = el.options[el.selectedIndex].text || '';
+                const idx = text.indexOf(' (');
+                return idx > -1 ? text.substring(0, idx) : text;
+            };
+
+            const tipoVia = getVal('tipo_via');
+            const numeroVia = getVal('numero_via');
+            const letraVia = getVal('letra_via');
+            const bis = getCheck('bis');
+            const letraSufijo = getVal('letra_sufijo');
+            const cuadrante = getSelectText('cuadrante');
+
+            const viaSecundaria = getVal('via_secundaria');
+            const letraViaSec = getVal('letra_via_secundaria');
+            const cuadranteSec = getSelectText('cuadrante_secundario');
+
+            const numeroCasa = getVal('numero_casa');
+            const complementos = getVal('complementos');
+            const barrio = getVal('barrio');
 
             // Validar campos obligatorios
-            if (!carrera || !calle || !numeroCasa) {
-                alert('Por favor complete todos los campos obligatorios: Carrera, Calle y Número Casa.');
+            if (!tipoVia || !numeroVia || !numeroCasa) {
+                alert('Por favor complete todos los campos obligatorios: Tipo de vía, Número de vía y Número de casa.');
                 return;
             }
 
             // Construir la dirección
-            let direccion = `Carrera ${carrera} Calle ${calle} #${numeroCasa}`;
-            if (numeroApartamento) {
-                direccion += ` Apt ${numeroApartamento}`;
+            let direccion = `${tipoVia} ${numeroVia}`;
+            if (letraVia) direccion += `${letraVia}`;
+            if (bis) direccion += ' BIS';
+            if (letraSufijo) direccion += `${letraSufijo}`;
+            if (cuadrante) direccion += ` ${cuadrante}`;
+
+            direccion += ` #${numeroCasa}`;
+
+            if (viaSecundaria) {
+                direccion += ` ${viaSecundaria}`;
+                if (letraViaSec) direccion += `${letraViaSec}`;
+                if (cuadranteSec) direccion += ` ${cuadranteSec}`;
             }
+
+            if (complementos) direccion += ` ${complementos}`;
+            if (barrio) direccion += `, ${barrio}`;
 
             // Asignar al campo principal
             document.getElementById('direccion').value = direccion;
@@ -457,7 +586,15 @@
             $('#addressForm').collapse('hide');
 
             // Limpiar campos
-            document.querySelectorAll('.address-field').forEach(field => field.value = '');
+            document.querySelectorAll('.address-field').forEach(field => {
+                if (field.type === 'select-one') {
+                    field.selectedIndex = 0;
+                } else {
+                    field.value = '';
+                }
+            });
+            const bisEl = document.getElementById('bis');
+            if (bisEl) bisEl.checked = false;
         });
 
         document.getElementById('cancelAddress').addEventListener('click', function() {
@@ -469,13 +606,88 @@
         });
 
         // Validar solo números en campos de dirección
-        const addressNumericFields = ['carrera', 'calle', 'numero_casa', 'numero_apartamento'];
+        const addressNumericFields = ['numero_via', 'numero_casa'];
         addressNumericFields.forEach(fieldId => {
             const element = document.getElementById(fieldId);
             if (element) {
                 element.addEventListener('keypress', soloNumeros);
             }
         });
+
+        // Validación de edad mínima (14 años)
+        const fechaNacimientoInput = document.getElementById('fecha_nacimiento');
+        if (fechaNacimientoInput) {
+            // Calcular la fecha máxima permitida (hace 14 años)
+            const hoy = new Date();
+            const fechaMaxima = new Date();
+            fechaMaxima.setFullYear(hoy.getFullYear() - 14);
+            
+            // Establecer el atributo max si no está ya establecido
+            if (!fechaNacimientoInput.getAttribute('max')) {
+                const fechaMaximaStr = fechaMaxima.toISOString().split('T')[0];
+                fechaNacimientoInput.setAttribute('max', fechaMaximaStr);
+            }
+
+            // Validar cuando cambia la fecha
+            fechaNacimientoInput.addEventListener('change', function() {
+                const fechaSeleccionada = new Date(this.value);
+                const edadMinima = new Date();
+                edadMinima.setFullYear(edadMinima.getFullYear() - 14);
+
+                if (fechaSeleccionada > edadMinima) {
+                    this.setCustomValidity('Debe tener al menos 14 años para registrarse.');
+                    this.classList.add('is-invalid');
+                    
+                    // Mostrar mensaje de error
+                    let errorMessage = this.parentElement.querySelector('.invalid-feedback');
+                    if (!errorMessage) {
+                        errorMessage = document.createElement('div');
+                        errorMessage.className = 'invalid-feedback';
+                        this.parentElement.appendChild(errorMessage);
+                    }
+                    errorMessage.textContent = 'Debe tener al menos 14 años para registrarse.';
+                } else {
+                    this.setCustomValidity('');
+                    this.classList.remove('is-invalid');
+                    
+                    // Remover mensaje de error
+                    const errorMessage = this.parentElement.querySelector('.invalid-feedback');
+                    if (errorMessage) {
+                        errorMessage.remove();
+                    }
+                }
+            });
+
+            // Validar al enviar el formulario
+            const form = document.getElementById('inscripcionForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const fechaSeleccionada = new Date(fechaNacimientoInput.value);
+                    const edadMinima = new Date();
+                    edadMinima.setFullYear(edadMinima.getFullYear() - 14);
+
+                    if (fechaSeleccionada > edadMinima) {
+                        e.preventDefault();
+                        fechaNacimientoInput.focus();
+                        fechaNacimientoInput.setCustomValidity('Debe tener al menos 14 años para registrarse.');
+                        fechaNacimientoInput.classList.add('is-invalid');
+                        
+                        // Mostrar mensaje de error
+                        let errorMessage = fechaNacimientoInput.parentElement.querySelector('.invalid-feedback');
+                        if (!errorMessage) {
+                            errorMessage = document.createElement('div');
+                            errorMessage.className = 'invalid-feedback';
+                            fechaNacimientoInput.parentElement.appendChild(errorMessage);
+                        }
+                        errorMessage.textContent = 'Debe tener al menos 14 años para registrarse.';
+                        
+                        // Mostrar alerta
+                        alert('Debe tener al menos 14 años para registrarse.');
+                        return false;
+                    }
+                });
+            }
+        }
     </script>
 
     @include('components.modal-terminos')

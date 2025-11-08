@@ -31,7 +31,7 @@ class Handler extends ExceptionHandler
     public function render($request, Throwable $exception)
     {
         if ($exception instanceof AuthorizationException) {
-            return redirect()->route('home.index')->with('error', 'No tiene autorización para hacer esta acción.');
+            return redirect()->route('home')->with('error', 'No tiene autorización para hacer esta acción.');
         }
 
         return parent::render($request, $exception);

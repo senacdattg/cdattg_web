@@ -13,10 +13,7 @@ use App\Http\Controllers\ProgramaFormacionController;
 |
 */
 
-// Rutas resource para CRUD completo
-Route::resource('programa', ProgramaFormacionController::class)->except(['show']);
-
-// Ruta adicional para mostrar detalles
+// Ruta para mostrar detalles
 Route::get('/programa/{programa}', [ProgramaFormacionController::class, 'show'])
     ->name('programa.show')
     ->middleware('can:programa.show');

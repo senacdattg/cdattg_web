@@ -58,7 +58,7 @@
                         <label for="email">Usuario</label>
                         <div class="input-group">
                             <input type="email" class="form-control @error('email') is-invalid @enderror" name="email"
-                                id="email" placeholder="Correo Institucional" value="{{ old('email') }}" required
+                                id="email" placeholder="Correo" value="{{ old('email') }}" required
                                 autofocus>
                             <div class="input-group-append">
                                 <div class="input-group-text">
@@ -96,6 +96,15 @@
                     </div>
 
                 </form>
+
+                {{-- Botón para volver a la página principal --}}
+                <div class="row mt-3 d-flex justify-content-center">
+                    <div class="col-6">
+                        <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-block">
+                            <i class="fas fa-arrow-left mr-2"></i>Volver al Inicio
+                        </a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

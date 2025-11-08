@@ -16,6 +16,26 @@
 
 @section('content')
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <!-- Alertas de sesión -->
+    @if (session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> {{ session('success') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
+
     <!-- Search and Filters -->
     <div class="card">
         <div class="card-body">
@@ -64,8 +84,8 @@
                     <p class="card-text">{{ $programa->descripcion }}</p>
                     <div class="d-flex justify-content-center mt-3 pt-3 border-top">
                         <div>
-                            <small class="text-muted">Duraciรณn</small>
-                            <p class="mb-0"><strong>{{ $programa->duracion }} horas</strong></p>
+                            <small class="text-muted">Duración</small>
+                            <p class="mb-0"><strong>{{ formatear_horas($programa->duracion) }} horas</strong></p>
                         </div>
                     </div>
                 </div>
@@ -122,7 +142,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="edit_duracion" class="form-label">Duraciรณn (horas)</label>
+                                    <label for="edit_duracion" class="form-label">Duración (horas)</label>
                                     <input type="number" class="form-control" id="edit_duracion"
                                         name="duracion" required min="1">
                                 </div>
@@ -157,6 +177,14 @@
                                 <option value="0">Sin Oferta</option>
                                 <option value="1">Con Oferta</option>
                                 <option value="2">Cupos Llenos</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_ambiente_id" class="form-label">Ambiente</label>
+                            <select class="form-select" id="edit_ambiente_id" name="ambiente_id" required>
+                                @foreach($ambientes as $ambiente)
+                                <option value="{{ $ambiente->id }}">{{ $ambiente->title }} - {{ $ambiente->piso->piso ?? 'N/A' }}</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="d-grid gap-2 d-md-flex justify-content-md-end">
@@ -206,7 +234,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label class="form-label fw-bold">Duraciรณn (horas)</label>
+                                <label class="form-label fw-bold">Duración (horas)</label>
                                 <p id="view_duracion" class="form-control-plaintext"></p>
                             </div>
                         </div>
@@ -234,6 +262,10 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Estado</label>
                         <p id="view_estado" class="form-control-plaintext"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Ambiente</label>
+                        <p id="view_ambiente" class="form-control-plaintext"></p>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Dรญas de Formaciรณn</label>
@@ -330,6 +362,11 @@
                     const estados = {0: 'Sin Oferta', 1: 'Con Oferta', 2: 'Cupos Llenos'};
                     document.getElementById('view_estado').textContent = estados[data.estado] || 'N/A';
 
+                    // Ambiente
+                    const ambientes = @json($ambientes);
+                    const ambiente = ambientes.find(a => a.id == data.ambiente_id);
+                    document.getElementById('view_ambiente').textContent = ambiente ? `${ambiente.title} - ${ambiente.piso?.piso ?? 'N/A'}` : 'N/A';
+
                     // Dias
                     if (data.dias && data.dias.length > 0) {
                         const diasText = data.dias.map(dia => {
@@ -370,6 +407,7 @@
                     document.getElementById('edit_modalidad_id').value = data.modalidad_id;
                     document.getElementById('edit_jornada_id').value = data.jornada_id;
                     document.getElementById('edit_estado').value = data.estado;
+                    document.getElementById('edit_ambiente_id').value = data.ambiente_id;
 
                     // Show the edit modal
                     $('#editProgramModal').modal('show');

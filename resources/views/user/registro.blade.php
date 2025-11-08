@@ -55,6 +55,9 @@
 
                             // Configurar funcionalidad de dirección estructurada
                             setupAddressForm();
+
+                            // Configurar validación de edad mínima
+                            setupEdadMinimaValidation();
                         });
 
                         function setupUppercaseConversion() {
@@ -66,7 +69,19 @@
                                 const campo = document.getElementById(campoId);
                                 if (campo) {
                                     campo.addEventListener('input', function() {
-                                        this.value = this.value.toUpperCase();
+                                        // Convertir a mayúsculas y remover números
+                                        this.value = this.value.toUpperCase().replace(/[0-9]/g, '');
+                                    });
+
+                                    // Validación en tiempo real - prevenir números durante escritura
+                                    campo.addEventListener('keypress', function(e) {
+                                        const char = String.fromCharCode(e.which);
+                                        // Permitir letras, espacios, guiones, tildes y teclas de control
+                                        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]$/.test(char) && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                                            e.preventDefault();
+                                            return false;
+                                        }
+                                        return true;
                                     });
                                 }
                             });
@@ -101,10 +116,15 @@
                                 departamentoSelect.addEventListener('change', function() {
                                     loadMunicipiosForDepartamento(this.value);
                                 });
+                                // Cargar municipios en carga inicial si ya hay un departamento seleccionado (por old())
+                                const oldMunicipioId = "{{ old('municipio_id') }}";
+                                if (departamentoSelect.value) {
+                                    loadMunicipiosForDepartamento(departamentoSelect.value, oldMunicipioId || null);
+                                }
                             }
                         }
 
-                        function loadMunicipiosForDepartamento(departamentoId) {
+                        function loadMunicipiosForDepartamento(departamentoId, selectedMunicipioId = null) {
                             const municipioSelect = document.getElementById('municipio_id');
                             if (!municipioSelect) return;
 
@@ -119,6 +139,10 @@
                                             option.textContent = municipio.municipio;
                                             municipioSelect.appendChild(option);
                                         });
+                                        // Preseleccionar municipio si viene de old() tras validación
+                                        if (selectedMunicipioId) {
+                                            municipioSelect.value = selectedMunicipioId;
+                                        }
                                     })
                                     .catch(error => {
                                         console.error('Error cargando municipios:', error);
@@ -149,21 +173,34 @@
                             const saveButton = document.getElementById('saveAddress');
                             if (saveButton) {
                                 saveButton.addEventListener('click', function() {
-                                    const carrera = document.getElementById('carrera').value.trim();
-                                    const calle = document.getElementById('calle').value.trim();
-                                    const numeroCasa = document.getElementById('numero_casa').value.trim();
-                                    const numeroApartamento = document.getElementById('numero_apartamento').value.trim();
+                                    const tipoVia = document.getElementById('tipo_via') ? document.getElementById('tipo_via').value.trim() : '';
+                                    const numeroVia = document.getElementById('numero_via') ? document.getElementById('numero_via').value.trim() : '';
+                                    const letraVia = document.getElementById('letra_via') ? document.getElementById('letra_via').value.trim() : '';
+                                    const viaSecundaria = document.getElementById('via_secundaria') ? document.getElementById('via_secundaria').value.trim() : '';
+                                    const numeroCasa = document.getElementById('numero_casa') ? document.getElementById('numero_casa').value.trim() : '';
+                                    const complementos = document.getElementById('complementos') ? document.getElementById('complementos').value.trim() : '';
+                                    const barrio = document.getElementById('barrio') ? document.getElementById('barrio').value.trim() : '';
 
                                     // Validar campos obligatorios
-                                    if (!carrera || !calle || !numeroCasa) {
-                                        alert('Por favor complete todos los campos obligatorios: Carrera, Calle y Número Casa.');
+                                    if (!tipoVia || !numeroVia || !numeroCasa) {
+                                        alert('Por favor complete todos los campos obligatorios: Tipo de vía, Número de vía y Número de casa.');
                                         return;
                                     }
 
                                     // Construir la dirección
-                                    let direccion = `Carrera ${carrera} Calle ${calle} #${numeroCasa}`;
-                                    if (numeroApartamento) {
-                                        direccion += ` Apt ${numeroApartamento}`;
+                                    let direccion = `${tipoVia} ${numeroVia}`;
+                                    if (letraVia) {
+                                        direccion += letraVia;
+                                    }
+                                    direccion += ` #${numeroCasa}`;
+                                    if (viaSecundaria) {
+                                        direccion += ` ${viaSecundaria}`;
+                                    }
+                                    if (complementos) {
+                                        direccion += ` ${complementos}`;
+                                    }
+                                    if (barrio) {
+                                        direccion += `, ${barrio}`;
                                     }
 
                                     // Asignar al campo principal
@@ -173,7 +210,13 @@
                                     $('#addressForm').collapse('hide');
 
                                     // Limpiar campos
-                                    document.querySelectorAll('.address-field').forEach(field => field.value = '');
+                                    document.querySelectorAll('.address-field').forEach(field => {
+                                        if (field.type === 'select-one') {
+                                            field.selectedIndex = 0;
+                                        } else {
+                                            field.value = '';
+                                        }
+                                    });
                                 });
                             }
 
@@ -189,7 +232,7 @@
                             }
 
                             // Validar solo números en campos de dirección
-                            const addressNumericFields = ['carrera', 'calle', 'numero_casa', 'numero_apartamento'];
+                            const addressNumericFields = ['numero_via', 'numero_casa'];
                             addressNumericFields.forEach(fieldId => {
                                 const element = document.getElementById(fieldId);
                                 if (element) {
@@ -206,6 +249,82 @@
                                     });
                                 }
                             });
+                        }
+
+                        function setupEdadMinimaValidation() {
+                            const fechaNacimientoInput = document.getElementById('fecha_nacimiento');
+                            if (!fechaNacimientoInput) return;
+
+                            // Calcular la fecha máxima permitida (hace 14 años)
+                            const hoy = new Date();
+                            const fechaMaxima = new Date();
+                            fechaMaxima.setFullYear(hoy.getFullYear() - 14);
+                            
+                            // Establecer el atributo max si no está ya establecido
+                            if (!fechaNacimientoInput.getAttribute('max')) {
+                                const fechaMaximaStr = fechaMaxima.toISOString().split('T')[0];
+                                fechaNacimientoInput.setAttribute('max', fechaMaximaStr);
+                            }
+
+                            // Validar cuando cambia la fecha
+                            fechaNacimientoInput.addEventListener('change', function() {
+                                const fechaSeleccionada = new Date(this.value);
+                                const edadMinima = new Date();
+                                edadMinima.setFullYear(edadMinima.getFullYear() - 14);
+
+                                if (fechaSeleccionada > edadMinima) {
+                                    this.setCustomValidity('Debe tener al menos 14 años para registrarse.');
+                                    this.classList.add('is-invalid');
+                                    
+                                    // Mostrar mensaje de error
+                                    let errorMessage = this.parentElement.querySelector('.invalid-feedback');
+                                    if (!errorMessage) {
+                                        errorMessage = document.createElement('div');
+                                        errorMessage.className = 'invalid-feedback';
+                                        this.parentElement.appendChild(errorMessage);
+                                    }
+                                    errorMessage.textContent = 'Debe tener al menos 14 años para registrarse.';
+                                } else {
+                                    this.setCustomValidity('');
+                                    this.classList.remove('is-invalid');
+                                    
+                                    // Remover mensaje de error
+                                    const errorMessage = this.parentElement.querySelector('.invalid-feedback');
+                                    if (errorMessage) {
+                                        errorMessage.remove();
+                                    }
+                                }
+                            });
+
+                            // Validar al enviar el formulario
+                            const form = document.getElementById('registroForm');
+                            if (form) {
+                                form.addEventListener('submit', function(e) {
+                                    const fechaSeleccionada = new Date(fechaNacimientoInput.value);
+                                    const edadMinima = new Date();
+                                    edadMinima.setFullYear(edadMinima.getFullYear() - 14);
+
+                                    if (fechaSeleccionada > edadMinima) {
+                                        e.preventDefault();
+                                        fechaNacimientoInput.focus();
+                                        fechaNacimientoInput.setCustomValidity('Debe tener al menos 14 años para registrarse.');
+                                        fechaNacimientoInput.classList.add('is-invalid');
+                                        
+                                        // Mostrar mensaje de error
+                                        let errorMessage = fechaNacimientoInput.parentElement.querySelector('.invalid-feedback');
+                                        if (!errorMessage) {
+                                            errorMessage = document.createElement('div');
+                                            errorMessage.className = 'invalid-feedback';
+                                            fechaNacimientoInput.parentElement.appendChild(errorMessage);
+                                        }
+                                        errorMessage.textContent = 'Debe tener al menos 14 años para registrarse.';
+                                        
+                                        // Mostrar alerta
+                                        alert('Debe tener al menos 14 años para registrarse.');
+                                        return false;
+                                    }
+                                });
+                            }
                         }
                     </script>
 
