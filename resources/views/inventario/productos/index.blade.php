@@ -201,7 +201,7 @@
 
 @push('css')
     @vite([
-        'public/css/inventario/shared/base.css',
+        'resources/css/inventario/shared/base.css',
     ])
 @endpush
 
@@ -210,3 +210,4 @@
     @vite(['resources/js/pages/formularios-generico.js'])
 @endpush
 <script src="{{ asset('js/inventario/escaner.js') }}"></script>
+

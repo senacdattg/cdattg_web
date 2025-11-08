@@ -214,7 +214,7 @@
 @endsection
 
 @push('css')
-    @vite(['public/css/inventario/shared/base.css'])
+    @vite(['resources/css/inventario/shared/base.css'])
     <link rel="stylesheet" href="{{ asset('css/inventario/carrito.css') }}">
     <style>
         .sticky-top {
@@ -225,5 +225,5 @@
 
 @push('js')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="{{ asset('js/inventario/carrito.js') }}"></script>
+    @vite('resources/js/inventario/carrito.js')
 @endpush

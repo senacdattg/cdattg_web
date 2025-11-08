@@ -236,7 +236,7 @@ class SuperAdminSeeder extends Seeder
         }
 
         $this->command->info('Super Admin creado exitosamente:');
-        $this->command->info('Email: admin@admin.com');
+        $this->command->info('Email: superAdmin@superAdmin.com');
         $this->command->info('Password: 123456');
         $this->command->info('Rol: SUPER ADMINISTRADOR');
         $this->command->info('Permisos asignados: ' . count($allPermissions) . ' permisos');

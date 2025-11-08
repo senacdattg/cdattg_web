@@ -91,6 +91,8 @@ class DatabaseSeeder extends Seeder
             GuiasAprendizajeSeeder::class,
             ResultadosGuiasSeeder::class,
             CompetenciaProgramaSeeder::class,
+            ProductoSeeder::class, // Crear productos para agregar al módulo de inventario
+            // Categorias de caracterizacion para complementarios
             CategoriaCaracterizacionComplementariosSeeder::class,
         ]);
 
