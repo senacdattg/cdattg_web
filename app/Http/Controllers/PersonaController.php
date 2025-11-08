@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\CategoriaCaracterizacionComplementario;
 
 class PersonaController extends Controller
 {
@@ -210,13 +211,26 @@ class PersonaController extends Controller
         $departamentos = Departamento::where('status', 1)->get();
         $municipios = Municipio::where('status', 1)->get();
 
+        $persona->loadMissing('caracterizacionesComplementarias');
+
+        $categoriasCaracterizacion = CategoriaCaracterizacionComplementario::with([
+            'children' => function ($query) {
+                $query->where('activo', 1)->orderBy('nombre');
+            },
+        ])
+            ->whereNull('parent_id')
+            ->where('activo', 1)
+            ->orderBy('nombre')
+            ->get();
+
         return view('personas.edit', [
             'persona' => $persona,
             'documentos' => $documentos,
             'generos' => $generos,
             'paises' => $paises,
             'departamentos' => $departamentos,
-            'municipios' => $municipios
+            'municipios' => $municipios,
+            'categoriasCaracterizacion' => $categoriasCaracterizacion,
         ]);
     }
 
@@ -228,7 +242,18 @@ class PersonaController extends Controller
         try {
             DB::transaction(function () use ($request, $persona) {
                 $data = $request->validated();
+                $caracterizacionesIds = collect($request->input('caracterizacion_ids', []))
+                    ->filter()
+                    ->map(fn ($id) => (int) $id)
+                    ->unique()
+                    ->values();
+
+                $data['caracterizacion_id'] = $caracterizacionesIds->first() ?: null;
+                unset($data['caracterizacion_ids']);
+
                 $persona->update($data);
+
+                $persona->caracterizacionesComplementarias()->sync($caracterizacionesIds);
 
                 if ($persona->user) {
                     $persona->user->update([

@@ -13,7 +13,7 @@
 @endsection
 
 @section('content')
-    <section class="content mt-4">
+    <section class="content mt-4 mb-4">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <a class="btn btn-outline-secondary" href="{{ route('personas.show', $persona->id) }}">
@@ -33,6 +33,14 @@
                         $fechaNacimientoValor = $persona->fecha_nacimiento;
                     }
                 }
+                $caracterizacionesSeleccionadas = collect(
+                    old('caracterizacion_ids', $persona->caracterizacionesComplementarias->pluck('id')->toArray()),
+                )
+                    ->filter()
+                    ->map(fn($id) => (int) $id)
+                    ->unique()
+                    ->values()
+                    ->all();
             @endphp
 
             <form method="POST" action="{{ route('personas.update', $persona->id) }}" id="form-persona-edit">
@@ -274,6 +282,99 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="card shadow-sm border-0 mb-4">
+                            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                                <h5 class="card-title m-0 text-primary">
+                                    <i class="fas fa-layer-group mr-2"></i> Caracterización complementaria
+                                </h5>
+                                <div class="btn-group btn-group-sm" role="group" aria-label="Acciones caracterización">
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        data-action="caracterizacion-select-all">
+                                        <i class="fas fa-check-double mr-1"></i> Seleccionar todo
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary"
+                                        data-action="caracterizacion-clear">
+                                        <i class="fas fa-eraser mr-1"></i> Limpiar
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="card-body pt-0">
+                                <p class="text-muted small mb-3">
+                                    Marca una o varias categorías que describan la caracterización complementaria de la
+                                    persona.
+                                    Puedes combinar múltiples opciones según corresponda.
+                                </p>
+
+                                <div class="accordion" id="caracterizacionesAccordion">
+                                    @forelse ($categoriasCaracterizacion as $categoria)
+                                        @php
+                                            $children = $categoria->children ?? collect();
+                                            $collapseId = 'categoria-' . $categoria->id;
+                                        @endphp
+                                        <div class="card border-0 mb-2 caracterizacion-group"
+                                            data-group="{{ $collapseId }}">
+                                            <div
+                                                class="card-header bg-light border rounded d-flex justify-content-between align-items-center">
+                                                <button class="btn btn-link text-left text-primary font-weight-bold p-0"
+                                                    type="button" data-toggle="collapse"
+                                                    data-target="#{{ $collapseId }}" aria-expanded="true"
+                                                    aria-controls="{{ $collapseId }}">
+                                                    <i class="fas fa-folder-open mr-2"></i> {{ $categoria->nombre }}
+                                                </button>
+                                                <span class="badge badge-pill badge-light text-muted">
+                                                    {{ $children->count() > 0 ? $children->count() . ' opciones' : '1 opción' }}
+                                                </span>
+                                            </div>
+
+                                            <div id="{{ $collapseId }}" class="collapse show"
+                                                data-parent="#caracterizacionesAccordion">
+                                                <div class="card-body py-3">
+                                                    @if ($children->isNotEmpty())
+                                                        <div class="row">
+                                                            @foreach ($children as $child)
+                                                                <div class="col-md-6 mb-2">
+                                                                    <div class="custom-control custom-checkbox">
+                                                                        <input type="checkbox"
+                                                                            class="custom-control-input"
+                                                                            id="caracterizacion-{{ $child->id }}"
+                                                                            name="caracterizacion_ids[]"
+                                                                            value="{{ $child->id }}"
+                                                                            {{ in_array($child->id, $caracterizacionesSeleccionadas, true) ? 'checked' : '' }}>
+                                                                        <label class="custom-control-label"
+                                                                            for="caracterizacion-{{ $child->id }}">
+                                                                            {{ $child->nombre }}
+                                                                        </label>
+                                                                    </div>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    @else
+                                                        <div class="custom-control custom-checkbox">
+                                                            <input type="checkbox" class="custom-control-input"
+                                                                id="caracterizacion-{{ $categoria->id }}"
+                                                                name="caracterizacion_ids[]" value="{{ $categoria->id }}"
+                                                                {{ in_array($categoria->id, $caracterizacionesSeleccionadas, true) ? 'checked' : '' }}>
+                                                            <label class="custom-control-label"
+                                                                for="caracterizacion-{{ $categoria->id }}">
+                                                                {{ $categoria->nombre }}
+                                                            </label>
+                                                        </div>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @empty
+                                        <div class="alert alert-light mb-0">
+                                            No hay categorías de caracterización disponibles por el momento.
+                                        </div>
+                                    @endforelse
+                                </div>
+
+                                @error('caracterizacion_ids')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
                     </div>
 
                     <div class="col-lg-4">
@@ -332,7 +433,7 @@
                     </div>
                 </div>
 
-                <div class="card shadow-sm border-0 mt-4">
+                <div class="card shadow-sm border-0 mt-4 mb-5">
                     <div class="card-body d-flex justify-content-between align-items-center">
                         <div class="text-muted small">
                             Última modificación: {{ $persona->updated_at?->diffForHumans() ?? 'Sin información' }}
@@ -360,4 +461,31 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     @vite(['resources/js/parametros.js'])
     @vite(['resources/js/pages/formularios-select-dinamico.js'])
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectAllBtn = document.querySelector('[data-action="caracterizacion-select-all"]');
+            const clearBtn = document.querySelector('[data-action="caracterizacion-clear"]');
+            const groups = document.querySelectorAll('.caracterizacion-group');
+
+            const toggleCheckboxes = (checked) => {
+                groups.forEach(group => {
+                    group.querySelectorAll('input[type="checkbox"]').forEach(chk => {
+                        chk.checked = checked;
+                    });
+                });
+            };
+
+            if (selectAllBtn) {
+                selectAllBtn.addEventListener('click', function() {
+                    toggleCheckboxes(true);
+                });
+            }
+
+            if (clearBtn) {
+                clearBtn.addEventListener('click', function() {
+                    toggleCheckboxes(false);
+                });
+            }
+        });
+    </script>
 @endsection

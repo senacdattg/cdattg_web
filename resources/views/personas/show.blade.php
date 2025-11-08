@@ -174,8 +174,14 @@
                                 <div class="col-md-6 mb-0">
                                     <span class="text-muted text-uppercase small d-block">Caracterización</span>
                                     <p class="h6 mb-0">
-                                        @if ($persona->caracterizacion)
-                                            {{ $persona->caracterizacion->nombre }}
+                                        @if ($persona->caracterizacionesComplementarias->isNotEmpty())
+                                            @foreach ($persona->caracterizacionesComplementarias as $categoria)
+                                                <span
+                                                    class="badge badge-info text-white mr-1 mb-1">{{ $categoria->nombre }}</span>
+                                            @endforeach
+                                        @elseif ($persona->caracterizacion)
+                                            <span
+                                                class="badge badge-info text-white">{{ $persona->caracterizacion->nombre }}</span>
                                         @else
                                             <span class="badge badge-warning text-dark">Sin información</span>
                                         @endif
@@ -343,16 +349,6 @@
                                     <p class="h6 mb-0">
                                         <span
                                             class="badge {{ $estadoSofiaBadgeClass }} text-white">{{ $estadoSofiaLabel }}</span>
-                                    </p>
-                                </div>
-                                <div class="col-md-6 mb-0">
-                                    <span class="text-muted text-uppercase small d-block">Caracterización</span>
-                                    <p class="h6 mb-0">
-                                        @if ($persona->caracterizacion)
-                                            {{ $persona->caracterizacion->nombre }}
-                                        @else
-                                            <span class="badge badge-warning text-dark">Sin información</span>
-                                        @endif
                                     </p>
                                 </div>
                             </div>

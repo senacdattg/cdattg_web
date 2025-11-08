@@ -61,7 +61,20 @@ class PersonaService
             $datos['user_create_id'] = auth()->id();
             $datos['user_edit_id'] = auth()->id();
 
+            $caracterizacionesIds = collect($datos['caracterizacion_ids'] ?? [])
+                ->filter()
+                ->map(fn ($id) => (int) $id)
+                ->unique()
+                ->values();
+
+            $datos['caracterizacion_id'] = $caracterizacionesIds->first() ?: null;
+            unset($datos['caracterizacion_ids']);
+
             $persona = Persona::create($datos);
+
+            if ($caracterizacionesIds->isNotEmpty()) {
+                $persona->caracterizacionesComplementarias()->sync($caracterizacionesIds);
+            }
 
             // Crear usuario asociado
             $this->crearUsuarioPersona($persona);

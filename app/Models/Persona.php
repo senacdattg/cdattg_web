@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\PersonaContactAlert;
 use App\Models\FichaCaracterizacion;
@@ -250,6 +251,32 @@ class Persona extends Model
     public function caracterizacion()
     {
         return $this->belongsTo(CategoriaCaracterizacionComplementario::class, 'caracterizacion_id');
+    }
+
+    public function caracterizacionesComplementarias(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            CategoriaCaracterizacionComplementario::class,
+            'persona_caracterizacion',
+            'persona_id',
+            'categoria_caracterizacion_id'
+        )->withTimestamps();
+    }
+
+    public function getCaracterizacionesComplementariasNombresAttribute(): array
+    {
+        return $this->caracterizacionesComplementarias
+            ->pluck('nombre')
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    public function getCaracterizacionesComplementariasTextoAttribute(): string
+    {
+        $nombres = $this->caracterizaciones_complementarias_nombres;
+
+        return $nombres ? implode(', ', $nombres) : '';
     }
 
     public function contactAlerts()
