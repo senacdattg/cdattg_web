@@ -24,17 +24,13 @@ class CarritoController extends Controller
         $this->middleware('can:VACIAR CARRITO')->only(['vaciar']);
     }
 
-    /**
-     * Vista del carrito
-     */
+    // Vista del carrito
     public function index()
     {
         return view('inventario.carrito.carrito');
     }
 
-    /**
-     * Agregar productos al carrito (crear orden)
-     */
+    // Agregar productos al carrito (crear orden)
     public function agregar(Request $request)
     {
         $validated = $request->validate([
@@ -69,9 +65,8 @@ class CarritoController extends Controller
         }
     }
 
-    /**
-     * Actualizar cantidad de un producto en el carrito
-     */
+    // Actualizar cantidad de un producto en el carrito
+     
     public function actualizar(Request $request, $id)
     {
         $validated = $request->validate([
@@ -107,9 +102,8 @@ class CarritoController extends Controller
         }
     }
 
-    /**
-     * Eliminar producto del carrito
-     */
+    //Eliminar producto del carrito
+     
     public function eliminar($id)
     {
         try {
@@ -130,9 +124,7 @@ class CarritoController extends Controller
         }
     }
 
-    /**
-     * Vaciar todo el carrito
-     */
+    // Vaciar todo el carrito
     public function vaciar()
     {
         // Esta es una operación del lado del cliente (localStorage)
@@ -142,9 +134,7 @@ class CarritoController extends Controller
         ]);
     }
 
-    /**
-     * Obtener contenido del carrito
-     */
+    // Obtener contenido del carrito
     public function contenido(Request $request)
     {
         try {
