@@ -2,17 +2,21 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\JornadaFormacion;
+use Database\Seeders\Concerns\TruncatesTables;
 
 class JornadaFormacionSeeder extends Seeder
 {
+    use TruncatesTables;
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $this->truncateModel(JornadaFormacion::class);
+
         $jornadas = [
             [
                 'jornada' => 'MAÑANA'

@@ -101,7 +101,8 @@
                                     <i class="fas fa-file-alt validation-icon text-primary"></i>
                                     Extracción OCR
                                 </h6>
-                                <p class="card-text">Extracción automática de información de documentos de identidad.</p>
+                                <p class="card-text">Extracción automática de información de documentos de
+                                    identidad.</p>
                                 <button class="btn btn-sm btn-primary">Iniciar Extracción</button>
                             </div>
                         </div>

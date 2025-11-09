@@ -1,39 +1,45 @@
-FROM node:18-alpine
+FROM node:20-alpine AS dependencies
 
-# Instalar Playwright y dependencias del sistema
-RUN apk add --no-cache \
-    chromium \
-    nss \
-    freetype \
-    freetype-dev \
-    harfbuzz \
-    ca-certificates \
-    ttf-freefont \
-    chromium-chromedriver
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
+WORKDIR /app
 
-# Configurar Playwright
+RUN set -eux; \
+    npm init -y; \
+    npm install playwright@^1.56.1; \
+    npm prune --omit=dev
+
+FROM node:20-alpine AS runtime
+
+ARG NODE_ENV=production
+ENV NODE_ENV=${NODE_ENV}
 ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
 ENV PLAYWRIGHT_BROWSERS_PATH=/usr/lib/playwright
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-
-# Instalar Playwright
-RUN npm install -g playwright@^1.56.1
-
-# Crear directorio de trabajo
 WORKDIR /app
 
-# Copiar script de validación
-COPY resources/js/sofia-validator.js ./
+RUN set -eux; \
+    apk add --no-cache \
+        chromium \
+        nss \
+        freetype \
+        harfbuzz \
+        ca-certificates \
+        ttf-freefont \
+        chromium-chromedriver
 
-# Configurar usuario no-root
+COPY --from=dependencies /app/package.json ./package.json
+COPY --from=dependencies /app/package-lock.json ./package-lock.json
+COPY --from=dependencies /app/node_modules ./node_modules
+COPY resources/js/sofia-validator.js ./sofia-validator.js
+COPY resources/js/sofia-validator-server.js ./sofia-validator-server.js
+
 RUN addgroup -g 1001 -S playwright \
-    && adduser -S playwright -u 1001
+    && adduser -S playwright -G playwright -u 1001
 
 USER playwright
 
-# Exponer puerto
 EXPOSE 3000
 
-# Comando de inicio
-CMD ["node", "sofia-validator.js"]
+CMD ["node", "sofia-validator-server.js"]

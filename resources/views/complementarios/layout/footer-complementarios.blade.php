@@ -9,7 +9,8 @@
             </div>
             <div class="col-md-6 text-md-right">
                 <div class="d-flex justify-content-end align-items-center">
-                    <img src="{{ asset('img/sena-logo.png') }}" alt="SENA Logo" style="height: 30px; margin-right: 10px;">
+                    <img src="{{ asset('img/sena-logo.png') }}" alt="SENA Logo"
+                        style="height: 30px; margin-right: 10px;">
                     <div>
                         <small>Centro de Desarrollo Tecnológico</small>
                         <br>

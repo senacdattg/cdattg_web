@@ -17,7 +17,8 @@
             <form class="row g-3">
                 <div class="col-md-6">
                     <label class="form-label fw-bold">Cédula</label>
-                    <input type="text" class="form-control form-control-lg" id="cedula" placeholder="Ingrese la cédula">
+                    <input type="text" class="form-control form-control-lg" id="cedula"
+                        placeholder="Ingrese la cédula">
                 </div>
                 <div class="col-md-3 d-flex align-items-end">
                     <button type="button" class="btn btn-primary btn-lg w-100" id="btn-consultar">
@@ -40,7 +41,8 @@
                 <h3 class="card-title" id="form-title">Información de la Persona</h3>
             </div>
             <div class="card-body">
-                <form id="personaForm" action="{{ route('talento-humano.consultar') }}" method="POST" enctype="multipart/form-data">
+                <form id="personaForm" action="{{ route('talento-humano.consultar') }}" method="POST"
+                    enctype="multipart/form-data">
                     @csrf
                     <input type="hidden" id="action_type" name="action_type" value="consultar">
 
@@ -67,7 +69,8 @@
                         <div class="col-12 col-md-6">
                             <div class="form-group">
                                 <label for="numero_documento">Número de Documento *</label>
-                                <input type="text" class="form-control" id="numero_documento" name="numero_documento" required>
+                                <input type="text" class="form-control" id="numero_documento"
+                                    name="numero_documento" required>
                             </div>
                         </div>
                     </div>
@@ -82,7 +85,8 @@
                         <div class="col-12 col-md-6">
                             <div class="form-group">
                                 <label for="primer_nombre">Primer Nombre *</label>
-                                <input type="text" class="form-control" id="primer_nombre" name="primer_nombre" required>
+                                <input type="text" class="form-control" id="primer_nombre"
+                                    name="primer_nombre" required>
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
@@ -94,7 +98,8 @@
                         <div class="col-12 col-md-6">
                             <div class="form-group">
                                 <label for="primer_apellido">Primer Apellido *</label>
-                                <input type="text" class="form-control" id="primer_apellido" name="primer_apellido" required>
+                                <input type="text" class="form-control" id="primer_apellido"
+                                    name="primer_apellido" required>
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
@@ -115,7 +120,8 @@
                         <div class="col-12 col-md-6">
                             <div class="form-group">
                                 <label for="fecha_nacimiento">Fecha de Nacimiento *</label>
-                                <input type="date" class="form-control" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                                <input type="date" class="form-control" id="fecha_nacimiento"
+                                    name="fecha_nacimiento" required>
                             </div>
                         </div>
                         <div class="col-12 col-md-6">
@@ -184,7 +190,8 @@
                                 <select class="form-control" name="departamento_id" id="departamento_id" required>
                                     <option value="">Seleccione...</option>
                                     @foreach ($departamentos ?? [] as $departamento)
-                                        <option value="{{ $departamento->id }}">{{ $departamento->departamento }}</option>
+                                        <option value="{{ $departamento->id }}">
+                                            {{ $departamento->departamento }}</option>
                                     @endforeach
                                 </select>
                             </div>
@@ -200,9 +207,11 @@
                         <div class="col-12">
                             <div class="form-group">
                                 <label for="direccion">Dirección *</label>
-                                <input type="text" class="form-control" id="direccion" name="direccion" placeholder="Dirección completa" required>
+                                <input type="text" class="form-control" id="direccion" name="direccion"
+                                    placeholder="Dirección completa" required>
                                 <div class="mt-2">
-                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                                        id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
                                         <i class="fas fa-edit"></i> Ingresar Dirección Estructurada
                                     </button>
                                     <small class="text-muted ms-2">O ingrese la dirección libremente arriba</small>
@@ -228,12 +237,14 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="numero_casa">Número Casa *</label>
-                                                    <input type="text" class="form-control address-field" id="numero_casa"
+                                                    <input type="text" class="form-control address-field"
+                                                        id="numero_casa"
                                                         placeholder="Ej: 3" data-required="true">
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="numero_apartamento">Número Apartamento</label>
-                                                    <input type="text" class="form-control address-field" id="numero_apartamento"
+                                                    <input type="text" class="form-control address-field"
+                                                        id="numero_apartamento"
                                                         placeholder="Ej: 4 (opcional)">
                                                 </div>
                                             </div>
@@ -241,16 +252,19 @@
                                                 <div class="w-100">
                                                     <p class="mb-2"><strong>Ejemplo de formato:</strong></p>
                                                     <p class="text-muted">Carrera 1 Calle 2 #3 Apt 4</p>
-                                                    <p class="text-muted small">Los campos marcados con * son obligatorios.</p>
+                                                    <p class="text-muted small">Los campos marcados con * son
+                                                        obligatorios.</p>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="col-12">
-                                                <button type="button" class="btn btn-success btn-sm mr-2" id="saveAddress">
+                                                <button type="button" class="btn btn-success btn-sm mr-2"
+                                                    id="saveAddress">
                                                     <i class="fas fa-save"></i> Guardar Dirección
                                                 </button>
-                                                <button type="button" class="btn btn-secondary btn-sm" id="cancelAddress">
+                                                <button type="button" class="btn btn-secondary btn-sm"
+                                                    id="cancelAddress">
                                                     <i class="fas fa-times"></i> Cancelar
                                                 </button>
                                             </div>
@@ -267,7 +281,8 @@
                             <h4 class="text-dark mb-3">
                                 <i class="fas fa-tags mr-2"></i>Caracterización
                             </h4>
-                            <p class="text-muted mb-3">Seleccione una categoría que corresponda a su situación (opcional):</p>
+                            <p class="text-muted mb-3">Seleccione una categoría que corresponda a su situación
+                                (opcional):</p>
                         </div>
                         @foreach ($categoriasConHijos ?? [] as $categoria)
                             <div class="col-12 mb-4">
@@ -444,7 +459,8 @@
 
             // Marcar caracterización si existe
             if (data.caracterizacion_id) {
-                const caracterizacionRadio = document.querySelector(`input[name="caracterizacion_id"][value="${data.caracterizacion_id}"]`);
+                const caracterizacionRadio = document.querySelector(
+                    `input[name="caracterizacion_id"][value="${data.caracterizacion_id}"]`);
                 if (caracterizacionRadio) {
                     caracterizacionRadio.checked = true;
                 }
@@ -578,12 +594,15 @@
         document.getElementById('saveAddress').addEventListener('click', function() {
             const carrera = document.getElementById('carrera') ? document.getElementById('carrera').value.trim() : '';
             const calle = document.getElementById('calle') ? document.getElementById('calle').value.trim() : '';
-            const numeroCasa = document.getElementById('numero_casa') ? document.getElementById('numero_casa').value.trim() : '';
-            const numeroApartamento = document.getElementById('numero_apartamento') ? document.getElementById('numero_apartamento').value.trim() : '';
+            const numeroCasa = document.getElementById('numero_casa') ?
+                document.getElementById('numero_casa').value.trim() : '';
+            const numeroApartamento = document.getElementById('numero_apartamento') ?
+                document.getElementById('numero_apartamento').value.trim() : '';
 
             // Validar campos obligatorios
             if (!carrera || !calle || !numeroCasa) {
-                showAlert('warning', 'Por favor complete todos los campos obligatorios: Carrera, Calle y Número Casa.');
+                showAlert('warning', 'Por favor complete todos los campos obligatorios: ' +
+                    'Carrera, Calle y Número Casa.');
                 return;
             }
 
@@ -745,10 +764,12 @@
         function showAlert(type, message) {
             // Crear elemento de alerta
             const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type === 'success' ? 'success' : type === 'warning' ? 'warning' : type === 'info' ? 'info' : 'danger'} alert-dismissible fade show position-fixed`;
+            alertDiv.className = `alert alert-${type === 'success' ? 'success' : type === 'warning' ?
+                'warning' : type === 'info' ? 'info' : 'danger'} alert-dismissible fade show position-fixed`;
             alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
             alertDiv.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ? 'exclamation-triangle' : type === 'info' ? 'info-circle' : 'exclamation-triangle'} me-2"></i>
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'warning' ?
+                    'exclamation-triangle' : type === 'info' ? 'info-circle' : 'exclamation-triangle'} me-2"></i>
                 ${message}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             `;

@@ -3,16 +3,20 @@
 namespace Database\Seeders;
 
 use App\Models\Departamento;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Database\Seeders\Concerns\TruncatesTables;
 
 class DepartamentoSeeder extends Seeder
 {
+    use TruncatesTables;
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $this->truncateModel(Departamento::class);
+
         $departamentos = [
             ['id' => 5, 'departamento' => 'ANTIOQUIA', 'pais_id' => 1],
             ['id' => 8, 'departamento' => 'ATLÁNTICO', 'pais_id' => 1],
@@ -50,7 +54,14 @@ class DepartamentoSeeder extends Seeder
         ];
 
         foreach ($departamentos as $departamento) {
-            Departamento::create($departamento);
+            Departamento::updateOrCreate(
+                ['id' => $departamento['id']],
+                [
+                    'departamento' => $departamento['departamento'],
+                    'pais_id'      => $departamento['pais_id'],
+                    'status'       => $departamento['status'] ?? 1,
+                ]
+            );
         }
     }
 }

@@ -9,11 +9,20 @@
             <p class="text-muted mb-0">Administre los aspirantes a programas de formación complementaria</p>
         </div>
         <div class="d-flex" style="gap: 1rem;">
-            <button class="btn btn-primary" id="btn-nuevo-aspirante" @if(isset($existingProgress) && $existingProgress) disabled @endif onclick="console.log('Botón Nuevo Aspirante clickeado'); $('#modalNuevoAspirante').modal('show');">
+            <button class="btn btn-primary" id="btn-nuevo-aspirante"
+                @if(isset($existingProgress) && $existingProgress) disabled @endif
+                onclick="console.log('Botón Nuevo Aspirante clickeado'); $('#modalNuevoAspirante').modal('show');">
                 <i class="fas fa-plus me-1"></i>Nuevo Aspirante
             </button>
-            <a href="{{ route('programas-complementarios.exportar-excel', $programa->id) }}" class="btn btn-success" id="btn-descargar-excel" @if(isset($existingProgress) && $existingProgress) style="pointer-events: none; opacity: 0.5;" @endif>
+            <a href="{{ route('programas-complementarios.exportar-excel', $programa->id) }}"
+                class="btn btn-success" id="btn-descargar-excel"
+                @if(isset($existingProgress) && $existingProgress) style="pointer-events: none; opacity: 0.5;" @endif>
                 <i class="fas fa-download me-1"></i>Descargar Excel
+            </a>
+            <a href="{{ route('programas-complementarios.descargar-cedulas', $programa->id) }}"
+                class="btn btn-info" id="btn-descargar-cedulas"
+                @if(isset($existingProgress) && $existingProgress) style="pointer-events: none; opacity: 0.5;" @endif>
+                <i class="fas fa-file-pdf me-1"></i>Descargar Cédulas
             </a>
             <a href="{{ route('gestion-aspirantes') }}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-1"></i> Volver
@@ -30,26 +39,10 @@
                     <label class="form-label fw-bold">Buscar Aspirante</label>
                     <div class="input-group">
                         <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
-                        <input type="text" class="form-control form-control-lg" placeholder="Buscar por nombre o número de identidad">
+                        <input type="text" class="form-control form-control-lg"
+                            placeholder="Buscar por nombre o número de identidad">
                     </div>
                 </div>
-                <!-- <div class="col-md-3">
-                    <label class="form-label fw-bold">Programa</label>
-                    <select class="form-select form-select-lg bg-light">
-                        <option selected>{{ $programa->nombre }}</option>
-                    </select>
-                </div> -->
-                <!-- <div class="col-md-3">
-                    <label class="form-label fw-bold">Año</label>
-                    <select class="form-select form-select-lg bg-light">
-                        <option selected>Todos los años</option>
-                        <option>2025</option>
-                        <option>2024</option>
-                        <option>2023</option>
-                        <option>2022</option>
-                        <option>2021</option>
-                    </select>
-                </div> -->
                 <div class="col-md-2 d-flex align-items-end">
                     <button class="btn btn-outline-secondary btn-lg w-100">
                         <i class="fas fa-filter me-1"></i>Filtrar
@@ -61,7 +54,8 @@
                 <button class="btn btn-outline-warning btn-sm me-2">En Proceso</button>
                 <button class="btn btn-outline-success btn-sm me-2">Aceptados</button>
                 <button class="btn btn-outline-danger btn-sm me-2">Rechazados</button>
-                <button class="btn btn-outline-primary btn-sm" id="btn-validar-sofia" data-programa-id="{{ $programa->id }}">
+                <button class="btn btn-outline-primary btn-sm" id="btn-validar-sofia"
+                    data-programa-id="{{ $programa->id }}">
                     <i class="fas fa-search me-1"></i>Validar SenaSofiaPlus
                 </button>
             </div>
@@ -81,6 +75,7 @@
                             <th>Fecha Solicitud</th>
                             <th>Estado</th>
                             <th>SenaSofiaPlus</th>
+                            <th>Condocumento</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
@@ -88,7 +83,10 @@
                         @forelse($aspirantes as $index => $aspirante)
                         <tr>
                             <td>{{ $index + 1 }}</td>
-                            <td>{{ $aspirante->persona->primer_nombre }} {{ $aspirante->persona->segundo_nombre ?? '' }} {{ $aspirante->persona->primer_apellido }} {{ $aspirante->persona->segundo_apellido ?? '' }}</td>
+                            <td>{{ $aspirante->persona->primer_nombre }}
+                                {{ $aspirante->persona->segundo_nombre ?? '' }}
+                                {{ $aspirante->persona->primer_apellido }}
+                                {{ $aspirante->persona->segundo_apellido ?? '' }}</td>
                             <td>{{ $aspirante->persona->numero_documento }}</td>
                             <td>{{ $aspirante->complementario->nombre }}</td>
                             <td>{{ $aspirante->created_at->format('d/m/Y') }}</td>
@@ -103,19 +101,34 @@
                                     <span class="badge bg-secondary">DESCONOCIDO</span>
                                 @endif
                             </td>
-                            <td><span class="badge {{ $aspirante->persona->estado_sofia_badge_class }}">{{ $aspirante->persona->estado_sofia_label }}</span></td>
+                            <td><span class="badge {{ $aspirante->persona->estado_sofia_badge_class }}">
+                                {{ $aspirante->persona->estado_sofia_label }}</span></td>
                             <td>
-                                <!-- <button class="btn btn-warning btn-sm me-1 aspirante-action-btn" title="Editar" @if(isset($existingProgress) && $existingProgress) disabled @endif>
+                                @if($aspirante->persona->condocumento == 1)
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle me-1"></i>Subido
+                                    </span>
+                                @else
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-times-circle me-1"></i>No subido
+                                    </span>
+                                @endif
+                            </td>
+                            <td>
+                                <!-- <button class="btn btn-warning btn-sm me-1 aspirante-action-btn" title="Editar"
+                                    @if(isset($existingProgress) && $existingProgress) disabled @endif>
                                     <i class="fas fa-edit"></i>
                                 </button> -->
-                                <button class="btn btn-danger btn-sm aspirante-action-btn" title="Eliminar" data-aspirante-id="{{ $aspirante->id }}" @if(isset($existingProgress) && $existingProgress) disabled @endif>
+                                <button class="btn btn-danger btn-sm aspirante-action-btn" title="Eliminar"
+                                    data-aspirante-id="{{ $aspirante->id }}"
+                                    @if(isset($existingProgress) && $existingProgress) disabled @endif>
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="8" class="text-center">
+                            <td colspan="9" class="text-center">
                                 <div class="alert alert-info mb-0">
                                     <i class="fas fa-info-circle me-2"></i>
                                     No hay aspirantes registrados para este programa.
@@ -140,7 +153,8 @@
     </div>
 
     <!-- Modal Nuevo Aspirante -->
-    <div class="modal fade" id="modalNuevoAspirante" tabindex="-1" aria-labelledby="modalNuevoAspiranteLabel" aria-hidden="true">
+    <div class="modal fade" id="modalNuevoAspirante" tabindex="-1"
+        aria-labelledby="modalNuevoAspiranteLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -227,7 +241,8 @@
                     button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Agregando...';
 
                     try {
-                        const response = await fetch(`/programas-complementarios/{{ $programa->id }}/agregar-aspirante`, {
+                        const response = await fetch(
+                            `/programas-complementarios/{{ $programa->id }}/agregar-aspirante`, {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
@@ -312,7 +327,8 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                        'X-CSRF-TOKEN':
+                            document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
                     }
                 });
 
@@ -490,7 +506,8 @@
                     Math.round((progress.successful_validations / progress.total_aspirantes) * 100) : 0;
 
                 showAlert('success',
-                    `Validación completada. ${progress.successful_validations}/${progress.total_aspirantes} aspirantes validados exitosamente (${successRate}%).`
+                    `Validación completada. ${progress.successful_validations}/${progress.total_aspirantes}
+                        aspirantes validados exitosamente (${successRate}%).`
                 );
 
                 // Cambiar botón a completado
@@ -541,7 +558,8 @@
                 <div style="max-height: 200px; overflow-y: auto;">
                     <ul class="mb-0">
                         ${errors.slice(0, 10).map(error => `<li style="font-size: 0.875rem;">${error}</li>`).join('')}
-                        ${errors.length > 10 ? `<li style="font-size: 0.875rem;">... y ${errors.length - 10} errores más</li>` : ''}
+                        ${errors.length > 10 ?
+                            `<li style="font-size: 0.875rem;">... y ${errors.length - 10} errores más</li>` : ''}
                     </ul>
                 </div>
             `;
@@ -581,7 +599,8 @@
                 }
 
                 // Confirmación antes de eliminar
-                if (!confirm('¿Está seguro de que desea eliminar este aspirante del programa? Esta acción no se puede deshacer.')) {
+                if (!confirm('¿Está seguro de que desea eliminar este aspirante del programa? ' +
+                    'Esta acción no se puede deshacer.')) {
                     return;
                 }
 
@@ -627,7 +646,8 @@
         function showAlert(type, message) {
             // Crear elemento de alerta
             const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'} alert-dismissible fade show position-fixed`;
+            alertDiv.className = `alert alert-${type === 'success' ? 'success' : 'danger'}
+                alert-dismissible fade show position-fixed`;
             alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
             alertDiv.innerHTML = `
                 <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>

@@ -1,5 +1,5 @@
 // Script para validar registro en SenaSofiaPlus
-import { chromium } from 'playwright';
+const { chromium } = require('playwright');
 
 async function validarCedula(cedula, maxRetries = 3) {
   let browser = null;
@@ -268,8 +268,8 @@ async function main() {
 }
 
 // Ejecutar si se llama directamente
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (require.main === module) {
   main();
 }
 
-export { validarCedula };
+module.exports = { validarCedula };

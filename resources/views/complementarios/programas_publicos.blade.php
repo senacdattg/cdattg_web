@@ -73,7 +73,8 @@
             <div class="container py-5">
                 <div class="row align-items-center">
                     <div class="col-12 col-md-5 text-center mb-4 mb-md-0">
-                        <img src="{{ asset('img/flor_guaviare.png') }}" class="img-fluid hero-figure" alt="Imagen representativa SENA">
+                        <img src="{{ asset('img/flor_guaviare.png') }}" class="img-fluid hero-figure"
+                            alt="Imagen representativa SENA">
                     </div>
                     <div class="col-12 col-md-7 text-dark">
                         <span class="badge hero-badge mb-2">Formación Complementaria</span>
@@ -89,7 +90,8 @@
             <div class="row justify-content-center">
                 <div class="col-lg-10 col-xl-10">
                     @if (session('success'))
-                        <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-top: 20px;">
+                        <div class="alert alert-success alert-dismissible fade show" role="alert"
+                            style="margin-top: 20px;">
                             <i class="fas fa-check-circle mr-2"></i>
                             <strong>¡Éxito!</strong> {{ session('success') }}
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -99,7 +101,8 @@
                     @endif
 
                     @if (session('error'))
-                        <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-top: 20px;">
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert"
+                            style="margin-top: 20px;">
                             <i class="fas fa-exclamation-circle mr-2"></i>
                             <strong>Error:</strong> {{ session('error') }}
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -109,7 +112,8 @@
                     @endif
 
                     @if (session('warning'))
-                        <div class="alert alert-warning alert-dismissible fade show" role="alert" style="margin-top: 20px;">
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert"
+                            style="margin-top: 20px;">
                             <i class="fas fa-exclamation-triangle mr-2"></i>
                             <strong>Advertencia:</strong> {{ session('warning') }}
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -119,7 +123,8 @@
                     @endif
 
                     @if (session('info'))
-                        <div class="alert alert-info alert-dismissible fade show" role="alert" style="margin-top: 20px;">
+                        <div class="alert alert-info alert-dismissible fade show" role="alert"
+                            style="margin-top: 20px;">
                             <i class="fas fa-info-circle mr-2"></i>
                             <strong>Información:</strong> {{ session('info') }}
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -135,8 +140,10 @@
         <div class="row justify-content-center">
             <div class="col-lg-10 col-xl-10">
 
-                <div class="card programs-card border-0 shadow-sm" style="background-color: #ffffff; border-color: #dee2e6;">
-                    <div class="card-header d-flex align-items-center justify-content-between" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
+                <div class="card programs-card border-0 shadow-sm"
+                    style="background-color: #ffffff; border-color: #dee2e6;">
+                    <div class="card-header d-flex align-items-center justify-content-between"
+                        style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
                         <h3 class="card-title mb-0">
                             <i class="fas fa-graduation-cap mr-2"></i>Programas Complementarios
                         </h3>

@@ -16,8 +16,8 @@ return new class extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->boolean('status')->default(1);
-            $table->foreignId('user_create_id')->constrained('users')->default(1);
-            $table->foreignId('user_edit_id')->constrained('users')->default(1);
+            $table->foreignId('user_create_id')->nullable()->constrained('users');
+            $table->foreignId('user_edit_id')->nullable()->constrained('users');
             $table->timestamps();
         });
 
@@ -26,8 +26,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('tema_id')->constrained('temas')->onDelete('cascade');
             $table->foreignId('parametro_id')->constrained('parametros')->onDelete('cascade');
-            $table->foreignId('user_create_id')->constrained('users')->default(1);
-            $table->foreignId('user_edit_id')->constrained('users')->default(1);
+            $table->foreignId('user_create_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('user_edit_id')->nullable()->constrained('users')->nullOnDelete();
             $table->boolean('status')->default(1);
             $table->timestamps();
         });

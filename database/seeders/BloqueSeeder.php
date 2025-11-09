@@ -3,16 +3,20 @@
 namespace Database\Seeders;
 
 use App\Models\Bloque;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Database\Seeders\Concerns\TruncatesTables;
 
 class BloqueSeeder extends Seeder
 {
+    use TruncatesTables;
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $this->truncateModel(Bloque::class);
+
         // SEDE CENTRO
         Bloque::create(['id' => 1, 'bloque' =>'CENTRO', 'sede_id' => 1, 'user_create_id' => 1, 'user_edit_id' => 1, 'status' => 1]);
         // SEDE BIODIVERSA

@@ -112,7 +112,7 @@ class TalentoHumanoController extends Controller
                 'municipio_id' => 'required|exists:municipios,id',
                 'direccion' => 'required|string|max:191',
                 'observaciones' => 'nullable|string',
-                'caracterizacion_id' => 'nullable|exists:categorias_caracterizacion_complementarios,id',
+                'caracterizacion_id' => 'nullable|exists:parametros,id',
             ]);
 
             // Verificar si ya existe una persona con el mismo documento o email

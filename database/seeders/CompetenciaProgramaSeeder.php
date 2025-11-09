@@ -2,17 +2,21 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\CompetenciaPrograma;
+use Database\Seeders\Concerns\TruncatesTables;
 
 class CompetenciaProgramaSeeder extends Seeder
 {
+    use TruncatesTables;
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $this->truncateModel(CompetenciaPrograma::class);
+
         $competencias_programas = [
             // Programa 1 - Todas las competencias principales
             ['programa_id' => 1, 'competencia_id' => 1, 'user_create_id' => 1, 'user_edit_id' => 1],

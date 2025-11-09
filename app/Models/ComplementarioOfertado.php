@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ComplementarioOfertado extends Model
 {
+    use HasFactory;
+
     protected $table = 'complementarios_ofertados';
 
     protected $fillable = [
@@ -39,6 +42,11 @@ class ComplementarioOfertado extends Model
     {
         return $this->belongsToMany(Parametro::class, 'complementarios_ofertados_dias_formacion', 'complementario_id', 'dia_id')
                     ->withPivot('hora_inicio', 'hora_fin');
+    }
+
+    public function aspirantes()
+    {
+        return $this->hasMany(AspiranteComplementario::class, 'complementario_id');
     }
 
     public function getEstadoLabelAttribute()

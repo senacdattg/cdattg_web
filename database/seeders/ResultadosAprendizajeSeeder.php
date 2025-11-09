@@ -2,17 +2,21 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\ResultadosAprendizaje;
+use Database\Seeders\Concerns\TruncatesTables;
 
 class ResultadosAprendizajeSeeder extends Seeder
 {
+    use TruncatesTables;
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $this->truncateModel(ResultadosAprendizaje::class);
+
         $resultados_aprendizajes = [
             [
                 'id' => 1,

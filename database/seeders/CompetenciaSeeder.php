@@ -4,14 +4,19 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Competencia;
+use Database\Seeders\Concerns\TruncatesTables;
 
 class CompetenciaSeeder extends Seeder
 {
+    use TruncatesTables;
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $this->truncateModel(Competencia::class);
+
         $competencias = [
             [
                 'codigo' => '38356',

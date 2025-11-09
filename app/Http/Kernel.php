@@ -76,6 +76,7 @@ class Kernel extends HttpKernel
         'permission' => PermissionMiddleware::class,
         'role_or_permission' => RoleOrPermissionMiddleware::class,
         'validar.ficha.caracterizacion' => \App\Http\Middleware\ValidarFichaCaracterizacion::class,
-
+        'validate.content.length' => \App\Http\Middleware\ValidateContentLength::class,
+        'api.rate.limit' => \App\Http\Middleware\ApiRateLimiter::class,
     ];
 }

@@ -11,16 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categorias_caracterizacion_complementarios', function (Blueprint $table) {
-            $table->id();
-            $table->string('nombre', 191);
-            $table->string('slug', 191);
-            $table->boolean('activo')->default(true);
-            $table->timestamps();
-
-            $table->unique('nombre', 'categorias_caracterizacion_complementarios_nombre_unique');
-            $table->unique('slug', 'categorias_caracterizacion_complementarios_slug_unique');
-        });
+        // Esta tabla ya no se usa, los datos se manejan en la tabla parametros con tema_id = 16
+        // Se mantiene la migración por compatibilidad pero no crea la tabla
+        return;
     }
 
     /**

@@ -3,16 +3,20 @@
 namespace Database\Seeders;
 
 use App\Models\Ambiente;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Database\Seeders\Concerns\TruncatesTables;
 
 class AmbienteSeeder extends Seeder
 {
+    use TruncatesTables;
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $this->truncateModel(Ambiente::class);
+
         // ambientes pisos centro
         // p1
         Ambiente::create(['id' => 1, 'title' => 'CENTRO-AUDITORIO', 'piso_id' => 1, 'user_create_id' => 1, 'user_edit_id' => 1, 'status' => 1]);

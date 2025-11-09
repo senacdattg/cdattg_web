@@ -3,16 +3,20 @@
 namespace Database\Seeders;
 
 use App\Models\Sede;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Database\Seeders\Concerns\TruncatesTables;
 
 class SedeSeeder extends Seeder
 {
+    use TruncatesTables;
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $this->truncateModel(Sede::class);
+
         Sede::create(['id' => 1, 'sede' => 'CENTRO', 'direccion' => 'Cra 24 no. 7', 'user_create_id' => 1, 'user_edit_id' => 1, 'status' => 1, 'municipio_id' => 824, 'regional_id' => 1]);
         Sede::create(['id' => 2, 'sede' => 'MODELO', 'direccion' => 'Cra 19c no. 16-48', 'user_create_id' => 1, 'user_edit_id' => 1, 'status' => 1, 'municipio_id' => 824, 'regional_id' => 1]);
         Sede::create(['id' => 3, 'sede' => 'BIODIVERSA KM11', 'direccion' => 'KM 11 RUTA 65', 'user_create_id' => 1, 'user_edit_id' => 1, 'status' => 1, 'municipio_id' => 824, 'regional_id' => 1]);

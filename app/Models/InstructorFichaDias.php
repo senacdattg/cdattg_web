@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InstructorFichaDias extends Model
 {
+    use HasFactory;
+
     protected $table = 'instructor_ficha_dias';
 
     protected $fillable = ['instructor_ficha_id', 'dia_id', 'hora_inicio', 'hora_fin'];

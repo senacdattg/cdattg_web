@@ -38,6 +38,7 @@ class Persona extends Model
         'direccion',
         'status',
         'estado_sofia',
+        'condocumento',
         'user_create_id',
         'user_edit_id',
         'caracterizacion_id',
@@ -256,10 +257,10 @@ class Persona extends Model
     public function caracterizacionesComplementarias(): BelongsToMany
     {
         return $this->belongsToMany(
-            CategoriaCaracterizacionComplementario::class,
+            Parametro::class,
             'persona_caracterizacion',
             'persona_id',
-            'categoria_caracterizacion_id'
+            'parametro_id'
         )->withTimestamps();
     }
 

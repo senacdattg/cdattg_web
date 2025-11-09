@@ -4,14 +4,19 @@ namespace Database\Seeders;
 
 use App\Models\Municipio;
 use Illuminate\Database\Seeder;
+use Database\Seeders\Concerns\TruncatesTables;
 
 class MunicipioSeeder extends Seeder
 {
+	use TruncatesTables;
+
 	/**
 	 * Run the database seeds.
 	 */
 	public function run(): void
 	{
+		$this->truncateModel(Municipio::class);
+
 		Municipio::create(['municipio' => 'El Retorno', 'departamento_id' => 95, 'status' => 1]);
 		Municipio::create(['municipio' => 'Calamar', 'departamento_id' => 95, 'status' => 1]);
 		Municipio::create(['municipio' => 'Mapiripan', 'departamento_id' => 50, 'status' => 1]);

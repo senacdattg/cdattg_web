@@ -3,16 +3,20 @@
 namespace Database\Seeders;
 
 use App\Models\Piso;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Database\Seeders\Concerns\TruncatesTables;
 
 class PisoSeeder extends Seeder
 {
+    use TruncatesTables;
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $this->truncateModel(Piso::class);
+
         // pisos bloque centro
         Piso::create(['id' => 1, 'piso' => 'P1', 'bloque_id' => 1, 'user_create_id' => 1, 'user_edit_id' => 1, 'status' => 1]);
         Piso::create(['id' => 2, 'piso' => 'P2', 'bloque_id' => 1, 'user_create_id' => 1, 'user_edit_id' => 1, 'status' => 1]);

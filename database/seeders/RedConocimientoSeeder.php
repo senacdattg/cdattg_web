@@ -4,16 +4,20 @@ namespace Database\Seeders;
 
 use App\Models\RedConocimiento;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Database\Seeders\Concerns\TruncatesTables;
 
 class RedConocimientoSeeder extends Seeder
 {
+    use TruncatesTables;
+
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
+        $this->truncateModel(RedConocimiento::class);
+
         // Obtener el primer usuario administrador para auditoría
         $adminUser = User::first();
         $userId = $adminUser ? $adminUser->id : null;

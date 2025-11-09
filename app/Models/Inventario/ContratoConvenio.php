@@ -2,12 +2,14 @@
 
 namespace App\Models\Inventario;
 
-use App\Traits\Seguimiento;
 use App\Models\ParametroTema;
+use App\Traits\Seguimiento;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class ContratoConvenio extends Model
 {
+    use HasFactory;
     use Seguimiento;
 
     protected $table = 'contratos_convenios';
