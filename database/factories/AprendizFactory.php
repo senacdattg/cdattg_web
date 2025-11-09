@@ -18,7 +18,7 @@ class AprendizFactory extends Factory
     {
         return [
             'persona_id' => Persona::factory(),
-            'estado' => $this->faker->boolean(90),
+            'estado' => (rand(1, 100) <= 90) ? 1 : 0,
             'user_create_id' => 1,
             'user_edit_id' => 1,
         ];

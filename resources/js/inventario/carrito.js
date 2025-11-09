@@ -384,9 +384,8 @@ function removeItem(index) {
     });
 }
 
-/**
- * Confirmar vaciar todo el carrito
- */
+
+// Confirmar vaciar todo el carrito
 function confirmEmptyCart() {
     if (cart.length === 0) return;
 
@@ -403,6 +402,8 @@ function confirmEmptyCart() {
         if (result.isConfirmed) {
             cart = [];
             saveCart();
+            localStorage.removeItem(DRAFT_KEY);
+            sessionStorage.removeItem('carrito_data');
             showEmptyCart();
             updateCartSummary();
             

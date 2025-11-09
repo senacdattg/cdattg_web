@@ -17,7 +17,7 @@ class AprobacionFactory extends Factory
     {
         return [
             'detalle_orden_id' => DetalleOrden::factory(),
-            'estado_aprobacion_id' => $this->faker->randomElement([49, 50]),
+            'estado_aprobacion_id' => [49, 50][array_rand([49, 50])],
             'user_create_id' => 1,
             'user_update_id' => 1,
         ];

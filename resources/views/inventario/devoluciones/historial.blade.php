@@ -46,6 +46,9 @@
                     @if($devoluciones->count() > 0)
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
+                                <caption id="devoluciones-description" class="sr-only">
+                                    Listado de devoluciones con información de ID, producto, cantidad devuelta, fecha de devolución, estado, registrado por y acciones disponibles.
+                                </caption>
                                 <thead>
                                     <tr>
                                         <th>ID</th>

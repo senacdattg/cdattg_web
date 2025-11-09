@@ -16,15 +16,16 @@ class InstructorFichaDiasFactory extends Factory
 
     public function definition(): array
     {
-        $horaInicio = $this->faker->randomElement(['06:30:00', '08:00:00', '14:00:00']);
-        $duracion = $this->faker->numberBetween(2, 5);
+        $horasInicio = ['06:30:00', '08:00:00', '14:00:00'];
+        $horaInicio = $horasInicio[array_rand($horasInicio)];
+        $duracion = rand(2, 5);
         $horaFin = Carbon::createFromFormat('H:i:s', $horaInicio)
             ->addHours($duracion)
             ->format('H:i:s');
 
         return [
             'instructor_ficha_id' => InstructorFichaCaracterizacion::factory(),
-            'dia_id' => $this->faker->numberBetween(12, 17),
+            'dia_id' => rand(12, 17),
             'hora_inicio' => $horaInicio,
             'hora_fin' => $horaFin,
         ];

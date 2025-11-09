@@ -25,8 +25,11 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $uniqueId = uniqid('user_', true);
+        $timestamp = time() . rand(1000, 9999);
+        
         return [
-            'email' => strtolower($this->faker->unique()->safeEmail()),
+            'email' => strtolower($uniqueId . $timestamp . '@example.com'),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('12345678'),
             'remember_token' => Str::random(10),

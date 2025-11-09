@@ -19,6 +19,12 @@ use App\Notifications\StockBajoNotification;
 
 class ProductoController extends InventarioController
 {
+    private const THEME_PRODUCT_STATES = 'ESTADOS DE PRODUCTO';
+    private const RULE_REQUIRED_PARAMETRO_TEMA = 'required|exists:parametros_temas,id';
+    private const RULE_REQUIRED_PARAMETRO = 'required|exists:parametros,id';
+    private const DEFAULT_PRODUCT_IMAGE = 'img/inventario/producto-default.png';
+
+
     public function __construct()
     {
         parent::__construct();
@@ -92,7 +98,7 @@ class ProductoController extends InventarioController
             ->get();
 
         $estados = ParametroTema::with(['parametro','tema'])
-            ->whereHas('tema', fn($q) => $q->where('name', 'ESTADOS DE PRODUCTO'))
+            ->whereHas('tema', fn($q) => $q->where('name', self::THEME_PRODUCT_STATES))
             ->where('status', 1)
             ->get();
 
@@ -112,7 +118,19 @@ class ProductoController extends InventarioController
 
         $proveedores = Proveedor::all();
 
-        return view('inventario.productos.create', compact('tiposProductos', 'unidadesMedida', 'estados', 'categorias', 'marcas', 'contratosConvenios', 'ambientes', 'proveedores'));
+        return view(
+            'inventario.productos.create',
+            compact(
+                'tiposProductos',
+                'unidadesMedida',
+                'estados',
+                'categorias',
+                'marcas',
+                'contratosConvenios',
+                'ambientes',
+                'proveedores'
+            )
+        );
     }
 
     /**
@@ -122,15 +140,15 @@ class ProductoController extends InventarioController
     {
         $validated = $request->validate([
             'producto' => 'required|unique:productos',
-            'tipo_producto_id' => 'required|exists:parametros_temas,id',
+            'tipo_producto_id' => self::RULE_REQUIRED_PARAMETRO_TEMA,
             'descripcion' => 'required|string',
             'peso' => 'required|numeric|min:0',
-            'unidad_medida_id' => 'required|exists:parametros_temas,id',
+            'unidad_medida_id' => self::RULE_REQUIRED_PARAMETRO_TEMA,
             'cantidad' => 'required|integer|min:1',
             'codigo_barras' => ['nullable','string'],
-            'estado_producto_id' => 'required|exists:parametros_temas,id',
-            'categoria_id' => 'required|exists:parametros,id',
-            'marca_id' => 'required|exists:parametros,id',
+            'estado_producto_id' => self::RULE_REQUIRED_PARAMETRO_TEMA,
+            'categoria_id' => self::RULE_REQUIRED_PARAMETRO,
+            'marca_id' => self::RULE_REQUIRED_PARAMETRO,
             'contrato_convenio_id' => 'required|exists:contratos_convenios,id',
             'ambiente_id' => 'required|exists:ambientes,id',
             'proveedor_id' => 'required|exists:proveedores,id',
@@ -144,7 +162,7 @@ class ProductoController extends InventarioController
             $validated['imagen'] = 'img/inventario/' . $nombreArchivo;
         } else {
             // Si no se sube imagen, se subirá la imagen por defecto
-            $validated['imagen'] = 'img/inventario/producto-default.png';
+            $validated['imagen'] = self::DEFAULT_PRODUCT_IMAGE;
         }
 
         // Normalizar/autoasignar código de barras (11 dígitos incrementales si no llega uno válido)
@@ -265,74 +283,16 @@ class ProductoController extends InventarioController
      */
     public function update(Request $request, string $id)
     {
-        // Buscar el producto
         $producto = Producto::findOrFail($id);
-
-        // Validar los datos
-        $validated = $request->validate([
-            'producto' => 'required|unique:productos,producto,' . $id,
-            'tipo_producto_id' => 'required|exists:parametros_temas,id',
-            'descripcion' => 'required|string',
-            'peso' => 'required|numeric|min:0',
-            'unidad_medida_id' => 'required|exists:parametros_temas,id',
-            'cantidad' => 'required|integer|min:0',            
-            'codigo_barras' => ['nullable','string'],
-            'estado_producto_id' => 'required|exists:parametros_temas,id',
-            'categoria_id' => 'required|exists:parametros,id',
-            'marca_id' => 'required|exists:parametros,id',
-            'contrato_convenio_id' => 'required|exists:contratos_convenios,id',
-            'ambiente_id' => 'required|exists:ambientes,id',
-            'fecha_vencimiento' => 'nullable|date',
-            'imagen' => 'nullable|image|mimes:jpg,jpeg,png'
-        ]);
-
-        if ($request->hasFile('imagen')) {
-            // Se elimina la imagen si no es la de defecto
-            if ($producto->imagen && 
-                $producto->imagen !== 'img/inventario/producto-default.png' && 
-                file_exists(public_path($producto->imagen))) {
-                unlink(public_path($producto->imagen));
-            }
-            // Guardar la nueva imagen
-            $nombreArchivo = time() . '.' . $request->imagen->extension();
-            $request->imagen->move(public_path('img/inventario'), $nombreArchivo);
-            $validated['imagen'] = 'img/inventario/' . $nombreArchivo;
-        }
-
-        // Normalizar/autoasignar código si llega un valor no válido de 11 dígitos
-        if ($request->has('codigo_barras')) {
-            $raw = $request->input('codigo_barras');
-            // Si el usuario deja vacío, no modificar el existente
-            if ($raw !== null && $raw !== '') {
-                $digits = preg_replace('/\D/', '', (string) $raw);
-                if (strlen($digits) === 11) {
-                    $validated['codigo_barras'] = $digits;
-                } else {
-                    $validated['codigo_barras'] = $this->generateNextBarcode();
-                }
-            } else {
-                unset($validated['codigo_barras']);
-            }
-        }
-
-        // Añadir user_update_id
+        $validated = $this->validateUpdateRequest($request, $id);
+        $this->processImageForUpdate($request, $producto, $validated);
+        $this->normalizeBarcodeForUpdate($request, $validated);
         $validated['user_update_id'] = Auth::id();
 
-        // Guardar la cantidad anterior para comparar
         $cantidadAnterior = $producto->cantidad;
-
-        // Actualizar el producto usando el método update de Eloquent
         $producto->update($validated);
 
-        // Verificar si el stock cambió y si está bajo
-        if ($cantidadAnterior != $producto->cantidad && $producto->cantidad <= 10) {
-            $superadmins = User::role('SUPER ADMINISTRADOR')->get();
-            if ($superadmins->isNotEmpty()) {
-                foreach ($superadmins as $admin) {
-                    $admin->notify(new StockBajoNotification($producto, $producto->cantidad, 10));
-                }
-            }
-        }
+        $this->notifyIfStockLow($producto, $cantidadAnterior);
 
         // Redireccionar con mensaje de éxito
         return redirect()->route('inventario.productos.show', $producto->id)
@@ -348,7 +308,7 @@ class ProductoController extends InventarioController
         
         // Se elimina la imagen si no es la de defecto
         if ($producto->imagen && 
-            $producto->imagen !== 'img/inventario/producto-default.png' && 
+            $producto->imagen !== self::DEFAULT_PRODUCT_IMAGE && 
             file_exists(public_path($producto->imagen))) {
             unlink(public_path($producto->imagen));
         }
@@ -394,7 +354,7 @@ class ProductoController extends InventarioController
             // Buscar el ParametroTema para este parámetro
             $estadoAgotadoTema = ParametroTema::where('parametro_id', 43)
                 ->whereHas('tema', function($query) {
-                    $query->where('name', 'ESTADOS DE PRODUCTO');
+                    $query->where('name', self::THEME_PRODUCT_STATES);
                 })
                 ->first();
             
@@ -450,7 +410,7 @@ class ProductoController extends InventarioController
         if ($parametroAgotado) {
             $estadoAgotadoTema = ParametroTema::where('parametro_id', 43)
                 ->whereHas('tema', function($query) {
-                    $query->where('name', 'ESTADOS DE PRODUCTO');
+                    $query->where('name', self::THEME_PRODUCT_STATES);
                 })
                 ->first();
 
@@ -491,6 +451,92 @@ class ProductoController extends InventarioController
             'success' => true,
             'productos' => $productos
         ]);
+    }
+
+    private function validateUpdateRequest(Request $request, string $id): array
+    {
+        return $request->validate([
+            'producto' => 'required|unique:productos,producto,' . $id,
+            'tipo_producto_id' => self::RULE_REQUIRED_PARAMETRO_TEMA,
+            'descripcion' => 'required|string',
+            'peso' => 'required|numeric|min:0',
+            'unidad_medida_id' => self::RULE_REQUIRED_PARAMETRO_TEMA,
+            'cantidad' => 'required|integer|min:0',
+            'codigo_barras' => ['nullable', 'string'],
+            'estado_producto_id' => self::RULE_REQUIRED_PARAMETRO_TEMA,
+            'categoria_id' => self::RULE_REQUIRED_PARAMETRO,
+            'marca_id' => self::RULE_REQUIRED_PARAMETRO,
+            'contrato_convenio_id' => 'required|exists:contratos_convenios,id',
+            'ambiente_id' => 'required|exists:ambientes,id',
+            'fecha_vencimiento' => 'nullable|date',
+            'imagen' => 'nullable|image|mimes:jpg,jpeg,png'
+        ]);
+    }
+
+    private function processImageForUpdate(Request $request, Producto $producto, array &$validated): void
+    {
+        if (!$request->hasFile('imagen')) {
+            return;
+        }
+
+        $this->deleteExistingImage($producto);
+        $validated['imagen'] = $this->storeUploadedImage($request);
+    }
+
+    private function deleteExistingImage(Producto $producto): void
+    {
+        if (!$producto->imagen ||
+            $producto->imagen === self::DEFAULT_PRODUCT_IMAGE ||
+            !file_exists(public_path($producto->imagen))) {
+            return;
+        }
+
+        unlink(public_path($producto->imagen));
+    }
+
+    private function storeUploadedImage(Request $request): string
+    {
+        $nombreArchivo = time() . '.' . $request->imagen->extension();
+        $request->imagen->move(public_path('img/inventario'), $nombreArchivo);
+
+        return 'img/inventario/' . $nombreArchivo;
+    }
+
+    private function normalizeBarcodeForUpdate(Request $request, array &$validated): void
+    {
+        if (!$request->has('codigo_barras')) {
+            return;
+        }
+
+        $raw = $request->input('codigo_barras');
+
+        if ($raw === null || $raw === '') {
+            unset($validated['codigo_barras']);
+            return;
+        }
+
+        $digits = preg_replace('/\D/', '', (string) $raw);
+
+        $validated['codigo_barras'] = strlen($digits) === 11
+            ? $digits
+            : $this->generateNextBarcode();
+    }
+
+    private function notifyIfStockLow(Producto $producto, int $cantidadAnterior): void
+    {
+        if ($cantidadAnterior == $producto->cantidad || $producto->cantidad > 10) {
+            return;
+        }
+
+        $superadmins = User::role('SUPER ADMINISTRADOR')->get();
+
+        if ($superadmins->isEmpty()) {
+            return;
+        }
+
+        foreach ($superadmins as $admin) {
+            $admin->notify(new StockBajoNotification($producto, $producto->cantidad, 10));
+        }
     }
 
     /**

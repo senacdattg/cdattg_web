@@ -26,6 +26,9 @@
 
     <!-- Tabla de información -->
     <table class="modal-table">
+        <caption id="producto-description" class="sr-only">
+            Lista de productos con información de código, marca, categoría, tipo, stock, peso, estado, ambiente, proveedor y contrato/convenio.
+        </caption>
         <thead>
             <tr>
                 <th>Detalle</th>

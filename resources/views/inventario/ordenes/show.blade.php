@@ -103,6 +103,9 @@
                             <h4><i class="fas fa-boxes"></i> Productos Solicitados</h4>
                             <div class="table-responsive">
                                 <table class="table table-striped">
+                                    <caption id="orden-description" class="sr-only">
+                                        Lista de productos solicitados con información de número, producto, cantidad, estado y acciones disponibles.
+                                    </caption>
                                     <thead>
                                         <tr>
                                             <th width="8%">#</th>

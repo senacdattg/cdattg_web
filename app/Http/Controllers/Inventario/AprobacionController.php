@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Inventario;
 
+use App\Exceptions\AprobacionException;
 use Illuminate\Http\Request;
 use App\Models\Inventario\Aprobacion;
 use App\Models\Inventario\DetalleOrden;
@@ -15,6 +16,8 @@ use App\Notifications\OrdenRechazadaNotification;
 
 class AprobacionController extends InventarioController
 {
+    private const STATUS_PENDING = 'EN ESPERA';
+
     public function __construct()
     {
         parent::__construct();
@@ -28,7 +31,7 @@ class AprobacionController extends InventarioController
     {
         // Obtener estado EN ESPERA
         $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
-            $q->where('name', 'EN ESPERA');
+            $q->where('name', self::STATUS_PENDING);
         })
         ->whereHas('tema', function($q) {
             $q->where('name', 'ESTADOS DE ORDEN');
@@ -66,7 +69,7 @@ class AprobacionController extends InventarioController
 
             // Verificar que esté en estado EN ESPERA
             $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
-                $q->where('name', 'EN ESPERA');
+                $q->where('name', self::STATUS_PENDING);
             })
             ->whereHas('tema', function($q) {
                 $q->where('name', 'ESTADOS DE ORDEN');
@@ -74,18 +77,18 @@ class AprobacionController extends InventarioController
             ->first();
 
             if ($detalleOrden->estado_orden_id != $estadoEnEspera->id) {
-                throw new \Exception('Esta solicitud no está pendiente de aprobación.');
+                throw new AprobacionException('Esta solicitud no está pendiente de aprobación.');
             }
 
             // Verificar que no tenga aprobación previa
             if ($detalleOrden->aprobacion) {
-                throw new \Exception('Esta solicitud ya fue procesada anteriormente.');
+                throw new AprobacionException('Esta solicitud ya fue procesada anteriormente.');
             }
 
             // Verificar stock disponible
             $producto = $detalleOrden->producto;
             if ($producto->cantidad < $detalleOrden->cantidad) {
-                throw new \Exception(
+                throw new AprobacionException(
                     "Stock insuficiente para '{$producto->producto}'. " .
                     "Disponible: {$producto->cantidad}, Solicitado: {$detalleOrden->cantidad}"
                 );
@@ -101,7 +104,7 @@ class AprobacionController extends InventarioController
             ->first();
 
             if (!$estadoAprobada) {
-                throw new \Exception("Estado 'APROBADA' no encontrado en parámetros.");
+                throw new AprobacionException("Estado 'APROBADA' no encontrado en parámetros.");
             }
 
             // Actualizar estado del detalle de orden
@@ -132,8 +135,12 @@ class AprobacionController extends InventarioController
 
             DB::commit();
 
-            return redirect()->back()
-                ->with('success', "Solicitud aprobada exitosamente. Stock actualizado para '{$producto->producto}'.");
+            return redirect()
+                ->back()
+                ->with(
+                    'success',
+                    "Solicitud aprobada exitosamente. Stock actualizado para '{$producto->producto}'."
+                );
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -158,7 +165,7 @@ class AprobacionController extends InventarioController
 
             // Verificar que esté en estado EN ESPERA
             $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
-                $q->where('name', 'EN ESPERA');
+                $q->where('name', self::STATUS_PENDING);
             })
             ->whereHas('tema', function($q) {
                 $q->where('name', 'ESTADOS DE ORDEN');
@@ -166,12 +173,12 @@ class AprobacionController extends InventarioController
             ->first();
 
             if ($detalleOrden->estado_orden_id != $estadoEnEspera->id) {
-                throw new \Exception('Esta solicitud no está pendiente de aprobación.');
+                throw new AprobacionException('Esta solicitud no está pendiente de aprobación.');
             }
 
             // Verificar que no tenga aprobación previa
             if ($detalleOrden->aprobacion) {
-                throw new \Exception('Esta solicitud ya fue procesada anteriormente.');
+                throw new AprobacionException('Esta solicitud ya fue procesada anteriormente.');
             }
 
             // Obtener estado RECHAZADA
@@ -184,7 +191,7 @@ class AprobacionController extends InventarioController
             ->first();
 
             if (!$estadoRechazada) {
-                throw new \Exception("Estado 'RECHAZADA' no encontrado en parámetros.");
+                throw new AprobacionException("Estado 'RECHAZADA' no encontrado en parámetros.");
             }
 
             // Actualizar estado del detalle de orden
@@ -246,7 +253,7 @@ class AprobacionController extends InventarioController
 
             // Verificar que todos los detalles estén en estado EN ESPERA
             $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
-                $q->where('name', 'EN ESPERA');
+                $q->where('name', self::STATUS_PENDING);
             })
             ->whereHas('tema', function($q) {
                 $q->where('name', 'ESTADOS DE ORDEN');
@@ -254,20 +261,20 @@ class AprobacionController extends InventarioController
             ->first();
 
             if (!$estadoEnEspera) {
-                throw new \Exception("Estado 'EN ESPERA' no encontrado.");
+                throw new AprobacionException("Estado 'EN ESPERA' no encontrado.");
             }
 
             // Verificar que todos los detalles estén pendientes
             $detallesPendientes = $orden->detalles->where('estado_orden_id', $estadoEnEspera->id);
 
             if ($detallesPendientes->isEmpty()) {
-                throw new \Exception('No hay productos pendientes de aprobación en esta orden.');
+                throw new AprobacionException('No hay productos pendientes de aprobación en esta orden.');
             }
 
             // Verificar stock para todos los productos
             foreach ($detallesPendientes as $detalle) {
                 if ($detalle->producto->cantidad < $detalle->cantidad) {
-                    throw new \Exception(
+                    throw new AprobacionException(
                         "Stock insuficiente para '{$detalle->producto->producto}'. " .
                         "Disponible: {$detalle->producto->cantidad}, Solicitado: {$detalle->cantidad}"
                     );
@@ -284,7 +291,7 @@ class AprobacionController extends InventarioController
             ->first();
 
             if (!$estadoAprobada) {
-                throw new \Exception("Estado 'APROBADA' no encontrado.");
+                throw new AprobacionException("Estado 'APROBADA' no encontrado.");
             }
 
             // Aprobar todos los detalles
@@ -347,7 +354,7 @@ class AprobacionController extends InventarioController
 
             // Verificar que todos los detalles estén en estado EN ESPERA
             $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
-                $q->where('name', 'EN ESPERA');
+                $q->where('name', self::STATUS_PENDING);
             })
             ->whereHas('tema', function($q) {
                 $q->where('name', 'ESTADOS DE ORDEN');
@@ -355,14 +362,14 @@ class AprobacionController extends InventarioController
             ->first();
 
             if (!$estadoEnEspera) {
-                throw new \Exception("Estado 'EN ESPERA' no encontrado.");
+                throw new AprobacionException("Estado 'EN ESPERA' no encontrado.");
             }
 
             // Verificar que todos los detalles estén pendientes
             $detallesPendientes = $orden->detalles->where('estado_orden_id', $estadoEnEspera->id);
 
             if ($detallesPendientes->isEmpty()) {
-                throw new \Exception('No hay productos pendientes de aprobación en esta orden.');
+                throw new AprobacionException('No hay productos pendientes de aprobación en esta orden.');
             }
 
             // Obtener estado RECHAZADA
@@ -375,7 +382,7 @@ class AprobacionController extends InventarioController
             ->first();
 
             if (!$estadoRechazada) {
-                throw new \Exception("Estado 'RECHAZADA' no encontrado.");
+                throw new AprobacionException("Estado 'RECHAZADA' no encontrado.");
             }
 
             // Rechazar todos los detalles
