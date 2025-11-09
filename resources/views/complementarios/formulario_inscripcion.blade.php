@@ -64,22 +64,22 @@
                                     <div class="card-body">
                                         <p class="text-muted mb-3">Seleccione una categoría que corresponda a su situación:</p>
 
-                                        @foreach ($categoriasConHijos as $categoria)
+                                        @foreach ($temasCaracterizacion as $tema)
                                             <div class="card card-outline mb-3" style="border-color: #dee2e6;">
                                                 <div class="card-header" style="background-color: #f8f9fa; color: #343a40;">
-                                                    <h6 class="mb-0">{{ $categoria['nombre'] }}</h6>
+                                                    
                                                 </div>
                                                 <div class="card-body">
                                                     <div class="row">
-                                                        @foreach ($categoria['hijos'] as $hijo)
+                                                        @foreach ($tema->parametros as $parametro)
                                                             <div class="col-12 mb-2">
                                                                 <div class="form-check">
                                                                     <input class="form-check-input" type="radio"
-                                                                        name="caracterizacion_id" value="{{ $hijo->id }}"
-                                                                        id="categoria_{{ $hijo->id }}">
+                                                                        name="parametro_id" value="{{ $parametro->id }}"
+                                                                        id="parametro_{{ $parametro->id }}">
                                                                     <label class="form-check-label"
-                                                                        for="categoria_{{ $hijo->id }}">
-                                                                        {{ ucwords(str_replace('_', ' ', $hijo->nombre)) }}
+                                                                        for="parametro_{{ $parametro->id }}">
+                                                                        {{ ucwords(str_replace('_', ' ', $parametro->name)) }}
                                                                     </label>
                                                                 </div>
                                                             </div>

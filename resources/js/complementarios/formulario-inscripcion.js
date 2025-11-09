@@ -1,5 +1,15 @@
 // Funcionalidad para formularios de inscripción y registro
 
+// Constantes de configuración
+const CONFIG = {
+    EDAD_MINIMA: 14,
+    MENSAJE_EDAD_INVALIDA: 'Debe tener al menos 14 años para registrarse.',
+    NINGUNA_LABEL: 'NINGUNA',
+    CAMPOS_TEXTOS: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido'],
+    CAMPOS_NUMERICOS: ['numero_documento', 'telefono', 'celular'],
+    CAMPOS_DIRECCION_NUMERICOS: ['numero_via', 'numero_casa']
+};
+
 document.addEventListener('DOMContentLoaded', function() {
     // Inicializar municipios si hay datos guardados
     initializeMunicipios();
@@ -133,11 +143,7 @@ function validateForm(form) {
 
 // Configurar conversión a mayúsculas y validación de texto
 function setupUppercaseConversion() {
-    const camposTexto = [
-        'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido'
-    ];
-
-    camposTexto.forEach(campoId => {
+    CONFIG.CAMPOS_TEXTOS.forEach(campoId => {
         const campo = document.getElementById(campoId);
         if (campo) {
             campo.addEventListener('input', function() {
@@ -161,9 +167,7 @@ function setupUppercaseConversion() {
 
 // Configurar validación de solo números
 function setupNumberValidation() {
-    const camposNumericos = ['numero_documento', 'telefono', 'celular'];
-
-    camposNumericos.forEach(campoId => {
+    CONFIG.CAMPOS_NUMERICOS.forEach(campoId => {
         const campo = document.getElementById(campoId);
         if (campo) {
             campo.addEventListener('keypress', soloNumeros);
@@ -233,6 +237,46 @@ function initializeMunicipiosDynamic() {
     }
 }
 
+// Función común para procesar respuestas de API de ubicaciones
+function processLocationData(data, entityType) {
+    let items = [];
+
+    if (data.success && data.data) {
+        // Estructura: {success: true, data: [...]}
+        items = data.data;
+    } else if (Array.isArray(data)) {
+        // Estructura: [...]
+        items = data;
+    } else if (data && typeof data === 'object') {
+        // Estructura: {departamentos: [...]} u otra variante
+        items = data[entityType] || data.data || [];
+    }
+
+    return items;
+}
+
+// Función común para poblar select con opciones de ubicación
+function populateLocationSelect(selectElement, items, selectedId, entityType) {
+    if (!Array.isArray(items) || items.length === 0) {
+        console.error(`No se encontraron ${entityType} o estructura inválida:`, items);
+        selectElement.innerHTML = `<option value="">No hay ${entityType} disponibles</option>`;
+        return;
+    }
+
+    items.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item.id;
+        // Manejar diferentes nombres de campo
+        const label = item.nombre ?? item[entityType] ?? item.name ?? item.label ?? '';
+        option.textContent = label || `ID ${item.id}`;
+        // Seleccionar el item si coincide con el ID proporcionado
+        if (selectedId && item.id == selectedId) {
+            option.selected = true;
+        }
+        selectElement.appendChild(option);
+    });
+}
+
 // Cargar departamentos para un país
 function loadDepartamentosForPais(paisId, selectedDepartamentoId = null) {
     const departamentoSelect = document.getElementById('departamento_id');
@@ -243,31 +287,6 @@ function loadDepartamentosForPais(paisId, selectedDepartamentoId = null) {
 
     if (!paisId) return;
 
-    // Función auxiliar para manejar errores
-    const handleError = (error) => {
-        console.error('Error cargando departamentos:', error);
-        departamentoSelect.innerHTML = '<option value="">Error cargando departamentos</option>';
-    };
-
-    // Función auxiliar para procesar datos
-    const processData = (data) => {
-        if (!Array.isArray(data)) {
-            console.error('Los datos de departamentos no son un array:', data);
-            departamentoSelect.innerHTML = '<option value="">Error en formato de datos</option>';
-            return;
-        }
-
-        data.forEach(departamento => {
-            const option = document.createElement('option');
-            option.value = departamento.id;
-            option.textContent = departamento.departamento;
-            if (selectedDepartamentoId && departamento.id == selectedDepartamentoId) {
-                option.selected = true;
-            }
-            departamentoSelect.appendChild(option);
-        });
-    };
-
     fetch(`/departamentos/${paisId}`)
         .then(response => {
             if (!response.ok) {
@@ -275,8 +294,14 @@ function loadDepartamentosForPais(paisId, selectedDepartamentoId = null) {
             }
             return response.json();
         })
-        .then(processData)
-        .catch(handleError);
+        .then(data => {
+            const departamentos = processLocationData(data, 'departamentos');
+            populateLocationSelect(departamentoSelect, departamentos, selectedDepartamentoId, 'departamento');
+        })
+        .catch(error => {
+            console.error('Error cargando departamentos:', error);
+            departamentoSelect.innerHTML = '<option value="">Error cargando departamentos</option>';
+        });
 }
 
 // Cargar municipios para un departamento
@@ -284,51 +309,20 @@ function loadMunicipiosForDepartamento(departamentoId, municipioIdToSelect = nul
     const municipioSelect = document.getElementById('municipio_id');
     if (!municipioSelect) return;
 
-    if (departamentoId) {
-        fetch(`/municipios/${departamentoId}`)
-            .then(response => response.json())
-            .then(data => {
-                municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
+    municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
 
-                // Manejar diferentes estructuras de respuesta
-                let municipios = [];
+    if (!departamentoId) return;
 
-                if (data.success && data.data) {
-                    // Estructura: {success: true, data: [...]}
-                    municipios = data.data;
-                } else if (Array.isArray(data)) {
-                    // Estructura: [...]
-                    municipios = data;
-                } else if (data && typeof data === 'object') {
-                    // Estructura: {municipios: [...]} u otra variante
-                    municipios = data.municipios || data.data || [];
-                }
-
-                if (Array.isArray(municipios) && municipios.length > 0) {
-                    municipios.forEach(municipio => {
-                        const option = document.createElement('option');
-                        option.value = municipio.id;
-                        // Manejar diferentes nombres de campo para el municipio
-                        const label = municipio.nombre ?? municipio.municipio ?? municipio.name ?? municipio.label ?? '';
-                        option.textContent = label || `ID ${municipio.id}`;
-                        // Seleccionar el municipio si coincide con el municipio_id del usuario
-                        if (municipioIdToSelect && municipio.id == municipioIdToSelect) {
-                            option.selected = true;
-                        }
-                        municipioSelect.appendChild(option);
-                    });
-                } else {
-                    console.error('No se encontraron municipios o estructura inválida:', data);
-                    municipioSelect.innerHTML = '<option value="">No hay municipios disponibles</option>';
-                }
-            })
-            .catch(error => {
-                console.error('Error cargando municipios:', error);
-                municipioSelect.innerHTML = '<option value="">Error cargando municipios</option>';
-            });
-    } else {
-        municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
-    }
+    fetch(`/municipios/${departamentoId}`)
+        .then(response => response.json())
+        .then(data => {
+            const municipios = processLocationData(data, 'municipios');
+            populateLocationSelect(municipioSelect, municipios, municipioIdToSelect, 'municipio');
+        })
+        .catch(error => {
+            console.error('Error cargando municipios:', error);
+            municipioSelect.innerHTML = '<option value="">Error cargando municipios</option>';
+        });
 }
 
 // Funciones para el formulario de dirección estructurada (si existe)
@@ -361,24 +355,18 @@ function setupAddressForm() {
     }
 
     // Validación de números en campos de dirección
-    const addressNumericFields = ['numero_via', 'numero_casa'];
-    addressNumericFields.forEach(fieldId => {
+    CONFIG.CAMPOS_DIRECCION_NUMERICOS.forEach(fieldId => {
         const element = document.getElementById(fieldId);
         if (element) {
-            element.addEventListener('keypress', function(event) {
-                const key = event.key;
-                if (event.ctrlKey || event.altKey || event.metaKey) {
-                    return true;
-                }
-                if (!/^\d$/.test(key)) {
-                    event.preventDefault();
-                    return false;
-                }
-                return true;
-            });
+            element.addEventListener('keypress', soloNumeros);
         }
     });
 }
+
+// Inicializar setupAddressForm cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    setupAddressForm();
+});
 
 
 
@@ -481,6 +469,139 @@ function saveAddress() {
     clearAddressFields();
 }
 
+
+// Función auxiliar para encontrar radio button de "NINGUNA"
+function findNingunaRadio(radios) {
+    for (const radio of radios) {
+        const label = document.querySelector(`label[for="${radio.id}"]`);
+        if (label && label.textContent.trim().toUpperCase() === CONFIG.NINGUNA_LABEL) {
+            return radio;
+        }
+    }
+    return null;
+}
+
+// Función auxiliar para manejar cambio de selección en radios
+function handleRadioChange(radio, ningunaRadio, allRadios) {
+    if (radio !== ningunaRadio && radio.checked) {
+        // Si se selecciona cualquier opción que no sea "NINGUNA", deseleccionar "NINGUNA"
+        ningunaRadio.checked = false;
+    } else if (radio === ningunaRadio && radio.checked) {
+        // Si se selecciona "NINGUNA", deseleccionar todas las demás opciones
+        allRadios.forEach(otherRadio => {
+            if (otherRadio !== ningunaRadio) {
+                otherRadio.checked = false;
+            }
+        });
+    }
+}
+
+// Función auxiliar para resetear selección a "NINGUNA"
+function resetToNinguna(ningunaRadio, allRadios) {
+    ningunaRadio.checked = true;
+    allRadios.forEach(radio => {
+        if (radio !== ningunaRadio) {
+            radio.checked = false;
+        }
+    });
+}
+
+// Configurar manejo de caracterización (parámetros)
+function setupCaracterizacionHandling() {
+    const caracterizacionRadios = document.querySelectorAll('input[name="parametro_id"]');
+    const ningunaRadio = findNingunaRadio(caracterizacionRadios);
+
+    // Si no se encuentra "NINGUNA", salir
+    if (!ningunaRadio) return;
+
+    // Establecer "NINGUNA" como seleccionada por defecto
+    ningunaRadio.checked = true;
+
+    // Agregar event listeners a todos los radio buttons
+    caracterizacionRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            handleRadioChange(radio, ningunaRadio, caracterizacionRadios);
+        });
+    });
+
+    // Manejar el evento de reset del formulario
+    const form = document.getElementById('formInscripcion');
+    if (form) {
+        form.addEventListener('reset', () => {
+            setTimeout(() => resetToNinguna(ningunaRadio, caracterizacionRadios), 0);
+        });
+    }
+}
+
+// Función auxiliar para calcular fecha límite de edad mínima
+function calcularFechaLimiteEdadMinima() {
+    const fechaLimite = new Date();
+    fechaLimite.setFullYear(fechaLimite.getFullYear() - CONFIG.EDAD_MINIMA);
+    return fechaLimite;
+}
+
+// Función auxiliar para validar edad
+function validarEdad(fechaNacimiento) {
+    const fechaSeleccionada = new Date(fechaNacimiento);
+    const fechaLimite = calcularFechaLimiteEdadMinima();
+    return fechaSeleccionada <= fechaLimite;
+}
+
+// Función auxiliar para mostrar/ocultar mensaje de error de edad
+function toggleMensajeErrorEdad(inputElement, mostrar) {
+    if (mostrar) {
+        inputElement.setCustomValidity(CONFIG.MENSAJE_EDAD_INVALIDA);
+        inputElement.classList.add('is-invalid');
+
+        let errorMessage = inputElement.parentElement.querySelector('.invalid-feedback');
+        if (!errorMessage) {
+            errorMessage = document.createElement('div');
+            errorMessage.className = 'invalid-feedback';
+            inputElement.parentElement.appendChild(errorMessage);
+        }
+        errorMessage.textContent = CONFIG.MENSAJE_EDAD_INVALIDA;
+    } else {
+        inputElement.setCustomValidity('');
+        inputElement.classList.remove('is-invalid');
+
+        const errorMessage = inputElement.parentElement.querySelector('.invalid-feedback');
+        if (errorMessage) {
+            errorMessage.remove();
+        }
+    }
+}
+
+// Configurar validación de edad mínima
+function setupEdadMinimaValidation() {
+    const fechaNacimientoInput = document.getElementById('fecha_nacimiento');
+    if (!fechaNacimientoInput) return;
+
+    // Establecer el atributo max si no está ya establecido
+    if (!fechaNacimientoInput.getAttribute('max')) {
+        const fechaMaximaStr = calcularFechaLimiteEdadMinima().toISOString().split('T')[0];
+        fechaNacimientoInput.setAttribute('max', fechaMaximaStr);
+    }
+
+    // Validar cuando cambia la fecha
+    fechaNacimientoInput.addEventListener('change', function() {
+        const esValida = validarEdad(this.value);
+        toggleMensajeErrorEdad(this, !esValida);
+    });
+
+    // Validar al enviar el formulario
+    const form = document.getElementById('formInscripcion');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            if (!validarEdad(fechaNacimientoInput.value)) {
+                e.preventDefault();
+                fechaNacimientoInput.focus();
+                toggleMensajeErrorEdad(fechaNacimientoInput, true);
+                alert(MENSAJE_EDAD_INVALIDA);
+                return false;
+            }
+        });
+    }
+}
 
 // Exportar funciones globales para uso en HTML
 window.setupAddressForm = setupAddressForm;

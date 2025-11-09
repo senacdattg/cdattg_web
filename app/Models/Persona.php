@@ -41,7 +41,7 @@ class Persona extends Model
         'condocumento',
         'user_create_id',
         'user_edit_id',
-        'caracterizacion_id',
+        'parametro_id',
     ];
 
     protected static function boot()
@@ -247,11 +247,11 @@ class Persona extends Model
     }
 
     /**
-     * Relación con la caracterización complementaria.
+     * Relación con el parámetro de caracterización.
      */
-    public function caracterizacion()
+    public function parametroCaracterizacion()
     {
-        return $this->belongsTo(CategoriaCaracterizacionComplementario::class, 'caracterizacion_id');
+        return $this->belongsTo(Parametro::class, 'parametro_id');
     }
 
     public function caracterizacionesComplementarias(): BelongsToMany
