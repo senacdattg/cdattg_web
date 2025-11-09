@@ -10,7 +10,19 @@ const CONFIG = {
     CAMPOS_DIRECCION_NUMERICOS: ['numero_via', 'numero_casa']
 };
 
+// Función para detectar el contexto del formulario
+function getFormContext() {
+    const registroForm = document.getElementById('registroForm');
+    const formInscripcion = document.getElementById('formInscripcion');
+
+    if (registroForm) return 'registro';
+    if (formInscripcion) return 'inscripcion';
+    return 'unknown';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
+    const context = getFormContext();
+
     // Inicializar municipios si hay datos guardados
     initializeMunicipios();
 
@@ -26,8 +38,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Configurar carga dinámica de municipios
     setupMunicipioLoading();
 
-    // Configurar manejo de caracterización
-    setupCaracterizacionHandling();
+    // Configurar manejo de caracterización solo para inscripción
+    if (context === 'inscripcion') {
+        setupCaracterizacionHandling();
+    }
 
     // Configurar validación de edad mínima
     setupEdadMinimaValidation();
@@ -35,6 +49,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Inicializar municipios dinámicos para formularios que lo necesiten
     if (typeof initializeMunicipiosDynamic === 'function') {
         initializeMunicipiosDynamic();
+    }
+
+    // Para registro, inicializar carga dinámica de países
+    if (context === 'registro') {
+        initializePaisesForRegistro();
     }
 });
 
@@ -525,12 +544,12 @@ function setupCaracterizacionHandling() {
     });
 
     // Manejar el evento de reset del formulario
-    const form = document.getElementById('formInscripcion');
-    if (form) {
+    const forms = document.querySelectorAll('#formInscripcion, #registroForm');
+    forms.forEach(form => {
         form.addEventListener('reset', () => {
             setTimeout(() => resetToNinguna(ningunaRadio, caracterizacionRadios), 0);
         });
-    }
+    });
 }
 
 // Función auxiliar para calcular fecha límite de edad mínima
@@ -589,20 +608,46 @@ function setupEdadMinimaValidation() {
     });
 
     // Validar al enviar el formulario
-    const form = document.getElementById('formInscripcion');
-    if (form) {
+    const forms = document.querySelectorAll('#formInscripcion, #registroForm');
+    forms.forEach(form => {
         form.addEventListener('submit', function(e) {
             if (!validarEdad(fechaNacimientoInput.value)) {
                 e.preventDefault();
                 fechaNacimientoInput.focus();
                 toggleMensajeErrorEdad(fechaNacimientoInput, true);
-                alert(MENSAJE_EDAD_INVALIDA);
+                alert(CONFIG.MENSAJE_EDAD_INVALIDA);
                 return false;
             }
         });
-    }
+    });
+}
+
+// Función para inicializar países dinámicamente para registro
+function initializePaisesForRegistro() {
+    const paisSelect = document.getElementById('pais_id');
+    if (!paisSelect) return;
+
+    // Limpiar select y mostrar opción por defecto
+    paisSelect.innerHTML = '<option value="">Seleccione...</option>';
+
+    fetch('/paises')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const paises = processLocationData(data, 'paises');
+            populateLocationSelect(paisSelect, paises, null, 'pais');
+        })
+        .catch(error => {
+            console.error('Error cargando países:', error);
+            paisSelect.innerHTML = '<option value="">Error cargando países</option>';
+        });
 }
 
 // Exportar funciones globales para uso en HTML
 window.setupAddressForm = setupAddressForm;
 window.initializeMunicipiosDynamic = initializeMunicipiosDynamic;
+window.initializePaisesForRegistro = initializePaisesForRegistro;
