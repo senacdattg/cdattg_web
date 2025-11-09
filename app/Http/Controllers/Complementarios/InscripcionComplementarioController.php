@@ -8,7 +8,7 @@ use App\Models\ComplementarioOfertado;
 use App\Models\Persona;
 use App\Models\AspiranteComplementario;
 use App\Models\User;
-use App\Models\CategoriaCaracterizacionComplementario;
+use App\Models\Tema;
 use App\Models\Pais;
 use App\Models\Departamento;
 use Illuminate\Support\Facades\Hash;
@@ -31,15 +31,13 @@ class InscripcionComplementarioController extends Controller
      */
     public function inscripcionGeneral()
     {
-        // Obtener categorías de caracterización principales con sus hijos
-        $categorias = CategoriaCaracterizacionComplementario::getMainCategories();
-        $categoriasConHijos = $categorias->map(function($categoria) {
-            return [
-                'id' => $categoria->id,
-                'nombre' => $categoria->nombre,
-                'hijos' => $categoria->getActiveChildren()
-            ];
-        });
+        // Obtener temas de caracterización con sus parámetros
+        $temasCaracterizacion = Tema::where('name', 'PERSONA CARACTERIZACION')
+            ->with(['parametros' => function($query) {
+                $query->where('status', 1);
+            }])
+            ->where('status', 1)
+            ->get();
 
         $paises = Pais::all();
         $departamentos = Departamento::all();
@@ -48,7 +46,7 @@ class InscripcionComplementarioController extends Controller
         $tiposDocumento = $this->complementarioService->getTiposDocumento();
         $generos = $this->complementarioService->getGeneros();
 
-        return view('complementarios.inscripcion_general', compact('categoriasConHijos', 'paises', 'departamentos', 'tiposDocumento', 'generos'));
+        return view('complementarios.inscripcion_general', compact('temasCaracterizacion', 'paises', 'departamentos', 'tiposDocumento', 'generos'));
     }
 
     /**
@@ -85,7 +83,7 @@ class InscripcionComplementarioController extends Controller
             'municipio_id' => 'required|exists:municipios,id',
             'direccion' => 'required|string|max:191',
             'observaciones' => 'nullable|string',
-            'caracterizacion_id' => 'nullable|exists:parametros,id',
+            'parametro_id' => 'nullable|exists:parametros,id',
         ]);
 
         // Verificar si ya existe una persona con el mismo documento o email
@@ -102,7 +100,7 @@ class InscripcionComplementarioController extends Controller
             'tipo_documento', 'numero_documento', 'primer_nombre', 'segundo_nombre',
             'primer_apellido', 'segundo_apellido', 'fecha_nacimiento', 'genero',
             'telefono', 'celular', 'email', 'pais_id', 'departamento_id',
-            'municipio_id', 'direccion', 'caracterizacion_id'
+            'municipio_id', 'direccion', 'parametro_id'
         ]));
 
         return redirect()->route('inscripcion.general')->with('success', '¡Registro exitoso! Sus datos han sido guardados correctamente.');
@@ -116,15 +114,13 @@ class InscripcionComplementarioController extends Controller
         // Permitir acceso a usuarios no autenticados - el formulario crea la cuenta automáticamente
         $programa = ComplementarioOfertado::with(['modalidad.parametro', 'jornada'])->findOrFail($id);
 
-        // Obtener categorías de caracterización principales con sus hijos
-        $categorias = CategoriaCaracterizacionComplementario::getMainCategories();
-        $categoriasConHijos = $categorias->map(function($categoria) {
-            return [
-                'id' => $categoria->id,
-                'nombre' => $categoria->nombre,
-                'hijos' => $categoria->getActiveChildren()
-            ];
-        });
+        // Obtener temas de caracterización con sus parámetros
+        $temasCaracterizacion = Tema::where('name', 'PERSONA CARACTERIZACION')
+            ->with(['parametros' => function($query) {
+                $query->where('parametros_temas.status', 1);
+            }])
+            ->where('status', 1)
+            ->get();
 
         $paises = Pais::all();
         $departamentos = Departamento::all();
@@ -161,7 +157,7 @@ class InscripcionComplementarioController extends Controller
             }
         }
 
-        return view('complementarios.formulario_inscripcion', compact('programa', 'categoriasConHijos', 'paises', 'departamentos', 'tiposDocumento', 'generos', 'userData'));
+        return view('complementarios.formulario_inscripcion', compact('programa', 'temasCaracterizacion', 'paises', 'departamentos', 'tiposDocumento', 'generos', 'userData'));
     }
 
     /**
@@ -209,7 +205,7 @@ class InscripcionComplementarioController extends Controller
             'municipio_id' => 'required|exists:municipios,id',
             'direccion' => 'required|string|max:191',
             'observaciones' => 'nullable|string',
-            'caracterizacion_id' => 'nullable|exists:parametros,id',
+            'parametro_id' => 'nullable|exists:parametros,id',
         ]);
 
         // Verificar si ya existe una persona con el mismo documento o email
@@ -226,7 +222,7 @@ class InscripcionComplementarioController extends Controller
                 'tipo_documento', 'numero_documento', 'primer_nombre', 'segundo_nombre',
                 'primer_apellido', 'segundo_apellido', 'fecha_nacimiento', 'genero',
                 'telefono', 'celular', 'email', 'pais_id', 'departamento_id',
-                'municipio_id', 'direccion', 'caracterizacion_id'
+                'municipio_id', 'direccion', 'parametro_id'
             ]));
         } else {
             // Crear nueva persona
@@ -234,7 +230,7 @@ class InscripcionComplementarioController extends Controller
                 'tipo_documento', 'numero_documento', 'primer_nombre', 'segundo_nombre',
                 'primer_apellido', 'segundo_apellido', 'fecha_nacimiento', 'genero',
                 'telefono', 'celular', 'email', 'pais_id', 'departamento_id',
-                'municipio_id', 'direccion', 'caracterizacion_id', 'status'
+                'municipio_id', 'direccion', 'parametro_id', 'status'
             ]) + ['user_create_id' => 1, 'user_edit_id' => 1]);
         }
 
