@@ -1,7 +1,5 @@
 <?php
-
 namespace Database\Seeders;
-
 use App\Models\Ambiente;
 use App\Models\Aprendiz;
 use App\Models\AprendizFicha;
@@ -24,7 +22,6 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
-
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -33,17 +30,16 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->truncateGeneratedData();
-
         $this->call([
             RolePermissionSeeder::class,
+            ParametroSeeder::class,
+            TemaSeeder::class,
             PaisSeeder::class,
             DepartamentoSeeder::class,
             MunicipioSeeder::class,
             PersonaSeeder::class,
             UpdatePersonaSeeder::class,
             SuperAdminSeeder::class,
-            ParametroSeeder::class,
-            TemaSeeder::class,
             UsersTableSeeder::class,
             RegionalSeeder::class,
             CentroFormacionSeeder::class,
@@ -64,17 +60,13 @@ class DatabaseSeeder extends Seeder
             ProductoSeeder::class, // Crear productos para agregar al módulo de inventario
             // Complementarios ofertados
             // ComplementariosOfertadosSeeder::class,
-
             // Aspirantes complementarios
             // AspirantesComplementariosSeeder::class,
-
             // Categorias de caracterizacion para complementarios
             // CategoriaCaracterizacionComplementariosSeeder::class,
         ]);
-
         $adminUser = User::where('email', 'admin@admin.com')->first() ?? User::first();
         $adminUserId = $adminUser?->id ?? 1;
-
         // Instructores de referencia
         $instructors = Instructor::factory()
             ->count(8)
@@ -83,7 +75,6 @@ class DatabaseSeeder extends Seeder
                 'user_edit_id' => $adminUserId,
             ])
             ->create();
-
         // Fichas de caracterización ligadas a instructores disponibles
         $fichas = new Collection();
         foreach ($instructors->shuffle()->take(4) as $instructor) {
@@ -95,26 +86,22 @@ class DatabaseSeeder extends Seeder
                 ])
             );
         }
-
         $fichas->each(function (FichaCaracterizacion $ficha) use ($adminUserId) {
             FichaDiasFormacion::factory()
                 ->count(3)
                 ->for($ficha, 'ficha')
                 ->create();
-
             $asignacion = InstructorFichaCaracterizacion::factory()->create([
                 'instructor_id' => $ficha->instructor_id,
                 'ficha_id' => $ficha->id,
                 'fecha_inicio' => $ficha->fecha_inicio,
                 'fecha_fin' => $ficha->fecha_fin,
             ]);
-
             InstructorFichaDias::factory()
                 ->count(2)
                 ->for($asignacion, 'instructorFicha')
                 ->create();
         });
-
         // Aprendices y asignación a fichas
         $aprendices = Aprendiz::factory()
             ->count(25)
@@ -123,18 +110,15 @@ class DatabaseSeeder extends Seeder
                 'user_edit_id' => $adminUserId,
             ])
             ->create();
-
         $aprendices->each(function (Aprendiz $aprendiz) use ($fichas) {
             if ($fichas->isEmpty()) {
                 return;
             }
-
             AprendizFicha::factory()->create([
                 'aprendiz_id' => $aprendiz->id,
                 'ficha_id' => $fichas->random()->id,
             ]);
         });
-
         // Inventario base utilizando factories
         $proveedores = Proveedor::factory()
             ->count(5)
@@ -143,7 +127,6 @@ class DatabaseSeeder extends Seeder
                 'user_update_id' => $adminUserId,
             ])
             ->create();
-
         $contratos = ContratoConvenio::factory()
             ->count(5)
             ->state(function () use ($proveedores, $adminUserId) {
@@ -154,9 +137,7 @@ class DatabaseSeeder extends Seeder
                 ];
             })
             ->create();
-
         $ambienteIds = Ambiente::query()->pluck('id');
-
         $productos = Producto::factory()
             ->count(12)
             ->state(function () use ($proveedores, $contratos, $ambienteIds, $adminUserId) {
@@ -169,7 +150,6 @@ class DatabaseSeeder extends Seeder
                 ];
             })
             ->create();
-
         $ordenes = Orden::factory()
             ->count(6)
             ->state(fn () => [
@@ -177,7 +157,6 @@ class DatabaseSeeder extends Seeder
                 'user_update_id' => $adminUserId,
             ])
             ->create();
-
         $detalles = new Collection();
         foreach ($ordenes as $orden) {
             $nuevosDetalles = DetalleOrden::factory()
@@ -191,10 +170,8 @@ class DatabaseSeeder extends Seeder
                     ];
                 })
                 ->create();
-
             $detalles = $detalles->merge($nuevosDetalles);
         }
-
         $detalles->unique('id')
             ->take(max(1, (int)floor($detalles->count() * 0.6)))
             ->each(function (DetalleOrden $detalle) use ($adminUserId) {
@@ -204,10 +181,8 @@ class DatabaseSeeder extends Seeder
                     'user_update_id' => $adminUserId,
                 ]);
             });
-
         // Oferta complementaria y aspirantes
         $complementarios = ComplementarioOfertado::factory()->count(3)->create();
-
         $pairs = collect();
         foreach ($aprendices as $aprendiz) {
             foreach ($complementarios as $complementario) {
@@ -217,7 +192,6 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
         }
-
         $pairs
             ->shuffle()
             ->take(min(12, $pairs->count()))
@@ -227,7 +201,6 @@ class DatabaseSeeder extends Seeder
                     ->create();
             });
     }
-
     private function truncateGeneratedData(): void
     {
         $tables = [
@@ -247,7 +220,6 @@ class DatabaseSeeder extends Seeder
             'aspirantes_complementarios',
             'complementarios_ofertados',
         ];
-
         Schema::disableForeignKeyConstraints();
         foreach ($tables as $table) {
             DB::table($table)->truncate();
@@ -255,3 +227,4 @@ class DatabaseSeeder extends Seeder
         Schema::enableForeignKeyConstraints();
     }
 }
+
