@@ -13,7 +13,13 @@ class ProductoSeeder extends Seeder
      */
     public function run(): void
     {
-        $productos = [
+        collect($this->obtenerProductos())
+            ->each(fn ($producto) => Producto::create($producto));
+    }
+
+    private function obtenerProductos(): array
+    {
+        return [
              [
                 'producto' => 'PAPEL ABSORBENTE',
                 'tipo_producto_id' => 28,
@@ -15367,8 +15373,5 @@ class ProductoSeeder extends Seeder
                 'user_update_id' => 1,
             ],
         ];
-        foreach ($productos as $producto){
-            Producto::create($producto);
-        }
     }
 }
