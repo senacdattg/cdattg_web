@@ -293,6 +293,8 @@ class ParametroSeeder extends Seeder
                 [
                     'name' => $parametro['name'],
                     'status' => $parametro['status'],
+                    'user_create_id' => $parametro['user_create_id'],
+                    'user_edit_id' => $parametro['user_edit_id'],
                 ]
             );
         }
