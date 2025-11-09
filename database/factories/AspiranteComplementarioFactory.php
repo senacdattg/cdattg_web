@@ -16,11 +16,19 @@ class AspiranteComplementarioFactory extends Factory
 
     public function definition(): array
     {
+        $observaciones = [
+            'El aspirante cumple con todos los requisitos.',
+            'Pendiente de documentación adicional.',
+            'Completar proceso de inscripción.',
+            'Revisar disponibilidad de horarios.',
+            'Aspirante en lista de espera.',
+        ];
+        
         return [
             'persona_id' => Persona::factory(),
             'complementario_id' => ComplementarioOfertado::factory(),
-            'observaciones' => $this->faker->sentence(12),
-            'estado' => $this->faker->randomElement([1, 2, 3]),
+            'observaciones' => $observaciones[array_rand($observaciones)],
+            'estado' => [1, 2, 3][array_rand([1, 2, 3])],
         ];
     }
 }

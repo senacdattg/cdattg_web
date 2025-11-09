@@ -28,6 +28,9 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 COPY composer.json composer.lock ./
 COPY app/Helpers/helper.php ./app/Helpers/helper.php
 
+# Deshabilitar timeout de Composer (sin límite de tiempo)
+ENV COMPOSER_PROCESS_TIMEOUT=0
+
 RUN set -eux; \
     if [ "$BUILD_ENV" = "production" ]; then \
         composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts --no-progress; \
@@ -101,6 +104,8 @@ RUN set -eux; \
     docker-php-ext-enable redis; \
     apt-get purge -y --auto-remove $PHPIZE_DEPS; \
     rm -rf /var/lib/apt/lists/*
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 COPY . .
 

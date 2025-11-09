@@ -42,6 +42,31 @@ ensure_permissions() {
 ensure_permissions storage
 ensure_permissions bootstrap/cache
 
+# Verificar dependencias de Composer
+if [ -f "vendor/autoload.php" ]; then
+    echo "✅ Dependencias de Composer ya están instaladas"
+else
+    echo "📦 Instalando dependencias de Composer..."
+    
+    # Deshabilitar timeout de Composer (sin límite de tiempo)
+    export COMPOSER_PROCESS_TIMEOUT=0
+    
+    # Instalar dependencias sin optimización (más rápido)
+    if [ "${BUILD_ENV:-production}" = "production" ] || [ "${APP_ENV:-production}" = "production" ]; then
+        composer install --no-dev --no-interaction --prefer-dist --no-scripts || {
+            echo "❌ Falló la instalación de dependencias de Composer";
+            exit 1;
+        }
+    else
+        composer install --no-interaction --prefer-dist --no-scripts || {
+            echo "❌ Falló la instalación de dependencias de Composer";
+            exit 1;
+        }
+    fi
+    
+    echo "✅ Dependencias de Composer instaladas"
+fi
+
 should_run() {
     case "${1:-}" in
         1|true|TRUE|True|yes|YES|Yes) return 0 ;;

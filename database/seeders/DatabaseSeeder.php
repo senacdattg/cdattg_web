@@ -160,7 +160,7 @@ class DatabaseSeeder extends Seeder
         $detalles = new Collection();
         foreach ($ordenes as $orden) {
             $nuevosDetalles = DetalleOrden::factory()
-                ->count(fake()->numberBetween(1, 3))
+                ->count(rand(1, 3))
                 ->state(function () use ($orden, $productos, $adminUserId) {
                     return [
                         'orden_id' => $orden->id,

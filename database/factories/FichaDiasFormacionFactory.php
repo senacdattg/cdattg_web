@@ -16,15 +16,16 @@ class FichaDiasFormacionFactory extends Factory
 
     public function definition(): array
     {
-        $horaInicio = $this->faker->randomElement(['06:30:00', '08:00:00', '13:00:00']);
-        $duracionHoras = $this->faker->numberBetween(2, 6);
+        $horasInicio = ['06:30:00', '08:00:00', '13:00:00'];
+        $horaInicio = $horasInicio[array_rand($horasInicio)];
+        $duracionHoras = rand(2, 6);
         $horaFin = Carbon::createFromFormat('H:i:s', $horaInicio)
             ->addHours($duracionHoras)
             ->format('H:i:s');
 
         return [
             'ficha_id' => FichaCaracterizacion::factory(),
-            'dia_id' => $this->faker->numberBetween(12, 17),
+            'dia_id' => rand(12, 17),
             'hora_inicio' => $horaInicio,
             'hora_fin' => $horaFin,
         ];

@@ -36,6 +36,8 @@ services:
       - "8080:8080"
     volumes:
       - ./:/var/www/html
+      - /var/www/html/vendor
+      - /var/www/html/node_modules
     depends_on:
       db:
         condition: service_healthy
