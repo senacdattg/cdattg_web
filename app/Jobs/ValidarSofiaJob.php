@@ -6,8 +6,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use App\Models\AspiranteComplementario;
 use App\Models\Persona;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
 class ValidarSofiaJob implements ShouldQueue
@@ -186,41 +185,81 @@ class ValidarSofiaJob implements ShouldQueue
 
     private function validarAspirante($cedula)
     {
-        // Ejecutar script de Node.js con mejor manejo de errores
-        $scriptPath = base_path('resources/js/sofia-validator.js');
+        // Obtener URL del servicio de Playwright desde variable de entorno
+        $playwrightUrl = env('PLAYWRIGHT_SERVICE_URL', 'http://playwright:3000');
+        $validateUrl = rtrim($playwrightUrl, '/') . '/validate';
 
-        Log::debug("Ejecutando script Node.js para cédula: {$cedula}");
-
-        $process = new Process(['node', $scriptPath, $cedula]);
-        $process->setTimeout(60000); // Aumentar timeout a 60 segundos
-        $process->setWorkingDirectory(base_path());
+        Log::debug("Enviando petición HTTP al servicio Playwright para cédula: {$cedula}", [
+            'url' => $validateUrl
+        ]);
 
         try {
-            $process->run();
-
-            if (!$process->isSuccessful()) {
-                $errorOutput = $process->getErrorOutput();
-                $exitCode = $process->getExitCode();
-
-                Log::error("Script Node.js falló para cédula {$cedula}", [
-                    'exit_code' => $exitCode,
-                    'error_output' => $errorOutput,
-                    'command' => $process->getCommandLine()
+            // Hacer petición POST al servicio de Playwright
+            $response = Http::timeout(60) // 60 segundos de timeout
+                ->post($validateUrl, [
+                    'cedula' => $cedula
                 ]);
 
-                throw new ProcessFailedException($process);
+            // Verificar si la petición fue exitosa
+            if (!$response->successful()) {
+                $statusCode = $response->status();
+                $errorBody = $response->body();
+                
+                Log::error("Servicio Playwright retornó error HTTP para cédula {$cedula}", [
+                    'status_code' => $statusCode,
+                    'response' => $errorBody,
+                    'url' => $validateUrl
+                ]);
+
+                throw new \Exception("Error HTTP {$statusCode} del servicio Playwright: {$errorBody}");
             }
 
-            $output = trim($process->getOutput());
-            Log::debug("Script Node.js completado para cédula {$cedula}: {$output}");
+            // Obtener respuesta JSON
+            $responseData = $response->json();
 
-            return $output;
+            // Verificar estructura de respuesta
+            if (!isset($responseData['status'])) {
+                Log::warning("Respuesta del servicio Playwright sin campo 'status' para cédula {$cedula}", [
+                    'response' => $responseData
+                ]);
+                throw new \Exception("Respuesta inválida del servicio Playwright");
+            }
 
-        } catch (ProcessFailedException $e) {
-            Log::error("ProcessFailedException para cédula {$cedula}: " . $e->getMessage(), [
-                'exit_code' => $e->getExitCode(),
-                'error_output' => $e->getErrorOutput(),
-                'output' => $e->getOutput()
+            // Si hay error en la respuesta
+            if ($responseData['status'] === 'error') {
+                $errorMessage = $responseData['message'] ?? 'Error desconocido del servicio Playwright';
+                Log::error("Servicio Playwright reportó error para cédula {$cedula}", [
+                    'message' => $errorMessage,
+                    'detail' => $responseData['detail'] ?? null
+                ]);
+                return 'ERROR';
+            }
+
+            // Extraer resultado de la respuesta
+            $resultado = $responseData['resultado'] ?? null;
+
+            if ($resultado === null) {
+                Log::warning("Respuesta del servicio Playwright sin campo 'resultado' para cédula {$cedula}", [
+                    'response' => $responseData
+                ]);
+                throw new \Exception("Respuesta sin resultado del servicio Playwright");
+            }
+
+            Log::debug("Servicio Playwright completado para cédula {$cedula}: {$resultado}");
+
+            return $resultado;
+
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            Log::error("Error de conexión con servicio Playwright para cédula {$cedula}", [
+                'message' => $e->getMessage(),
+                'url' => $validateUrl
+            ]);
+            throw new \Exception("No se pudo conectar al servicio Playwright: " . $e->getMessage());
+        } catch (\Exception $e) {
+            Log::error("Error al validar cédula {$cedula} con servicio Playwright", [
+                'message' => $e->getMessage(),
+                'url' => $validateUrl,
+                'exception' => get_class($e)
             ]);
             throw $e;
         }
