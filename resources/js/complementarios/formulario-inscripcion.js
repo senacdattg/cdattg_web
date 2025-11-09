@@ -16,6 +16,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Configurar carga dinámica de municipios
     setupMunicipioLoading();
 
+    // Configurar manejo de caracterización
+    setupCaracterizacionHandling();
+
+    // Configurar validación de edad mínima
+    setupEdadMinimaValidation();
+
     // Inicializar municipios dinámicos para formularios que lo necesiten
     if (typeof initializeMunicipiosDynamic === 'function') {
         initializeMunicipiosDynamic();
@@ -136,12 +142,12 @@ function setupUppercaseConversion() {
         if (campo) {
             campo.addEventListener('input', function() {
                 // Convertir a mayúsculas y remover números
-                this.value = this.value.toUpperCase().replace(/[0-9]/g, '');
+                this.value = this.value.toUpperCase().replace(/\d/g, '');
             });
 
             // Validación en tiempo real - prevenir números durante escritura
             campo.addEventListener('keypress', function(e) {
-                const char = String.fromCharCode(e.which);
+                const char = String.fromCharCode(e.keyCode || e.which);
                 // Permitir letras, espacios, guiones, tildes y teclas de control
                 if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]$/.test(char) && !e.ctrlKey && !e.altKey && !e.metaKey) {
                     e.preventDefault();
@@ -232,68 +238,88 @@ function loadDepartamentosForPais(paisId, selectedDepartamentoId = null) {
     const departamentoSelect = document.getElementById('departamento_id');
     if (!departamentoSelect) return;
 
-    if (paisId) {
-        fetch(`/departamentos/${paisId}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                departamentoSelect.innerHTML = '<option value="">Seleccione...</option>';
-                if (Array.isArray(data)) {
-                    data.forEach(departamento => {
-                        const option = document.createElement('option');
-                        option.value = departamento.id;
-                        option.textContent = departamento.departamento;
-                        if (selectedDepartamentoId && departamento.id == selectedDepartamentoId) {
-                            option.selected = true;
-                        }
-                        departamentoSelect.appendChild(option);
-                    });
-                } else {
-                    console.error('Los datos de departamentos no son un array:', data);
-                    departamentoSelect.innerHTML = '<option value="">Error en formato de datos</option>';
-                }
-            })
-            .catch(error => {
-                console.error('Error cargando departamentos:', error);
-                departamentoSelect.innerHTML = '<option value="">Error cargando departamentos</option>';
-            });
-    } else {
-        departamentoSelect.innerHTML = '<option value="">Seleccione...</option>';
-    }
+    // Limpiar select y mostrar opción por defecto
+    departamentoSelect.innerHTML = '<option value="">Seleccione...</option>';
+
+    if (!paisId) return;
+
+    // Función auxiliar para manejar errores
+    const handleError = (error) => {
+        console.error('Error cargando departamentos:', error);
+        departamentoSelect.innerHTML = '<option value="">Error cargando departamentos</option>';
+    };
+
+    // Función auxiliar para procesar datos
+    const processData = (data) => {
+        if (!Array.isArray(data)) {
+            console.error('Los datos de departamentos no son un array:', data);
+            departamentoSelect.innerHTML = '<option value="">Error en formato de datos</option>';
+            return;
+        }
+
+        data.forEach(departamento => {
+            const option = document.createElement('option');
+            option.value = departamento.id;
+            option.textContent = departamento.departamento;
+            if (selectedDepartamentoId && departamento.id == selectedDepartamentoId) {
+                option.selected = true;
+            }
+            departamentoSelect.appendChild(option);
+        });
+    };
+
+    fetch(`/departamentos/${paisId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(processData)
+        .catch(handleError);
 }
 
 // Cargar municipios para un departamento
-function loadMunicipiosForDepartamento(departamentoId, selectedMunicipioId = null) {
+function loadMunicipiosForDepartamento(departamentoId, municipioIdToSelect = null) {
     const municipioSelect = document.getElementById('municipio_id');
     if (!municipioSelect) return;
 
     if (departamentoId) {
         fetch(`/municipios/${departamentoId}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
-                if (Array.isArray(data)) {
-                    data.forEach(municipio => {
+
+                // Manejar diferentes estructuras de respuesta
+                let municipios = [];
+
+                if (data.success && data.data) {
+                    // Estructura: {success: true, data: [...]}
+                    municipios = data.data;
+                } else if (Array.isArray(data)) {
+                    // Estructura: [...]
+                    municipios = data;
+                } else if (data && typeof data === 'object') {
+                    // Estructura: {municipios: [...]} u otra variante
+                    municipios = data.municipios || data.data || [];
+                }
+
+                if (Array.isArray(municipios) && municipios.length > 0) {
+                    municipios.forEach(municipio => {
                         const option = document.createElement('option');
                         option.value = municipio.id;
-                        option.textContent = municipio.municipio;
-                        if (selectedMunicipioId && municipio.id == selectedMunicipioId) {
+                        // Manejar diferentes nombres de campo para el municipio
+                        const label = municipio.nombre ?? municipio.municipio ?? municipio.name ?? municipio.label ?? '';
+                        option.textContent = label || `ID ${municipio.id}`;
+                        // Seleccionar el municipio si coincide con el municipio_id del usuario
+                        if (municipioIdToSelect && municipio.id == municipioIdToSelect) {
                             option.selected = true;
                         }
                         municipioSelect.appendChild(option);
                     });
                 } else {
-                    console.error('Los datos de municipios no son un array:', data);
-                    municipioSelect.innerHTML = '<option value="">Error en formato de datos</option>';
+                    console.error('No se encontraron municipios o estructura inválida:', data);
+                    municipioSelect.innerHTML = '<option value="">No hay municipios disponibles</option>';
                 }
             })
             .catch(error => {
@@ -315,10 +341,13 @@ function setupAddressForm() {
         toggleButton.addEventListener('click', function() {
             const addressForm = document.getElementById('addressForm');
             const isVisible = addressForm.classList.contains('show');
+            const button = this;
             if (isVisible) {
                 $('#addressForm').collapse('hide');
+                button.setAttribute('aria-expanded', 'false');
             } else {
                 $('#addressForm').collapse('show');
+                button.setAttribute('aria-expanded', 'true');
             }
         });
     }
@@ -336,82 +365,65 @@ function setupAddressForm() {
     addressNumericFields.forEach(fieldId => {
         const element = document.getElementById(fieldId);
         if (element) {
-            element.addEventListener('keypress', soloNumeros);
+            element.addEventListener('keypress', function(event) {
+                const key = event.key;
+                if (event.ctrlKey || event.altKey || event.metaKey) {
+                    return true;
+                }
+                if (!/^\d$/.test(key)) {
+                    event.preventDefault();
+                    return false;
+                }
+                return true;
+            });
         }
     });
 }
 
-// Guardar dirección estructurada
-function saveAddress() {
-    const tipoVia = document.getElementById('tipo_via') ? document.getElementById('tipo_via').value.trim() : '';
-    const numeroVia = document.getElementById('numero_via') ? document.getElementById('numero_via').value.trim() : '';
-    const letraVia = document.getElementById('letra_via') ? document.getElementById('letra_via').value.trim() : '';
-    const viaSecundaria = document.getElementById('via_secundaria') ? document.getElementById('via_secundaria').value.trim() : '';
-    const numeroCasa = document.getElementById('numero_casa') ? document.getElementById('numero_casa').value.trim() : '';
-    const complementos = document.getElementById('complementos') ? document.getElementById('complementos').value.trim() : '';
-    const barrio = document.getElementById('barrio') ? document.getElementById('barrio').value.trim() : '';
 
-    // Verificar si estamos en un formulario con campos antiguos (carrera, calle)
-    const carrera = document.getElementById('carrera') ? document.getElementById('carrera').value.trim() : '';
-    const calle = document.getElementById('calle') ? document.getElementById('calle').value.trim() : '';
-    const numeroApartamento = document.getElementById('numero_apartamento') ? document.getElementById('numero_apartamento').value.trim() : '';
 
-    // Validar campos obligatorios - verificar si usar campos nuevos o antiguos
-    let isValid = false;
-    let direccion = '';
 
-    if (tipoVia && numeroVia && numeroCasa) {
-        // Usar campos nuevos (tipo_via, numero_via, etc.)
-        isValid = true;
-
-        // Construir la dirección con campos nuevos
-        direccion = `${tipoVia} ${numeroVia}`;
-
-        // Agregar letra de vía si existe
-        if (letraVia) {
-            direccion += letraVia;
-        }
-
-        // Agregar número de casa
-        direccion += ` #${numeroCasa}`;
-
-        // Agregar vía secundaria si existe
-        if (viaSecundaria) {
-            direccion += ` ${viaSecundaria}`;
-        }
-
-        // Agregar complementos si existen
-        if (complementos) {
-            direccion += ` ${complementos}`;
-        }
-
-        // Agregar barrio si existe
-        if (barrio) {
-            direccion += `, ${barrio}`;
-        }
-    } else if (carrera && calle && numeroCasa) {
-        // Usar campos antiguos (carrera, calle, etc.)
-        isValid = true;
-
-        // Construir la dirección con campos antiguos
-        direccion = `Carrera ${carrera} Calle ${calle} #${numeroCasa}`;
-        if (numeroApartamento) {
-            direccion += ` Apt ${numeroApartamento}`;
-        }
-    }
-
-    if (!isValid) {
-        alert('Por favor complete todos los campos obligatorios: Tipo de vía, Número de vía y Número de casa.');
-        return;
-    }
-
-    // Asignar al campo principal
-    document.getElementById('direccion').value = direccion;
-
+// Cancelar edición de dirección
+function cancelAddress() {
     // Ocultar el formulario
     $('#addressForm').collapse('hide');
 
-    // Limpiar campos - limpiar tanto campos nuevos como antiguos
+    // Limpiar campos
+    document.querySelectorAll('.address-field').forEach(field => field.value = '');
+}
+
+// Función auxiliar para obtener valor de campo
+function getFieldValue(fieldId) {
+    const field = document.getElementById(fieldId);
+    return field ? field.value.trim() : '';
+}
+
+// Función auxiliar para construir dirección con campos nuevos
+function buildNewAddressFormat(tipoVia, numeroVia, letraVia, numeroCasa, viaSecundaria, complementos, barrio) {
+    let direccion = `${tipoVia} ${numeroVia}`;
+    if (letraVia) direccion += letraVia;
+    direccion += ` #${numeroCasa}`;
+    if (viaSecundaria) direccion += ` ${viaSecundaria}`;
+    if (complementos) direccion += ` ${complementos}`;
+    if (barrio) direccion += `, ${barrio}`;
+    return direccion;
+}
+
+// Función auxiliar para construir dirección con campos antiguos
+function buildOldAddressFormat(carrera, calle, numeroCasa, numeroApartamento) {
+    let direccion = `Carrera ${carrera} Calle ${calle} #${numeroCasa}`;
+    if (numeroApartamento) direccion += ` Apt ${numeroApartamento}`;
+    return direccion;
+}
+
+// Función auxiliar para validar campos obligatorios
+function validateAddressFields(tipoVia, numeroVia, numeroCasa, carrera, calle) {
+    return (tipoVia && numeroVia && numeroCasa) || (carrera && calle && numeroCasa);
+}
+
+// Función auxiliar para limpiar campos
+function clearAddressFields() {
+    // Limpiar campos nuevos
     document.querySelectorAll('.address-field').forEach(field => {
         if (field.type === 'select-one') {
             field.selectedIndex = 0;
@@ -420,7 +432,7 @@ function saveAddress() {
         }
     });
 
-    // También limpiar campos antiguos si existen
+    // Limpiar campos antiguos
     const oldFields = ['carrera', 'calle', 'numero_apartamento'];
     oldFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
@@ -434,14 +446,41 @@ function saveAddress() {
     });
 }
 
-// Cancelar edición de dirección
-function cancelAddress() {
-    // Ocultar el formulario
+// Guardar dirección estructurada
+function saveAddress() {
+    // Obtener valores de campos nuevos
+    const tipoVia = getFieldValue('tipo_via');
+    const numeroVia = getFieldValue('numero_via');
+    const letraVia = getFieldValue('letra_via');
+    const viaSecundaria = getFieldValue('via_secundaria');
+    const numeroCasa = getFieldValue('numero_casa');
+    const complementos = getFieldValue('complementos');
+    const barrio = getFieldValue('barrio');
+
+    // Obtener valores de campos antiguos
+    const carrera = getFieldValue('carrera');
+    const calle = getFieldValue('calle');
+    const numeroApartamento = getFieldValue('numero_apartamento');
+
+    // Validar campos obligatorios
+    if (!validateAddressFields(tipoVia, numeroVia, numeroCasa, carrera, calle)) {
+        alert('Por favor complete todos los campos obligatorios: Tipo de vía, Número de vía y Número de casa.');
+        return;
+    }
+
+    // Construir dirección según el formato disponible
+    const direccion = (tipoVia && numeroVia && numeroCasa)
+        ? buildNewAddressFormat(tipoVia, numeroVia, letraVia, numeroCasa, viaSecundaria, complementos, barrio)
+        : buildOldAddressFormat(carrera, calle, numeroCasa, numeroApartamento);
+
+    // Asignar al campo principal y ocultar formulario
+    document.getElementById('direccion').value = direccion;
     $('#addressForm').collapse('hide');
 
     // Limpiar campos
-    document.querySelectorAll('.address-field').forEach(field => field.value = '');
+    clearAddressFields();
 }
+
 
 // Exportar funciones globales para uso en HTML
 window.setupAddressForm = setupAddressForm;
