@@ -42,6 +42,37 @@ ensure_permissions() {
 ensure_permissions storage
 ensure_permissions bootstrap/cache
 
+log_file="storage/logs/laravel.log"
+if [ ! -f "$log_file" ]; then
+    touch "$log_file"
+fi
+chown www-data:www-data "$log_file" || true
+chmod 664 "$log_file" || true
+chmod -R 777 storage bootstrap/cache || true
+
+install_composer_dependencies() {
+    if [ ! -f "vendor/autoload.php" ]; then
+        if ! command -v composer >/dev/null 2>&1; then
+            echo "❌ Composer no está disponible en el contenedor. Abortando."
+            exit 1
+        fi
+
+        echo "📦 Instalando dependencias de Composer..."
+
+        local composer_cmd="composer install --no-interaction --prefer-dist --no-progress"
+        if [ "${APP_ENV:-production}" != "local" ] && [ "${APP_ENV:-production}" != "testing" ]; then
+            composer_cmd="$composer_cmd --no-dev --optimize-autoloader"
+        fi
+
+        if ! COMPOSER_ALLOW_SUPERUSER=1 COMPOSER_PROCESS_TIMEOUT=${COMPOSER_PROCESS_TIMEOUT:-0} $composer_cmd; then
+            echo "❌ Falló la instalación de dependencias de Composer"
+            exit 1
+        fi
+    fi
+}
+
+install_composer_dependencies
+
 should_run() {
     case "${1:-}" in
         1|true|TRUE|True|yes|YES|Yes) return 0 ;;
@@ -49,19 +80,31 @@ should_run() {
     esac
 }
 
+run_module_migrations() {
+    local command=("$@")
+
+    set +e
+    local output
+    output="$("${command[@]}" 2>&1)"
+    local status=$?
+    set -e
+
+    if [ $status -ne 0 ]; then
+        echo "$output"
+        echo "❌ Migraciones de módulos fallaron"
+        exit 1
+    fi
+
+    printf "%s\n" "$output"
+}
+
 if should_run "${RUN_MIGRATIONS:-false}"; then
     if should_run "${RUN_MIGRATIONS_FRESH:-false}"; then
         echo "🗄️ Ejecutando migraciones de módulos (fresh)..."
-        php artisan migrate:module --all --fresh || {
-            echo "❌ Migraciones fresh de módulos fallaron";
-            exit 1;
-        }
+        run_module_migrations php artisan migrate:module --all --fresh
     else
         echo "🗄️ Ejecutando migraciones de módulos..."
-        php artisan migrate:module --all || {
-            echo "❌ Migraciones de módulos fallaron";
-            exit 1;
-        }
+        run_module_migrations php artisan migrate:module --all
     fi
 fi
 

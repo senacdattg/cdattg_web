@@ -114,6 +114,8 @@ COPY --from=assets_builder /app/public/build ./public/build
 
 COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+COPY --from=composer_vendor /usr/bin/composer /usr/bin/composer
+COPY docker/php/conf.d/uploads.ini /usr/local/etc/php/conf.d/uploads.ini
 
 RUN chmod +x /usr/local/bin/entrypoint.sh
 

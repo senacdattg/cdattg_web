@@ -11,8 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('ambientes')) {
+            return;
+        }
+
         Schema::table('complementarios_ofertados', function (Blueprint $table) {
-            $table->foreignId('ambiente_id')->nullable()->constrained('ambientes')->onDelete('set null');
+            if (!Schema::hasColumn('complementarios_ofertados', 'ambiente_id')) {
+                $table->foreignId('ambiente_id')->nullable()->constrained('ambientes')->onDelete('set null');
+            }
         });
     }
 
@@ -22,8 +28,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('complementarios_ofertados', function (Blueprint $table) {
-            $table->dropForeign(['ambiente_id']);
-            $table->dropColumn('ambiente_id');
+            if (Schema::hasColumn('complementarios_ofertados', 'ambiente_id')) {
+                $table->dropForeign(['ambiente_id']);
+                $table->dropColumn('ambiente_id');
+            }
         });
     }
 };

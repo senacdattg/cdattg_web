@@ -11,6 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('ambientes') || !Schema::hasTable('fichas_caracterizacion')) {
+            return;
+        }
+
+        if (Schema::hasTable('ambiente_ficha')) {
+            return;
+        }
+
         Schema::create('ambiente_ficha', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ambiente_id')->constrained('ambientes');
