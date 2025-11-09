@@ -15,10 +15,16 @@ export default defineConfig({
                 'dias_formacion_css': 'resources/css/dias-formacion.css',
                 'dashboard_superadmin': 'resources/css/dashboards/dashboard-superadmin.css',
                 'caracter_selecter': 'resources/css/Asistencia/caracter_selecter.css',
+                // Inventario CSS files
                 'inventario_base_css': 'resources/css/inventario/shared/base.css',
                 'inventario_card_css': 'resources/css/inventario/card.css',
-                'inventario_modal_producto_css': 'resources/css/inventario/modal-producto.css',
+                'inventario_carrito_css': 'resources/css/inventario/carrito.css',
                 'inventario_imagen_css': 'resources/css/inventario/imagen.css',
+                'inventario_inventario_css': 'resources/css/inventario/inventario.css',
+                'inventario_modal_orden_css': 'resources/css/inventario/modal-orden.css',
+                'inventario_modal_producto_css': 'resources/css/inventario/modal-producto.css',
+                'inventario_notificaciones_css': 'resources/css/inventario/notificaciones.css',
+                'inventario_orden_css': 'resources/css/inventario/orden.css',
                 
                 // Complementarios CSS files
                 'formulario_inscripcion_css': 'resources/css/formulario_inscripcion.css',
@@ -34,8 +40,15 @@ export default defineConfig({
                 'charts-scripts': 'resources/js/dashboards/superadmin/charts-scripts.js',
                 'widgets': 'resources/js/dashboards/superadmin/widgets.js',
                 'municipios': 'resources/js/municipios.js',
+                // Inventario files
+                'inventario_aprobaciones': 'resources/js/inventario/aprobaciones.js',
                 'inventario_card': 'resources/js/inventario/card.js',
                 'inventario_carrito': 'resources/js/inventario/carrito.js',
+                'inventario_escaner': 'resources/js/inventario/escaner.js',
+                'inventario_filtro_departamento': 'resources/js/inventario/filtro-departamento.js',
+                'inventario_imagen': 'resources/js/inventario/imagen.js',
+                'inventario_notificaciones': 'resources/js/inventario/notificaciones.js',
+                'inventario_solicitud': 'resources/js/inventario/solicitud.js',
                 // Complementarios files
                 'formulario_inscripcion': 'resources/js/complementarios/formulario-inscripcion.js',
                 'estadisticas_complementarios': 'resources/js/complementarios/estadisticas.js',
