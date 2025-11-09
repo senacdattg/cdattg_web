@@ -791,34 +791,34 @@ textarea.form-control-modern {
 /* Estilo para vista "Ver Producto" */
 
 /* --- Nombres de los campos --- */
-.product-info-list li strong {
-    color: #505152 !important; 
-    font-family: 'Source Sans Pro', sans-serif !important;
-    font-size: 1rem !important;
-    font-weight: 600 !important; 
-    text-transform: none !important;
-    letter-spacing: 0.3px !important;
+.product-info-card .product-info-list li strong {
+    color: #505152; 
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 1rem;
+    font-weight: 600; 
+    text-transform: none;
+    letter-spacing: 0.3px;
 }
 
 /* --- Información del producto --- */
-.product-info-list li span,
-.product-info-list li {
-    color: #4a5568 !important; 
-    font-family: 'Open Sans', sans-serif !important; 
-    font-size: 0.9rem !important; 
-    font-weight: 400 !important; 
-    text-transform: none !important;
-    letter-spacing: 0.2px !important;
-    line-height: 1.5 !important;
+.product-info-card .product-info-list li span,
+.product-info-card .product-info-list li {
+    color: #4a5568; 
+    font-family: 'Open Sans', sans-serif; 
+    font-size: 0.9rem; 
+    font-weight: 400; 
+    text-transform: none;
+    letter-spacing: 0.2px;
+    line-height: 1.5;
 }
 
 /* --- Quitar estilo de "badges" --- */
-.badge-modern,
-.badge-modern.badge-success,
-.badge-modern.badge-info,
-.badge-modern.badge-dark,
-.badge-modern.badge-secondary,
-.badge-modern.badge-warning {
+.product-info-card .badge-modern,
+.product-info-card .badge-modern.badge-success,
+.product-info-card .badge-modern.badge-info,
+.product-info-card .badge-modern.badge-dark,
+.product-info-card .badge-modern.badge-secondary,
+.product-info-card .badge-modern.badge-warning {
     background: none !important;
     border: none !important;
     box-shadow: none !important;
@@ -831,11 +831,11 @@ textarea.form-control-modern {
 }
 
 /* --- Eliminar íconos dentro de los badges --- */
-.badge-modern i {
+.product-info-card .badge-modern i {
     display: none !important;
 }
 
 /* --- Ajuste general para alineación limpia --- */
-.product-info-list li {
+.product-info-card .product-info-list li {
     margin-bottom: 6px !important;
 }
