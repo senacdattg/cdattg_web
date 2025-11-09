@@ -18,6 +18,9 @@ class PersonaImportController extends Controller
     {
         $this->middleware('auth');
         $this->middleware('can:CREAR PERSONA');
+
+        // Validar Content-Length para importaciones (25MB límite)
+        $this->middleware('validate.content.length:26214400')->only('store');
     }
 
     public function create(): View
