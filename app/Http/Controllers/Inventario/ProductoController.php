@@ -118,7 +118,19 @@ class ProductoController extends InventarioController
 
         $proveedores = Proveedor::all();
 
-        return view('inventario.productos.create', compact('tiposProductos', 'unidadesMedida', 'estados', 'categorias', 'marcas', 'contratosConvenios', 'ambientes', 'proveedores'));
+        return view(
+            'inventario.productos.create',
+            compact(
+                'tiposProductos',
+                'unidadesMedida',
+                'estados',
+                'categorias',
+                'marcas',
+                'contratosConvenios',
+                'ambientes',
+                'proveedores'
+            )
+        );
     }
 
     /**
