@@ -30,14 +30,26 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label><i class="fas fa-search"></i> Buscar Producto</label>
-                                        <input type="text" id="search-product" class="form-control" placeholder="Buscar por nombre o código...">
+                                        <label>
+                                            <i class="fas fa-search"></i> Buscar Producto
+                                        </label>
+                                        <input 
+                                            type="text" 
+                                            id="search-product" 
+                                            class="form-control" 
+                                            placeholder="Buscar por nombre o código..."
+                                        >
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label><i class="fas fa-tags"></i> Categoría</label>
-                                        <select id="filter-category" class="form-control">
+                                        <label>
+                                            <i class="fas fa-tags"></i> Categoría
+                                        </label>
+                                        <select 
+                                            id="filter-category" 
+                                            class="form-control"
+                                        >
                                             <option value="">Todas las categorías</option>
                                             @foreach($categorias as $categoria)
                                                 <option value="{{ $categoria->id }}">{{ $categoria->name }}</option>
@@ -47,8 +59,13 @@
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label><i class="fas fa-copyright"></i> Marca</label>
-                                        <select id="filter-brand" class="form-control">
+                                        <label>
+                                            <i class="fas fa-copyright"></i> Marca
+                                        </label>
+                                        <select 
+                                            id="filter-brand" 
+                                            class="form-control"
+                                        >
                                             <option value="">Todas las marcas</option>
                                             @foreach($marcas as $marca)
                                                 <option value="{{ $marca->id }}">{{ $marca->name }}</option>
@@ -58,8 +75,13 @@
                                 </div>
                                 <div class="col-md-2">
                                     <div class="form-group">
-                                        <label><i class="fas fa-sort"></i> Ordenar por</label>
-                                        <select id="sort-by" class="form-control">
+                                        <label>
+                                            <i class="fas fa-sort"></i> Ordenar por
+                                        </label>
+                                        <select 
+                                            id="sort-by" 
+                                            class="form-control"
+                                        >
                                             <option value="name">Nombre</option>
                                             <option value="stock-asc">Stock Menor</option>
                                             <option value="stock-desc">Stock Mayor</option>
@@ -206,14 +228,58 @@
     </section>
 
     {{-- Modal simple de detalles del producto --}}
-    <div id="productDetailModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-        <div style="background:white; border-radius:8px; width:90%; max-width:600px; max-height:90vh; overflow-y:auto; box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+    <div 
+        id="productDetailModal" 
+        style="
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.5);
+            z-index:9999;
+            align-items:center;
+            justify-content:center;
+        "
+    >
+        <div 
+            style="
+                background:white;
+                border-radius:8px;
+                width:90%;
+                max-width:600px;
+                max-height:90vh;
+                overflow-y:auto;
+                box-shadow:0 4px 20px rgba(0,0,0,0.3);
+            "
+        >
             <!-- Header -->
-            <div style="padding:20px; background:#17a2b8; color:white; display:flex; justify-content:space-between; align-items:center; border-radius:8px 8px 0 0;">
+            <div 
+                style="
+                    padding:20px;
+                    background:#17a2b8;
+                    color:white;
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    border-radius:8px 8px 0 0;
+                "
+            >
                 <h5 style="margin:0; font-size:18px;">
                     <i class="fas fa-box"></i> Detalles del Producto
                 </h5>
-                <button onclick="closeProductModal()" aria-label="Cerrar" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">
+                <button 
+                    onclick="closeProductModal()" 
+                    aria-label="Cerrar" 
+                    style="
+                        background:none;
+                        border:none;
+                        color:white;
+                        font-size:24px;
+                        cursor:pointer;
+                    "
+                >
                     &times;
                 </button>
             </div>
