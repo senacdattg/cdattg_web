@@ -47,7 +47,8 @@
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
                                 <caption id="devoluciones-description" class="sr-only">
-                                    Listado de devoluciones con información de producto, cantidad prestada, cantidad devuelta, cantidad pendiente, fecha de préstamo y fecha de devolución.
+                                    Listado de devoluciones con información de producto, cantidad prestada, 
+                                    cantidad devuelta, cantidad pendiente, fecha de préstamo y fecha de devolución.
                                 </caption>
                                 <thead>
                                     <tr>
@@ -75,16 +76,24 @@
                                                     {{ $detalle->getCantidadPendiente() }}
                                                 </span>
                                             </td>
-                                            <td>{{ $detalle->orden->created_at ? $detalle->orden->created_at->format('d/m/Y') : 'Sin fecha' }}</td>
-                                            <td>{{ $detalle->orden->fecha_devolucion ? $detalle->orden->fecha_devolucion->format('d/m/Y') : 'Sin fecha' }}</td>
+                                            <td>
+                                                {{ $detalle->orden->created_at ? $detalle->orden->created_at->format('d/m/Y') : 'Sin fecha' }}
+                                            </td>
+                                            <td>
+                                                {{ $detalle->orden->fecha_devolucion ? $detalle->orden->fecha_devolucion->format('d/m/Y') : 'Sin fecha' }}
+                                            </td>
                                             
                                             <td>
-                                                <a href="{{ route('inventario.devoluciones.create', $detalle->id) }}"
-                                                   class="btn btn-sm btn-primary">
+                                                <a 
+                                                    href="{{ route('inventario.devoluciones.create', $detalle->id) }}"
+                                                    class="btn btn-sm btn-primary"
+                                                >
                                                     <i class="fas fa-undo"></i> Devolver
                                                 </a>
-                                                <a href="{{ route('inventario.ordenes.show', $detalle->orden->id) }}"
-                                                   class="btn btn-sm btn-info">
+                                                <a 
+                                                    href="{{ route('inventario.ordenes.show', $detalle->orden->id) }}"
+                                                    class="btn btn-sm btn-info"
+                                                >
                                                     <i class="fas fa-eye"></i> Ver Orden
                                                 </a>
                                             </td>
