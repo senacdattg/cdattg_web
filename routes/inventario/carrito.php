@@ -6,7 +6,7 @@ use App\Http\Controllers\Inventario\CarritoController;
 // Rutas para el carrito del inventario
 Route::prefix('inventario')
     ->name('inventario.carrito.')
-    ->group(function () {    
+    ->group(function () {
         // Rutas e-commerce modernas
         Route::get('carrito-sena', [CarritoController::class, 'index'])->name('ecommerce');
         
