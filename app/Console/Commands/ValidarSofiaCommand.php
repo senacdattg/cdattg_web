@@ -5,8 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use App\Models\AspiranteComplementario;
 use App\Models\Persona;
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
+use Illuminate\Support\Facades\Http;
 
 class ValidarSofiaCommand extends Command
 {
@@ -87,18 +86,50 @@ class ValidarSofiaCommand extends Command
 
     private function validarAspirante($cedula)
     {
-        // Ejecutar script de Node.js
-        $scriptPath = base_path('resources/js/sofia-validator.js');
+        // Obtener URL del servicio de Playwright desde variable de entorno
+        $playwrightUrl = env('PLAYWRIGHT_SERVICE_URL', 'http://playwright:3000');
+        $validateUrl = rtrim($playwrightUrl, '/') . '/validate';
 
-        $process = new Process(['node', $scriptPath, $cedula]);
-        $process->setTimeout(30000); // 30 segundos timeout
-        $process->run();
+        try {
+            // Hacer petición POST al servicio de Playwright
+            $response = Http::timeout(60)
+                ->post($validateUrl, [
+                    'cedula' => $cedula
+                ]);
 
-        if (!$process->isSuccessful()) {
-            throw new ProcessFailedException($process);
+            // Verificar si la petición fue exitosa
+            if (!$response->successful()) {
+                throw new \Exception("Error HTTP {$response->status()} del servicio Playwright: {$response->body()}");
+            }
+
+            // Obtener respuesta JSON
+            $responseData = $response->json();
+
+            // Verificar estructura de respuesta
+            if (!isset($responseData['status'])) {
+                throw new \Exception("Respuesta inválida del servicio Playwright");
+            }
+
+            // Si hay error en la respuesta
+            if ($responseData['status'] === 'error') {
+                $errorMessage = $responseData['message'] ?? 'Error desconocido del servicio Playwright';
+                throw new \Exception($errorMessage);
+            }
+
+            // Extraer resultado de la respuesta
+            $resultado = $responseData['resultado'] ?? null;
+
+            if ($resultado === null) {
+                throw new \Exception("Respuesta sin resultado del servicio Playwright");
+            }
+
+            return $resultado;
+
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            throw new \Exception("No se pudo conectar al servicio Playwright: " . $e->getMessage());
+        } catch (\Exception $e) {
+            throw $e;
         }
-
-        return trim($process->getOutput());
     }
 
     private function determinarEstadoSofia($resultado)

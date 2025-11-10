@@ -1,44 +1,22 @@
-FROM node:20-alpine AS dependencies
+FROM mcr.microsoft.com/playwright:v1.56.1-noble
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 WORKDIR /app
 
+# Instalar dependencias de Node.js
 RUN set -eux; \
     npm init -y; \
     npm install playwright@^1.56.1; \
     npm prune --omit=dev
 
-FROM node:20-alpine AS runtime
-
-ARG NODE_ENV=production
-ENV NODE_ENV=${NODE_ENV}
-ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-ENV PLAYWRIGHT_BROWSERS_PATH=/usr/lib/playwright
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
-WORKDIR /app
-
-RUN set -eux; \
-    apk add --no-cache \
-        chromium \
-        nss \
-        freetype \
-        harfbuzz \
-        ca-certificates \
-        ttf-freefont \
-        chromium-chromedriver
-
-COPY --from=dependencies /app/package.json ./package.json
-COPY --from=dependencies /app/package-lock.json ./package-lock.json
-COPY --from=dependencies /app/node_modules ./node_modules
+# Copiar los archivos de la aplicación
 COPY resources/js/sofia-validator.js ./sofia-validator.js
 COPY resources/js/sofia-validator-server.js ./sofia-validator-server.js
 
-RUN addgroup -g 1001 -S playwright \
-    && adduser -S playwright -G playwright -u 1001
-
-USER playwright
+# La imagen oficial de Playwright corre como root por defecto
+# No necesitamos cambiar usuario, pero podemos crear uno si es necesario
+# Por ahora, dejamos que corra como root (la imagen oficial lo permite)
 
 EXPOSE 3000
 

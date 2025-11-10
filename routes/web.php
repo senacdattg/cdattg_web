@@ -103,6 +103,10 @@ Route::post(
     '/programas-complementarios/{id}/validar-sofia',
     [App\Http\Controllers\Complementarios\ValidacionSofiaController::class, 'validarSofia']
 )->name('programas-complementarios.validar-sofia');
+Route::post(
+    '/programas-complementarios/{id}/validar-documento',
+    [App\Http\Controllers\Complementarios\AspiranteComplementarioController::class, 'validarDocumentos']
+)->name('programas-complementarios.validar-documento');
 Route::get(
     '/sofia-validation-progress/{progressId}',
     [App\Http\Controllers\Complementarios\ValidacionSofiaController::class, 'getValidationProgress']

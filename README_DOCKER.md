@@ -117,6 +117,17 @@ El servicio de Playwright valida automáticamente las cédulas contra SenaSofiaP
 - Maneja reintentos automáticos
 - Registra el progreso en la base de datos
 - Es accesible en el puerto 3000 para debugging
+- Se comunica vía HTTP con el servicio de Playwright en el contenedor dedicado
+
+### Configuración del Servicio de Playwright
+
+Para configurar la URL del servicio de Playwright, agregar en el archivo `.env`:
+
+```env
+PLAYWRIGHT_SERVICE_URL=http://playwright:3000
+```
+
+**Nota**: En Docker, usar el nombre del servicio (`playwright`) para la comunicación interna entre contenedores. Para desarrollo local fuera de Docker, usar `http://localhost:3000`.
 
 ## Estructura de Archivos
 
@@ -148,9 +159,23 @@ docker-compose logs db
 # Verificar logs del contenedor Playwright
 docker-compose logs playwright
 
+# Verificar que el servicio esté corriendo
+docker-compose ps playwright
+
+# Verificar conectividad desde el contenedor app
+docker-compose exec app curl http://playwright:3000/health
+
 # Reiniciar el servicio
 docker-compose restart playwright
+
+# Verificar logs de la aplicación para errores de conexión
+docker-compose logs app | grep -i playwright
 ```
+
+**Nota**: Si las validaciones no funcionan, verificar que:
+1. El contenedor `playwright` esté corriendo (`docker-compose ps`)
+2. La variable `PLAYWRIGHT_SERVICE_URL` esté configurada correctamente en `.env`
+3. Ambos contenedores (`app` y `playwright`) estén en la misma red Docker (`cdattg_net`)
 
 ### Problemas de permisos
 ```bash

@@ -115,7 +115,7 @@ class AspiranteComplementarioController extends Controller
     }
 
     /**
-     * Eliminar aspirante de un programa complementario
+     * Rechazar aspirante de un programa complementario (cambiar estado a rechazado)
      */
     public function eliminarAspirante($complementarioId, $aspiranteId)
     {
@@ -129,22 +129,23 @@ class AspiranteComplementarioController extends Controller
                 ->with('persona')
                 ->firstOrFail();
 
-            // Verificar permisos del usuario (solo administradores pueden eliminar)
+            // Verificar permisos del usuario (solo administradores pueden rechazar)
             if (!auth()->user()->can('ELIMINAR ASPIRANTE COMPLEMENTARIO')) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No tiene permisos para eliminar aspirantes.'
+                    'message' => 'No tiene permisos para rechazar aspirantes.'
                 ], 403);
             }
 
-            // Guardar información del aspirante antes de eliminar para el mensaje
+            // Guardar información del aspirante para el mensaje
             $personaNombre = $aspirante->persona->primer_nombre . ' ' . $aspirante->persona->primer_apellido;
             $numeroDocumento = $aspirante->persona->numero_documento;
 
-            // Eliminar el aspirante
-            $aspirante->delete();
+            // Cambiar el estado a rechazado (2) en lugar de eliminar
+            $aspirante->estado = 2;
+            $aspirante->save();
 
-            Log::info('Aspirante eliminado exitosamente', [
+            Log::info('Aspirante rechazado exitosamente', [
                 'aspirante_id' => $aspiranteId,
                 'complementario_id' => $complementarioId,
                 'persona_id' => $aspirante->persona_id,
@@ -153,7 +154,7 @@ class AspiranteComplementarioController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Aspirante eliminado exitosamente. ' . $personaNombre . ' (' . $numeroDocumento . ') ya no está inscrito en el programa.'
+                'message' => 'Aspirante rechazado exitosamente. ' . $personaNombre . ' (' . $numeroDocumento . ') ha sido marcado como rechazado en el programa.'
             ]);
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -162,7 +163,7 @@ class AspiranteComplementarioController extends Controller
                 'message' => 'Aspirante o programa no encontrado.'
             ], 404);
         } catch (\Exception $e) {
-            Log::error('Error eliminando aspirante: ' . $e->getMessage(), [
+            Log::error('Error rechazando aspirante: ' . $e->getMessage(), [
                 'complementario_id' => $complementarioId,
                 'aspirante_id' => $aspiranteId,
                 'user_id' => auth()->id(),
@@ -396,6 +397,133 @@ class AspiranteComplementarioController extends Controller
             ]);
 
             return back()->with('error', 'Error al generar el archivo PDF. Por favor intente nuevamente.');
+        }
+    }
+
+    /**
+     * Validar documentos de aspirantes en Google Drive
+     */
+    public function validarDocumentos($complementarioId)
+    {
+        try {
+            // Verificar que el programa existe
+            $programa = ComplementarioOfertado::findOrFail($complementarioId);
+
+            // Obtener todos los aspirantes del programa
+            $aspirantes = AspiranteComplementario::with(['persona.tipoDocumento'])
+                ->where('complementario_id', $complementarioId)
+                ->get();
+
+            if ($aspirantes->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No hay aspirantes en este programa para validar documentos.'
+                ]);
+            }
+
+            $totalAspirantes = $aspirantes->count();
+            $conDocumento = 0;
+            $sinDocumento = 0;
+            $errores = 0;
+
+            // Listar todos los archivos en Google Drive una sola vez para optimizar
+            try {
+                $files = Storage::disk('google')->files('documentos_aspirantes');
+                Log::info("Total de archivos en Google Drive: " . count($files));
+            } catch (\Exception $e) {
+                Log::error("Error al listar archivos en Google Drive: " . $e->getMessage());
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al acceder a Google Drive: ' . $e->getMessage()
+                ], 500);
+            }
+
+            // Procesar cada aspirante
+            foreach ($aspirantes as $aspirante) {
+                try {
+                    $persona = $aspirante->persona;
+                    
+                    // Construir el patrón de búsqueda del archivo
+                    // Formato: tipo_documento_NumeroDocumento_PrimerNombre_PrimerApellido_*.pdf
+                    $tipoDocumento = $persona->tipoDocumento ? str_replace(' ', '_', $persona->tipoDocumento->name) : 'DOC';
+                    $numeroDocumento = $persona->numero_documento;
+                    $primerNombre = str_replace(' ', '_', $persona->primer_nombre);
+                    $primerApellido = str_replace(' ', '_', $persona->primer_apellido);
+                    
+                    $patron = "{$tipoDocumento}_{$numeroDocumento}_{$primerNombre}_{$primerApellido}_";
+                    
+                    // Buscar el archivo que coincida con el patrón
+                    $tieneDocumento = false;
+                    foreach ($files as $file) {
+                        $fileName = basename($file);
+                        if (strpos($fileName, $patron) === 0) {
+                            // Verificar que el archivo existe
+                            try {
+                                if (Storage::disk('google')->exists($file)) {
+                                    $tieneDocumento = true;
+                                    break;
+                                }
+                            } catch (\Exception $e) {
+                                Log::warning("Error verificando existencia de archivo: {$fileName}", [
+                                    'error' => $e->getMessage()
+                                ]);
+                            }
+                        }
+                    }
+
+                    // Actualizar condocumento en la persona
+                    $persona->update(['condocumento' => $tieneDocumento ? 1 : 0]);
+
+                    if ($tieneDocumento) {
+                        $conDocumento++;
+                    } else {
+                        $sinDocumento++;
+                    }
+
+                } catch (\Exception $e) {
+                    $errores++;
+                    Log::error("Error validando documento para aspirante {$aspirante->id}", [
+                        'aspirante_id' => $aspirante->id,
+                        'persona_id' => $aspirante->persona_id,
+                        'exception' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                }
+            }
+
+            Log::info("Validación de documentos completada", [
+                'complementario_id' => $complementarioId,
+                'total' => $totalAspirantes,
+                'con_documento' => $conDocumento,
+                'sin_documento' => $sinDocumento,
+                'errores' => $errores
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => "Validación completada. Total: {$totalAspirantes}, Con documento: {$conDocumento}, Sin documento: {$sinDocumento}" . ($errores > 0 ? ", Errores: {$errores}" : ""),
+                'total' => $totalAspirantes,
+                'con_documento' => $conDocumento,
+                'sin_documento' => $sinDocumento,
+                'errores' => $errores
+            ]);
+
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Programa no encontrado.'
+            ], 404);
+        } catch (\Exception $e) {
+            Log::error('Error validando documentos: ' . $e->getMessage(), [
+                'complementario_id' => $complementarioId,
+                'user_id' => auth()->id(),
+                'exception' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error interno del servidor: ' . $e->getMessage()
+            ], 500);
         }
     }
 }
