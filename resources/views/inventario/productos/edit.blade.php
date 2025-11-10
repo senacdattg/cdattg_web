@@ -7,7 +7,11 @@
 @endsection
 
 @push('css')
-    @vite(['resources/css/inventario/shared/base.css'])
+    @vite([
+        'resources/css/inventario/shared/base.css',
+        'resources/css/inventario/inventario.css',
+        'resources/css/inventario/imagen.css',
+    ])
 @endpush
 
 @section('content_header')
@@ -34,23 +38,23 @@
             <div class="col-lg-4 col-md-5">
                 <div class="image-preview-container slide-in">
                     <div class="image-preview-box">
-                        <img 
+                        <img
                             id="preview"
                             src="{{ $producto->imagen ? asset($producto->imagen) : asset('img/no-image.png') }}"
                             alt="Vista previa"
-                            onerror="this.onerror=null; this.src='{{ asset('img/no-image.png') }}'"
                             style="cursor: pointer;"
-                            onclick="$('#imageModal').modal('show'); $('#expandedImage').attr('src', this.src);"
+                            data-toggle="modal"
+                            data-target="#imageModal"
                         >
                     </div>
                     <div class="image-upload-area">
                         <label class="image-upload-btn">
                             <i class="fas fa-cloud-upload-alt"></i>
                             <span>Cambiar Imagen</span>
-                            <input 
-                                type="file" 
-                                name="imagen" 
-                                id="imagen" 
+                            <input
+                                type="file"
+                                name="imagen"
+                                id="imagen"
                                 accept="image/*"
                             >
                         </label>
@@ -93,10 +97,10 @@
                                                 Nombre del Producto
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <input type="text" 
-                                                   class="form-control-modern @error('producto') is-invalid @enderror" 
-                                                   id="producto" 
-                                                   name="producto" 
+                                            <input type="text"
+                                                   class="form-control-modern @error('producto') is-invalid @enderror"
+                                                   id="producto"
+                                                   name="producto"
                                                    value="{{ old('producto', $producto->producto) }}"
                                                    placeholder="Ej: Laptop Dell XPS 15"
                                                    required>
@@ -107,19 +111,19 @@
                                     </div>
 
                                     <div class="col-md-6">
-                                        <div class="form-group-modern">
+                                                                                <div class="form-group-modern">
                                             <label for="codigo_barras">
                                                 <i class="fas fa-barcode"></i>
                                                 Código de Barras
                                                 <span class="text-danger">*</span>
                                             </label>
                                             <div class="input-group">
-                                                <input type="text" 
-                                                       class="form-control-modern @error('codigo_barras') is-invalid @enderror" 
-                                                       id="codigo_barras" 
-                                                       name="codigo_barras" 
+                                                <input type="text"
+                                                       class="form-control-modern @error('codigo_barras') is-invalid @enderror"
+                                                       id="codigo_barras"
+                                                       name="codigo_barras"
                                                        value="{{ old('codigo_barras', $producto->codigo_barras) }}"
-                                                       placeholder="Escanear o ingresar (opcional)">
+                                                       placeholder="Escanear o ingresar">
                                                 <div class="input-group-append">
                                                     <button type="button" class="btn btn-info" id="scan-btn">
                                                         <i class="fas fa-qrcode"></i>
@@ -127,9 +131,6 @@
                                                 </div>
                                             </div>
                                             @error('codigo_barras')
-                                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                            @enderror
-                                        </div>
                                     </div>
 
                                     
@@ -140,11 +141,11 @@
                                                 <i class="fas fa-align-left"></i>
                                                 Descripción
                                             </label>
-                                            <textarea class="form-control-modern @error('descripcion') is-invalid @enderror" 
-                                                      id="descripcion" 
-                                                      name="descripcion" 
+                                            <textarea class="form-control-modern @error('descripcion') is-invalid @enderror"
+                                                      id="descripcion"
+                                                      name="descripcion"
                                                       rows="3"
-                                                      placeholder="Descripción detallada del producto">{{ old('descripcion', $producto->descripcion) }}</textarea>
+                                                      placeholder="Ingrese una descripción detallada">{{ old('descripcion', $producto->descripcion) }}</textarea>
                                             @error('descripcion')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -168,9 +169,9 @@
                                                 Tipo de Producto
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <select class="form-control-modern @error('tipo_producto_id') is-invalid @enderror" 
-                                                    id="tipo_producto_id" 
-                                                    name="tipo_producto_id" 
+                                            <select class="form-control-modern @error('tipo_producto_id') is-invalid @enderror"
+                                                    id="tipo_producto_id"
+                                                    name="tipo_producto_id"
                                                     required>
                                                 <option value="">Seleccionar tipo</option>
                                                 @foreach($tiposProductos as $tipo)
@@ -186,15 +187,15 @@
                                     </div>
 
                                     <div class="col-md-6">
-                                        <div class="form-group-modern">
+                                                                                <div class="form-group-modern">
                                             <label for="categoria_id">
-                                                <i class="fas fa-folder"></i>
+                                                <i class="fas fa-list"></i>
                                                 Categoría
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <select class="form-control-modern @error('categoria_id') is-invalid @enderror" 
-                                                    id="categoria_id" 
-                                                    name="categoria_id" 
+                                            <select class="form-control-modern @error('categoria_id') is-invalid @enderror"
+                                                    id="categoria_id"
+                                                    name="categoria_id"
                                                     required>
                                                 <option value="">Seleccionar categoría</option>
                                                 @foreach($categorias as $categoria)
@@ -204,9 +205,6 @@
                                                 @endforeach
                                             </select>
                                             @error('categoria_id')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
                                     </div>
 
                                     <div class="col-md-6">
@@ -216,9 +214,9 @@
                                                 Marca
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <select class="form-control-modern @error('marca_id') is-invalid @enderror" 
-                                                    id="marca_id" 
-                                                    name="marca_id" 
+                                            <select class="form-control-modern @error('marca_id') is-invalid @enderror"
+                                                    id="marca_id"
+                                                    name="marca_id"
                                                     required>
                                                 <option value="">Seleccionar marca</option>
                                                 @foreach($marcas as $marca)
@@ -240,9 +238,9 @@
                                                 Estado
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <select class="form-control-modern @error('estado_producto_id') is-invalid @enderror" 
-                                                    id="estado_producto_id" 
-                                                    name="estado_producto_id" 
+                                            <select class="form-control-modern @error('estado_producto_id') is-invalid @enderror"
+                                                    id="estado_producto_id"
+                                                    name="estado_producto_id"
                                                     required>
                                                 <option value="">Seleccionar estado</option>
                                                 @foreach($estados as $estado)
@@ -268,23 +266,21 @@
                                 
                                 <div class="row">
                                     <div class="col-md-4">
-                                        <div class="form-group-modern">
+                                                                                <div class="form-group-modern">
                                             <label for="cantidad">
-                                                <i class="fas fa-boxes"></i>
+                                                <i class="fas fa-sort-numeric-up"></i>
                                                 Cantidad
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <input type="number" 
-                                                   class="form-control-modern @error('cantidad') is-invalid @enderror" 
-                                                   id="cantidad" 
-                                                   name="cantidad" 
+                                            <input type="number"
+                                                   class="form-control-modern @error('cantidad') is-invalid @enderror"
+                                                   id="cantidad"
+                                                   name="cantidad"
                                                    value="{{ old('cantidad', $producto->cantidad) }}"
                                                    min="0"
+                                                   placeholder="Ej: 10"
                                                    required>
                                             @error('cantidad')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
                                     </div>
 
                                     <div class="col-md-4">
@@ -294,10 +290,10 @@
                                                 Peso/Magnitud
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <input type="number" 
-                                                   class="form-control-modern @error('peso') is-invalid @enderror" 
-                                                   id="peso" 
-                                                   name="peso" 
+                                            <input type="number"
+                                                   class="form-control-modern @error('peso') is-invalid @enderror"
+                                                   id="peso"
+                                                   name="peso"
                                                    value="{{ old('peso', $producto->peso) }}"
                                                    step="0.01"
                                                    min="0"
@@ -315,9 +311,9 @@
                                                 Unidad de Medida
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <select class="form-control-modern @error('unidad_medida_id') is-invalid @enderror" 
-                                                    id="unidad_medida_id" 
-                                                    name="unidad_medida_id" 
+                                            <select class="form-control-modern @error('unidad_medida_id') is-invalid @enderror"
+                                                    id="unidad_medida_id"
+                                                    name="unidad_medida_id"
                                                     required>
                                                 <option value="">Seleccionar unidad</option>
                                                 @foreach($unidadesMedida as $unidad)
@@ -349,9 +345,9 @@
                                                 Ambiente
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <select class="form-control-modern @error('ambiente_id') is-invalid @enderror" 
-                                                    id="ambiente_id" 
-                                                    name="ambiente_id" 
+                                            <select class="form-control-modern @error('ambiente_id') is-invalid @enderror"
+                                                    id="ambiente_id"
+                                                    name="ambiente_id"
                                                     required>
                                                 <option value="">Seleccionar ambiente</option>
                                                 @foreach($ambientes as $ambiente)
@@ -373,9 +369,9 @@
                                                 Contrato/Convenio
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <select class="form-control-modern @error('contrato_convenio_id') is-invalid @enderror" 
-                                                    id="contrato_convenio_id" 
-                                                    name="contrato_convenio_id" 
+                                            <select class="form-control-modern @error('contrato_convenio_id') is-invalid @enderror"
+                                                    id="contrato_convenio_id"
+                                                    name="contrato_convenio_id"
                                                     required>
                                                 <option value="">Seleccionar contrato</option>
                                                 @foreach($contratosConvenios as $contrato)
@@ -393,14 +389,14 @@
                                     <div class="col-md-6">
                                         <div class="form-group-modern">
                                             <label for="fecha_vencimiento">
-                                                <i class="fas fa-calendar-alt"></i>
+                                                <i class="fas fa-calendar-times"></i>
                                                 Fecha de Vencimiento
                                             </label>
-                                            <input type="date" 
-                                                   class="form-control-modern @error('fecha_vencimiento') is-invalid @enderror" 
-                                                   id="fecha_vencimiento" 
-                                                   name="fecha_vencimiento" 
-                                                   value="{{ old('fecha_vencimiento', $producto->fecha_vencimiento ? $producto->fecha_vencimiento->format('Y-m-d') : '') }}">
+                                            <input type="date"
+                                                   class="form-control-modern @error('fecha_vencimiento') is-invalid @enderror"
+                                                   id="fecha_vencimiento"
+                                                   name="fecha_vencimiento"
+                                                   value="{{ old('fecha_vencimiento', $producto->fecha_vencimiento) }}">
                                             @error('fecha_vencimiento')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -435,14 +431,6 @@
     @include('layout.footer')
 @endsection
 
-@push('css')
-    @vite([
-        'resources/css/inventario/shared/base.css',
-        'resources/css/inventario/inventario.css',
-        'resources/css/inventario/imagen.css',
-    ])
-@endpush
-
 @push('js')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
@@ -460,6 +448,5 @@
                 reader.readAsDataURL(file);
             }
         });
-        // Render barcode preview consolidado (si deseas mostrarlo, podríamos añadir un contenedor en el futuro)
     </script>
 @endpush

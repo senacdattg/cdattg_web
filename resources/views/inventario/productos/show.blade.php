@@ -45,12 +45,13 @@
                         <i class="fas fa-image"></i> Imagen del Producto
                     </h5>
                     <div class="product-image-wrapper">
-                        <img 
-                            src="{{ $producto->imagen ? asset($producto->imagen) : asset('public/img/inventario/producto-default.png') }}" 
+                        <img
+                            src="{{ $producto->imagen ? asset($producto->imagen) : asset('public/img/inventario/producto-default.png') }}"
                             alt="{{ $producto->producto }}"
                             class="img-fluid"
                             style="cursor: pointer;"
-                            onclick="$('#imageModal').modal('show'); $('#expandedImage').attr('src', this.src);"
+                            data-toggle="modal"
+                            data-target="#imageModal"
                         >
                     </div>
                     
@@ -125,9 +126,9 @@
                                     <div class="mt-2">
                                         <svg id="barcode-show" style="width:100%"></svg>
                                         <div class="mt-1">
-                                            <a 
-                                                target="_blank" 
-                                                class="btn btn-xs btn-outline-primary" 
+                                            <a
+                                                target="_blank"
+                                                class="btn btn-xs btn-outline-primary"
                                                 href="{{ route('inventario.productos.etiqueta', $producto->id) }}"
                                             >
                                                 <i class="fas fa-print"></i> Imprimir etiqueta
@@ -258,8 +259,8 @@
                 {{-- Botones de Acción --}}
                 <div class="action-buttons-container">
                     @can('EDITAR PRODUCTO')
-                        <a 
-                            href="{{ route('inventario.productos.edit', $producto->id) }}" 
+                        <a
+                            href="{{ route('inventario.productos.edit', $producto->id) }}"
                             class="btn-action btn-action-primary"
                         >
                             <i class="fas fa-edit"></i>
@@ -268,9 +269,9 @@
                     @endcan
 
                     @can('ELIMINAR PRODUCTO')
-                        <form 
+                        <form
                             action="{{ route('inventario.productos.destroy', $producto->id) }}"
-                            method="POST" 
+                            method="POST"
                             class="d-inline formulario-eliminar"
                         >
                             @csrf
@@ -334,8 +335,8 @@
         // Render del código de barras
         @if($producto->codigo_barras)
         JsBarcode(
-            "#barcode-show", 
-            "{{ $producto->codigo_barras }}", 
+            "#barcode-show",
+            "{{ $producto->codigo_barras }}",
             {
                 format: "code128",
                 width: 2,

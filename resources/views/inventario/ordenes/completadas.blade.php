@@ -32,15 +32,3 @@
     @include('layout.footer')
 @endsection
 
-@push('css')
-    @vite(['resources/css/inventario/shared/base.css'])
-@endpush
-
-@section('footer')
-    @include('layout.footer')
-@endsection
-
-@push('css')
-    @vite(['resources/css/inventario/shared/base.css'])    
-@endpush
-

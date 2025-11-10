@@ -64,12 +64,12 @@
                                 Orden #{{ $devolucion->detalleOrden->orden->id }}
                             </p>
                             <p class="mb-0">
-                                Fecha préstamo: 
+                                Fecha préstamo:
                                 {{ $devolucion->detalleOrden->orden->fecha_prestamo->format('d/m/Y') }}
                             </p>
                             @if($devolucion->detalleOrden->orden->fecha_devolucion)
                                 <p class="mb-0">
-                                    Fecha devolución esperada: 
+                                    Fecha devolución esperada:
                                     {{ $devolucion->detalleOrden->orden->fecha_devolucion->format('d/m/Y') }}
                                 </p>
                             @endif
@@ -94,11 +94,11 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="card 
-                                @if($devolucion->detalleOrden->orden->fecha_devolucion && $devolucion->fecha_devolucion->lte($devolucion->detalleOrden->orden->fecha_devolucion)) 
-                                    bg-success 
-                                @else 
-                                    bg-warning 
+                            <div class="card
+                                @if($devolucion->detalleOrden->orden->fecha_devolucion && $devolucion->fecha_devolucion->lte($devolucion->detalleOrden->orden->fecha_devolucion))
+                                    bg-success
+                                @else
+                                    bg-warning
                                 @endif text-white">
                                 <div class="card-body text-center">
                                     <h6>Estado</h6>
@@ -151,14 +151,14 @@
 
                     <div class="row">
                         <div class="col-12">
-                            <a 
-                                href="{{ route('inventario.devoluciones.historial') }}" 
+                            <a
+                                href="{{ route('inventario.devoluciones.historial') }}"
                                 class="btn btn-secondary"
                             >
                                 <i class="fas fa-arrow-left"></i> Volver al Historial
                             </a>
-                            <a 
-                                href="{{ route('inventario.ordenes.show', $devolucion->detalleOrden->orden->id) }}" 
+                            <a
+                                href="{{ route('inventario.ordenes.show', $devolucion->detalleOrden->orden->id) }}"
                                 class="btn btn-info"
                             >
                                 <i class="fas fa-eye"></i> Ver Orden Completa
@@ -181,6 +181,6 @@
 
 @push('css')
     @vite([
-        'resources/css/inventario/shared/base.css',    
+        'resources/css/inventario/shared/base.css',
     ])
 @endpush
