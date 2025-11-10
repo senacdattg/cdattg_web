@@ -270,8 +270,10 @@
 @endsection
 
 @push('css')
-    @vite(['resources/css/inventario/shared/base.css'])
-    <link rel="stylesheet" href="{{ asset('css/inventario/orden.css') }}">
+    @vite([
+        'resources/css/inventario/shared/base.css',
+        'resources/css/inventario/orden.css'
+    ])
 @endpush
 
 @push('scripts')

@@ -19,8 +19,10 @@
     />
 @endsection
 @push('css')
-    @vite(['resources/css/inventario/shared/base.css'])
-    <link rel="stylesheet" href="{{ asset('css/inventario/modal-orden.css') }}">
+    @vite([
+        'resources/css/inventario/shared/base.css', 
+        'resources/css/inventario/modal-orden.css'
+    ])
 @endpush
 
 @section('content')
