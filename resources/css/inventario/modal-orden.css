@@ -16,8 +16,8 @@
 
 /* Header del Modal */
 .modal-orden .modal-header {
-    background: linear-gradient(135deg, #66ea99 0%, #4ba252 100%);
-    color: white;
+    background: linear-gradient(135deg, #2d6640 0%, #1f4a2d 100%);
+    color: #ffffff;
     padding: 1.5rem 2rem;
     border: none;
     position: relative;
