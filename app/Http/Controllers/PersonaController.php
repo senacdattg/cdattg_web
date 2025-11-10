@@ -174,7 +174,7 @@ class PersonaController extends Controller
 
             if ($request->expectsJson() || $request->wantsJson()) {
                 $persona->loadMissing(['caracterizacionesComplementarias']);
-                
+
                 return response()->json([
                     'success' => true,
                     'message' => 'Información actualizada exitosamente',
@@ -204,7 +204,7 @@ class PersonaController extends Controller
                 ->with('success', 'Información actualizada exitosamente');
         } catch (\Throwable $e) {
             Log::error("Error al actualizar la persona (ID: {$persona->id}): " . $e->getMessage());
-            
+
             if ($request->expectsJson() || $request->wantsJson()) {
                 return response()->json([
                     'success' => false,

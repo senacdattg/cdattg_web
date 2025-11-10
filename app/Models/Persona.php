@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\PersonaContactAlert;
@@ -256,9 +257,18 @@ class Persona extends Model
     /**
      * Relación con el parámetro de caracterización.
      */
-    public function parametroCaracterizacion()
+    public function parametroCaracterizacion(): BelongsTo
     {
         return $this->belongsTo(Parametro::class, 'parametro_id');
+    }
+
+    /**
+     * Alias legacy para acceder a la caracterización principal.
+     * Mantiene compatibilidad con controladores que invocan $persona->caracterizacion.
+     */
+    public function caracterizacion(): BelongsTo
+    {
+        return $this->parametroCaracterizacion();
     }
 
     public function caracterizacionesComplementarias(): BelongsToMany
