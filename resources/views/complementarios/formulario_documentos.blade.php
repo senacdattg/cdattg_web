@@ -279,7 +279,7 @@
             title: '¡Cuenta creada exitosamente!',
             html: `
                 <p>Se ha creado su cuenta de usuario.</p>
-                <p><strong>Usuario:</strong> {{ $aspirante_id ? \App\Models\AspiranteComplementario::find($aspirante_id)->persona->email : 'N/A' }}</p>
+                <p><strong>Usuario:</strong> {{ $aspirante_id ? strtolower(\App\Models\AspiranteComplementario::find($aspirante_id)->persona->email) : 'N/A' }}</p>
                 <p><strong>Contraseña:</strong> Tu contraseña es tu documento de identidad registrado</p>
                 <p class="text-muted">Guarde esta información en un lugar seguro.</p>
             `,

@@ -121,7 +121,7 @@
 
         <div class="mb-3">
             <label for="email" class="form-label">Correo Electrónico *</label>
-            <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $userData['email'] ?? '') }}" required>
+            <input type="email" class="form-control" id="email" name="email" value="{{ old('email', isset($userData['email']) ? strtolower($userData['email']) : '') }}" required>
         </div>
     </div>
 </div>
