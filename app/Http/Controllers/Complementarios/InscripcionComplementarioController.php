@@ -185,7 +185,14 @@ class InscripcionComplementarioController extends Controller
 
         return view(
             'complementarios.formulario_inscripcion',
-            compact('programa', 'temasCaracterizacion', 'paises', 'departamentos', 'tiposDocumento', 'generos', 'userData'
+            compact(
+                'programa',
+                'temasCaracterizacion',
+                'paises',
+                'departamentos',
+                'tiposDocumento',
+                'generos',
+                'userData'
             )
         );
     }
