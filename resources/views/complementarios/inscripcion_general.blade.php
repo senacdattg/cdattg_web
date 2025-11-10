@@ -465,17 +465,40 @@
 
             if (departamentoId) {
                 fetch(`/municipios/${departamentoId}`)
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
-                        data.forEach(municipio => {
+                        
+                        // Manejar diferentes formatos de respuesta
+                        let municipios = [];
+                        if (Array.isArray(data)) {
+                            // Si la respuesta es directamente un array
+                            municipios = data;
+                        } else if (data && data.data && Array.isArray(data.data)) {
+                            // Si la respuesta es {success: true, data: [...]}
+                            municipios = data.data;
+                        } else if (data && data.municipios && Array.isArray(data.municipios)) {
+                            // Si la respuesta es {success: true, municipios: [...]}
+                            municipios = data.municipios;
+                        }
+                        
+                        municipios.forEach(municipio => {
                             const option = document.createElement('option');
                             option.value = municipio.id;
-                            option.textContent = municipio.municipio;
+                            // El servicio devuelve 'nombre' o 'name', no 'municipio'
+                            option.textContent = municipio.nombre || municipio.name || municipio.municipio || '';
                             municipioSelect.appendChild(option);
                         });
                     })
-                    .catch(error => console.error('Error:', error));
+                    .catch(error => {
+                        console.error('Error cargando municipios:', error);
+                        municipioSelect.innerHTML = '<option value="">Error cargando municipios</option>';
+                    });
             } else {
                 municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
             }
