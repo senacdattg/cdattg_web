@@ -172,9 +172,10 @@ function setupUppercaseConversion() {
 
             // Validación en tiempo real - prevenir números durante escritura
             campo.addEventListener('keypress', function(e) {
-                const char = String.fromCharCode(e.keyCode || e.which);
+                const char = String.fromCharCode(e.key || e.keyCode || e.which);
                 // Permitir letras, espacios, guiones, tildes y teclas de control
-                if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]$/.test(char) && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]$/.test(char) &&
+                    !e.ctrlKey && !e.altKey && !e.metaKey) {
                     e.preventDefault();
                     return false;
                 }

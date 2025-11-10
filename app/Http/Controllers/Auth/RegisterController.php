@@ -125,6 +125,34 @@ class RegisterController extends Controller
         // Autenticar al usuario automáticamente
         Auth::login($user);
 
+        Log::info('RegisterController - Usuario autenticado, verificando redirección', [
+            'user_id' => $user->id,
+            'tiene_inscripciones' => $tieneInscripciones,
+            'tiene_rol_aspirante' => $user->hasRole('ASPIRANTE')
+        ]);
+
+        // Verificar si el usuario tiene inscripciones pendientes en programas complementarios
+        if ($tieneInscripciones) {
+            // Buscar la inscripción más reciente para redirigir al formulario de documentos
+            $inscripcionPendiente = \App\Models\AspiranteComplementario::where('persona_id', $persona->id)
+                ->where('estado', 1) // Estado "En proceso"
+                ->whereNull('documento_identidad_path') // Sin documento subido
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($inscripcionPendiente) {
+                Log::info('RegisterController - Redirigiendo a formulario de documentos', [
+                    'aspirante_id' => $inscripcionPendiente->id,
+                    'programa_id' => $inscripcionPendiente->complementario_id
+                ]);
+
+                return redirect()->route('programas-complementarios.documentos', [
+                    'id' => $inscripcionPendiente->complementario_id,
+                    'aspirante_id' => $inscripcionPendiente->id
+                ])->with('success', '¡Registro Exitoso! Complete el proceso subiendo su documento de identidad.');
+            }
+        }
+
         return redirect('/')->with('success', '¡Registro Exitoso! Bienvenido a la plataforma.');
     }
 

@@ -19,9 +19,9 @@ class DocumentoComplementarioController extends Controller
         $programa = ComplementarioOfertado::findOrFail($id);
 
         // Obtener aspirante_id de la URL
-        $aspirante_id = $request->query('aspirante_id');
+        $aspiranteId = $request->query('aspirante_id');
 
-        return view('complementarios.formulario_documentos', compact('programa', 'aspirante_id'));
+        return view('complementarios.formulario_documentos', compact('programa', 'aspiranteId'));
     }
 
     /**
@@ -65,14 +65,16 @@ class DocumentoComplementarioController extends Controller
             if ($request->hasFile('documento_identidad')) {
                 $file = $request->file('documento_identidad');
 
-                // Crear nombre de archivo con formato: tipo_documento_NumeroDocumento_PrimerNombre_PrimerApellido_timestamp.pdf
+                // Crear nombre de archivo con formato:
+                // tipo_documento_NumeroDocumento_PrimerNombre_PrimerApellido_timestamp.pdf
                 $tipoDocumento = $aspirante->persona->tipoDocumento->name ?? 'DOC';
                 $numeroDocumento = $aspirante->persona->numero_documento;
                 $primerNombre = $aspirante->persona->primer_nombre;
                 $primerApellido = $aspirante->persona->primer_apellido;
                 $timestamp = now()->format('d-m-y-H-i-s');
 
-                $fileName = "{$tipoDocumento}_{$numeroDocumento}_{$primerNombre}_{$primerApellido}_{$timestamp}.{$file->getClientOriginalExtension()}";
+                $fileName = "{$tipoDocumento}_{$numeroDocumento}_{$primerNombre}_" .
+                           "{$primerApellido}_{$timestamp}.{$file->getClientOriginalExtension()}";
 
                 Log::info('Attempting to upload file to Google Drive', [
                     'file_name' => $fileName,
@@ -83,11 +85,12 @@ class DocumentoComplementarioController extends Controller
                 ]);
 
                 // Verificar configuración de Google Drive
+                $notSetMessage = 'NOT SET';
                 Log::info('Google Drive config check', [
-                    'client_id' => env('GOOGLE_DRIVE_CLIENT_ID') ? 'SET' : 'NOT SET',
-                    'client_secret' => env('GOOGLE_DRIVE_CLIENT_SECRET') ? 'SET' : 'NOT SET',
-                    'refresh_token' => env('GOOGLE_DRIVE_REFRESH_TOKEN') ? 'SET' : 'NOT SET',
-                    'folder_id' => env('GOOGLE_DRIVE_FOLDER_ID') ? 'SET' : 'NOT SET'
+                    'client_id' => env('GOOGLE_DRIVE_CLIENT_ID') ? 'SET' : $notSetMessage,
+                    'client_secret' => env('GOOGLE_DRIVE_CLIENT_SECRET') ? 'SET' : $notSetMessage,
+                    'refresh_token' => env('GOOGLE_DRIVE_REFRESH_TOKEN') ? 'SET' : $notSetMessage,
+                    'folder_id' => env('GOOGLE_DRIVE_FOLDER_ID') ? 'SET' : $notSetMessage
                 ]);
 
                 // Subir a Google Drive
@@ -103,8 +106,17 @@ class DocumentoComplementarioController extends Controller
                 ]);
             }
 
-            return redirect()->route('login.index')
-                ->with('success', 'Documento subido exitosamente. Su cuenta de usuario ha sido creada. Puede iniciar sesión con su correo electrónico y número de documento como contraseña.');
+            Log::info('DocumentoComplementarioController - Documento subido exitosamente, redirigiendo a login', [
+                'aspirante_id' => $aspirante->id,
+                'persona_id' => $aspirante->persona_id,
+                'email' => $aspirante->persona->email
+            ]);
+
+            return redirect()->route('login.index')->with(
+                'success',
+                'Documento subido exitosamente. Su cuenta de usuario ha sido creada. ' .
+                'Puede iniciar sesión con su correo electrónico y número de documento como contraseña.'
+            );
 
         } catch (\Exception $e) {
             Log::error('Error al subir documento: ' . $e->getMessage(), [
