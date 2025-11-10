@@ -257,18 +257,65 @@ function initializeMunicipiosDynamic() {
 }
 
 // Función común para procesar respuestas de API de ubicaciones
+// Maneja Collections de Laravel que se serializan como objetos
 function processLocationData(data, entityType) {
     let items = [];
 
-    if (data.success && data.data) {
-        // Estructura: {success: true, data: [...]}
-        items = data.data;
-    } else if (Array.isArray(data)) {
-        // Estructura: [...]
+    // Si data es directamente un array, usarlo
+    if (Array.isArray(data)) {
         items = data;
     } else if (data && typeof data === 'object') {
-        // Estructura: {departamentos: [...]} u otra variante
-        items = data[entityType] || data.data || [];
+        // Extraer los datos del objeto
+        let rawData = null;
+        
+        // Prioridad 1: {success: true, data: [...]}
+        if (data.success !== undefined && data.data !== undefined) {
+            rawData = data.data;
+        }
+        // Prioridad 2: {data: [...]}
+        else if (data.data !== undefined) {
+            rawData = data.data;
+        }
+        // Prioridad 3: {departamentos: [...]} o {municipios: [...]}
+        else if (data[entityType] !== undefined) {
+            rawData = data[entityType];
+        }
+        // Prioridad 4: El objeto completo parece ser una Collection
+        else {
+            rawData = data;
+        }
+
+        // Convertir rawData a array
+        if (rawData !== null && rawData !== undefined) {
+            if (Array.isArray(rawData)) {
+                // Ya es un array, usarlo directamente
+                items = rawData;
+            } else if (typeof rawData === 'object') {
+                // Es un objeto (Collection de Laravel serializada), convertirlo a array
+                // Laravel serializa Collections como objetos con índices numéricos
+                items = Object.values(rawData);
+            } else {
+                items = [];
+            }
+        } else {
+            items = [];
+        }
+    }
+
+    // Validación final: asegurar que items sea un array
+    // Si aún no es un array después de todas las conversiones, intentar una última vez
+    if (!Array.isArray(items)) {
+        if (items && typeof items === 'object' && items !== null) {
+            try {
+                items = Object.values(items);
+            } catch (e) {
+                console.error(`Error convirtiendo datos de ${entityType} a array:`, e);
+                items = [];
+            }
+        } else {
+            console.error(`Los datos de ${entityType} no son un array ni un objeto:`, items);
+            items = [];
+        }
     }
 
     return items;
@@ -333,7 +380,12 @@ function loadMunicipiosForDepartamento(departamentoId, municipioIdToSelect = nul
     if (!departamentoId) return;
 
     fetch(`/municipios/${departamentoId}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
             const municipios = processLocationData(data, 'municipios');
             populateLocationSelect(municipioSelect, municipios, municipioIdToSelect, 'municipio');
