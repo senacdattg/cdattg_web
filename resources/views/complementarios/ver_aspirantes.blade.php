@@ -58,6 +58,10 @@
                     data-programa-id="{{ $programa->id }}">
                     <i class="fas fa-search me-1"></i>Validar SenaSofiaPlus
                 </button>
+                <button class="btn btn-outline-info btn-sm" id="btn-validar-documento"
+                    data-programa-id="{{ $programa->id }}">
+                    <i class="fas fa-file-pdf me-1"></i>Validar con documento
+                </button>
             </div>
         </div>
     </div>
@@ -289,11 +293,18 @@
 
         // Función para actualizar UI durante validación
         function updateUIForValidationInProgress() {
-            // Deshabilitar botón de validación
+            // Deshabilitar botón de validación SenaSofiaPlus
             const validationButton = document.getElementById('btn-validar-sofia');
             if (validationButton) {
                 validationButton.disabled = true;
                 validationButton.innerHTML = '<i class="fas fa-clock me-1"></i>Procesando...';
+            }
+
+            // Deshabilitar botón de validación de documentos
+            const documentoButton = document.getElementById('btn-validar-documento');
+            if (documentoButton) {
+                documentoButton.disabled = true;
+                documentoButton.innerHTML = '<i class="fas fa-clock me-1"></i>Procesando...';
             }
 
             // Deshabilitar botón de nuevo aspirante
@@ -308,6 +319,60 @@
                 button.disabled = true;
             });
         }
+
+        // Botón de validación de documentos
+        document.getElementById('btn-validar-documento').addEventListener('click', async function() {
+            const button = this;
+            const originalText = button.innerHTML;
+
+            // Confirmar antes de validar
+            if (!confirm('¿Está seguro de que desea validar los documentos de todos los aspirantes en Google Drive?')) {
+                return;
+            }
+
+            // Deshabilitar botón y mostrar loading
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Validando...';
+
+            try {
+                // Obtener el ID del programa desde el data attribute
+                const programaId = button.dataset.programaId;
+
+                // Hacer la petición AJAX
+                const response = await fetch(`/programas-complementarios/${programaId}/validar-documento`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN':
+                            document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showAlert('success', data.message);
+                    
+                    // Recargar la página para mostrar los cambios
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    // Mostrar mensaje de error
+                    showAlert('error', data.message || 'Error durante la validación');
+                    // Restaurar botón
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                showAlert('error', 'Error de conexión. Intente nuevamente.');
+                // Restaurar botón
+                button.disabled = false;
+                button.innerHTML = originalText;
+            }
+        });
 
         // Botón de validación SenaSofiaPlus
         document.getElementById('btn-validar-sofia').addEventListener('click', async function() {
@@ -572,6 +637,20 @@
 
         // Función para restaurar UI después de validación
         function restoreUIAfterValidation() {
+            // Habilitar botón de validación SenaSofiaPlus
+            const validationButton = document.getElementById('btn-validar-sofia');
+            if (validationButton) {
+                validationButton.disabled = false;
+                validationButton.innerHTML = '<i class="fas fa-search me-1"></i>Validar SenaSofiaPlus';
+            }
+
+            // Habilitar botón de validación de documentos
+            const documentoButton = document.getElementById('btn-validar-documento');
+            if (documentoButton) {
+                documentoButton.disabled = false;
+                documentoButton.innerHTML = '<i class="fas fa-file-pdf me-1"></i>Validar con documento';
+            }
+
             // Habilitar botón de nuevo aspirante
             const newAspirantButton = document.getElementById('btn-nuevo-aspirante');
             if (newAspirantButton) {
