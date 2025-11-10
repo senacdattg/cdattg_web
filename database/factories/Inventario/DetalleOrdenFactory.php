@@ -19,8 +19,8 @@ class DetalleOrdenFactory extends Factory
         return [
             'orden_id' => Orden::factory(),
             'producto_id' => Producto::factory(),
-            'cantidad' => $this->faker->numberBetween(1, 10),
-            'estado_orden_id' => $this->faker->randomElement([46, 47, 48]),
+            'cantidad' => rand(1, 10),
+            'estado_orden_id' => [46, 47, 48][array_rand([46, 47, 48])],
             'user_create_id' => 1,
             'user_update_id' => 1,
         ];

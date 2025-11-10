@@ -55,6 +55,13 @@ class Persona extends Model
             $persona->segundo_apellido = strtoupper($persona->segundo_apellido);
             $persona->direccion = strtoupper($persona->direccion);
         });
+
+        // Eliminar usuario asociado antes de eliminar la persona
+        static::deleting(function ($persona) {
+            if ($persona->user) {
+                $persona->user->delete();
+            }
+        });
     }
 
     public function user()

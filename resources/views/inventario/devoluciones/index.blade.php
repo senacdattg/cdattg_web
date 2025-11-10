@@ -46,6 +46,9 @@
                     @if($prestamos->count() > 0)
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
+                                <caption id="devoluciones-description" class="sr-only">
+                                    Listado de devoluciones con información de producto, cantidad prestada, cantidad devuelta, cantidad pendiente, fecha de préstamo y fecha de devolución.
+                                </caption>
                                 <thead>
                                     <tr>
                                         <th>Producto</th>

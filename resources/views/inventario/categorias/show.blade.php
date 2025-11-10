@@ -81,6 +81,9 @@
                         <div class="card-body p-0">
                             <div class="table-responsive">
                                 <table class="table detail-table mb-0">
+                                    <caption id="categoria-description" class="sr-only">
+                                        Lista de categorías con información de nombre, estado, descripción, total de productos y fechas de creación y actualización.
+                                    </caption>
                                     <tbody>
                                         <tr>
                                             <th class="py-3">Nombre</th>

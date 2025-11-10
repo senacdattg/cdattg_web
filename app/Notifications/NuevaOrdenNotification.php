@@ -79,14 +79,14 @@ class NuevaOrdenNotification extends Notification implements ShouldQueue
         $solicitante = $this->solicitante;
         
         // Obtener el rol del usuario
-        $rol = $solicitante && $solicitante->roles->isNotEmpty() 
-            ? $solicitante->roles->first()->name 
+        $rol = $solicitante && $solicitante->roles->isNotEmpty()
+            ? $solicitante->roles->first()->name
             : 'N/A';
         
         // Obtener datos de la persona
         $persona = $solicitante ? $solicitante->persona : null;
-        $nombreCompleto = $persona 
-            ? trim(($persona->primer_nombre ?? '') . ' ' . ($persona->segundo_nombre ?? '') . ' ' . 
+        $nombreCompleto = $persona
+            ? trim(($persona->primer_nombre ?? '') . ' ' . ($persona->segundo_nombre ?? '') . ' ' .
                    ($persona->primer_apellido ?? '') . ' ' . ($persona->segundo_apellido ?? ''))
             : ($solicitante->name ?? 'N/A');
         

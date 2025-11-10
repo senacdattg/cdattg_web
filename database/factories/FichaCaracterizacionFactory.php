@@ -30,23 +30,27 @@ class FichaCaracterizacionFactory extends Factory
         $sedeId = Sede::query()->inRandomOrder()->value('id') ?? 1;
         $ambienteId = Ambiente::query()->inRandomOrder()->value('id') ?? 1;
 
-        $fechaInicio = $this->faker->dateTimeBetween('-6 months', '+2 months');
-        $fechaFin = (clone $fechaInicio)->modify('+' . $this->faker->numberBetween(12, 24) . ' months');
+        $mesesAtras = rand(0, 6);
+        $mesesAdelante = rand(0, 2);
+        $fechaInicio = date('Y-m-d', strtotime("-{$mesesAtras} months +{$mesesAdelante} months"));
+        
+        $duracionMeses = rand(12, 24);
+        $fechaFin = date('Y-m-d', strtotime($fechaInicio . " +{$duracionMeses} months"));
 
         return [
             'programa_formacion_id' => $programaId,
-            'ficha' => $this->faker->unique()->numerify('29#####'),
+            'ficha' => '29' . str_pad(rand(10000, 99999), 5, '0', STR_PAD_LEFT),
             'instructor_id' => Instructor::factory(),
-            'fecha_inicio' => $fechaInicio->format('Y-m-d'),
-            'fecha_fin' => $fechaFin->format('Y-m-d'),
+            'fecha_inicio' => $fechaInicio,
+            'fecha_fin' => $fechaFin,
             'ambiente_id' => $ambienteId,
-            'modalidad_formacion_id' => $this->faker->randomElement($modalidades),
+            'modalidad_formacion_id' => $modalidades[array_rand($modalidades)],
             'sede_id' => $sedeId,
             'jornada_id' => $jornadaId,
-            'total_horas' => $this->faker->numberBetween(1200, 3200),
+            'total_horas' => rand(1200, 3200),
             'user_create_id' => 1,
             'user_edit_id' => 1,
-            'status' => $this->faker->boolean(90),
+            'status' => (rand(1, 100) <= 90) ? 1 : 0,
         ];
     }
 }

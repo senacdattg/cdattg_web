@@ -27,6 +27,6 @@ return new class extends Migration
             $table->dropForeign(['programa_formacion_id']);
             
             $table->dropColumn(['programa_formacion_id']);
-        }); 
+        });
     }
 };

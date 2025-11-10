@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Configuration\UploadLimits;
 use App\Http\Requests\PersonaImportRequest;
 use App\Models\PersonaImport;
 use App\Services\PersonaImportService;
@@ -19,8 +20,8 @@ class PersonaImportController extends Controller
         $this->middleware('auth');
         $this->middleware('can:CREAR PERSONA');
 
-        // Validar Content-Length para importaciones (25MB límite)
-        $this->middleware('validate.content.length:26214400')->only('store');
+        // Validar Content-Length para importaciones (8MB límite)
+        $this->middleware('validate.content.length:' . UploadLimits::IMPORT_CONTENT_LENGTH_BYTES)->only('store');
     }
 
     public function create(): View

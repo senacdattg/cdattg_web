@@ -40,12 +40,21 @@
                             @php
                                 $rolesPersona = $persona->user?->getRoleNames();
                             @endphp
-                            <p class="text-muted mb-3">
-                                {{ $rolesPersona && $rolesPersona->isNotEmpty() ? $rolesPersona->implode(', ') : 'Sin roles asignados' }}
-                            </p>
+                            <div class="mb-3">
+                                @if ($rolesPersona && $rolesPersona->isNotEmpty())
+                                    <p class="text-muted mb-0">{{ $rolesPersona->implode(', ') }}</p>
+                                @else
+                                    <span class="badge badge-warning text-dark px-3 py-2">
+                                        <i class="fas fa-exclamation-triangle mr-1"></i>Sin roles asignados
+                                    </span>
+                                @endif
+                            </div>
 
-                            <span class="badge badge-{{ $persona->status === 1 ? 'success' : 'danger' }} px-3 py-2 mb-3">
-                                <i class="fas fa-circle mr-1"></i>{{ $persona->status === 1 ? 'Activo' : 'Inactivo' }}
+                            <span
+                                class="badge badge-{{ $persona->status === 1 ? 'success' : 'danger' }}
+                                px-3 py-2 mb-3">
+                                <i class="fas fa-circle mr-1"></i>
+                                {{ $persona->status === 1 ? 'Activo' : 'Inactivo' }}
                             </span>
 
                             <div class="d-flex flex-wrap justify-content-center w-100">
@@ -55,8 +64,8 @@
                                     </a>
                                 @endif
                                 @if ($persona->celular)
-                                    <a class="btn btn-sm btn-light mx-1 mb-2" href="https://wa.me/{{ $persona->celular }}"
-                                        target="_blank">
+                                    <a class="btn btn-sm btn-light mx-1 mb-2"
+                                        href="https://wa.me/{{ $persona->celular }}" target="_blank">
                                         <i class="fab fa-whatsapp mr-1 text-success"></i> WhatsApp
                                     </a>
                                 @endif
@@ -171,21 +180,28 @@
                                         @endif
                                     </p>
                                 </div>
-                                <div class="col-md-6 mb-0">
-                                    <span class="text-muted text-uppercase small d-block">Caracterización</span>
-                                    <p class="h6 mb-0">
+                                <div class="col-md-12 mb-0">
+                                    <span class="text-muted text-uppercase small d-block mb-2">
+                                        Caracterización
+                                    </span>
+                                    <div class="d-flex flex-wrap gap-2">
                                         @if ($persona->caracterizacionesComplementarias->isNotEmpty())
                                             @foreach ($persona->caracterizacionesComplementarias as $categoria)
-                                                <span
-                                                    class="badge badge-info text-white mr-1 mb-1">{{ $categoria->nombre }}</span>
+                                                <span class="badge badge-info text-white px-3 py-2 mr-1 mb-1">
+                                                    <i class="fas fa-tag mr-1"></i>{{ $categoria->name }}
+                                                </span>
                                             @endforeach
                                         @elseif ($persona->caracterizacion)
-                                            <span
-                                                class="badge badge-info text-white">{{ $persona->caracterizacion->nombre }}</span>
+                                            <span class="badge badge-info text-white px-3 py-2">
+                                                <i class="fas fa-tag mr-1"></i>{{ $persona->caracterizacion->nombre }}
+                                            </span>
                                         @else
-                                            <span class="badge badge-warning text-dark">Sin información</span>
+                                            <span class="badge badge-warning text-dark px-3 py-2">
+                                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                                Sin caracterización asignada
+                                            </span>
                                         @endif
-                                    </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -347,8 +363,9 @@
                                 <div class="col-md-6 mb-0">
                                     <span class="text-muted text-uppercase small d-block">Registro en SOFIA</span>
                                     <p class="h6 mb-0">
-                                        <span
-                                            class="badge {{ $estadoSofiaBadgeClass }} text-white">{{ $estadoSofiaLabel }}</span>
+                                        <span class="badge {{ $estadoSofiaBadgeClass }} text-white">
+                                            {{ $estadoSofiaLabel }}
+                                        </span>
                                     </p>
                                 </div>
                             </div>
@@ -365,6 +382,5 @@
 @endsection
 
 @section('js')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     @vite(['resources/js/parametros.js'])
 @endsection

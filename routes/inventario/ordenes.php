@@ -18,6 +18,8 @@ Route::prefix('inventario')
             ->name('prestamos-salidas.store');
         
         // Rutas adicionales para órdenes
+        $ordenRoute = 'ordenes/{orden}';
+
         Route::get('ordenes', [OrdenController::class, 'index'])
             ->name('ordenes.index');
         Route::get('ordenes/pendientes', [OrdenController::class, 'pendientes'])
@@ -26,11 +28,11 @@ Route::prefix('inventario')
             ->name('ordenes.completadas');
         Route::get('ordenes/rechazadas', [OrdenController::class, 'rechazadas'])
             ->name('ordenes.rechazadas');
-        Route::get('ordenes/{orden}', [OrdenController::class, 'show'])
+        Route::get($ordenRoute, [OrdenController::class, 'show'])
             ->name('ordenes.show');
-        Route::put('ordenes/{orden}', [OrdenController::class, 'update'])
+        Route::put($ordenRoute, [OrdenController::class, 'update'])
             ->name('ordenes.update');
-        Route::delete('ordenes/{orden}', [OrdenController::class, 'destroy'])
+        Route::delete($ordenRoute, [OrdenController::class, 'destroy'])
             ->name('ordenes.destroy');
 
         // Rutas para aprobaciones (solo superadministrador)

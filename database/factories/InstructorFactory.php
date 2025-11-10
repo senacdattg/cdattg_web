@@ -8,6 +8,7 @@ use App\Models\Regional;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Collection;
+use Faker\Generator as Faker;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Instructor>
@@ -30,12 +31,12 @@ class InstructorFactory extends Factory
             'Construcción',
             'Gastronomía',
         ];
-
-        $principal = $this->faker->randomElement($especialidades);
+        
+        $principal = $especialidades[array_rand($especialidades)];
         $secundarias = Collection::make($especialidades)
             ->reject(fn ($value) => $value === $principal)
             ->shuffle()
-            ->take($this->faker->numberBetween(0, 2))
+            ->take(rand(0, 2))
             ->values()
             ->all();
 
@@ -52,19 +53,25 @@ class InstructorFactory extends Factory
 
         $regionalId = Regional::query()->inRandomOrder()->value('id') ?? 1;
 
+        $competenciasSeleccionadas = Collection::make($competencias)
+            ->shuffle()
+            ->take(rand(2, 4))
+            ->values()
+            ->all();
+
         return [
             'persona_id' => Persona::factory(),
             'regional_id' => $regionalId,
-            'status' => $this->faker->boolean(85),
+            'status' => (rand(1, 100) <= 85) ? 1 : 0,
             'user_create_id' => 1,
             'user_edit_id' => 1,
             'especialidades' => [
                 'principal' => $principal,
                 'secundarias' => $secundarias,
             ],
-            'competencias' => $this->faker->randomElements($competencias, $this->faker->numberBetween(2, 4)),
-            'anos_experiencia' => $this->faker->numberBetween(2, 25),
-            'experiencia_laboral' => $this->faker->paragraph(3),
+            'competencias' => $competenciasSeleccionadas,
+            'anos_experiencia' => rand(2, 25),
+            'experiencia_laboral' => 'Experiencia profesional en el área de ' . $principal . ' con múltiples proyectos desarrollados.',
         ];
     }
 

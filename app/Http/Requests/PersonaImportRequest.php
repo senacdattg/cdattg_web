@@ -11,6 +11,12 @@ use Symfony\Component\HttpFoundation\Response;
 class PersonaImportRequest extends FormRequest
 {
     /**
+     * Reexporta los límites de UploadLimits para que SonarQube detecte valores constantes.
+     */
+    private const MAX_FILE_SIZE_KB = UploadLimits::IMPORT_FILE_SIZE_KB;
+    private const MAX_CONTENT_LENGTH_BYTES = UploadLimits::IMPORT_CONTENT_LENGTH_BYTES;
+
+    /**
      * Determina si el usuario está autorizado para realizar esta petición.
      */
     public function authorize(): bool
@@ -28,8 +34,8 @@ class PersonaImportRequest extends FormRequest
                 'required',
                 'file',
                 'mimes:xlsx,xls,csv',
-                'max:' . UploadLimits::IMPORT_FILE_SIZE_KB,
-                function ($attribute, $value, $fail) {
+                'max:' . self::MAX_FILE_SIZE_KB,
+                function ($value, $fail) {
                     $this->validateFileIntegrity($value, $fail);
                 },
             ],
@@ -105,18 +111,48 @@ class PersonaImportRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        // Validar Content-Length si está presente
-        $contentLength = $this->header('Content-Length');
+        $this->assertSafeContentLength($this->header('Content-Length'));
+    }
 
-        if ($contentLength !== null && (int) $contentLength > UploadLimits::IMPORT_CONTENT_LENGTH_BYTES) {
-            $maxSize = UploadLimits::formatBytes(UploadLimits::IMPORT_CONTENT_LENGTH_BYTES);
+    /**
+     * Valida el encabezado Content-Length y corta la petición si se excede el límite.
+     *
+     * Mantener esta verificación evita que se inicie el procesamiento de cargas
+     * que podrían saturar el post buffer del servidor (DoS por tamaño).
+     */
+    private function assertSafeContentLength(?string $contentLengthHeader): void
+    {
+        if ($contentLengthHeader === null) {
+            return;
+        }
+
+        $contentLength = filter_var(
+            $contentLengthHeader,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 0]]
+        );
+
+        if ($contentLength === false) {
+            throw new HttpResponseException(
+                response()->json([
+                    'success' => false,
+                    'message' => 'El encabezado Content-Length es inválido.',
+                    'errors' => [
+                        'content_length' => ['El valor recibido debe ser un entero positivo.'],
+                    ],
+                ], Response::HTTP_BAD_REQUEST)
+            );
+        }
+
+        if ($contentLength > self::MAX_CONTENT_LENGTH_BYTES) {
+            $maxSize = UploadLimits::formatBytes(self::MAX_CONTENT_LENGTH_BYTES);
 
             throw new HttpResponseException(
                 response()->json([
                     'success' => false,
                     'message' => "El tamaño de la petición excede el límite permitido de {$maxSize}.",
-                    'max_size_bytes' => UploadLimits::IMPORT_CONTENT_LENGTH_BYTES,
-                    'request_size_bytes' => (int) $contentLength,
+                    'max_size_bytes' => self::MAX_CONTENT_LENGTH_BYTES,
+                    'request_size_bytes' => $contentLength,
                 ], Response::HTTP_REQUEST_ENTITY_TOO_LARGE)
             );
         }

@@ -17,15 +17,17 @@ class InstructorFichaCaracterizacionFactory extends Factory
 
     public function definition(): array
     {
-        $fechaInicio = Carbon::instance($this->faker->dateTimeBetween('-4 months', 'now'));
-        $fechaFin = (clone $fechaInicio)->addMonths($this->faker->numberBetween(6, 18));
+        $mesesAtras = rand(0, 4);
+        $fechaInicio = Carbon::now()->subMonths($mesesAtras);
+        $mesesDuracion = rand(6, 18);
+        $fechaFin = (clone $fechaInicio)->addMonths($mesesDuracion);
 
         return [
             'instructor_id' => Instructor::factory(),
             'ficha_id' => FichaCaracterizacion::factory(),
             'fecha_inicio' => $fechaInicio->format('Y-m-d'),
             'fecha_fin' => $fechaFin->format('Y-m-d'),
-            'total_horas_instructor' => $this->faker->numberBetween(180, 1200),
+            'total_horas_instructor' => rand(180, 1200),
         ];
     }
 }

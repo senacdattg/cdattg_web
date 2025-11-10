@@ -14,13 +14,22 @@ class OrdenFactory extends Factory
 
     public function definition(): array
     {
-        $tipoOrdenId = $this->faker->randomElement([44, 45]);
+        $tipoOrdenId = [44, 45][array_rand([44, 45])];
+        
+        $diasAdelante = rand(7, 120);
         $fechaDevolucion = $tipoOrdenId === 44
-            ? $this->faker->dateTimeBetween('+1 week', '+4 months')->format('Y-m-d')
+            ? date('Y-m-d', strtotime("+{$diasAdelante} days"))
             : null;
 
+        $descripciones = [
+            'ORDEN DE COMPRA EQUIPOS TECNOLÓGICOS',
+            'ORDEN DE SUMINISTRO MATERIALES',
+            'ORDEN DE SERVICIO MANTENIMIENTO',
+            'ORDEN DE COMPRA HERRAMIENTAS',
+        ];
+
         return [
-            'descripcion_orden' => strtoupper($this->faker->sentence(4)),
+            'descripcion_orden' => strtoupper($descripciones[array_rand($descripciones)]),
             'tipo_orden_id' => $tipoOrdenId,
             'fecha_devolucion' => $fechaDevolucion,
             'user_create_id' => 1,

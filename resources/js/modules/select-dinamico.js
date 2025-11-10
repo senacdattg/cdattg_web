@@ -17,13 +17,13 @@ export class SelectDinamicoHandler {
             municipiosTemplate: null,
             ...options
         };
-        
+
         this.alertHandler = new AlertHandler({
             autoHide: true,
             hideDelay: 5000,
             alertSelector: '.alert'
         });
-        
+
         this.init();
     }
 
@@ -107,7 +107,7 @@ export class SelectDinamicoHandler {
                 success: (response) => {
                     // Manejar diferentes estructuras de respuesta
                     let departamentos = [];
-                    
+
                     if (response.success && response.data) {
                         // Estructura: {success: true, data: [...]}
                         departamentos = response.data;
@@ -118,7 +118,7 @@ export class SelectDinamicoHandler {
                         // Estructura: {departamentos: [...]} u otra variante
                         departamentos = response.departamentos || response.data || [];
                     }
-                    
+
                     if (Array.isArray(departamentos) && departamentos.length > 0) {
                         this.populateSelect(departamentoSelect, departamentos, 'Seleccione un departamento...');
                         this.clearSelect(this.options.municipioSelector, 'Primero seleccione un departamento...');
@@ -157,7 +157,7 @@ export class SelectDinamicoHandler {
                 success: (response) => {
                     // Manejar diferentes estructuras de respuesta
                     let municipios = [];
-                    
+
                     if (response.success && response.data) {
                         // Estructura: {success: true, data: [...]}
                         municipios = response.data;
@@ -168,7 +168,7 @@ export class SelectDinamicoHandler {
                         // Estructura: {municipios: [...]} u otra variante
                         municipios = response.municipios || response.data || [];
                     }
-                    
+
                     if (Array.isArray(municipios) && municipios.length > 0) {
                         this.populateSelect(municipioSelect, municipios, 'Seleccione un municipio...');
                         resolve(response);
@@ -225,7 +225,7 @@ export class SelectDinamicoHandler {
      */
     populateSelect(select, data, placeholder, formatter = null) {
         select.html(`<option value="">${placeholder}</option>`);
-        
+
         data.forEach(item => {
             let option;
             if (formatter) {
@@ -236,7 +236,7 @@ export class SelectDinamicoHandler {
             }
             select.append(option);
         });
-        
+
         select.prop('disabled', false);
     }
 
@@ -274,9 +274,9 @@ export class SelectDinamicoHandler {
         const departamentoSelect = $(this.options.departamentoSelector);
         const municipioSelect = $(this.options.municipioSelector);
 
-        const paisId = paisSelect.data('initial-value');
-        const departamentoId = departamentoSelect.data('initial-value');
-        const municipioId = municipioSelect.data('initial-value');
+        const paisId = paisSelect.data('initial-value') || paisSelect.val();
+        const departamentoId = departamentoSelect.data('initial-value') || departamentoSelect.val();
+        const municipioId = municipioSelect.data('initial-value') || municipioSelect.val();
 
         if (departamentoSelect.length) {
             this.options.departamentosTemplate = departamentoSelect.data('url-template') || this.options.departamentosTemplate;

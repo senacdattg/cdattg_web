@@ -15,6 +15,8 @@ class ComplementarioOfertadoFactory extends Factory
 
     public function definition(): array
     {
+        static $usedNombres = [];
+        
         $nombres = [
             'Auxiliar de Cocina',
             'Acabados en Madera',
@@ -24,20 +26,29 @@ class ComplementarioOfertadoFactory extends Factory
             'Normatividad Laboral',
         ];
 
-        $nombre = $this->faker->unique()->randomElement($nombres);
+        // Filtrar nombres ya usados
+        $availableNombres = array_diff($nombres, $usedNombres);
+        if (empty($availableNombres)) {
+            $usedNombres = [];
+            $availableNombres = $nombres;
+        }
+        
+        $nombre = $availableNombres[array_rand($availableNombres)];
+        $usedNombres[] = $nombre;
+        
         $modalidades = [18, 19, 20];
         $jornadas = [1, 2, 3, 4];
         $ambienteId = Ambiente::query()->inRandomOrder()->value('id') ?? 1;
 
         return [
-            'codigo' => strtoupper($this->faker->bothify('COMP###')),
+            'codigo' => strtoupper('COMP' . rand(100, 999)),
             'nombre' => $nombre,
-            'descripcion' => $this->faker->sentence(15),
-            'duracion' => $this->faker->numberBetween(30, 80),
-            'cupos' => $this->faker->numberBetween(10, 30),
-            'estado' => $this->faker->randomElement([0, 1, 2]),
-            'modalidad_id' => $this->faker->randomElement($modalidades),
-            'jornada_id' => $this->faker->randomElement($jornadas),
+            'descripcion' => 'Curso complementario de ' . strtolower($nombre) . ' diseñado para fortalecer las competencias de los aprendices.',
+            'duracion' => rand(30, 80),
+            'cupos' => rand(10, 30),
+            'estado' => [0, 1, 2][array_rand([0, 1, 2])],
+            'modalidad_id' => $modalidades[array_rand($modalidades)],
+            'jornada_id' => $jornadas[array_rand($jornadas)],
             'ambiente_id' => $ambienteId,
         ];
     }

@@ -65,6 +65,7 @@ class CheckUploadLimitsCommand extends Command
         $limitsTable = [
             ['Tipo', 'Límite'],
             ['Importación de archivos (Excel/CSV)', UploadLimits::formatBytes(UploadLimits::IMPORT_FILE_SIZE_BYTES)],
+            ['Content-Length general', UploadLimits::formatBytes(UploadLimits::GENERAL_CONTENT_LENGTH_BYTES)],
             ['Content-Length para importaciones', UploadLimits::formatBytes(UploadLimits::IMPORT_CONTENT_LENGTH_BYTES)],
             ['Documentos complementarios', UploadLimits::formatBytes(UploadLimits::DOCUMENT_FILE_SIZE_BYTES)],
             ['Imágenes de perfil', UploadLimits::formatBytes(UploadLimits::IMAGE_FILE_SIZE_BYTES)],
