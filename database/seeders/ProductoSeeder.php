@@ -36,7 +36,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -55,7 +55,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -74,7 +74,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -93,7 +93,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -112,7 +112,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -131,7 +131,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -150,7 +150,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -169,7 +169,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -188,7 +188,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -207,7 +207,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -226,7 +226,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -245,7 +245,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -264,7 +264,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -283,7 +283,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -302,7 +302,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -321,7 +321,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -340,7 +340,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -359,7 +359,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -378,7 +378,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -397,7 +397,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -416,7 +416,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -435,7 +435,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -454,7 +454,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -473,7 +473,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -492,7 +492,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -511,7 +511,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -530,7 +530,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -549,7 +549,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -568,7 +568,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -587,7 +587,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -606,7 +606,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -625,7 +625,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -644,7 +644,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -663,7 +663,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -682,7 +682,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -701,7 +701,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -720,7 +720,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -739,7 +739,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -758,7 +758,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -777,7 +777,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -796,7 +796,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -815,7 +815,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -834,7 +834,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -853,7 +853,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -872,7 +872,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -891,7 +891,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -910,7 +910,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -929,7 +929,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -948,7 +948,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -967,7 +967,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
              [
@@ -986,7 +986,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1005,7 +1005,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1024,7 +1024,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1043,7 +1043,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1062,7 +1062,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1081,7 +1081,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1100,7 +1100,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1119,7 +1119,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1138,7 +1138,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1157,7 +1157,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1176,7 +1176,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1195,7 +1195,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1214,7 +1214,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1233,7 +1233,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1252,7 +1252,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1271,7 +1271,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1290,7 +1290,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1309,7 +1309,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1328,7 +1328,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1347,7 +1347,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1366,7 +1366,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1385,7 +1385,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1404,7 +1404,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1
             ],
             [
@@ -1423,7 +1423,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1442,7 +1442,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1461,7 +1461,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1480,7 +1480,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1499,7 +1499,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1518,7 +1518,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1537,7 +1537,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1556,7 +1556,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1575,7 +1575,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1594,7 +1594,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1613,7 +1613,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1632,7 +1632,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1651,7 +1651,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1670,7 +1670,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1689,7 +1689,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1708,7 +1708,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1727,7 +1727,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1746,7 +1746,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1765,7 +1765,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1784,7 +1784,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1803,7 +1803,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1822,7 +1822,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1841,7 +1841,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1860,7 +1860,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1879,7 +1879,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1898,7 +1898,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1917,7 +1917,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
               [
@@ -1936,7 +1936,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1955,7 +1955,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1974,7 +1974,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -1993,7 +1993,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2012,7 +2012,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2031,7 +2031,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2050,7 +2050,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2069,7 +2069,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2088,7 +2088,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2107,7 +2107,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2126,7 +2126,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2145,7 +2145,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2164,7 +2164,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2183,7 +2183,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2202,7 +2202,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2221,7 +2221,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2240,7 +2240,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2259,7 +2259,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2278,7 +2278,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2297,7 +2297,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2316,7 +2316,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2335,7 +2335,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2354,7 +2354,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2373,7 +2373,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2392,7 +2392,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2411,7 +2411,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2430,7 +2430,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2449,7 +2449,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2468,7 +2468,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2487,7 +2487,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2506,7 +2506,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2525,7 +2525,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2544,7 +2544,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2563,7 +2563,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2582,7 +2582,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2601,7 +2601,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2620,7 +2620,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2639,7 +2639,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2658,7 +2658,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2677,7 +2677,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2696,7 +2696,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2715,7 +2715,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2734,7 +2734,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2753,7 +2753,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2772,7 +2772,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2791,7 +2791,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2810,7 +2810,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2829,7 +2829,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2848,7 +2848,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2867,7 +2867,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
              [
@@ -2886,7 +2886,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2905,7 +2905,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2924,7 +2924,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2943,7 +2943,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2962,7 +2962,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -2981,7 +2981,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3000,7 +3000,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3019,7 +3019,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3038,7 +3038,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3057,7 +3057,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3076,7 +3076,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3095,7 +3095,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3114,7 +3114,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3133,7 +3133,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3152,7 +3152,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3171,7 +3171,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3190,7 +3190,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3209,7 +3209,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3228,7 +3228,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3247,7 +3247,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3266,7 +3266,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3285,7 +3285,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3304,7 +3304,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3323,7 +3323,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3342,7 +3342,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3357,11 +3357,11 @@ class ProductoSeeder extends Seeder
                 'categoria_id' => 67,
                 'marca_id' => 75,
                 'contrato_convenio_id' => null,
-                'ambiente_id' => 1,
+                'ambiente_id' => 55,
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3376,11 +3376,11 @@ class ProductoSeeder extends Seeder
                 'categoria_id' => 67,
                 'marca_id' => 75,
                 'contrato_convenio_id' => null,
-                'ambiente_id' => 1,
+                'ambiente_id' => 55,
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3395,11 +3395,11 @@ class ProductoSeeder extends Seeder
                 'categoria_id' => 67,
                 'marca_id' => 75,
                 'contrato_convenio_id' => null,
-                'ambiente_id' => 1,
+                'ambiente_id' => 55,
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3418,7 +3418,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3433,11 +3433,11 @@ class ProductoSeeder extends Seeder
                 'categoria_id' => 67,
                 'marca_id' => 78,
                 'contrato_convenio_id' => null,
-                'ambiente_id' => 1,
+                'ambiente_id' => 55,
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3452,11 +3452,11 @@ class ProductoSeeder extends Seeder
                 'categoria_id' => 67,
                 'marca_id' => 78,
                 'contrato_convenio_id' => null,
-                'ambiente_id' => 1,
+                'ambiente_id' => 55,
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3471,11 +3471,11 @@ class ProductoSeeder extends Seeder
                 'categoria_id' => 67,
                 'marca_id' => null,
                 'contrato_convenio_id' => null,
-                'ambiente_id' => 1,
+                'ambiente_id' => 55,
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3490,11 +3490,11 @@ class ProductoSeeder extends Seeder
                 'categoria_id' => 67,
                 'marca_id' => 91,
                 'contrato_convenio_id' => null,
-                'ambiente_id' => 1,
+                'ambiente_id' => 55,
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3509,11 +3509,11 @@ class ProductoSeeder extends Seeder
                 'categoria_id' => 67,
                 'marca_id' => 74,
                 'contrato_convenio_id' => null,
-                'ambiente_id' => 1,
+                'ambiente_id' => 55,
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3528,11 +3528,11 @@ class ProductoSeeder extends Seeder
                 'categoria_id' => 67,
                 'marca_id' => 89,
                 'contrato_convenio_id' => null,
-                'ambiente_id' => 1,
+                'ambiente_id' => 55,
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3547,11 +3547,11 @@ class ProductoSeeder extends Seeder
                 'categoria_id' => 67,
                 'marca_id' => 89,
                 'contrato_convenio_id' => null,
-                'ambiente_id' => 1,
+                'ambiente_id' => 55,
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3566,11 +3566,11 @@ class ProductoSeeder extends Seeder
                 'categoria_id' => 67,
                 'marca_id' => 75,
                 'contrato_convenio_id' => null,
-                'ambiente_id' => 1,
+                'ambiente_id' => 55,
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3585,11 +3585,11 @@ class ProductoSeeder extends Seeder
                 'categoria_id' => 67,
                 'marca_id' => 75,
                 'contrato_convenio_id' => null,
-                'ambiente_id' => 1,
+                'ambiente_id' => 55,
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3604,11 +3604,11 @@ class ProductoSeeder extends Seeder
                 'categoria_id' => 67,
                 'marca_id' => 75,
                 'contrato_convenio_id' => null,
-                'ambiente_id' => 1,
+                'ambiente_id' => 55,
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3623,11 +3623,11 @@ class ProductoSeeder extends Seeder
                 'categoria_id' => 67,
                 'marca_id' => 89,
                 'contrato_convenio_id' => null,
-                'ambiente_id' => 1,
+                'ambiente_id' => 55,
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3642,11 +3642,11 @@ class ProductoSeeder extends Seeder
                 'categoria_id' => 67,
                 'marca_id' => 89,
                 'contrato_convenio_id' => null,
-                'ambiente_id' => 1,
+                'ambiente_id' => 55,
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3661,11 +3661,11 @@ class ProductoSeeder extends Seeder
                 'categoria_id' => 67,
                 'marca_id' => 74,
                 'contrato_convenio_id' => null,
-                'ambiente_id' => 1,
+                'ambiente_id' => 55,
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3680,11 +3680,11 @@ class ProductoSeeder extends Seeder
                 'categoria_id' => 67,
                 'marca_id' => 76,
                 'contrato_convenio_id' => null,
-                'ambiente_id' => 1,
+                'ambiente_id' => 55,
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3699,11 +3699,11 @@ class ProductoSeeder extends Seeder
                 'categoria_id' => 67,
                 'marca_id' => 74,
                 'contrato_convenio_id' => null,
-                'ambiente_id' => 1,
+                'ambiente_id' => 55,
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3722,7 +3722,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3741,7 +3741,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3760,7 +3760,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3779,7 +3779,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3798,7 +3798,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3817,7 +3817,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
               [
@@ -3836,7 +3836,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3855,7 +3855,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3874,7 +3874,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3893,7 +3893,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3912,7 +3912,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3931,7 +3931,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3950,7 +3950,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3969,7 +3969,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -3988,7 +3988,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4007,7 +4007,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4026,7 +4026,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4045,7 +4045,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4064,7 +4064,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4083,7 +4083,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4102,7 +4102,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4121,7 +4121,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4140,7 +4140,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4159,7 +4159,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4178,7 +4178,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4197,7 +4197,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4216,7 +4216,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4235,7 +4235,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4254,7 +4254,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4273,7 +4273,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4292,7 +4292,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4311,7 +4311,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4330,7 +4330,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4349,7 +4349,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4368,7 +4368,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4387,7 +4387,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4406,7 +4406,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4425,7 +4425,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4444,7 +4444,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4463,7 +4463,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4482,7 +4482,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4501,7 +4501,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4520,7 +4520,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4539,7 +4539,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4558,7 +4558,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4577,7 +4577,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4596,7 +4596,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4615,7 +4615,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4634,7 +4634,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4653,7 +4653,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4672,7 +4672,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4691,7 +4691,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4710,7 +4710,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4729,7 +4729,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4748,7 +4748,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4767,7 +4767,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
              [
@@ -4786,7 +4786,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4805,7 +4805,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4824,7 +4824,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4843,7 +4843,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4862,7 +4862,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4881,7 +4881,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4900,7 +4900,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4919,7 +4919,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4938,7 +4938,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4957,7 +4957,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4976,7 +4976,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -4995,7 +4995,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5014,7 +5014,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5033,7 +5033,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5052,7 +5052,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5071,7 +5071,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5090,7 +5090,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5109,7 +5109,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5128,7 +5128,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5147,7 +5147,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5166,7 +5166,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5185,7 +5185,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5204,7 +5204,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5223,7 +5223,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5242,7 +5242,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5261,7 +5261,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5280,7 +5280,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5299,7 +5299,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5318,7 +5318,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5337,7 +5337,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5356,7 +5356,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5375,7 +5375,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5394,7 +5394,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5413,7 +5413,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5432,7 +5432,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5451,7 +5451,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5470,7 +5470,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5489,7 +5489,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5508,7 +5508,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5527,7 +5527,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5546,7 +5546,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5565,7 +5565,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5584,7 +5584,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5603,7 +5603,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5622,7 +5622,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5641,7 +5641,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5660,7 +5660,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5679,7 +5679,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5698,7 +5698,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5717,7 +5717,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
               [
@@ -5736,7 +5736,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5755,7 +5755,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5774,7 +5774,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5793,7 +5793,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5812,7 +5812,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5831,7 +5831,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5850,7 +5850,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5869,7 +5869,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5888,7 +5888,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5907,7 +5907,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5926,7 +5926,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5945,7 +5945,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5964,7 +5964,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -5983,7 +5983,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6002,7 +6002,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6021,7 +6021,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6040,7 +6040,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6059,7 +6059,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6078,7 +6078,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6097,7 +6097,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6116,7 +6116,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6135,7 +6135,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6154,7 +6154,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6173,7 +6173,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6192,7 +6192,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6211,7 +6211,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6230,7 +6230,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6249,7 +6249,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6268,7 +6268,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6287,7 +6287,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6306,7 +6306,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6325,7 +6325,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6344,7 +6344,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6363,7 +6363,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6382,7 +6382,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6401,7 +6401,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6420,7 +6420,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6439,7 +6439,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6458,7 +6458,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6477,7 +6477,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6496,7 +6496,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6515,7 +6515,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6534,7 +6534,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6553,7 +6553,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6572,7 +6572,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6591,7 +6591,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6610,7 +6610,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6629,7 +6629,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6648,7 +6648,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6667,7 +6667,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
               [
@@ -6686,7 +6686,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6705,7 +6705,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6724,7 +6724,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6743,7 +6743,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6762,7 +6762,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6781,7 +6781,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6800,7 +6800,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6819,7 +6819,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6838,7 +6838,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6857,7 +6857,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6876,7 +6876,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6895,7 +6895,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6914,7 +6914,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6933,7 +6933,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6952,7 +6952,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6971,7 +6971,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -6990,7 +6990,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7009,7 +7009,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7028,7 +7028,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7047,7 +7047,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7066,7 +7066,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7085,7 +7085,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7104,7 +7104,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7123,7 +7123,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7142,7 +7142,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7161,7 +7161,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7180,7 +7180,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7199,7 +7199,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7218,7 +7218,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7237,7 +7237,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7256,7 +7256,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7275,7 +7275,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7294,7 +7294,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7313,7 +7313,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7332,7 +7332,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7351,7 +7351,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7370,7 +7370,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7389,7 +7389,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7408,7 +7408,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7427,7 +7427,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7446,7 +7446,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7465,7 +7465,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7484,7 +7484,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7503,7 +7503,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7522,7 +7522,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7541,7 +7541,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7560,7 +7560,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7579,7 +7579,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7598,7 +7598,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7617,7 +7617,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7636,7 +7636,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7655,7 +7655,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7674,7 +7674,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7693,7 +7693,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7712,7 +7712,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7731,7 +7731,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7750,7 +7750,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7769,7 +7769,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7788,7 +7788,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7807,7 +7807,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7826,7 +7826,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7845,7 +7845,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7864,7 +7864,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7883,7 +7883,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7902,7 +7902,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7921,7 +7921,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7940,7 +7940,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7959,7 +7959,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7978,7 +7978,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -7997,7 +7997,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8016,7 +8016,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8035,7 +8035,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8054,7 +8054,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8073,7 +8073,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8092,7 +8092,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8111,7 +8111,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8130,7 +8130,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8149,7 +8149,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8168,7 +8168,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8187,7 +8187,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8206,7 +8206,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8225,7 +8225,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8244,7 +8244,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8263,7 +8263,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8282,7 +8282,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                    'user_create_id' => 1,
+                'user_create_id' => 1,
 
                 'user_update_id' => 1,
             ],
@@ -8302,7 +8302,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8321,7 +8321,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8340,7 +8340,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8359,7 +8359,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8378,7 +8378,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8397,7 +8397,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8416,7 +8416,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8435,7 +8435,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8454,7 +8454,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8473,7 +8473,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8492,7 +8492,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8511,7 +8511,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8530,7 +8530,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8549,7 +8549,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8568,7 +8568,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
               [
@@ -8587,7 +8587,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8606,7 +8606,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8625,7 +8625,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8644,7 +8644,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8663,7 +8663,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8682,7 +8682,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8701,7 +8701,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8720,7 +8720,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8739,7 +8739,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8758,7 +8758,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8777,7 +8777,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8796,7 +8796,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8815,7 +8815,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8834,7 +8834,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8853,7 +8853,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8872,7 +8872,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8891,7 +8891,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8910,7 +8910,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8929,7 +8929,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8948,7 +8948,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8967,7 +8967,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -8986,7 +8986,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9005,7 +9005,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9024,7 +9024,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9043,7 +9043,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9062,7 +9062,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9081,7 +9081,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9100,7 +9100,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9119,7 +9119,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9138,7 +9138,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9157,7 +9157,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9176,7 +9176,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9195,7 +9195,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9214,7 +9214,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9233,7 +9233,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9252,7 +9252,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9271,7 +9271,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9290,7 +9290,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9309,7 +9309,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9328,7 +9328,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9347,7 +9347,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9366,7 +9366,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9385,7 +9385,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9404,7 +9404,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9423,7 +9423,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9442,7 +9442,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9461,7 +9461,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9480,7 +9480,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9499,7 +9499,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9518,7 +9518,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
              [
@@ -9537,7 +9537,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9556,7 +9556,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9575,7 +9575,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9594,7 +9594,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9613,7 +9613,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9632,7 +9632,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9651,7 +9651,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9670,7 +9670,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9689,7 +9689,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9708,7 +9708,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9727,7 +9727,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9746,7 +9746,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9765,7 +9765,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9784,7 +9784,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9803,7 +9803,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9822,7 +9822,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9841,7 +9841,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9860,7 +9860,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9879,7 +9879,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9898,7 +9898,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9917,7 +9917,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9936,7 +9936,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9955,7 +9955,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9974,7 +9974,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -9993,7 +9993,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10012,7 +10012,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10031,7 +10031,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10050,7 +10050,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10069,7 +10069,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10088,7 +10088,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10107,7 +10107,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10126,7 +10126,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10145,7 +10145,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10164,7 +10164,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10183,7 +10183,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10202,7 +10202,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10221,7 +10221,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10240,7 +10240,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10259,7 +10259,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10278,7 +10278,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10297,7 +10297,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10316,7 +10316,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10335,7 +10335,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10354,7 +10354,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10373,7 +10373,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10392,7 +10392,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10411,7 +10411,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10430,7 +10430,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10449,7 +10449,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10468,7 +10468,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
              [
@@ -10487,7 +10487,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10506,7 +10506,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10525,7 +10525,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10544,7 +10544,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10563,7 +10563,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10582,7 +10582,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10601,7 +10601,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10620,7 +10620,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10639,7 +10639,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10658,7 +10658,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10677,7 +10677,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10696,7 +10696,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10715,7 +10715,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10734,7 +10734,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10753,7 +10753,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10772,7 +10772,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10791,7 +10791,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10810,7 +10810,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10829,7 +10829,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10848,7 +10848,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10867,7 +10867,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10886,7 +10886,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10905,7 +10905,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10924,7 +10924,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10943,7 +10943,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10962,7 +10962,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -10981,7 +10981,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11000,7 +11000,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11019,7 +11019,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11038,7 +11038,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11057,7 +11057,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11076,7 +11076,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11095,7 +11095,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11114,7 +11114,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11133,7 +11133,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11152,7 +11152,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11171,7 +11171,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11190,7 +11190,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11209,7 +11209,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11228,7 +11228,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11247,7 +11247,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11266,7 +11266,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11285,7 +11285,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11304,7 +11304,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11323,7 +11323,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11342,7 +11342,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11361,7 +11361,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11380,7 +11380,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11399,7 +11399,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11418,7 +11418,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
              [
@@ -11437,7 +11437,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11456,7 +11456,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11475,7 +11475,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11494,7 +11494,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11513,7 +11513,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11532,7 +11532,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11551,7 +11551,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11570,7 +11570,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11589,7 +11589,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11608,7 +11608,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11627,7 +11627,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11646,7 +11646,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11665,7 +11665,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11684,7 +11684,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11703,7 +11703,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11722,7 +11722,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11741,7 +11741,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11760,7 +11760,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11779,7 +11779,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11798,7 +11798,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11817,7 +11817,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11836,7 +11836,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11855,7 +11855,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11874,7 +11874,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11893,7 +11893,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11912,7 +11912,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11931,7 +11931,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11950,7 +11950,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11969,7 +11969,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -11988,7 +11988,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12007,7 +12007,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12026,7 +12026,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12045,7 +12045,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12064,7 +12064,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12083,7 +12083,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12102,7 +12102,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12121,7 +12121,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12140,7 +12140,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12159,7 +12159,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12178,7 +12178,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12197,7 +12197,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12216,7 +12216,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12235,7 +12235,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12254,7 +12254,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12273,7 +12273,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12292,7 +12292,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12311,7 +12311,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12330,7 +12330,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12349,7 +12349,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12368,7 +12368,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
              [
@@ -12387,7 +12387,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12406,7 +12406,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12425,7 +12425,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12444,7 +12444,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12463,7 +12463,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12482,7 +12482,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12501,7 +12501,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12520,7 +12520,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12539,7 +12539,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12558,7 +12558,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12577,7 +12577,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12596,7 +12596,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12615,7 +12615,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12634,7 +12634,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12653,7 +12653,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12672,7 +12672,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12691,7 +12691,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12710,7 +12710,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12729,7 +12729,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12748,7 +12748,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12767,7 +12767,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12786,7 +12786,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12805,7 +12805,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12824,7 +12824,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12843,7 +12843,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12862,7 +12862,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12881,7 +12881,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12900,7 +12900,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12919,7 +12919,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12938,7 +12938,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12957,7 +12957,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12976,7 +12976,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -12995,7 +12995,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13014,7 +13014,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13033,7 +13033,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13052,7 +13052,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13071,7 +13071,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13090,7 +13090,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13109,7 +13109,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13128,7 +13128,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13147,7 +13147,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13166,7 +13166,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13185,7 +13185,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13204,7 +13204,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13223,7 +13223,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13242,7 +13242,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13261,7 +13261,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13280,7 +13280,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13299,7 +13299,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13318,7 +13318,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
               [
@@ -13337,7 +13337,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13356,7 +13356,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13375,7 +13375,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13394,7 +13394,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13413,7 +13413,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13432,7 +13432,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13451,7 +13451,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13470,7 +13470,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13489,7 +13489,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13508,7 +13508,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13527,7 +13527,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13546,7 +13546,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13565,7 +13565,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13584,7 +13584,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13603,7 +13603,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13622,7 +13622,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13641,7 +13641,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13660,7 +13660,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13679,7 +13679,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13698,7 +13698,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13717,7 +13717,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13736,7 +13736,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13755,7 +13755,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13774,7 +13774,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13793,7 +13793,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13812,7 +13812,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13831,7 +13831,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13850,7 +13850,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13869,7 +13869,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13888,7 +13888,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13907,7 +13907,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13926,13 +13926,14 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
                 'producto' => 'ENVASE PLÁSTICO CUADRADO',
                 'tipo_producto_id' => 28,
-                'descripcion' => 'RECIPIENTE DE PLÁSTICO CON TAPA DE ENRROSQUE PARA ENVASAR BEBIDAS, CON UNA CAPACIDAD DE 230 ML.',
+                'descripcion' => 'RECIPIENTE DE PLÁSTICO CON TAPA DE
+                 ENRROSQUE PARA ENVASAR BEBIDAS, CON UNA CAPACIDAD DE 230 ML.',
                 'peso' => 0,
                 'unidad_medida_id' => 41,
                 'cantidad' => 654.0,
@@ -13945,13 +13946,14 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
                 'producto' => 'ENVASE PLÁSTICO DE YOGURT',
                 'tipo_producto_id' => 28,
-                'descripcion' => 'ENVASE PLÁSTICO DE DISEÑO CUADRADO CON ASA Y TAPA DE ENRROSQUE, CAPACIDAD DE 1 LITRO.',
+                'descripcion' => 'ENVASE PLÁSTICO DE DISEÑO
+                  CUADRADO CON ASA Y TAPA DE ENRROSQUE, CAPACIDAD DE 1 LITRO.',
                 'peso' => 0,
                 'unidad_medida_id' => 41,
                 'cantidad' => 156.0,
@@ -13964,7 +13966,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -13983,13 +13985,15 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
                 'producto' => 'TERMÓMETRO DIGITAL ECO TEMP',
                 'tipo_producto_id' => 28,
-                'descripcion' => 'TERMÓMETRO DIGITAL CON SONDA DE PENETRACIÓN, MATERIAL DE PLÁSTICO Y LA SONDA DE ACERO INOXIDABL, EL CABLE DE SILICONA MODELO ETI 810-950, RANGO DE TEMPERATURA DE -49.9 °C A 199.9 °C.',
+                'descripcion' => 'TERMÓMETRO DIGITAL CON SONDA
+                  DE PENETRACIÓN, MATERIAL DE PLÁSTICO Y LA SONDA DE ACERO INOXIDABL,
+                  EL CABLE DE SILICONA MODELO ETI 810-950, RANGO DE TEMPERATURA DE -49.9 °C A 199.9 °C.',
                 'peso' => 0,
                 'unidad_medida_id' => 41,
                 'cantidad' => 3.0,
@@ -14002,7 +14006,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14021,7 +14025,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14040,7 +14044,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14059,7 +14063,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14078,7 +14082,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14097,7 +14101,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14116,7 +14120,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14135,7 +14139,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14154,7 +14158,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14173,7 +14177,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14192,7 +14196,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14211,7 +14215,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14230,7 +14234,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14249,7 +14253,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14268,7 +14272,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
               [
@@ -14287,7 +14291,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14306,7 +14310,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14325,7 +14329,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14344,7 +14348,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14363,7 +14367,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14382,7 +14386,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14401,7 +14405,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14420,7 +14424,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14439,7 +14443,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14458,7 +14462,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14477,7 +14481,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14496,7 +14500,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14515,13 +14519,14 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
                 'producto' => 'ALCOHOL',
                 'tipo_producto_id' => 28,
-                'descripcion' => 'ALCOHOL ANTISÉPTICO AL 70°, CANTIDAD DE 3,7 L, ESTE PRODUCTO LLEGO EL DÍA 24/09/2025.',
+                'descripcion' => 'ALCOHOL ANTISÉPTICO AL 70°, CANTIDAD DE 3,7 L,
+                 ESTE PRODUCTO LLEGO EL DÍA 24/09/2025.',
                 'peso' => 0,
                 'unidad_medida_id' => 41,
                 'cantidad' => 2.0,
@@ -14534,7 +14539,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14553,7 +14558,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14572,7 +14577,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14591,7 +14596,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14610,7 +14615,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14629,7 +14634,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14648,7 +14653,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14667,7 +14672,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14686,7 +14691,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14705,7 +14710,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14724,7 +14729,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14743,7 +14748,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14762,7 +14767,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14781,7 +14786,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14800,7 +14805,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14819,7 +14824,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14838,7 +14843,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14857,7 +14862,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14876,7 +14881,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14895,7 +14900,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14914,7 +14919,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14933,7 +14938,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14952,7 +14957,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14971,7 +14976,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -14990,7 +14995,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15009,7 +15014,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15028,7 +15033,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15047,7 +15052,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15066,7 +15071,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15085,7 +15090,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15104,7 +15109,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15123,7 +15128,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15142,7 +15147,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15161,7 +15166,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15180,7 +15185,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15199,7 +15204,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15218,7 +15223,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15237,7 +15242,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15256,7 +15261,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15275,7 +15280,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15294,7 +15299,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15313,7 +15318,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15332,7 +15337,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15351,7 +15356,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
             [
@@ -15370,7 +15375,7 @@ class ProductoSeeder extends Seeder
                 'proveedor_id' => null,
                 'fecha_vencimiento' => null,
                 'imagen' => 'img/inventario/producto-default.png',
-                'user_create_id' => 1,
+            'user_create_id' => 1,
                 'user_update_id' => 1,
             ],
         ];
