@@ -34,14 +34,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const actualizarIncidencias = (issues) => {
+        const lista = Array.isArray(issues) ? issues : Object.values(issues ?? {});
         tablaIncidencias.innerHTML = '';
 
-        if (!issues.length) {
+        if (!lista.length) {
             tablaIncidencias.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Sin incidencias registradas.</td></tr>';
             return;
         }
 
-        issues.forEach((issue) => {
+        lista.forEach((issue) => {
             const fila = document.createElement('tr');
             fila.innerHTML = `
                 <td>${issue.row_number ?? '-'}</td>
