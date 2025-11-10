@@ -26,18 +26,25 @@
             <div class="col-lg-4 col-md-5">
                 <div class="image-preview-container slide-in">
                     <div class="image-preview-box">
-                        <img id="preview"
-                             src="{{ $producto->imagen ? asset($producto->imagen) : asset('img/no-image.png') }}"
-                             alt="Vista previa"
-                             onerror="this.onerror=null; this.src='{{ asset('img/no-image.png') }}'"
-                             style="cursor: pointer;"
-                             onclick="$('#imageModal').modal('show'); $('#expandedImage').attr('src', this.src);">
+                        <img 
+                            id="preview"
+                            src="{{ $producto->imagen ? asset($producto->imagen) : asset('img/no-image.png') }}"
+                            alt="Vista previa"
+                            onerror="this.onerror=null; this.src='{{ asset('img/no-image.png') }}'"
+                            style="cursor: pointer;"
+                            onclick="$('#imageModal').modal('show'); $('#expandedImage').attr('src', this.src);"
+                        >
                     </div>
                     <div class="image-upload-area">
                         <label class="image-upload-btn">
                             <i class="fas fa-cloud-upload-alt"></i>
                             <span>Cambiar Imagen</span>
-                            <input type="file" name="imagen" id="imagen" accept="image/*">
+                            <input 
+                                type="file" 
+                                name="imagen" 
+                                id="imagen" 
+                                accept="image/*"
+                            >
                         </label>
                         <p class="text-muted mt-2 mb-0" style="font-size: 0.85rem;">
                             <i class="fas fa-info-circle"></i> JPG, PNG (máx. 2MB)

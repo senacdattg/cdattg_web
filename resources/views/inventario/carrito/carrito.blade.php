@@ -55,11 +55,11 @@
                                         </caption>
                                         <thead>
                                             <tr>
-                                                <th width="10%">Imagen</th>
-                                                <th width="35%">Producto</th>
-                                                <th width="15%" class="text-center">Disponible</th>
-                                                <th width="20%" class="text-center">Cantidad</th>
-                                                <th width="10%" class="text-center">Acciones</th>
+                                                <th style="width: 10%;">Imagen</th>
+                                                <th style="width: 35%;">Producto</th>
+                                                <th style="width: 15%;" class="text-center">Disponible</th>
+                                                <th style="width: 20%;" class="text-center">Cantidad</th>
+                                                <th style="width: 10%;" class="text-center">Acciones</th>
                                             </tr>
                                         </thead>
                                         <tbody id="cart-items-body">
@@ -113,32 +113,44 @@
 
                             {{-- Datos del solicitante --}}
                             <div class="form-group">
-                                <label><i class="fas fa-user"></i> Solicitante:</label>
-                                <input type="text" 
-                                       class="form-control" 
-                                       value="{{ auth()->user()->name }}" 
-                                       readonly>
+                                <label>
+                                    <i class="fas fa-user"></i> Solicitante:
+                                </label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    value="{{ auth()->user()->name }}" 
+                                    readonly
+                                >
                             </div>
 
                             <div class="form-group">
-                                <label><i class="fas fa-envelope"></i> Correo:</label>
-                                <input type="text" 
-                                       class="form-control" 
-                                       value="{{ auth()->user()->email }}" 
-                                       readonly>
+                                <label>
+                                    <i class="fas fa-envelope"></i> Correo:
+                                </label>
+                                <input 
+                                    type="text" 
+                                    class="form-control" 
+                                    value="{{ auth()->user()->email }}" 
+                                    readonly
+                                >
                             </div>
 
                             {{-- Botones de acción --}}
-                            <button type="button" 
-                                    class="btn btn-success btn-block btn-lg" 
-                                    id="btn-confirm-order"
-                                    disabled>
+                            <button 
+                                type="button" 
+                                class="btn btn-success btn-block btn-lg" 
+                                id="btn-confirm-order"
+                                disabled
+                            >
                                 <i class="fas fa-check"></i> Confirmar Solicitud
                             </button>
 
-                            <button type="button" 
-                                    class="btn btn-outline-secondary btn-block mt-2" 
-                                    id="btn-save-draft">
+                            <button 
+                                type="button" 
+                                class="btn btn-outline-secondary btn-block mt-2" 
+                                id="btn-save-draft"
+                            >
                                 <i class="fas fa-save"></i> Guardar Borrador
                             </button>
                         </div>
@@ -149,8 +161,16 @@
     </section>
 
     {{-- Modal de confirmación de orden --}}
-    <div class="modal fade" id="confirmOrderModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
+    <div 
+        class="modal fade" 
+        id="confirmOrderModal" 
+        tabindex="-1" 
+        role="dialog"
+    >
+        <div 
+            class="modal-dialog modal-lg" 
+            role="document"
+        >
             <div class="modal-content">
                 <div class="modal-header bg-success">
                     <h5 class="modal-title">
@@ -172,10 +192,18 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <button 
+                        type="button" 
+                        class="btn btn-secondary" 
+                        data-dismiss="modal"
+                    >
                         <i class="fas fa-times"></i> Cancelar
                     </button>
-                    <button type="button" class="btn btn-success" id="btn-final-confirm">
+                    <button 
+                        type="button" 
+                        class="btn btn-success" 
+                        id="btn-final-confirm"
+                    >
                         <i class="fas fa-check"></i> Confirmar y Enviar
                     </button>
                 </div>
@@ -184,7 +212,12 @@
     </div>
 
     {{-- Modal de producto no disponible --}}
-    <div class="modal fade" id="stockWarningModal" tabindex="-1" role="dialog">
+    <div 
+        class="modal fade" 
+        id="stockWarningModal" 
+        tabindex="-1" 
+        role="dialog"
+    >
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header bg-warning">

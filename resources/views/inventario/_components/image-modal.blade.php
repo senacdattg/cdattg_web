@@ -3,7 +3,14 @@
     Modal moderno con controles interactivos
     Requiere: imagen.css y imagen.js
 --}}
-<div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+<div 
+    class="modal fade" 
+    id="imageModal" 
+    tabindex="-1" 
+    role="dialog" 
+    aria-labelledby="imageModalLabel" 
+    aria-hidden="true"
+>
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content image-modal-modern">
             {{-- Header --}}
@@ -13,16 +20,37 @@
                     Vista Previa de Imagen
                 </h5>
                 <div class="modal-header-controls">
-                    <button type="button" class="btn btn-sm btn-light" id="zoomIn" title="Acercar (Tecla +)">
+                    <button 
+                        type="button" 
+                        class="btn btn-sm btn-light" 
+                        id="zoomIn" 
+                        title="Acercar (Tecla +)"
+                    >
                         <i class="fas fa-search-plus"></i>
                     </button>
-                    <button type="button" class="btn btn-sm btn-light" id="zoomOut" title="Alejar (Tecla -)">
+                    <button 
+                        type="button" 
+                        class="btn btn-sm btn-light" 
+                        id="zoomOut" 
+                        title="Alejar (Tecla -)"
+                    >
                         <i class="fas fa-search-minus"></i>
                     </button>
-                    <button type="button" class="btn btn-sm btn-light" id="resetZoom" title="Restablecer (Tecla 0)">
+                    <button 
+                        type="button" 
+                        class="btn btn-sm btn-light" 
+                        id="resetZoom" 
+                        title="Restablecer (Tecla 0)"
+                    >
                         <i class="fas fa-redo"></i>
                     </button>
-                    <button type="button" class="btn btn-sm btn-light" data-dismiss="modal" aria-label="Cerrar" title="Cerrar (ESC)">
+                    <button 
+                        type="button" 
+                        class="btn btn-sm btn-light" 
+                        data-dismiss="modal" 
+                        aria-label="Cerrar" 
+                        title="Cerrar (ESC)"
+                    >
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -31,7 +59,12 @@
             {{-- Body --}}
             <div class="modal-body image-modal-body">
                 <div class="image-container" id="imageContainer">
-                    <img id="expandedImage" src="" alt="Imagen expandida" class="expanded-image">
+                    <img 
+                        id="expandedImage" 
+                        src="" 
+                        alt="Imagen expandida" 
+                        class="expanded-image"
+                    >
                 </div>
                 <div class="image-modal-info">
                     <span id="imageInfo"></span>
