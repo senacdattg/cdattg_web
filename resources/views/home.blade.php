@@ -41,7 +41,7 @@
                         <p class="text-muted mb-4">Estos son los programas en los que estás inscrito actualmente:</p>
                         <div class="row justify-content-center g-3">
                             @foreach ($programasInscritos as $programa)
-                                @include('complementarios.components.card-programas', ['programa' => $programa])
+                                @include('complementarios.components.card-programas-info', ['programa' => $programa])
                             @endforeach
                         </div>
                         <hr class="my-5">
