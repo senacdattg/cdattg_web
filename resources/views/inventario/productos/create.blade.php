@@ -156,10 +156,12 @@
                                                 Tipo de Producto
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <select class="form-control-modern @error('tipo_producto_id') is-invalid @enderror"
-                                                    id="tipo_producto_id"
-                                                    name="tipo_producto_id"
-                                                    required>
+                                            <select
+                                                class="form-control-modern @error('tipo_producto_id') is-invalid @enderror"
+                                                id="tipo_producto_id"
+                                                name="tipo_producto_id"
+                                                required
+                                            >
                                                 <option value="">Seleccionar tipo</option>
                                                 @foreach($tiposProductos as $tipo)
                                                     <option value="{{ $tipo->id }}" {{ old('tipo_producto_id') == $tipo->id ? 'selected' : '' }}>
@@ -180,10 +182,12 @@
                                                 Categoría
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <select class="form-control-modern @error('categoria_id') is-invalid @enderror"
-                                                    id="categoria_id"
-                                                    name="categoria_id"
-                                                    required>
+                                            <select
+                                                class="form-control-modern @error('categoria_id') is-invalid @enderror"
+                                                id="categoria_id"
+                                                name="categoria_id"
+                                                required
+                                            >
                                                 <option value="">Seleccionar categoría</option>
                                                 @foreach($categorias as $categoria)
                                                     <option value="{{ $categoria->parametro->id }}" {{ old('categoria_id') == $categoria->parametro->id ? 'selected' : '' }}>
@@ -204,10 +208,12 @@
                                                 Marca
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <select class="form-control-modern @error('marca_id') is-invalid @enderror"
-                                                    id="marca_id"
-                                                    name="marca_id"
-                                                    required>
+                                            <select
+                                                class="form-control-modern @error('marca_id') is-invalid @enderror"
+                                                id="marca_id"
+                                                name="marca_id"
+                                                required
+                                            >
                                                 <option value="">Seleccionar marca</option>
                                                 @foreach($marcas as $marca)
                                                     <option value="{{ $marca->parametro->id }}" {{ old('marca_id') == $marca->parametro->id ? 'selected' : '' }}>
@@ -222,16 +228,18 @@
                                     </div>
 
                                     <div class="col-md-6">
-                                                                                <div class="form-group-modern">
+                                        <div class="form-group-modern">
                                             <label for="estado_producto_id">
                                                 <i class="fas fa-info-circle"></i>
                                                 Estado del Producto
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <select class="form-control-modern @error('estado_producto_id') is-invalid @enderror"
-                                                    id="estado_producto_id"
-                                                    name="estado_producto_id"
-                                                    required>
+                                            <select
+                                                class="form-control-modern @error('estado_producto_id') is-invalid @enderror"
+                                                id="estado_producto_id"
+                                                name="estado_producto_id"
+                                                required
+                                            >
                                                 <option value="">Seleccionar estado</option>
                                                 @foreach($estados as $estado)
                                                     <option value="{{ $estado->id }}" {{ old('estado_producto_id') == $estado->id ? 'selected' : '' }}>
@@ -240,6 +248,9 @@
                                                 @endforeach
                                             </select>
                                             @error('estado_producto_id')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -253,21 +264,26 @@
                                 
                                 <div class="row">
                                     <div class="col-md-4">
-                                                                                <div class="form-group-modern">
+                                        <div class="form-group-modern">
                                             <label for="cantidad">
                                                 <i class="fas fa-sort-numeric-up"></i>
                                                 Cantidad
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <input type="number"
-                                                   class="form-control-modern @error('cantidad') is-invalid @enderror"
-                                                   id="cantidad"
-                                                   name="cantidad"
-                                                   value="{{ old('cantidad', 1) }}"
-                                                   min="0"
-                                                   placeholder="Ej: 10"
-                                                   required>
+                                            <input
+                                                type="number"
+                                                class="form-control-modern @error('cantidad') is-invalid @enderror"
+                                                id="cantidad"
+                                                name="cantidad"
+                                                value="{{ old('cantidad', 1) }}"
+                                                min="0"
+                                                placeholder="Ej: 10"
+                                                required
+                                            >
                                             @error('cantidad')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
                                     </div>
 
                                     <div class="col-md-4">
@@ -277,20 +293,17 @@
                                                 Peso/Magnitud
                                                 <span class="text-danger">*</span>
                                             </label>
-                                                                                    <div class="form-group-modern">
-                                            <label for="peso">
-                                                <i class="fas fa-weight"></i>
-                                                Peso (kg)
-                                            </label>
-                                            <input type="number"
-                                                   class="form-control-modern @error('peso') is-invalid @enderror"
-                                                   id="peso"
-                                                   name="peso"
-                                                   value="{{ old('peso') }}"
-                                                   step="0.01"
-                                                   min="0"
-                                                   placeholder="Ej: 2.5">
-                                            @error('peso')
+                                            <input
+                                                type="number"
+                                                class="form-control-modern @error('peso') is-invalid @enderror"
+                                                id="peso"
+                                                name="peso"
+                                                value="{{ old('peso') }}"
+                                                step="0.01"
+                                                min="0"
+                                                placeholder="Ej: 2.5"
+                                                required
+                                            >
                                             @error('peso')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -304,10 +317,12 @@
                                                 Unidad de Medida
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <select class="form-control-modern @error('unidad_medida_id') is-invalid @enderror"
-                                                    id="unidad_medida_id"
-                                                    name="unidad_medida_id"
-                                                    required>
+                                            <select
+                                                class="form-control-modern @error('unidad_medida_id') is-invalid @enderror"
+                                                id="unidad_medida_id"
+                                                name="unidad_medida_id"
+                                                required
+                                            >
                                                 <option value="">Seleccionar unidad</option>
                                                 @foreach($unidadesMedida as $unidad)
                                                     <option value="{{ $unidad->id }}" {{ old('unidad_medida_id') == $unidad->id ? 'selected' : '' }}>
@@ -338,10 +353,12 @@
                                                 Ambiente
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <select class="form-control-modern @error('ambiente_id') is-invalid @enderror"
-                                                    id="ambiente_id"
-                                                    name="ambiente_id"
-                                                    required>
+                                            <select
+                                                class="form-control-modern @error('ambiente_id') is-invalid @enderror"
+                                                id="ambiente_id"
+                                                name="ambiente_id"
+                                                required
+                                            >
                                                 <option value="">Seleccionar ambiente</option>
                                                 @foreach($ambientes as $ambiente)
                                                     <option value="{{ $ambiente->id }}" {{ old('ambiente_id') == $ambiente->id ? 'selected' : '' }}>
@@ -362,10 +379,12 @@
                                                 Proveedor
                                                 <span class="text-danger">*</span>
                                             </label>
-                                            <select class="form-control-modern @error('proveedor_id') is-invalid @enderror"
-                                                    id="proveedor_id"
-                                                    name="proveedor_id"
-                                                    required>
+                                            <select
+                                                class="form-control-modern @error('proveedor_id') is-invalid @enderror"
+                                                id="proveedor_id"
+                                                name="proveedor_id"
+                                                required
+                                            >
                                                 <option value="">Seleccionar proveedor</option>
                                                 @foreach($proveedores as $proveedor)
                                                     <option value="{{ $proveedor->id }}" {{ old('proveedor_id') == $proveedor->id ? 'selected' : '' }}>
@@ -380,14 +399,16 @@
                                     </div>
 
                                     <div class="col-md-6">
-                                                                                <div class="form-group-modern">
+                                        <div class="form-group-modern">
                                             <label for="contrato_convenio_id">
                                                 <i class="fas fa-file-contract"></i>
                                                 Contrato/Convenio
                                             </label>
-                                            <select class="form-control-modern @error('contrato_convenio_id') is-invalid @enderror"
-                                                    id="contrato_convenio_id"
-                                                    name="contrato_convenio_id">
+                                            <select
+                                                class="form-control-modern @error('contrato_convenio_id') is-invalid @enderror"
+                                                id="contrato_convenio_id"
+                                                name="contrato_convenio_id"
+                                            >
                                                 <option value="">Seleccionar contrato/convenio</option>
                                                 @foreach($contratosConvenios as $contrato)
                                                     <option value="{{ $contrato->id }}" {{ old('contrato_convenio_id') == $contrato->id ? 'selected' : '' }}>
@@ -396,6 +417,9 @@
                                                 @endforeach
                                             </select>
                                             @error('contrato_convenio_id')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
                                     </div>
 
                                     <div class="col-md-6">
