@@ -115,7 +115,7 @@ class AspiranteComplementarioController extends Controller
     }
 
     /**
-     * Eliminar aspirante de un programa complementario
+     * Rechazar aspirante de un programa complementario (cambiar estado a rechazado)
      */
     public function eliminarAspirante($complementarioId, $aspiranteId)
     {
@@ -129,22 +129,23 @@ class AspiranteComplementarioController extends Controller
                 ->with('persona')
                 ->firstOrFail();
 
-            // Verificar permisos del usuario (solo administradores pueden eliminar)
+            // Verificar permisos del usuario (solo administradores pueden rechazar)
             if (!auth()->user()->can('ELIMINAR ASPIRANTE COMPLEMENTARIO')) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No tiene permisos para eliminar aspirantes.'
+                    'message' => 'No tiene permisos para rechazar aspirantes.'
                 ], 403);
             }
 
-            // Guardar información del aspirante antes de eliminar para el mensaje
+            // Guardar información del aspirante para el mensaje
             $personaNombre = $aspirante->persona->primer_nombre . ' ' . $aspirante->persona->primer_apellido;
             $numeroDocumento = $aspirante->persona->numero_documento;
 
-            // Eliminar el aspirante
-            $aspirante->delete();
+            // Cambiar el estado a rechazado (2) en lugar de eliminar
+            $aspirante->estado = 2;
+            $aspirante->save();
 
-            Log::info('Aspirante eliminado exitosamente', [
+            Log::info('Aspirante rechazado exitosamente', [
                 'aspirante_id' => $aspiranteId,
                 'complementario_id' => $complementarioId,
                 'persona_id' => $aspirante->persona_id,
@@ -153,7 +154,7 @@ class AspiranteComplementarioController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Aspirante eliminado exitosamente. ' . $personaNombre . ' (' . $numeroDocumento . ') ya no está inscrito en el programa.'
+                'message' => 'Aspirante rechazado exitosamente. ' . $personaNombre . ' (' . $numeroDocumento . ') ha sido marcado como rechazado en el programa.'
             ]);
 
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
@@ -162,7 +163,7 @@ class AspiranteComplementarioController extends Controller
                 'message' => 'Aspirante o programa no encontrado.'
             ], 404);
         } catch (\Exception $e) {
-            Log::error('Error eliminando aspirante: ' . $e->getMessage(), [
+            Log::error('Error rechazando aspirante: ' . $e->getMessage(), [
                 'complementario_id' => $complementarioId,
                 'aspirante_id' => $aspiranteId,
                 'user_id' => auth()->id(),

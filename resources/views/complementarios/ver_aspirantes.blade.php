@@ -119,10 +119,10 @@
                                     @if(isset($existingProgress) && $existingProgress) disabled @endif>
                                     <i class="fas fa-edit"></i>
                                 </button> -->
-                                <button class="btn btn-danger btn-sm aspirante-action-btn" title="Eliminar"
+                                <button class="btn btn-danger btn-sm aspirante-action-btn" title="Rechazar"
                                     data-aspirante-id="{{ $aspirante->id }}"
                                     @if(isset($existingProgress) && $existingProgress) disabled @endif>
-                                    <i class="fas fa-trash"></i>
+                                    <i class="fas fa-times-circle"></i>
                                 </button>
                             </td>
                         </tr>
@@ -586,11 +586,11 @@
         }
 
 
-        // Event listener para botones de eliminar aspirante
+        // Event listener para botones de rechazar aspirante
         document.addEventListener('click', function(e) {
-            if (e.target.closest('.aspirante-action-btn') && e.target.querySelector('.fa-trash')) {
+            const button = e.target.closest('.aspirante-action-btn');
+            if (button && button.dataset.aspiranteId) {
                 e.preventDefault();
-                const button = e.target.closest('.aspirante-action-btn');
                 const aspiranteId = button.dataset.aspiranteId;
 
                 if (!aspiranteId) {
@@ -598,9 +598,9 @@
                     return;
                 }
 
-                // Confirmación antes de eliminar
-                if (!confirm('¿Está seguro de que desea eliminar este aspirante del programa? ' +
-                    'Esta acción no se puede deshacer.')) {
+                // Confirmación antes de rechazar
+                if (!confirm('¿Está seguro de que desea rechazar este aspirante del programa? ' +
+                    'El aspirante será marcado como rechazado.')) {
                     return;
                 }
 
