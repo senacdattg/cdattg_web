@@ -182,6 +182,13 @@
                 <label for="municipio_id" class="form-label">Municipio *</label>
                 <select class="form-control" id="municipio_id" name="municipio_id" required>
                     <option value="">Seleccione...</option>
+                    @if(isset($userData['municipio_id']) && isset($municipios))
+                        @foreach($municipios as $municipio)
+                            <option value="{{ $municipio->id }}" {{ old('municipio_id', $userData['municipio_id'] ?? '') == $municipio->id ? 'selected' : '' }}>
+                                {{ $municipio->municipio }}
+                            </option>
+                        @endforeach
+                    @endif
                 </select>
             </div>
         </div>
