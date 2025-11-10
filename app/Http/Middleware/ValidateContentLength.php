@@ -22,50 +22,58 @@ class ValidateContentLength
     public function handle(Request $request, Closure $next, ?int $maxSize = null): Response
     {
         // Usar el tamaño personalizado si se proporciona, sino usar el por defecto
-        $maxContentLength = $maxSize ?? UploadLimits::IMPORT_CONTENT_LENGTH_BYTES;
+        $maxContentLength = $maxSize ?? UploadLimits::GENERAL_CONTENT_LENGTH_BYTES;
 
         // Obtener el Content-Length del header
         $contentLength = $request->header('Content-Length');
+        $error = null;
 
-        // Si no existe el header Content-Length, rechazar la petición
         if ($contentLength === null && $request->isMethod('POST')) {
-            return response()->json([
-                'error' => 'Content-Length header es requerido',
-                'message' => 'La petición debe incluir el header Content-Length.'
-            ], Response::HTTP_LENGTH_REQUIRED);
+            $error = [
+                'status' => Response::HTTP_LENGTH_REQUIRED,
+                'payload' => [
+                    'error' => 'Content-Length header es requerido',
+                    'message' => 'La petición debe incluir el header Content-Length.',
+                ],
+            ];
+        } elseif ($contentLength !== null && !is_numeric($contentLength)) {
+            $error = [
+                'status' => Response::HTTP_BAD_REQUEST,
+                'payload' => [
+                    'error' => 'Content-Length inválido',
+                    'message' => 'El valor del header Content-Length debe ser un número.',
+                ],
+            ];
+        } elseif ($contentLength !== null) {
+            $contentLengthValue = (int) $contentLength;
+
+            if ($contentLengthValue < 0) {
+                $error = [
+                    'status' => Response::HTTP_BAD_REQUEST,
+                    'payload' => [
+                        'error' => 'Content-Length inválido',
+                        'message' => 'El valor del header Content-Length no puede ser negativo.',
+                    ],
+                ];
+            } elseif ($contentLengthValue > $maxContentLength) {
+                $error = [
+                    'status' => Response::HTTP_REQUEST_ENTITY_TOO_LARGE,
+                    'payload' => [
+                        'error' => 'Payload demasiado grande',
+                        'message' => sprintf(
+                            'El tamaño de la petición (%sMB) excede el límite permitido de %sMB.',
+                            round($contentLengthValue / 1024 / 1024, 2),
+                            round($maxContentLength / 1024 / 1024, 2)
+                        ),
+                        'max_size_bytes' => $maxContentLength,
+                        'request_size_bytes' => $contentLengthValue,
+                    ],
+                ];
+            }
         }
 
-        // Validar que el Content-Length no exceda el límite
-        if ($contentLength !== null && (int) $contentLength > $maxContentLength) {
-            $maxSizeMB = round($maxContentLength / 1024 / 1024, 2);
-            $requestSizeMB = round((int) $contentLength / 1024 / 1024, 2);
-
-            return response()->json([
-                'error' => 'Payload demasiado grande',
-                'message' => sprintf(
-                    'El tamaño de la petición (%sMB) excede el límite permitido de %sMB.',
-                    $requestSizeMB,
-                    $maxSizeMB
-                ),
-                'max_size_bytes' => $maxContentLength,
-                'request_size_bytes' => (int) $contentLength
-            ], Response::HTTP_REQUEST_ENTITY_TOO_LARGE);
-        }
-
-        // Validar que el Content-Length sea un número válido
-        if ($contentLength !== null && !is_numeric($contentLength)) {
-            return response()->json([
-                'error' => 'Content-Length inválido',
-                'message' => 'El valor del header Content-Length debe ser un número.'
-            ], Response::HTTP_BAD_REQUEST);
-        }
-
-        // Validar que el Content-Length no sea negativo
-        if ($contentLength !== null && (int) $contentLength < 0) {
-            return response()->json([
-                'error' => 'Content-Length inválido',
-                'message' => 'El valor del header Content-Length no puede ser negativo.'
-            ], Response::HTTP_BAD_REQUEST);
+        if ($error !== null) {
+            return response()->json($error['payload'], $error['status']);
         }
 
         return $next($request);

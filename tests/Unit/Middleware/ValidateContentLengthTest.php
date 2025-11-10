@@ -36,7 +36,7 @@ class ValidateContentLengthTest extends TestCase
     public function test_rechaza_peticiones_con_content_length_excesivo(): void
     {
         $request = Request::create('/test', 'POST');
-        $request->headers->set('Content-Length', (string) (UploadLimits::IMPORT_CONTENT_LENGTH_BYTES + 1));
+        $request->headers->set('Content-Length', (string) (UploadLimits::GENERAL_CONTENT_LENGTH_BYTES + 1));
 
         $response = $this->middleware->handle(
             $request,
@@ -153,7 +153,7 @@ class ValidateContentLengthTest extends TestCase
     public function test_respuesta_incluye_informacion_detallada_del_error(): void
     {
         $request = Request::create('/test', 'POST');
-        $contentLength = UploadLimits::IMPORT_CONTENT_LENGTH_BYTES + 1000000; // +1MB sobre el límite
+        $contentLength = UploadLimits::GENERAL_CONTENT_LENGTH_BYTES + 1000000; // +1MB sobre el límite
         $request->headers->set('Content-Length', (string) $contentLength);
 
         $response = $this->middleware->handle(
@@ -167,7 +167,7 @@ class ValidateContentLengthTest extends TestCase
         
         $this->assertArrayHasKey('max_size_bytes', $data);
         $this->assertArrayHasKey('request_size_bytes', $data);
-        $this->assertEquals(UploadLimits::IMPORT_CONTENT_LENGTH_BYTES, $data['max_size_bytes']);
+        $this->assertEquals(UploadLimits::GENERAL_CONTENT_LENGTH_BYTES, $data['max_size_bytes']);
         $this->assertEquals($contentLength, $data['request_size_bytes']);
     }
 }

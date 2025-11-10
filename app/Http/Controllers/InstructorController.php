@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Configuration\UploadLimits;
 use App\Models\Instructor;
 use App\Http\Requests\StoreInstructorRequest;
 use App\Http\Requests\UpdateInstructorRequest;
@@ -21,10 +22,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\InstructoresDisponiblesRequest;
+use App\Http\Requests\VerificarDisponibilidadRequest;
 use Illuminate\Support\Facades\Auth;
 
 class InstructorController extends Controller
 {
+    private const MAX_IMPORT_FILE_KB = UploadLimits::IMPORT_FILE_SIZE_KB;
+    private const PERSONAS_JS_FILENAME = 'instructor-create-data.js';
+    private const CSV_HEADER_EMAIL = 'CORREO INSTITUCIONAL';
+
     protected $businessRulesService;
     protected $instructorService;
 
@@ -45,6 +52,8 @@ class InstructorController extends Controller
         $this->middleware('can:GESTIONAR ESPECIALIDADES INSTRUCTOR')->only(['especialidades', 'asignarEspecialidad']);
         $this->middleware('can:VER FICHAS ASIGNADAS')->only('fichasAsignadas');
         $this->middleware('can:CAMBIAR ESTADO INSTRUCTOR')->only('cambiarEstado');
+        $this->middleware('validate.content.length:' . UploadLimits::IMPORT_CONTENT_LENGTH_BYTES)
+            ->only('storeImportarCSV');
     }
     /**
      * Display a listing of the resource.
@@ -61,7 +70,7 @@ class InstructorController extends Controller
             ];
 
             $instructores = $this->instructorService->listarConFiltros($filtros);
-            
+
             // Obtener datos para filtros
             $regionales = Regional::where('status', true)->orderBy('nombre')->get();
             $especialidades = RedConocimiento::where('status', true)->orderBy('nombre')->get();
@@ -69,17 +78,21 @@ class InstructorController extends Controller
             // Estadísticas
             $estadisticas = $this->instructorService->obtenerEstadisticas();
 
-            return view('Instructores.index', compact(
-                'instructores', 
-                'regionales', 
-                'especialidades', 
-                'estadisticas',
-                'filtros'
-            ));
-            
+            return view(
+                'Instructores.index',
+                compact(
+                    'instructores',
+                    'regionales',
+                    'especialidades',
+                    'estadisticas',
+                    'filtros'
+                )
+            );
         } catch (Exception $e) {
             Log::error('Error al listar instructores: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Error al cargar la lista de instructores.');
+            return redirect()
+                ->back()
+                ->with('error', 'Error al cargar la lista de instructores.');
         }
     }
 
@@ -99,15 +112,15 @@ class InstructorController extends Controller
             $query = Instructor::with([
                 'persona',
                 'regional',
-                'instructorFichas' => function($q) {
+                'instructorFichas' => function ($q) {
                     $q->with('ficha.programaFormacion');
                 }
             ]);
 
             // Aplicar filtros
             if ($search) {
-                $query->where(function($q) use ($search) {
-                    $q->whereHas('persona', function($personaQuery) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->whereHas('persona', function ($personaQuery) use ($search) {
                         $personaQuery->where('primer_nombre', 'like', "%{$search}%")
                             ->orWhere('segundo_nombre', 'like', "%{$search}%")
                             ->orWhere('primer_apellido', 'like', "%{$search}%")
@@ -149,7 +162,6 @@ class InstructorController extends Controller
                 'success' => false,
                 'message' => 'Solicitud no válida'
             ]);
-
         } catch (Exception $e) {
             Log::error('Error en búsqueda de instructores', [
                 'error' => $e->getMessage(),
@@ -163,7 +175,9 @@ class InstructorController extends Controller
                 ], 500);
             }
 
-            return redirect()->back()->with('error', 'Error en la búsqueda de instructores.');
+            return redirect()
+                ->back()
+                ->with('error', 'Error en la búsqueda de instructores.');
         }
     }
 
@@ -178,50 +192,69 @@ class InstructorController extends Controller
                 ->whereHas('user') // Solo personas que tienen usuario
                 ->with(['user', 'tipoDocumento'])
                 ->get();
-            
+
             // Preparar datos para JavaScript
-            $personasData = $personas->map(function($persona) {
+            $personasData = $personas->map(function ($persona) {
                 return [
                     'id' => $persona->id,
-                    'nombre' => trim($persona->primer_nombre . ' ' . $persona->segundo_nombre . ' ' . $persona->primer_apellido . ' ' . $persona->segundo_apellido),
+                    'nombre' => trim(implode(' ', [
+                        $persona->primer_nombre,
+                        $persona->segundo_nombre,
+                        $persona->primer_apellido,
+                        $persona->segundo_apellido,
+                    ])),
                     'documento' => $persona->numero_documento,
-                    'email' => $persona->email
+                    'email' => $persona->email,
                 ];
             });
-            
+
             // Generar archivo JavaScript con los datos
             $jsContent = "// Datos de personas para el formulario de creación de instructor\n";
             $jsContent .= "// Generado automáticamente desde el controlador\n";
-            $jsContent .= "window.personasData = " . json_encode($personasData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) . ";";
-            
+            $jsContent .= sprintf(
+                "window.personasData = %s;",
+                json_encode(
+                    $personasData,
+                    JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
+                )
+            );
+
             // Verificar que el directorio existe
             $jsPath = public_path('js');
             if (!is_dir($jsPath)) {
                 mkdir($jsPath, 0755, true);
             }
-            
-            file_put_contents($jsPath . '/instructor-create-data.js', $jsContent);
-            
+
+            $jsFile = $jsPath . '/' . self::PERSONAS_JS_FILENAME;
+
+            file_put_contents($jsFile, $jsContent);
+
             $regionales = Regional::where('status', 1)->get();
             $especialidades = RedConocimiento::where('status', true)->orderBy('nombre')->get();
 
             // Debug temporal
+            $jsFileExists = file_exists($jsFile);
+
             Log::info('Variables pasadas a la vista create:', [
                 'personas_count' => $personas->count(),
                 'regionales_count' => $regionales->count(),
                 'especialidades_count' => $especialidades->count(),
-                'js_file_created' => file_exists($jsPath . '/instructor-create-data.js'),
-                'js_file_size' => file_exists($jsPath . '/instructor-create-data.js') ? filesize($jsPath . '/instructor-create-data.js') : 0
+                'js_file_created' => $jsFileExists,
+                'js_file_size' => $jsFileExists ? filesize($jsFile) : 0,
             ]);
-            
-            return view('Instructores.create', compact('personas', 'regionales', 'especialidades'));
-            
+
+            return view(
+                'Instructores.create',
+                compact('personas', 'regionales', 'especialidades')
+            );
         } catch (Exception $e) {
             Log::error('Error al cargar formulario de creación de instructor', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            return redirect()->route('instructor.index')->with('error', 'Error al cargar el formulario. Por favor, inténtelo de nuevo.');
+            return redirect()
+                ->route('instructor.index')
+                ->with('error', 'Error al cargar el formulario. Por favor, inténtelo de nuevo.');
         }
     }
 
@@ -232,7 +265,7 @@ class InstructorController extends Controller
     {
         try {
             $datos = $request->validated();
-            
+
             // Preparar especialidades
             if ($request->has('especialidades')) {
                 $especialidades = $request->input('especialidades');
@@ -242,13 +275,17 @@ class InstructorController extends Controller
                 $datos['especialidades'] = $especialidades;
             }
 
-            $instructor = $this->instructorService->crear($datos);
-            
-            return redirect()->route('instructor.index')->with('success', '¡Instructor asignado exitosamente!');
-            
+            $this->instructorService->crear($datos);
+
+            return redirect()
+                ->route('instructor.index')
+                ->with('success', '¡Instructor asignado exitosamente!');
         } catch (Exception $e) {
             Log::error('Error al crear instructor: ' . $e->getMessage());
-            return redirect()->back()->withInput()->with('error', $e->getMessage());
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', $e->getMessage());
         }
     }
 
@@ -260,16 +297,19 @@ class InstructorController extends Controller
         try {
             $fichasCaracterizacion = FichaCaracterizacion::all();
             $instructor->persona->edad = Carbon::parse($instructor->persona->fecha_de_nacimiento)->age;
-            $instructor->persona->fecha_de_nacimiento = Carbon::parse($instructor->persona->fecha_de_nacimiento)->format('d/m/Y');
-            
+            $instructor->persona->fecha_de_nacimiento = Carbon::parse(
+                $instructor->persona->fecha_de_nacimiento
+            )->format('d/m/Y');
+
             return view('Instructores.show', compact('instructor', 'fichasCaracterizacion'));
-            
         } catch (Exception $e) {
             Log::error('Error al mostrar instructor', [
                 'instructor_id' => $instructor->id,
                 'error' => $e->getMessage()
             ]);
-            return redirect()->route('instructor.index')->with('error', 'Error al cargar los datos del instructor. Por favor, inténtelo de nuevo.');
+            return redirect()
+                ->route('instructor.index')
+                ->with('error', 'Error al cargar los datos del instructor. Por favor, inténtelo de nuevo.');
         }
     }
 
@@ -280,25 +320,34 @@ class InstructorController extends Controller
     {
         try {
             // llamar los tipos de documentos
-            $documentos = Tema::with(['parametros' => function ($query) {
-                $query->wherePivot('status', 1);
-            }])->findOrFail(2);
-            
+            $documentos = Tema::with([
+                'parametros' => function ($query) {
+                    $query->wherePivot('status', 1);
+                },
+            ])->findOrFail(2);
+
             // llamar los generos
-            $generos = Tema::with(['parametros' => function ($query) {
-                $query->wherePivot('status', 1);
-            }])->findOrFail(3);
-            
+            $generos = Tema::with([
+                'parametros' => function ($query) {
+                    $query->wherePivot('status', 1);
+                },
+            ])->findOrFail(3);
+
             $regionales = Regional::where('status', 1)->get();
-            
-            return view('Instructores.edit', ['instructor' => $instructor], compact('documentos', 'generos', 'regionales'));
-            
+
+            return view(
+                'Instructores.edit',
+                ['instructor' => $instructor],
+                compact('documentos', 'generos', 'regionales')
+            );
         } catch (Exception $e) {
             Log::error('Error al cargar formulario de edición de instructor', [
                 'instructor_id' => $instructor->id,
                 'error' => $e->getMessage()
             ]);
-            return redirect()->route('instructor.index')->with('error', 'Error al cargar el formulario de edición. Por favor, inténtelo de nuevo.');
+            return redirect()
+                ->route('instructor.index')
+                ->with('error', 'Error al cargar el formulario de edición. Por favor, inténtelo de nuevo.');
         }
     }
 
@@ -309,7 +358,7 @@ class InstructorController extends Controller
     {
         try {
             DB::beginTransaction();
-            
+
             $persona = Persona::findOrFail($instructor->persona_id);
             $persona->update([
                 'tipo_documento' => $request->input('tipo_documento'),
@@ -327,7 +376,7 @@ class InstructorController extends Controller
                 'persona_id' => $persona->id,
                 'regional_id' => $request->regional_id,
             ]);
-            
+
             // Actualizar Usuario asociado a la Persona
             $user = User::where('persona_id', $persona->id)->first();
             if ($user) {
@@ -338,33 +387,39 @@ class InstructorController extends Controller
             }
 
             DB::commit();
-            
+
             Log::info('Instructor actualizado exitosamente', [
                 'instructor_id' => $instructor->id,
                 'persona_id' => $persona->id,
                 'user_id' => $user ? $user->id : null,
-                'email' => $request->input('email')
+                'email' => $request->input('email'),
             ]);
-            
-            return redirect()->route('instructor.index')->with('success', '¡Actualización Exitosa!');
-            
+
+            return redirect()
+                ->route('instructor.index')
+                ->with('success', '¡Actualización Exitosa!');
         } catch (QueryException $e) {
             DB::rollBack();
             Log::error('Error al actualizar instructor - QueryException', [
                 'instructor_id' => $instructor->id,
                 'error' => $e->getMessage(),
-                'request_data' => $request->except(['password'])
+                'request_data' => $request->except(['password']),
             ]);
-            return redirect()->back()->withInput()->with('error', 'Error de base de datos. Por favor, inténtelo de nuevo.');
-            
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Error de base de datos. Por favor, inténtelo de nuevo.');
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error al actualizar instructor - Exception', [
                 'instructor_id' => $instructor->id,
                 'error' => $e->getMessage(),
-                'request_data' => $request->except(['password'])
+                'request_data' => $request->except(['password']),
             ]);
-            return redirect()->back()->withInput()->with('error', 'Error inesperado. Por favor, inténtelo de nuevo.');
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Error inesperado. Por favor, inténtelo de nuevo.');
         }
     }
     public function ApiUpdate(Request $request)
@@ -429,22 +484,28 @@ class InstructorController extends Controller
     {
         try {
             $this->instructorService->eliminar($instructor->id);
-            
-            return redirect()->route('instructor.index')->with('success', 'Instructor eliminado exitosamente.');
-            
+
+            return redirect()
+                ->route('instructor.index')
+                ->with('success', 'Instructor eliminado exitosamente.');
         } catch (QueryException $e) {
             Log::error('Error al eliminar instructor: ' . $e->getMessage());
-            
+
             if ($e->getCode() == 23000) {
-                return redirect()->back()->with('error', 'El instructor se encuentra en uso, no se puede eliminar');
+                return redirect()
+                    ->back()
+                    ->with('error', 'El instructor se encuentra en uso, no se puede eliminar');
             }
-            
-            return redirect()->back()->with('error', 'Error de base de datos al eliminar el instructor.');
-            
+
+            return redirect()
+                ->back()
+                ->with('error', 'Error de base de datos al eliminar el instructor.');
         } catch (Exception $e) {
             Log::error('Error al eliminar instructor: ' . $e->getMessage());
-            
-            return redirect()->back()->with('error', $e->getMessage());
+
+            return redirect()
+                ->back()
+                ->with('error', $e->getMessage());
         }
     }
     public function createImportarCSV()
@@ -456,7 +517,7 @@ class InstructorController extends Controller
         try {
             // Validar que el archivo subido sea un archivo CSV o TXT
             $request->validate([
-                'archivoCSV' => 'required|file|mimes:csv,txt',
+                'archivoCSV' => 'required|file|mimes:csv,txt|max:' . self::MAX_IMPORT_FILE_KB,
             ]);
 
             // Obtener el archivo subido
@@ -481,11 +542,13 @@ class InstructorController extends Controller
             $header = array_map('strtoupper', $header);
 
             // Definir el encabezado esperado
-            $expectedHeader = ['TITLE', 'ID_PERSONAL', 'CORREO INSTITUCIONAL'];
+            $expectedHeader = ['TITLE', 'ID_PERSONAL', self::CSV_HEADER_EMAIL];
 
             // Comprobar si el encabezado del CSV coincide con el encabezado esperado
             if ($header !== $expectedHeader) {
-                return redirect()->back()->with('error', 'El encabezado del archivo CSV no coincide con el formato esperado.');
+                return redirect()
+                    ->back()
+                    ->with('error', 'El encabezado del archivo CSV no coincide con el formato esperado.');
             }
 
             // Iniciar una transacción de base de datos
@@ -496,7 +559,8 @@ class InstructorController extends Controller
 
             // Procesar cada fila de datos del CSV
             foreach ($rows as $row) {
-                // Verificar que la cantidad de columnas en la fila coincida con la cantidad de columnas en el encabezado
+                // Verificar que la cantidad de columnas en la fila
+                // coincida con la cantidad de columnas en el encabezado
                 if (count($row) != count($header)) {
                     $errores[] = $row;
                     continue;
@@ -512,12 +576,12 @@ class InstructorController extends Controller
                         'numero_documento' => $data['ID_PERSONAL'],
                         'primer_nombre' => $data['TITLE'],
                         'genero' => 11,
-                        'email' => $data['CORREO INSTITUCIONAL'],
+                        'email' => $data[self::CSV_HEADER_EMAIL],
                     ]);
 
                     // Crear una nueva entrada en la tabla `User`
                     $user = User::create([
-                        'email' => $data['CORREO INSTITUCIONAL'],
+                        'email' => $data[self::CSV_HEADER_EMAIL],
                         'password' => Hash::make($data['ID_PERSONAL']),
                         'persona_id' => $persona->id,
                     ]);
@@ -547,20 +611,25 @@ class InstructorController extends Controller
             $mensaje = 'Instructores creados exitosamente: ' . $procesados;
 
             // Si hubo errores, agregar una nota al mensaje de éxito
-            if (count($errores) > 0) {
+            if (!empty($errores)) {
                 $mensaje .= '. Algunos registros no pudieron ser procesados.';
             }
 
             // Mostrar la vista con los errores y el mensaje de éxito
-            return view('Instructores.errorImport', compact('errores'))->with('success', $mensaje);
+            return view('Instructores.errorImport', compact('errores'))
+                ->with('success', $mensaje);
         } catch (QueryException $e) {
             // Si ocurre un error en la base de datos, revertir la transacción
             DB::rollBack();
-            return redirect()->back()->with('error', 'Error en la base de datos: ' . $e->getMessage());
+            return redirect()
+                ->back()
+                ->with('error', 'Error en la base de datos: ' . $e->getMessage());
         } catch (Exception $e) {
             // Si ocurre un error general, revertir la transacción
             DB::rollBack();
-            return redirect()->back()->with('error', 'Error: ' . $e->getMessage());
+            return redirect()
+                ->back()
+                ->with('error', 'Error: ' . $e->getMessage());
         }
     }
 
@@ -569,35 +638,40 @@ class InstructorController extends Controller
     {
         try {
             DB::beginTransaction();
-            
+
             // Buscar el instructor por persona_id
             $instructor = Instructor::where('persona_id', $id)->first();
-            
+
             if (!$instructor) {
-                return redirect()->back()->with('error', 'No se encontró el instructor.');
+                return redirect()
+                    ->back()
+                    ->with('error', 'No se encontró el instructor.');
             }
-            
+
             // Eliminar solo el instructor
             $instructor->delete();
-            
+
             DB::commit();
-            
+
             Log::info('Instructor sin usuario eliminado exitosamente', [
                 'instructor_id' => $instructor->id,
                 'persona_id' => $id
             ]);
-            
-            return redirect()->back()->with('success', 'Instructor eliminado exitosamente. La persona se mantiene intacta.');
-            
+
+            return redirect()
+                ->back()
+                ->with('success', 'Instructor eliminado exitosamente. La persona se mantiene intacta.');
         } catch (Exception $e) {
             DB::rollBack();
-            
+
             Log::error('Error al eliminar instructor sin usuario', [
                 'persona_id' => $id,
                 'error' => $e->getMessage()
             ]);
-            
-            return redirect()->back()->with('error', 'Error al eliminar el instructor.');
+
+            return redirect()
+                ->back()
+                ->with('error', 'Error al eliminar el instructor.');
         }
     }
 
@@ -607,9 +681,9 @@ class InstructorController extends Controller
     public function especialidades(Instructor $instructor)
     {
         $this->authorize('gestionarEspecialidades', $instructor);
-        
+
         $especialidades = $instructor->especialidades;
-        
+
         return view('instructores.especialidades', compact('instructor', 'especialidades'));
     }
 
@@ -619,26 +693,29 @@ class InstructorController extends Controller
     public function gestionarEspecialidades(Instructor $instructor)
     {
         $this->authorize('gestionarEspecialidades', $instructor);
-        
+
         // Obtener redes de conocimiento disponibles según la regional del instructor
         $redesConocimiento = RedConocimiento::where('regionals_id', $instructor->regional_id)
             ->where('status', true)
             ->orderBy('nombre')
             ->get();
-        
+
         // Obtener especialidades actuales del instructor
         $especialidadesActuales = $instructor->especialidades ?? [];
-        
+
         // Separar especialidades principales y secundarias
         $especialidadPrincipal = $especialidadesActuales['principal'] ?? null;
         $especialidadesSecundarias = $especialidadesActuales['secundarias'] ?? [];
-        
-        return view('instructores.gestionar-especialidades', compact(
-            'instructor', 
-            'redesConocimiento', 
-            'especialidadPrincipal', 
-            'especialidadesSecundarias'
-        ));
+
+        return view(
+            'instructores.gestionar-especialidades',
+            compact(
+                'instructor',
+                'redesConocimiento',
+                'especialidadPrincipal',
+                'especialidadesSecundarias'
+            )
+        );
     }
 
     /**
@@ -647,7 +724,7 @@ class InstructorController extends Controller
     public function asignarEspecialidad(Request $request, Instructor $instructor)
     {
         $this->authorize('gestionarEspecialidades', $instructor);
-        
+
         $request->validate([
             'red_conocimiento_id' => 'required|exists:red_conocimientos,id',
             'tipo' => 'required|in:principal,secundaria'
@@ -655,7 +732,7 @@ class InstructorController extends Controller
 
         try {
             DB::beginTransaction();
-            
+
             // Validar que la red de conocimiento pertenezca a la regional del instructor
             $redConocimiento = RedConocimiento::where('id', $request->red_conocimiento_id)
                 ->where('regionals_id', $instructor->regional_id)
@@ -663,7 +740,9 @@ class InstructorController extends Controller
                 ->first();
 
             if (!$redConocimiento) {
-                return redirect()->back()->with('error', 'La red de conocimiento no está disponible para esta regional');
+                return redirect()
+                    ->back()
+                    ->with('error', 'La red de conocimiento no está disponible para esta regional');
             }
 
             $especialidadesActuales = $instructor->especialidades ?? [];
@@ -673,29 +752,36 @@ class InstructorController extends Controller
                 $especialidadesSecundarias = $especialidadesActuales['secundarias'] ?? [];
                 if (in_array($redConocimiento->nombre, $especialidadesSecundarias)) {
                     // Remover de secundarias antes de asignar como principal
-                    $especialidadesSecundarias = array_filter($especialidadesSecundarias, function($esp) use ($redConocimiento) {
-                        return $esp !== $redConocimiento->nombre;
-                    });
+                    $especialidadesSecundarias = array_filter(
+                        $especialidadesSecundarias,
+                        function ($esp) use ($redConocimiento) {
+                            return $esp !== $redConocimiento->nombre;
+                        }
+                    );
                     $especialidadesActuales['secundarias'] = array_values($especialidadesSecundarias);
                 }
-                
+
                 // Solo puede haber una especialidad principal
                 $especialidadesActuales['principal'] = $redConocimiento->nombre;
                 $mensaje = "Especialidad principal '{$redConocimiento->nombre}' asignada exitosamente";
             } else {
                 // Agregar especialidad secundaria
                 $especialidadesSecundarias = $especialidadesActuales['secundarias'] ?? [];
-                
+
                 // Verificar que no sea la misma especialidad principal
                 if ($especialidadesActuales['principal'] === $redConocimiento->nombre) {
-                    return redirect()->back()->with('warning', 'Esta especialidad ya está asignada como principal');
+                    return redirect()
+                        ->back()
+                        ->with('warning', 'Esta especialidad ya está asignada como principal');
                 }
-                
+
                 // Verificar que no esté ya en secundarias
                 if (in_array($redConocimiento->nombre, $especialidadesSecundarias)) {
-                    return redirect()->back()->with('warning', 'Esta especialidad ya está asignada como secundaria');
+                    return redirect()
+                        ->back()
+                        ->with('warning', 'Esta especialidad ya está asignada como secundaria');
                 }
-                
+
                 $especialidadesSecundarias[] = $redConocimiento->nombre;
                 $especialidadesActuales['secundarias'] = $especialidadesSecundarias;
                 $mensaje = "Especialidad secundaria '{$redConocimiento->nombre}' asignada exitosamente";
@@ -713,7 +799,9 @@ class InstructorController extends Controller
                 'especialidades_actuales' => $especialidadesActuales
             ]);
 
-            return redirect()->back()->with('success', $mensaje);
+            return redirect()
+                ->back()
+                ->with('success', $mensaje);
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error al asignar especialidad', [
@@ -722,7 +810,9 @@ class InstructorController extends Controller
                 'tipo' => $request->tipo,
                 'error' => $e->getMessage()
             ]);
-            return redirect()->back()->with('error', 'Error al asignar la especialidad. Por favor, inténtelo de nuevo.');
+            return redirect()
+                ->back()
+                ->with('error', 'Error al asignar la especialidad. Por favor, inténtelo de nuevo.');
         }
     }
 
@@ -732,7 +822,7 @@ class InstructorController extends Controller
     public function removerEspecialidad(Request $request, Instructor $instructor)
     {
         $this->authorize('gestionarEspecialidades', $instructor);
-        
+
         $request->validate([
             'especialidad' => 'required|string',
             'tipo' => 'required|in:principal,secundaria'
@@ -740,38 +830,45 @@ class InstructorController extends Controller
 
         try {
             DB::beginTransaction();
-            
+
             $especialidadesActuales = $instructor->especialidades ?? [];
             $especialidadNombre = $request->especialidad;
 
             if ($request->tipo === 'principal') {
                 // Verificar que la especialidad principal existe
                 if ($especialidadesActuales['principal'] !== $especialidadNombre) {
-                    return redirect()->back()->with('error', 'La especialidad principal especificada no coincide');
+                    return redirect()
+                        ->back()
+                        ->with('error', 'La especialidad principal especificada no coincide');
                 }
-                
+
                 $especialidadesActuales['principal'] = null;
                 $mensaje = "Especialidad principal '{$especialidadNombre}' removida exitosamente";
-                
+
                 Log::info('Especialidad principal removida', [
                     'instructor_id' => $instructor->id,
                     'especialidad_removida' => $especialidadNombre
                 ]);
             } else {
                 $especialidadesSecundarias = $especialidadesActuales['secundarias'] ?? [];
-                
+
                 // Verificar que la especialidad secundaria existe
                 if (!in_array($especialidadNombre, $especialidadesSecundarias)) {
-                    return redirect()->back()->with('error', 'La especialidad secundaria especificada no existe');
+                    return redirect()
+                        ->back()
+                        ->with('error', 'La especialidad secundaria especificada no existe');
                 }
-                
+
                 // Remover la especialidad de la lista
-                $especialidadesSecundarias = array_filter($especialidadesSecundarias, function($esp) use ($especialidadNombre) {
-                    return $esp !== $especialidadNombre;
-                });
+                $especialidadesSecundarias = array_filter(
+                    $especialidadesSecundarias,
+                    function ($esp) use ($especialidadNombre) {
+                        return $esp !== $especialidadNombre;
+                    }
+                );
                 $especialidadesActuales['secundarias'] = array_values($especialidadesSecundarias);
                 $mensaje = "Especialidad secundaria '{$especialidadNombre}' removida exitosamente";
-                
+
                 Log::info('Especialidad secundaria removida', [
                     'instructor_id' => $instructor->id,
                     'especialidad_removida' => $especialidadNombre,
@@ -784,7 +881,9 @@ class InstructorController extends Controller
 
             DB::commit();
 
-            return redirect()->back()->with('success', $mensaje);
+            return redirect()
+                ->back()
+                ->with('success', $mensaje);
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error al remover especialidad', [
@@ -793,7 +892,9 @@ class InstructorController extends Controller
                 'tipo' => $request->tipo,
                 'error' => $e->getMessage()
             ]);
-            return redirect()->back()->with('error', 'Error al remover la especialidad. Por favor, inténtelo de nuevo.');
+            return redirect()
+                ->back()
+                ->with('error', 'Error al remover la especialidad. Por favor, inténtelo de nuevo.');
         }
     }
 
@@ -807,7 +908,9 @@ class InstructorController extends Controller
             $instructor = $user->instructor;
 
             if (!$instructor) {
-                return redirect()->back()->with('error', 'No se encontró información del instructor');
+                return redirect()
+                    ->back()
+                    ->with('error', 'No se encontró información del instructor');
             }
 
             // Autorizar acceso
@@ -815,7 +918,7 @@ class InstructorController extends Controller
 
             // Obtener fichas activas
             $fichasActivas = $instructor->instructorFichas()
-                ->with(['ficha' => function($q) {
+                ->with(['ficha' => function ($q) {
                     $q->with([
                         'programaFormacion.redConocimiento',
                         'modalidadFormacion',
@@ -824,16 +927,16 @@ class InstructorController extends Controller
                         'diasFormacion'
                     ]);
                 }])
-                ->whereHas('ficha', function($q) {
+                ->whereHas('ficha', function ($q) {
                     $q->where('status', true)
-                      ->where('fecha_fin', '>=', now()->toDateString());
+                        ->where('fecha_fin', '>=', now()->toDateString());
                 })
                 ->orderBy('fecha_inicio')
                 ->get();
 
             // Obtener fichas próximas (próximos 30 días)
             $fichasProximas = $instructor->instructorFichas()
-                ->with(['ficha' => function($q) {
+                ->with(['ficha' => function ($q) {
                     $q->with([
                         'programaFormacion.redConocimiento',
                         'modalidadFormacion',
@@ -842,91 +945,68 @@ class InstructorController extends Controller
                         'diasFormacion'
                     ]);
                 }])
-                ->whereHas('ficha', function($q) {
+                ->whereHas('ficha', function ($q) {
                     $q->where('status', true)
-                      ->where('fecha_inicio', '>=', now()->toDateString())
-                      ->where('fecha_inicio', '<=', now()->addDays(30)->toDateString());
+                        ->where('fecha_inicio', '>=', now()->toDateString())
+                        ->where('fecha_inicio', '<=', now()->addDays(30)->toDateString());
                 })
                 ->orderBy('fecha_inicio')
                 ->get();
 
             // Obtener estadísticas de desempeño
-            $estadisticas = $this->obtenerEstadisticasDesempeño($instructor);
+            $estadisticas = $this->obtenerEstadisticasDesempeno($instructor);
 
             // Obtener eventos del calendario (clases)
             $eventosCalendario = $this->obtenerEventosCalendario($instructor);
 
             // Obtener notificaciones recientes
-            $notificaciones = $this->obtenerNotificacionesRecientes($instructor);
+            $notificaciones = $this->obtenerNotificacionesRecientes();
 
             // Obtener resumen de actividades
             $actividadesRecientes = $this->obtenerActividadesRecientes($instructor);
 
-            return view('instructores.dashboard', compact(
-                'instructor',
-                'fichasActivas',
-                'fichasProximas',
-                'estadisticas',
-                'eventosCalendario',
-                'notificaciones',
-                'actividadesRecientes'
-            ));
-
+            return view(
+                'instructores.dashboard',
+                compact(
+                    'instructor',
+                    'fichasActivas',
+                    'fichasProximas',
+                    'estadisticas',
+                    'eventosCalendario',
+                    'notificaciones',
+                    'actividadesRecientes'
+                )
+            );
         } catch (Exception $e) {
             Log::error('Error cargando dashboard del instructor', [
                 'instructor_id' => Auth::user()->instructor?->id,
                 'error' => $e->getMessage()
             ]);
-            return redirect()->back()->with('error', 'Error al cargar el dashboard del instructor');
+            return redirect()
+                ->back()
+                ->with('error', 'Error al cargar el dashboard del instructor');
         }
     }
 
     /**
      * Obtener estadísticas de desempeño del instructor
      */
-    private function obtenerEstadisticasDesempeño(Instructor $instructor): array
+    private function obtenerEstadisticasDesempeno(Instructor $instructor): array
     {
-        $fichasActivas = $instructor->instructorFichas()
-            ->whereHas('ficha', function($q) {
-                $q->where('status', true)
-                  ->where('fecha_fin', '>=', now()->toDateString());
-            })
-            ->get();
-
-        $fichasFinalizadas = $instructor->instructorFichas()
-            ->whereHas('ficha', function($q) {
-                $q->where('fecha_fin', '<', now()->toDateString());
-            })
-            ->get();
-
-        $totalHoras = $instructor->instructorFichas()->sum('total_horas_instructor');
-        $horasEsteMes = $instructor->instructorFichas()
-            ->whereHas('ficha', function($q) {
-                $q->whereMonth('fecha_inicio', now()->month)
-                  ->whereYear('fecha_inicio', now()->year);
-            })
-            ->sum('total_horas_instructor');
+        $resumenFichas = $this->businessRulesService->obtenerResumenFichas($instructor);
+        $horasEsteMes = $this->businessRulesService->sumarHorasDelMes($instructor, now());
+        $promedioHorasUltimosMeses = $this->businessRulesService->promedioHorasUltimosMeses($instructor, 6);
 
         return [
-            'fichas_activas' => $fichasActivas->count(),
-            'fichas_proximas' => $instructor->instructorFichas()
-                ->whereHas('ficha', function($q) {
-                    $q->where('status', true)
-                      ->where('fecha_inicio', '>=', now()->toDateString())
-                      ->where('fecha_inicio', '<=', now()->addDays(30)->toDateString());
-                })
-                ->count(),
-            'fichas_finalizadas' => $fichasFinalizadas->count(),
-            'total_horas' => $totalHoras,
+            'fichas_activas' => $resumenFichas['activas'],
+            'fichas_proximas' => $resumenFichas['proximas'],
+            'fichas_finalizadas' => $resumenFichas['finalizadas'],
+            'total_horas' => $resumenFichas['total_horas'],
             'horas_este_mes' => $horasEsteMes,
-            'promedio_horas_mes' => $instructor->instructorFichas()
-                ->whereHas('ficha', function($q) {
-                    $q->where('fecha_inicio', '>=', now()->subMonths(6)->toDateString());
-                })
-                ->sum('total_horas_instructor') / 6,
+            'promedio_horas_mes' => $promedioHorasUltimosMeses,
             'anos_experiencia' => $instructor->anos_experiencia ?? 0,
-            'especialidades' => count($instructor->especialidades['secundarias'] ?? []) + 
-                               (empty($instructor->especialidades['principal']) ? 0 : 1)
+            'especialidades' => count($instructor->especialidades['secundarias'] ?? []) +
+                (empty($instructor->especialidades['principal']) ? 0 : 1)
         ];
     }
 
@@ -939,19 +1019,19 @@ class InstructorController extends Controller
 
         $fichasActivas = $instructor->instructorFichas()
             ->with(['ficha.diasFormacion'])
-            ->whereHas('ficha', function($q) {
+            ->whereHas('ficha', function ($q) {
                 $q->where('status', true)
-                  ->where('fecha_fin', '>=', now()->toDateString());
+                    ->where('fecha_fin', '>=', now()->toDateString());
             })
             ->get();
 
         foreach ($fichasActivas as $instructorFicha) {
             $ficha = $instructorFicha->ficha;
-            
+
             foreach ($ficha->diasFormacion as $diaFormacion) {
                 $fechaInicio = Carbon::parse($ficha->fecha_inicio);
                 $fechaFin = Carbon::parse($ficha->fecha_fin);
-                
+
                 // Generar eventos para cada día de formación en el rango
                 $fechaActual = $fechaInicio->copy();
                 while ($fechaActual->lte($fechaFin)) {
@@ -960,8 +1040,12 @@ class InstructorController extends Controller
                             'title' => $ficha->programaFormacion->nombre ?? 'Sin programa',
                             'start' => $fechaActual->format('Y-m-d') . 'T' . $diaFormacion->hora_inicio,
                             'end' => $fechaActual->format('Y-m-d') . 'T' . $diaFormacion->hora_fin,
-                            'backgroundColor' => $this->obtenerColorPorEspecialidad($ficha->programaFormacion->redConocimiento->nombre ?? ''),
-                            'borderColor' => $this->obtenerColorPorEspecialidad($ficha->programaFormacion->redConocimiento->nombre ?? ''),
+                            'backgroundColor' => $this->obtenerColorPorEspecialidad(
+                                $ficha->programaFormacion->redConocimiento->nombre ?? ''
+                            ),
+                            'borderColor' => $this->obtenerColorPorEspecialidad(
+                                $ficha->programaFormacion->redConocimiento->nombre ?? ''
+                            ),
                             'extendedProps' => [
                                 'ficha_id' => $ficha->id,
                                 'ambiente' => $ficha->ambiente->nombre ?? 'Sin ambiente',
@@ -1017,10 +1101,10 @@ class InstructorController extends Controller
     /**
      * Obtener notificaciones recientes para el instructor
      */
-    private function obtenerNotificacionesRecientes(Instructor $instructor): array
+    private function obtenerNotificacionesRecientes(): array
     {
         // Simular notificaciones - en un sistema real vendrían de una tabla de notificaciones
-        $notificaciones = [
+        return [
             [
                 'id' => 1,
                 'titulo' => 'Nueva ficha asignada',
@@ -1046,8 +1130,6 @@ class InstructorController extends Controller
                 'leida' => true
             ]
         ];
-
-        return $notificaciones;
     }
 
     /**
@@ -1069,8 +1151,8 @@ class InstructorController extends Controller
             $actividades[] = [
                 'tipo' => 'ficha_asignada',
                 'titulo' => 'Ficha asignada',
-                'descripcion' => 'Se asignó la ficha ' . $instructorFicha->ficha->ficha . ' - ' . 
-                               ($instructorFicha->ficha->programaFormacion->nombre ?? 'Sin programa'),
+                'descripcion' => 'Se asignó la ficha ' . $instructorFicha->ficha->ficha . ' - ' .
+                    ($instructorFicha->ficha->programaFormacion->nombre ?? 'Sin programa'),
                 'fecha' => $instructorFicha->created_at,
                 'icono' => 'fas fa-clipboard-list'
             ];
@@ -1082,10 +1164,10 @@ class InstructorController extends Controller
     /**
      * Ver fichas asignadas al instructor
      */
-    public function fichasAsignadas(Request $request, Instructor $instructor = null)
+    public function fichasAsignadas(Request $request, ?Instructor $instructor = null)
     {
         $user = Auth::user();
-        
+
         // Autorizar acceso usando la política
         if ($instructor) {
             $this->authorize('verFichasAsignadas', $instructor);
@@ -1097,7 +1179,7 @@ class InstructorController extends Controller
                 $this->authorize('verFichasAsignadas', $instructorActual);
             }
         }
-        
+
         if (!$instructorActual) {
             return redirect()->back()->with('error', 'No se encontró información del instructor');
         }
@@ -1111,7 +1193,7 @@ class InstructorController extends Controller
         // Construir query base con relaciones
         $query = $instructorActual->instructorFichas()
             ->with([
-                'ficha' => function($q) {
+                'ficha' => function ($q) {
                     $q->with([
                         'programaFormacion.redConocimiento',
                         'modalidadFormacion',
@@ -1125,35 +1207,35 @@ class InstructorController extends Controller
         // Aplicar filtros
         if ($filtroEstado !== 'todas') {
             if ($filtroEstado === 'activas') {
-                $query->whereHas('ficha', function($q) {
+                $query->whereHas('ficha', function ($q) {
                     $q->where('status', true)
-                      ->where('fecha_fin', '>=', now()->toDateString());
+                        ->where('fecha_fin', '>=', now()->toDateString());
                 });
             } elseif ($filtroEstado === 'finalizadas') {
-                $query->whereHas('ficha', function($q) {
+                $query->whereHas('ficha', function ($q) {
                     $q->where('fecha_fin', '<', now()->toDateString());
                 });
             } elseif ($filtroEstado === 'inactivas') {
-                $query->whereHas('ficha', function($q) {
+                $query->whereHas('ficha', function ($q) {
                     $q->where('status', false);
                 });
             }
         }
 
         if ($filtroFechaInicio) {
-            $query->whereHas('ficha', function($q) use ($filtroFechaInicio) {
+            $query->whereHas('ficha', function ($q) use ($filtroFechaInicio) {
                 $q->where('fecha_inicio', '>=', $filtroFechaInicio);
             });
         }
 
         if ($filtroFechaFin) {
-            $query->whereHas('ficha', function($q) use ($filtroFechaFin) {
+            $query->whereHas('ficha', function ($q) use ($filtroFechaFin) {
                 $q->where('fecha_fin', '<=', $filtroFechaFin);
             });
         }
 
         if ($filtroPrograma) {
-            $query->whereHas('ficha.programaFormacion', function($q) use ($filtroPrograma) {
+            $query->whereHas('ficha.programaFormacion', function ($q) use ($filtroPrograma) {
                 $q->where('nombre', 'like', "%{$filtroPrograma}%");
             });
         }
@@ -1165,18 +1247,12 @@ class InstructorController extends Controller
         $fichasAsignadas = $query->paginate(15)->withQueryString();
 
         // Obtener estadísticas
+        $resumenFichas = $this->businessRulesService->obtenerResumenFichas($instructorActual);
         $estadisticas = [
-            'total' => $instructorActual->instructorFichas()->count(),
-            'activas' => $instructorActual->instructorFichas()
-                ->whereHas('ficha', function($q) {
-                    $q->where('status', true)
-                      ->where('fecha_fin', '>=', now()->toDateString());
-                })->count(),
-            'finalizadas' => $instructorActual->instructorFichas()
-                ->whereHas('ficha', function($q) {
-                    $q->where('fecha_fin', '<', now()->toDateString());
-                })->count(),
-            'total_horas' => $instructorActual->instructorFichas()->sum('total_horas_instructor')
+            'total' => $resumenFichas['total'],
+            'activas' => $resumenFichas['activas'],
+            'finalizadas' => $resumenFichas['finalizadas'],
+            'total_horas' => $resumenFichas['total_horas']
         ];
 
         // Obtener programas únicos para el filtro
@@ -1189,16 +1265,19 @@ class InstructorController extends Controller
             ->sort()
             ->values();
 
-        return view('instructores.fichas-asignadas', compact(
-            'instructorActual', 
-            'fichasAsignadas', 
-            'estadisticas',
-            'programas',
-            'filtroEstado',
-            'filtroFechaInicio',
-            'filtroFechaFin',
-            'filtroPrograma'
-        ));
+        return view(
+            'instructores.fichas-asignadas',
+            compact(
+                'instructorActual',
+                'fichasAsignadas',
+                'estadisticas',
+                'programas',
+                'filtroEstado',
+                'filtroFechaInicio',
+                'filtroFechaFin',
+                'filtroPrograma'
+            )
+        );
     }
 
     /**
@@ -1207,39 +1286,36 @@ class InstructorController extends Controller
     public function cambiarEstado(Request $request, Instructor $instructor)
     {
         $this->authorize('cambiarEstado', $instructor);
-        
+
         $request->validate([
             'estado' => 'required|in:activo,inactivo'
         ]);
 
         try {
             $instructor->update(['estado' => $request->estado]);
-            
-            $mensaje = $request->estado === 'activo' 
-                ? 'Instructor activado exitosamente' 
+
+            $mensaje = $request->estado === 'activo'
+                ? 'Instructor activado exitosamente'
                 : 'Instructor desactivado exitosamente';
-                
-            return redirect()->back()->with('success', $mensaje);
+
+            return redirect()
+                ->back()
+                ->with('success', $mensaje);
         } catch (Exception $e) {
             Log::error('Error al cambiar estado del instructor: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Error al cambiar el estado del instructor');
+            return redirect()
+                ->back()
+                ->with('error', 'Error al cambiar el estado del instructor');
         }
     }
 
     /**
      * Verificar disponibilidad del instructor para una nueva ficha
      */
-    public function verificarDisponibilidad(Request $request, Instructor $instructor)
+    public function verificarDisponibilidad(VerificarDisponibilidadRequest $request, Instructor $instructor)
     {
         try {
-            $request->validate([
-                'fecha_inicio' => 'required|date',
-                'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
-                'especialidad_requerida' => 'nullable|string',
-                'horas_semanales' => 'nullable|integer|min:0|max:48'
-            ]);
-
-            $datosFicha = $request->only(['fecha_inicio', 'fecha_fin', 'especialidad_requerida', 'horas_semanales']);
+            $datosFicha = $request->validated();
 
             $disponibilidad = $this->businessRulesService->verificarDisponibilidad($instructor, $datosFicha);
 
@@ -1251,7 +1327,6 @@ class InstructorController extends Controller
             }
 
             return response()->json($disponibilidad);
-
         } catch (Exception $e) {
             Log::error('Error verificando disponibilidad del instructor', [
                 'instructor_id' => $instructor->id,
@@ -1272,17 +1347,10 @@ class InstructorController extends Controller
     /**
      * Obtener instructores disponibles para una ficha específica
      */
-    public function instructoresDisponibles(Request $request)
+    public function instructoresDisponibles(InstructoresDisponiblesRequest $request)
     {
         try {
-            $request->validate([
-                'fecha_inicio' => 'required|date',
-                'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
-                'especialidad_requerida' => 'nullable|string',
-                'regional_id' => 'nullable|integer|exists:regionals,id'
-            ]);
-
-            $criterios = $request->only(['fecha_inicio', 'fecha_fin', 'especialidad_requerida', 'regional_id']);
+            $criterios = $request->validated();
             $instructoresDisponibles = $this->businessRulesService->obtenerInstructoresDisponibles($criterios);
 
             if ($request->ajax()) {
@@ -1294,7 +1362,6 @@ class InstructorController extends Controller
             }
 
             return view('instructores.disponibles', compact('instructoresDisponibles', 'criterios'));
-
         } catch (Exception $e) {
             Log::error('Error obteniendo instructores disponibles', [
                 'error' => $e->getMessage(),
@@ -1336,7 +1403,6 @@ class InstructorController extends Controller
             }
 
             return response()->json($validacion);
-
         } catch (Exception $e) {
             Log::error('Error validando reglas SENA', [
                 'instructor_id' => $instructor->id,
@@ -1370,7 +1436,6 @@ class InstructorController extends Controller
             }
 
             return view('instructores.estadisticas-carga', compact('estadisticas'));
-
         } catch (Exception $e) {
             Log::error('Error obteniendo estadísticas de carga', [
                 'error' => $e->getMessage()
@@ -1401,7 +1466,7 @@ class InstructorController extends Controller
             ]);
 
             $ficha = FichaCaracterizacion::findOrFail($request->ficha_id);
-            
+
             // Verificar que la ficha esté activa
             if (!$ficha->status) {
                 return response()->json([
@@ -1420,7 +1485,7 @@ class InstructorController extends Controller
             ];
 
             $disponibilidad = $this->businessRulesService->verificarDisponibilidad($instructor, $datosFicha);
-            
+
             if (!$disponibilidad['disponible']) {
                 return response()->json([
                     'success' => false,
@@ -1432,7 +1497,7 @@ class InstructorController extends Controller
 
             // Validar reglas SENA
             $validacionSENA = $this->businessRulesService->validarReglasSENA($instructor, $datosFicha);
-            
+
             if (!$validacionSENA['valido']) {
                 return response()->json([
                     'success' => false,
@@ -1463,7 +1528,6 @@ class InstructorController extends Controller
                 'asignacion' => $instructorFicha,
                 'advertencias' => $validacionSENA['advertencias'] ?? []
             ]);
-
         } catch (Exception $e) {
             Log::error('Error asignando ficha al instructor', [
                 'instructor_id' => $instructor->id,
@@ -1517,7 +1581,6 @@ class InstructorController extends Controller
                 'success' => true,
                 'message' => 'Ficha desasignada exitosamente del instructor'
             ]);
-
         } catch (Exception $e) {
             Log::error('Error desasignando ficha del instructor', [
                 'instructor_id' => $instructor->id,

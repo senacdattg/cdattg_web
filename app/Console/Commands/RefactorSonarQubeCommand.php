@@ -13,7 +13,7 @@ class RefactorSonarQubeCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'refactor:sonarqube 
+    protected $signature = 'refactor:sonarqube
                             {--dry-run : Ejecutar sin aplicar cambios}
                             {--path=app : Ruta específica a analizar}';
 
@@ -48,39 +48,38 @@ class RefactorSonarQubeCommand extends Command
         $this->info('🤖 Agente de Refactorización SonarQube');
         $this->line('📁 Ruta base: ' . base_path());
         $this->line('🎯 Analizando: ' . $targetPath);
-        
+
         if ($dryRun) {
             $this->warn('🔍 Modo DRY-RUN (sin cambios)');
         } else {
             $this->info('✏️  Modo CORRECCIÓN (aplicará cambios)');
         }
-        
+
         $this->newLine();
 
         $fullPath = base_path($targetPath);
-        
+
         if (!file_exists($fullPath)) {
             $this->error("❌ La ruta {$targetPath} no existe");
             return self::FAILURE;
         }
 
         $files = $this->findPhpFiles($fullPath);
-        
-        if (empty($files)) {
+
+        if (!empty($files)) {
+            $progressBar = $this->output->createProgressBar(count($files));
+            $progressBar->setFormat('verbose');
+
+            foreach ($files as $file) {
+                $this->analyzeFile($file, $dryRun);
+                $progressBar->advance();
+            }
+
+            $progressBar->finish();
+            $this->newLine(2);
+        } else {
             $this->warn('⚠️  No se encontraron archivos PHP en la ruta especificada');
-            return self::SUCCESS;
         }
-
-        $progressBar = $this->output->createProgressBar(count($files));
-        $progressBar->setFormat('verbose');
-
-        foreach ($files as $file) {
-            $this->analyzeFile($file, $dryRun);
-            $progressBar->advance();
-        }
-
-        $progressBar->finish();
-        $this->newLine(2);
 
         $this->printReport($dryRun);
 
@@ -95,8 +94,8 @@ class RefactorSonarQubeCommand extends Command
         $files = [];
 
         if (!is_dir($directory)) {
-            return is_file($directory) && pathinfo($directory, PATHINFO_EXTENSION) === 'php' 
-                ? [$directory] 
+            return is_file($directory) && pathinfo($directory, PATHINFO_EXTENSION) === 'php'
+                ? [$directory]
                 : [];
         }
 
@@ -120,7 +119,7 @@ class RefactorSonarQubeCommand extends Command
     private function analyzeFile(string $filePath, bool $dryRun): void
     {
         $this->stats['archivos_analizados']++;
-        
+
         $content = file_get_contents($filePath);
         $originalContent = $content;
         $erroresEnArchivo = 0;
@@ -131,7 +130,7 @@ class RefactorSonarQubeCommand extends Command
 
         if ($content !== $originalContent) {
             $this->stats['errores_encontrados'] += $erroresEnArchivo;
-            
+
             if (!$dryRun) {
                 file_put_contents($filePath, $content);
                 $this->stats['errores_corregidos'] += $erroresEnArchivo;
@@ -218,7 +217,7 @@ class RefactorSonarQubeCommand extends Command
         }
 
         $this->newLine();
-        
+
         if ($dryRun) {
             $this->warn('🔍 Modo DRY-RUN: Sin cambios aplicados');
             $this->info('💡 Ejecuta sin --dry-run para aplicar las correcciones');
@@ -227,4 +226,3 @@ class RefactorSonarQubeCommand extends Command
         }
     }
 }
-
