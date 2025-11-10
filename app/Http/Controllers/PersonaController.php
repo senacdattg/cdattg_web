@@ -172,10 +172,46 @@ class PersonaController extends Controller
         try {
             $this->personaService->actualizar($persona, $request->validated());
 
+            if ($request->expectsJson() || $request->wantsJson()) {
+                $persona->loadMissing(['caracterizacionesComplementarias']);
+                
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Información actualizada exitosamente',
+                    'data' => [
+                        'id' => $persona->id,
+                        'tipo_documento' => $persona->tipo_documento,
+                        'numero_documento' => $persona->numero_documento,
+                        'primer_nombre' => $persona->primer_nombre,
+                        'segundo_nombre' => $persona->segundo_nombre,
+                        'primer_apellido' => $persona->primer_apellido,
+                        'segundo_apellido' => $persona->segundo_apellido,
+                        'fecha_nacimiento' => $persona->fecha_nacimiento,
+                        'genero' => $persona->genero,
+                        'telefono' => $persona->telefono,
+                        'celular' => $persona->celular,
+                        'email' => $persona->email,
+                        'pais_id' => $persona->pais_id,
+                        'departamento_id' => $persona->departamento_id,
+                        'municipio_id' => $persona->municipio_id,
+                        'direccion' => $persona->direccion,
+                        'caracterizaciones' => $persona->caracterizacionesComplementarias->pluck('id')->toArray(),
+                    ]
+                ]);
+            }
+
             return redirect()->route('personas.show', $persona->id)
                 ->with('success', 'Información actualizada exitosamente');
         } catch (\Throwable $e) {
             Log::error("Error al actualizar la persona (ID: {$persona->id}): " . $e->getMessage());
+            
+            if ($request->expectsJson() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error al actualizar la información. Por favor, inténtelo de nuevo.'
+                ], 500);
+            }
+
             return redirect()->back()->withErrors([
                 'error' => 'Error al actualizar la información. Por favor, inténtelo de nuevo '
                     . 'o comuníquese con el administrador del sistema.'
@@ -345,7 +381,7 @@ class PersonaController extends Controller
         if (!$persona) {
             return response()->json([
                 'success' => false,
-                'message' => 'La persona no está registrada en la base de datos. Complete el formulario para crearla.',
+                'message' => 'Persona no encontrada. Complete los datos para crear un nuevo registro.',
                 'data' => null,
                 'show_form' => true
             ]);
@@ -357,6 +393,7 @@ class PersonaController extends Controller
             'success' => true,
             'message' => 'Persona encontrada.',
             'data' => [
+                'id' => $persona->id,
                 'tipo_documento' => $persona->tipo_documento,
                 'numero_documento' => $persona->numero_documento,
                 'primer_nombre' => $persona->primer_nombre,

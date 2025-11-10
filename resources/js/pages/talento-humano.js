@@ -1,23 +1,27 @@
 /**
  * Módulo de Talento Humano
- * Maneja la consulta y creación de personas
+ * Búsqueda en tiempo real, creación y actualización de personas
  */
 
 class TalentoHumanoManager {
     constructor() {
+        this.searchTimeout = null;
+        this.currentPersona = null;
+        this.isEditing = false;
+
         this.elements = {
-            btnConsultar: document.getElementById('btn-consultar'),
+            searchInput: document.getElementById('numero_documento_buscar'),
             btnLimpiar: document.getElementById('btn-limpiar'),
-            btnCrearPersona: document.getElementById('btn-crear-persona'),
+            btnEditar: document.getElementById('btn-editar'),
+            btnGuardar: document.getElementById('btn-guardar'),
             btnCancelar: document.getElementById('btn-cancelar'),
-            cedulaInput: document.getElementById('cedula'),
             formContainer: document.getElementById('form-container'),
             formTitle: document.getElementById('form-title'),
             personaForm: document.getElementById('personaForm'),
-            actionType: document.getElementById('action_type')
+            personaIdInput: document.getElementById('persona_id'),
+            actionModeInput: document.getElementById('action_mode')
         };
 
-        this.csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         this.init();
     }
 
@@ -26,112 +30,171 @@ class TalentoHumanoManager {
     }
 
     attachEventListeners() {
-        this.elements.btnConsultar.addEventListener('click', () => this.consultarPersona());
-        this.elements.btnLimpiar.addEventListener('click', () => this.limpiarFormulario());
-        this.elements.btnCrearPersona.addEventListener('click', () => this.crearPersona());
+        // Búsqueda en tiempo real
+        this.elements.searchInput.addEventListener('input', (e) => {
+            clearTimeout(this.searchTimeout);
+            const documento = e.target.value.trim();
+
+            if (documento.length >= 3) {
+                this.searchTimeout = setTimeout(() => {
+                    this.buscarPersona(documento);
+                }, 500);
+            } else if (documento.length === 0) {
+                this.ocultarFormulario();
+            }
+        });
+
+        this.elements.btnLimpiar.addEventListener('click', () => this.limpiarTodo());
+        this.elements.btnEditar.addEventListener('click', () => this.habilitarEdicion());
+        this.elements.btnGuardar.addEventListener('click', () => this.guardarPersona());
         this.elements.btnCancelar.addEventListener('click', () => this.cancelar());
+
+        // Validación en tiempo real
+        this.elements.personaForm.querySelectorAll('input, select, textarea').forEach(input => {
+            input.addEventListener('blur', () => this.validarCampo(input));
+        });
     }
 
-    async consultarPersona() {
-        const cedula = this.elements.cedulaInput.value.trim();
-        if (!cedula) {
-            this.showAlert('warning', 'Por favor ingrese una cédula');
-            return;
-        }
-
-        const originalText = this.elements.btnConsultar.innerHTML;
-        this.setButtonLoading(this.elements.btnConsultar, 'Consultando...');
-
+    async buscarPersona(documento) {
         try {
-            const formData = new FormData();
-            formData.append('cedula', cedula);
-
-            const response = await fetch('/talento-humano/consultar', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': this.csrfToken,
-                    'Accept': 'application/json'
-                },
-                body: formData
+            const response = await axios.post('/talento-humano/consultar', {
+                cedula: documento
             });
 
-            const data = await response.json();
-
-            if (data.success) {
-                this.mostrarPersonaExistente(data);
-            } else if (data.show_form) {
-                this.mostrarFormularioCreacion(cedula, data.message);
-            } else {
-                this.elements.formContainer.style.display = 'none';
-                this.showAlert('error', data.message);
+            if (response.data.success) {
+                this.mostrarPersonaExistente(response.data.data);
+            } else if (response.data.show_form) {
+                this.mostrarFormularioCreacion(documento);
             }
         } catch (error) {
-            this.showAlert('error', 'Error de conexión. Por favor, verifique su conexión e intente nuevamente.');
-        } finally {
-            this.restoreButton(this.elements.btnConsultar, originalText);
-        }
-    }
-
-    async crearPersona() {
-        if (!this.validateRequiredFields()) {
-            return;
-        }
-
-        this.elements.actionType.value = 'crear';
-        const formData = new FormData(this.elements.personaForm);
-
-        const originalText = this.elements.btnCrearPersona.innerHTML;
-        this.setButtonLoading(this.elements.btnCrearPersona, 'Creando...');
-
-        try {
-            const response = await fetch('/talento-humano/personas', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': this.csrfToken,
-                    'Accept': 'application/json'
-                },
-                body: formData
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP ${response.status}`);
-            }
-
-            const data = await response.json();
-
-            if (data.success) {
-                this.setFormReadOnly(true);
-                this.elements.formTitle.textContent = 'Información de la Persona';
-                this.toggleActionButtons(false);
-                this.showAlert('success', data.message);
+            if (error.response?.status === 404) {
+                this.mostrarFormularioCreacion(documento);
             } else {
-                this.showAlert('error', data.message);
+                this.mostrarAlerta('error', 'Error al buscar persona',
+                    'Ocurrió un error al realizar la búsqueda');
             }
-        } catch (error) {
-            this.showAlert('error', 'Error de conexión. Por favor, verifique su conexión e intente nuevamente.');
-        } finally {
-            this.restoreButton(this.elements.btnCrearPersona, originalText);
         }
     }
 
     mostrarPersonaExistente(data) {
+        this.currentPersona = data;
+        this.isEditing = false;
+
         this.elements.formContainer.style.display = 'block';
         this.elements.formTitle.textContent = 'Información de la Persona';
-        this.setFormReadOnly(true);
-        this.fillFormData(data.data);
-        this.showAlert('success', data.message);
+        this.elements.actionModeInput.value = 'update';
+        this.elements.personaIdInput.value = data.id || '';
+
+        this.llenarFormulario(data);
+        this.setFormularioSoloLectura(true);
+
+        this.elements.btnEditar.style.display = 'inline-block';
+        this.elements.btnGuardar.style.display = 'none';
+
+        this.mostrarAlerta('success', 'Persona encontrada',
+            `Se encontró la información de ${data.primer_nombre} ${data.primer_apellido}`);
     }
 
-    mostrarFormularioCreacion(cedula, message) {
+    mostrarFormularioCreacion(documento) {
+        this.currentPersona = null;
+        this.isEditing = true;
+
         this.elements.formContainer.style.display = 'block';
         this.elements.formTitle.textContent = 'Crear Nueva Persona';
-        this.setFormReadOnly(false);
-        document.getElementById('numero_documento').value = cedula;
-        this.toggleActionButtons(true);
-        this.showAlert('info', message);
+        this.elements.actionModeInput.value = 'create';
+        this.elements.personaIdInput.value = '';
+
+        this.limpiarFormulario();
+
+        // Pequeño delay para asegurar que el DOM esté listo
+        setTimeout(() => {
+            const numDocInput = document.getElementById('numero_documento');
+            if (numDocInput) {
+                numDocInput.value = documento;
+            }
+            this.setFormularioSoloLectura(false);
+        }, 100);
+
+        this.elements.btnEditar.style.display = 'none';
+        this.elements.btnGuardar.style.display = 'inline-block';
+
+        this.mostrarAlerta('info', 'Nueva persona',
+            'Complete los datos para registrar la nueva persona');
     }
 
-    fillFormData(data) {
+    habilitarEdicion() {
+        this.isEditing = true;
+
+        // Forzar habilitación con delay para asegurar que se aplique
+        setTimeout(() => {
+            this.setFormularioSoloLectura(false);
+        }, 50);
+
+        this.elements.btnEditar.style.display = 'none';
+        this.elements.btnGuardar.style.display = 'inline-block';
+        this.elements.formTitle.textContent = 'Editar Información';
+    }
+
+    async guardarPersona() {
+        if (!this.validarFormulario()) {
+            return;
+        }
+
+        const formData = new FormData(this.elements.personaForm);
+        const isUpdate = this.elements.actionModeInput.value === 'update';
+
+        const btnGuardar = this.elements.btnGuardar;
+        const textoOriginal = btnGuardar.innerHTML;
+        btnGuardar.disabled = true;
+        btnGuardar.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Guardando...';
+
+        try {
+            let response;
+            if (isUpdate && this.currentPersona) {
+                response = await axios.post(
+                    `/personas/${this.currentPersona.id}`,
+                    formData,
+                    {
+                        headers: {
+                            'Content-Type': 'multipart/form-data',
+                            'X-HTTP-Method-Override': 'PUT'
+                        }
+                    }
+                );
+            } else {
+                response = await axios.post('/talento-humano/personas', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' }
+                });
+            }
+
+            if (response.data.success) {
+                this.mostrarAlerta('success', '¡Éxito!',
+                    isUpdate ? 'Información actualizada correctamente' :
+                        'Persona creada exitosamente');
+
+                if (!isUpdate && response.data.data) {
+                    this.mostrarPersonaExistente(response.data.data);
+                } else {
+                    this.setFormularioSoloLectura(true);
+                    this.isEditing = false;
+                    this.elements.btnEditar.style.display = 'inline-block';
+                    this.elements.btnGuardar.style.display = 'none';
+                }
+            }
+        } catch (error) {
+            if (error.response?.status === 422) {
+                this.mostrarErroresValidacion(error.response.data.errors);
+            } else {
+                this.mostrarAlerta('error', 'Error al guardar',
+                    'No se pudo guardar la información. Por favor, intente nuevamente.');
+            }
+        } finally {
+            btnGuardar.disabled = false;
+            btnGuardar.innerHTML = textoOriginal;
+        }
+    }
+
+    llenarFormulario(data) {
         const campos = [
             'tipo_documento', 'numero_documento', 'primer_nombre', 'segundo_nombre',
             'primer_apellido', 'segundo_apellido', 'fecha_nacimiento', 'genero',
@@ -145,37 +208,50 @@ class TalentoHumanoManager {
             }
         });
 
-        // Cargar departamento y municipio
-        this.setLocationData(data);
+        // Cargar ubicación con soporte dinámico
+        const handler = window.selectDinamicoHandler;
+        const paisSelect = $('#pais_id');
+        const deptoSelect = $('#departamento_id');
+        const muniSelect = $('#municipio_id');
+
+        if (paisSelect.length && data.pais_id) {
+            paisSelect.val(data.pais_id).attr('data-initial-value', data.pais_id);
+        }
+
+        if (deptoSelect.length && data.departamento_id) {
+            deptoSelect.attr('data-initial-value', data.departamento_id);
+        }
+
+        if (muniSelect.length && data.municipio_id) {
+            muniSelect.attr('data-initial-value', data.municipio_id);
+        }
+
+        if (handler && data.pais_id) {
+            handler.loadDepartamentos(data.pais_id).then(() => {
+                if (data.departamento_id) {
+                    deptoSelect.val(data.departamento_id);
+                    handler.loadMunicipios(data.departamento_id).then(() => {
+                        if (data.municipio_id) {
+                            muniSelect.val(data.municipio_id);
+                        }
+                    });
+                }
+            });
+        }
 
         // Marcar caracterizaciones
-        this.setCaracterizaciones(data.caracterizaciones);
+        this.marcarCaracterizaciones(data.caracterizaciones || []);
     }
 
-    setLocationData(data) {
-        const departamentoSelect = document.getElementById('departamento_id');
-        const municipioSelect = document.getElementById('municipio_id');
-
-        if (data.departamento_id) {
-            departamentoSelect.value = data.departamento_id;
-            departamentoSelect.setAttribute('data-initial-value', data.departamento_id);
-        }
-
-        if (data.municipio_id) {
-            municipioSelect.setAttribute('data-initial-value', data.municipio_id);
-            departamentoSelect.dispatchEvent(new Event('change'));
-        }
-    }
-
-    setCaracterizaciones(caracterizaciones) {
+    marcarCaracterizaciones(caracterizaciones) {
         document.querySelectorAll('input[name="caracterizacion_ids[]"]').forEach(checkbox => {
             checkbox.checked = false;
         });
 
-        if (caracterizaciones && Array.isArray(caracterizaciones)) {
-            caracterizaciones.forEach(caracId => {
+        if (Array.isArray(caracterizaciones)) {
+            caracterizaciones.forEach(id => {
                 const checkbox = document.querySelector(
-                    `input[name="caracterizacion_ids[]"][value="${caracId}"]`
+                    `input[name="caracterizacion_ids[]"][value="${id}"]`
                 );
                 if (checkbox) {
                     checkbox.checked = true;
@@ -184,138 +260,188 @@ class TalentoHumanoManager {
         }
     }
 
-    setFormReadOnly(readOnly) {
+    setFormularioSoloLectura(readonly) {
         const form = this.elements.personaForm;
-        const inputs = form.querySelectorAll('input, select, textarea');
+
+        // Buscar todos los inputs, selects y textareas, incluyendo checkboxes
+        const inputs = form.querySelectorAll(
+            'input:not([type="hidden"]), select, textarea, input[type="checkbox"]'
+        );
 
         inputs.forEach(input => {
-            if (readOnly) {
+            if (readonly) {
                 input.setAttribute('readonly', 'readonly');
                 input.setAttribute('disabled', 'disabled');
+                input.classList.remove('is-invalid');
             } else {
+                // Forzar habilitación removiendo múltiples veces por si acaso
                 input.removeAttribute('readonly');
                 input.removeAttribute('disabled');
+                input.disabled = false;
+                input.readOnly = false;
             }
         });
 
-        this.toggleActionButtons(!readOnly);
+        // Habilitar/deshabilitar botones de caracterización
+        const btnsCaracterizacion = form.querySelectorAll('[data-action]');
+        btnsCaracterizacion.forEach(btn => {
+            btn.disabled = readonly;
+        });
     }
 
-    toggleActionButtons(show) {
-        this.elements.btnCrearPersona.style.display = show ? 'inline-block' : 'none';
-        this.elements.btnCancelar.style.display = show ? 'inline-block' : 'none';
-        document.getElementById('btn-guardar-cambios').style.display = 'none';
+    validarFormulario() {
+        const camposRequeridos = [
+            { id: 'tipo_documento', nombre: 'Tipo de Documento' },
+            { id: 'numero_documento', nombre: 'Número de Documento' },
+            { id: 'primer_nombre', nombre: 'Primer Nombre' },
+            { id: 'primer_apellido', nombre: 'Primer Apellido' },
+            { id: 'fecha_nacimiento', nombre: 'Fecha de Nacimiento' },
+            { id: 'genero', nombre: 'Género' },
+            { id: 'celular', nombre: 'Celular' },
+            { id: 'email', nombre: 'Correo Electrónico' },
+            { id: 'pais_id', nombre: 'País' },
+            { id: 'departamento_id', nombre: 'Departamento' },
+            { id: 'municipio_id', nombre: 'Municipio' },
+            { id: 'direccion', nombre: 'Dirección' }
+        ];
+
+        let valido = true;
+        let primerCampoInvalido = null;
+
+        camposRequeridos.forEach(campo => {
+            const elemento = document.getElementById(campo.id);
+            if (elemento && !elemento.value.trim()) {
+                elemento.classList.add('is-invalid');
+                if (!primerCampoInvalido) {
+                    primerCampoInvalido = elemento;
+                }
+                valido = false;
+            } else if (elemento) {
+                elemento.classList.remove('is-invalid');
+            }
+        });
+
+        if (!valido) {
+            this.mostrarAlerta('warning', 'Campos requeridos',
+                'Complete todos los campos obligatorios marcados con *');
+            if (primerCampoInvalido) {
+                primerCampoInvalido.focus();
+            }
+        }
+
+        return valido;
     }
 
-    clearFormData() {
+    validarCampo(input) {
+        if (input.hasAttribute('required') || input.classList.contains('required')) {
+            if (!input.value.trim()) {
+                input.classList.add('is-invalid');
+            } else {
+                input.classList.remove('is-invalid');
+            }
+        }
+    }
+
+    mostrarErroresValidacion(errores) {
+        let mensaje = '<ul class="mb-0 text-left">';
+        Object.values(errores).forEach(error => {
+            if (Array.isArray(error)) {
+                error.forEach(msg => {
+                    mensaje += `<li>${msg}</li>`;
+                });
+            } else {
+                mensaje += `<li>${error}</li>`;
+            }
+        });
+        mensaje += '</ul>';
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Errores de validación',
+            html: mensaje,
+            confirmButtonText: 'Entendido'
+        });
+    }
+
+    limpiarFormulario() {
         const form = this.elements.personaForm;
-        const inputs = form.querySelectorAll('input, select, textarea');
-
-        inputs.forEach(input => {
-            if (input.type === 'radio' || input.type === 'checkbox') {
+        form.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(input => {
+            if (input.type === 'checkbox' || input.type === 'radio') {
                 input.checked = false;
             } else {
                 input.value = '';
             }
+            input.classList.remove('is-invalid');
+            // Asegurar que no queden deshabilitados
+            input.removeAttribute('readonly');
+            input.removeAttribute('disabled');
+            input.disabled = false;
+            input.readOnly = false;
         });
-
-        this.toggleActionButtons(false);
     }
 
-    limpiarFormulario() {
-        this.elements.cedulaInput.value = '';
+    limpiarTodo() {
+        this.elements.searchInput.value = '';
+        this.ocultarFormulario();
+    }
+
+    ocultarFormulario() {
         this.elements.formContainer.style.display = 'none';
-        this.clearFormData();
+        this.limpiarFormulario();
+        this.currentPersona = null;
+        this.isEditing = false;
     }
 
     cancelar() {
-        this.elements.formContainer.style.display = 'none';
-        this.clearFormData();
-    }
-
-    validateRequiredFields() {
-        const requiredFields = [
-            { id: 'tipo_documento', name: 'Tipo de Documento' },
-            { id: 'numero_documento', name: 'Número de Documento' },
-            { id: 'primer_nombre', name: 'Primer Nombre' },
-            { id: 'primer_apellido', name: 'Primer Apellido' },
-            { id: 'fecha_nacimiento', name: 'Fecha de Nacimiento' },
-            { id: 'genero', name: 'Género' },
-            { id: 'celular', name: 'Celular' },
-            { id: 'email', name: 'Correo Electrónico' },
-            { id: 'pais_id', name: 'País' },
-            { id: 'departamento_id', name: 'Departamento' },
-            { id: 'municipio_id', name: 'Municipio' },
-            { id: 'direccion', name: 'Dirección' }
-        ];
-
-        let isValid = true;
-        let firstInvalidField = null;
-
-        requiredFields.forEach(field => {
-            const element = document.getElementById(field.id);
-            if (!element || !element.value.trim()) {
-                element.classList.add('is-invalid');
-                if (!firstInvalidField) {
-                    firstInvalidField = element;
-                }
-                isValid = false;
-            } else {
-                element.classList.remove('is-invalid');
-            }
-        });
-
-        if (!isValid) {
-            this.showAlert('warning', 'Por favor complete todos los campos obligatorios marcados con *.');
-            if (firstInvalidField) {
-                firstInvalidField.focus();
-                firstInvalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+        if (this.currentPersona) {
+            this.llenarFormulario(this.currentPersona);
+            this.setFormularioSoloLectura(true);
+            this.isEditing = false;
+            this.elements.btnEditar.style.display = 'inline-block';
+            this.elements.btnGuardar.style.display = 'none';
+            this.elements.formTitle.textContent = 'Información de la Persona';
+        } else {
+            this.ocultarFormulario();
         }
-
-        return isValid;
     }
 
-    setButtonLoading(button, text) {
-        button.disabled = true;
-        button.innerHTML = `<i class="fas fa-spinner fa-spin me-1"></i>${text}`;
-    }
-
-    restoreButton(button, originalText) {
-        button.disabled = false;
-        button.innerHTML = originalText;
-    }
-
-    showAlert(type, message) {
-        const alertTypes = {
-            success: { class: 'alert-success', icon: 'check-circle' },
-            warning: { class: 'alert-warning', icon: 'exclamation-triangle' },
-            info: { class: 'alert-info', icon: 'info-circle' },
-            error: { class: 'alert-danger', icon: 'exclamation-triangle' }
+    mostrarAlerta(tipo, titulo, texto) {
+        const iconos = {
+            success: 'success',
+            error: 'error',
+            warning: 'warning',
+            info: 'info'
         };
 
-        const config = alertTypes[type] || alertTypes.error;
+        const SwalInstance = window.Swal;
 
-        const alertDiv = document.createElement('div');
-        alertDiv.className = `alert ${config.class} alert-dismissible fade show position-fixed`;
-        alertDiv.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-        alertDiv.innerHTML = `
-            <i class="fas fa-${config.icon} me-2"></i>${message}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        `;
+        if (!SwalInstance) {
+            window.alert([titulo, texto].filter(Boolean).join('\n'));
+            return;
+        }
 
-        document.body.appendChild(alertDiv);
+        const opciones = {
+            title: titulo,
+            text: texto,
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: tipo === 'success' ? '#28a745' : '#3085d6',
+            allowOutsideClick: true
+        };
 
-        setTimeout(() => {
-            if (alertDiv.parentNode) {
-                alertDiv.remove();
-            }
-        }, 5000);
+        const version = SwalInstance.version || '';
+        const usaTipo = version.startsWith('8.') || version.startsWith('7.') || version === '';
+
+        if (usaTipo) {
+            opciones.type = iconos[tipo] || 'info';
+        } else {
+            opciones.icon = iconos[tipo] || 'info';
+        }
+
+        SwalInstance.fire(opciones);
     }
 }
 
-// Inicializar cuando el DOM esté listo
+// Inicializar
 document.addEventListener('DOMContentLoaded', () => {
     new TalentoHumanoManager();
 });
-
