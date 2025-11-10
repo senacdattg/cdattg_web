@@ -1,5 +1,10 @@
+x-common-env-files: &common-env-files
+ - .env.${DOCKER_ENV:-local}
+ - docker/.env.docker.${DOCKER_ENV:-local}
+
 services:
   app:
+    profiles: ["produccion", "local"]
     build:
       context: .
       dockerfile: docker/Dockerfile.app
@@ -10,32 +15,13 @@ services:
         NODE_ENV: ${NODE_ENV:-production}
     image: cdattg/app:${BUILD_ENV:-production}
     container_name: cdattg_app
-    env_file:
-      - .env
-      - docker/.env.docker
-    environment:
-      APP_ENV: ${APP_ENV:-production}
-      APP_DEBUG: ${APP_DEBUG:-false}
-      APP_URL: ${APP_URL:-http://localhost}
-      DB_HOST: db
-      DB_PORT: ${DB_PORT:-3306}
-      DB_DATABASE: ${DB_DATABASE:-cdattg}
-      DB_USERNAME: cdattg_user
-      DB_PASSWORD: password
-      CACHE_DRIVER: redis
-      QUEUE_CONNECTION: redis
-      SESSION_DRIVER: redis
-      REDIS_HOST: redis
-      REDIS_PORT: ${REDIS_PORT:-6379}
-      REVERB_SERVER_HOST: 0.0.0.0
-      REVERB_SERVER_PORT: ${REVERB_SERVER_PORT:-8080}
-      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
-      RUN_SEEDERS: ${RUN_SEEDERS:-true}
-      CACHE_BOOTSTRAP: ${CACHE_BOOTSTRAP:-false}
+    env_file: *common-env-files
     ports:
       - "8080:8080"
     volumes:
       - ./:/var/www/html
+      - /var/www/html/vendor
+      - /var/www/html/node_modules
     depends_on:
       db:
         condition: service_healthy
@@ -45,6 +31,7 @@ services:
       - cdattg_net
 
   nginx:
+    profiles: ["produccion", "local"]
     image: nginx:1.25-alpine
     container_name: cdattg_nginx
     ports:
@@ -60,11 +47,10 @@ services:
       - cdattg_net
 
   db:
+    profiles: ["produccion", "local"]
     image: mysql:8.0
     container_name: cdattg_db
-    env_file:
-      - .env
-      - docker/.env.docker
+    env_file: *common-env-files
     command:
       - --default-authentication-plugin=mysql_native_password
       - --lower_case_table_names=1
@@ -89,9 +75,11 @@ services:
       - cdattg_net
 
   redis:
+    profiles: ["produccion", "local"]
     image: redis:7-alpine
     container_name: cdattg_redis
     command: redis-server --save 60 1 --loglevel warning
+    env_file: *common-env-files
     ports:
       - "6379:6379"
     volumes:
@@ -104,12 +92,36 @@ services:
     networks:
       - cdattg_net
 
+  frontend:
+    profiles: ["local"]
+    image: node:20-bullseye
+    container_name: cdattg_frontend
+    working_dir: /var/www/html
+    env_file: *common-env-files
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0 --port ${VITE_PORT:-5173}"
+    environment:
+      NODE_ENV: development
+      CHOKIDAR_USEPOLLING: "true"
+      WATCHPACK_POLLING: "true"
+      VITE_PORT: ${VITE_PORT:-5173}
+    ports:
+      - "${VITE_PORT:-5173}:${VITE_PORT:-5173}"
+    volumes:
+      - ./:/var/www/html
+      - frontend_node_modules:/var/www/html/node_modules
+    depends_on:
+      - app
+    networks:
+      - cdattg_net
+
   playwright:
+    profiles: ["local"]
     build:
       context: .
       dockerfile: docker/Dockerfile.playwright
       args:
         NODE_ENV: ${NODE_ENV:-production}
+    env_file: *common-env-files
     image: cdattg/playwright:${NODE_ENV:-production}
     container_name: cdattg_playwright
     environment:
@@ -128,6 +140,7 @@ services:
 volumes:
   mysql_data:
   redis_data:
+  frontend_node_modules:
 
 networks:
   cdattg_net:

@@ -11,6 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (Schema::hasTable('ambiente_instructor_ficha')) {
+            return;
+        }
+
         Schema::create('ambiente_instructor_ficha', function (Blueprint $table) {
             $table->id();
             $table->date('fecha_asignacion')->nullable();

@@ -34,7 +34,7 @@ class InscripcionComplementarioController extends Controller
         // Obtener temas de caracterización con sus parámetros
         $temasCaracterizacion = Tema::where('name', 'PERSONA CARACTERIZACION')
             ->with(['parametros' => function($query) {
-                $query->where('status', 1);
+                $query->where('parametros_temas.status', 1);
             }])
             ->where('status', 1)
             ->get();

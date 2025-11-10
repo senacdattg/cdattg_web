@@ -19,21 +19,31 @@ class ProductoFactory extends Factory
     {
         $ambienteId = Ambiente::query()->inRandomOrder()->value('id') ?? 1;
 
+        $productos = ['COMPUTADOR', 'MONITOR', 'TECLADO', 'MOUSE', 'CABLE', 'SWITCH', 'ROUTER', 'ESCRITORIO', 'SILLA'];
+        $producto = strtoupper($productos[array_rand($productos)] . ' ' . $productos[array_rand($productos)]);
+        
+        $descripciones = [
+            'Producto de alta calidad para uso en ambientes formativos',
+            'Equipo tecnológico para la formación profesional',
+            'Material didáctico para el desarrollo de competencias',
+            'Herramienta especializada para uso institucional',
+        ];
+
         return [
-            'producto' => strtoupper($this->faker->words(3, true)),
-            'tipo_producto_id' => $this->faker->randomElement([28, 29]),
-            'descripcion' => $this->faker->sentence(8),
-            'peso' => $this->faker->randomFloat(2, 0.5, 2500),
-            'unidad_medida_id' => $this->faker->randomElement(range(30, 41)),
-            'cantidad' => $this->faker->numberBetween(1, 80),
-            'codigo_barras' => $this->faker->unique()->ean13(),
-            'estado_producto_id' => $this->faker->randomElement([42, 43]),
-            'categoria_id' => $this->faker->randomElement(range(51, 59)),
-            'marca_id' => $this->faker->numberBetween(60, 179),
+            'producto' => $producto,
+            'tipo_producto_id' => [28, 29][array_rand([28, 29])],
+            'descripcion' => $descripciones[array_rand($descripciones)],
+            'peso' => round(rand(50, 250000) / 100, 2),
+            'unidad_medida_id' => range(30, 41)[array_rand(range(30, 41))],
+            'cantidad' => rand(1, 80),
+            'codigo_barras' => rand(1000000000000, 9999999999999),
+            'estado_producto_id' => [42, 43][array_rand([42, 43])],
+            'categoria_id' => range(51, 59)[array_rand(range(51, 59))],
+            'marca_id' => rand(60, 179),
             'contrato_convenio_id' => ContratoConvenio::factory(),
             'ambiente_id' => $ambienteId,
             'proveedor_id' => Proveedor::factory(),
-            'fecha_vencimiento' => $this->faker->dateTimeBetween('+3 months', '+2 years')->format('Y-m-d'),
+            'fecha_vencimiento' => date('Y-m-d', strtotime('+' . rand(90, 730) . ' days')),
             'imagen' => 'img/inventario/producto-default.png',
             'user_create_id' => 1,
             'user_update_id' => 1,

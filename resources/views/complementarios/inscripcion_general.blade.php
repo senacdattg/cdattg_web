@@ -404,18 +404,17 @@
                                             <p class="text-muted mb-3">Seleccione una categoría que corresponda a su
                                                 situación (opcional):</p>
                                         </div>
-                                        @foreach ($categoriasConHijos as $categoria)
+                                        @foreach ($temasCaracterizacion ?? [] as $tema)
                                             <div class="col-12 mb-4">
-                                                <h5 class="text-primary mb-2">{{ $categoria['nombre'] }}</h5>
-                                                @foreach ($categoria['hijos'] as $hijo)
+                                                @foreach ($tema->parametros as $parametro)
                                                     <div class="form-check mb-2">
                                                         <input class="form-check-input" type="radio"
-                                                            id="categoria_{{ $hijo->id }}" name="caracterizacion_id"
-                                                            value="{{ $hijo->id }}"
-                                                            {{ old('caracterizacion_id') == $hijo->id ? 'checked' : '' }}>
+                                                            id="parametro_{{ $parametro->id }}" name="parametro_id"
+                                                            value="{{ $parametro->id }}"
+                                                            {{ old('parametro_id') == $parametro->id ? 'checked' : '' }}>
                                                         <label class="form-check-label"
-                                                            for="categoria_{{ $hijo->id }}">
-                                                            {{ $hijo->nombre }}
+                                                            for="parametro_{{ $parametro->id }}">
+                                                            {{ ucwords(str_replace('_', ' ', $parametro->name)) }}
                                                         </label>
                                                     </div>
                                                 @endforeach
@@ -466,17 +465,40 @@
 
             if (departamentoId) {
                 fetch(`/municipios/${departamentoId}`)
-                    .then(response => response.json())
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
                     .then(data => {
                         municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
-                        data.forEach(municipio => {
+                        
+                        // Manejar diferentes formatos de respuesta
+                        let municipios = [];
+                        if (Array.isArray(data)) {
+                            // Si la respuesta es directamente un array
+                            municipios = data;
+                        } else if (data && data.data && Array.isArray(data.data)) {
+                            // Si la respuesta es {success: true, data: [...]}
+                            municipios = data.data;
+                        } else if (data && data.municipios && Array.isArray(data.municipios)) {
+                            // Si la respuesta es {success: true, municipios: [...]}
+                            municipios = data.municipios;
+                        }
+                        
+                        municipios.forEach(municipio => {
                             const option = document.createElement('option');
                             option.value = municipio.id;
-                            option.textContent = municipio.municipio;
+                            // El servicio devuelve 'nombre' o 'name', no 'municipio'
+                            option.textContent = municipio.nombre || municipio.name || municipio.municipio || '';
                             municipioSelect.appendChild(option);
                         });
                     })
-                    .catch(error => console.error('Error:', error));
+                    .catch(error => {
+                        console.error('Error cargando municipios:', error);
+                        municipioSelect.innerHTML = '<option value="">Error cargando municipios</option>';
+                    });
             } else {
                 municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
             }

@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hideDelay: 5000,
         alertSelector: '.alert'
     });
-    
+
     // Inicializar Select2 si existe
     if (typeof $ !== 'undefined' && $.fn.select2) {
         $('.select2').select2({
@@ -21,10 +21,10 @@ document.addEventListener('DOMContentLoaded', () => {
             placeholder: 'Seleccione una opción',
             allowClear: true,
             language: {
-                noResults: function() {
+                noResults: function () {
                     return "No se encontraron resultados";
                 },
-                searching: function() {
+                searching: function () {
                     return "Buscando...";
                 }
             }
@@ -41,96 +41,144 @@ document.addEventListener('DOMContentLoaded', () => {
         programaSelector: '#programa_formacion_id'
     });
 
+    // Exponer instancia global para integraciones dinámicas (ej. Talento Humano)
+    window.selectDinamicoHandler = selectDinamico;
+
     // Validación de formulario
     const form = document.querySelector('form');
     if (form) {
-        form.addEventListener('submit', function(event) {
-            // Validaciones específicas según el tipo de formulario
-            const formId = form.id || form.className;
-            
-            if (formId.includes('persona') || formId.includes('sede') || formId.includes('piso') || 
-                formId.includes('bloque') || formId.includes('ambiente')) {
-                
-                // Validar ubicación geográfica
-                const paisId = $('#pais_id').val();
-                const departamentoId = $('#departamento_id').val();
-                const municipioId = $('#municipio_id').val();
+        initFormValidation(form, alertHandler);
+    }
 
-                if (!paisId) {
-                    event.preventDefault();
-                    alertHandler.showError('Debe seleccionar un país.');
-                    return;
-                }
+    function initFormValidation(form, alertHandler) {
+        const validators = [
+            (ctx) => validateUbicacion(ctx, alertHandler),
+            (ctx) => validateFicha(ctx, alertHandler),
+            (ctx) => validateFechas(ctx, alertHandler),
+            (ctx) => validateRequiredFields(ctx, alertHandler),
+        ];
 
-                if (!departamentoId) {
-                    event.preventDefault();
-                    alertHandler.showError('Debe seleccionar un departamento.');
-                    return;
-                }
+        form.addEventListener('submit', (event) => {
+            const context = {
+                event,
+                form,
+                formId: (form.id || form.className || '').toLowerCase(),
+            };
 
-                if (!municipioId) {
-                    event.preventDefault();
-                    alertHandler.showError('Debe seleccionar un municipio.');
-                    return;
-                }
-            }
+            const isValid = validators.every((validator) => validator(context));
 
-            if (formId.includes('ficha')) {
-                // Validar ficha
-                const programaId = $('#programa_formacion_id').val();
-                const sedeId = $('#sede_id').val();
-                const numeroFicha = $('#numero_ficha').val();
-
-                if (!programaId) {
-                    event.preventDefault();
-                    alertHandler.showError('Debe seleccionar un programa de formación.');
-                    return;
-                }
-
-                if (!sedeId) {
-                    event.preventDefault();
-                    alertHandler.showError('Debe seleccionar una sede.');
-                    return;
-                }
-
-                if (!numeroFicha || numeroFicha.trim() === '') {
-                    event.preventDefault();
-                    alertHandler.showError('El número de ficha es requerido.');
-                    return;
-                }
-            }
-
-            // Validar fechas si existen
-            const fechaInicio = $('#fecha_inicio').val();
-            const fechaFin = $('#fecha_fin').val();
-            
-            if (fechaInicio && fechaFin) {
-                if (new Date(fechaInicio) >= new Date(fechaFin)) {
-                    event.preventDefault();
-                    alertHandler.showError('La fecha de inicio debe ser anterior a la fecha de fin.');
-                    return;
-                }
-            }
-
-            // Validar campos requeridos básicos
-            const requiredFields = form.querySelectorAll('[required]');
-            let hasErrors = false;
-            
-            requiredFields.forEach(field => {
-                if (!field.value || field.value.trim() === '') {
-                    hasErrors = true;
-                    field.classList.add('is-invalid');
-                } else {
-                    field.classList.remove('is-invalid');
-                }
-            });
-
-            if (hasErrors) {
+            if (!isValid) {
                 event.preventDefault();
-                alertHandler.showError('Por favor, complete todos los campos requeridos.');
-                return;
             }
         });
+    }
+
+    /**
+     * Valida la selección de país/departamento/municipio según el formulario
+     */
+    function validateUbicacion({ formId }, alertHandler) {
+        const secciones = ['persona', 'sede', 'piso', 'bloque', 'ambiente'];
+        const requiereUbicacion = secciones.some((seccion) => formId.includes(seccion));
+
+        if (!requiereUbicacion) {
+            return true;
+        }
+
+        const paisId = $('#pais_id').val();
+        const departamentoId = $('#departamento_id').val();
+        const municipioId = $('#municipio_id').val();
+
+        if (!paisId) {
+            alertHandler.showError('Debe seleccionar un país.');
+            return false;
+        }
+
+        if (!departamentoId) {
+            alertHandler.showError('Debe seleccionar un departamento.');
+            return false;
+        }
+
+        if (!municipioId) {
+            alertHandler.showError('Debe seleccionar un municipio.');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Valida la información mínima de una ficha
+     */
+    function validateFicha({ formId }, alertHandler) {
+        if (!formId.includes('ficha')) {
+            return true;
+        }
+
+        const programaId = $('#programa_formacion_id').val();
+        const sedeId = $('#sede_id').val();
+        const numeroFicha = $('#numero_ficha').val();
+
+        if (!programaId) {
+            alertHandler.showError('Debe seleccionar un programa de formación.');
+            return false;
+        }
+
+        if (!sedeId) {
+            alertHandler.showError('Debe seleccionar una sede.');
+            return false;
+        }
+
+        if (!numeroFicha || numeroFicha.trim() === '') {
+            alertHandler.showError('El número de ficha es requerido.');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Valida el rango de fechas (cuando aplica)
+     */
+    function validateFechas(_context, alertHandler) {
+        const fechaInicio = $('#fecha_inicio').val();
+        const fechaFin = $('#fecha_fin').val();
+
+        if (!fechaInicio || !fechaFin) {
+            return true;
+        }
+
+        if (new Date(fechaInicio) >= new Date(fechaFin)) {
+            alertHandler.showError('La fecha de inicio debe ser anterior a la fecha de fin.');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Verifica que los campos requeridos estén diligenciados
+     */
+    function validateRequiredFields({ form }, alertHandler) {
+        const requiredFields = form.querySelectorAll('[required]');
+        let hasErrors = false;
+
+        requiredFields.forEach((field) => {
+            const value = (field.value || '').trim();
+            const isEmpty = value === '';
+
+            field.classList.toggle('is-invalid', isEmpty);
+
+            if (isEmpty) {
+                hasErrors = true;
+            }
+        });
+
+        if (hasErrors) {
+            alertHandler.showError('Por favor, complete todos los campos requeridos.');
+            return false;
+        }
+
+        return true;
     }
 
     // Auto-focus en el primer campo
@@ -157,10 +205,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Validación de fechas en tiempo real
-    $('#fecha_inicio, #fecha_fin').on('change', function() {
+    $('#fecha_inicio, #fecha_fin').on('change', function () {
         const fechaInicio = $('#fecha_inicio').val();
         const fechaFin = $('#fecha_fin').val();
-        
+
         if (fechaInicio && fechaFin) {
             if (new Date(fechaInicio) >= new Date(fechaFin)) {
                 $('#fecha_fin')[0].setCustomValidity('La fecha de fin debe ser posterior a la fecha de inicio');
@@ -171,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Confirmación de eliminación si es necesario
-    window.confirmarEliminacion = function(nombre, url, tipo = 'elemento') {
+    window.confirmarEliminacion = function (nombre, url, tipo = 'elemento') {
         alertHandler.showCustomAlert({
             title: '¿Estás seguro?',
             text: `¿Deseas eliminar ${tipo} "${nombre}"? Esta acción no se puede deshacer.`,
@@ -187,17 +235,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = url;
-                
+
                 const csrfToken = document.createElement('input');
                 csrfToken.type = 'hidden';
                 csrfToken.name = '_token';
                 csrfToken.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-                
+
                 const methodField = document.createElement('input');
                 methodField.type = 'hidden';
                 methodField.name = '_method';
                 methodField.value = 'DELETE';
-                
+
                 form.appendChild(csrfToken);
                 form.appendChild(methodField);
                 document.body.appendChild(form);
@@ -205,6 +253,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
-
-    console.log('Formulario con select dinámico inicializado correctamente');
 });

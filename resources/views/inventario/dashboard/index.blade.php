@@ -109,6 +109,9 @@
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-hover">
+                                <caption id="dashboard-description" class="sr-only">
+                                    Estadisticas de productos más solicitados con información de producto y cantidad de solicitudes.
+                                </caption>
                                 <thead>
                                     <tr>
                                         <th>Producto</th>
@@ -154,6 +157,9 @@
                     </div>
                     <div class="card-body table-responsive p-0" style="height: 300px;">
                         <table class="table table-hover">
+                            <caption id="dashboard-description" class="sr-only">
+                                Lista de productos recientes con información de producto, cantidad, estado y fecha de creación.
+                            </caption>
                             <thead>
                                 <tr>
                                     <th>Producto</th>

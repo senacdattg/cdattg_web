@@ -4,30 +4,36 @@ namespace App\Configuration;
 
 /**
  * Configuración centralizada de límites de carga de archivos.
- * 
+ *
  * Esta clase define los límites de tamaño para diferentes tipos de cargas
  * y proporciona métodos para validarlos de manera consistente en toda la aplicación.
- * 
+ *
  * IMPORTANTE: Estos límites deben estar sincronizados con la configuración de PHP:
- * - upload_max_filesize >= 20M
- * - post_max_size >= 25M
+ * - upload_max_filesize >= 8M
+ * - post_max_size >= 8M
  * - memory_limit >= 128M
  * - max_execution_time >= 300 (5 minutos)
  */
 final class UploadLimits
 {
     /**
-     * Tamaño máximo para importación de archivos Excel/CSV (20MB).
+     * Tamaño máximo para importación de archivos Excel/CSV (8MB).
      */
-    public const IMPORT_FILE_SIZE_KB = 20480;
+    public const IMPORT_FILE_SIZE_KB = 8192;
     public const IMPORT_FILE_SIZE_BYTES = self::IMPORT_FILE_SIZE_KB * 1024;
     public const IMPORT_FILE_SIZE_MB = self::IMPORT_FILE_SIZE_KB / 1024;
 
     /**
-     * Tamaño máximo del contenido HTTP para importaciones (25MB).
-     * Debe ser mayor que el límite de archivo para permitir otros datos del formulario.
+     * Tamaño máximo del contenido HTTP para solicitudes estándar (2MB).
+     * Úsese como valor base en middleware globales para evitar DoS.
      */
-    public const IMPORT_CONTENT_LENGTH_BYTES = 26214400; // 25MB
+    public const GENERAL_CONTENT_LENGTH_BYTES = 2 * 1024 * 1024; // 2MB
+
+    /**
+     * Tamaño máximo del contenido HTTP para importaciones (8MB).
+     * Mantenerlo alineado con el límite del archivo evita sobrecargas del buffer de entrada.
+     */
+    public const IMPORT_CONTENT_LENGTH_BYTES = 8 * 1024 * 1024; // 8MB
 
     /**
      * Tamaño máximo para documentos complementarios (5MB).
@@ -149,7 +155,7 @@ final class UploadLimits
     public static function isValidExcelMimeType(string $extension, string $mimeType): bool
     {
         $extension = strtolower($extension);
-        
+
         if (!isset(self::EXCEL_MIME_TYPES[$extension])) {
             return false;
         }
@@ -163,8 +169,8 @@ final class UploadLimits
     public static function getRecommendedPhpConfig(): array
     {
         return [
-            'upload_max_filesize' => '20M',
-            'post_max_size' => '25M',
+            'upload_max_filesize' => '8M',
+            'post_max_size' => '8M',
             'memory_limit' => '128M',
             'max_execution_time' => '300',
             'max_input_time' => '300',
@@ -193,15 +199,29 @@ final class UploadLimits
         $memoryLimitBytes = self::convertToBytes($current['memory_limit']);
 
         if ($uploadMaxBytes < self::IMPORT_FILE_SIZE_BYTES) {
-            $issues[] = "upload_max_filesize ({$current['upload_max_filesize']}) es menor que el límite requerido ({$recommended['upload_max_filesize']})";
+            $issues[] = sprintf(
+                'upload_max_filesize (%s) es menor que el límite requerido (%s)',
+                $current['upload_max_filesize'],
+                $recommended['upload_max_filesize']
+            );
         }
 
-        if ($postMaxBytes < self::IMPORT_CONTENT_LENGTH_BYTES) {
-            $issues[] = "post_max_size ({$current['post_max_size']}) es menor que el límite requerido ({$recommended['post_max_size']})";
+        $requiredPostMax = max(self::IMPORT_CONTENT_LENGTH_BYTES, self::GENERAL_CONTENT_LENGTH_BYTES);
+
+        if ($postMaxBytes < $requiredPostMax) {
+            $issues[] = sprintf(
+                'post_max_size (%s) es menor que el límite requerido (%s)',
+                $current['post_max_size'],
+                self::formatBytes($requiredPostMax, 0)
+            );
         }
 
         if ($memoryLimitBytes < self::convertToBytes($recommended['memory_limit'])) {
-            $issues[] = "memory_limit ({$current['memory_limit']}) es menor que el límite requerido ({$recommended['memory_limit']})";
+            $issues[] = sprintf(
+                'memory_limit (%s) es menor que el límite requerido (%s)',
+                $current['memory_limit'],
+                $recommended['memory_limit']
+            );
         }
 
         return [
@@ -229,4 +249,3 @@ final class UploadLimits
         };
     }
 }
-

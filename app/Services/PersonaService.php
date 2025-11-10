@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\PersonaException;
 use App\Repositories\PersonaRepository;
 use App\Repositories\UserRepository;
 use App\Models\Persona;
@@ -51,6 +52,24 @@ class PersonaService
     }
 
     /**
+     * Busca una persona por número de documento
+     *
+     * @param string $numeroDocumento
+     * @return Persona|null
+     */
+    public function buscarPorDocumento(string $numeroDocumento): ?Persona
+    {
+        return Persona::with([
+            'tipoDocumento',
+            'tipoGenero',
+            'pais',
+            'departamento',
+            'municipio',
+            'caracterizacionesComplementarias'
+        ])->where('numero_documento', $numeroDocumento)->first();
+    }
+
+    /**
      * Crea una persona y su usuario
      *
      * @param array $datos
@@ -60,29 +79,20 @@ class PersonaService
     {
         $userId = $this->obtenerIdUsuarioAutenticado();
 
-        return DB::transaction(function () use ($datos, $userId) {
+        return DB::transaction(function () use (&$datos, $userId) {
             $datos['user_create_id'] = $userId;
             $datos['user_edit_id'] = $userId;
 
-            $caracterizacionesIds = collect($datos['caracterizacion_ids'] ?? [])
-                ->filter()
-                ->map(fn($id) => (int) $id)
-                ->unique()
-                ->values();
-
-            $datos['caracterizacion_id'] = $caracterizacionesIds->first() ?: null;
-            unset($datos['caracterizacion_ids']);
+            $caracterizacionesIds = $this->extraerCaracterizacionIds($datos);
 
             $persona = Persona::create($datos);
 
-            if ($caracterizacionesIds->isNotEmpty()) {
-                $persona->caracterizacionesComplementarias()->sync($caracterizacionesIds);
-            }
+            $this->syncCaracterizaciones($persona, $caracterizacionesIds);
 
             // Crear usuario asociado
             $this->crearUsuarioPersona($persona);
 
-            return $persona;
+            return $persona->fresh(['caracterizacionesComplementarias', 'user']);
         });
     }
 
@@ -93,16 +103,26 @@ class PersonaService
      * @param array $datos
      * @return bool
      */
-    public function actualizar(int $id, array $datos): bool
+    public function actualizar(Persona $persona, array $datos): Persona
     {
         $userId = $this->obtenerIdUsuarioAutenticado();
 
-        return DB::transaction(function () use ($id, $datos, $userId) {
-
+        return DB::transaction(function () use ($persona, &$datos, $userId) {
             $datos['user_edit_id'] = $userId;
-            $actualizado = Persona::where('id', $id)->update($datos);
 
-            return $actualizado;
+            $caracterizacionesIds = $this->extraerCaracterizacionIds($datos);
+
+            $persona->update($datos);
+
+            $this->syncCaracterizaciones($persona, $caracterizacionesIds);
+
+            if ($persona->user) {
+                $this->userRepo->actualizar($persona->user->id, [
+                    'email' => $persona->email,
+                ]);
+            }
+
+            return $persona->fresh(['caracterizacionesComplementarias', 'user']);
         });
     }
 
@@ -119,17 +139,15 @@ class PersonaService
             $persona = Persona::find($id);
 
             if (!$persona) {
-                throw new \Exception('Persona no encontrada');
+                throw new PersonaException('Persona no encontrada');
             }
 
             // Verificar si tiene dependencias
             if ($persona->aprendiz || $persona->instructor) {
-                throw new \Exception('No se puede eliminar una persona que es aprendiz o instructor');
+                throw new PersonaException('No se puede eliminar una persona que es aprendiz o instructor');
             }
 
-            $eliminado = $persona->delete();
-
-            return $eliminado;
+            return $persona->delete();
         });
     }
 
@@ -144,7 +162,7 @@ class PersonaService
         $persona = $this->obtener($personaId);
 
         if (!$persona || !$persona->user) {
-            throw new \Exception('Persona o usuario no encontrado');
+            throw new PersonaException('Persona o usuario no encontrado');
         }
 
         $nuevoEstado = !$persona->user->status;
@@ -162,11 +180,42 @@ class PersonaService
      */
     protected function crearUsuarioPersona(Persona $persona): User
     {
-        return $this->userRepo->crear([
+        $user = $this->userRepo->crear([
             'email' => $persona->email,
             'password' => Hash::make($persona->numero_documento),
             'persona_id' => $persona->id,
         ]);
+
+        // Asignar rol VISITANTE por defecto
+        $user->assignRole('VISITANTE');
+
+        return $user;
+    }
+
+    /**
+     * @param array<string,mixed> $datos
+     * @return array<int,int>
+     */
+    private function extraerCaracterizacionIds(array &$datos): array
+    {
+        $ids = collect($datos['caracterizacion_ids'] ?? [])
+            ->filter()
+            ->map(fn($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
+
+        unset($datos['caracterizacion_ids']);
+
+        return $ids;
+    }
+
+    /**
+     * @param array<int,int> $caracterizacionesIds
+     */
+    private function syncCaracterizaciones(Persona $persona, array $caracterizacionesIds): void
+    {
+        $persona->caracterizacionesComplementarias()->sync($caracterizacionesIds);
     }
 
     protected function obtenerIdUsuarioAutenticado(): int
