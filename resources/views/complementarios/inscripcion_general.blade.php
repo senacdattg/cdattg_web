@@ -404,18 +404,17 @@
                                             <p class="text-muted mb-3">Seleccione una categoría que corresponda a su
                                                 situación (opcional):</p>
                                         </div>
-                                        @foreach ($categoriasConHijos as $categoria)
+                                        @foreach ($temasCaracterizacion ?? [] as $tema)
                                             <div class="col-12 mb-4">
-                                                <h5 class="text-primary mb-2">{{ $categoria['nombre'] }}</h5>
-                                                @foreach ($categoria['hijos'] as $hijo)
+                                                @foreach ($tema->parametros as $parametro)
                                                     <div class="form-check mb-2">
                                                         <input class="form-check-input" type="radio"
-                                                            id="categoria_{{ $hijo->id }}" name="caracterizacion_id"
-                                                            value="{{ $hijo->id }}"
-                                                            {{ old('caracterizacion_id') == $hijo->id ? 'checked' : '' }}>
+                                                            id="parametro_{{ $parametro->id }}" name="parametro_id"
+                                                            value="{{ $parametro->id }}"
+                                                            {{ old('parametro_id') == $parametro->id ? 'checked' : '' }}>
                                                         <label class="form-check-label"
-                                                            for="categoria_{{ $hijo->id }}">
-                                                            {{ $hijo->nombre }}
+                                                            for="parametro_{{ $parametro->id }}">
+                                                            {{ ucwords(str_replace('_', ' ', $parametro->name)) }}
                                                         </label>
                                                     </div>
                                                 @endforeach
