@@ -26,6 +26,8 @@ class HomeController extends Controller
 
         // Obtener programas en los que el usuario está inscrito
         $programasInscritos = collect();
+        $programasInscritosIds = collect();
+        
         if (Auth::check() && Auth::user()->persona) {
             $personaId = Auth::user()->persona->id;
             
@@ -45,6 +47,9 @@ class HomeController extends Controller
 
             Log::info("Debug HomeController - Programas inscritos encontrados: " . $programasInscritos->count());
 
+            // Obtener IDs de programas inscritos
+            $programasInscritosIds = $programasInscritos->pluck('id');
+
             // Asignar iconos a cada programa inscrito
             $programasInscritos->each(function($programa) {
                 $programa->icono = $this->getIconoForPrograma($programa->nombre);
@@ -53,7 +58,7 @@ class HomeController extends Controller
             Log::info("Debug HomeController - Usuario no autenticado o sin persona asociada");
         }
 
-        return view('home', compact('programas', 'programasInscritos'));
+        return view('home', compact('programas', 'programasInscritos', 'programasInscritosIds'));
     }
 
     /**

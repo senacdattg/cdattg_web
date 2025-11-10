@@ -55,7 +55,10 @@
                         <p class="text-muted mb-4">Explora otros programas complementarios que puedes tomar:</p>
                         <div class="row justify-content-center g-3">
                             @foreach ($programas as $programa)
-                                @include('complementarios.components.card-programas', ['programa' => $programa])
+                                @include('complementarios.components.card-programas', [
+                                    'programa' => $programa,
+                                    'programasInscritosIds' => $programasInscritosIds ?? collect()
+                                ])
                             @endforeach
                         </div>
                     </div>
