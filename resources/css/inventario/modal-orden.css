@@ -137,6 +137,7 @@
 .modal-orden .info-item strong i {
     color: #299a42;
     font-size: 0.9rem;
+    transition: all 0.3s ease;
 }
 
 .modal-orden .info-item .text-muted {
@@ -325,11 +326,6 @@
     .modal-orden .modal-title {
         font-size: 1.25rem;
     }
-}
-
-/* Efectos de Hover en Iconos */
-.modal-orden .info-item strong i {
-    transition: all 0.3s ease;
 }
 
 .modal-orden .info-item:hover strong i {

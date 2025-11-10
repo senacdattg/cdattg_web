@@ -2,6 +2,14 @@
 
 @section('title', 'Registrar Devolución')
 
+@section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+@endsection
+
+@push('css')
+    @vite(['resources/css/inventario/shared/base.css'])
+@endpush
+
 @section('content_header')
     <x-page-header
         icon="fas fa-undo"
@@ -52,9 +60,15 @@
                         </div>
                         <div class="col-md-6">
                             <h6>Orden #{{ $detalleOrden->orden->id }}</h6>
-                            <p class="mb-0">Fecha préstamo: {{ $detalleOrden->orden->fecha_prestamo ? $detalleOrden->orden->fecha_prestamo->format('d/m/Y') : 'N/A' }}</p>
+                            <p class="mb-0">
+                                Fecha préstamo:
+                                {{ $detalleOrden->orden->fecha_prestamo ? $detalleOrden->orden->fecha_prestamo->format('d/m/Y') : 'N/A' }}
+                            </p>
                             @if($detalleOrden->orden->fecha_devolucion)
-                                <p class="mb-0">Fecha devolución esperada: {{ $detalleOrden->orden->fecha_devolucion->format('d/m/Y') }}</p>
+                                <p class="mb-0">
+                                    Fecha devolución esperada:
+                                    {{ $detalleOrden->orden->fecha_devolucion->format('d/m/Y') }}
+                                </p>
                             @endif
                         </div>
                     </div>
@@ -68,16 +82,16 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card bg-warning">
+                            <div class="col-md-4">
+                                <div class="card bg-warning">
                                 <div class="card-body text-center">
                                     <h6>Ya Devuelto</h6>
                                     <h3 class="text-white">{{ $detalleOrden->getCantidadDevuelta() }}</h3>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card bg-danger">
+                            <div class="col-md-4">
+                                <div class="card bg-danger">
                                 <div class="card-body text-center">
                                     <h6>Pendiente</h6>
                                     <h3 class="text-white">{{ $detalleOrden->getCantidadPendiente() }}</h3>
@@ -113,11 +127,13 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="observaciones">Observaciones</label>
-                                    <textarea class="form-control @error('observaciones') is-invalid @enderror"
-                                              id="observaciones"
-                                              name="observaciones"
-                                              rows="3"
-                                              placeholder="Observaciones sobre la devolución...">{{ old('observaciones') }}</textarea>
+                                    <textarea
+                                        class="form-control @error('observaciones') is-invalid @enderror"
+                                        id="observaciones"
+                                        name="observaciones"
+                                        rows="3"
+                                        placeholder="Observaciones sobre la devolución..."
+                                    >{{ old('observaciones') }}</textarea>
                                     @error('observaciones')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
@@ -136,10 +152,16 @@
 
                         <div class="row">
                             <div class="col-12">
-                                <button type="submit" class="btn btn-primary">
+                                <button
+                                    type="submit"
+                                    class="btn btn-primary"
+                                >
                                     <i class="fas fa-save"></i> Registrar Devolución
                                 </button>
-                                <a href="{{ route('inventario.devoluciones.index') }}" class="btn btn-secondary">
+                                <a
+                                    href="{{ route('inventario.devoluciones.index') }}"
+                                    class="btn btn-secondary"
+                                >
                                     <i class="fas fa-times"></i> Cancelar
                                 </a>
                             </div>
@@ -160,6 +182,6 @@
 
 @push('css')
     @vite([
-        'resources/css/inventario/shared/base.css',    
+        'resources/css/inventario/shared/base.css',
     ])
 @endpush

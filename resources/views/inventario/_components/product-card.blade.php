@@ -6,17 +6,24 @@
 --}}
 @props(['producto', 'showActions' => true])
 
-<div class="product-card" data-product-id="{{ $producto->id }}">
+<div 
+    class="product-card" 
+    data-product-id="{{ $producto->id }}"
+>
     <div class="product-image-container">
         @if($producto->imagen)
-            <img src="{{ asset($producto->imagen) }}" 
+            <img 
+                src="{{ asset($producto->imagen) }}" 
                 alt="{{ $producto->producto }}" 
-                class="product-image img-expandable">
+                class="product-image img-expandable"
+            >
         @else
             <div class="placeholder-image">
-                <img src="https://placehold.co/300x300?text={{ urlencode($producto->producto) }}" 
+                <img 
+                    src="https://placehold.co/300x300?text={{ urlencode($producto->producto) }}" 
                     alt="Vista previa de {{ $producto->producto }}" 
-                    class="product-image img-expandable">
+                    class="product-image img-expandable"
+                >
             </div>
         @endif
         
@@ -44,36 +51,48 @@
         @if(!empty($producto->codigo_barras))
             <div class="mt-2">
                 <small class="text-muted">Código: {{ $producto->codigo_barras }}</small>
-                <svg class="barcode-inline" id="barcode-card-{{ $producto->id }}" style="width:100%"></svg>
+                <svg 
+                    class="barcode-inline" 
+                    id="barcode-card-{{ $producto->id }}" 
+                    style="width:100%"
+                ></svg>
             </div>
         @endif
         
         @if($showActions)
             <div class="product-actions">
-                <a href="{{ route('inventario.productos.show', $producto->id) }}" 
+                <a 
+                    href="{{ route('inventario.productos.show', $producto->id) }}" 
                     class="btn btn-sm btn-info action-btn" 
-                    title="Ver detalles">
+                    title="Ver detalles"
+                >
                     <i class="fas fa-eye"></i>
                 </a>
                 
                 @can('EDITAR PRODUCTO')
-                    <a href="{{ route('inventario.productos.edit', $producto->id) }}" 
+                    <a 
+                        href="{{ route('inventario.productos.edit', $producto->id) }}" 
                         class="btn btn-sm btn-warning action-btn" 
-                        title="Editar">
+                        title="Editar"
+                    >
                         <i class="fas fa-edit"></i>
                     </a>
                 @endcan
                 
                 @can('ELIMINAR PRODUCTO')
-                    <form action="{{ route('inventario.productos.destroy', $producto->id) }}" 
-                            method="POST" 
-                            class="d-inline">
+                    <form 
+                        action="{{ route('inventario.productos.destroy', $producto->id) }}" 
+                        method="POST" 
+                        class="d-inline"
+                    >
                         @csrf
                         @method('DELETE')
-                        <button type="submit" 
-                                class="btn btn-sm btn-danger action-btn" 
-                                title="Eliminar"
-                                onclick="return confirm('¿Estás seguro de eliminar este producto?')">
+                        <button 
+                            type="submit" 
+                            class="btn btn-sm btn-danger action-btn" 
+                            title="Eliminar"
+                            onclick="return confirm('¿Estás seguro de eliminar este producto?')"
+                        >
                             <i class="fas fa-trash"></i>
                         </button>
                     </form>
@@ -88,7 +107,16 @@
         document.addEventListener('DOMContentLoaded', function() {
             @if(!empty($producto->codigo_barras))
             try {
-                JsBarcode('#barcode-card-{{ $producto->id }}', '{{ $producto->codigo_barras }}', {format:'code128', width:1.6, height:40, displayValue:false});
+                JsBarcode(
+                    '#barcode-card-{{ $producto->id }}', 
+                    '{{ $producto->codigo_barras }}', 
+                    {
+                        format: 'code128', 
+                        width: 1.6, 
+                        height: 40, 
+                        displayValue: false
+                    }
+                );
             } catch(e) {}
             @endif
         });

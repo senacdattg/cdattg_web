@@ -82,6 +82,7 @@
 .orden-show-card .info-group label i {
     color: #66ea83;
     font-size: 1rem;
+    transition: all 0.3s ease;
 }
 
 .orden-show-card .info-group span {
@@ -225,6 +226,7 @@
 .orden-show-card .badge-warning {
     background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
     color: #000;
+    animation: pulse 2s infinite;
 }
 
 .orden-show-card .badge-success {
@@ -412,19 +414,9 @@
     }
 }
 
-/* Efectos de Hover Mejorados */
-.orden-show-card .info-group label i {
-    transition: all 0.3s ease;
-}
-
 .orden-show-card .info-group:hover label i {
     transform: scale(1.2) rotate(5deg);
     color: #37b258;
-}
-
-/* Badge con Pulso para Estados Pendientes */
-.orden-show-card .badge-warning {
-    animation: pulse 2s infinite;
 }
 
 @keyframes pulse {

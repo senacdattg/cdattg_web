@@ -1,5 +1,15 @@
 @props(['producto'])
 
+@php
+    if ($producto->cantidad <= 5) {
+        $badgeClass = 'danger';
+    } elseif ($producto->cantidad <= 10) {
+        $badgeClass = 'warning';
+    } else {
+        $badgeClass = 'success';
+    }
+@endphp
+
 <div class="cart-widget">
     {{-- Información del producto --}}
     <div class="product-info mb-3">
@@ -8,7 +18,7 @@
                 <strong>Stock disponible:</strong>
             </div>
             <div class="col-8">
-                <span class="badge badge-{{ $producto->cantidad <= 5 ? 'danger' : ($producto->cantidad <= 10 ? 'warning' : 'success') }}">
+                <span class="badge badge-{{ $badgeClass }}">
                     {{ $producto->cantidad }} unidades
                 </span>
             </div>
@@ -128,10 +138,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Mostrar notificación
+        const successMessage = `${quantity} unidad(es) de "${productName}" ` +
+            'agregada(s) al carrito';
+
         Swal.fire({
             icon: 'success',
             title: '¡Agregado al carrito!',
-            text: `${quantity} unidad(es) de "${productName}" agregada(s) al carrito`,
+            text: successMessage,
             timer: 3000,
             showConfirmButton: false
         });

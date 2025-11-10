@@ -263,8 +263,8 @@ class ProductoController extends InventarioController
             ->get();
 
         $contratosConvenios = ContratoConvenio::all();
-
         $ambientes = Ambiente::all();
+        $proveedores = Proveedor::all();
     
         return view('inventario.productos.edit', compact(
             'producto',
@@ -274,7 +274,8 @@ class ProductoController extends InventarioController
             'categorias',
             'marcas',
             'contratosConvenios',
-            'ambientes'
+            'ambientes',
+            'proveedores'
         ));
     }
 
