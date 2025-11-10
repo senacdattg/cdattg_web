@@ -2,6 +2,14 @@
 
 @section('title', 'Registrar Devolución')
 
+@section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+@endsection
+
+@push('css')
+    @vite(['resources/css/inventario/shared/base.css'])
+@endpush
+
 @section('content_header')
     <x-page-header
         icon="fas fa-undo"
@@ -53,12 +61,12 @@
                         <div class="col-md-6">
                             <h6>Orden #{{ $detalleOrden->orden->id }}</h6>
                             <p class="mb-0">
-                                Fecha préstamo: 
+                                Fecha préstamo:
                                 {{ $detalleOrden->orden->fecha_prestamo ? $detalleOrden->orden->fecha_prestamo->format('d/m/Y') : 'N/A' }}
                             </p>
                             @if($detalleOrden->orden->fecha_devolucion)
                                 <p class="mb-0">
-                                    Fecha devolución esperada: 
+                                    Fecha devolución esperada:
                                     {{ $detalleOrden->orden->fecha_devolucion->format('d/m/Y') }}
                                 </p>
                             @endif
@@ -119,7 +127,7 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="observaciones">Observaciones</label>
-                                    <textarea 
+                                    <textarea
                                         class="form-control @error('observaciones') is-invalid @enderror"
                                         id="observaciones"
                                         name="observaciones"
@@ -144,14 +152,14 @@
 
                         <div class="row">
                             <div class="col-12">
-                                <button 
-                                    type="submit" 
+                                <button
+                                    type="submit"
                                     class="btn btn-primary"
                                 >
                                     <i class="fas fa-save"></i> Registrar Devolución
                                 </button>
-                                <a 
-                                    href="{{ route('inventario.devoluciones.index') }}" 
+                                <a
+                                    href="{{ route('inventario.devoluciones.index') }}"
                                     class="btn btn-secondary"
                                 >
                                     <i class="fas fa-times"></i> Cancelar
@@ -174,6 +182,6 @@
 
 @push('css')
     @vite([
-        'resources/css/inventario/shared/base.css',    
+        'resources/css/inventario/shared/base.css',
     ])
 @endpush

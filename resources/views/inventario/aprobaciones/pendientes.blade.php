@@ -2,6 +2,10 @@
 
 @section('title', 'Aprobaciones Pendientes')
 
+@section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+@endsection
+
 @section('content_header')
     <x-page-header
         icon="fas fa-clipboard-check"
@@ -71,9 +75,9 @@
                                             </span>
                                         </h6>
                                         <small class="text-muted">
-                                            <i class="fas fa-user"></i> 
+                                            <i class="fas fa-user"></i>
                                             {{ $orden->userCreate->name ?? 'N/A' }} |
-                                            <i class="fas fa-calendar"></i> 
+                                            <i class="fas fa-calendar"></i>
                                             {{ $primeraDetalle->created_at->format('d/m/Y H:i') }}
                                         </small>
                                     </div>
@@ -156,7 +160,7 @@
                                             <tr>
                                                 <td>
                                                     <div class="d-flex align-items-center">
-                                                        <img 
+                                                        <img
                                                             src="{{ $productoImagenSrc }}"
                                                             alt="{{ $productoNombre }}"
                                                             class="img-thumbnail mr-2"
@@ -186,7 +190,7 @@
                                                 </td>
                                                 <td class="text-center">
                                                     <div class="btn-group btn-group-xs">
-                                                        <button 
+                                                        <button
                                                             type="button"
                                                             class="btn btn-success btn-xs"
                                                             onclick="aprobarProducto({{ $detalle->id }}, '{{ addslashes($productoNombre) }}')"
@@ -194,7 +198,7 @@
                                                         >
                                                             <i class="fas fa-check"></i>
                                                         </button>
-                                                        <button 
+                                                        <button
                                                             type="button"
                                                             class="btn btn-danger btn-xs"
                                                             onclick="rechazarProducto({{ $detalle->id }}, '{{ addslashes($productoNombre) }}')"
@@ -213,9 +217,9 @@
                         </div>
 
                         {{-- Modal de detalles de la orden --}}
-                        <div 
-                            class="modal fade modal-orden" 
-                            id="ordenModal{{ $ordenId }}" 
+                        <div
+                            class="modal fade modal-orden"
+                            id="ordenModal{{ $ordenId }}"
                             tabindex="-1"
                         >
                             <div class="modal-dialog modal-xl">

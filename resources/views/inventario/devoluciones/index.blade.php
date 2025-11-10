@@ -2,6 +2,14 @@
 
 @section('title', 'Préstamos Pendientes de Devolución')
 
+@section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+@endsection
+
+@push('css')
+    @vite(['resources/css/inventario/shared/base.css'])
+@endpush
+
 @section('content_header')
     <x-page-header
         icon="fas fa-undo"
@@ -47,7 +55,7 @@
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
                                 <caption id="devoluciones-description" class="sr-only">
-                                    Listado de devoluciones con información de producto, cantidad prestada, 
+                                    Listado de devoluciones con información de producto, cantidad prestada,
                                     cantidad devuelta, cantidad pendiente, fecha de préstamo y fecha de devolución.
                                 </caption>
                                 <thead>
@@ -84,13 +92,13 @@
                                             </td>
                                             
                                             <td>
-                                                <a 
+                                                <a
                                                     href="{{ route('inventario.devoluciones.create', $detalle->id) }}"
                                                     class="btn btn-sm btn-primary"
                                                 >
                                                     <i class="fas fa-undo"></i> Devolver
                                                 </a>
-                                                <a 
+                                                <a
                                                     href="{{ route('inventario.ordenes.show', $detalle->orden->id) }}"
                                                     class="btn btn-sm btn-info"
                                                 >
@@ -131,6 +139,6 @@
 
 @push('css')
     @vite([
-        'resources/css/inventario/shared/base.css',    
+        'resources/css/inventario/shared/base.css',
     ])
 @endpush
