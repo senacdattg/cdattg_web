@@ -35,8 +35,11 @@ class PersonaImportRequest extends FormRequest
                 'file',
                 'mimes:xlsx,xls,csv',
                 'max:' . self::MAX_FILE_SIZE_KB,
-                function ($value, $fail) {
-                    $this->validateFileIntegrity($value, $fail);
+                function (string $attribute, $value, $fail) {
+                    /** @var \Illuminate\Http\UploadedFile|null $uploadedFile */
+                    $uploadedFile = $this->file($attribute);
+
+                    $this->validateFileIntegrity($uploadedFile, $fail);
                 },
             ],
         ];
@@ -60,7 +63,7 @@ class PersonaImportRequest extends FormRequest
     /**
      * Validaciones adicionales de integridad del archivo.
      */
-    private function validateFileIntegrity($file, $fail): void
+    private function validateFileIntegrity(?\Illuminate\Http\UploadedFile $file, $fail): void
     {
         if (!$file || !$file->isValid()) {
             $fail('El archivo no es válido o está corrupto.');

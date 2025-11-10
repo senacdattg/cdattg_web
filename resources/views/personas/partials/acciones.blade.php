@@ -37,7 +37,7 @@
               method="POST"
               title="Eliminar"
               style="display: inline-block;"
-              onsubmit="return confirm('¿Está seguro de eliminar esta persona?')">
+              data-persona-nombre="{{ $persona->nombre_completo }}">
             @csrf
             @method('DELETE')
             <button type="submit" class="btn btn-sm btn-light">
