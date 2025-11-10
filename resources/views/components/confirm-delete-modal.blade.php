@@ -44,6 +44,3 @@
     </div>
 </div>
 
-@push('scripts')
-    @vite(['resources/js/modules/confirm-delete-modal.js'])
-@endpush
