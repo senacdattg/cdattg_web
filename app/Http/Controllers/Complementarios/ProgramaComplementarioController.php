@@ -9,6 +9,7 @@ use App\Models\Parametro;
 use App\Models\JornadaFormacion;
 use App\Models\Ambiente;
 use App\Services\ComplementarioService;
+use Illuminate\Support\Facades\Auth;
 
 class ProgramaComplementarioController extends Controller
 {
@@ -52,11 +53,21 @@ class ProgramaComplementarioController extends Controller
             $programa->icono = $this->complementarioService->getIconoForPrograma($programa->nombre);
         });
 
+        // Obtener programas en los que el usuario está inscrito
+        $programasInscritosIds = collect();
+        if (Auth::check() && Auth::user()->persona) {
+            $personaId = Auth::user()->persona->id;
+            
+            $programasInscritosIds = \App\Models\AspiranteComplementario::where('persona_id', $personaId)
+                ->where('estado', 1)
+                ->pluck('complementario_id');
+        }
+
         // Obtener tipos de documento y géneros dinámicamente
         $tiposDocumento = $this->complementarioService->getTiposDocumento();
         $generos = $this->complementarioService->getGeneros();
 
-        return view('complementarios.programas_publicos', compact('programas', 'tiposDocumento', 'generos'));
+        return view('complementarios.programas_publicos', compact('programas', 'tiposDocumento', 'generos', 'programasInscritosIds'));
     }
 
     /**

@@ -154,7 +154,10 @@
                     <div class="card-body">
                         <div class="row justify-content-center g-3">
                             @foreach ($programas as $programa)
-                                @include('complementarios.components.card-programas', ['programa' => $programa])
+                                @include('complementarios.components.card-programas', [
+                                    'programa' => $programa,
+                                    'programasInscritosIds' => $programasInscritosIds ?? collect()
+                                ])
                             @endforeach
                         </div>
                     </div>
