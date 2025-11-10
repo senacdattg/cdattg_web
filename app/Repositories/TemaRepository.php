@@ -15,7 +15,8 @@ class TemaRepository
     {
         $this->cacheType = 'temas';
         $this->cacheTags = ['temas', 'configuracion'];
-    }    /**
+    }
+    /**
      * Obtiene todos los temas con parámetros activos
      *
      * @return Collection
@@ -65,6 +66,16 @@ class TemaRepository
     }
 
     /**
+     * Obtiene caracterizaciones complementarias
+     *
+     * @return Tema|null
+     */
+    public function obtenerCaracterizacionesComplementarias(): ?Tema
+    {
+        return $this->encontrarConParametros(16);
+    }
+
+    /**
      * Invalida caché
      *
      * @return void
@@ -74,4 +85,3 @@ class TemaRepository
         $this->flushCache();
     }
 }
-
