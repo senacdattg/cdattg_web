@@ -88,6 +88,10 @@ Route::get('/fichas-caracterizacion/flutter/{id}', [FichaCaracterizacionFlutterC
 // SELECTORES DINÁMICOS
 // ==========================================
 
+Route::get('/paises', function () {
+    return \App\Models\Pais::all(['id', 'pais']);
+})->name('api.paises');
+
 Route::get('/modalidades', function () {
     return \App\Models\Parametro::where('tema_id', function($query) {
         $query->select('id')
