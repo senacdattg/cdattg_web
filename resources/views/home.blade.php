@@ -24,7 +24,8 @@
                 <p class="lead">Recuerda tomar la asistencia y revisar tus asignaciones.</p>
                 <hr class="my-4">
                 <p>Para comenzar, haz clic en el siguiente botón:</p>
-                <a class="btn btn-outline-secondary btn-lg" href="{{ route('fichaCaracterizacion.index') }}" role="button">
+                <a class="btn btn-outline-secondary btn-lg" 
+                href="{{ route('fichaCaracterizacion.index') }}" role="button">
                     Comencemos
                 </a>
             @else
