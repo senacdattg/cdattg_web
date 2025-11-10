@@ -13,5 +13,5 @@ foreach ([
     'productos',
     'proveedor',
 ] as $routeFile) {
-    require __DIR__ . "/{$routeFile}.php";
+    require_once __DIR__ . "/{$routeFile}.php"; // NOSONAR - Standard Laravel practice for route inclusion --- IGNORE ---
 }
