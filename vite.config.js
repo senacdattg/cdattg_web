@@ -62,6 +62,16 @@ export default defineConfig({
         host: '0.0.0.0',  // Escucha en todas las interfaces de red
         port: 5173,
         strictPort: true,
+        watch: {
+            ignored: [
+                /(^|[/\\])vendor([/\\]|$)/,
+                /(^|[/\\])storage([/\\]|$)/,
+                /(^|[/\\])bootstrap[/\\]cache([/\\]|$)/,
+                /(^|[/\\])routes([/\\]|$)/,
+                /(^|[/\\])database([/\\]|$)/,
+                /(^|[/\\])public([/\\]|$)/,
+            ],
+        },
         hmr: {
             host: 'localhost',  // Usa localhost para HMR en el navegador
         },
