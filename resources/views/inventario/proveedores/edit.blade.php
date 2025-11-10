@@ -232,7 +232,7 @@
     @include('layout.footer')
 @endsection
 
-<script src="{{ asset('js/inventario/filtro-departamento.js') }}"></script>
+@vite(['resources/js/inventario/filtro-departamento.js'])
 <script>
     // Pasar datos de municipios al JavaScript
     window.municipiosData = @json($municipios->map(function($m) {

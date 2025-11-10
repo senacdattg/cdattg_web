@@ -289,7 +289,7 @@
     </div>
 
     {{-- 🧩 Scripts --}}
-    <script src="{{ asset('js/inventario/solicitud.js') }}"></script>
+    @vite(['resources/js/inventario/solicitud.js'])
     <script>
         // Cargar carrito al enviar formulario
         document.getElementById('form-solicitud').addEventListener('submit', function() {
@@ -318,7 +318,9 @@
 @endsection
 
 @push('css')
-    @vite(['resources/css/inventario/shared/base.css'])
-    <link href="{{ asset('css/inventario/inventario.css') }}" rel="stylesheet">
+    @vite([
+        'resources/css/inventario/shared/base.css',
+        'resources/css/inventario/inventario.css'
+    ])
 @endpush
 

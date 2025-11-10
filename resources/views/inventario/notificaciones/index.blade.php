@@ -4,7 +4,9 @@
 
 @section('css')
 <!-- Estilos personalizados para notificaciones -->
-<link rel="stylesheet" href="{{ asset('css/inventario/notificaciones.css') }}">
+@vite([
+        'resources/css/inventario/notificaciones.css'
+    ])
 @endsection
 
 @section('content_header')
@@ -224,7 +226,7 @@
 <!-- SweetAlert2 -->
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Script de notificaciones -->
-<script src="{{ asset('js/inventario/notificaciones.js') }}"></script>
+@vite(['resources/js/inventario/notificaciones.js'])
 @endsection
 
 

@@ -52,7 +52,7 @@
             
             @if($showCart)
                 <a 
-                    href="{{ route('inventario.carrito.index') }}" 
+                    href="{{ route('inventario.carrito.ecommerce') }}" 
                     class="btn-lg carrito-icon-btn" 
                     title="Ver Carrito"
                 >
