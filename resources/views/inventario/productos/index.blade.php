@@ -210,6 +210,7 @@
 @push('css')
     @vite([
         'resources/css/inventario/shared/base.css',
+        'resources/js/inventario/escaner.js'
     ])
 @endpush
 
@@ -217,5 +218,5 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @vite(['resources/js/pages/formularios-generico.js'])
 @endpush
-<script src="{{ asset('js/inventario/escaner.js') }}"></script>
+
 

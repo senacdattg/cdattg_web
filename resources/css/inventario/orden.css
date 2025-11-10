@@ -12,8 +12,8 @@
 
 /* Header del Card con Gradiente */
 .orden-show-card .card-header {
-    background: linear-gradient(135deg, #66ea8b 0%, #4ba261 100%);
-    color: white;
+    background: linear-gradient(135deg, #1f4a2d 0%, #163820 100%);
+    color: #ffffff;
     padding: 1.5rem 2rem;
     border: none;
     position: relative;
