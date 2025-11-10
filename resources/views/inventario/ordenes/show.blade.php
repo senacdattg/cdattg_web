@@ -2,6 +2,14 @@
 
 @section('title', 'Detalles de Orden')
 
+@section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+@endsection
+
+@push('css')
+    @vite(['resources/css/inventario/shared/base.css'])
+@endpush
+
 @section('content_header')
     <x-page-header
         icon="fas fa-info-circle"
@@ -33,11 +41,11 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="info-group">
-                                    <label><i class="fas fa-hashtag"></i> ID de Orden:</label>
+                                    <strong><i class="fas fa-hashtag"></i> ID de Orden:</strong>
                                     <span class="badge badge-secondary">#{{ $orden->id }}</span>
                                 </div>
                                 <div class="info-group">
-                                    <label><i class="fas fa-exchange-alt"></i> Tipo de Orden:</label>
+                                    <strong><i class="fas fa-exchange-alt"></i> Tipo de Orden:</strong>
                                     @php
                                         $tipoNombre = $orden->tipoOrden->parametro->name ?? 'N/A';
                                         $tipoClass = $tipoNombre === 'PRÉSTAMO' ? 'warning' : 'info';
@@ -48,12 +56,12 @@
                                     </span>
                                 </div>
                                 <div class="info-group">
-                                    <label><i class="fas fa-calendar-plus"></i> Fecha Creación:</label>
+                                    <strong><i class="fas fa-calendar-plus"></i> Fecha Creación:</strong>
                                     <span>{{ $orden->created_at->format('d/m/Y H:i') }}</span>
                                 </div>
                                 @if($orden->fecha_devolucion)
                                     <div class="info-group">
-                                        <label><i class="fas fa-calendar-check"></i> Fecha Devolución:</label>
+                                        <strong><i class="fas fa-calendar-check"></i> Fecha Devolución:</strong>
                                         <span class="badge badge-warning">
                                             <i class="fas fa-clock"></i>
                                             {{ $orden->fecha_devolucion->format('d/m/Y') }}
@@ -63,11 +71,11 @@
                             </div>
                             <div class="col-md-6">
                                 <div class="info-group">
-                                    <label><i class="fas fa-user-circle"></i> Solicitante:</label>
+                                    <strong><i class="fas fa-user-circle"></i> Solicitante:</strong>
                                     <span>{{ $orden->userCreate->name }}</span>
                                 </div>
                                 <div class="info-group">
-                                    <label><i class="fas fa-envelope"></i> Email:</label>
+                                    <strong><i class="fas fa-envelope"></i> Email:</strong>
                                     <span>{{ $orden->userCreate->email }}</span>
                                 </div>
                                 @php
@@ -79,18 +87,18 @@
                                     $rol = $matchRol[1] ?? 'N/A';
                                 @endphp
                                 <div class="info-group">
-                                    <label><i class="fas fa-graduation-cap"></i> Programa:</label>
+                                    <strong><i class="fas fa-graduation-cap"></i> Programa:</strong>
                                     <span>{{ $programa }}</span>
                                 </div>
                                 <div class="info-group">
-                                    <label><i class="fas fa-id-badge"></i> Rol:</label>
+                                    <strong><i class="fas fa-id-badge"></i> Rol:</strong>
                                     <span>{{ $rol }}</span>
                                 </div>
                             </div>
                         </div>
 
                         <div class="description-box">
-                            <label><i class="fas fa-comment-dots"></i> Motivo de la Solicitud:</label>
+                            <strong><i class="fas fa-comment-dots"></i> Motivo de la Solicitud:</strong>
                             @php
                                 preg_match('/MOTIVO:\s*(.+?)$/s', $descripcion, $matchMotivo);
                                 $motivo = isset($matchMotivo[1]) ? trim($matchMotivo[1]) : $orden->descripcion_orden;
@@ -108,11 +116,11 @@
                                     </caption>
                                     <thead>
                                         <tr>
-                                            <th width="8%">#</th>
-                                            <th width="35%">Producto</th>
-                                            <th width="12%" class="text-center">Cantidad</th>
-                                            <th width="15%">Estado</th>
-                                            <th width="30%" class="text-center">Información</th>
+                                            <th style="width: 8%;">#</th>
+                                            <th style="width: 35%;">Producto</th>
+                                            <th style="width: 12%;" class="text-center">Cantidad</th>
+                                            <th style="width: 15%;">Estado</th>
+                                            <th style="width: 30%;" class="text-center">Información</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -152,9 +160,9 @@
                                                 </td>
                                                 <td class="text-center">
                                                     @if($estadoNombre === 'EN ESPERA')
-                                                        <a href="{{ route('inventario.aprobaciones.pendientes') }}" 
+                                                        <a href="{{ route('inventario.aprobaciones.pendientes') }}"
                                                            class="btn btn-sm btn-info"
-                                                           data-toggle="tooltip" 
+                                                           data-toggle="tooltip"
                                                            title="Ir a gestionar la aprobación">
                                                             <i class="fas fa-tasks"></i> Gestionar Aprobación
                                                         </a>
@@ -215,27 +223,27 @@
     </div>
 
     {{-- Modal de Observaciones para Rechazo --}}
-    <div class="modal fade" id="modalRechazo" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+    <div class="modal fade" id="modalRechazo" tabindex="-1" aria-labelledby="modalRechazoLabel" aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">
+                    <h5 class="modal-title" id="modalRechazoLabel">
                         <i class="fas fa-comment-alt"></i>
                         Observaciones del Rechazo
                     </h5>
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span>&times;</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
                     <form id="formRechazo">
                         <div class="form-group">
                             <label for="observaciones">Motivo del rechazo:</label>
-                            <textarea 
-                                class="form-control" 
-                                id="observaciones" 
-                                name="observaciones" 
-                                rows="3" 
+                            <textarea
+                                class="form-control"
+                                id="observaciones"
+                                name="observaciones"
+                                rows="3"
                                 required
                             ></textarea>
                         </div>

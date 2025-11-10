@@ -2,6 +2,14 @@
 
 @section('title', 'Carrito de Compras')
 
+@section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+@endsection
+
+@push('css')
+    @vite(['resources/css/inventario/shared/base.css'])
+@endpush
+
 @section('content_header')
     <div class="d-flex justify-content-between align-items-center">
         <div>

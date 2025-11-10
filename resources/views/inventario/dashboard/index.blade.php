@@ -2,6 +2,14 @@
 
 @section('title', 'Dashboard de Inventario')
 
+@section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+@endsection
+
+@push('css')
+    @vite(['resources/css/inventario/shared/base.css'])
+@endpush
+
 @section('content_header')
     <x-page-header
         icon="fas fa-chart-bar"
@@ -157,7 +165,7 @@
                     </div>
                     <div class="card-body table-responsive p-0" style="height: 300px;">
                         <table class="table table-hover">
-                            <caption id="dashboard-description" class="sr-only">
+                            <caption id="productos-recientes-description" class="sr-only">
                                 Lista de productos recientes con información de producto, cantidad, estado y fecha de creación.
                             </caption>
                             <thead>

@@ -2,6 +2,10 @@
 
 @section('title', 'Aprobaciones Pendientes')
 
+@section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+@endsection
+
 @section('content_header')
     <x-page-header
         icon="fas fa-clipboard-check"

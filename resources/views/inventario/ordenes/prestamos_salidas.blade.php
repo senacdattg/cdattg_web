@@ -2,6 +2,14 @@
 
 @section('title', 'Préstamo o Salida')
 
+@section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+@endsection
+
+@push('css')
+    @vite(['resources/css/inventario/shared/base.css'])
+@endpush
+
 @section('content_header')
     <x-page-header
         icon="fas fa-exchange-alt"
@@ -84,7 +92,7 @@
                                             <thead class="table-light">
                                                 <tr>
                                                     <th>Producto</th>
-                                                    <th width="100" class="text-center">Cantidad</th>
+                                                    <th class="text-center" style="width: 100px;">Cantidad</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="carrito-items-tbody"></tbody>
@@ -102,11 +110,12 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-modern">
-                                            <label>
+                                            <label for="solicitante-nombre">
                                                 <i class="fas fa-user"></i> Solicitante
                                             </label>
                                             <input
                                                 type="text"
+                                                id="solicitante-nombre"
                                                 class="form-control-modern"
                                                 value="{{ auth()->user()->name ?? 'Usuario' }}"
                                                 readonly
@@ -116,11 +125,12 @@
 
                                     <div class="col-md-6">
                                         <div class="form-group-modern">
-                                            <label>
+                                            <label for="solicitante-correo">
                                                 <i class="fas fa-envelope"></i> Correo
                                             </label>
                                             <input
                                                 type="text"
+                                                id="solicitante-correo"
                                                 class="form-control-modern"
                                                 value="{{ auth()->user()->email ?? '' }}"
                                                 readonly
@@ -134,11 +144,12 @@
                                 <div class="row">
                                     <div class="col-md-6">
                                         <div class="form-group-modern">
-                                            <label>
+                                            <label for="solicitante-rol">
                                                 <i class="fas fa-user-tag"></i> Rol
                                             </label>
                                             <input
                                                 type="text"
+                                                id="solicitante-rol"
                                                 class="form-control-modern"
                                                 value="{{ (auth()->check() && method_exists(auth()->user(), 'getRoleNames') && auth()->user()->getRoleNames()->first()) ? auth()->user()->getRoleNames()->first() : (auth()->user()->role->name ?? 'N/A') }}"
                                                 readonly
