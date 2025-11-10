@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\PersonaService;
+use App\Exceptions\PersonaException;
 use App\Services\UbicacionService;
 use App\Repositories\TemaRepository;
 use App\Models\Persona;
@@ -15,10 +16,9 @@ use App\Http\Requests\StorePersonaRequest;
 use App\Http\Requests\UpdatePersonaRequest;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\DB;
 use App\Models\User;
-use App\Models\CategoriaCaracterizacionComplementario;
 
 class PersonaController extends Controller
 {
@@ -70,7 +70,15 @@ class PersonaController extends Controller
         $departamentos = Departamento::where('status', 1)->get();
         $municipios = Municipio::where('status', 1)->get();
 
-        return view('personas.create', compact('documentos', 'generos', 'paises', 'departamentos', 'municipios'));
+        // Cargar los tipos de caracterización
+        $caracterizaciones = Tema::with(['parametros' => function ($query) {
+            $query->wherePivot('status', 1);
+        }])->findOrFail(16);
+
+        return view(
+            'personas.create',
+            compact('documentos', 'generos', 'paises', 'departamentos', 'municipios', 'caracterizaciones')
+        );
     }
 
     /**
@@ -81,11 +89,17 @@ class PersonaController extends Controller
         try {
             $this->personaService->crear($request->validated());
 
-            return redirect()->route('personas.index')->with('success', '¡Registro Exitoso!');
-        } catch (\Exception $e) {
+            return redirect()->route('personas.index')->with(
+                'success',
+                'La persona y su usuario fueron creados exitosamente en el sistema.'
+            );
+        } catch (\Throwable $e) {
             Log::error('Error al registrar persona: ' . $e->getMessage());
 
-            return redirect()->back()->withInput()->with('error', 'Error al registrar persona.');
+            return redirect()->back()->withInput()->with(
+                'error',
+                'No se pudo registrar la persona. Por favor, verifique los datos e inténtelo nuevamente.'
+            );
         }
     }
 
@@ -94,6 +108,19 @@ class PersonaController extends Controller
      */
     public function show(Persona $persona)
     {
+        $persona->loadMissing([
+            'tipoDocumento',
+            'tipoGenero',
+            'pais',
+            'departamento',
+            'municipio',
+            'caracterizacionesComplementarias',
+            'caracterizacion',
+            'user.roles',
+            'userCreatedBy.persona',
+            'userUpdatedBy.persona'
+        ]);
+
         return view('personas.show', ['persona' => $persona]);
     }
 
@@ -112,21 +139,19 @@ class PersonaController extends Controller
             $query->wherePivot('status', 1);
         }])->findOrFail(3);
 
+        // llamar los paises
         $paises = Pais::where('status', 1)->get();
+
+        // llamar los departamentos
         $departamentos = Departamento::where('status', 1)->get();
-        $municipios = Municipio::where('status', 1)->get();
 
-        $persona->loadMissing('caracterizacionesComplementarias');
+        // Los municipios se cargarán dinámicamente por JavaScript según el departamento
+        $municipios = collect([]);
 
-        $categoriasCaracterizacion = CategoriaCaracterizacionComplementario::with([
-            'children' => function ($query) {
-                $query->where('activo', 1)->orderBy('nombre');
-            },
-        ])
-            ->whereNull('parent_id')
-            ->where('activo', 1)
-            ->orderBy('nombre')
-            ->get();
+        // llamar los tipos de caracterizacion
+        $caracterizaciones = Tema::with(['parametros' => function ($query) {
+            $query->wherePivot('status', 1);
+        }])->findOrFail(16);
 
         return view('personas.edit', [
             'persona' => $persona,
@@ -135,7 +160,7 @@ class PersonaController extends Controller
             'paises' => $paises,
             'departamentos' => $departamentos,
             'municipios' => $municipios,
-            'categoriasCaracterizacion' => $categoriasCaracterizacion,
+            'caracterizaciones' => $caracterizaciones,
         ]);
     }
 
@@ -145,34 +170,15 @@ class PersonaController extends Controller
     public function update(UpdatePersonaRequest $request, Persona $persona)
     {
         try {
-            DB::transaction(function () use ($request, $persona) {
-                $data = $request->validated();
-                $caracterizacionesIds = collect($request->input('caracterizacion_ids', []))
-                    ->filter()
-                    ->map(fn($id) => (int) $id)
-                    ->unique()
-                    ->values();
-
-                $data['caracterizacion_id'] = $caracterizacionesIds->first() ?: null;
-                unset($data['caracterizacion_ids']);
-
-                $persona->update($data);
-
-                $persona->caracterizacionesComplementarias()->sync($caracterizacionesIds);
-
-                if ($persona->user) {
-                    $persona->user->update([
-                        'email' => $request->input('email'),
-                    ]);
-                }
-            });
+            $this->personaService->actualizar($persona, $request->validated());
 
             return redirect()->route('personas.show', $persona->id)
                 ->with('success', 'Información actualizada exitosamente');
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             Log::error("Error al actualizar la persona (ID: {$persona->id}): " . $e->getMessage());
             return redirect()->back()->withErrors([
-                'error' => 'Error al actualizar la información. Por favor, inténtelo de nuevo o comuníquese con el administrador del sistema.'
+                'error' => 'Error al actualizar la información. Por favor, inténtelo de nuevo '
+                    . 'o comuníquese con el administrador del sistema.'
             ]);
         }
     }
@@ -183,20 +189,24 @@ class PersonaController extends Controller
     public function destroy(Persona $persona)
     {
         try {
-            DB::transaction(function () use ($persona) {
-                $persona->delete();
-            });
+            $this->personaService->eliminar($persona->id);
 
             return redirect()->route('personas.index')->with('success', 'Persona eliminada exitosamente');
         } catch (QueryException $e) {
             Log::error("Error al eliminar la persona (ID: {$persona->id}): " . $e->getMessage());
 
-            return redirect()->back()->with('error', 'No se pudo eliminar la persona. Es posible que tenga un usuario asociado.');
-        } catch (\Exception $e) {
+            $message = 'No se pudo eliminar la persona. Es posible que tenga un usuario asociado.';
+        } catch (PersonaException $e) {
+            Log::warning("No se pudo eliminar la persona (ID: {$persona->id}): " . $e->getMessage());
+
+            $message = $e->getMessage();
+        } catch (\Throwable $e) {
             Log::error("Error inesperado al eliminar la persona (ID: {$persona->id}): " . $e->getMessage());
 
-            return redirect()->back()->with('error', 'Ocurrió un error inesperado. Por favor, inténtelo de nuevo.');
+            $message = 'Ocurrió un error inesperado. Por favor, inténtelo de nuevo.';
         }
+
+        return redirect()->back()->with('error', $message);
     }
 
     public function datatable(Request $request): JsonResponse
@@ -315,6 +325,122 @@ class PersonaController extends Controller
             Log::error("Error al cambiar estado de la persona (ID: {$id}): " . $e->getMessage());
 
             return redirect()->back()->with('error', 'No se pudo actualizar el estado.');
+        }
+    }
+
+    /**
+     * Consulta una persona por número de documento (usado por Talento Humano)
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function consultarPorDocumento(Request $request): JsonResponse
+    {
+        $request->validate([
+            'cedula' => 'required|string|max:20'
+        ]);
+
+        $persona = $this->personaService->buscarPorDocumento(trim($request->cedula));
+
+        if (!$persona) {
+            return response()->json([
+                'success' => false,
+                'message' => 'La persona no está registrada en la base de datos. Complete el formulario para crearla.',
+                'data' => null,
+                'show_form' => true
+            ]);
+        }
+
+        $persona->loadMissing(['caracterizacionesComplementarias']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Persona encontrada.',
+            'data' => [
+                'tipo_documento' => $persona->tipo_documento,
+                'numero_documento' => $persona->numero_documento,
+                'primer_nombre' => $persona->primer_nombre,
+                'segundo_nombre' => $persona->segundo_nombre,
+                'primer_apellido' => $persona->primer_apellido,
+                'segundo_apellido' => $persona->segundo_apellido,
+                'fecha_nacimiento' => $persona->fecha_nacimiento,
+                'genero' => $persona->genero,
+                'telefono' => $persona->telefono,
+                'celular' => $persona->celular,
+                'email' => $persona->email,
+                'pais_id' => $persona->pais_id,
+                'departamento_id' => $persona->departamento_id,
+                'municipio_id' => $persona->municipio_id,
+                'direccion' => $persona->direccion,
+                'caracterizaciones' => $persona->caracterizacionesComplementarias->pluck('id')->toArray(),
+            ],
+            'show_form' => false
+        ]);
+    }
+
+    /**
+     * Crea una persona desde una petición JSON (usado por Talento Humano)
+     *
+     * @param StorePersonaRequest $request
+     * @return JsonResponse
+     */
+    public function storeJson(StorePersonaRequest $request): JsonResponse
+    {
+        try {
+            $persona = $this->personaService->crear($request->validated());
+
+            Log::info('Persona creada desde Talento Humano', [
+                'persona_id' => $persona->id,
+                'numero_documento' => $persona->numero_documento,
+                'user_id' => Auth::id()
+            ]);
+
+            $persona->loadMissing(['caracterizacionesComplementarias']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Persona creada exitosamente.',
+                'data' => [
+                    'tipo_documento' => $persona->tipo_documento,
+                    'numero_documento' => $persona->numero_documento,
+                    'primer_nombre' => $persona->primer_nombre,
+                    'segundo_nombre' => $persona->segundo_nombre,
+                    'primer_apellido' => $persona->primer_apellido,
+                    'segundo_apellido' => $persona->segundo_apellido,
+                    'fecha_nacimiento' => $persona->fecha_nacimiento,
+                    'genero' => $persona->genero,
+                    'telefono' => $persona->telefono,
+                    'celular' => $persona->celular,
+                    'email' => $persona->email,
+                    'pais_id' => $persona->pais_id,
+                    'departamento_id' => $persona->departamento_id,
+                    'municipio_id' => $persona->municipio_id,
+                    'direccion' => $persona->direccion,
+                    'caracterizaciones' => $persona->caracterizacionesComplementarias->pluck('id')->toArray(),
+                ]
+            ]);
+        } catch (\Illuminate\Database\QueryException $e) {
+            Log::error('Error de base de datos al crear persona', [
+                'error' => $e->getMessage(),
+                'code' => $e->getCode(),
+                'user_id' => Auth::id()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al guardar la información. Por favor, verifique los datos e intente nuevamente.'
+            ], 500);
+        } catch (\Exception $e) {
+            Log::error('Error inesperado al crear persona', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => Auth::id()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Ocurrió un error inesperado. Por favor, contacte al administrador.'
+            ], 500);
         }
     }
 }

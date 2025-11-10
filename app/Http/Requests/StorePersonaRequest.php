@@ -43,6 +43,27 @@ class StorePersonaRequest extends FormRequest
     }
 
     /**
+     * Configure the validator instance.
+     *
+     * @param  \Illuminate\Validation\Validator  $validator
+     * @return void
+     */
+    public function withValidator($validator): void
+    {
+        $validator->after(function ($validator) {
+            $caracterizacionIds = $this->input('caracterizacion_ids', []);
+
+            // Si seleccionó "NINGUNA" (id 235) y otras opciones, es inválido
+            if (in_array(235, $caracterizacionIds) && count($caracterizacionIds) > 1) {
+                $validator->errors()->add(
+                    'caracterizacion_ids',
+                    'No puede seleccionar "NINGUNA" junto con otras caracterizaciones.'
+                );
+            }
+        });
+    }
+
+    /**
      * Get custom messages for validator errors.
      *
      * @return array<string, string>
@@ -76,7 +97,7 @@ class StorePersonaRequest extends FormRequest
             'direccion.string'             => 'La dirección debe ser una cadena de texto.',
             'direccion.max'                => 'La dirección no puede tener más de 255 caracteres.',
             'caracterizacion_ids.array'    => 'Las caracterizaciones deben enviarse en una lista válida.',
-            'caracterizacion_ids.*.integer'=> 'El identificador de caracterización no es válido.',
+            'caracterizacion_ids.*.integer' => 'El identificador de caracterización no es válido.',
             'caracterizacion_ids.*.exists' => 'Alguna de las caracterizaciones seleccionadas no existe.',
         ];
     }

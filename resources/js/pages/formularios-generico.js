@@ -115,6 +115,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-
-    console.log('Formulario genérico inicializado correctamente');
 });

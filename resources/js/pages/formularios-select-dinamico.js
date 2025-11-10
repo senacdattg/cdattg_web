@@ -205,6 +205,4 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     };
-
-    console.log('Formulario con select dinámico inicializado correctamente');
 });
