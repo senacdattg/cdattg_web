@@ -32,6 +32,10 @@ Route::middleware(['can:programa.edit'])->group(function () {
     Route::get('/programa/{programa}/edit', [ProgramaFormacionController::class, 'edit'])->name('programa.edit');
     Route::put('/programa/{programa}', [ProgramaFormacionController::class, 'update'])->name('programa.update');
     Route::patch('/programa/{programa}', [ProgramaFormacionController::class, 'update']);
+    Route::delete(
+        '/programa/{programa}/competencias/{competencia}',
+        [ProgramaFormacionController::class, 'detachCompetencia']
+    )->name('programa.competencia.detach');
 });
 
 Route::middleware(['can:programa.delete'])->group(function () {

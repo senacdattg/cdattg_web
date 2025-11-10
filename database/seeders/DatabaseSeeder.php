@@ -1,5 +1,7 @@
 <?php
+
 namespace Database\Seeders;
+
 use App\Models\Ambiente;
 use App\Models\Aprendiz;
 use App\Models\AprendizFicha;
@@ -17,11 +19,13 @@ use App\Models\Inventario\Orden;
 use App\Models\Inventario\Producto;
 use App\Models\Inventario\Proveedor;
 use App\Models\Parametro;
+use App\Models\ProgramaFormacion;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -48,7 +52,6 @@ class DatabaseSeeder extends Seeder
             PisoSeeder::class,
             AmbienteSeeder::class,
             RedConocimientoSeeder::class,
-            ProgramasFormacionSeeder::class,
             JornadaFormacionSeeder::class,
             UpdatePersonasUserFieldsSeeder::class,
             CompetenciaSeeder::class,

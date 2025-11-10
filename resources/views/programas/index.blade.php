@@ -108,7 +108,10 @@
                             ['label' => 'Código', 'width' => '10%'],
                             ['label' => 'Nombre', 'width' => '30%'],
                             ['label' => 'Red de Conocimiento', 'width' => '20%'],
-                            ['label' => 'Nivel', 'width' => '15%'],
+                            ['label' => 'Nivel', 'width' => '12%'],
+                            ['label' => 'Horas totales', 'width' => '8%'],
+                            ['label' => 'Horas etapa lectiva', 'width' => '8%'],
+                            ['label' => 'Horas etapa productiva', 'width' => '8%'],
                             ['label' => 'Estado', 'width' => '10%'],
                             ['label' => 'Acciones', 'width' => '10%', 'class' => 'text-center']
                         ]"
@@ -165,6 +168,21 @@
                                                     @else
                                                         <span class="text-muted">Sin asignar</span>
                                                     @endif
+                                                </td>
+                                                <td class="px-4">
+                                                    <span class="badge badge-info">
+                                                        {{ number_format($programa->horas_totales ?? 0) }} h
+                                                    </span>
+                                                </td>
+                                                <td class="px-4">
+                                                    <span class="badge badge-light text-primary">
+                                                        {{ number_format($programa->horas_etapa_lectiva ?? 0) }} h
+                                                    </span>
+                                                </td>
+                                                <td class="px-4">
+                                                    <span class="badge badge-light text-success">
+                                                        {{ number_format($programa->horas_etapa_productiva ?? 0) }} h
+                                                    </span>
                                                 </td>
                                                 <td class="px-4">
                                                     <div class="d-inline-block px-3 py-1 rounded-pill {{ $programa->status ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}">
