@@ -101,8 +101,6 @@
 @endsection
 
 @section('js')
-    @vite(['resources/js/bootstrap.js'])
-    @vite(['resources/js/pages/formularios-select-dinamico.js'])
-    @vite(['resources/js/pages/talento-humano.js'])
+    @vite(['resources/js/app.js', 'resources/js/pages/formularios-select-dinamico.js', 'resources/js/pages/talento-humano.js'])
     @stack('js')
 @endsection

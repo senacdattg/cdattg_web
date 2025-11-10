@@ -244,9 +244,7 @@
 @endsection
 
 @section('js')
-    @vite(['resources/js/bootstrap.js'])
-    @vite(['resources/js/parametros.js'])
-    @vite(['resources/js/pages/formularios-generico.js'])
+    @vite(['resources/js/app.js', 'resources/js/parametros.js', 'resources/js/pages/formularios-generico.js'])
     <script>
         $(function() {
             // Mostrar mensajes flash con SweetAlert2
