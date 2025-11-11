@@ -70,14 +70,22 @@
                                 </thead>
                                 <tbody>
                                     @foreach($devoluciones as $devolucion)
-                                        <tr>
+                                        @php
+                                            $esConsumoTotal = $devolucion->cierra_sin_stock === true;
+                                        @endphp
+                                        <tr @if($esConsumoTotal) class="table-warning" @endif>
                                             <td>{{ $devolucion->id }}</td>
                                             <td>
                                                 <strong>{{ $devolucion->detalleOrden->producto->producto }}</strong>
                                                 <br>
                                                 <small class="text-muted">{{ $devolucion->detalleOrden->producto->descripcion }}</small>
                                             </td>
-                                            <td>{{ $devolucion->cantidad_devuelta }}</td>
+                                            <td>
+                                                {{ $devolucion->cantidad_devuelta }}
+                                                @if($esConsumoTotal)
+                                                    <span class="badge badge-warning ml-1">Consumo total</span>
+                                                @endif
+                                            </td>
                                             <td>{{ $devolucion->fecha_devolucion->format('d/m/Y H:i') }}</td>
                                             <td>
                                                 @if($devolucion->detalleOrden->orden->fecha_devolucion)
@@ -99,6 +107,17 @@
                                                    title="Ver orden">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
+                                                @if($esConsumoTotal)
+                                                    <button
+                                                        type="button"
+                                                        class="btn btn-sm btn-warning btn-motivo-consumo-total"
+                                                        data-consumo-total
+                                                        data-motivo="{{ $devolucion->observaciones ? e($devolucion->observaciones) : 'Sin observaciones registradas.' }}"
+                                                        title="Ver motivo de consumo total"
+                                                    >
+                                                        <i class="fas fa-info-circle"></i>
+                                                    </button>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
@@ -135,4 +154,28 @@
     @vite([
         'resources/css/inventario/shared/base.css',
     ])
+@endpush
+
+@push('js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('[data-consumo-total]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    var motivo = button.getAttribute('data-motivo') || 'Sin observaciones registradas.';
+
+                    if (window.Swal && typeof window.Swal.fire === 'function') {
+                        window.Swal.fire({
+                            icon: 'info',
+                            title: 'Motivo de consumo total',
+                            text: motivo,
+                            confirmButtonText: 'Cerrar'
+                        });
+                        return;
+                    }
+
+                    window.alert(motivo);
+                });
+            });
+        });
+    </script>
 @endpush

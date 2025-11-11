@@ -59,9 +59,26 @@ class DetalleOrden extends Model
         return $this->devoluciones()->sum('cantidad_devuelta');
     }
 
+    public function tieneCierreSinStock(): bool
+    {
+        if ($this->relationLoaded('devoluciones')) {
+            return $this->devoluciones->contains(static function (Devolucion $devolucion): bool {
+                return $devolucion->cierra_sin_stock === true;
+            });
+        }
+
+        return $this->devoluciones()
+            ->where('cierra_sin_stock', true)
+            ->exists();
+    }
+
     // Verificar si está completamente devuelto
     public function estaCompletamenteDevuelto()
     {
+        if ($this->tieneCierreSinStock()) {
+            return true;
+        }
+
         return $this->getCantidadDevuelta() >= $this->cantidad;
     }
 
@@ -74,6 +91,12 @@ class DetalleOrden extends Model
     // Obtener cantidad pendiente de devolución
     public function getCantidadPendiente()
     {
-        return $this->cantidad - $this->getCantidadDevuelta();
+        if ($this->tieneCierreSinStock()) {
+            return 0;
+        }
+
+        $pendiente = $this->cantidad - $this->getCantidadDevuelta();
+
+        return $pendiente > 0 ? $pendiente : 0;
     }
 }
