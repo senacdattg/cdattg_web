@@ -45,8 +45,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      redis:
-        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "php artisan config:clear || exit 1"]
       interval: 15s
@@ -105,25 +103,6 @@ services:
     networks:
       - cdattg_net
 
- # ===========================================
-  # === REDIS
-  # ===========================================
-  redis:
-    profiles: ["produccion", "local", "testing"]
-    image: ${REDIS_BASE_IMAGE:-redis:7-alpine}
-    container_name: cdattg_redis
-    command: redis-server --save 60 1 --loglevel warning
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - cdattg_net
 
   # ===========================================
   # === FRONTEND (solo local)
@@ -179,7 +158,6 @@ services:
 # ===========================================
 volumes:
   mysql_data:
-  redis_data:
   app_vendor:
   app_node_modules:
   app_storage:
