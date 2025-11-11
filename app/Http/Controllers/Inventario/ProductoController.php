@@ -376,15 +376,18 @@ class ProductoController extends InventarioController
             }
         });
 
-        // Obtener categorías desde ParametroTema
-        $temaCategorias = Tema::where('name', 'CATEGORIAS')->first();
-        $categorias = $temaCategorias ? $temaCategorias->parametros()->wherePivot('status', 1)->get() : collect();
+        $tiposProductos = ParametroTema::with(['parametro', 'tema'])
+            ->whereHas('tema', function ($query) {
+                $query->where('name', 'TIPOS DE PRODUCTO');
+            })
+            ->where('status', 1)
+            ->get()
+            ->sortBy(function ($tipo) {
+                return mb_strtolower($tipo->parametro->name ?? '');
+            })
+            ->values();
 
-        // Obtener marcas desde ParametroTema
-        $temaMarcas = Tema::where('name', 'MARCAS')->first();
-        $marcas = $temaMarcas ? $temaMarcas->parametros()->wherePivot('status', 1)->get() : collect();
-
-        return view('inventario.productos.card', compact('productos', 'categorias', 'marcas'));
+        return view('inventario.productos.card', compact('productos', 'tiposProductos'));
     }
 
     /**
@@ -393,8 +396,7 @@ class ProductoController extends InventarioController
     public function buscar(Request $request)
     {
         $search = $request->input('search');
-        $categoryId = $request->input('category_id');
-        $brandId = $request->input('brand_id');
+        $tipoProductoId = $request->input('tipo_producto_id');
 
         $query = Producto::with([
             'tipoProducto.parametro',
@@ -422,18 +424,12 @@ class ProductoController extends InventarioController
 
         if (!empty($search)) {
             $query->where(function($q) use ($search) {
-                $q->where('producto', 'LIKE', "%{$search}%")
-                  ->orWhere('codigo_barras', 'LIKE', "%{$search}%")
-                  ->orWhere('descripcion', 'LIKE', "%{$search}%");
+                $q->where('producto', 'LIKE', "%{$search}%");
             });
         }
 
-        if ($categoryId) {
-            $query->where('categoria_id', $categoryId);
-        }
-
-        if ($brandId) {
-            $query->where('marca_id', $brandId);
+        if ($tipoProductoId) {
+            $query->where('tipo_producto_id', $tipoProductoId);
         }
 
         $productos = $query->get();
