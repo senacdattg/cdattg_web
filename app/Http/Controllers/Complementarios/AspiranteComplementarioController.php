@@ -13,9 +13,20 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use setasign\Fpdi\Fpdi;
+use App\Services\AspiranteDocumentoService;
+use App\Services\AspiranteComplementarioService;
 
 class AspiranteComplementarioController extends Controller
 {
+    protected $documentoService;
+    protected $complementarioService;
+
+    public function __construct(AspiranteDocumentoService $documentoService)
+    {
+        $this->documentoService = $documentoService;
+        $this->complementarioService = new AspiranteComplementarioService($documentoService);
+    }
+
     /**
      * Mostrar gestión de aspirantes (Admin)
      */
@@ -24,7 +35,7 @@ class AspiranteComplementarioController extends Controller
         $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion'])->get();
 
         // Add aspirantes count for each program
-        $programas->each(function($programa) {
+        $programas->each(function ($programa) {
             $programa->aspirantes_count = AspiranteComplementario::where('complementario_id', $programa->id)->count();
         });
 
@@ -63,16 +74,16 @@ class AspiranteComplementarioController extends Controller
 
         try {
             // Verificar que el programa existe
-            $programa = ComplementarioOfertado::findOrFail($complementarioId);
+            ComplementarioOfertado::findOrFail($complementarioId);
 
             // Buscar persona por número de documento
             $persona = Persona::where('numero_documento', $request->numero_documento)->first();
 
             if (!$persona) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No se encontró ninguna persona registrada con el número de documento "' . $request->numero_documento . '".'
-                ]);
+                return $this->createErrorResponse(
+                    'No se encontró ninguna persona registrada con el número de documento "' .
+                        $request->numero_documento . '".'
+                );
             }
 
             // Verificar si ya está inscrita en este programa
@@ -81,10 +92,10 @@ class AspiranteComplementarioController extends Controller
                 ->first();
 
             if ($aspiranteExistente) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'La persona con documento "' . $request->numero_documento . '" ya se encuentra inscrita en este programa complementario.'
-                ]);
+                return $this->createErrorResponse(
+                    'La persona con documento "' . $request->numero_documento .
+                        '" ya se encuentra inscrita en este programa complementario.'
+                );
             }
 
             // Crear nuevo aspirante - ahora permite múltiples programas por persona
@@ -95,23 +106,52 @@ class AspiranteComplementarioController extends Controller
                 'observaciones' => 'Agregado manualmente desde gestión de aspirantes'
             ]);
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Aspirante agregado exitosamente. ' . $persona->primer_nombre . ' ' . $persona->primer_apellido . ' ha sido inscrito en el programa.'
-            ]);
-
+            return $this->createSuccessResponse(
+                'Aspirante agregado exitosamente. ' . $persona->primer_nombre . ' ' .
+                    $persona->primer_apellido . ' ha sido inscrito en el programa.'
+            );
         } catch (\Exception $e) {
-            Log::error('Error agregando aspirante: ' . $e->getMessage(), [
-                'complementario_id' => $complementarioId,
-                'numero_documento' => $request->numero_documento,
-                'exception' => $e->getTraceAsString()
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Error interno del servidor. Por favor intente nuevamente.'
-            ], 500);
+            return $this->handleAspiranteException($e, $complementarioId, $request->numero_documento);
         }
+    }
+
+    /**
+     * Crear respuesta JSON de error
+     */
+    private function createErrorResponse($message)
+    {
+        return response()->json([
+            'success' => false,
+            'message' => $message
+        ]);
+    }
+
+    /**
+     * Crear respuesta JSON de éxito
+     */
+    private function createSuccessResponse($message)
+    {
+        return response()->json([
+            'success' => true,
+            'message' => $message
+        ]);
+    }
+
+    /**
+     * Manejar excepciones en operaciones de aspirantes
+     */
+    private function handleAspiranteException(\Exception $e, $complementarioId, $numeroDocumento)
+    {
+        Log::error('Error agregando aspirante: ' . $e->getMessage(), [
+            'complementario_id' => $complementarioId,
+            'numero_documento' => $numeroDocumento,
+            'exception' => $e->getTraceAsString()
+        ]);
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Error interno del servidor. Por favor intente nuevamente.'
+        ], 500);
     }
 
     /**
@@ -121,7 +161,7 @@ class AspiranteComplementarioController extends Controller
     {
         try {
             // Verificar que el programa existe
-            $programa = ComplementarioOfertado::findOrFail($complementarioId);
+            ComplementarioOfertado::findOrFail($complementarioId);
 
             // Verificar que el aspirante existe y pertenece al programa
             $aspirante = AspiranteComplementario::where('id', $aspiranteId)
@@ -154,9 +194,9 @@ class AspiranteComplementarioController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Aspirante rechazado exitosamente. ' . $personaNombre . ' (' . $numeroDocumento . ') ha sido marcado como rechazado en el programa.'
+                'message' => 'Aspirante rechazado exitosamente. ' .
+                    $personaNombre . ' (' . $numeroDocumento . ') ha sido marcado como rechazado en el programa.'
             ]);
-
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
@@ -218,7 +258,8 @@ class AspiranteComplementarioController extends Controller
             foreach ($aspirantes as $aspirante) {
                 $tipoDocumento = $aspirante->persona->tipoDocumento ? $aspirante->persona->tipoDocumento->name : 'N/A';
                 $numeroDocumento = $aspirante->persona->numero_documento;
-                $caracterizacion = $aspirante->persona->caracterizacion ? $aspirante->persona->caracterizacion->nombre : 'Sin caracterización';
+                $caracterizacion = $aspirante->persona->caracterizacion ?
+                    $aspirante->persona->caracterizacion->nombre : 'Sin caracterización';
 
                 $sheet->setCellValue('A' . $row, $tipoDocumento);
                 $sheet->setCellValue('B' . $row, $numeroDocumento);
@@ -233,7 +274,8 @@ class AspiranteComplementarioController extends Controller
             }
 
             // Crear nombre del archivo
-            $fileName = 'aspirantes_' . str_replace(' ', '_', $programa->nombre) . '_' . now()->format('Y-m-d_H-i-s') . '.xlsx';
+            $fileName = 'aspirantes_' . str_replace(' ', '_', $programa->nombre) . '_' .
+                now()->format('Y-m-d_H-i-s') . '.xlsx';
 
             // Crear respuesta de descarga
             $response = new StreamedResponse(function () use ($spreadsheet) {
@@ -241,12 +283,14 @@ class AspiranteComplementarioController extends Controller
                 $writer->save('php://output');
             });
 
-            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            $response->headers->set(
+                'Content-Type',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            );
             $response->headers->set('Content-Disposition', 'attachment;filename="' . $fileName . '"');
             $response->headers->set('Cache-Control', 'max-age=0');
 
             return $response;
-
         } catch (\Exception $e) {
             Log::error('Error exportando aspirantes a Excel: ' . $e->getMessage(), [
                 'complementario_id' => $complementarioId,
@@ -270,125 +314,32 @@ class AspiranteComplementarioController extends Controller
             // Verificar que el programa existe
             $programa = ComplementarioOfertado::findOrFail($complementarioId);
 
-            // Obtener todos los aspirantes del programa con personas que tengan documento
-            $aspirantes = AspiranteComplementario::with(['persona.tipoDocumento'])
-                ->where('complementario_id', $complementarioId)
-                ->whereHas('persona', function($query) {
-                    $query->where('condocumento', 1);
-                })
-                ->get()
-                ->sortBy(function($aspirante) {
-                    return $aspirante->persona->numero_documento;
-                });
+            // Obtener aspirantes con documentos
+            $aspirantes = $this->complementarioService->getAspirantesConDocumentos($complementarioId);
 
             if ($aspirantes->isEmpty()) {
                 return back()->with('error', 'No hay aspirantes con documentos de identidad para descargar.');
             }
 
-            // Crear directorio temporal si no existe
-            $tempDir = storage_path('app/temp');
-            if (!file_exists($tempDir)) {
-                mkdir($tempDir, 0755, true);
-            }
-
-            // Crear instancia de FPDI para combinar PDFs
+            $tempDir = $this->documentoService->createTempDirectory();
             $pdf = new Fpdi();
 
-            $archivosAgregados = 0;
-            $archivosTemporales = [];
+            $resultados = $this->complementarioService->procesarDescargaDocumentos($aspirantes, $pdf, $tempDir);
 
-            foreach ($aspirantes as $aspirante) {
-                try {
-                    $persona = $aspirante->persona;
-                    
-                    // Construir el patrón de búsqueda del archivo en Google Drive
-                    // Formato: tipo_documento_NumeroDocumento_PrimerNombre_PrimerApellido_*.pdf
-                    $tipoDocumento = $persona->tipoDocumento ? str_replace(' ', '_', $persona->tipoDocumento->name) : 'DOC';
-                    $numeroDocumento = $persona->numero_documento;
-                    $primerNombre = str_replace(' ', '_', $persona->primer_nombre);
-                    $primerApellido = str_replace(' ', '_', $persona->primer_apellido);
-                    
-                    // Listar archivos en Google Drive
-                    $files = Storage::disk('google')->files('documentos_aspirantes');
-                    
-                    // Buscar el archivo que coincida con el patrón
-                    $matchingFile = null;
-                    foreach ($files as $file) {
-                        $fileName = basename($file);
-                        if (strpos($fileName, "{$tipoDocumento}_{$numeroDocumento}_{$primerNombre}_{$primerApellido}_") === 0) {
-                            $matchingFile = $file;
-                            break;
-                        }
-                    }
-
-                    if ($matchingFile && Storage::disk('google')->exists($matchingFile)) {
-                        // Obtener el contenido del archivo
-                        $fileContent = Storage::disk('google')->get($matchingFile);
-                        
-                        // Guardar temporalmente para procesar con FPDI
-                        $tempFilePath = $tempDir . '/temp_' . $archivosAgregados . '_' . $numeroDocumento . '.pdf';
-                        file_put_contents($tempFilePath, $fileContent);
-                        $archivosTemporales[] = $tempFilePath;
-
-                        // Obtener el número de páginas del PDF
-                        $pageCount = $pdf->setSourceFile($tempFilePath);
-                        
-                        // Agregar cada página al PDF combinado
-                        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-                            $templateId = $pdf->importPage($pageNo);
-                            $size = $pdf->getTemplateSize($templateId);
-                            
-                            // Agregar página en orientación correcta
-                            $pdf->AddPage($size['orientation'], [$size['width'], $size['height']]);
-                            $pdf->useTemplate($templateId);
-                        }
-                        
-                        $archivosAgregados++;
-                    } else {
-                        Log::warning('Archivo no encontrado en Google Drive', [
-                            'aspirante_id' => $aspirante->id,
-                            'persona_id' => $persona->id,
-                            'numero_documento' => $numeroDocumento
-                        ]);
-                    }
-                } catch (\Exception $e) {
-                    Log::error('Error procesando archivo PDF: ' . $e->getMessage(), [
-                        'aspirante_id' => $aspirante->id,
-                        'persona_id' => $aspirante->persona_id ?? 'N/A',
-                        'exception' => $e->getTraceAsString()
-                    ]);
-                    // Continuar con el siguiente archivo
-                    continue;
-                }
+            if ($resultados['archivos_agregados'] === 0) {
+                $this->documentoService->limpiarArchivosTemporales($resultados['archivos_temporales']);
+                return back()->with(
+                    'error',
+                    'No se pudieron descargar los documentos. Verifique que los archivos existan en Google Drive.'
+                );
             }
 
-            if ($archivosAgregados === 0) {
-                // Limpiar archivos temporales
-                foreach ($archivosTemporales as $tempFile) {
-                    if (file_exists($tempFile)) {
-                        unlink($tempFile);
-                    }
-                }
-                return back()->with('error', 'No se pudieron descargar los documentos. Verifique que los archivos existan en Google Drive.');
-            }
-
-            // Generar nombre del archivo PDF
-            $pdfFileName = 'cedulas_' . str_replace(' ', '_', $programa->nombre) . '_' . now()->format('Y-m-d_H-i-s') . '.pdf';
-            $pdfPath = $tempDir . '/' . $pdfFileName;
-
-            // Guardar el PDF combinado
-            $pdf->Output('F', $pdfPath);
-
-            // Limpiar archivos temporales
-            foreach ($archivosTemporales as $tempFile) {
-                if (file_exists($tempFile)) {
-                    unlink($tempFile);
-                }
-            }
-
-            // Crear respuesta de descarga
-            return response()->download($pdfPath, $pdfFileName)->deleteFileAfterSend(true);
-
+            return $this->complementarioService->generarArchivoPDF(
+                $programa,
+                $pdf,
+                $tempDir,
+                $resultados['archivos_temporales']
+            );
         } catch (\Exception $e) {
             Log::error('Error descargando cédulas: ' . $e->getMessage(), [
                 'complementario_id' => $complementarioId,
@@ -400,6 +351,7 @@ class AspiranteComplementarioController extends Controller
         }
     }
 
+
     /**
      * Validar documentos de aspirantes en Google Drive
      */
@@ -407,7 +359,7 @@ class AspiranteComplementarioController extends Controller
     {
         try {
             // Verificar que el programa existe
-            $programa = ComplementarioOfertado::findOrFail($complementarioId);
+            ComplementarioOfertado::findOrFail($complementarioId);
 
             // Obtener todos los aspirantes del programa
             $aspirantes = AspiranteComplementario::with(['persona.tipoDocumento'])
@@ -421,93 +373,28 @@ class AspiranteComplementarioController extends Controller
                 ]);
             }
 
-            $totalAspirantes = $aspirantes->count();
-            $conDocumento = 0;
-            $sinDocumento = 0;
-            $errores = 0;
-
-            // Listar todos los archivos en Google Drive una sola vez para optimizar
-            try {
-                $files = Storage::disk('google')->files('documentos_aspirantes');
-                Log::info("Total de archivos en Google Drive: " . count($files));
-            } catch (\Exception $e) {
-                Log::error("Error al listar archivos en Google Drive: " . $e->getMessage());
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error al acceder a Google Drive: ' . $e->getMessage()
-                ], 500);
-            }
-
-            // Procesar cada aspirante
-            foreach ($aspirantes as $aspirante) {
-                try {
-                    $persona = $aspirante->persona;
-                    
-                    // Construir el patrón de búsqueda del archivo
-                    // Formato: tipo_documento_NumeroDocumento_PrimerNombre_PrimerApellido_*.pdf
-                    $tipoDocumento = $persona->tipoDocumento ? str_replace(' ', '_', $persona->tipoDocumento->name) : 'DOC';
-                    $numeroDocumento = $persona->numero_documento;
-                    $primerNombre = str_replace(' ', '_', $persona->primer_nombre);
-                    $primerApellido = str_replace(' ', '_', $persona->primer_apellido);
-                    
-                    $patron = "{$tipoDocumento}_{$numeroDocumento}_{$primerNombre}_{$primerApellido}_";
-                    
-                    // Buscar el archivo que coincida con el patrón
-                    $tieneDocumento = false;
-                    foreach ($files as $file) {
-                        $fileName = basename($file);
-                        if (strpos($fileName, $patron) === 0) {
-                            // Verificar que el archivo existe
-                            try {
-                                if (Storage::disk('google')->exists($file)) {
-                                    $tieneDocumento = true;
-                                    break;
-                                }
-                            } catch (\Exception $e) {
-                                Log::warning("Error verificando existencia de archivo: {$fileName}", [
-                                    'error' => $e->getMessage()
-                                ]);
-                            }
-                        }
-                    }
-
-                    // Actualizar condocumento en la persona
-                    $persona->update(['condocumento' => $tieneDocumento ? 1 : 0]);
-
-                    if ($tieneDocumento) {
-                        $conDocumento++;
-                    } else {
-                        $sinDocumento++;
-                    }
-
-                } catch (\Exception $e) {
-                    $errores++;
-                    Log::error("Error validando documento para aspirante {$aspirante->id}", [
-                        'aspirante_id' => $aspirante->id,
-                        'persona_id' => $aspirante->persona_id,
-                        'exception' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString()
-                    ]);
-                }
-            }
+            $files = $this->documentoService->getGoogleDriveFiles();
+            $resultados = $this->complementarioService->procesarValidacionDocumentos($aspirantes, $files);
 
             Log::info("Validación de documentos completada", [
                 'complementario_id' => $complementarioId,
-                'total' => $totalAspirantes,
-                'con_documento' => $conDocumento,
-                'sin_documento' => $sinDocumento,
-                'errores' => $errores
+                'total' => $resultados['total'],
+                'con_documento' => $resultados['con_documento'],
+                'sin_documento' => $resultados['sin_documento'],
+                'errores' => $resultados['errores']
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => "Validación completada. Total: {$totalAspirantes}, Con documento: {$conDocumento}, Sin documento: {$sinDocumento}" . ($errores > 0 ? ", Errores: {$errores}" : ""),
-                'total' => $totalAspirantes,
-                'con_documento' => $conDocumento,
-                'sin_documento' => $sinDocumento,
-                'errores' => $errores
+                'message' => "Validación completada. Total: {$resultados['total']}, " .
+                    "Con documento: {$resultados['con_documento']}, " .
+                    "Sin documento: {$resultados['sin_documento']}" .
+                    ($resultados['errores'] > 0 ? ", Errores: {$resultados['errores']}" : ""),
+                'total' => $resultados['total'],
+                'con_documento' => $resultados['con_documento'],
+                'sin_documento' => $resultados['sin_documento'],
+                'errores' => $resultados['errores']
             ]);
-
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return response()->json([
                 'success' => false,
@@ -526,4 +413,5 @@ class AspiranteComplementarioController extends Controller
             ], 500);
         }
     }
+
 }

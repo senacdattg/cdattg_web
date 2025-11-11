@@ -153,7 +153,14 @@ class RegisterController extends Controller
             }
         }
 
-        return redirect('/')->with('success', '¡Registro Exitoso! Bienvenido a la plataforma.');
+        // Nuevo usuario registrado - redirigir a programas complementarios para que pueda inscribirse
+        Log::info('RegisterController - Nuevo usuario registrado, redirigiendo a programas complementarios', [
+            'user_id' => $user->id,
+            'persona_id' => $persona->id
+        ]);
+
+        return redirect()->route('programas-complementarios.publicos')
+            ->with('success', '¡Registro Exitoso! Ahora puede inscribirse en los programas complementarios disponibles.');
     }
 
     public function mostrarFormulario()
