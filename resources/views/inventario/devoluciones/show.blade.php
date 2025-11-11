@@ -82,6 +82,9 @@
                                 <div class="card-body text-center">
                                     <h6>Cantidad Devuelta</h6>
                                     <h3>{{ $devolucion->cantidad_devuelta }}</h3>
+                                    @if($devolucion->cierra_sin_stock)
+                                        <span class="badge badge-warning mt-2">Consumo total sin stock</span>
+                                    @endif
                                 </div>
                             </div>
                         </div>

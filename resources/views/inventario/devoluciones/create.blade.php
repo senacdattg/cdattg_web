@@ -112,15 +112,15 @@
                                            class="form-control @error('cantidad_devuelta') is-invalid @enderror"
                                            id="cantidad_devuelta"
                                            name="cantidad_devuelta"
-                                           value="{{ old('cantidad_devuelta', 1) }}"
-                                           min="1"
+                                           value="{{ old('cantidad_devuelta', $detalleOrden->getCantidadPendiente()) }}"
+                                           min="0"
                                            max="{{ $detalleOrden->getCantidadPendiente() }}"
                                            required>
                                     @error('cantidad_devuelta')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                     <small class="form-text text-muted">
-                                        Máximo: {{ $detalleOrden->getCantidadPendiente() }} unidades
+                                        Máximo: {{ $detalleOrden->getCantidadPendiente() }} unidades. Usa 0 si el consumible se utilizó totalmente.
                                     </small>
                                 </div>
                             </div>
@@ -137,6 +137,9 @@
                                     @error('observaciones')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
+                                    <small class="form-text text-muted">
+                                        Justifica aquí cuando registres la devolución en cero por consumo total.
+                                    </small>
                                 </div>
                             </div>
                         </div>
@@ -145,7 +148,7 @@
                             <div class="col-12">
                                 <div class="alert alert-info">
                                     <i class="fas fa-info-circle"></i>
-                                    <strong>Nota:</strong> Al registrar esta devolución, el stock del producto será restaurado automáticamente.
+                                    <strong>Nota:</strong> El stock solo se restaurará cuando registres cantidades mayores a cero. Si el consumible se usó por completo, registra cantidad 0 y explica el motivo.
                                 </div>
                             </div>
                         </div>
