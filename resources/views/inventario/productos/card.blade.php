@@ -28,7 +28,7 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row">
-                                <div class="col-md-4">
+                                <div class="col-md-5">
                                     <div class="form-group">
                                         <label>
                                             <i class="fas fa-search"></i> Buscar Producto
@@ -37,38 +37,25 @@
                                             type="text" 
                                             id="search-product" 
                                             class="form-control" 
-                                            placeholder="Buscar por nombre o código..."
+                                            placeholder="Buscar por nombre..."
                                         >
                                     </div>
                                 </div>
-                                <div class="col-md-3">
+                                <div class="col-md-4">
                                     <div class="form-group">
                                         <label>
-                                            <i class="fas fa-tags"></i> Categoría
+                                            <i class="fas fa-box-open"></i> Tipo de producto
                                         </label>
-                                        <select 
-                                            id="filter-category" 
-                                            class="form-control"
+                                        <select
+                                            id="filter-type"
+                                            class="form-control select2"
+                                            data-placeholder="Todos los tipos"
                                         >
-                                            <option value="">Todas las categorías</option>
-                                            @foreach($categorias as $categoria)
-                                                <option value="{{ $categoria->id }}">{{ $categoria->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label>
-                                            <i class="fas fa-copyright"></i> Marca
-                                        </label>
-                                        <select 
-                                            id="filter-brand" 
-                                            class="form-control"
-                                        >
-                                            <option value="">Todas las marcas</option>
-                                            @foreach($marcas as $marca)
-                                                <option value="{{ $marca->id }}">{{ $marca->name }}</option>
+                                            <option value="">Todos los tipos</option>
+                                            @foreach($tiposProductos as $tipoProducto)
+                                                <option value="{{ $tipoProducto->id }}">
+                                                    {{ $tipoProducto->parametro->name }}
+                                                </option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -100,8 +87,7 @@
                 @forelse($productos as $producto)
                     <div class="col-lg-3 col-md-4 col-sm-6 mb-4 product-card" 
                          data-id="{{ $producto->id }}"
-                         data-category="{{ $producto->categoria_id }}"
-                         data-brand="{{ $producto->marca_id }}"
+                         data-type="{{ $producto->tipo_producto_id }}"
                          data-name="{{ strtolower($producto->producto) }}"
                          data-code="{{ strtolower($producto->codigo_barras) }}">
                         <div class="card h-100 shadow-sm hover-shadow">
@@ -133,6 +119,11 @@
                             <div class="card-body d-flex flex-column">
                                 {{-- Categoría y marca --}}
                                 <div class="mb-2">
+                                    @if($producto->tipoProducto && $producto->tipoProducto->parametro)
+                                        <small class="text-muted d-block">
+                                            <i class="fas fa-box-open"></i> {{ $producto->tipoProducto->parametro->name }}
+                                        </small>
+                                    @endif
                                     <small class="text-muted">
                                         <i class="fas fa-tag"></i> {{ $producto->categoria->name ?? 'Sin categoría' }}
                                     </small>
@@ -304,6 +295,8 @@
 @endsection
 
 @push('css')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.6.2/dist/select2-bootstrap4.min.css" rel="stylesheet" />
     @vite([
     'resources/css/inventario/shared/base.css', 
     'resources/css/inventario/card.css', 
@@ -314,5 +307,6 @@
 
 @push('js')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     @vite('resources/js/inventario/card.js')
 @endpush

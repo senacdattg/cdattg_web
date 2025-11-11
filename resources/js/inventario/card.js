@@ -71,6 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeCardView();
     updateCartCount();
     setupModalDismissHandlers();
+    initializeSelect2();
 });
 
 /**
@@ -78,8 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 function initializeCardView() {
     setupSearchFilter();
-    setupCategoryFilter();
-    setupBrandFilter();
+    setupTypeFilter();
     setupSortFilter();
     setupProductActions();
     updateCartCount();
@@ -145,25 +145,13 @@ function setupSearchFilter() {
 }
 
 /**
- * Configurar filtro por categoría
+ * Configurar filtro por tipo de producto
  */
-function setupCategoryFilter() {
-    const categorySelect = document.getElementById('filter-category');
-    if (!categorySelect) return;
+function setupTypeFilter() {
+    const typeSelect = document.getElementById('filter-type');
+    if (!typeSelect) return;
 
-    categorySelect.addEventListener('change', function() {
-        handleFiltersChange();
-    });
-}
-
-/**
- * Configurar filtro por marca
- */
-function setupBrandFilter() {
-    const brandSelect = document.getElementById('filter-brand');
-    if (!brandSelect) return;
-
-    brandSelect.addEventListener('change', function() {
+    typeSelect.addEventListener('change', function() {
         handleFiltersChange();
     });
 }
@@ -185,11 +173,10 @@ function setupSortFilter() {
  */
 function handleFiltersChange() {
     const searchTerm = document.getElementById('search-product')?.value.trim() || '';
-    const categoryId = document.getElementById('filter-category')?.value || '';
-    const brandId = document.getElementById('filter-brand')?.value || '';
+    const typeId = document.getElementById('filter-type')?.value || '';
     const sortBy = document.getElementById('sort-by')?.value || 'name';
 
-    const hasActiveFilters = Boolean(searchTerm) || Boolean(categoryId) || Boolean(brandId);
+    const hasActiveFilters = Boolean(searchTerm) || Boolean(typeId);
 
     if (!hasActiveFilters) {
         if (showingSearchResults) {
@@ -200,7 +187,7 @@ function handleFiltersChange() {
         return;
     }
 
-    fetchAndRenderProducts({ searchTerm, categoryId, brandId, sortBy });
+    fetchAndRenderProducts({ searchTerm, typeId, sortBy });
 }
 
 /**
@@ -228,7 +215,7 @@ function restoreInitialState() {
 /**
  * Consultar al backend para traer los productos filtrados
  */
-async function fetchAndRenderProducts({ searchTerm, categoryId, brandId, sortBy }) {
+async function fetchAndRenderProducts({ searchTerm, typeId, sortBy }) {
     const grid = document.getElementById('products-grid');
     if (!grid) return;
 
@@ -243,8 +230,7 @@ async function fetchAndRenderProducts({ searchTerm, categoryId, brandId, sortBy 
     const params = new URLSearchParams();
 
     if (searchTerm) params.append('search', searchTerm);
-    if (categoryId) params.append('category_id', categoryId);
-    if (brandId) params.append('brand_id', brandId);
+    if (typeId) params.append('tipo_producto_id', typeId);
 
     grid.innerHTML = `
         <div class="col-12 text-center py-5">
@@ -377,6 +363,7 @@ function renderProducts(products, skipSort = false) {
 function createProductCardHTML(product) {
     const stockClass = getStockClass(product.cantidad);
     const categoriaNombre = product?.categoria?.name || 'Sin categoría';
+    const tipoNombre = product?.tipo_producto?.parametro?.name || '';
     const marcaNombre = product?.marca?.name || '';
     const descripcion = product.descripcion || 'Sin descripción disponible';
     const codigoBarras = product.codigo_barras || 'S/N';
@@ -386,8 +373,7 @@ function createProductCardHTML(product) {
     return `
         <div class="col-lg-3 col-md-4 col-sm-6 mb-4 product-card"
              data-id="${product.id}"
-             data-category="${product.categoria_id || ''}"
-             data-brand="${product.marca_id || ''}"
+             data-type="${product.tipo_producto_id || ''}"
              data-name="${productoNombre.toLowerCase()}"
              data-code="${(product.codigo_barras || '').toLowerCase()}">
             <div class="card h-100 shadow-sm hover-shadow">
@@ -404,6 +390,11 @@ function createProductCardHTML(product) {
                 </div>
                 <div class="card-body d-flex flex-column">
                     <div class="mb-2">
+                        ${tipoNombre ? `
+                            <small class="text-muted d-block">
+                                <i class="fas fa-box-open"></i> ${tipoNombre}
+                            </small>
+                        ` : ''}
                         <small class="text-muted">
                             <i class="fas fa-tag"></i> ${categoriaNombre}
                         </small>
@@ -458,6 +449,29 @@ function createProductCardHTML(product) {
             </div>
         </div>
     `;
+}
+
+function initializeSelect2() {
+    if (typeof $ === 'undefined' || !$.fn || !$.fn.select2) {
+        return;
+    }
+
+    const elements = document.querySelectorAll('.select2');
+
+    elements.forEach(function(element) {
+        const $element = $(element);
+        if ($element.hasClass('select2-hidden-accessible')) {
+            return;
+        }
+
+        $element.select2({
+            theme: 'bootstrap4',
+            width: '100%',
+            placeholder: element.dataset.placeholder || 'Seleccione una opción',
+            minimumResultsForSearch: Infinity,
+            allowClear: true
+        });
+    });
 }
 
 function truncateText(text, maxLength) {
@@ -672,13 +686,16 @@ function showSuccessNotification(message) {
  */
 function clearFilters() {
     const searchInput = document.getElementById('search-product');
-    const categorySelect = document.getElementById('filter-category');
-    const brandSelect = document.getElementById('filter-brand');
+    const typeSelect = document.getElementById('filter-type');
     const sortSelect = document.getElementById('sort-by');
 
     if (searchInput) searchInput.value = '';
-    if (categorySelect) categorySelect.value = '';
-    if (brandSelect) brandSelect.value = '';
+    if (typeSelect) {
+        typeSelect.value = '';
+        if (typeof $ !== 'undefined' && $.fn && $.fn.select2) {
+            $(typeSelect).val(null).trigger('change');
+        }
+    }
     if (sortSelect) sortSelect.value = 'name';
 
     handleFiltersChange();
