@@ -953,9 +953,6 @@ return [
         // MÓDULO: TALENTO HUMANO
         // ========================================
         [
-            'header' => 'TALENTO HUMANO',
-        ],
-        [
             'text' => 'Talento Humano',
             'icon' => 'fas fa-fw fa-users',
             'can' => 'VER TALENTO HUMANO',
