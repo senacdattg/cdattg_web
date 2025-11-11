@@ -177,9 +177,14 @@ class CompetenciaController extends Controller
     public function edit(Competencia $competencia)
     {
         try {
-            $competencia->load(['programasFormacion' => function ($query) {
-                $query->orderBy('nombre');
-            }]);
+            $competencia->load([
+                'programasFormacion' => function ($query) {
+                    $query->orderBy('nombre');
+                },
+                'resultadosAprendizaje' => function ($query) {
+                    $query->orderBy('codigo');
+                }
+            ]);
 
             return view('competencias.edit', compact('competencia'));
         } catch (Exception $e) {

@@ -64,6 +64,7 @@
                         <div class="card-body">
                             @php
                                 $programasAsociados = $competencia->programasFormacion ?? collect();
+                                $resultadosAsociados = $competencia->resultadosAprendizaje ?? collect();
                             @endphp
 
                             <form method="POST" action="{{ route('competencias.update', $competencia) }}">
@@ -263,6 +264,71 @@
                                 </div>
                                 <small class="text-muted d-block mt-3">
                                     Para asociar esta competencia a nuevos programas utilice el proceso de creación o gestione el vínculo desde el módulo de programas.
+                                </small>
+                            @endif
+                        </div>
+                    </div>
+
+                    <div class="card shadow-sm no-hover mt-4">
+                        <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="m-0 font-weight-bold text-success">
+                                <i class="fas fa-tasks mr-1"></i> Resultados de aprendizaje asociados
+                            </h6>
+                            <span class="badge badge-success badge-pill">
+                                {{ $resultadosAsociados->count() }} resultado(s)
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            @if($resultadosAsociados->isEmpty())
+                                <p class="text-muted mb-0">Esta competencia no tiene resultados de aprendizaje asociados.</p>
+                            @else
+                                <div class="table-responsive competencias-scroll">
+                                    <table class="table table-sm table-striped mb-0">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th style="width: 18%;">Código</th>
+                                                <th>Resultado de aprendizaje</th>
+                                                <th style="width: 18%;" class="text-center">Duración (h)</th>
+                                                <th style="width: 15%;" class="text-right">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($resultadosAsociados as $resultado)
+                                                @php
+                                                    $mensajeQuitarResultado = "¿Quitar el resultado '{$resultado->codigo}' de la competencia?";
+                                                    $rutaDesasociarResultado = route('competencias.desasociarResultado', [$competencia->id, $resultado->id]);
+                                                @endphp
+                                                <tr>
+                                                    <td>
+                                                        <span class="badge badge-success">{{ $resultado->codigo }}</span>
+                                                    </td>
+                                                    <td>{{ $resultado->nombre }}</td>
+                                                    <td class="text-center">
+                                                        {{ number_format($resultado->duracion ?? 0, 0) }}
+                                                    </td>
+                                                    <td class="text-right">
+                                                        @can('GESTIONAR RESULTADOS COMPETENCIA')
+                                                            <form
+                                                                method="POST"
+                                                                action="{{ $rutaDesasociarResultado }}"
+                                                                class="d-inline"
+                                                                onsubmit="return confirmarQuitar('{{ $mensajeQuitarResultado }}');"
+                                                            >
+                                                                @csrf
+                                                                @method('DELETE')
+                                                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                                    <i class="fas fa-times mr-1"></i>Quitar
+                                                                </button>
+                                                            </form>
+                                                        @endcan
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <small class="text-muted d-block mt-3">
+                                    Para asociar nuevos resultados de aprendizaje utilice la acción "Gestionar Resultados" disponible en el detalle de la competencia.
                                 </small>
                             @endif
                         </div>
