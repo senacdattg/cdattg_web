@@ -59,6 +59,25 @@ body .content-wrapper {
   min-height: 100vh;
 }
 
+body .main-footer {
+    margin-left: 0 !important;
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+body .main-footer > .container-fluid {
+    padding-left: 260px;
+    padding-right: 30px;
+}
+
+@media (max-width: 991.98px) {
+    body .main-footer > .container-fluid {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+}
+
 /* Estilos del navbar */
 .main-header.navbar { 
     background-color: #00041D !important;
