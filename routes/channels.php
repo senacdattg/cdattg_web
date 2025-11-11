@@ -25,3 +25,12 @@ Broadcast::channel('qr-scans', function ($user) {
 Broadcast::channel('asistencias', function ($user) {
     return true; // Canal público para asistencias
 });
+
+// Canales para WebSockets de visitantes
+Broadcast::channel('visitantes', function ($user) {
+    return true; // Canal público para datos de visitantes individuales
+});
+
+Broadcast::channel('estadisticas-visitantes', function ($user) {
+    return true; // Canal público para estadísticas de visitantes
+});
