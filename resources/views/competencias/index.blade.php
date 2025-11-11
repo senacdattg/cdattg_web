@@ -179,12 +179,12 @@
                         searchValue="{{ request('search') }}"
                         :columns="[
                             ['label' => '#', 'width' => '5%'],
-                            ['label' => 'Código', 'width' => '12%'],
-                            ['label' => 'Nombre', 'width' => '33%'],
-                            ['label' => 'Duración', 'width' => '10%'],
-                            ['label' => 'RAPs', 'width' => '10%'],
-                            ['label' => 'Estado', 'width' => '15%'],
-                            ['label' => 'Acciones', 'width' => '15%', 'class' => 'text-center']
+                            ['label' => 'Código norma', 'width' => '12%'],
+                            ['label' => 'Nombre de la competencia', 'width' => '30%'],
+                            ['label' => 'Norma / Unidad', 'width' => '20%'],
+                            ['label' => 'Programas', 'width' => '15%'],
+                            ['label' => 'Duración máx. (h)', 'width' => '8%'],
+                            ['label' => 'Acciones', 'width' => '10%', 'class' => 'text-center']
                         ]"
                         :pagination="$competencias->links()"
                     >
@@ -192,29 +192,34 @@
                                             <tr>
                                                 <td class="px-4">{{ $loop->iteration }}</td>
                                                 <td class="px-4 font-weight-medium">{{ $competencia->codigo }}</td>
-                                                <td class="px-4">{{ Str::limit($competencia->nombre, 50) }}</td>
+                                                <td class="px-4">{{ Str::limit($competencia->nombre, 60) }}</td>
+                                                <td class="px-4">{{ Str::limit($competencia->descripcion, 70) }}</td>
+                                                <td class="px-4">
+                                                    @forelse($competencia->programasFormacion as $programa)
+                                                        <span class="badge badge-light text-primary border mr-1 mb-1 d-inline-block">
+                                                            {{ $programa->codigo }}
+                                                        </span>
+                                                    @empty
+                                                        <span class="text-muted">Sin programas</span>
+                                                    @endforelse
+                                                </td>
                                                 <td class="px-4">
                                                     @if($competencia->duracion)
-                                                        <span class="badge badge-info">{{ formatear_horas($competencia->duracion) }}h</span>
+                                                        <span class="badge badge-info">{{ number_format($competencia->duracion, 0) }}</span>
                                                     @else
                                                         <span class="text-muted">N/A</span>
                                                     @endif
                                                 </td>
                                                 <td class="px-4 text-center">
-                                                    <span class="badge badge-primary">{{ $competencia->resultadosAprendizaje->count() }}</span>
-                                                </td>
-                                                <td class="px-4">
-                                                    <div class="d-inline-block px-3 py-1 rounded-pill {{ $competencia->status == 1 ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}">
-                                                        <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
-                                                        {{ $competencia->status == 1 ? 'Activa' : 'Inactiva' }}
-                                                    </div>
-                                                </td>
-                                                <td class="px-4 text-center">
-                                                    <div class="btn-group">
-                                                        @can('VER COMPETENCIA')
-                                                            <a href="{{ route('competencias.show', $competencia) }}" 
-                                                                class="btn btn-light btn-sm" data-toggle="tooltip" title="Ver detalles">
-                                                                <i class="fas fa-eye text-info"></i>
+                                                     <div class="mb-2">
+                                                         <span class="badge badge-{{ $competencia->status ? 'success' : 'secondary' }}">
+                                                             {{ $competencia->status ? 'Activa' : 'Inactiva' }}
+                                                         </span>
+                                                     </div>
+                                                     <div class="btn-group btn-group-sm" role="group" aria-label="Acciones">
+                                                         @can('VER COMPETENCIA')
+                                                             <a href="{{ route('competencias.show', $competencia) }}" class="btn btn-outline-info" data-toggle="tooltip" title="Ver Detalle">
+                                                                <i class="fas fa-eye"></i>
                                                             </a>
                                                         @endcan
                                                         @can('GESTIONAR RESULTADOS COMPETENCIA')

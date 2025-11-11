@@ -61,31 +61,65 @@
                             <form method="POST" action="{{ route('competencias.store') }}">
                                 @csrf
 
-                                {{-- Sección: Información Básica --}}
                                 <div class="form-section">
                                     <div class="form-section-title">
-                                        <i class="fas fa-info-circle mr-1"></i> Información Básica
+                                        <i class="fas fa-info-circle mr-1"></i> Información de la Competencia
                                     </div>
+
+                                    <div class="form-group mb-3">
+                                        <label for="descripcion" class="form-label font-weight-bold">
+                                            Norma / Unidad de competencia <span class="text-danger">*</span>
+                                        </label>
+                                        <textarea
+                                            name="descripcion"
+                                            id="descripcion"
+                                            rows="3"
+                                            class="form-control @error('descripcion') is-invalid @enderror"
+                                            placeholder="Describa la norma o unidad de competencia"
+                                            required
+                                        >{{ old('descripcion') }}</textarea>
+                                        @error('descripcion')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        <small class="form-text text-muted">Máximo 1000 caracteres.</small>
+                                    </div>
+
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="codigo" class="form-label font-weight-bold">Código <span class="text-danger">*</span></label>
-                                                <input type="text" name="codigo" id="codigo"
+                                            <div class="form-group mb-3">
+                                                <label for="codigo" class="form-label font-weight-bold">
+                                                    Código de norma de competencia laboral <span class="text-danger">*</span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name="codigo"
+                                                    id="codigo"
                                                     class="form-control @error('codigo') is-invalid @enderror"
-                                                    value="{{ old('codigo') }}" placeholder="Ej: 38356" required>
+                                                    value="{{ old('codigo') }}"
+                                                    placeholder="Ej: NCL-1234"
+                                                    maxlength="50"
+                                                    required
+                                                >
                                                 @error('codigo')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
-                                                <small class="form-text text-muted">Código único de la competencia</small>
                                             </div>
                                         </div>
-
                                         <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="duracion" class="form-label font-weight-bold">Duración (horas) <span class="text-danger">*</span></label>
-                                                <input type="number" name="duracion" id="duracion"
+                                            <div class="form-group mb-3">
+                                                <label for="duracion" class="form-label font-weight-bold">
+                                                    Duración máxima de la competencia (horas) <span class="text-danger">*</span>
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name="duracion"
+                                                    id="duracion"
                                                     class="form-control @error('duracion') is-invalid @enderror"
-                                                    value="{{ old('duracion') }}" placeholder="Ej: 144" min="1" step="0.01" required>
+                                                    value="{{ old('duracion') }}"
+                                                    placeholder="Ej: 120"
+                                                    min="1"
+                                                    required
+                                                >
                                                 @error('duracion')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
@@ -93,82 +127,59 @@
                                         </div>
                                     </div>
 
-                                    <div class="form-group">
-                                        <label for="nombre" class="form-label font-weight-bold">Nombre <span class="text-danger">*</span></label>
-                                        <input type="text" name="nombre" id="nombre"
+                                    <div class="form-group mb-3">
+                                        <label for="nombre" class="form-label font-weight-bold">
+                                            Nombre de la competencia <span class="text-danger">*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="nombre"
+                                            id="nombre"
                                             class="form-control @error('nombre') is-invalid @enderror"
-                                            value="{{ old('nombre') }}" placeholder="Ej: IMPLANTACIÓN DEL SOFTWARE" required>
+                                            value="{{ old('nombre') }}"
+                                            placeholder="Ej: Aplicar normas de calidad en el desarrollo de software"
+                                            maxlength="255"
+                                            required
+                                        >
                                         @error('nombre')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
                                     </div>
 
-                                    <div class="form-group">
-                                        <label for="descripcion" class="form-label font-weight-bold">Descripción</label>
-                                        <textarea name="descripcion" id="descripcion" rows="3"
-                                            class="form-control @error('descripcion') is-invalid @enderror"
-                                            placeholder="Descripción detallada de la competencia...">{{ old('descripcion') }}</textarea>
-                                        @error('descripcion')
-                                            <div class="invalid-feedback">{{ $message }}</div>
+                                    <div class="form-group mb-3">
+                                        <label for="programas" class="form-label font-weight-bold">
+                                            Programas de formación <span class="text-danger">*</span>
+                                        </label>
+                                        <select
+                                            name="programas[]"
+                                            id="programas"
+                                            class="form-control select2 @error('programas') is-invalid @enderror @error('programas.*') is-invalid @enderror"
+                                            multiple
+                                            data-placeholder="Seleccione los programas de formación"
+                                            required
+                                        >
+                                            @foreach($programas as $programa)
+                                                <option value="{{ $programa->id }}" {{ collect(old('programas', []))->contains($programa->id) ? 'selected' : '' }}>
+                                                    {{ $programa->codigo }} - {{ $programa->nombre }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                        @error('programas')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
                                         @enderror
-                                        <small class="form-text text-muted">Máximo 1000 caracteres</small>
+                                        @error('programas.*')
+                                            <div class="invalid-feedback d-block">{{ $message }}</div>
+                                        @enderror
+                                        <small class="form-text text-muted">
+                                            Puede seleccionar uno o varios programas donde aplica esta competencia.
+                                        </small>
                                     </div>
                                 </div>
 
-                                {{-- Sección: Fechas de Vigencia --}}
-                                <div class="form-section">
-                                    <div class="form-section-title">
-                                        <i class="fas fa-calendar-alt mr-1"></i> Fechas de Vigencia
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="fecha_inicio" class="form-label font-weight-bold">Fecha de Inicio <span class="text-danger">*</span></label>
-                                                <input type="date" name="fecha_inicio" id="fecha_inicio"
-                                                    class="form-control @error('fecha_inicio') is-invalid @enderror"
-                                                    value="{{ old('fecha_inicio') }}" required>
-                                                @error('fecha_inicio')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="fecha_fin" class="form-label font-weight-bold">Fecha de Fin <span class="text-danger">*</span></label>
-                                                <input type="date" name="fecha_fin" id="fecha_fin"
-                                                    class="form-control @error('fecha_fin') is-invalid @enderror"
-                                                    value="{{ old('fecha_fin') }}" required>
-                                                @error('fecha_fin')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div class="alert alert-info">
+                                    Las competencias se podrán modificar posteriormente, incluyendo la eliminación de vínculos con los programas seleccionados.
                                 </div>
 
-                                {{-- Sección: Estado --}}
-                                <div class="form-section">
-                                    <div class="form-section-title">
-                                        <i class="fas fa-toggle-on mr-1"></i> Estado
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="status" class="form-label font-weight-bold">Estado</label>
-                                                <select name="status" id="status" class="form-control @error('status') is-invalid @enderror">
-                                                    <option value="1" {{ old('status', '1') == '1' ? 'selected' : '' }}>Activa</option>
-                                                    <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Inactiva</option>
-                                                </select>
-                                                @error('status')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {{-- Botones de Acción --}}
                                 <hr class="mt-4">
                                 <div class="d-flex justify-content-end">
                                     <a href="{{ route('competencias.index') }}" class="btn btn-light mr-2">

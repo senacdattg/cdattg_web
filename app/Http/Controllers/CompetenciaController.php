@@ -9,6 +9,7 @@ use App\Http\Requests\StoreCompetenciaRequest;
 use App\Http\Requests\UpdateCompetenciaRequest;
 use App\Models\Competencia;
 use App\Models\ResultadosAprendizaje;
+use App\Models\ProgramaFormacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -42,7 +43,7 @@ class CompetenciaController extends Controller
     public function index(Request $request)
     {
         try {
-            $query = Competencia::with(['userCreate', 'userEdit']);
+            $query = Competencia::with(['userCreate', 'userEdit', 'programasFormacion']);
             
             // Filtro de búsqueda por código o nombre
             if ($request->filled('search')) {
@@ -92,7 +93,9 @@ class CompetenciaController extends Controller
     public function create()
     {
         try {
-            return view('competencias.create');
+            $programas = ProgramaFormacion::orderBy('nombre')->get(['id', 'codigo', 'nombre']);
+
+            return view('competencias.create', compact('programas'));
         } catch (Exception $e) {
             Log::error('Error al cargar formulario de creación de competencia: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Error al cargar el formulario de creación.');
@@ -105,15 +108,28 @@ class CompetenciaController extends Controller
             DB::beginTransaction();
             
             $data = $request->validated();
+            $programasSeleccionados = $request->input('programas', []);
+
             $data['user_create_id'] = Auth::id();
             $data['user_edit_id'] = Auth::id();
-            
-            // Agregar status por defecto si no viene
-            if (!isset($data['status'])) {
-                $data['status'] = 1;
-            }
-            
+            $data['fecha_inicio'] = now();
+            $data['fecha_fin'] = now()->addYear();
+            $data['status'] = 1;
+
             $competencia = Competencia::create($data);
+
+            if (!empty($programasSeleccionados)) {
+                $competencia->programasFormacion()->attach(
+                    collect($programasSeleccionados)->mapWithKeys(function ($programaId) {
+                        return [
+                            $programaId => [
+                                'user_create_id' => Auth::id(),
+                                'user_edit_id' => Auth::id(),
+                            ],
+                        ];
+                    })->toArray()
+                );
+            }
             
             DB::commit();
             
@@ -161,6 +177,10 @@ class CompetenciaController extends Controller
     public function edit(Competencia $competencia)
     {
         try {
+            $competencia->load(['programasFormacion' => function ($query) {
+                $query->orderBy('nombre');
+            }]);
+
             return view('competencias.edit', compact('competencia'));
         } catch (Exception $e) {
             Log::error('Error al cargar formulario de edición: ' . $e->getMessage(), [

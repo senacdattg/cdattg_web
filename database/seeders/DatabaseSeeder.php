@@ -25,6 +25,7 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use App\Models\CompetenciaPrograma;
 
 class DatabaseSeeder extends Seeder
 {
@@ -59,7 +60,6 @@ class DatabaseSeeder extends Seeder
             ResultadosCompetenciasSeeder::class,
             GuiasAprendizajeSeeder::class,
             ResultadosGuiasSeeder::class,
-            CompetenciaProgramaSeeder::class,
             ProductoSeeder::class, // Crear productos para agregar al módulo de inventario
             // Complementarios ofertados
             // ComplementariosOfertadosSeeder::class,
@@ -68,6 +68,7 @@ class DatabaseSeeder extends Seeder
             // Categorias de caracterizacion para complementarios
             // CategoriaCaracterizacionComplementariosSeeder::class,
         ]);
+
     }
     private function truncateGeneratedData(): void
     {

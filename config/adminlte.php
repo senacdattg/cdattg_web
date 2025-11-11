@@ -558,13 +558,13 @@ return [
             'submenu' => [
                 [
                     'text' => 'Ver Competencias',
-                    'url' => 'competencias',
+                    'route' => 'competencias.index',
                     'icon' => 'fas fa-fw fa-list',
                     'can' => 'VER COMPETENCIA',
                 ],
                 [
                     'text' => 'Crear Competencia',
-                    'url' => 'competencias/create',
+                    'route' => 'competencias.create',
                     'icon' => 'fas fa-fw fa-plus',
                     'can' => 'CREAR COMPETENCIA',
                 ],

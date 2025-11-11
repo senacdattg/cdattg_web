@@ -21,6 +21,10 @@
         .link_right_header:hover {
             color: #4299e1;
         }
+        .competencias-scroll {
+            max-height: 260px;
+            overflow-y: auto;
+        }
     </style>
 @endsection
 
@@ -58,35 +62,71 @@
                             </h5>
                         </div>
                         <div class="card-body">
+                            @php
+                                $programasAsociados = $competencia->programasFormacion ?? collect();
+                            @endphp
+
                             <form method="POST" action="{{ route('competencias.update', $competencia) }}">
                                 @csrf
                                 @method('PUT')
 
-                                {{-- Sección: Información Básica --}}
+                                {{-- Sección: Información de la competencia --}}
                                 <div class="form-section">
                                     <div class="form-section-title">
-                                        <i class="fas fa-info-circle mr-1"></i> Información Básica
+                                        <i class="fas fa-info-circle mr-1"></i> Información de la Competencia
                                     </div>
+                                    <div class="form-group mb-3">
+                                        <label for="descripcion" class="form-label font-weight-bold">
+                                            Norma / Unidad de competencia <span class="text-danger">*</span>
+                                        </label>
+                                        <textarea
+                                            name="descripcion"
+                                            id="descripcion"
+                                            rows="3"
+                                            class="form-control @error('descripcion') is-invalid @enderror"
+                                            placeholder="Describa la norma o unidad de competencia"
+                                            required
+                                        >{{ old('descripcion', $competencia->descripcion) }}</textarea>
+                                        @error('descripcion')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                        <small class="form-text text-muted">Máximo 1000 caracteres.</small>
+                                    </div>
+
                                     <div class="row">
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="codigo" class="form-label font-weight-bold">Código <span class="text-danger">*</span></label>
-                                                <input type="text" name="codigo" id="codigo"
+                                                <label for="codigo" class="form-label font-weight-bold">
+                                                    Código de norma de competencia laboral <span class="text-danger">*</span>
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    name="codigo"
+                                                    id="codigo"
                                                     class="form-control @error('codigo') is-invalid @enderror"
-                                                    value="{{ old('codigo', $competencia->codigo) }}" placeholder="Ej: 38356" required>
+                                                    value="{{ old('codigo', $competencia->codigo) }}"
+                                                    maxlength="50"
+                                                    required
+                                                >
                                                 @error('codigo')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
-                                                <small class="form-text text-muted">Código único de la competencia</small>
                                             </div>
                                         </div>
-
                                         <div class="col-md-6">
                                             <div class="form-group">
-                                                <label for="duracion" class="form-label font-weight-bold">Duración (horas) <span class="text-danger">*</span></label>
-                                                <input type="number" name="duracion" id="duracion"
+                                                <label for="duracion" class="form-label font-weight-bold">
+                                                    Duración máxima de la competencia (horas) <span class="text-danger">*</span>
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name="duracion"
+                                                    id="duracion"
                                                     class="form-control @error('duracion') is-invalid @enderror"
-                                                    value="{{ old('duracion', $competencia->duracion) }}" placeholder="Ej: 144" min="1" step="0.01" required>
+                                                    value="{{ old('duracion', $competencia->duracion) }}"
+                                                    min="1"
+                                                    required
+                                                >
                                                 @error('duracion')
                                                     <div class="invalid-feedback">{{ $message }}</div>
                                                 @enderror
@@ -95,56 +135,19 @@
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="nombre" class="form-label font-weight-bold">Nombre <span class="text-danger">*</span></label>
-                                        <input type="text" name="nombre" id="nombre"
+                                        <label for="nombre" class="form-label font-weight-bold">Nombre de la competencia <span class="text-danger">*</span></label>
+                                        <input
+                                            type="text"
+                                            name="nombre"
+                                            id="nombre"
                                             class="form-control @error('nombre') is-invalid @enderror"
-                                            value="{{ old('nombre', $competencia->nombre) }}" placeholder="Ej: IMPLANTACIÓN DEL SOFTWARE" required>
+                                            value="{{ old('nombre', $competencia->nombre) }}"
+                                            maxlength="255"
+                                            required
+                                        >
                                         @error('nombre')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="descripcion" class="form-label font-weight-bold">Descripción</label>
-                                        <textarea name="descripcion" id="descripcion" rows="3"
-                                            class="form-control @error('descripcion') is-invalid @enderror"
-                                            placeholder="Descripción detallada de la competencia...">{{ old('descripcion', $competencia->descripcion) }}</textarea>
-                                        @error('descripcion')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                        <small class="form-text text-muted">Máximo 1000 caracteres</small>
-                                    </div>
-                                </div>
-
-                                {{-- Sección: Fechas de Vigencia --}}
-                                <div class="form-section">
-                                    <div class="form-section-title">
-                                        <i class="fas fa-calendar-alt mr-1"></i> Fechas de Vigencia
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="fecha_inicio" class="form-label font-weight-bold">Fecha de Inicio <span class="text-danger">*</span></label>
-                                                <input type="date" name="fecha_inicio" id="fecha_inicio"
-                                                    class="form-control @error('fecha_inicio') is-invalid @enderror"
-                                                    value="{{ old('fecha_inicio', $competencia->fecha_inicio ? $competencia->fecha_inicio->format('Y-m-d') : '') }}" required>
-                                                @error('fecha_inicio')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-
-                                        <div class="col-md-6">
-                                            <div class="form-group">
-                                                <label for="fecha_fin" class="form-label font-weight-bold">Fecha de Fin <span class="text-danger">*</span></label>
-                                                <input type="date" name="fecha_fin" id="fecha_fin"
-                                                    class="form-control @error('fecha_fin') is-invalid @enderror"
-                                                    value="{{ old('fecha_fin', $competencia->fecha_fin ? $competencia->fecha_fin->format('Y-m-d') : '') }}" required>
-                                                @error('fecha_fin')
-                                                    <div class="invalid-feedback">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
 
@@ -199,6 +202,71 @@
                             </form>
                         </div>
                     </div>
+
+                    <div class="card shadow-sm no-hover mt-4">
+                        <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                <i class="fas fa-graduation-cap mr-1"></i> Programas de formación asociados
+                            </h6>
+                            <span class="badge badge-primary badge-pill">
+                                {{ $programasAsociados->count() }} programa(s)
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            @if($programasAsociados->isEmpty())
+                                <p class="text-muted mb-0">Esta competencia no tiene programas asociados actualmente.</p>
+                            @else
+                                <div class="table-responsive competencias-scroll">
+                                    <table class="table table-sm table-striped mb-0">
+                                        <thead class="thead-light">
+                                            <tr>
+                                                <th style="width: 18%;">Código</th>
+                                                <th>Programa de formación</th>
+                                                <th style="width: 15%;" class="text-center">Estado</th>
+                                                <th style="width: 15%;" class="text-right">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($programasAsociados as $programa)
+                                                @php
+                                                    $mensajeConfirmacion = "¿Quitar la competencia del programa '{$programa->nombre}'?";
+                                                    $rutaDesasociar = route('programa.competencia.detach', [$programa->id, $competencia->id]);
+                                                @endphp
+                                                <tr>
+                                                    <td>
+                                                        <span class="badge badge-primary">{{ $programa->codigo }}</span>
+                                                    </td>
+                                                    <td>{{ $programa->nombre }}</td>
+                                                    <td class="text-center">
+                                                        <span class="badge badge-{{ $programa->status ? 'success' : 'secondary' }}">
+                                                            {{ $programa->status ? 'Activo' : 'Inactivo' }}
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <form
+                                                            method="POST"
+                                                            action="{{ $rutaDesasociar }}"
+                                                            class="d-inline"
+                                                            onsubmit="return confirmarQuitar('{{ $mensajeConfirmacion }}');"
+                                                        >
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-outline-danger btn-sm">
+                                                                <i class="fas fa-times mr-1"></i>Quitar
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <small class="text-muted d-block mt-3">
+                                    Para asociar esta competencia a nuevos programas utilice el proceso de creación o gestione el vínculo desde el módulo de programas.
+                                </small>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -211,4 +279,11 @@
 
 @section('js')
     @vite(['resources/js/pages/competencias-form.js'])
+    <script>
+        if (typeof window.confirmarQuitar !== 'function') {
+            window.confirmarQuitar = function (mensaje) {
+                return window.confirm(mensaje);
+            };
+        }
+    </script>
 @endsection

@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class CompetenciaPrograma extends Model
 {
+    use HasFactory;
+
     protected $table = 'competencia_programa';
     protected $fillable = [
         'competencia_id',
