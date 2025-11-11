@@ -187,7 +187,30 @@
                     </h5>
                     <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
-                    </button>    {{-- Modal de producto no disponible --}}
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3">
+                        Revisa el detalle de los productos antes de confirmar la solicitud.
+                    </p>
+                    <div id="order-summary-content"></div>
+                </div>
+                <div class="modal-footer">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button
+                        type="button"
+                        class="btn btn-success"
+                        id="btn-final-confirm">
+                        <i class="fas fa-paper-plane"></i> Enviar solicitud
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     {{-- Modal de advertencia de stock --}}
@@ -213,7 +236,12 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">
                         Entendido
-                    </button>    {{-- Alertas --}}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {{-- Alertas --}}
     @include('layout.alertas')
 @endsection
 
