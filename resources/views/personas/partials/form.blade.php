@@ -27,8 +27,12 @@
             ->values()
             ->all();
     }
-    $departamentoUrlTemplate = route('departamentos.by.pais', ['pais' => '__ID__']);
-    $municipioUrlTemplate = route('municipios.by.departamento', ['departamento' => '__ID__']);
+    $departamentoUrlTemplate = \Illuminate\Support\Facades\Route::has('departamentos.by.pais')
+        ? route('departamentos.by.pais', ['pais' => '__ID__'])
+        : null;
+    $municipioUrlTemplate = \Illuminate\Support\Facades\Route::has('municipios.by.departamento')
+        ? route('municipios.by.departamento', ['departamento' => '__ID__'])
+        : null;
     $oldDepartamentoId = old('departamento_id', $isEdit ? $persona->departamento_id : null);
     $oldMunicipioId = old('municipio_id', $isEdit ? $persona->municipio_id : null);
 @endphp
@@ -128,6 +132,9 @@
                         <input type="date" id="fecha_nacimiento" name="fecha_nacimiento"
                             class="form-control @error('fecha_nacimiento') is-invalid @enderror"
                             value="{{ old('fecha_nacimiento', $fechaNacimientoValor) }}" required>
+                        <small class="form-text text-muted">
+                            Debe tener al menos 14 años para registrarse.
+                        </small>
                         @error('fecha_nacimiento')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -209,10 +216,13 @@
                         <label for="pais_id" class="form-label font-weight-bold">País</label>
                         @php
                             $oldPaisId = old('pais_id', $isEdit ? $persona->pais_id : null);
+                            $paisesEndpoint = \Illuminate\Support\Facades\Route::has('api.paises')
+                                ? route('api.paises')
+                                : url('/api/paises');
                         @endphp
                         <select name="pais_id" id="pais_id"
                             class="form-control @error('pais_id') is-invalid @enderror"
-                            data-initial-value="{{ $oldPaisId }}">
+                            data-initial-value="{{ $oldPaisId }}" data-url="{{ $paisesEndpoint }}">
                             <option value="" disabled {{ $oldPaisId ? '' : 'selected' }}>
                                 Seleccione un país
                             </option>
@@ -265,12 +275,153 @@
                     </div>
                     <div class="col-md-6 mb-0">
                         <label for="direccion" class="form-label font-weight-bold">Dirección</label>
-                        <input type="text" id="direccion" name="direccion"
-                            class="form-control @error('direccion') is-invalid @enderror"
-                            value="{{ old('direccion', $isEdit ? $persona->direccion : '') }}">
-                        @error('direccion')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <div class="input-group">
+                            <input type="text" id="direccion" name="direccion"
+                                class="form-control @error('direccion') is-invalid @enderror"
+                                value="{{ old('direccion', $isEdit ? $persona->direccion : '') }}"
+                                placeholder="Usa el asistente para ingresar una dirección estructurada" readonly>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-primary" id="toggleAddressForm"
+                                    aria-haspopup="dialog" aria-controls="addressModal">
+                                    <i class="fas fa-map-marker-alt mr-1"></i>Editar
+                                </button>
+                            </div>
+                            @error('direccion')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <small class="form-text text-muted">
+                            Haz clic en el campo o en “Editar” para capturar la dirección de forma estructurada.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="addressModal" tabindex="-1" role="dialog"
+                    aria-labelledby="addressModalLabel" aria-hidden="true" data-backdrop="static"
+                    data-keyboard="false">
+                    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title" id="addressModalLabel">Ingresar dirección estructurada</h5>
+                                <button type="button" class="close text-white" data-dismiss="modal"
+                                    aria-label="Cerrar">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="alert alert-info border-info d-flex align-items-start" role="alert">
+                                    <i class="fas fa-info-circle fa-lg mr-2 mt-1 text-info"></i>
+                                    <div>
+                                        <strong>Consejo:</strong>
+                                        <p class="mb-0 small">
+                                            Usa el formato estructurado para asegurar notificaciones y
+                                            georreferenciación correctas.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="tipo_via">1. Tipo de vía principal *</label>
+                                            <select class="form-control address-field" id="tipo_via"
+                                                data-required="true">
+                                                <option value="">Seleccione...</option>
+                                                <option value="Carrera">Carrera</option>
+                                                <option value="Calle">Calle</option>
+                                                <option value="Transversal">Transversal</option>
+                                                <option value="Diagonal">Diagonal</option>
+                                                <option value="Avenida">Avenida</option>
+                                                <option value="Autopista">Autopista</option>
+                                                <option value="Circular">Circular</option>
+                                                <option value="Vía">Vía</option>
+                                                <option value="Pasaje">Pasaje</option>
+                                                <option value="Manzana">Manzana</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="numero_via">2. Número o nombre de vía principal *</label>
+                                            <input type="text" class="form-control address-field" id="numero_via"
+                                                placeholder="Ej: 9A, 7 Bis, 45" data-required="true">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="letra_via">3. Letra o complemento de vía principal</label>
+                                            <input type="text" class="form-control address-field" id="letra_via"
+                                                placeholder="Ej: A, B, Bis (opcional)" maxlength="5">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="via_secundaria">4. Vía secundaria o intersección</label>
+                                            <select class="form-control address-field" id="via_secundaria">
+                                                <option value="">Seleccione...</option>
+                                                <option value="Carrera">Carrera</option>
+                                                <option value="Calle">Calle</option>
+                                                <option value="Transversal">Transversal</option>
+                                                <option value="Diagonal">Diagonal</option>
+                                                <option value="Avenida">Avenida</option>
+                                                <option value="Autopista">Autopista</option>
+                                                <option value="Circular">Circular</option>
+                                                <option value="Vía">Vía</option>
+                                                <option value="Pasaje">Pasaje</option>
+                                                <option value="Manzana">Manzana</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="numero_casa">5. Número de casa o edificio *</label>
+                                            <input type="text" class="form-control address-field" id="numero_casa"
+                                                placeholder="Ej: 34-15, 45-20, 12" data-required="true">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="complementos">6. Complementos</label>
+                                            <input type="text" class="form-control address-field"
+                                                id="complementos"
+                                                placeholder="Ej: Apto 301, Bloque 2, Oficina 5 (opcional)">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="barrio">7. Barrio o vereda</label>
+                                            <input type="text" class="form-control address-field" id="barrio"
+                                                placeholder="Ej: Centro, La Candelaria (opcional)">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="alert alert-light border mt-4">
+                                            <small>
+                                                <strong>Ejemplo:</strong><br>
+                                                <span class="text-muted">Carrera 9A BIS #34-15 Este Apto 301,
+                                                    Barrio Centro</span><br>
+                                                <span class="text-muted">
+                                                    Los campos marcados con * son obligatorios.
+                                                </span>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" id="cancelAddress">
+                                    <i class="fas fa-times mr-2"></i>Cancelar
+                                </button>
+                                <button type="button" class="btn btn-primary" id="saveAddress">
+                                    <i class="fas fa-save mr-2"></i>Guardar dirección
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -412,97 +563,8 @@
     @endif
 </div>
 
-@push('js')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // ==========================================
-            // Manejo de caracterización (seleccionar todo/limpiar)
-            // ==========================================
-            const selectAllBtn = document.querySelector('[data-action="caracterizacion-select-all"]');
-            const clearBtn = document.querySelector('[data-action="caracterizacion-clear"]');
-            const groups = document.querySelectorAll('.caracterizacion-group');
-
-            const toggleCheckboxes = (checked) => {
-                groups.forEach(group => {
-                    group.querySelectorAll('input[type="checkbox"]').forEach(chk => {
-                        chk.checked = checked;
-                    });
-                });
-            };
-
-            if (selectAllBtn) {
-                selectAllBtn.addEventListener('click', function() {
-                    toggleCheckboxes(true);
-                });
-            }
-
-            if (clearBtn) {
-                clearBtn.addEventListener('click', function() {
-                    toggleCheckboxes(false);
-                });
-            }
-
-            // ==========================================
-            // Validación "NINGUNA" vs otras caracterizaciones
-            // ==========================================
-            const caracterizacionCheckboxes = document.querySelectorAll('input[name="caracterizacion_ids[]"]');
-            const ningunaCbx = document.querySelector('input[name="caracterizacion_ids[]"][value="235"]');
-
-            if (ningunaCbx && caracterizacionCheckboxes.length > 0) {
-                caracterizacionCheckboxes.forEach(checkbox => {
-                    checkbox.addEventListener('change', function() {
-                        if (this.value === '235' && this.checked) {
-                            // Si marcó "NINGUNA", desmarcar todas las demás
-                            caracterizacionCheckboxes.forEach(cbx => {
-                                if (cbx.value !== '235') {
-                                    cbx.checked = false;
-                                }
-                            });
-                        } else if (this.value !== '235' && this.checked) {
-                            // Si marcó otra opción, desmarcar "NINGUNA"
-                            if (ningunaCbx) {
-                                ningunaCbx.checked = false;
-                            }
-                        }
-                    });
-                });
-            }
-
-            // ==========================================
-            // Conversión automática a mayúsculas
-            // ==========================================
-            const camposTexto = ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido'];
-            camposTexto.forEach(campo => {
-                const elemento = document.getElementsByName(campo)[0];
-                if (elemento) {
-                    elemento.addEventListener('input', function() {
-                        this.value = this.value.toUpperCase();
-                    });
-                }
-            });
-
-            // ==========================================
-            // Validación de solo números
-            // ==========================================
-            function soloNumeros(event) {
-                const key = event.key;
-                if (event.ctrlKey || event.altKey || event.metaKey) {
-                    return true;
-                }
-                if (!/^\d$/.test(key)) {
-                    event.preventDefault();
-                    return false;
-                }
-                return true;
-            }
-
-            const camposNumericos = ['numero_documento', 'telefono', 'celular'];
-            camposNumericos.forEach(campo => {
-                const elemento = document.getElementsByName(campo)[0];
-                if (elemento) {
-                    elemento.addEventListener('keypress', soloNumeros);
-                }
-            });
-        });
-    </script>
-@endpush
+@once
+    @push('js')
+        @vite('resources/js/personas/form.js')
+    @endpush
+@endonce

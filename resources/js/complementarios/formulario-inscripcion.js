@@ -1,6 +1,28 @@
 // Funcionalidad para formularios de inscripción y registro
 
-document.addEventListener('DOMContentLoaded', function() {
+// Constantes de configuración para centralizar reglas de negocio
+const CONFIG = {
+    EDAD_MINIMA: 14,
+    MENSAJE_EDAD_INVALIDA: 'Debe tener al menos 14 años para registrarse.',
+    NINGUNA_LABEL: 'NINGUNA',
+    CAMPOS_TEXTOS: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido'],
+    CAMPOS_NUMERICOS: ['numero_documento', 'telefono', 'celular'],
+    CAMPOS_DIRECCION_NUMERICOS: ['numero_via', 'numero_casa']
+};
+
+// Detecta el contexto del formulario (inscripción vs registro) para activar lógica específica
+function getFormContext() {
+    const registroForm = document.getElementById('registroForm');
+    const formInscripcion = document.getElementById('formInscripcion');
+
+    if (registroForm) return 'registro';
+    if (formInscripcion) return 'inscripcion';
+    return 'unknown';
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const context = getFormContext();
+
     // Inicializar municipios si hay datos guardados
     initializeMunicipios();
 
@@ -16,9 +38,22 @@ document.addEventListener('DOMContentLoaded', function() {
     // Configurar carga dinámica de municipios
     setupMunicipioLoading();
 
+    // Configurar manejo de caracterización solo para inscripción
+    if (context === 'inscripcion') {
+        setupCaracterizacionHandling();
+    }
+
+    // Configurar validación de edad mínima (aplica a ambos contextos si existe el campo)
+    setupEdadMinimaValidation();
+
     // Inicializar municipios dinámicos para formularios que lo necesiten
     if (typeof initializeMunicipiosDynamic === 'function') {
         initializeMunicipiosDynamic();
+    }
+
+    // Para registro, inicializar carga dinámica de países (solo si aplica)
+    if (context === 'registro') {
+        initializePaisesForRegistro();
     }
 });
 
@@ -68,7 +103,7 @@ function getUserData() {
 function setupFormValidations() {
     const forms = document.querySelectorAll('#formInscripcion, #registroForm');
     forms.forEach(form => {
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', function (e) {
             if (!validateForm(this)) {
                 e.preventDefault();
             }
@@ -81,8 +116,7 @@ function validateForm(form) {
     let isValid = true;
 
     // Validar nombres y apellidos (solo letras)
-    const camposTexto = ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido'];
-    camposTexto.forEach(campoId => {
+    CONFIG.CAMPOS_TEXTOS.forEach(campoId => {
         const campo = form.querySelector(`#${campoId}`);
         if (campo && campo.value && !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/.test(campo.value)) {
             alert(`El campo ${campoId.replace('_', ' ')} solo puede contener letras, espacios y guiones.`);
@@ -127,21 +161,20 @@ function validateForm(form) {
 
 // Configurar conversión a mayúsculas y validación de texto
 function setupUppercaseConversion() {
-    const camposTexto = [
-        'primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido'
-    ];
-
-    camposTexto.forEach(campoId => {
+    CONFIG.CAMPOS_TEXTOS.forEach(campoId => {
         const campo = document.getElementById(campoId);
         if (campo) {
-            campo.addEventListener('input', function() {
+            campo.addEventListener('input', function () {
                 // Convertir a mayúsculas y remover números
-                this.value = this.value.toUpperCase().replace(/[0-9]/g, '');
+                this.value = this.value.toUpperCase().replace(/\d/g, '');
             });
 
             // Validación en tiempo real - prevenir números durante escritura
-            campo.addEventListener('keypress', function(e) {
-                const char = String.fromCharCode(e.which);
+            campo.addEventListener('keypress', function (e) {
+                const char = e.key;
+                if (!char || char.length !== 1) {
+                    return true;
+                }
                 // Permitir letras, espacios, guiones, tildes y teclas de control
                 if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]$/.test(char) && !e.ctrlKey && !e.altKey && !e.metaKey) {
                     e.preventDefault();
@@ -155,9 +188,7 @@ function setupUppercaseConversion() {
 
 // Configurar validación de solo números
 function setupNumberValidation() {
-    const camposNumericos = ['numero_documento', 'telefono', 'celular'];
-
-    camposNumericos.forEach(campoId => {
+    CONFIG.CAMPOS_NUMERICOS.forEach(campoId => {
         const campo = document.getElementById(campoId);
         if (campo) {
             campo.addEventListener('keypress', soloNumeros);
@@ -186,7 +217,7 @@ function setupMunicipioLoading() {
     const departamentoSelect = document.getElementById('departamento_id');
 
     if (paisSelect) {
-        paisSelect.addEventListener('change', function() {
+        paisSelect.addEventListener('change', function () {
             loadDepartamentosForPais(this.value);
             // Limpiar municipios cuando cambia el país
             const municipioSelect = document.getElementById('municipio_id');
@@ -197,7 +228,7 @@ function setupMunicipioLoading() {
     }
 
     if (departamentoSelect) {
-        departamentoSelect.addEventListener('change', function() {
+        departamentoSelect.addEventListener('change', function () {
             loadMunicipiosForDepartamento(this.value);
         });
     }
@@ -208,7 +239,7 @@ function initializeMunicipiosDynamic() {
     // Configurar carga dinámica de municipios
     const departamentoSelect = document.getElementById('departamento_id');
     if (departamentoSelect) {
-        departamentoSelect.addEventListener('change', function() {
+        departamentoSelect.addEventListener('change', function () {
             loadMunicipiosForDepartamento(this.value);
         });
     }
@@ -216,7 +247,7 @@ function initializeMunicipiosDynamic() {
     // Configurar carga de departamentos si hay país seleccionado
     const paisSelect = document.getElementById('pais_id');
     if (paisSelect) {
-        paisSelect.addEventListener('change', function() {
+        paisSelect.addEventListener('change', function () {
             loadDepartamentosForPais(this.value);
             // Limpiar municipios cuando cambia el país
             const municipioSelect = document.getElementById('municipio_id');
@@ -227,82 +258,133 @@ function initializeMunicipiosDynamic() {
     }
 }
 
+// Función común para procesar respuestas de API de ubicaciones
+function processLocationData(data, entityType) {
+    return extractItemsFromResponse(data, entityType);
+}
+
+// Extraer items de diferentes formatos de respuesta
+function extractItemsFromResponse(data, entityType) {
+    if (Array.isArray(data)) {
+        return data;
+    }
+
+    if (!data || typeof data !== 'object') {
+        return [];
+    }
+
+    const rawData = extractRawData(data, entityType);
+    return convertToArray(rawData, entityType);
+}
+
+// Extraer datos crudos de diferentes formatos de respuesta
+function extractRawData(data, entityType) {
+    if (data.success !== undefined && data.data !== undefined) {
+        return data.data;
+    }
+
+    if (data.data !== undefined) {
+        return data.data;
+    }
+
+    if (data[entityType] !== undefined) {
+        return data[entityType];
+    }
+
+    return data;
+}
+
+// Convertir datos crudos a array
+function convertToArray(rawData, entityType) {
+    if (rawData === null || rawData === undefined) {
+        return [];
+    }
+
+    if (Array.isArray(rawData)) {
+        return rawData;
+    }
+
+    if (typeof rawData === 'object') {
+        try {
+            return Object.values(rawData);
+        } catch (e) {
+            console.error(`Error convirtiendo datos de ${entityType} a array:`, e);
+            return [];
+        }
+    }
+
+    console.error(`Los datos de ${entityType} no son un array ni un objeto:`, rawData);
+    return [];
+}
+
+// Función común para poblar select con opciones de ubicación
+function populateLocationSelect(selectElement, items, selectedId, entityType) {
+    if (!Array.isArray(items) || items.length === 0) {
+        console.error(`No se encontraron ${entityType} o estructura inválida:`, items);
+        selectElement.innerHTML = `<option value="">No hay ${entityType} disponibles</option>`;
+        return;
+    }
+
+    items.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item.id;
+        const label = item.nombre ?? item[entityType] ?? item.name ?? item.label ?? '';
+        option.textContent = label || `ID ${item.id}`;
+        if (selectedId && item.id == selectedId) {
+            option.selected = true;
+        }
+        selectElement.appendChild(option);
+    });
+}
+
 // Cargar departamentos para un país
 function loadDepartamentosForPais(paisId, selectedDepartamentoId = null) {
     const departamentoSelect = document.getElementById('departamento_id');
     if (!departamentoSelect) return;
 
-    if (paisId) {
-        fetch(`/departamentos/${paisId}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                departamentoSelect.innerHTML = '<option value="">Seleccione...</option>';
-                if (Array.isArray(data)) {
-                    data.forEach(departamento => {
-                        const option = document.createElement('option');
-                        option.value = departamento.id;
-                        option.textContent = departamento.departamento;
-                        if (selectedDepartamentoId && departamento.id == selectedDepartamentoId) {
-                            option.selected = true;
-                        }
-                        departamentoSelect.appendChild(option);
-                    });
-                } else {
-                    console.error('Los datos de departamentos no son un array:', data);
-                    departamentoSelect.innerHTML = '<option value="">Error en formato de datos</option>';
-                }
-            })
-            .catch(error => {
-                console.error('Error cargando departamentos:', error);
-                departamentoSelect.innerHTML = '<option value="">Error cargando departamentos</option>';
-            });
-    } else {
-        departamentoSelect.innerHTML = '<option value="">Seleccione...</option>';
-    }
+    departamentoSelect.innerHTML = '<option value="">Seleccione...</option>';
+    if (!paisId) return;
+
+    fetch(`/departamentos/${paisId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const departamentos = processLocationData(data, 'departamentos');
+            populateLocationSelect(departamentoSelect, departamentos, selectedDepartamentoId, 'departamento');
+        })
+        .catch(error => {
+            console.error('Error cargando departamentos:', error);
+            departamentoSelect.innerHTML = '<option value="">Error cargando departamentos</option>';
+        });
 }
 
 // Cargar municipios para un departamento
-function loadMunicipiosForDepartamento(departamentoId, selectedMunicipioId = null) {
+function loadMunicipiosForDepartamento(departamentoId, municipioIdToSelect = null) {
     const municipioSelect = document.getElementById('municipio_id');
     if (!municipioSelect) return;
 
-    if (departamentoId) {
-        fetch(`/municipios/${departamentoId}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
-                if (Array.isArray(data)) {
-                    data.forEach(municipio => {
-                        const option = document.createElement('option');
-                        option.value = municipio.id;
-                        option.textContent = municipio.municipio;
-                        if (selectedMunicipioId && municipio.id == selectedMunicipioId) {
-                            option.selected = true;
-                        }
-                        municipioSelect.appendChild(option);
-                    });
-                } else {
-                    console.error('Los datos de municipios no son un array:', data);
-                    municipioSelect.innerHTML = '<option value="">Error en formato de datos</option>';
-                }
-            })
-            .catch(error => {
-                console.error('Error cargando municipios:', error);
-                municipioSelect.innerHTML = '<option value="">Error cargando municipios</option>';
-            });
-    } else {
-        municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
-    }
+    municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
+    if (!departamentoId) return;
+
+    fetch(`/municipios/${departamentoId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const municipios = processLocationData(data, 'municipios');
+            populateLocationSelect(municipioSelect, municipios, municipioIdToSelect, 'municipio');
+        })
+        .catch(error => {
+            console.error('Error cargando municipios:', error);
+            municipioSelect.innerHTML = '<option value="">Error cargando municipios</option>';
+        });
 }
 
 // Funciones para el formulario de dirección estructurada (si existe)
@@ -312,13 +394,16 @@ function setupAddressForm() {
     const cancelButton = document.getElementById('cancelAddress');
 
     if (toggleButton) {
-        toggleButton.addEventListener('click', function() {
+        toggleButton.addEventListener('click', function () {
             const addressForm = document.getElementById('addressForm');
             const isVisible = addressForm.classList.contains('show');
+            const button = this;
             if (isVisible) {
                 $('#addressForm').collapse('hide');
+                button.setAttribute('aria-expanded', 'false');
             } else {
                 $('#addressForm').collapse('show');
+                button.setAttribute('aria-expanded', 'true');
             }
         });
     }
@@ -331,9 +416,7 @@ function setupAddressForm() {
         cancelButton.addEventListener('click', cancelAddress);
     }
 
-    // Validación de números en campos de dirección
-    const addressNumericFields = ['numero_via', 'numero_casa'];
-    addressNumericFields.forEach(fieldId => {
+    CONFIG.CAMPOS_DIRECCION_NUMERICOS.forEach(fieldId => {
         const element = document.getElementById(fieldId);
         if (element) {
             element.addEventListener('keypress', soloNumeros);
@@ -341,77 +424,43 @@ function setupAddressForm() {
     });
 }
 
-// Guardar dirección estructurada
-function saveAddress() {
-    const tipoVia = document.getElementById('tipo_via') ? document.getElementById('tipo_via').value.trim() : '';
-    const numeroVia = document.getElementById('numero_via') ? document.getElementById('numero_via').value.trim() : '';
-    const letraVia = document.getElementById('letra_via') ? document.getElementById('letra_via').value.trim() : '';
-    const viaSecundaria = document.getElementById('via_secundaria') ? document.getElementById('via_secundaria').value.trim() : '';
-    const numeroCasa = document.getElementById('numero_casa') ? document.getElementById('numero_casa').value.trim() : '';
-    const complementos = document.getElementById('complementos') ? document.getElementById('complementos').value.trim() : '';
-    const barrio = document.getElementById('barrio') ? document.getElementById('barrio').value.trim() : '';
+// Inicializar setupAddressForm cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function () {
+    setupAddressForm();
+});
 
-    // Verificar si estamos en un formulario con campos antiguos (carrera, calle)
-    const carrera = document.getElementById('carrera') ? document.getElementById('carrera').value.trim() : '';
-    const calle = document.getElementById('calle') ? document.getElementById('calle').value.trim() : '';
-    const numeroApartamento = document.getElementById('numero_apartamento') ? document.getElementById('numero_apartamento').value.trim() : '';
-
-    // Validar campos obligatorios - verificar si usar campos nuevos o antiguos
-    let isValid = false;
-    let direccion = '';
-
-    if (tipoVia && numeroVia && numeroCasa) {
-        // Usar campos nuevos (tipo_via, numero_via, etc.)
-        isValid = true;
-
-        // Construir la dirección con campos nuevos
-        direccion = `${tipoVia} ${numeroVia}`;
-
-        // Agregar letra de vía si existe
-        if (letraVia) {
-            direccion += letraVia;
-        }
-
-        // Agregar número de casa
-        direccion += ` #${numeroCasa}`;
-
-        // Agregar vía secundaria si existe
-        if (viaSecundaria) {
-            direccion += ` ${viaSecundaria}`;
-        }
-
-        // Agregar complementos si existen
-        if (complementos) {
-            direccion += ` ${complementos}`;
-        }
-
-        // Agregar barrio si existe
-        if (barrio) {
-            direccion += `, ${barrio}`;
-        }
-    } else if (carrera && calle && numeroCasa) {
-        // Usar campos antiguos (carrera, calle, etc.)
-        isValid = true;
-
-        // Construir la dirección con campos antiguos
-        direccion = `Carrera ${carrera} Calle ${calle} #${numeroCasa}`;
-        if (numeroApartamento) {
-            direccion += ` Apt ${numeroApartamento}`;
-        }
-    }
-
-    if (!isValid) {
-        alert('Por favor complete todos los campos obligatorios: Tipo de vía, Número de vía y Número de casa.');
-        return;
-    }
-
-    // Asignar al campo principal
-    document.getElementById('direccion').value = direccion;
-
-    // Ocultar el formulario
+// Cancelar edición de dirección
+function cancelAddress() {
     $('#addressForm').collapse('hide');
+    document.querySelectorAll('.address-field').forEach(field => field.value = '');
+}
 
-    // Limpiar campos - limpiar tanto campos nuevos como antiguos
+function getFieldValue(fieldId) {
+    const field = document.getElementById(fieldId);
+    return field ? field.value.trim() : '';
+}
+
+function buildNewAddressFormat(tipoVia, numeroVia, letraVia, numeroCasa, viaSecundaria, complementos, barrio) {
+    let direccion = `${tipoVia} ${numeroVia}`;
+    if (letraVia) direccion += letraVia;
+    direccion += ` #${numeroCasa}`;
+    if (viaSecundaria) direccion += ` ${viaSecundaria}`;
+    if (complementos) direccion += ` ${complementos}`;
+    if (barrio) direccion += `, ${barrio}`;
+    return direccion;
+}
+
+function buildOldAddressFormat(carrera, calle, numeroCasa, numeroApartamento) {
+    let direccion = `Carrera ${carrera} Calle ${calle} #${numeroCasa}`;
+    if (numeroApartamento) direccion += ` Apt ${numeroApartamento}`;
+    return direccion;
+}
+
+function validateAddressFields(tipoVia, numeroVia, numeroCasa, carrera, calle) {
+    return (tipoVia && numeroVia && numeroCasa) || (carrera && calle && numeroCasa);
+}
+
+function clearAddressFields() {
     document.querySelectorAll('.address-field').forEach(field => {
         if (field.type === 'select-one') {
             field.selectedIndex = 0;
@@ -420,7 +469,6 @@ function saveAddress() {
         }
     });
 
-    // También limpiar campos antiguos si existen
     const oldFields = ['carrera', 'calle', 'numero_apartamento'];
     oldFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
@@ -434,15 +482,199 @@ function saveAddress() {
     });
 }
 
-// Cancelar edición de dirección
-function cancelAddress() {
-    // Ocultar el formulario
-    $('#addressForm').collapse('hide');
+function collectNewAddressFields() {
+    return {
+        tipoVia: getFieldValue('tipo_via'),
+        numeroVia: getFieldValue('numero_via'),
+        letraVia: getFieldValue('letra_via'),
+        viaSecundaria: getFieldValue('via_secundaria'),
+        numeroCasa: getFieldValue('numero_casa'),
+        complementos: getFieldValue('complementos'),
+        barrio: getFieldValue('barrio')
+    };
+}
 
-    // Limpiar campos
-    document.querySelectorAll('.address-field').forEach(field => field.value = '');
+function collectOldAddressFields() {
+    return {
+        carrera: getFieldValue('carrera'),
+        calle: getFieldValue('calle'),
+        numeroApartamento: getFieldValue('numero_apartamento')
+    };
+}
+
+function resolveDireccion(newFields, oldFields) {
+    const { tipoVia, numeroVia, letraVia, numeroCasa, viaSecundaria, complementos, barrio } = newFields;
+    const { carrera, calle, numeroApartamento } = oldFields;
+
+    if (validateAddressFields(tipoVia, numeroVia, numeroCasa, carrera, calle)) {
+        if (tipoVia && numeroVia && numeroCasa) {
+            return buildNewAddressFormat(tipoVia, numeroVia, letraVia, numeroCasa, viaSecundaria, complementos, barrio);
+        }
+
+        return buildOldAddressFormat(carrera, calle, numeroCasa, numeroApartamento);
+    }
+
+    return null;
+}
+
+function applyDireccion(direccion) {
+    document.getElementById('direccion').value = direccion;
+    $('#addressForm').collapse('hide');
+    clearAddressFields();
+}
+
+// Guardar dirección estructurada
+function saveAddress() {
+    const newFields = collectNewAddressFields();
+    const oldFields = collectOldAddressFields();
+
+    const direccion = resolveDireccion(newFields, oldFields);
+    if (!direccion) {
+        alert('Por favor complete todos los campos obligatorios: Tipo de vía, Número de vía y Número de casa.');
+        return;
+    }
+
+    applyDireccion(direccion);
+}
+
+function findNingunaRadio(radios) {
+    for (const radio of radios) {
+        const label = document.querySelector(`label[for="${radio.id}"]`);
+        if (label && label.textContent.trim().toUpperCase() === CONFIG.NINGUNA_LABEL) {
+            return radio;
+        }
+    }
+    return null;
+}
+
+function handleRadioChange(radio, ningunaRadio, allRadios) {
+    if (radio !== ningunaRadio && radio.checked) {
+        ningunaRadio.checked = false;
+    } else if (radio === ningunaRadio && radio.checked) {
+        allRadios.forEach(otherRadio => {
+            if (otherRadio !== ningunaRadio) {
+                otherRadio.checked = false;
+            }
+        });
+    }
+}
+
+function resetToNinguna(ningunaRadio, allRadios) {
+    ningunaRadio.checked = true;
+    allRadios.forEach(radio => {
+        if (radio !== ningunaRadio) {
+            radio.checked = false;
+        }
+    });
+}
+
+function setupCaracterizacionHandling() {
+    const caracterizacionRadios = document.querySelectorAll('input[name="parametro_id"]');
+    const ningunaRadio = findNingunaRadio(caracterizacionRadios);
+    if (!ningunaRadio) return;
+
+    ningunaRadio.checked = true;
+    caracterizacionRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            handleRadioChange(radio, ningunaRadio, caracterizacionRadios);
+        });
+    });
+
+    const forms = document.querySelectorAll('#formInscripcion, #registroForm');
+    forms.forEach(form => {
+        form.addEventListener('reset', () => {
+            setTimeout(() => resetToNinguna(ningunaRadio, caracterizacionRadios), 0);
+        });
+    });
+}
+
+function calcularFechaLimiteEdadMinima() {
+    const fechaLimite = new Date();
+    fechaLimite.setFullYear(fechaLimite.getFullYear() - CONFIG.EDAD_MINIMA);
+    return fechaLimite;
+}
+
+function validarEdad(fechaNacimiento) {
+    const fechaSeleccionada = new Date(fechaNacimiento);
+    const fechaLimite = calcularFechaLimiteEdadMinima();
+    return fechaSeleccionada <= fechaLimite;
+}
+
+function toggleMensajeErrorEdad(inputElement, mostrar) {
+    if (mostrar) {
+        inputElement.setCustomValidity(CONFIG.MENSAJE_EDAD_INVALIDA);
+        inputElement.classList.add('is-invalid');
+
+        let errorMessage = inputElement.parentElement.querySelector('.invalid-feedback');
+        if (!errorMessage) {
+            errorMessage = document.createElement('div');
+            errorMessage.className = 'invalid-feedback';
+            inputElement.parentElement.appendChild(errorMessage);
+        }
+        errorMessage.textContent = CONFIG.MENSAJE_EDAD_INVALIDA;
+    } else {
+        inputElement.setCustomValidity('');
+        inputElement.classList.remove('is-invalid');
+
+        const errorMessage = inputElement.parentElement.querySelector('.invalid-feedback');
+        if (errorMessage) {
+            errorMessage.remove();
+        }
+    }
+}
+
+function setupEdadMinimaValidation() {
+    const fechaNacimientoInput = document.getElementById('fecha_nacimiento');
+    if (!fechaNacimientoInput) return;
+
+    if (!fechaNacimientoInput.getAttribute('max')) {
+        const fechaMaximaStr = calcularFechaLimiteEdadMinima().toISOString().split('T')[0];
+        fechaNacimientoInput.setAttribute('max', fechaMaximaStr);
+    }
+
+    fechaNacimientoInput.addEventListener('change', function () {
+        const esValida = validarEdad(this.value);
+        toggleMensajeErrorEdad(this, !esValida);
+    });
+
+    const forms = document.querySelectorAll('#formInscripcion, #registroForm');
+    forms.forEach(form => {
+        form.addEventListener('submit', function (e) {
+            if (!validarEdad(fechaNacimientoInput.value)) {
+                e.preventDefault();
+                fechaNacimientoInput.focus();
+                toggleMensajeErrorEdad(fechaNacimientoInput, true);
+                alert(CONFIG.MENSAJE_EDAD_INVALIDA);
+                return false;
+            }
+        });
+    });
+}
+
+function initializePaisesForRegistro() {
+    const paisSelect = document.getElementById('pais_id');
+    if (!paisSelect) return;
+
+    paisSelect.innerHTML = '<option value="">Seleccione...</option>';
+
+    fetch('/paises')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const paises = processLocationData(data, 'paises');
+            populateLocationSelect(paisSelect, paises, null, 'pais');
+        })
+        .catch(error => {
+            console.error('Error cargando países:', error);
+            paisSelect.innerHTML = '<option value="">Error cargando países</option>';
+        });
 }
 
 // Exportar funciones globales para uso en HTML
 window.setupAddressForm = setupAddressForm;
 window.initializeMunicipiosDynamic = initializeMunicipiosDynamic;
+window.initializePaisesForRegistro = initializePaisesForRegistro;

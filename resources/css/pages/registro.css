@@ -1,0 +1,65 @@
+.register-box {
+    width: 900px;
+    max-width: 95vw;
+}
+
+.register-box .card {
+    width: 100%;
+}
+
+.sena-card {
+    border-radius: 16px;
+    overflow: hidden;
+    border: none;
+}
+
+.sena-header {
+    background: linear-gradient(135deg, #00794d 0%, #005235 100%);
+    border-bottom: none;
+}
+
+.sena-header-icon {
+    width: 64px;
+    height: 64px;
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.sena-body {
+    background: #f4f9f7;
+}
+
+.sena-alert {
+    background: #fff2e6;
+    border-left: 6px solid #ff7900;
+    border-radius: 12px;
+}
+
+.sena-alert__icon {
+    color: #ff7900;
+}
+
+.sena-alert__title {
+    color: #c95c00;
+}
+
+.sena-btn-primary {
+    background: linear-gradient(135deg, #ff8c1a 0%, #ff6f00 100%);
+    border: none;
+    color: #fff;
+}
+
+.sena-btn-primary:hover {
+    background: linear-gradient(135deg, #ff9b33 0%, #ff7f1a 100%);
+    color: #fff;
+}
+
+.sena-btn-outline {
+    border: 2px solid #00794d;
+    color: #00794d;
+    background: #fff;
+}
+
+.sena-btn-outline:hover {
+    background: #00794d;
+    color: #fff;
+}
