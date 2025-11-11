@@ -25,6 +25,9 @@
             max-height: 260px;
             overflow-y: auto;
         }
+        .tabla-resultados-aprendizaje td {
+            vertical-align: middle;
+        }
     </style>
 @endsection
 
@@ -40,6 +43,15 @@
 @section('content')
     <section class="content mt-4">
         <div class="container-fluid">
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle"></i> {{ session('success') }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            @endif
+
             @if (session('error'))
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
@@ -63,8 +75,26 @@
                         </div>
                         <div class="card-body">
                             @php
-                                $programasAsociados = $competencia->programasFormacion ?? collect();
-                                $resultadosAsociados = $competencia->resultadosAprendizaje ?? collect();
+                                $horasTotalesCompetencia = (int) old('duracion', $competencia->duracion ?? 0);
+                                $resultadosFormulario = collect(old('resultados'))->map(function ($resultado) {
+                                    return [
+                                        'id' => $resultado['id'] ?? null,
+                                        'codigo' => $resultado['codigo'] ?? '',
+                                        'nombre' => $resultado['nombre'] ?? '',
+                                        'horas' => (int) ($resultado['horas'] ?? 0),
+                                    ];
+                                })->values();
+
+                                if ($resultadosFormulario->isEmpty()) {
+                                    $resultadosFormulario = $competencia->resultadosAprendizaje->map(function ($resultado) {
+                                        return [
+                                            'id' => $resultado->id,
+                                            'codigo' => $resultado->codigo ?? '',
+                                            'nombre' => $resultado->nombre,
+                                            'horas' => (int) ($resultado->duracion ?? 0),
+                                        ];
+                                    });
+                                }
                             @endphp
 
                             <form method="POST" action="{{ route('competencias.update', $competencia) }}">
@@ -152,6 +182,113 @@
                                     </div>
                                 </div>
 
+                                {{-- Sección: Resultados de Aprendizaje --}}
+                                <div class="form-section">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h3 class="h5 mb-0 text-primary">Resultados de Aprendizaje</h3>
+                                        <span class="small text-muted" id="resumen-horas-resultados"></span>
+                                    </div>
+                                    <p class="text-muted small mb-3">
+                                        Distribuya las {{ $horasTotalesCompetencia }} hora(s) totales de la competencia entre los resultados de aprendizaje. Las horas se redistribuyen automáticamente al agregar, quitar o modificar filas.
+                                    </p>
+
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered tabla-resultados-aprendizaje" id="tabla-resultados-aprendizaje" data-horas-totales="{{ $horasTotalesCompetencia }}">
+                                            <thead class="thead-light">
+                                                <tr>
+                                                    <th style="width: 180px;">Código</th>
+                                                    <th>Nombre del resultado de aprendizaje</th>
+                                                    <th style="width: 150px;" class="text-center">Horas</th>
+                                                    <th style="width: 60px;" class="text-center">Acciones</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse($resultadosFormulario as $indice => $resultado)
+                                                    @php
+                                                        $horasResultado = max(0, (int) ($resultado['horas'] ?? 0));
+                                                    @endphp
+                                                    <tr data-index="{{ $indice }}">
+                                                        <td>
+                                                            <input type="hidden" class="input-id" name="resultados[{{ $indice }}][id]" value="{{ $resultado['id'] ?? '' }}">
+                                                            <input type="text" class="form-control form-control-sm input-codigo" name="resultados[{{ $indice }}][codigo]" value="{{ $resultado['codigo'] ?? '' }}" placeholder="Código" maxlength="50">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control form-control-sm input-nombre" name="resultados[{{ $indice }}][nombre]" value="{{ $resultado['nombre'] ?? '' }}" placeholder="Nombre del resultado" required>
+                                                        </td>
+                                                        <td class="text-center align-middle">
+                                                            <div class="input-group input-group-sm justify-content-center">
+                                                                <input type="number" class="form-control text-end input-horas" name="resultados[{{ $indice }}][horas]" value="{{ $horasResultado }}" min="0" step="1" data-last-value="{{ $horasResultado }}" required>
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text">h</span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center align-middle">
+                                                            <button type="button" class="btn btn-outline-danger btn-sm btn-eliminar-resultado" title="Quitar resultado">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                @empty
+                                                    <tr data-index="0">
+                                                        <td>
+                                                            <input type="hidden" class="input-id" name="resultados[0][id]" value="">
+                                                            <input type="text" class="form-control form-control-sm input-codigo" name="resultados[0][codigo]" value="" placeholder="Código" maxlength="50">
+                                                        </td>
+                                                        <td>
+                                                            <input type="text" class="form-control form-control-sm input-nombre" name="resultados[0][nombre]" value="" placeholder="Nombre del resultado" required>
+                                                        </td>
+                                                        <td class="text-center align-middle">
+                                                            <div class="input-group input-group-sm justify-content-center">
+                                                                <input type="number" class="form-control text-end input-horas" name="resultados[0][horas]" value="0" min="0" step="1" data-last-value="0" required>
+                                                                <div class="input-group-append">
+                                                                    <span class="input-group-text">h</span>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td class="text-center align-middle">
+                                                            <button type="button" class="btn btn-outline-danger btn-sm btn-eliminar-resultado" title="Quitar resultado">
+                                                                <i class="fas fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                @endforelse
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div id="resultados-alerta" class="alert alert-warning d-none mt-3 mb-0"></div>
+
+                                    <button type="button" class="btn btn-outline-primary btn-sm mt-3" id="agregar-resultado-btn">
+                                        <i class="fas fa-plus mr-1"></i> Agregar resultado de aprendizaje
+                                    </button>
+                                </div>
+
+                                <template id="fila-resultado-template">
+                                    <tr data-index="">
+                                        <td>
+                                            <input type="hidden" class="input-id" name="" value="">
+                                            <input type="text" class="form-control form-control-sm input-codigo" name="" placeholder="Código" maxlength="50">
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control form-control-sm input-nombre" name="" placeholder="Nombre del resultado" required>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <div class="input-group input-group-sm justify-content-center">
+                                                <input type="number" class="form-control text-end input-horas" name="" value="0" min="0" step="1" data-last-value="0" required>
+                                                <div class="input-group-append">
+                                                    <span class="input-group-text">h</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td class="text-center align-middle">
+                                            <button type="button" class="btn btn-outline-danger btn-sm btn-eliminar-resultado" title="Quitar resultado">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                </template>
+
                                 {{-- Sección: Estado --}}
                                 <div class="form-section">
                                     <div class="form-section-title">
@@ -203,136 +340,6 @@
                             </form>
                         </div>
                     </div>
-
-                    <div class="card shadow-sm no-hover mt-4">
-                        <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
-                            <h6 class="m-0 font-weight-bold text-primary">
-                                <i class="fas fa-graduation-cap mr-1"></i> Programas de formación asociados
-                            </h6>
-                            <span class="badge badge-primary badge-pill">
-                                {{ $programasAsociados->count() }} programa(s)
-                            </span>
-                        </div>
-                        <div class="card-body">
-                            @if($programasAsociados->isEmpty())
-                                <p class="text-muted mb-0">Esta competencia no tiene programas asociados actualmente.</p>
-                            @else
-                                <div class="table-responsive competencias-scroll">
-                                    <table class="table table-sm table-striped mb-0">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th style="width: 18%;">Código</th>
-                                                <th>Programa de formación</th>
-                                                <th style="width: 15%;" class="text-center">Estado</th>
-                                                <th style="width: 15%;" class="text-right">Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($programasAsociados as $programa)
-                                                @php
-                                                    $mensajeConfirmacion = "¿Quitar la competencia del programa '{$programa->nombre}'?";
-                                                    $rutaDesasociar = route('programa.competencia.detach', [$programa->id, $competencia->id]);
-                                                @endphp
-                                                <tr>
-                                                    <td>
-                                                        <span class="badge badge-primary">{{ $programa->codigo }}</span>
-                                                    </td>
-                                                    <td>{{ $programa->nombre }}</td>
-                                                    <td class="text-center">
-                                                        <span class="badge badge-{{ $programa->status ? 'success' : 'secondary' }}">
-                                                            {{ $programa->status ? 'Activo' : 'Inactivo' }}
-                                                        </span>
-                                                    </td>
-                                                    <td class="text-right">
-                                                        <form
-                                                            method="POST"
-                                                            action="{{ $rutaDesasociar }}"
-                                                            class="d-inline"
-                                                            onsubmit="return confirmarQuitar('{{ $mensajeConfirmacion }}');"
-                                                        >
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-outline-danger btn-sm">
-                                                                <i class="fas fa-times mr-1"></i>Quitar
-                                                            </button>
-                                                        </form>
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <small class="text-muted d-block mt-3">
-                                    Para asociar esta competencia a nuevos programas utilice el proceso de creación o gestione el vínculo desde el módulo de programas.
-                                </small>
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="card shadow-sm no-hover mt-4">
-                        <div class="card-header bg-light py-3 d-flex justify-content-between align-items-center">
-                            <h6 class="m-0 font-weight-bold text-success">
-                                <i class="fas fa-tasks mr-1"></i> Resultados de aprendizaje asociados
-                            </h6>
-                            <span class="badge badge-success badge-pill">
-                                {{ $resultadosAsociados->count() }} resultado(s)
-                            </span>
-                        </div>
-                        <div class="card-body">
-                            @if($resultadosAsociados->isEmpty())
-                                <p class="text-muted mb-0">Esta competencia no tiene resultados de aprendizaje asociados.</p>
-                            @else
-                                <div class="table-responsive competencias-scroll">
-                                    <table class="table table-sm table-striped mb-0">
-                                        <thead class="thead-light">
-                                            <tr>
-                                                <th style="width: 18%;">Código</th>
-                                                <th>Resultado de aprendizaje</th>
-                                                <th style="width: 18%;" class="text-center">Duración (h)</th>
-                                                <th style="width: 15%;" class="text-right">Acciones</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @foreach($resultadosAsociados as $resultado)
-                                                @php
-                                                    $mensajeQuitarResultado = "¿Quitar el resultado '{$resultado->codigo}' de la competencia?";
-                                                    $rutaDesasociarResultado = route('competencias.desasociarResultado', [$competencia->id, $resultado->id]);
-                                                @endphp
-                                                <tr>
-                                                    <td>
-                                                        <span class="badge badge-success">{{ $resultado->codigo }}</span>
-                                                    </td>
-                                                    <td>{{ $resultado->nombre }}</td>
-                                                    <td class="text-center">
-                                                        {{ number_format($resultado->duracion ?? 0, 0) }}
-                                                    </td>
-                                                    <td class="text-right">
-                                                        @can('GESTIONAR RESULTADOS COMPETENCIA')
-                                                            <form
-                                                                method="POST"
-                                                                action="{{ $rutaDesasociarResultado }}"
-                                                                class="d-inline"
-                                                                onsubmit="return confirmarQuitar('{{ $mensajeQuitarResultado }}');"
-                                                            >
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit" class="btn btn-outline-danger btn-sm">
-                                                                    <i class="fas fa-times mr-1"></i>Quitar
-                                                                </button>
-                                                            </form>
-                                                        @endcan
-                                                    </td>
-                                                </tr>
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                                <small class="text-muted d-block mt-3">
-                                    Para asociar nuevos resultados de aprendizaje utilice la acción "Gestionar Resultados" disponible en el detalle de la competencia.
-                                </small>
-                            @endif
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -351,5 +358,292 @@
                 return window.confirm(mensaje);
             };
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const totalHorasInput = document.getElementById('duracion');
+            const tablaResultados = document.getElementById('tabla-resultados-aprendizaje');
+            const cuerpoTabla = tablaResultados ? tablaResultados.querySelector('tbody') : null;
+            const botonAgregar = document.getElementById('agregar-resultado-btn');
+            const plantillaFila = document.getElementById('fila-resultado-template');
+            const alertaResultados = document.getElementById('resultados-alerta');
+            const resumenHoras = document.getElementById('resumen-horas-resultados');
+
+            if (!tablaResultados || !cuerpoTabla || !plantillaFila) {
+                return;
+            }
+
+            let recalculando = false;
+
+            const obtenerTotalHoras = () => {
+                const valor = parseInt(totalHorasInput?.value ?? tablaResultados.dataset.horasTotales ?? 0, 10);
+                return Number.isNaN(valor) ? 0 : Math.max(valor, 0);
+            };
+
+            const obtenerFilas = () => Array.from(cuerpoTabla.querySelectorAll('tr[data-index]'));
+
+            const sincronizarIndices = () => {
+                obtenerFilas().forEach((fila, indice) => {
+                    fila.dataset.index = indice;
+                    const inputId = fila.querySelector('.input-id');
+                    const inputCodigo = fila.querySelector('.input-codigo');
+                    const inputNombre = fila.querySelector('.input-nombre');
+                    const inputHoras = fila.querySelector('.input-horas');
+
+                    if (inputId) {
+                        inputId.name = `resultados[${indice}][id]`;
+                    }
+                    if (inputCodigo) {
+                        inputCodigo.name = `resultados[${indice}][codigo]`;
+                    }
+                    if (inputNombre) {
+                        inputNombre.name = `resultados[${indice}][nombre]`;
+                    }
+                    if (inputHoras) {
+                        inputHoras.name = `resultados[${indice}][horas]`;
+                    }
+                });
+            };
+
+            const actualizarResumenYAlerta = () => {
+                const totalHoras = obtenerTotalHoras();
+                const filas = obtenerFilas();
+                const sumaHoras = filas.reduce((acumulado, fila) => {
+                    const inputHoras = fila.querySelector('.input-horas');
+                    const valor = parseInt(inputHoras?.value ?? 0, 10);
+                    return acumulado + (Number.isNaN(valor) ? 0 : valor);
+                }, 0);
+
+                if (resumenHoras) {
+                    resumenHoras.textContent = `Total asignado: ${sumaHoras} h / ${totalHoras} h`;
+                }
+
+                if (!alertaResultados) {
+                    return;
+                }
+
+                alertaResultados.classList.add('d-none');
+                alertaResultados.classList.remove('alert-danger', 'alert-warning', 'alert-info');
+                alertaResultados.textContent = '';
+
+                if (sumaHoras > totalHoras) {
+                    alertaResultados.textContent = `La suma de horas (${sumaHoras}) supera las horas totales (${totalHoras}). Ajusta los valores.`;
+                    alertaResultados.classList.remove('d-none');
+                    alertaResultados.classList.add('alert-danger');
+                } else if (sumaHoras < totalHoras && obtenerFilas().length > 0) {
+                    const diferencia = totalHoras - sumaHoras;
+                    alertaResultados.textContent = `Faltan ${diferencia} hora(s) por distribuir para completar las ${totalHoras} horas totales.`;
+                    alertaResultados.classList.remove('d-none');
+                    alertaResultados.classList.add('alert-warning');
+                }
+            };
+
+            const distribuirEquitativamente = () => {
+                const filas = obtenerFilas();
+                const totalHoras = obtenerTotalHoras();
+
+                if (!filas.length) {
+                    return;
+                }
+
+                const base = Math.floor(totalHoras / filas.length);
+                let resto = totalHoras - base * filas.length;
+
+                filas.forEach((fila) => {
+                    const inputHoras = fila.querySelector('.input-horas');
+                    if (!inputHoras) {
+                        return;
+                    }
+                    let nuevoValor = base;
+                    if (resto > 0) {
+                        nuevoValor += 1;
+                        resto -= 1;
+                    }
+                    inputHoras.value = nuevoValor;
+                    inputHoras.dataset.lastValue = nuevoValor;
+                });
+            };
+
+            const ajustarProporcional = (inputModificado) => {
+                const filas = obtenerFilas();
+                const filaModificada = inputModificado.closest('tr');
+                const totalHoras = obtenerTotalHoras();
+                let valorModificado = parseInt(inputModificado.value ?? 0, 10);
+
+                if (Number.isNaN(valorModificado) || valorModificado < 0) {
+                    valorModificado = 0;
+                }
+
+                if (valorModificado > totalHoras) {
+                    valorModificado = totalHoras;
+                }
+
+                inputModificado.value = valorModificado;
+                inputModificado.dataset.lastValue = valorModificado;
+
+                const filasRestantes = filas.filter((fila) => fila !== filaModificada);
+
+                if (!filasRestantes.length) {
+                    return;
+                }
+
+                let horasDisponibles = totalHoras - valorModificado;
+                if (horasDisponibles < 0) {
+                    horasDisponibles = 0;
+                }
+
+                const sumatoriaPrevias = filasRestantes.reduce((acumulado, fila) => {
+                    const inputHoras = fila.querySelector('.input-horas');
+                    const previo = parseInt(inputHoras?.dataset.lastValue ?? inputHoras?.value ?? 0, 10);
+                    return acumulado + (Number.isNaN(previo) ? 0 : Math.max(previo, 0));
+                }, 0);
+
+                if (sumatoriaPrevias <= 0) {
+                    const base = Math.floor(horasDisponibles / filasRestantes.length);
+                    let resto = horasDisponibles - base * filasRestantes.length;
+
+                    filasRestantes.forEach((fila) => {
+                        const inputHoras = fila.querySelector('.input-horas');
+                        if (!inputHoras) {
+                            return;
+                        }
+                        let nuevoValor = base;
+                        if (resto > 0) {
+                            nuevoValor += 1;
+                            resto -= 1;
+                        }
+                        inputHoras.value = nuevoValor;
+                        inputHoras.dataset.lastValue = nuevoValor;
+                    });
+
+                    return;
+                }
+
+                let acumuladoAsignado = 0;
+                const provisional = filasRestantes.map((fila) => {
+                    const inputHoras = fila.querySelector('.input-horas');
+                    const previo = parseInt(inputHoras?.dataset.lastValue ?? inputHoras?.value ?? 0, 10);
+                    const proporcion = (Number.isNaN(previo) ? 0 : Math.max(previo, 0)) / sumatoriaPrevias;
+                    const objetivo = proporcion * horasDisponibles;
+                    const base = Math.floor(objetivo);
+
+                    acumuladoAsignado += base;
+
+                    return {
+                        fila,
+                        inputHoras,
+                        base,
+                        fraccion: objetivo - base,
+                    };
+                });
+
+                let resto = Math.round(horasDisponibles - acumuladoAsignado);
+
+                provisional.sort((a, b) => b.fraccion - a.fraccion);
+
+                provisional.forEach((item) => {
+                    let nuevoValor = item.base;
+                    if (resto > 0) {
+                        nuevoValor += 1;
+                        resto -= 1;
+                    } else if (resto < 0) {
+                        nuevoValor -= 1;
+                        resto += 1;
+                    }
+                    item.inputHoras.value = nuevoValor;
+                    item.inputHoras.dataset.lastValue = nuevoValor;
+                });
+            };
+
+            const recalcularHoras = ({ modo = 'igual', input = null } = {}) => {
+                if (recalculando) {
+                    return;
+                }
+
+                recalculando = true;
+
+                if (modo === 'manual' && input) {
+                    ajustarProporcional(input);
+                } else {
+                    distribuirEquitativamente();
+                }
+
+                sincronizarIndices();
+                actualizarResumenYAlerta();
+                recalculando = false;
+            };
+
+            const registrarEventosFila = (fila) => {
+                const botonEliminar = fila.querySelector('.btn-eliminar-resultado');
+                const inputHoras = fila.querySelector('.input-horas');
+
+                if (botonEliminar) {
+                    botonEliminar.addEventListener('click', () => {
+                        fila.remove();
+                        recalcularHoras();
+                    });
+                }
+
+                if (inputHoras) {
+                    inputHoras.addEventListener('input', (evento) => {
+                        const valorNumerico = parseInt(evento.target.value ?? 0, 10);
+                        evento.target.value = Number.isNaN(valorNumerico) ? 0 : Math.max(valorNumerico, 0);
+                        evento.target.dataset.lastValue = evento.target.value;
+                        recalcularHoras({ modo: 'manual', input: evento.target });
+                    });
+                }
+            };
+
+            const crearFila = (datos = {}) => {
+                const clon = plantillaFila.content.firstElementChild.cloneNode(true);
+                const inputId = clon.querySelector('.input-id');
+                const inputCodigo = clon.querySelector('.input-codigo');
+                const inputNombre = clon.querySelector('.input-nombre');
+                const inputHoras = clon.querySelector('.input-horas');
+
+                if (inputId) {
+                    inputId.value = datos.id ?? '';
+                }
+                if (inputCodigo) {
+                    inputCodigo.value = datos.codigo ?? '';
+                }
+                if (inputNombre) {
+                    inputNombre.value = datos.nombre ?? '';
+                }
+                if (inputHoras) {
+                    const horas = Math.max(0, parseInt(datos.horas ?? 0, 10) || 0);
+                    inputHoras.value = horas;
+                    inputHoras.dataset.lastValue = horas;
+                }
+
+                cuerpoTabla.appendChild(clon);
+                registrarEventosFila(clon);
+                sincronizarIndices();
+                recalcularHoras();
+            };
+
+            obtenerFilas().forEach((fila) => {
+                const inputHoras = fila.querySelector('.input-horas');
+                if (inputHoras) {
+                    const valor = parseInt(inputHoras.value ?? 0, 10);
+                    inputHoras.dataset.lastValue = Number.isNaN(valor) ? 0 : Math.max(valor, 0);
+                }
+                registrarEventosFila(fila);
+            });
+
+            if (!obtenerFilas().length) {
+                crearFila();
+            } else {
+                sincronizarIndices();
+                actualizarResumenYAlerta();
+            }
+
+            botonAgregar?.addEventListener('click', () => {
+                crearFila();
+            });
+
+            totalHorasInput?.addEventListener('input', () => {
+                recalcularHoras();
+            });
+        });
     </script>
 @endsection
