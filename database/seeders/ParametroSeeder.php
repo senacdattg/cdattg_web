@@ -46,7 +46,7 @@ class ParametroSeeder extends Seeder
             // Modalidades
             ['id' => 18, 'name' => 'PRESENCIAL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
             ['id' => 19, 'name' => 'VIRTUAL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 20, 'name' => 'MIXTA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
+            ['id' => 20, 'name' => 'A DISTANCIA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
 
             // Niveles de formación
             ['id' => 21, 'name' => 'TÉCNICO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],

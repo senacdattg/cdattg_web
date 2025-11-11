@@ -213,6 +213,8 @@ class SuperAdminSeeder extends Seeder
             'ELIMINAR COMPETENCIA',
             'GESTIONAR RESULTADOS COMPETENCIA',
             'CAMBIAR ESTADO COMPETENCIA',
+
+            'ASIGNACION DE INSTRUCTORES',
         ];
 
         // Crear cada permiso si no existe

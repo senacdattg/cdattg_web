@@ -590,6 +590,12 @@ return [
             ],
         ],
         [
+            'text' => 'Asignaciones de Instructores',
+            'icon' => 'fas fa-fw fa-user-check',
+            'url' => 'asignaciones/instructores',
+            'can' => ['ASIGNACION DE INSTRUCTORES'],
+        ],
+        [
             'text' => 'Guías de Aprendizaje',
             'icon' => 'fas fa-fw fa-book-open',
             'can' => ['VER GUIA APRENDIZAJE', 'CREAR GUIA APRENDIZAJE'],
