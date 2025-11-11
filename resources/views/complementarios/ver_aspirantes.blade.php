@@ -70,6 +70,7 @@
         <div class="card-body p-0">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
+                    <caption class="visually-hidden">Lista de aspirantes del programa {{ $programa->nombre }}</caption>
                     <thead>
                         <tr>
                             <th>ID</th>
@@ -119,10 +120,6 @@
                                 @endif
                             </td>
                             <td>
-                                <!-- <button class="btn btn-warning btn-sm me-1 aspirante-action-btn" title="Editar"
-                                    @if(isset($existingProgress) && $existingProgress) disabled @endif>
-                                    <i class="fas fa-edit"></i>
-                                </button> -->
                                 <button class="btn btn-danger btn-sm aspirante-action-btn" title="Rechazar"
                                     data-aspirante-id="{{ $aspirante->id }}"
                                     @if(isset($existingProgress) && $existingProgress) disabled @endif>

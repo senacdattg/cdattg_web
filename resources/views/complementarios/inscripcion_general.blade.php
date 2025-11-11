@@ -40,7 +40,8 @@
                         @endif
 
                         <div class="card">
-                            <div class="card-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
+                            <div class="card-header"
+                                style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
                                 <h3 class="card-title">Registro de datos personales y caracterización</h3>
                             </div>
 
@@ -139,7 +140,8 @@
                                                 <input type="date" class="form-control" id="fecha_nacimiento"
                                                     value="{{ old('fecha_nacimiento') }}" name="fecha_nacimiento"
                                                     max="{{ date('Y-m-d', strtotime('-14 years')) }}" required>
-                                                <small class="form-text text-muted">Debe tener al menos 14 años para registrarse.</small>
+                                                <small class="form-text text-muted">Debe tener al menos 14 años para
+                                                    registrarse.</small>
                                             </div>
                                         </div>
                                         <div class="col-12 col-md-6">
@@ -242,11 +244,14 @@
                                                 <input type="text" class="form-control" id="direccion"
                                                     value="{{ old('direccion') }}" name="direccion"
                                                     placeholder="Dirección completa" required readonly>
-                                                <button type="button" class="btn btn-outline-secondary btn-sm mt-2" id="toggleAddressForm" aria-expanded="false" aria-controls="addressForm">
+                                                <button type="button" class="btn btn-outline-secondary btn-sm mt-2"
+                                                    id="toggleAddressForm" aria-expanded="false"
+                                                    aria-controls="addressForm">
                                                     <i class="fas fa-edit"></i> Ingresar Dirección
                                                 </button>
                                             </div>
-                                            <div id="addressForm" class="collapse mt-3" aria-labelledby="addressFormLabel">
+                                            <div id="addressForm" class="collapse mt-3"
+                                                aria-labelledby="addressFormLabel">
                                                 <div class="card card-outline-secondary">
                                                     <div class="card-header">
                                                         <h5 id="addressFormLabel" class="mb-0">Ingresar Dirección</h5>
@@ -255,8 +260,10 @@
                                                         <div class="row">
                                                             <div class="col-12">
                                                                 <div class="form-group">
-                                                                    <label for="tipo_via">1. Tipo de vía principal *</label>
-                                                                    <select class="form-control address-field" id="tipo_via" data-required="true">
+                                                                    <label for="tipo_via">1. Tipo de vía principal
+                                                                        *</label>
+                                                                    <select class="form-control address-field"
+                                                                        id="tipo_via" data-required="true">
                                                                         <option value="">Seleccione...</option>
                                                                         <option value="Carrera">Carrera</option>
                                                                         <option value="Calle">Calle</option>
@@ -271,43 +278,91 @@
                                                                     </select>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="numero_via">2. Número o nombre de vía principal *</label>
-                                                                    <input type="text" class="form-control address-field" id="numero_via"
-                                                                        placeholder="Ej: 9A, 7 Bis, 45" data-required="true">
+                                                                    <label for="numero_via">2. Número o nombre de vía
+                                                                        principal *</label>
+                                                                    <input type="text"
+                                                                        class="form-control address-field"
+                                                                        id="numero_via"
+                                                                        placeholder="Ej: 9A, 7 Bis, 45"
+                                                                        data-required="true">
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="letra_via">3. Letra principal de la vía</label>
-                                                                    <select class="form-control address-field" id="letra_via">
+                                                                    <label for="letra_via">3. Letra principal de la
+                                                                        vía</label>
+                                                                    <select class="form-control address-field"
+                                                                        id="letra_via">
                                                                         <option value="">(Sin letra)</option>
-                                                                        <option>A</option><option>B</option><option>C</option><option>D</option>
-                                                                        <option>E</option><option>F</option><option>G</option><option>H</option>
-                                                                        <option>I</option><option>J</option><option>K</option><option>L</option>
-                                                                        <option>M</option><option>N</option><option>O</option><option>P</option>
-                                                                        <option>Q</option><option>R</option><option>S</option><option>T</option>
-                                                                        <option>U</option><option>V</option><option>W</option><option>X</option>
-                                                                        <option>Y</option><option>Z</option>
+                                                                        <option>A</option>
+                                                                        <option>B</option>
+                                                                        <option>C</option>
+                                                                        <option>D</option>
+                                                                        <option>E</option>
+                                                                        <option>F</option>
+                                                                        <option>G</option>
+                                                                        <option>H</option>
+                                                                        <option>I</option>
+                                                                        <option>J</option>
+                                                                        <option>K</option>
+                                                                        <option>L</option>
+                                                                        <option>M</option>
+                                                                        <option>N</option>
+                                                                        <option>O</option>
+                                                                        <option>P</option>
+                                                                        <option>Q</option>
+                                                                        <option>R</option>
+                                                                        <option>S</option>
+                                                                        <option>T</option>
+                                                                        <option>U</option>
+                                                                        <option>V</option>
+                                                                        <option>W</option>
+                                                                        <option>X</option>
+                                                                        <option>Y</option>
+                                                                        <option>Z</option>
                                                                     </select>
                                                                 </div>
                                                                 <div class="form-group form-check">
-                                                                    <input type="checkbox" class="form-check-input" id="bis">
-                                                                    <label class="form-check-label" for="bis">Sufijo BIS</label>
+                                                                    <input type="checkbox" class="form-check-input"
+                                                                        id="bis">
+                                                                    <label class="form-check-label" for="bis">Sufijo
+                                                                        BIS</label>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="letra_sufijo">Letra Sufijo</label>
-                                                                    <select class="form-control address-field" id="letra_sufijo">
+                                                                    <select class="form-control address-field"
+                                                                        id="letra_sufijo">
                                                                         <option value="">(Sin sufijo)</option>
-                                                                        <option>A</option><option>B</option><option>C</option><option>D</option>
-                                                                        <option>E</option><option>F</option><option>G</option><option>H</option>
-                                                                        <option>I</option><option>J</option><option>K</option><option>L</option>
-                                                                        <option>M</option><option>N</option><option>O</option><option>P</option>
-                                                                        <option>Q</option><option>R</option><option>S</option><option>T</option>
-                                                                        <option>U</option><option>V</option><option>W</option><option>X</option>
-                                                                        <option>Y</option><option>Z</option>
+                                                                        <option>A</option>
+                                                                        <option>B</option>
+                                                                        <option>C</option>
+                                                                        <option>D</option>
+                                                                        <option>E</option>
+                                                                        <option>F</option>
+                                                                        <option>G</option>
+                                                                        <option>H</option>
+                                                                        <option>I</option>
+                                                                        <option>J</option>
+                                                                        <option>K</option>
+                                                                        <option>L</option>
+                                                                        <option>M</option>
+                                                                        <option>N</option>
+                                                                        <option>O</option>
+                                                                        <option>P</option>
+                                                                        <option>Q</option>
+                                                                        <option>R</option>
+                                                                        <option>S</option>
+                                                                        <option>T</option>
+                                                                        <option>U</option>
+                                                                        <option>V</option>
+                                                                        <option>W</option>
+                                                                        <option>X</option>
+                                                                        <option>Y</option>
+                                                                        <option>Z</option>
                                                                     </select>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="cuadrante">Cuadrante</label>
-                                                                    <select class="form-control address-field" id="cuadrante">
+                                                                    <select class="form-control address-field"
+                                                                        id="cuadrante">
                                                                         <option value="">(Sin cuadrante)</option>
                                                                         <option value="N">Norte (N)</option>
                                                                         <option value="S">Sur (S)</option>
@@ -320,26 +375,54 @@
                                                                     </select>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="via_secundaria">4. Número de la vía secundaria / intersección</label>
-                                                                    <input type="text" class="form-control address-field" id="via_secundaria"
+                                                                    <label for="via_secundaria">
+                                                                        4. Número de la via secundaria / intersección
+                                                                    </label>
+                                                                    <input type="text"
+                                                                        class="form-control address-field"
+                                                                        id="via_secundaria"
                                                                         placeholder="Ej: 12, 22B (opcional)">
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="letra_via_secundaria">Letra asociada a la vía secundaria</label>
-                                                                    <select class="form-control address-field" id="letra_via_secundaria">
+                                                                    <label for="letra_via_secundaria">
+                                                                        Letra asociada a la vía secundaria
+                                                                    </label>
+                                                                    <select class="form-control address-field"
+                                                                        id="letra_via_secundaria">
                                                                         <option value="">(Sin letra)</option>
-                                                                        <option>A</option><option>B</option><option>C</option><option>D</option>
-                                                                        <option>E</option><option>F</option><option>G</option><option>H</option>
-                                                                        <option>I</option><option>J</option><option>K</option><option>L</option>
-                                                                        <option>M</option><option>N</option><option>O</option><option>P</option>
-                                                                        <option>Q</option><option>R</option><option>S</option><option>T</option>
-                                                                        <option>U</option><option>V</option><option>W</option><option>X</option>
-                                                                        <option>Y</option><option>Z</option>
+                                                                        <option>A</option>
+                                                                        <option>B</option>
+                                                                        <option>C</option>
+                                                                        <option>D</option>
+                                                                        <option>E</option>
+                                                                        <option>F</option>
+                                                                        <option>G</option>
+                                                                        <option>H</option>
+                                                                        <option>I</option>
+                                                                        <option>J</option>
+                                                                        <option>K</option>
+                                                                        <option>L</option>
+                                                                        <option>M</option>
+                                                                        <option>N</option>
+                                                                        <option>O</option>
+                                                                        <option>P</option>
+                                                                        <option>Q</option>
+                                                                        <option>R</option>
+                                                                        <option>S</option>
+                                                                        <option>T</option>
+                                                                        <option>U</option>
+                                                                        <option>V</option>
+                                                                        <option>W</option>
+                                                                        <option>X</option>
+                                                                        <option>Y</option>
+                                                                        <option>Z</option>
                                                                     </select>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="cuadrante_secundario">Cuadrante vía secundaria</label>
-                                                                    <select class="form-control address-field" id="cuadrante_secundario">
+                                                                    <label for="cuadrante_secundario">Cuadrante vía
+                                                                        secundaria</label>
+                                                                    <select class="form-control address-field"
+                                                                        id="cuadrante_secundario">
                                                                         <option value="">(Sin cuadrante)</option>
                                                                         <option value="N">Norte (N)</option>
                                                                         <option value="S">Sur (S)</option>
@@ -352,19 +435,27 @@
                                                                     </select>
                                                                 </div>
                                                                 <div class="form-group">
-                                                                    <label for="numero_casa">5. Número de casa o edificio *</label>
-                                                                    <input type="text" class="form-control address-field" id="numero_casa"
-                                                                        placeholder="Ej: 34-15, 45-20, 12" data-required="true">
+                                                                    <label for="numero_casa">
+                                                                        5. Número de casa o edificio*
+                                                                    </label>
+                                                                    <input type="text"
+                                                                        class="form-control address-field"
+                                                                        id="numero_casa"
+                                                                        placeholder="Ej: 34-15, 45-20, 12"
+                                                                        data-required="true">
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="complementos">6. Complementos</label>
-                                                                    <input type="text" class="form-control address-field" id="complementos"
+                                                                    <input type="text"
+                                                                        class="form-control address-field"
+                                                                        id="complementos"
                                                                         placeholder="Ej: Apto 301, Bloque 2, Oficina 5 (opcional)">
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label for="barrio">7. Barrio o vereda</label>
-                                                                    <input type="text" class="form-control address-field" id="barrio"
-                                                                        placeholder="Ej: Centro, La Candelaria (opcional)">
+                                                                    <input type="text"
+                                                                        class="form-control address-field" id="barrio"
+                                                                        placeholder="Ej: Barrio el Centro (opcional)">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -373,18 +464,24 @@
                                                                 <div class="alert alert-info">
                                                                     <small>
                                                                         <strong>Ejemplo de formato:</strong><br>
-                                                                        <span class="text-muted">Carrera 9A #34-15 Apto 301, Barrio Centro</span><br>
-                                                                        <span class="text-muted">Los campos marcados con * son obligatorios.</span>
+                                                                        <span class="text-muted">Carrera 9A #34-15 Apto
+                                                                            301, Barrio Centro</span><br>
+                                                                        <span
+                                                                        class="text-muted">Los campos marcados con *
+                                                                            son obligatorios.</span>
                                                                     </small>
                                                                 </div>
                                                             </div>
                                                         </div>
                                                         <div class="row">
                                                             <div class="col-12">
-                                                                <button type="button" class="btn btn-primary btn-sm mr-2" id="saveAddress">
+                                                                <button
+                                                                    type="button" class="btn btn-primary btn-sm mr-2"
+                                                                    id="saveAddress">
                                                                     <i class="fas fa-save"></i> Guardar Dirección
                                                                 </button>
-                                                                <button type="button" class="btn btn-secondary btn-sm" id="cancelAddress">
+                                                                <button type="button" class="btn btn-secondary btn-sm"
+                                                                    id="cancelAddress">
                                                                     <i class="fas fa-times"></i> Cancelar
                                                                 </button>
                                                             </div>
@@ -411,7 +508,7 @@
                                                         <input class="form-check-input" type="radio"
                                                             id="parametro_{{ $parametro->id }}" name="parametro_id"
                                                             value="{{ $parametro->id }}"
-                                                            {{ old('parametro_id') == $parametro->id ? 'checked' : '' }}>
+                                                            {{old('parametro_id') == $parametro->id ? 'checked' : '' }}>
                                                         <label class="form-check-label"
                                                             for="parametro_{{ $parametro->id }}">
                                                             {{ ucwords(str_replace('_', ' ', $parametro->name)) }}
@@ -430,8 +527,10 @@
                                             </h4>
                                             <div class="form-group">
                                                 <label for="observaciones">Información Adicional</label>
-                                                <textarea class="form-control" id="observaciones" name="observaciones" rows="3"
-                                                    placeholder="Información adicional que considere relevante...">{{ old('observaciones') }}</textarea>
+                                                <textarea
+                                                class="form-control" id="observaciones" name="observaciones" rows="3"
+                                                placeholder="Información adicional que considere relevante...">
+                                                {{ old('observaciones') }}</textarea>
                                             </div>
                                         </div>
                                     </div>
@@ -440,9 +539,11 @@
 
                                 <div class="card-footer">
                                     <div class="form-check mb-3">
-                                        <input class="form-check-input" type="checkbox" id="acepto_terminos" name="acepto_terminos" required>
+                                        <input class="form-check-input" type="checkbox" id="acepto_terminos"
+                                            name="acepto_terminos" required>
                                         <label class="form-check-label" for="acepto_terminos">
-                                            Acepto los <a href="#" data-toggle="modal" data-target="#modalTerminos">términos y condiciones</a> *
+                                            Acepto los <a href="#" data-toggle="modal"
+                                                data-target="#modalTerminos">términos y condiciones</a> *
                                         </label>
                                     </div>
                                     <button type="submit" class="btn btn-primary btn-lg">
@@ -473,7 +574,7 @@
                     })
                     .then(data => {
                         municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
-                        
+
                         // Manejar diferentes formatos de respuesta
                         let municipios = [];
                         if (Array.isArray(data)) {
@@ -486,12 +587,13 @@
                             // Si la respuesta es {success: true, municipios: [...]}
                             municipios = data.municipios;
                         }
-                        
+
                         municipios.forEach(municipio => {
                             const option = document.createElement('option');
                             option.value = municipio.id;
                             // El servicio devuelve 'nombre' o 'name', no 'municipio'
-                            option.textContent = municipio.nombre || municipio.name || municipio.municipio || '';
+                            option.textContent = municipio.nombre || municipio.name || municipio
+                                .municipio || '';
                             municipioSelect.appendChild(option);
                         });
                     })
@@ -579,7 +681,8 @@
 
             // Validar campos obligatorios
             if (!tipoVia || !numeroVia || !numeroCasa) {
-                alert('Por favor complete todos los campos obligatorios: Tipo de vía, Número de vía y Número de casa.');
+                alert(
+                    'Por favor complete todos los campos obligatorios: Tipo de vía, Número de vía y Número de casa.');
                 return;
             }
 
@@ -643,7 +746,7 @@
             const hoy = new Date();
             const fechaMaxima = new Date();
             fechaMaxima.setFullYear(hoy.getFullYear() - 14);
-            
+
             // Establecer el atributo max si no está ya establecido
             if (!fechaNacimientoInput.getAttribute('max')) {
                 const fechaMaximaStr = fechaMaxima.toISOString().split('T')[0];
@@ -659,7 +762,7 @@
                 if (fechaSeleccionada > edadMinima) {
                     this.setCustomValidity('Debe tener al menos 14 años para registrarse.');
                     this.classList.add('is-invalid');
-                    
+
                     // Mostrar mensaje de error
                     let errorMessage = this.parentElement.querySelector('.invalid-feedback');
                     if (!errorMessage) {
@@ -671,7 +774,7 @@
                 } else {
                     this.setCustomValidity('');
                     this.classList.remove('is-invalid');
-                    
+
                     // Remover mensaje de error
                     const errorMessage = this.parentElement.querySelector('.invalid-feedback');
                     if (errorMessage) {
@@ -693,7 +796,7 @@
                         fechaNacimientoInput.focus();
                         fechaNacimientoInput.setCustomValidity('Debe tener al menos 14 años para registrarse.');
                         fechaNacimientoInput.classList.add('is-invalid');
-                        
+
                         // Mostrar mensaje de error
                         let errorMessage = fechaNacimientoInput.parentElement.querySelector('.invalid-feedback');
                         if (!errorMessage) {
@@ -702,7 +805,7 @@
                             fechaNacimientoInput.parentElement.appendChild(errorMessage);
                         }
                         errorMessage.textContent = 'Debe tener al menos 14 años para registrarse.';
-                        
+
                         // Mostrar alerta
                         alert('Debe tener al menos 14 años para registrarse.');
                         return false;

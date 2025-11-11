@@ -16,7 +16,7 @@
 
 @section('content')
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
+
     <!-- Alertas de sesión -->
     @if (session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -71,50 +71,55 @@
     <!-- Programs Cards View -->
     <div class="row row-cols-1 row-cols-md-3 g-4 mb-4">
         @forelse($programas as $programa)
-        <div class="col mb-3">
-            <div class="card h-100">
-                <div class="card-body text-center">
-                    <div class="h1 text-primary mb-3">
-                        <i class="{{ $programa->icono ?? 'fas fa-graduation-cap' }}"></i>
+            <div class="col mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <div class="h1 text-primary mb-3">
+                            <i class="{{ $programa->icono ?? 'fas fa-graduation-cap' }}"></i>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            <h5 class="card-title font-weight-bold">{{ $programa->nombre }}</h5>
+                        </div>
+                        <span
+                            class="badge {{ $programa->badge_class }} mb-2 w-20 text-center">
+                            {{ $programa->estado_label }}
+                        </span>
+                        <p class="card-text">{{ $programa->descripcion }}</p>
+                        <div class="d-flex justify-content-center mt-3 pt-3 border-top">
+                            <div>
+                                <small class="text-muted">Duración</small>
+                                <p class="mb-0"><strong>{{ formatear_horas($programa->duracion) }} horas</strong></p>
+                            </div>
+                        </div>
                     </div>
-                    <div class="d-flex justify-content-center">
-                        <h5 class="card-title font-weight-bold">{{ $programa->nombre }}</h5>
-                    </div>
-                    <span class="badge {{ $programa->badge_class }} mb-2 w-20 text-center">{{ $programa->estado_label }}</span>
-                    <p class="card-text">{{ $programa->descripcion }}</p>
-                    <div class="d-flex justify-content-center mt-3 pt-3 border-top">
-                        <div>
-                            <small class="text-muted">Duración</small>
-                            <p class="mb-0"><strong>{{ formatear_horas($programa->duracion) }} horas</strong></p>
+                    <div class="card-footer bg-transparent border-0">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                            <button class="btn btn-sm btn-outline-primary me-md-2 mr-2"
+                                onclick="viewPrograma({{ $programa->id }})">
+                                <i class="fas fa-eye"></i> Ver
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning me-md-2 mr-2"
+                                onclick="editPrograma({{ $programa->id }})">
+                                <i class="fas fa-edit"></i> Editar
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deletePrograma({{ $programa->id }})">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
                         </div>
                     </div>
                 </div>
-                <div class="card-footer bg-transparent border-0">
-                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
-                        <button class="btn btn-sm btn-outline-primary me-md-2 mr-2" onclick="viewPrograma({{ $programa->id }})">
-                            <i class="fas fa-eye"></i> Ver
-                        </button>
-                        <button class="btn btn-sm btn-outline-warning me-md-2 mr-2" onclick="editPrograma({{ $programa->id }})">
-                            <i class="fas fa-edit"></i> Editar
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="deletePrograma({{ $programa->id }})">
-                            <i class="fas fa-trash"></i> Eliminar
-                        </button>
-                    </div>
-                </div>
             </div>
-        </div>
         @empty
-        <div class="col-12">
-            <p class="text-center">No hay programas disponibles.</p>
-        </div>
+            <div class="col-12">
+                <p class="text-center">No hay programas disponibles.</p>
+            </div>
         @endforelse
     </div>
 
 
     <!-- Edit Program Modal -->
-    <div class="modal fade" id="editProgramModal" tabindex="-1" aria-labelledby="editProgramModalLabel"
-        aria-hidden="true">
+    <div class="modal fade" id="editProgramModal" tabindex="-1"
+     aria-labelledby="editProgramModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
@@ -137,37 +142,42 @@
                         </div>
                         <div class="mb-3">
                             <label for="edit_descripcion" class="form-label">Descripciรณn</label>
-                            <textarea class="form-control" id="edit_descripcion" name="descripcion" rows="3" required></textarea>
+                            <textarea
+                                class="form-control"
+                                id="edit_descripcion"
+                                name="descripcion"
+                                rows="3" required>
+                            </textarea>
                         </div>
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="edit_duracion" class="form-label">Duración (horas)</label>
-                                    <input type="number" class="form-control" id="edit_duracion"
-                                        name="duracion" required min="1">
+                                    <input type="number" class="form-control" id="edit_duracion" name="duracion"
+                                        required min="1">
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="edit_cupos" class="form-label">Cupos</label>
-                                    <input type="number" class="form-control" id="edit_cupos"
-                                        name="cupos" required min="1">
+                                    <input type="number" class="form-control" id="edit_cupos" name="cupos" required
+                                        min="1">
                                 </div>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="edit_modalidad_id" class="form-label">Modalidad</label>
                             <select class="form-select" id="edit_modalidad_id" name="modalidad_id" required>
-                                @foreach($modalidades as $mod)
-                                <option value="{{ $mod->id }}">{{ $mod->parametro->name }}</option>
+                                @foreach ($modalidades as $mod)
+                                    <option value="{{ $mod->id }}">{{ $mod->parametro->name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="mb-3">
                             <label for="edit_jornada_id" class="form-label">Jornada</label>
                             <select class="form-select" id="edit_jornada_id" name="jornada_id" required>
-                                @foreach($jornadas as $jor)
-                                <option value="{{ $jor->id }}">{{ $jor->jornada }}</option>
+                                @foreach ($jornadas as $jor)
+                                    <option value="{{ $jor->id }}">{{ $jor->jornada }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -182,8 +192,9 @@
                         <div class="mb-3">
                             <label for="edit_ambiente_id" class="form-label">Ambiente</label>
                             <select class="form-select" id="edit_ambiente_id" name="ambiente_id" required>
-                                @foreach($ambientes as $ambiente)
-                                <option value="{{ $ambiente->id }}">{{ $ambiente->title }} - {{ $ambiente->piso->piso ?? 'N/A' }}</option>
+                                @foreach ($ambientes as $ambiente)
+                                    <option value="{{ $ambiente->id }}">{{ $ambiente->title }} -
+                                        {{ $ambiente->piso->piso ?? 'N/A' }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -291,7 +302,7 @@
         console.log("AdminLTE programs: bootstrapping");
         document.addEventListener('DOMContentLoaded', function() {
             console.log("DOM loaded for programs view");
-            
+
             // Ensure jQuery and Bootstrap modal are loaded
             if (typeof $ !== 'undefined' && $.fn.modal) {
                 console.log("Bootstrap modal available");
@@ -307,139 +318,152 @@
 
                     const programaId = document.getElementById('edit_programa_id').value;
                     const formData = new FormData(editProgramForm);
-                    fetch('{{ route("complementarios-ofertados.update", ":id") }}'.replace(':id', programaId), {
-                        method: 'POST',
-                        body: formData,
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                            'X-HTTP-Method-Override': 'PUT'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert(data.message);
-                            location.reload(); // Reload to show updated program
-                        } else {
-                            alert('Error: ' + (data.message || 'Unknown error'));
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred while updating the program.');
-                    });
+                    fetch('{{ route('complementarios-ofertados.update', ':id') }}'.replace(':id',
+                            programaId), {
+                            method: 'POST',
+                            body: formData,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .getAttribute('content'),
+                                'X-HTTP-Method-Override': 'PUT'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert(data.message);
+                                location.reload(); // Reload to show updated program
+                            } else {
+                                alert('Error: ' + (data.message || 'Unknown error'));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while updating the program.');
+                        });
                 });
             }
 
             // Function to view program
             window.viewPrograma = function(id) {
-                fetch('{{ route("complementarios-ofertados.edit", ":id") }}'.replace(':id', id), {
-                    method: 'GET',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Populate the view modal with data
-                    document.getElementById('view_nombre').textContent = data.nombre;
-                    document.getElementById('view_codigo').textContent = data.codigo;
-                    document.getElementById('view_descripcion').textContent = data.descripcion;
-                    document.getElementById('view_duracion').textContent = data.duracion;
-                    document.getElementById('view_cupos').textContent = data.cupos;
+                fetch('{{ route('complementarios-ofertados.edit', ':id') }}'.replace(':id', id), {
+                        method: 'GET',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                'content')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Populate the view modal with data
+                        document.getElementById('view_nombre').textContent = data.nombre;
+                        document.getElementById('view_codigo').textContent = data.codigo;
+                        document.getElementById('view_descripcion').textContent = data.descripcion;
+                        document.getElementById('view_duracion').textContent = data.duracion;
+                        document.getElementById('view_cupos').textContent = data.cupos;
 
-                    // Get modality name
-                    const modalidades = @json($modalidades);
-                    const modalidad = modalidades.find(m => m.id == data.modalidad_id);
-                    document.getElementById('view_modalidad').textContent = modalidad ? modalidad.parametro.name : 'N/A';
+                        // Get modality name
+                        const modalidades = @json($modalidades);
+                        const modalidad = modalidades.find(m => m.id == data.modalidad_id);
+                        document.getElementById('view_modalidad').textContent = modalidad ? modalidad
+                            .parametro.name : 'N/A';
 
-                    // Get jornada name
-                    const jornadas = @json($jornadas);
-                    const jornada = jornadas.find(j => j.id == data.jornada_id);
-                    document.getElementById('view_jornada').textContent = jornada ? jornada.jornada : 'N/A';
+                        // Get jornada name
+                        const jornadas = @json($jornadas);
+                        const jornada = jornadas.find(j => j.id == data.jornada_id);
+                        document.getElementById('view_jornada').textContent = jornada ? jornada.jornada :
+                            'N/A';
 
-                    // Estado
-                    const estados = {0: 'Sin Oferta', 1: 'Con Oferta', 2: 'Cupos Llenos'};
-                    document.getElementById('view_estado').textContent = estados[data.estado] || 'N/A';
+                        // Estado
+                        const estados = {
+                            0: 'Sin Oferta',
+                            1: 'Con Oferta',
+                            2: 'Cupos Llenos'
+                        };
+                        document.getElementById('view_estado').textContent = estados[data.estado] || 'N/A';
 
-                    // Ambiente
-                    const ambientes = @json($ambientes);
-                    const ambiente = ambientes.find(a => a.id == data.ambiente_id);
-                    document.getElementById('view_ambiente').textContent = ambiente ? `${ambiente.title} - ${ambiente.piso?.piso ?? 'N/A'}` : 'N/A';
+                        // Ambiente
+                        const ambientes = @json($ambientes);
+                        const ambiente = ambientes.find(a => a.id == data.ambiente_id);
+                        document.getElementById('view_ambiente').textContent = ambiente ?
+                            `${ambiente.title} - ${ambiente.piso?.piso ?? 'N/A'}` : 'N/A';
 
-                    // Dias
-                    if (data.dias && data.dias.length > 0) {
-                        const diasText = data.dias.map(dia => {
-                            const diaName = modalidades.find(m => m.id == dia.dia_id)?.parametro.name || 'N/A';
-                            return `${diaName} (${dia.hora_inicio} - ${dia.hora_fin})`;
-                        }).join(', ');
-                        document.getElementById('view_dias').textContent = diasText;
-                    } else {
-                        document.getElementById('view_dias').textContent = 'No especificado';
-                    }
+                        // Dias
+                        if (data.dias && data.dias.length > 0) {
+                            const diasText = data.dias.map(dia => {
+                                const diaName = modalidades.find(m => m.id == dia.dia_id)?.parametro
+                                    .name || 'N/A';
+                                return `${diaName} (${dia.hora_inicio} - ${dia.hora_fin})`;
+                            }).join(', ');
+                            document.getElementById('view_dias').textContent = diasText;
+                        } else {
+                            document.getElementById('view_dias').textContent = 'No especificado';
+                        }
 
-                    // Show the view modal
-                    $('#viewProgramModal').modal('show');
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while loading the program data.');
-                });
+                        // Show the view modal
+                        $('#viewProgramModal').modal('show');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while loading the program data.');
+                    });
             };
 
             // Function to edit program
             window.editPrograma = function(id) {
-                fetch('{{ route("complementarios-ofertados.edit", ":id") }}'.replace(':id', id), {
-                    method: 'GET',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    // Populate the edit modal with data
-                    document.getElementById('edit_programa_id').value = data.id;
-                    document.getElementById('edit_nombre').value = data.nombre;
-                    document.getElementById('edit_codigo').value = data.codigo;
-                    document.getElementById('edit_descripcion').value = data.descripcion;
-                    document.getElementById('edit_duracion').value = data.duracion;
-                    document.getElementById('edit_cupos').value = data.cupos;
-                    document.getElementById('edit_modalidad_id').value = data.modalidad_id;
-                    document.getElementById('edit_jornada_id').value = data.jornada_id;
-                    document.getElementById('edit_estado').value = data.estado;
-                    document.getElementById('edit_ambiente_id').value = data.ambiente_id;
+                fetch('{{ route('complementarios-ofertados.edit', ':id') }}'.replace(':id', id), {
+                        method: 'GET',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute(
+                                'content')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Populate the edit modal with data
+                        document.getElementById('edit_programa_id').value = data.id;
+                        document.getElementById('edit_nombre').value = data.nombre;
+                        document.getElementById('edit_codigo').value = data.codigo;
+                        document.getElementById('edit_descripcion').value = data.descripcion;
+                        document.getElementById('edit_duracion').value = data.duracion;
+                        document.getElementById('edit_cupos').value = data.cupos;
+                        document.getElementById('edit_modalidad_id').value = data.modalidad_id;
+                        document.getElementById('edit_jornada_id').value = data.jornada_id;
+                        document.getElementById('edit_estado').value = data.estado;
+                        document.getElementById('edit_ambiente_id').value = data.ambiente_id;
 
-                    // Show the edit modal
-                    $('#editProgramModal').modal('show');
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert('An error occurred while loading the program data.');
-                });
+                        // Show the edit modal
+                        $('#editProgramModal').modal('show');
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while loading the program data.');
+                    });
             };
 
             // Function to delete program
             window.deletePrograma = function(id) {
                 if (confirm('¿Estás seguro de que quieres eliminar este programa?')) {
-                    fetch('{{ route("complementarios-ofertados.destroy", ":id") }}'.replace(':id', id), {
-                        method: 'DELETE',
-                        headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert(data.message);
-                            location.reload();
-                        } else {
-                            alert('Error: ' + (data.message || 'Unknown error'));
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('An error occurred while deleting the program.');
-                    });
+                    fetch('{{ route('complementarios-ofertados.destroy', ':id') }}'.replace(':id', id), {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')
+                                    .getAttribute('content')
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert(data.message);
+                                location.reload();
+                            } else {
+                                alert('Error: ' + (data.message || 'Unknown error'));
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred while deleting the program.');
+                        });
                 }
             };
         });

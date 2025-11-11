@@ -30,7 +30,9 @@
                         <div class="info-box bg-light">
                             <div class="info-box-content py-3">
                                 <span class="info-box-text">Duración</span>
-                                <span class="info-box-number">{{ formatear_horas($programaData['duracion']) }} horas</span>
+                                <span class="info-box-number">
+                                    {{ formatear_horas($programaData['duracion']) }} horas
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -39,7 +41,8 @@
 
             <div class="col-md-4">
                 <div class="card card-widget widget-user">
-                    <div class="widget-user-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
+                    <div class="widget-user-header"
+                         style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
 
                         <h3 class="widget-user-username">Inscripción</h3>
                         <h5 class="widget-user-desc">Programa Disponible</h5>
@@ -51,14 +54,16 @@
                                     <span class="description-text">¿ESTÁS INTERESADO?</span>
                                     <p class="text-muted mb-3">Realiza tu inscripción ahora mismo</p>
                                     @auth
-                                    <a href="{{ route('programas-complementarios.inscripcion', ['id' => $programaData['id']]) }}"
-                                        class="btn btn-primary btn-block" data-show-preloader>
+                                    <a href="{{ route('programas-complementarios.inscripcion',
+                                               ['id' => $programaData['id']]) }}"
+                                       class="btn btn-primary btn-block" data-show-preloader>
                                         <i class="fas fa-user-plus mr-1"></i> Inscribirse
                                     </a>
                                     @else
                                     <button type="button" class="btn btn-primary btn-block"
 
-                                            onclick="openInscripcionModal({{ $programaData['id'] }}, '{{ $programaData['nombre'] }}')">
+                                            onclick="openInscripcionModal({{ $programaData['id'] }},
+                                                                          '{{ $programaData['nombre'] }}')">
                                         <i class="fas fa-user-plus mr-1"></i> Inscribirse
                                     </button>
                                     @endauth

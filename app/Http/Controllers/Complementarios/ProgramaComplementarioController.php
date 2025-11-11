@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\Auth;
 
 class ProgramaComplementarioController extends Controller
 {
+    const VALIDATION_RULE_POSITIVE_INTEGER = 'required|integer|min:1';
+    const VALIDATION_RULE_TIME = 'nullable|date_format:H:i';
+
     protected $complementarioService;
 
     public function __construct(ComplementarioService $complementarioService)
@@ -25,11 +28,24 @@ class ProgramaComplementarioController extends Controller
      */
     public function gestionProgramasComplementarios()
     {
-        $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion', 'ambiente'])->get();
+        $programas = ComplementarioOfertado::with([
+            'modalidad.parametro',
+            'jornada',
+            'diasFormacion',
+            'ambiente'
+        ])->get();
         $modalidades = \App\Models\ParametroTema::where('tema_id', 5)->with('parametro')->get();
         $jornadas = \App\Models\JornadaFormacion::all();
         $ambientes = Ambiente::with('piso')->where('status', 1)->orderBy('piso_id')->orderBy('title')->get();
-        return view('complementarios.gestion_complementarios.index', compact('programas', 'modalidades', 'jornadas', 'ambientes'));
+        return view(
+            'complementarios.gestion_complementarios.index',
+            compact(
+                'programas',
+                'modalidades',
+                'jornadas',
+                'ambientes'
+            )
+        );
     }
 
     /**
@@ -48,8 +64,12 @@ class ProgramaComplementarioController extends Controller
      */
     public function programasPublicos()
     {
-        $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion'])->where('estado', 1)->get();
-        $programas->each(function($programa) {
+        $programas = ComplementarioOfertado::with([
+            'modalidad.parametro',
+            'jornada',
+            'diasFormacion'
+        ])->where('estado', 1)->get();
+        $programas->each(function ($programa) {
             $programa->icono = $this->complementarioService->getIconoForPrograma($programa->nombre);
         });
 
@@ -57,7 +77,7 @@ class ProgramaComplementarioController extends Controller
         $programasInscritosIds = collect();
         if (Auth::check() && Auth::user()->persona) {
             $personaId = Auth::user()->persona->id;
-            
+
             $programasInscritosIds = \App\Models\AspiranteComplementario::where('persona_id', $personaId)
                 ->where('estado', 1)
                 ->pluck('complementario_id');
@@ -67,7 +87,15 @@ class ProgramaComplementarioController extends Controller
         $tiposDocumento = $this->complementarioService->getTiposDocumento();
         $generos = $this->complementarioService->getGeneros();
 
-        return view('complementarios.programas_publicos', compact('programas', 'tiposDocumento', 'generos', 'programasInscritosIds'));
+        return view(
+            'complementarios.programas_publicos',
+            compact(
+                'programas',
+                'tiposDocumento',
+                'generos',
+                'programasInscritosIds'
+            )
+        );
     }
 
     /**
@@ -76,7 +104,7 @@ class ProgramaComplementarioController extends Controller
     public function verProgramas()
     {
         $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion'])->get();
-        $programas->each(function($programa) {
+        $programas->each(function ($programa) {
             $programa->icono = $this->complementarioService->getIconoForPrograma($programa->nombre);
             $programa->badge_class = $this->complementarioService->getBadgeClassForEstado($programa->estado);
             $programa->estado_label = $this->complementarioService->getEstadoLabel($programa->estado);
@@ -114,7 +142,9 @@ class ProgramaComplementarioController extends Controller
      */
     public function edit($id)
     {
-        $programa = ComplementarioOfertado::with(['modalidad', 'jornada', 'diasFormacion', 'ambiente'])->findOrFail($id);
+        $programa = ComplementarioOfertado::with(
+            ['modalidad', 'jornada', 'diasFormacion', 'ambiente']
+        )->findOrFail($id);
 
         $dias = $programa->diasFormacion->map(function ($dia) {
             return [
@@ -148,20 +178,28 @@ class ProgramaComplementarioController extends Controller
             'codigo' => 'required|unique:complementarios_ofertados',
             'nombre' => 'required',
             'descripcion' => 'nullable',
-            'duracion' => 'required|integer|min:1',
-            'cupos' => 'required|integer|min:1',
+            'duracion' => self::VALIDATION_RULE_POSITIVE_INTEGER,
+            'cupos' => self::VALIDATION_RULE_POSITIVE_INTEGER,
             'estado' => 'required|integer|in:0,1,2',
             'modalidad_id' => 'required|exists:parametros_temas,id',
             'jornada_id' => 'required|exists:jornadas_formacion,id',
             'ambiente_id' => 'required|exists:ambientes,id',
             'dias' => 'nullable|array',
             'dias.*.dia_id' => 'exists:parametros_temas,id',
-            'dias.*.hora_inicio' => 'nullable|date_format:H:i',
-            'dias.*.hora_fin' => 'nullable|date_format:H:i',
+            'dias.*.hora_inicio' => self::VALIDATION_RULE_TIME,
+            'dias.*.hora_fin' => self::VALIDATION_RULE_TIME,
         ]);
 
         $programa = ComplementarioOfertado::create($request->only([
-            'codigo', 'nombre', 'descripcion', 'duracion', 'cupos', 'estado', 'modalidad_id', 'jornada_id', 'ambiente_id'
+            'codigo',
+            'nombre',
+            'descripcion',
+            'duracion',
+            'cupos',
+            'estado',
+            'modalidad_id',
+            'jornada_id',
+            'ambiente_id'
         ]));
 
         if ($request->dias) {
@@ -188,20 +226,28 @@ class ProgramaComplementarioController extends Controller
             'codigo' => 'required|unique:complementarios_ofertados,codigo,' . $id,
             'nombre' => 'required',
             'descripcion' => 'nullable',
-            'duracion' => 'required|integer|min:1',
-            'cupos' => 'required|integer|min:1',
+            'duracion' => self::VALIDATION_RULE_POSITIVE_INTEGER,
+            'cupos' => self::VALIDATION_RULE_POSITIVE_INTEGER,
             'estado' => 'required|integer|in:0,1,2',
             'modalidad_id' => 'required|exists:parametros_temas,id',
             'jornada_id' => 'required|exists:jornadas_formacion,id',
             'ambiente_id' => 'required|exists:ambientes,id',
             'dias' => 'nullable|array',
             'dias.*.dia_id' => 'exists:parametros_temas,id',
-            'dias.*.hora_inicio' => 'nullable|date_format:H:i',
-            'dias.*.hora_fin' => 'nullable|date_format:H:i',
+            'dias.*.hora_inicio' => self::VALIDATION_RULE_TIME,
+            'dias.*.hora_fin' => self::VALIDATION_RULE_TIME,
         ]);
 
         $programa->update($request->only([
-            'codigo', 'nombre', 'descripcion', 'duracion', 'cupos', 'estado', 'modalidad_id', 'jornada_id', 'ambiente_id'
+            'codigo',
+            'nombre',
+            'descripcion',
+            'duracion',
+            'cupos',
+            'estado',
+            'modalidad_id',
+            'jornada_id',
+            'ambiente_id'
         ]));
 
         $programa->diasFormacion()->detach();
