@@ -114,8 +114,8 @@ class CompetenciaController extends Controller
             $data['user_edit_id'] = Auth::id();
             $data['fecha_inicio'] = now();
             $data['fecha_fin'] = now()->addYear();
-            $data['status'] = 1;
-
+                $data['status'] = 1;
+            
             $competencia = Competencia::create($data);
 
             if (!empty($programasSeleccionados)) {

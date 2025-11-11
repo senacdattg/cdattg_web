@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreAsignacionInstructorRequest;
+use App\Http\Requests\UpdateAsignacionInstructorRequest;
 use App\Models\AsignacionInstructor;
 use App\Models\Competencia;
 use App\Models\FichaCaracterizacion;
@@ -88,6 +89,70 @@ class AsignacionInstructorController extends Controller
         return redirect()
             ->route('asignaciones.instructores.index')
             ->with('success', 'Asignación registrada correctamente.');
+    }
+
+    public function show(AsignacionInstructor $asignacion): View
+    {
+        $asignacion->load([
+            'ficha.programaFormacion',
+            'instructor.persona',
+            'competencia',
+            'resultadosAprendizaje',
+        ]);
+
+        return view('asignaciones.show', compact('asignacion'));
+    }
+
+    public function edit(AsignacionInstructor $asignacion): View
+    {
+        $asignacion->load([
+            'ficha.programaFormacion',
+            'instructor.persona',
+            'competencia',
+            'resultadosAprendizaje',
+        ]);
+
+        $fichas = FichaCaracterizacion::with('programaFormacion')
+            ->orderBy('ficha')
+            ->get();
+
+        $instructores = Instructor::with('persona')
+            ->orderBy('nombre_completo_cache')
+            ->get();
+
+        return view('asignaciones.edit', compact('asignacion', 'fichas', 'instructores'));
+    }
+
+    public function update(UpdateAsignacionInstructorRequest $request, AsignacionInstructor $asignacion): RedirectResponse
+    {
+        $validated = $request->validated();
+
+        try {
+            DB::transaction(function () use ($validated, $asignacion) {
+                $asignacion->update([
+                    'ficha_id' => $validated['ficha_id'],
+                    'instructor_id' => $validated['instructor_id'],
+                    'competencia_id' => $validated['competencia_id'],
+                ]);
+
+                $asignacion->resultadosAprendizaje()->sync($validated['resultados']);
+            });
+        } catch (\Throwable $e) {
+            Log::error('Error al actualizar asignación de instructor', [
+                'asignacion_id' => $asignacion->id,
+                'payload' => $validated,
+                'error' => $e->getMessage(),
+            ]);
+
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('error', 'Ocurrió un error al actualizar la asignación. Intente nuevamente.');
+        }
+
+        return redirect()
+            ->route('asignaciones.instructores.show', $asignacion)
+            ->with('success', 'Asignación actualizada correctamente.');
     }
 
     public function competenciasPorFicha(FichaCaracterizacion $ficha): JsonResponse

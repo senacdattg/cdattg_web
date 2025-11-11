@@ -169,7 +169,7 @@
                                         @enderror
                                         @error('programas.*')
                                             <div class="invalid-feedback d-block">{{ $message }}</div>
-                                        @enderror
+                                                @enderror
                                         <small class="form-text text-muted">
                                             Puede seleccionar uno o varios programas donde aplica esta competencia.
                                         </small>

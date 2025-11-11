@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hideDelay: 5000,
         alertSelector: '.alert'
     });
-
+    
     if (typeof $ !== 'undefined' && $.fn.select2) {
         $('.select2').select2({
             theme: 'bootstrap-5',

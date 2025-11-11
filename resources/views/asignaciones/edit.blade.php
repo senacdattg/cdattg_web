@@ -42,9 +42,9 @@
 
 @section('content_header')
     <x-page-header
-        icon="fa-user-plus"
+        icon="fa-edit"
         title="Asignaciones de instructores"
-        subtitle="Registrar nueva asignación"
+        subtitle="Editar asignación"
         :breadcrumb="[
             [
                 'label' => 'Asignaciones',
@@ -52,8 +52,13 @@
                 'icon' => 'fa-user-check',
             ],
             [
-                'label' => 'Nueva asignación',
-                'icon' => 'fa-plus-circle',
+                'label' => 'Detalle',
+                'url' => route('asignaciones.instructores.show', $asignacion),
+                'icon' => 'fa-eye',
+            ],
+            [
+                'label' => 'Editar',
+                'icon' => 'fa-edit',
                 'active' => true,
             ],
         ]"
@@ -67,13 +72,14 @@
                 <div class="col-12 mb-3">
                     <a
                         class="btn btn-outline-secondary btn-sm"
-                        href="{{ route('asignaciones.instructores.index') }}"
+                        href="{{ route('asignaciones.instructores.show', $asignacion) }}"
                     >
                         <i class="fas fa-arrow-left mr-1"></i>
-                        Volver al listado
+                        Volver al detalle
                     </a>
                 </div>
             </div>
+
             <div class="row">
                 <div class="col-lg-8">
                     <x-session-alerts />
@@ -81,18 +87,19 @@
                     <div class="card shadow-sm no-hover">
                         <div class="card-header bg-white py-3">
                             <h5 class="card-title m-0 font-weight-bold text-primary">
-                                <i class="fas fa-user-check mr-2"></i>
-                                Registrar asignación
+                                <i class="fas fa-pencil-alt mr-2"></i>
+                                Editar asignación
                             </h5>
                         </div>
                         <div class="card-body">
                             <form
                                 method="POST"
-                                action="{{ route('asignaciones.instructores.store') }}"
+                                action="{{ route('asignaciones.instructores.update', $asignacion) }}"
                                 id="form-asignacion"
                                 class="row"
                             >
                                 @csrf
+                                @method('PUT')
 
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -113,7 +120,7 @@
                                             @foreach ($fichas as $ficha)
                                                 <option
                                                     value="{{ $ficha->id }}"
-                                                    {{ old('ficha_id') == $ficha->id ? 'selected' : '' }}
+                                                    {{ old('ficha_id', $asignacion->ficha_id) == $ficha->id ? 'selected' : '' }}
                                                 >
                                                     {{ $ficha->ficha }} —
                                                     {{ $ficha->programaFormacion->nombre ?? 'Sin programa' }}
@@ -145,7 +152,7 @@
                                             @foreach ($instructores as $instructor)
                                                 <option
                                                     value="{{ $instructor->id }}"
-                                                    {{ old('instructor_id') == $instructor->id ? 'selected' : '' }}
+                                                    {{ old('instructor_id', $asignacion->instructor_id) == $instructor->id ? 'selected' : '' }}
                                                 >
                                                     {{ $instructor->nombre_completo_cache
                                                         ?? $instructor->nombre_completo
@@ -213,14 +220,14 @@
                                     <hr class="mt-4">
                                     <div class="d-flex justify-content-end">
                                         <a
-                                            href="{{ route('asignaciones.instructores.index') }}"
+                                            href="{{ route('asignaciones.instructores.show', $asignacion) }}"
                                             class="btn btn-light mr-2"
                                         >
                                             Cancelar
                                         </a>
                                         <button type="submit" class="btn btn-primary">
                                             <i class="fas fa-save mr-1"></i>
-                                            Guardar asignación
+                                            Guardar cambios
                                         </button>
                                     </div>
                                 </div>
@@ -231,28 +238,23 @@
 
                 <div class="col-lg-4 mt-4 mt-lg-0">
                     <x-cards.info
-                        title="Guía rápida"
-                        icon="fas fa-info-circle"
-                        color="primary"
+                        title="Consejos de edición"
+                        icon="fas fa-lightbulb"
+                        color="warning"
                     >
                         <x-cards.info-item
-                            label="Paso 1"
-                            value="Seleccione la ficha de caracterización"
+                            label="Considere"
+                            value="Verifique que la competencia pertenezca al programa de la ficha"
                             size="col-12"
                         />
                         <x-cards.info-item
-                            label="Paso 2"
-                            value="Elija el instructor responsable"
+                            label="Recuerde"
+                            value="Un instructor puede estar asignado a varias competencias"
                             size="col-12"
                         />
                         <x-cards.info-item
-                            label="Paso 3"
-                            value="Seleccione la competencia asociada"
-                            size="col-12"
-                        />
-                        <x-cards.info-item
-                            label="Paso 4"
-                            value="Marque los resultados de aprendizaje correspondientes"
+                            label="Tip"
+                            value="Asegúrese de seleccionar los resultados de aprendizaje correctos"
                             size="col-12"
                         />
                     </x-cards.info>
@@ -290,10 +292,13 @@
 @endsection
 
 @php
-    $initialFicha = old('ficha_id');
-    $initialInstructor = old('instructor_id');
-    $initialCompetencia = old('competencia_id');
-    $initialResultados = old('resultados', []);
+    $initialFicha = old('ficha_id', $asignacion->ficha_id);
+    $initialInstructor = old('instructor_id', $asignacion->instructor_id);
+    $initialCompetencia = old('competencia_id', $asignacion->competencia_id);
+    $initialResultados = old(
+        'resultados',
+        $asignacion->resultadosAprendizaje->pluck('id')->map(fn ($id) => (string) $id)->all()
+    );
 @endphp
 
 @section('js')

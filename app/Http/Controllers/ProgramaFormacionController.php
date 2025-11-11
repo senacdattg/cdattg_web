@@ -226,7 +226,7 @@ class ProgramaFormacionController extends Controller
             }
             
             $programaFormacion->competencias()->detach();
-
+            
             if ($programaFormacion->delete()) {
                 Log::info('Programa de formación eliminado exitosamente', [
                     'programa_id' => $id,

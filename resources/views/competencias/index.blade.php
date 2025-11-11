@@ -215,9 +215,9 @@
                                                          <span class="badge badge-{{ $competencia->status ? 'success' : 'secondary' }}">
                                                              {{ $competencia->status ? 'Activa' : 'Inactiva' }}
                                                          </span>
-                                                     </div>
+                                                    </div>
                                                      <div class="btn-group btn-group-sm" role="group" aria-label="Acciones">
-                                                         @can('VER COMPETENCIA')
+                                                        @can('VER COMPETENCIA')
                                                              <a href="{{ route('competencias.show', $competencia) }}" class="btn btn-outline-info" data-toggle="tooltip" title="Ver Detalle">
                                                                 <i class="fas fa-eye"></i>
                                                             </a>

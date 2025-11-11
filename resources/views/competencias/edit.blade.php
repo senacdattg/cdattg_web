@@ -220,8 +220,8 @@
                                                                 <input type="number" class="form-control text-end input-horas" name="resultados[{{ $indice }}][horas]" value="{{ $horasResultado }}" min="0" step="1" data-last-value="{{ $horasResultado }}" required>
                                                                 <div class="input-group-append">
                                                                     <span class="input-group-text">h</span>
-                                                                </div>
-                                                            </div>
+                                            </div>
+                                        </div>
                                                         </td>
                                                         <td class="text-center align-middle">
                                                             <button type="button" class="btn btn-outline-danger btn-sm btn-eliminar-resultado" title="Quitar resultado">
@@ -243,8 +243,8 @@
                                                                 <input type="number" class="form-control text-end input-horas" name="resultados[0][horas]" value="0" min="0" step="1" data-last-value="0" required>
                                                                 <div class="input-group-append">
                                                                     <span class="input-group-text">h</span>
-                                                                </div>
-                                                            </div>
+                                            </div>
+                                        </div>
                                                         </td>
                                                         <td class="text-center align-middle">
                                                             <button type="button" class="btn btn-outline-danger btn-sm btn-eliminar-resultado" title="Quitar resultado">
