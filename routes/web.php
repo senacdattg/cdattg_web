@@ -60,7 +60,8 @@ Route::middleware('auth')->group(function () {
         'ubicacion',
         'actividades',
         'complementarios',
-        'talento-humano'
+        'talento-humano',
+        'websocket_visitantes'
     ];
     foreach ($protectedFolders as $folder) {
         foreach (glob(routes_path($folder) . '/*.php') as $routeFile) {
@@ -91,14 +92,15 @@ Route::post(
     '/programas-complementarios/{id}/inscripcion',
     [App\Http\Controllers\Complementarios\InscripcionComplementarioController::class, 'procesarInscripcion']
 )->name('programas-complementarios.procesar-inscripcion');
-Route::get(
-    '/programas-complementarios/{id}/documentos',
-    [App\Http\Controllers\Complementarios\DocumentoComplementarioController::class, 'formularioDocumentos']
-)->name('programas-complementarios.documentos');
-Route::post(
-    '/programas-complementarios/{id}/documentos',
-    [App\Http\Controllers\Complementarios\DocumentoComplementarioController::class, 'subirDocumento']
-)->name('programas-complementarios.subir-documentos');
+// Rutas obsoletas - ahora el documento se sube junto con la inscripción
+// Route::get(
+//     '/programas-complementarios/{id}/documentos',
+//     [App\Http\Controllers\Complementarios\DocumentoComplementarioController::class, 'formularioDocumentos']
+// )->name('programas-complementarios.documentos');
+// Route::post(
+//     '/programas-complementarios/{id}/documentos',
+//     [App\Http\Controllers\Complementarios\DocumentoComplementarioController::class, 'subirDocumento']
+// )->name('programas-complementarios.subir-documentos');
 Route::post(
     '/programas-complementarios/{id}/validar-sofia',
     [App\Http\Controllers\Complementarios\ValidacionSofiaController::class, 'validarSofia']

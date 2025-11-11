@@ -286,3 +286,12 @@ Route::post('/asistencia/entrada', [RegistroAsistenciaController::class, 'regist
 Route::post('/asistencia/salida', [RegistroAsistenciaController::class, 'registrarSalida']);
 Route::get('/asistencia/jornada', [RegistroAsistenciaController::class, 'obtenerAsistenciasPorJornada']);
 Route::get('/asistencia/fichas', [RegistroAsistenciaController::class, 'obtenerFichasConJornadas']);
+
+// ==========================================
+// WEBSOCKETS - RUTAS PÚBLICAS
+// ==========================================
+
+Route::get('/websocket/estadisticas', [\App\Http\Controllers\WebSocketVisitantesController::class, 'obtenerEstadisticas']);
+Route::post('/websocket/entrada', [\App\Http\Controllers\WebSocketVisitantesController::class, 'registrarEntrada']);
+Route::post('/websocket/salida', [\App\Http\Controllers\WebSocketVisitantesController::class, 'registrarSalida']);
+Route::get('/websocket/visitantes-actuales', [\App\Http\Controllers\WebSocketVisitantesController::class, 'obtenerVisitantesActuales']);

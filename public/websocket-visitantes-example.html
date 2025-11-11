@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket Visitantes - Ejemplo de Consumo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            background: #f9f9f9;
+        }
+        .entrada { border-left: 4px solid #28a745; }
+        .salida { border-left: 4px solid #dc3545; }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #007bff;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .log {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: #f8f9fa;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+        }
+        .connected { background: #d4edda; color: #155724; }
+        .disconnected { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>WebSocket Visitantes - Ejemplo de Consumo</h1>
+        
+        <div class="status" id="connectionStatus">
+            Estado: Desconectado
+        </div>
+
+        <div class="stats-grid" id="statsGrid">
+            <!-- Las estadísticas se cargarán aquí -->
+        </div>
+
+        <h3>Visitantes Recientes</h3>
+        <div id="visitantesList">
+            <!-- Lista de visitantes se cargará aquí -->
+        </div>
+
+        <h3>Log de Eventos</h3>
+        <div class="log" id="eventLog"></div>
+
+        <h3>Instrucciones para el Equipo Externo</h3>
+        <div class="card">
+            <h4>URLs de WebSocket:</h4>
+            <ul>
+                <li><strong>Canal de visitantes:</strong> <code>ws://tu-dominio:8080/app/REVERB_APP_KEY</code></li>
+                <li><strong>Canal de estadísticas:</strong> <code>ws://tu-dominio:8080/app/REVERB_APP_KEY</code></li>
+            </ul>
+
+            <h4>Eventos Disponibles:</h4>
+            <ul>
+                <li><code>visitante.actualizado</code> - Cuando un visitante entra o sale</li>
+                <li><code>estadisticas.actualizadas</code> - Cuando se actualizan las estadísticas</li>
+            </ul>
+
+            <h4>Endpoints HTTP:</h4>
+            <ul>
+                <li><code>GET /websocket/estadisticas</code> - Obtener estadísticas actuales</li>
+                <li><code>POST /websocket/entrada</code> - Registrar entrada de visitante</li>
+                <li><code>POST /websocket/salida</code> - Registrar salida de visitante</li>
+                <li><code>GET /websocket/visitantes-actuales</code> - Obtener lista de visitantes actuales</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Configuración
+        const REVERB_APP_KEY = 'local-app-key'; // Reemplazar con la clave real
+        const WS_HOST = '127.0.0.1:8081'; // Cambiado a 8081 para evitar conflicto
+        const API_BASE_URL = window.location.origin;
+
+        // Elementos del DOM
+        const connectionStatus = document.getElementById('connectionStatus');
+        const statsGrid = document.getElementById('statsGrid');
+        const visitantesList = document.getElementById('visitantesList');
+        const eventLog = document.getElementById('eventLog');
+
+        let websocket = null;
+        let visitantes = [];
+
+        // Función para conectar WebSocket
+        function connectWebSocket() {
+            try {
+                const wsUrl = `ws://${WS_HOST}/app/${REVERB_APP_KEY}?protocol=7&client=js&version=7.0.0&flash=false`;
+                
+                websocket = new WebSocket(wsUrl);
+
+                websocket.onopen = function(event) {
+                    updateStatus('Conectado', 'connected');
+                    logEvent('WebSocket conectado exitosamente');
+                    
+                    // Suscribirse a canales
+                    subscribeToChannel('visitantes');
+                    subscribeToChannel('estadisticas-visitantes');
+                };
+
+                websocket.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    handleWebSocketMessage(data);
+                };
+
+                websocket.onclose = function(event) {
+                    updateStatus('Desconectado', 'disconnected');
+                    logEvent('WebSocket desconectado');
+                    
+                    // Intentar reconectar después de 5 segundos
+                    setTimeout(connectWebSocket, 5000);
+                };
+
+                websocket.onerror = function(error) {
+                    logEvent('Error en WebSocket: ' + error);
+                };
+
+            } catch (error) {
+                logEvent('Error al conectar WebSocket: ' + error);
+            }
+        }
+
+        // Suscribirse a un canal
+        function subscribeToChannel(channel) {
+            const subscribeMessage = {
+                event: 'pusher:subscribe',
+                data: {
+                    channel: channel
+                }
+            };
+            websocket.send(JSON.stringify(subscribeMessage));
+            logEvent(`Suscrito al canal: ${channel}`);
+        }
+
+        // Manejar mensajes del WebSocket
+        function handleWebSocketMessage(data) {
+            if (data.event === 'visitante.actualizado') {
+                handleVisitanteActualizado(data.data);
+            } else if (data.event === 'estadisticas.actualizadas') {
+                handleEstadisticasActualizadas(data.data);
+            }
+        }
+
+        // Manejar actualización de visitante
+        function handleVisitanteActualizado(data) {
+            const visitante = data.visitante;
+            const tipo = data.tipo;
+            
+            // Agregar a la lista de visitantes
+            if (tipo === 'entrada') {
+                visitantes.unshift(visitante);
+            }
+            
+            // Actualizar UI
+            updateVisitantesList();
+            logEvent(`${tipo.toUpperCase()}: ${visitante.nombre} (${visitante.rol})`);
+        }
+
+        // Manejar actualización de estadísticas
+        function handleEstadisticasActualizadas(data) {
+            updateStatsGrid(data.estadisticas);
+            logEvent('Estadísticas actualizadas');
+        }
+
+        // Actualizar lista de visitantes
+        function updateVisitantesList() {
+            // Mantener solo los últimos 10 visitantes
+            visitantes = visitantes.slice(0, 10);
+            
+            visitantesList.innerHTML = visitantes.map(visitante => `
+                <div class="card entrada">
+                    <strong>${visitante.nombre}</strong><br>
+                    Documento: ${visitante.documento}<br>
+                    Rol: ${visitante.rol}<br>
+                    ${visitante.ficha ? `Ficha: ${visitante.ficha}<br>` : ''}
+                    Hora: ${new Date(visitante.hora_entrada).toLocaleTimeString()}
+                </div>
+            `).join('');
+        }
+
+        // Actualizar estadísticas
+        function updateStatsGrid(stats) {
+            const roles = stats.roles || {};
+            statsGrid.innerHTML = `
+                <div class="stat-card">
+                    <h3>${roles.super_administradores?.total || 0}</h3>
+                    <p>Super Administradores</p>
+                    <small>Activos: ${roles.super_administradores?.activos || 0}</small>
+                </div>
+                <div class="stat-card">
+                    <h3>${roles.administradores?.total || 0}</h3>
+                    <p>Administradores</p>
+                    <small>Activos: ${roles.administradores?.activos || 0}</small>
+                </div>
+                <div class="stat-card">
+                    <h3>${roles.instructores?.total || 0}</h3>
+                    <p>Instructores</p>
+                    <small>Activos: ${roles.instructores?.activos || 0}</small>
+                </div>
+                <div class="stat-card">
+                    <h3>${roles.visitantes?.total || 0}</h3>
+                    <p>Visitantes</p>
+                    <small>Activos: ${roles.visitantes?.activos || 0}</small>
+                </div>
+                <div class="stat-card">
+                    <h3>${roles.aprendices?.total || 0}</h3>
+                    <p>Aprendices</p>
+                    <small>Activos: ${roles.aprendices?.activos || 0}</small>
+                </div>
+                <div class="stat-card">
+                    <h3>${roles.aspirantes?.total || 0}</h3>
+                    <p>Aspirantes</p>
+                    <small>Activos: ${roles.aspirantes?.activos || 0}</small>
+                </div>
+                <div class="stat-card">
+                    <h3>${stats.asistencias_hoy || 0}</h3>
+                    <p>Asistencias Hoy</p>
+                </div>
+            `;
+        }
+
+        // Actualizar estado de conexión
+        function updateStatus(message, className) {
+            connectionStatus.textContent = `Estado: ${message}`;
+            connectionStatus.className = `status ${className}`;
+        }
+
+        // Log de eventos
+        function logEvent(message) {
+            const timestamp = new Date().toLocaleTimeString();
+            eventLog.innerHTML += `[${timestamp}] ${message}\n`;
+            eventLog.scrollTop = eventLog.scrollHeight;
+        }
+
+        // Cargar estadísticas iniciales
+        async function loadInitialStats() {
+            try {
+                // Usar la ruta API pública (sin autenticación)
+                const response = await fetch(`${API_BASE_URL}/api/websocket/estadisticas`);
+                
+                // Verificar si la respuesta es HTML (error) en lugar de JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const text = await response.text();
+                    logEvent('Error: El servidor devolvió HTML en lugar de JSON. Verifica que Reverb esté ejecutándose.');
+                    return;
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateStatsGrid(data.data);
+                } else {
+                    logEvent('Error en respuesta del servidor: ' + (data.message || 'Error desconocido'));
+                }
+            } catch (error) {
+                logEvent('Error cargando estadísticas iniciales: ' + error);
+            }
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            connectWebSocket();
+            loadInitialStats();
+        });
+    </script>
+</body>
+</html>

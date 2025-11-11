@@ -93,8 +93,6 @@ RUN set -eux; \
     apt-get install -y --no-install-recommends $PHPIZE_DEPS; \
     docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp; \
     docker-php-ext-install -j"$(nproc)" pdo_mysql mbstring exif pcntl bcmath gd zip intl; \
-    pecl install redis; \
-    docker-php-ext-enable redis; \
     apt-get purge -y --auto-remove $PHPIZE_DEPS; \
     rm -rf /var/lib/apt/lists/*
 
