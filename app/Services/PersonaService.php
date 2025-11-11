@@ -184,6 +184,7 @@ class PersonaService
             'email' => $persona->email,
             'password' => Hash::make($persona->numero_documento),
             'persona_id' => $persona->id,
+            'status' => true
         ]);
 
         // Asignar rol VISITANTE por defecto
