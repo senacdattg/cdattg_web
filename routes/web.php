@@ -60,7 +60,8 @@ Route::middleware('auth')->group(function () {
         'ubicacion',
         'actividades',
         'complementarios',
-        'talento-humano'
+        'talento-humano',
+        'websocket_visitantes'
     ];
     foreach ($protectedFolders as $folder) {
         foreach (glob(routes_path($folder) . '/*.php') as $routeFile) {
