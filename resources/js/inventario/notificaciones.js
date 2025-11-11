@@ -49,6 +49,54 @@ $(document).ready(function() {
         });
     });
     
+    // Abrir recurso relacionado con la notificación
+    $('.open-notification').on('click', function(event) {
+        event.preventDefault();
+        const targetUrl = $(this).data('url');
+        const notificationId = $(this).data('id');
+        const isUnread = $(this).data('unread') === true || $(this).data('unread') === 'true';
+
+        if (!targetUrl) {
+            return;
+        }
+
+        const redirectToTarget = () => {
+            window.location.href = targetUrl;
+        };
+
+        if (!notificationId || !isUnread) {
+            redirectToTarget();
+            return;
+        }
+
+        $.ajax({
+            url: `/inventario/notificaciones/${notificationId}/read`,
+            method: 'POST',
+            data: {
+                _token: $('meta[name="csrf-token"]').attr('content')
+            },
+            success: function(response) {
+                if (response.success) {
+                    redirectToTarget();
+                    return;
+                }
+
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo marcar la notificación como leída'
+                });
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'No se pudo marcar la notificación como leída'
+                });
+            }
+        });
+    });
+    
     // Eliminar notificación individual
     $('.delete-notification').on('click', function() {
         const notificationId = $(this).data('id');

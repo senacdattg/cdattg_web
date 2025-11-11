@@ -81,6 +81,23 @@
                                             $datos = is_string($notificacion->datos) 
                                                 ? json_decode($notificacion->datos, true) 
                                                 : $notificacion->datos;
+                                            $datosTipo = $datos['tipo'] ?? null;
+                                            $accionUrl = null;
+
+                                            if ($datosTipo === 'stock_bajo' && isset($datos['producto_id'])) {
+                                                $accionUrl = route('inventario.productos.show', ['producto' => $datos['producto_id']]);
+                                            } elseif (
+                                                in_array($datosTipo, ['orden_aprobada', 'orden_rechazada'], true)
+                                                && isset($datos['orden_id'])
+                                            ) {
+                                                $accionUrl = route('inventario.ordenes.show', ['orden' => $datos['orden_id']]);
+                                            } elseif ($datosTipo === 'nueva_orden') {
+                                                $accionUrl = isset($datos['orden_id'])
+                                                    ? route('inventario.aprobaciones.pendientes') . '?orden=' . $datos['orden_id']
+                                                    : route('inventario.aprobaciones.pendientes');
+                                            } elseif (isset($datos['orden_id'])) {
+                                                $accionUrl = route('inventario.ordenes.show', ['orden' => $datos['orden_id']]);
+                                            }
                                         @endphp
                                         
                                         <div class="list-group-item {{ is_null($notificacion->leida_en) ? 'list-group-item-light' : '' }}">
@@ -164,6 +181,17 @@
                                                     </div>
                                                 </div>
                                                 <div class="ml-2">
+                                                    @if($accionUrl)
+                                                        <button
+                                                            class="btn btn-sm btn-outline-info open-notification mb-1"
+                                                            data-id="{{ $notificacion->id }}"
+                                                            data-url="{{ $accionUrl }}"
+                                                            data-unread="{{ is_null($notificacion->leida_en) ? 'true' : 'false' }}"
+                                                            title="Ver detalle"
+                                                        >
+                                                            <i class="fas fa-external-link-alt"></i>
+                                                        </button>
+                                                    @endif
                                                     @if(is_null($notificacion->leida_en))
                                                         <button 
                                                             class="btn btn-sm btn-outline-primary mark-read mb-1" 
