@@ -25,6 +25,7 @@ services:
       RUN_BUILD_ASSETS: ${RUN_BUILD_ASSETS:-false}
     ports:
       - "8080:8080"
+      - "8081:8081"
     volumes:
       - type: ${APP_CODE_VOLUME_TYPE:-bind}
         source: ${APP_CODE_SOURCE:-./}
