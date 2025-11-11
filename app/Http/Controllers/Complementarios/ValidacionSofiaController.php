@@ -31,7 +31,7 @@ class ValidacionSofiaController extends Controller
             // Contar aspirantes que necesitan validación
             $aspirantesCount = AspiranteComplementario::with('persona')
                 ->where('complementario_id', $complementarioId)
-                ->whereHas('persona', function($query) {
+                ->whereHas('persona', function ($query) {
                     $query->whereIn('estado_sofia', [0, 2]);
                 })
                 ->count();
