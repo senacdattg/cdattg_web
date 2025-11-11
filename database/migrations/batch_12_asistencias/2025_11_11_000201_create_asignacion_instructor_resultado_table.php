@@ -16,13 +16,24 @@ return new class extends Migration
             $table->foreignId('asignacion_id')
                 ->constrained('asignaciones_instructores')
                 ->cascadeOnDelete();
-            $table->foreignId('resultado_aprendizaje_id')
-                ->constrained('resultados_aprendizajes')
-                ->cascadeOnDelete();
+            $table->unsignedBigInteger('resultado_aprendizaje_id');
             $table->timestamps();
 
             $table->unique(['asignacion_id', 'resultado_aprendizaje_id'], 'asignacion_resultado_unica');
         });
+
+        if (Schema::hasTable('resultados_aprendizajes')) {
+            Schema::table('asignacion_instructor_resultado', function (Blueprint $table) {
+                $table->foreign('resultado_aprendizaje_id', 'asignacion_resultado_rap_id_foreign')
+                    ->references('id')
+                    ->on('resultados_aprendizajes')
+                    ->cascadeOnDelete();
+            });
+        } else {
+            Schema::table('asignacion_instructor_resultado', function (Blueprint $table) {
+                $table->index('resultado_aprendizaje_id', 'asignacion_resultado_rap_id_index');
+            });
+        }
     }
 
     /**

@@ -68,6 +68,17 @@ Route::middleware('auth')->group(function () {
         }
     }
 
+    $protectedFiles = [
+        'web_instructores.php',
+    ];
+
+    foreach ($protectedFiles as $routeFile) {
+        $fullPath = routes_path($routeFile);
+        if (file_exists($fullPath)) {
+            include_once $fullPath;
+        }
+    }
+
     Route::post('/verify-document', [AsistenceQrController::class, 'verifyDocument'])->name('api.verifyDocument');
 
     Route::prefix('inventario')->name('inventario.')->group(function () {
