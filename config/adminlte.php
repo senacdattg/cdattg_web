@@ -954,22 +954,9 @@ return [
         // ========================================
         [
             'text' => 'Talento Humano',
+            'url' => 'talento-humano',
             'icon' => 'fas fa-fw fa-users',
             'can' => 'VER TALENTO HUMANO',
-            'submenu' => [
-                [
-                    'text' => 'Ver Talento Humano',
-                    'url' => 'talento-humano',
-                    'icon' => 'fas fa-fw fa-list',
-                    'can' => 'VER TALENTO HUMANO',
-                ],
-                [
-                    'text' => 'Crear Talento Humano',
-                    'url' => 'talento-humano/create',
-                    'icon' => 'fas fa-fw fa-plus',
-                    'can' => 'CREAR TALENTO HUMANO',
-                ],
-            ],
         ],
     ],
 
