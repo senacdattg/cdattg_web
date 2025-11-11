@@ -8,6 +8,8 @@ use App\Models\Inventario\Producto;
 
 class ProductoSeeder extends Seeder
 {
+    private const DEFAULT_IMAGE_PATH = 'img/inventario/producto-default.png';
+
     /**
      * Run the database seeds.
      */
@@ -14297,7 +14299,8 @@ class ProductoSeeder extends Seeder
             [
                 'producto' => 'HIDRÓXIDO DE SODIO',
                 'tipo_producto_id' => 28,
-                'descripcion' => 'HIDRÓXIDO DE SODIO CON AGUA DESMINERALIZADA, CON UNA CAPACIDAD DE 1 LITRO, SOLO PARA USO PRÁCTICO.',
+                'descripcion' => 'HIDRÓXIDO DE SODIO CON AGUA DESMINERALIZADA,
+                 CON UNA CAPACIDAD DE 1 LITRO, SOLO PARA USO PRÁCTICO.',
                 'peso' => 0,
                 'unidad_medida_id' => 41,
                 'cantidad' => 5.0,
@@ -14316,7 +14319,9 @@ class ProductoSeeder extends Seeder
             [
                 'producto' => 'TIRAS DE PRUEBA DE PERÓXIDO',
                 'tipo_producto_id' => 28,
-                'descripcion' => 'TIRAS REACTIVAS DISEÑADAS PARA MEDIR LA CONCENTRACIÓN DE PERÓXIDO DE HIDRÓGENO, CON UNA CANTIDAD DE 50 TIRASREACTIVAS PARA ANÁLISIS INDIVIDUAL.',
+                'descripcion' => 'TIRAS REACTIVAS DISEÑADAS PARA MEDIR
+                 LA CONCENTRACIÓN DE PERÓXIDO DE HIDRÓGENO,
+                 CON UNA CANTIDAD DE 50 TIRASREACTIVAS PARA ANÁLISIS INDIVIDUAL.',
                 'peso' => 0,
                 'unidad_medida_id' => 41,
                 'cantidad' => 1.0,
