@@ -17,6 +17,7 @@ use App\Notifications\OrdenRechazadaNotification;
 class AprobacionController extends InventarioController
 {
     private const STATUS_PENDING = 'EN ESPERA';
+    private const ORDER_STATUS_THEME = 'ESTADOS DE ORDEN';
 
     public function __construct()
     {
@@ -30,11 +31,11 @@ class AprobacionController extends InventarioController
     public function pendientes()
     {
         // Obtener estado EN ESPERA
-        $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
+        $estadoEnEspera = ParametroTema::whereHas('parametro', function ($q) {
             $q->where('name', self::STATUS_PENDING);
         })
-        ->whereHas('tema', function($q) {
-            $q->where('name', 'ESTADOS DE ORDEN');
+        ->whereHas('tema', function ($q) {
+            $q->where('name', self::ORDER_STATUS_THEME);
         })
         ->first();
 
@@ -68,11 +69,11 @@ class AprobacionController extends InventarioController
             $detalleOrden = DetalleOrden::with(['producto', 'orden'])->findOrFail($detalleOrdenId);
 
             // Verificar que esté en estado EN ESPERA
-            $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
+            $estadoEnEspera = ParametroTema::whereHas('parametro', function ($q) {
                 $q->where('name', self::STATUS_PENDING);
             })
-            ->whereHas('tema', function($q) {
-                $q->where('name', 'ESTADOS DE ORDEN');
+            ->whereHas('tema', function ($q) {
+                $q->where('name', self::ORDER_STATUS_THEME);
             })
             ->first();
 
@@ -95,11 +96,11 @@ class AprobacionController extends InventarioController
             }
 
             // Obtener estado APROBADA
-            $estadoAprobada = ParametroTema::whereHas('parametro', function($q) {
+            $estadoAprobada = ParametroTema::whereHas('parametro', function ($q) {
                 $q->where('name', 'APROBADA');
             })
-            ->whereHas('tema', function($q) {
-                $q->where('name', 'ESTADOS DE ORDEN');
+            ->whereHas('tema', function ($q) {
+                $q->where('name', self::ORDER_STATUS_THEME);
             })
             ->first();
 
@@ -164,11 +165,11 @@ class AprobacionController extends InventarioController
             $detalleOrden = DetalleOrden::with(['producto', 'orden'])->findOrFail($detalleOrdenId);
 
             // Verificar que esté en estado EN ESPERA
-            $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
+            $estadoEnEspera = ParametroTema::whereHas('parametro', function ($q) {
                 $q->where('name', self::STATUS_PENDING);
             })
-            ->whereHas('tema', function($q) {
-                $q->where('name', 'ESTADOS DE ORDEN');
+            ->whereHas('tema', function ($q) {
+                $q->where('name', self::ORDER_STATUS_THEME);
             })
             ->first();
 
@@ -182,11 +183,11 @@ class AprobacionController extends InventarioController
             }
 
             // Obtener estado RECHAZADA
-            $estadoRechazada = ParametroTema::whereHas('parametro', function($q) {
+            $estadoRechazada = ParametroTema::whereHas('parametro', function ($q) {
                 $q->where('name', 'RECHAZADA');
             })
-            ->whereHas('tema', function($q) {
-                $q->where('name', 'ESTADOS DE ORDEN');
+            ->whereHas('tema', function ($q) {
+                $q->where('name', self::ORDER_STATUS_THEME);
             })
             ->first();
 
@@ -223,8 +224,8 @@ class AprobacionController extends InventarioController
             $solicitante = $detalleOrden->orden->userCreate;
             if ($solicitante) {
                 $solicitante->notify(new OrdenRechazadaNotification(
-                    $detalleOrden, 
-                    Auth::user(), 
+                    $detalleOrden,
+                    Auth::user(),
                     $validated['motivo_rechazo']
                 ));
             }
@@ -252,11 +253,11 @@ class AprobacionController extends InventarioController
             $orden = Orden::with('detalles.producto')->findOrFail($ordenId);
 
             // Verificar que todos los detalles estén en estado EN ESPERA
-            $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
+            $estadoEnEspera = ParametroTema::whereHas('parametro', function ($q) {
                 $q->where('name', self::STATUS_PENDING);
             })
-            ->whereHas('tema', function($q) {
-                $q->where('name', 'ESTADOS DE ORDEN');
+            ->whereHas('tema', function ($q) {
+                $q->where('name', self::ORDER_STATUS_THEME);
             })
             ->first();
 
@@ -282,11 +283,11 @@ class AprobacionController extends InventarioController
             }
 
             // Obtener estado APROBADA
-            $estadoAprobada = ParametroTema::whereHas('parametro', function($q) {
+            $estadoAprobada = ParametroTema::whereHas('parametro', function ($q) {
                 $q->where('name', 'APROBADA');
             })
-            ->whereHas('tema', function($q) {
-                $q->where('name', 'ESTADOS DE ORDEN');
+            ->whereHas('tema', function ($q) {
+                $q->where('name', self::ORDER_STATUS_THEME);
             })
             ->first();
 
@@ -328,8 +329,12 @@ class AprobacionController extends InventarioController
 
             DB::commit();
 
-            return redirect()->back()
-                ->with('success', "Orden #{$ordenId} aprobada exitosamente. Stock actualizado para todos los productos.");
+            return redirect()
+                ->back()
+                ->with(
+                    'success',
+                    "Orden #{$ordenId} aprobada exitosamente. Stock actualizado para todos los productos."
+                );
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -353,11 +358,11 @@ class AprobacionController extends InventarioController
             $orden = Orden::with('detalles.producto')->findOrFail($ordenId);
 
             // Verificar que todos los detalles estén en estado EN ESPERA
-            $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
+            $estadoEnEspera = ParametroTema::whereHas('parametro', function ($q) {
                 $q->where('name', self::STATUS_PENDING);
             })
-            ->whereHas('tema', function($q) {
-                $q->where('name', 'ESTADOS DE ORDEN');
+            ->whereHas('tema', function ($q) {
+                $q->where('name', self::ORDER_STATUS_THEME);
             })
             ->first();
 
@@ -373,11 +378,11 @@ class AprobacionController extends InventarioController
             }
 
             // Obtener estado RECHAZADA
-            $estadoRechazada = ParametroTema::whereHas('parametro', function($q) {
+            $estadoRechazada = ParametroTema::whereHas('parametro', function ($q) {
                 $q->where('name', 'RECHAZADA');
             })
-            ->whereHas('tema', function($q) {
-                $q->where('name', 'ESTADOS DE ORDEN');
+            ->whereHas('tema', function ($q) {
+                $q->where('name', self::ORDER_STATUS_THEME);
             })
             ->first();
 
@@ -417,8 +422,8 @@ class AprobacionController extends InventarioController
                 // Enviar una notificación por cada detalle rechazado
                 foreach ($detallesPendientes as $detalle) {
                     $solicitante->notify(new OrdenRechazadaNotification(
-                        $detalle, 
-                        Auth::user(), 
+                        $detalle,
+                        Auth::user(),
                         $validated['motivo_rechazo']
                     ));
                 }
