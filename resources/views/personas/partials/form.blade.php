@@ -221,19 +221,23 @@
                         <label for="celular" class="form-label font-weight-bold">Celular</label>
                         <input type="text" id="celular" name="celular"
                             class="form-control @error('celular') is-invalid @enderror"
-                            value="{{ old('celular', $isEdit ? $persona->celular : '') }}">
+                            value="{{ old('celular', $isEdit ? $persona->celular : '') }}"
+                            maxlength="10" minlength="10">
                         @error('celular')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                       <small id="celular-feedback" class="form-text"></small>
                     </div>
                     <div class="col-md-6 mb-4">
                         <label for="telefono" class="form-label font-weight-bold">Teléfono</label>
                         <input type="text" id="telefono" name="telefono"
                             class="form-control @error('telefono') is-invalid @enderror"
-                            value="{{ old('telefono', $isEdit ? $persona->telefono : '') }}">
+                            value="{{ old('telefono', $isEdit ? $persona->telefono : '') }}"
+                            maxlength="7" minlength="7">
                         @error('telefono')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                       <small id="telefono-feedback" class="form-text"></small>
                     </div>
                     <div class="col-md-12 mb-0">
                         <label for="email" class="form-label font-weight-bold">

@@ -1354,8 +1354,8 @@ class ValidationHandler {
         return (
             this.validateTextFields(form) &&
             this.validateNumericField(form, '#numero_documento', 'El número de documento solo puede contener números.') &&
-            this.validateNumericField(form, '#telefono', 'El teléfono fijo solo puede contener números.') &&
-            this.validateNumericField(form, '#celular', 'El celular solo puede contener números.')
+            this.validatePhoneField(form, '#telefono', 7, 'El teléfono fijo debe tener exactamente 7 dígitos.') &&
+            this.validatePhoneField(form, '#celular', 10, 'El celular debe tener exactamente 10 dígitos.')
         );
     }
 
@@ -1391,6 +1391,22 @@ class ValidationHandler {
         field.focus();
         return false;
     }
+
+    validatePhoneField(form, selector, exactLength, message) {
+        const field = form.querySelector(selector);
+        if (!field || !field.value) {
+            return true;
+        }
+
+        if (/^\d+$/.test(field.value) && field.value.length === exactLength) {
+            return true;
+        }
+
+        // Instead of alert, set custom validity for inline feedback
+        field.setCustomValidity(message);
+        field.classList.add('is-invalid');
+        return false;
+    }
 }
 
 class PreloaderHandler {
@@ -1410,7 +1426,7 @@ class PreloaderHandler {
     }
 }
 
-class CedulaValidator {
+class FieldValidator {
     constructor() {
         this.timeout = null;
         this.http = new HttpClient();
@@ -1418,24 +1434,41 @@ class CedulaValidator {
 
     attach(forms) {
         forms.forEach((form) => {
+            // Validación de cédula
             const cedulaField = resolveField(form, 'numero_documento');
-            if (!cedulaField) return;
-
-            bindOnce(cedulaField, 'input', (e) => {
-                clearTimeout(this.timeout);
-                const cedula = e.target.value.trim();
-                if (cedula.length >= 5) {
-                    this.timeout = setTimeout(() => {
-                        this.checkCedulaAvailability(cedula);
-                    }, 500);
-                } else {
-                    // Limpiar feedback si es muy corto
-                    const feedback = document.getElementById('cedula-feedback');
-                    if (feedback) {
-                        feedback.textContent = '';
+            if (cedulaField) {
+                bindOnce(cedulaField, 'input', (e) => {
+                    clearTimeout(this.timeout);
+                    const cedula = e.target.value.trim();
+                    if (cedula.length >= 5) {
+                        this.timeout = setTimeout(() => {
+                            this.checkCedulaAvailability(cedula);
+                        }, 500);
+                    } else {
+                        // Limpiar feedback si es muy corto
+                        const feedback = document.getElementById('cedula-feedback');
+                        if (feedback) {
+                            feedback.textContent = '';
+                        }
                     }
-                }
-            }, 'personaCedulaInput');
+                }, 'personaCedulaInput');
+            }
+
+            // Validación de celular
+            const celularField = resolveField(form, 'celular');
+            if (celularField) {
+                bindOnce(celularField, 'input', (e) => {
+                    this.validatePhoneLength(e.target, 10, 'celular-feedback', 'El celular debe tener exactamente 10 dígitos');
+                }, 'personaCelularInput');
+            }
+
+            // Validación de teléfono
+            const telefonoField = resolveField(form, 'telefono');
+            if (telefonoField) {
+                bindOnce(telefonoField, 'input', (e) => {
+                    this.validatePhoneLength(e.target, 7, 'telefono-feedback', 'El teléfono fijo debe tener exactamente 7 dígitos');
+                }, 'personaTelefonoInput');
+            }
         });
     }
 
@@ -1458,6 +1491,38 @@ class CedulaValidator {
             feedback.className = 'form-text text-warning';
         }
     }
+
+    validatePhoneLength(field, requiredLength, feedbackId, message) {
+        const feedback = document.getElementById(feedbackId);
+        if (!feedback) return;
+
+        const value = field.value.trim();
+        if (!value) {
+            feedback.textContent = '';
+            field.setCustomValidity('');
+            field.classList.remove('is-invalid');
+            return;
+        }
+
+        if (/^\d+$/.test(value)) {
+            if (value.length === requiredLength) {
+                feedback.textContent = 'Número válido';
+                feedback.className = 'form-text text-success';
+                field.setCustomValidity('');
+                field.classList.remove('is-invalid');
+            } else {
+                feedback.textContent = message;
+                feedback.className = 'form-text text-danger';
+                field.setCustomValidity(message);
+                field.classList.add('is-invalid');
+            }
+        } else {
+            feedback.textContent = 'Solo se permiten números';
+            feedback.className = 'form-text text-danger';
+            field.setCustomValidity('Solo se permiten números');
+            field.classList.add('is-invalid');
+        }
+    }
 }
 
 class PersonaFormManager {
@@ -1473,7 +1538,7 @@ class PersonaFormManager {
         this.age = new AgeValidator(config, selectors);
         this.validation = new ValidationHandler(config);
         this.preloader = new PreloaderHandler(selectors);
-        this.cedulaValidator = new CedulaValidator();
+        this.fieldValidator = new FieldValidator();
     }
 
     getTargetForms() {
@@ -1499,7 +1564,7 @@ class PersonaFormManager {
         this.input.attach(forms);
         this.caracterizacion.attach();
         this.address.attach();
-        this.cedulaValidator.attach(forms);
+        this.fieldValidator.attach(forms);
 
         try {
             await this.location.init();
