@@ -41,6 +41,8 @@ class RegisterRequest extends FormRequest
             'departamento_id' => ['required', 'exists:departamentos,id'],
             'municipio_id' => ['required', 'exists:municipios,id'],
             'direccion' => ['required', 'string', 'max:191'],
+            'caracterizacion_ids' => ['nullable', 'array'],
+            'caracterizacion_ids.*' => ['integer', 'exists:parametros,id'],
         ];
     }
 
@@ -53,6 +55,9 @@ class RegisterRequest extends FormRequest
             'pais_id.exists' => 'Seleccione un país válido.',
             'departamento_id.exists' => 'Seleccione un departamento válido.',
             'municipio_id.exists' => 'Seleccione un municipio válido.',
+            'caracterizacion_ids.array' => 'Las caracterizaciones seleccionadas no son válidas.',
+            'caracterizacion_ids.*.integer' => 'Cada caracterización debe ser un identificador numérico válido.',
+            'caracterizacion_ids.*.exists' => 'Alguna de las caracterizaciones seleccionadas no existe.',
         ];
     }
 
@@ -65,4 +70,3 @@ class RegisterRequest extends FormRequest
         ]);
     }
 }
-
