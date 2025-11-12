@@ -460,17 +460,22 @@ function initializeSelect2() {
 
     elements.forEach(function(element) {
         const $element = $(element);
+        
+        // Destruir instancia existente si existe
         if ($element.hasClass('select2-hidden-accessible')) {
-            return;
+            $element.select2('destroy');
         }
 
-        $element.select2({
-            theme: 'bootstrap4',
-            width: '100%',
-            placeholder: element.dataset.placeholder || 'Seleccione una opción',
-            minimumResultsForSearch: Infinity,
-            allowClear: true
-        });
+        // Solo inicializar si tiene opciones
+        if (element.options && element.options.length > 0) {
+            $element.select2({
+                theme: 'bootstrap4',
+                width: '100%',
+                placeholder: element.dataset.placeholder || 'Seleccione una opción',
+                allowClear: true,
+                minimumResultsForSearch: -1 // Ocultar barra de búsqueda
+            });
+        }
     });
 }
 

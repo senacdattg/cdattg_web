@@ -43,11 +43,12 @@
                                 </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label>
+                                        <label for="filter-type">
                                             <i class="fas fa-box-open"></i> Tipo de producto
                                         </label>
                                         <select
                                             id="filter-type"
+                                            name="filter-type"
                                             class="form-control select2"
                                             data-placeholder="Todos los tipos"
                                         >
