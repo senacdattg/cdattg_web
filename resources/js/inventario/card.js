@@ -10,13 +10,6 @@ const STORAGE_KEY = 'inventario_carrito';
 // Estado del carrito
 let cart = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
-// Estado de la vista del catálogo
-let originalGridHTML = '';
-let originalPaginationHTML = '';
-let showingSearchResults = false;
-let currentFetchController = null;
-let currentFetchedProducts = [];
-
 /**
  * Helper para mostrar/ocultar modales compatible con Bootstrap 4 y 5
  */
@@ -67,7 +60,6 @@ function agregarAlCarritoDesdeModal(productId, productName, productStock) {
  * Inicialización cuando el DOM está listo
  */
 document.addEventListener('DOMContentLoaded', function() {
-    captureInitialState();
     initializeCardView();
     updateCartCount();
     setupModalDismissHandlers();
@@ -112,35 +104,27 @@ function handleProductModalEscape(event) {
 }
 
 /**
- * Guardar el estado inicial renderizado por Blade
- */
-function captureInitialState() {
-    const grid = document.getElementById('products-grid');
-    const pagination = document.getElementById('catalog-pagination');
-
-    if (grid) {
-        originalGridHTML = grid.innerHTML;
-    }
-
-    if (pagination) {
-        originalPaginationHTML = pagination.innerHTML;
-    }
-}
-
-/**
  * Configurar búsqueda de productos
  */
 function setupSearchFilter() {
     const searchInput = document.getElementById('search-product');
     if (!searchInput) return;
 
-    // Búsqueda en tiempo real con debounce
+    // Búsqueda con Enter o después de dejar de escribir
     let searchTimeout;
     searchInput.addEventListener('input', function(e) {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
-            handleFiltersChange();
-        }, 300);
+            applyFilters();
+        }, 500);
+    });
+
+    // También aplicar al presionar Enter
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            clearTimeout(searchTimeout);
+            applyFilters();
+        }
     });
 }
 
@@ -152,7 +136,7 @@ function setupTypeFilter() {
     if (!typeSelect) return;
 
     typeSelect.addEventListener('change', function() {
-        handleFiltersChange();
+        applyFilters();
     });
 }
 
@@ -164,31 +148,48 @@ function setupSortFilter() {
     if (!sortSelect) return;
 
     sortSelect.addEventListener('change', function() {
-        handleFiltersChange();
+        applyFilters();
     });
 }
 
 /**
- * Gestionar filtros: decide cuándo usar búsqueda AJAX y cuándo restaurar la vista inicial
+ * Aplicar filtros mediante redirección con parámetros GET
  */
-function handleFiltersChange() {
+function applyFilters() {
     const searchTerm = document.getElementById('search-product')?.value.trim() || '';
     const typeId = document.getElementById('filter-type')?.value || '';
     const sortBy = document.getElementById('sort-by')?.value || 'name';
 
-    const hasActiveFilters = Boolean(searchTerm) || Boolean(typeId);
+    // Construir URL con parámetros
+    const url = new URL(window.location.href);
+    url.searchParams.delete('page'); // Resetear a página 1 cuando se filtran
 
-    if (!hasActiveFilters) {
-        if (showingSearchResults) {
-            restoreInitialState();
-        }
-        sortProducts(sortBy);
-        setPaginationVisibility(true);
-        return;
+    if (searchTerm) {
+        url.searchParams.set('search', searchTerm);
+    } else {
+        url.searchParams.delete('search');
     }
 
-    fetchAndRenderProducts({ searchTerm, typeId, sortBy });
+    if (typeId) {
+        url.searchParams.set('tipo_producto_id', typeId);
+    } else {
+        url.searchParams.delete('tipo_producto_id');
+    }
+
+    if (sortBy && sortBy !== 'name') {
+        url.searchParams.set('sort_by', sortBy);
+    } else {
+        url.searchParams.delete('sort_by');
+    }
+
+    // Redirigir a la URL con los filtros
+    window.location.href = url.toString();
 }
+
+
+/**
+ * Configurar acciones de productos (ver detalles, agregar al carrito)
+ */
 
 /**
  * Restaurar la grilla original renderizada por Blade

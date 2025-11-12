@@ -334,10 +334,14 @@ class ProductoController extends InventarioController
     /**
      * Mostrar catálogo de productos estilo ecommerce
      */
-    public function catalogo()
+    public function catalogo(Request $request)
     {
+        // Obtener filtros de la URL
+        $search = $request->input('search');
+        $tipoProductoId = $request->input('tipo_producto_id');
+        $sortBy = $request->input('sort_by', 'name');
+
         // Obtener el ParametroTema del estado "AGOTADO"
-        // Primero obtener el Parámetro con ID 43 (AGOTADO)
         $parametroAgotado = Parametro::find(43);
 
         $query = Producto::with([
@@ -347,12 +351,10 @@ class ProductoController extends InventarioController
             'contratoConvenio',
             'ambiente'
         ])
-        ->where('cantidad', '>', 0) // Solo productos con stock
-        ->orderBy('producto', 'asc');
+        ->where('cantidad', '>', 0); // Solo productos con stock
 
         // Excluir productos con estado "AGOTADO"
         if ($parametroAgotado) {
-            // Buscar el ParametroTema para este parámetro
             $estadoAgotadoTema = ParametroTema::where('parametro_id', 43)
                 ->whereHas('tema', function($query) {
                     $query->where('name', self::THEME_PRODUCT_STATES);
@@ -364,7 +366,38 @@ class ProductoController extends InventarioController
             }
         }
 
-        $productos = $query->paginate(12);
+        // Aplicar filtro de búsqueda
+        if (!empty($search)) {
+            $query->where('producto', 'LIKE', "%{$search}%");
+        }
+
+        // Aplicar filtro de tipo de producto
+        if (!empty($tipoProductoId)) {
+            $query->where('tipo_producto_id', $tipoProductoId);
+        }
+
+        // Aplicar ordenamiento
+        switch ($sortBy) {
+            case 'stock-asc':
+                $query->orderBy('cantidad', 'asc');
+                break;
+            case 'stock-desc':
+                $query->orderBy('cantidad', 'desc');
+                break;
+            case 'newest':
+                $query->orderBy('created_at', 'desc');
+                break;
+            default: // 'name'
+                $query->orderBy('producto', 'asc');
+                break;
+        }
+
+        // Mantener filtros en la paginación
+        $productos = $query->paginate(12)->appends([
+            'search' => $search,
+            'tipo_producto_id' => $tipoProductoId,
+            'sort_by' => $sortBy
+        ]);
 
         // Cargar marca y categoria directamente para cada producto
         $productos->each(function($producto) {
