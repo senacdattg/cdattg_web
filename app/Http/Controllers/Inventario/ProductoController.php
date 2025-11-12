@@ -263,8 +263,8 @@ class ProductoController extends InventarioController
             ->get();
 
         $contratosConvenios = ContratoConvenio::all();
-
         $ambientes = Ambiente::all();
+        $proveedores = Proveedor::all();
     
         return view('inventario.productos.edit', compact(
             'producto',
@@ -274,7 +274,8 @@ class ProductoController extends InventarioController
             'categorias',
             'marcas',
             'contratosConvenios',
-            'ambientes'
+            'ambientes',
+            'proveedores'
         ));
     }
 
@@ -333,10 +334,14 @@ class ProductoController extends InventarioController
     /**
      * Mostrar catálogo de productos estilo ecommerce
      */
-    public function catalogo()
+    public function catalogo(Request $request)
     {
+        // Obtener filtros de la URL
+        $search = $request->input('search');
+        $tipoProductoId = $request->input('tipo_producto_id');
+        $sortBy = $request->input('sort_by', 'name');
+
         // Obtener el ParametroTema del estado "AGOTADO"
-        // Primero obtener el Parámetro con ID 43 (AGOTADO)
         $parametroAgotado = Parametro::find(43);
 
         $query = Producto::with([
@@ -346,12 +351,10 @@ class ProductoController extends InventarioController
             'contratoConvenio',
             'ambiente'
         ])
-        ->where('cantidad', '>', 0) // Solo productos con stock
-        ->orderBy('producto', 'asc');
+        ->where('cantidad', '>', 0); // Solo productos con stock
 
         // Excluir productos con estado "AGOTADO"
         if ($parametroAgotado) {
-            // Buscar el ParametroTema para este parámetro
             $estadoAgotadoTema = ParametroTema::where('parametro_id', 43)
                 ->whereHas('tema', function($query) {
                     $query->where('name', self::THEME_PRODUCT_STATES);
@@ -363,7 +366,38 @@ class ProductoController extends InventarioController
             }
         }
 
-        $productos = $query->paginate(12);
+        // Aplicar filtro de búsqueda
+        if (!empty($search)) {
+            $query->where('producto', 'LIKE', "%{$search}%");
+        }
+
+        // Aplicar filtro de tipo de producto
+        if (!empty($tipoProductoId)) {
+            $query->where('tipo_producto_id', $tipoProductoId);
+        }
+
+        // Aplicar ordenamiento
+        switch ($sortBy) {
+            case 'stock-asc':
+                $query->orderBy('cantidad', 'asc');
+                break;
+            case 'stock-desc':
+                $query->orderBy('cantidad', 'desc');
+                break;
+            case 'newest':
+                $query->orderBy('created_at', 'desc');
+                break;
+            default: // 'name'
+                $query->orderBy('producto', 'asc');
+                break;
+        }
+
+        // Mantener filtros en la paginación
+        $productos = $query->paginate(12)->appends([
+            'search' => $search,
+            'tipo_producto_id' => $tipoProductoId,
+            'sort_by' => $sortBy
+        ]);
 
         // Cargar marca y categoria directamente para cada producto
         $productos->each(function($producto) {
@@ -375,15 +409,18 @@ class ProductoController extends InventarioController
             }
         });
 
-        // Obtener categorías desde ParametroTema
-        $temaCategorias = Tema::where('name', 'CATEGORIAS')->first();
-        $categorias = $temaCategorias ? $temaCategorias->parametros()->wherePivot('status', 1)->get() : collect();
+        $tiposProductos = ParametroTema::with(['parametro', 'tema'])
+            ->whereHas('tema', function ($query) {
+                $query->where('name', 'TIPOS DE PRODUCTO');
+            })
+            ->where('status', 1)
+            ->get()
+            ->sortBy(function ($tipo) {
+                return mb_strtolower($tipo->parametro->name ?? '');
+            })
+            ->values();
 
-        // Obtener marcas desde ParametroTema
-        $temaMarcas = Tema::where('name', 'MARCAS')->first();
-        $marcas = $temaMarcas ? $temaMarcas->parametros()->wherePivot('status', 1)->get() : collect();
-
-        return view('inventario.productos.card', compact('productos', 'categorias', 'marcas'));
+        return view('inventario.productos.card', compact('productos', 'tiposProductos'));
     }
 
     /**
@@ -392,8 +429,7 @@ class ProductoController extends InventarioController
     public function buscar(Request $request)
     {
         $search = $request->input('search');
-        $categoryId = $request->input('category_id');
-        $brandId = $request->input('brand_id');
+        $tipoProductoId = $request->input('tipo_producto_id');
 
         $query = Producto::with([
             'tipoProducto.parametro',
@@ -421,18 +457,12 @@ class ProductoController extends InventarioController
 
         if (!empty($search)) {
             $query->where(function($q) use ($search) {
-                $q->where('producto', 'LIKE', "%{$search}%")
-                  ->orWhere('codigo_barras', 'LIKE', "%{$search}%")
-                  ->orWhere('descripcion', 'LIKE', "%{$search}%");
+                $q->where('producto', 'LIKE', "%{$search}%");
             });
         }
 
-        if ($categoryId) {
-            $query->where('categoria_id', $categoryId);
-        }
-
-        if ($brandId) {
-            $query->where('marca_id', $brandId);
+        if ($tipoProductoId) {
+            $query->where('tipo_producto_id', $tipoProductoId);
         }
 
         $productos = $query->get();

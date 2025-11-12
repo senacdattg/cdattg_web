@@ -2,6 +2,14 @@
 
 @section('title', 'Detalle de Devolución')
 
+@section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+@endsection
+
+@push('css')
+    @vite(['resources/css/inventario/shared/base.css'])
+@endpush
+
 @section('content_header')
     <x-page-header
         icon="fas fa-info-circle"
@@ -52,10 +60,18 @@
                         </div>
                         <div class="col-md-6">
                             <h6>Información de la Orden</h6>
-                            <p class="mb-0">Orden #{{ $devolucion->detalleOrden->orden->id }}</p>
-                            <p class="mb-0">Fecha préstamo: {{ $devolucion->detalleOrden->orden->fecha_prestamo->format('d/m/Y') }}</p>
+                            <p class="mb-0">
+                                Orden #{{ $devolucion->detalleOrden->orden->id }}
+                            </p>
+                            <p class="mb-0">
+                                Fecha préstamo:
+                                {{ $devolucion->detalleOrden->orden->fecha_prestamo->format('d/m/Y') }}
+                            </p>
                             @if($devolucion->detalleOrden->orden->fecha_devolucion)
-                                <p class="mb-0">Fecha devolución esperada: {{ $devolucion->detalleOrden->orden->fecha_devolucion->format('d/m/Y') }}</p>
+                                <p class="mb-0">
+                                    Fecha devolución esperada:
+                                    {{ $devolucion->detalleOrden->orden->fecha_devolucion->format('d/m/Y') }}
+                                </p>
                             @endif
                         </div>
                     </div>
@@ -66,6 +82,9 @@
                                 <div class="card-body text-center">
                                     <h6>Cantidad Devuelta</h6>
                                     <h3>{{ $devolucion->cantidad_devuelta }}</h3>
+                                    @if($devolucion->cierra_sin_stock)
+                                        <span class="badge badge-warning mt-2">Consumo total sin stock</span>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -78,7 +97,12 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="card @if($devolucion->detalleOrden->orden->fecha_devolucion && $devolucion->fecha_devolucion->lte($devolucion->detalleOrden->orden->fecha_devolucion)) bg-success @else bg-warning @endif text-white">
+                            <div class="card
+                                @if($devolucion->detalleOrden->orden->fecha_devolucion && $devolucion->fecha_devolucion->lte($devolucion->detalleOrden->orden->fecha_devolucion))
+                                    bg-success
+                                @else
+                                    bg-warning
+                                @endif text-white">
                                 <div class="card-body text-center">
                                     <h6>Estado</h6>
                                     @if($devolucion->detalleOrden->orden->fecha_devolucion)
@@ -86,7 +110,9 @@
                                             <h5>A Tiempo</h5>
                                         @else
                                             <h5>Con Retraso</h5>
-                                            <small>{{ $devolucion->fecha_devolucion->diffInDays($devolucion->detalleOrden->orden->fecha_devolucion) }} días</small>
+                                            <small>
+                                                {{ $devolucion->fecha_devolucion->diffInDays($devolucion->detalleOrden->orden->fecha_devolucion) }} días
+                                            </small>
                                         @endif
                                     @else
                                         <h5>Sin fecha límite</h5>
@@ -128,10 +154,16 @@
 
                     <div class="row">
                         <div class="col-12">
-                            <a href="{{ route('inventario.devoluciones.historial') }}" class="btn btn-secondary">
+                            <a
+                                href="{{ route('inventario.devoluciones.historial') }}"
+                                class="btn btn-secondary"
+                            >
                                 <i class="fas fa-arrow-left"></i> Volver al Historial
                             </a>
-                            <a href="{{ route('inventario.ordenes.show', $devolucion->detalleOrden->orden->id) }}" class="btn btn-info">
+                            <a
+                                href="{{ route('inventario.ordenes.show', $devolucion->detalleOrden->orden->id) }}"
+                                class="btn btn-info"
+                            >
                                 <i class="fas fa-eye"></i> Ver Orden Completa
                             </a>
                         </div>
@@ -152,6 +184,6 @@
 
 @push('css')
     @vite([
-        'resources/css/inventario/shared/base.css',    
+        'resources/css/inventario/shared/base.css',
     ])
 @endpush

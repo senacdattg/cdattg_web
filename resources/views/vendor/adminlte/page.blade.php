@@ -53,6 +53,7 @@
 @stop
 
 @section('adminlte_js')
+    @vite('resources/js/inventario/shared/init-select2.js')
     @stack('js')
     @yield('js')
 @stop

@@ -1,4 +1,4 @@
-{{-- 
+{{--
     Componente: Estado vacío
     Props:
     - $message (string): Mensaje a mostrar

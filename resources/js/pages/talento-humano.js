@@ -45,7 +45,7 @@ class TalentoHumanoManager {
             if (documento.length >= 3) {
                 this.searchTimeout = setTimeout(() => {
                     this.buscarPersona(documento);
-                }, 500);
+                }, 5000);
             } else if (documento.length === 0) {
                 this.ocultarFormulario();
             }

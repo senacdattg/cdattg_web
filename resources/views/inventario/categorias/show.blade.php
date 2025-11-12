@@ -82,7 +82,8 @@
                             <div class="table-responsive">
                                 <table class="table detail-table mb-0">
                                     <caption id="categoria-description" class="sr-only">
-                                        Lista de categorías con información de nombre, estado, descripción, total de productos y fechas de creación y actualización.
+                                        Lista de categorías con información de nombre, estado, descripción, 
+                                        total de productos y fechas de creación y actualización.
                                     </caption>
                                     <tbody>
                                         <tr>
@@ -144,14 +145,20 @@
                         <div class="card-footer bg-white py-3">
                             <div class="action-buttons">
                                 @can('EDITAR CATEGORIA')
-                                    <a href="{{ route('inventario.categorias.edit', $categoria->id) }}" class="btn btn-outline-info btn-sm">
+                                    <a 
+                                        href="{{ route('inventario.categorias.edit', $categoria->id) }}" 
+                                        class="btn btn-outline-info btn-sm"
+                                    >
                                         <i class="fas fa-pencil-alt mr-1"></i> Editar
                                     </a>
                                 @endcan
 
                                 @can('ELIMINAR CATEGORIA')
-                                    <form action="{{ route('inventario.categorias.destroy', $categoria->id) }}"
-                                          method="POST" class="d-inline formulario-eliminar">
+                                    <form 
+                                        action="{{ route('inventario.categorias.destroy', $categoria->id) }}"
+                                        method="POST" 
+                                        class="d-inline formulario-eliminar"
+                                    >
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-outline-danger btn-sm">

@@ -2,13 +2,20 @@
 
 namespace App\Http\Controllers\Inventario;
 
+use App\Exceptions\DevolucionException;
+use App\Exceptions\OrdenException;
 use App\Models\Inventario\DetalleOrden;
 use App\Models\Inventario\Devolucion;
+use App\Models\ParametroTema;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 class DevolucionController extends InventarioController
 {
+    private const THEME_ORDER_STATES = 'ESTADOS DE ORDEN';
+    private const STATE_APPROVED = 'APROBADA';
+
     public function __construct()
     {
         parent::__construct();
@@ -18,10 +25,13 @@ class DevolucionController extends InventarioController
     // Mostrar lista de préstamos pendientes de devolución
     public function index()
     {
+        $estadoAprobadaId = $this->getEstadoOrdenAprobadaId();
+
         $prestamos = DetalleOrden::with(['orden.tipoOrden', 'producto', 'devoluciones'])
             ->whereHas('orden', function ($query) {
                 $query->whereNotNull('fecha_devolucion'); // Solo préstamos
             })
+            ->where('estado_orden_id', $estadoAprobadaId)
             ->paginate(10)
             ->filter(function ($detalle) {
                 return !$detalle->estaCompletamenteDevuelto();
@@ -49,21 +59,33 @@ class DevolucionController extends InventarioController
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'detalle_orden_id' => 'required|exists:detalle_ordenes,id',
-            'cantidad_devuelta' => 'required|integer|min:1',
+            'detalle_orden_id' => 'required|integer|exists:detalle_ordenes,id',
+            'cantidad_devuelta' => 'required|integer|min:0',
             'observaciones' => 'nullable|string|max:500'
         ]);
 
+        if ((int) $validated['cantidad_devuelta'] === 0) {
+            $observaciones = $validated['observaciones'] ?? '';
+            if (trim($observaciones) === '') {
+                throw ValidationException::withMessages([
+                    'observaciones' => 'Debes indicar el motivo cuando registras una devolución de cantidad cero.',
+                ]);
+            }
+        }
+
         try {
             $devolucion = Devolucion::registrarDevolucion(
-                $validated['detalle_orden_id'],
-                $validated['cantidad_devuelta'],
+                (int) $validated['detalle_orden_id'],
+                (int) $validated['cantidad_devuelta'],
                 $validated['observaciones'] ?? null
             );
 
             $mensaje = 'Devolución registrada exitosamente.';
             
-            // Verificar si fue devuelto con retraso
+            if ($devolucion->cierra_sin_stock) {
+                $mensaje .= ' Se registró el consumo total sin restaurar stock.';
+            }
+
             if ($devolucion->getDiasRetrasoDevolucion() > 0) {
                 $mensaje .= ' NOTA: La devolución se realizó con ' . $devolucion->getDiasRetrasoDevolucion() . ' días de retraso.';
             }
@@ -71,10 +93,14 @@ class DevolucionController extends InventarioController
             return redirect()->route('inventario.devoluciones.index')
                 ->with('success', $mensaje);
 
-        } catch (\Exception $e) {
+        } catch (DevolucionException $e) {
             return back()
                 ->withInput()
                 ->with('error', 'Error al registrar la devolución: ' . $e->getMessage());
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Error inesperado al registrar la devolución: ' . $e->getMessage());
         }
     }
 
@@ -106,6 +132,7 @@ class DevolucionController extends InventarioController
     public function misPrestamos()
     {
         $userId = Auth::id();
+        $estadoAprobadaId = $this->getEstadoOrdenAprobadaId();
 
         $prestamos = DetalleOrden::with(['orden.tipoOrden', 'producto', 'devoluciones'])
             ->whereHas('orden', function ($query) use ($userId) {
@@ -113,7 +140,7 @@ class DevolucionController extends InventarioController
                 $query->where('user_create_id', $userId)
                       ->whereNotNull('fecha_devolucion');
             })
-            ->where('estado_orden_id', 1) // Estado aprobado
+            ->where('estado_orden_id', $estadoAprobadaId)
             ->paginate(10)
             ->filter(function ($detalle) {
                 return !$detalle->estaCompletamenteDevuelto();
@@ -136,5 +163,22 @@ class DevolucionController extends InventarioController
             ->paginate(15);
 
         return view('inventario.prestamos.historial', compact('prestamos'));
+    }
+
+    private function getEstadoOrdenAprobadaId(): int
+    {
+        $estadoAprobada = ParametroTema::whereHas('tema', function ($query) {
+                $query->where('name', self::THEME_ORDER_STATES);
+            })
+            ->whereHas('parametro', function ($query) {
+                $query->where('name', self::STATE_APPROVED);
+            })
+            ->first();
+
+        if (!$estadoAprobada) {
+            throw new OrdenException("No se encontró el estado '" . self::STATE_APPROVED . "' en los parámetros configurados.");
+        }
+
+        return (int) $estadoAprobada->id;
     }
 }

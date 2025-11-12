@@ -508,6 +508,15 @@ async function submitOrder() {
     try {
         // Guardar datos en sessionStorage para pasar a la siguiente vista
         sessionStorage.setItem('carrito_data', JSON.stringify(orderData));
+
+        // Vaciar carrito local y actualizar UI antes de salir
+        cart = [];
+        productsDetails = {};
+        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(DRAFT_KEY);
+        saveCart();
+        showEmptyCart();
+        updateCartSummary();
         
         // Redirigir a la vista de préstamo/salida
         window.location.href = '/inventario/ordenes/prestamos-salidas?desde_carrito=true';

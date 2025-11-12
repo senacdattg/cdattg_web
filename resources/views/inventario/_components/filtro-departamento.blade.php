@@ -10,7 +10,7 @@
     <div class="col-md-6">
         <div class="form-group">
             <label for="departamento_id">
-                Departamento 
+                Departamento
                 @if($required)
                     <span class="text-danger">*</span>
                 @endif
@@ -23,8 +23,8 @@
             >
                 <option value="">Seleccione un departamento</option>
                 @foreach($departamentos as $departamento)
-                    <option 
-                        value="{{ $departamento->id }}" 
+                    <option
+                        value="{{ $departamento->id }}"
                         {{ old('departamento_id', $departamentoSeleccionado) == $departamento->id ? 'selected' : '' }}
                     >
                         {{ $departamento->departamento }}
@@ -40,7 +40,7 @@
     <div class="col-md-6">
         <div class="form-group">
             <label for="municipio_id">
-                Municipio 
+                Municipio
                 @if($required)
                     <span class="text-danger">*</span>
                 @endif
@@ -53,8 +53,8 @@
             >
                 <option value="">Seleccione un municipio</option>
                 @foreach($municipios as $municipio)
-                    <option 
-                        value="{{ $municipio->id }}" 
+                    <option
+                        value="{{ $municipio->id }}"
                         {{ old('municipio_id', $municipioSeleccionado) == $municipio->id ? 'selected' : '' }}
                     >
                         {{ $municipio->municipio }} ({{ $municipio->departamento->departamento ?? '' }})

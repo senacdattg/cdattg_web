@@ -3,6 +3,14 @@
 
 @section('title', 'Gestión de Categorías')
 
+@section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+@endsection
+
+@push('css')
+    @vite(['resources/css/inventario/shared/base.css'])
+@endpush
+
 @section('content_header')
     <x-page-header
         icon="fas fa-tags"
@@ -83,7 +91,7 @@
                     </x-data-table>
                     <div class="float-left pt-2">
                         <small class="text-muted">
-                            Mostrando {{ $categorias->firstItem() ?? 0 }} a {{ $categorias->lastItem() ?? 0 }} 
+                            Mostrando {{ $categorias->firstItem() ?? 0 }} a {{ $categorias->lastItem() ?? 0 }}
                             de {{ $categorias->total() }} categorías
                         </small>
                     </div>

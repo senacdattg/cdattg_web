@@ -3,6 +3,8 @@
  * Incluye funcionalidades para aprobar/rechazar productos individuales y órdenes completas
  */
 
+import Swal from 'sweetalert2';
+
 /**
  * Aprobar un producto individual
  * @param {number} detalleId - ID del detalle de la orden
@@ -178,3 +180,9 @@ function rechazarOrden(ordenId, productos) {
         }
     });
 }
+
+// Exponer funciones para uso en vistas Blade
+window.aprobarProducto = aprobarProducto;
+window.rechazarProducto = rechazarProducto;
+window.aprobarOrden = aprobarOrden;
+window.rechazarOrden = rechazarOrden;

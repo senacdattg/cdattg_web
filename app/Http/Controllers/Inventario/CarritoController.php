@@ -3,15 +3,13 @@
 namespace App\Http\Controllers\Inventario;
 
 use App\Http\Controllers\Controller;
+use App\Models\Inventario\Producto;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use App\Models\Inventario\Producto;
-use App\Models\User;
-
 
 class CarritoController extends Controller
 {
+
     public function __construct()
     {
         $this->middleware('auth');
@@ -31,7 +29,7 @@ class CarritoController extends Controller
     }
 
     // Agregar productos al carrito (crear orden)
-    public function agregar(Request $request)
+    public function agregar(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'items' => 'required|array|min:1',
@@ -47,14 +45,11 @@ class CarritoController extends Controller
                 return $availabilityResponse;
             }
 
-            // Aquí se debe crear la orden en la base de datos
-            // Por ahora solo devolvemos éxito
-            // En una implementación completa, se crearía un registro en una tabla de órdenes
-
+            // La creación de la orden se completa en el formulario de préstamos/salidas.
             return response()->json([
                 'success' => true,
                 'message' => 'Solicitud procesada correctamente',
-                'orden_id' => null // Se debería retornar el ID de la orden creada
+                'orden_id' => null
             ]);
 
         } catch (\Exception $e) {
@@ -109,7 +104,7 @@ class CarritoController extends Controller
         try {
             // Esta es una operación del lado del cliente (localStorage)
             // Solo validamos que el producto existe
-            $producto = Producto::findOrFail($id);
+            Producto::findOrFail($id);
 
             return response()->json([
                 'success' => true,
@@ -124,7 +119,7 @@ class CarritoController extends Controller
         }
     }
 
-    // Vaciar todo el carrito
+
     public function vaciar()
     {
         // Esta es una operación del lado del cliente (localStorage)
@@ -209,3 +204,4 @@ class CarritoController extends Controller
         return null;
     }
 }
+

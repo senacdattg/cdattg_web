@@ -1,4 +1,4 @@
-{{-- 
+{{--
     Componente: filtros.blade.php
     Componente reutilizable para filtrar órdenes por estado o tipo
     Parámetros:
@@ -15,20 +15,39 @@
                     <div class="row">
                         <div class="col-md-4">
                             <div class="form-group">
-                                <label><i class="fas fa-filter"></i> Buscar Orden</label>
-                                <input type="text" id="search-orden" class="form-control" placeholder="ID o descripción...">
+                                <label for="search-orden">
+                                    <i class="fas fa-filter"></i> Buscar Orden
+                                </label>
+                                <input
+                                    type="text"
+                                    id="search-orden"
+                                    class="form-control"
+                                    placeholder="ID o descripción..."
+                                >
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label><i class="fas fa-calendar-alt"></i> Desde</label>
-                                <input type="date" id="fecha-desde" class="form-control">
+                                <label for="fecha-desde">
+                                    <i class="fas fa-calendar-alt"></i> Desde
+                                </label>
+                                <input
+                                    type="date"
+                                    id="fecha-desde"
+                                    class="form-control"
+                                >
                             </div>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group">
-                                <label><i class="fas fa-calendar-alt"></i> Hasta</label>
-                                <input type="date" id="fecha-hasta" class="form-control">
+                                <label for="fecha-hasta">
+                                    <i class="fas fa-calendar-alt"></i> Hasta
+                                </label>
+                                <input
+                                    type="date"
+                                    id="fecha-hasta"
+                                    class="form-control"
+                                >
                             </div>
                         </div>
                         <div class="col-md-2 d-flex align-items-end">
@@ -50,9 +69,13 @@
                 <div class="card-body">
                     @if($ordenes && count($ordenes) > 0)
                         <div class="table-responsive">
-                            <table class="table table-hover table-striped" aria-describedby="ordenes-description">
+                            <table
+                                class="table table-hover table-striped"
+                                aria-describedby="ordenes-description"
+                            >
                                 <caption id="ordenes-description" class="sr-only">
-                                    Listado de órdenes con información de usuario, tipo, estado, fecha, cantidad de ítems y acciones disponibles.
+                                    Listado de órdenes con información de usuario, tipo, estado,
+                                    fecha, cantidad de ítems y acciones disponibles.
                                 </caption>
                                 <thead>
                                     <tr>
@@ -68,6 +91,23 @@
                                 </thead>
                                 <tbody>
                                     @forelse($ordenes as $orden)
+                                        @php
+                                            $tipoNombre = $orden->tipoOrden->parametro->name ?? 'N/A';
+                                            $tipoClass = $tipoNombre === 'PRÉSTAMO' ? 'info' : 'warning';
+
+                                            $estadoDetalle = $orden->detalles->first();
+                                            $estadoNombre = $estadoDetalle->estadoOrden->parametro->name ?? 'N/A';
+                                            $estadoClass = match ($estadoNombre) {
+                                                'EN ESPERA' => 'warning',
+                                                'APROBADA' => 'success',
+                                                'RECHAZADA' => 'danger',
+                                                default => 'secondary'
+                                            };
+
+                                            $itemsCount = $orden->detalles ? $orden->detalles->count() : 0;
+                                            $fechaCreacion = optional($orden->created_at)->format('d/m/Y H:i');
+                                            $estadoActual = $estadoNombre ?? '';
+                                        @endphp
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
                                             <td>
@@ -75,48 +115,32 @@
                                             </td>
                                             <td>{{ $orden->userCreate->name ?? 'N/A' }}</td>
                                             <td>
-                                                @php
-                                                    $tipoNombre = $orden->tipoOrden->parametro->name ?? 'N/A';
-                                                    $tipoClass = $tipoNombre === 'PRÉSTAMO' ? 'info' : 'warning';
-                                                @endphp
                                                 <span class="badge badge-{{ $tipoClass }}">
                                                     {{ $tipoNombre }}
                                                 </span>
                                             </td>
                                             <td>
-                                                @php
-                                                    $estadoNombre = $orden->detalles->first()->estadoOrden->parametro->name ?? 'N/A';
-                                                    $estadoClass = match($estadoNombre) {
-                                                        'EN ESPERA' => 'warning',
-                                                        'APROBADA' => 'success',
-                                                        'RECHAZADA' => 'danger',
-                                                        default => 'secondary'
-                                                    };
-                                                @endphp
                                                 <span class="badge badge-{{ $estadoClass }}">
                                                     {{ $estadoNombre }}
                                                 </span>
                                             </td>
                                             <td>
-                                                {{ $orden->created_at ? $orden->created_at->format('d/m/Y H:i') : 'N/A' }}
+                                                {{ $fechaCreacion ?? 'N/A' }}
                                             </td>
                                             <td>
                                                 <span class="badge badge-primary">
-                                                    {{ $orden->detalles ? count($orden->detalles) : 0 }} items
+                                                    {{ $itemsCount }} items
                                                 </span>
                                             </td>
                                             <td>
-                                                <a href="{{ route('inventario.ordenes.show', $orden->id) }}" 
-                                                   class="btn btn-sm btn-info" 
+                                                <a href="{{ route('inventario.ordenes.show', $orden->id) }}"
+                                                   class="btn btn-sm btn-info"
                                                    title="Ver detalles">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                                @php
-                                                    $estadoActual = $orden->detalles->first()->estadoOrden->parametro->name ?? '';
-                                                @endphp
                                                 @if($estadoActual === 'EN ESPERA')
-                                                    <a href="{{ route('inventario.ordenes.index') }}?action=edit&id={{ $orden->id }}" 
-                                                       class="btn btn-sm btn-warning" 
+                                                    <a href="{{ route('inventario.ordenes.index', ['action' => 'edit', 'id' => $orden->id]) }}"
+                                                       class="btn btn-sm btn-warning"
                                                        title="Editar">
                                                         <i class="fas fa-edit"></i>
                                                     </a>
@@ -155,19 +179,20 @@
 
 @push('js')
     <script>
-        document.getElementById('btn-filtrar').addEventListener('click', function() {
-            const search = document.getElementById('search-orden').value;
-            const desde = document.getElementById('fecha-desde').value;
-            const hasta = document.getElementById('fecha-hasta').value;
-            
-            // Construir URL con parámetros
-            let url = new URL(window.location.href);
-            if(search) url.searchParams.set('search', search);
-            if(desde) url.searchParams.set('desde', desde);
-            if(hasta) url.searchParams.set('hasta', hasta);
-            
-            window.location.href = url.toString();
-        });
+        document
+            .getElementById('btn-filtrar')
+            .addEventListener('click', function() {
+                const search = document.getElementById('search-orden').value;
+                const desde = document.getElementById('fecha-desde').value;
+                const hasta = document.getElementById('fecha-hasta').value;
+
+                const url = new URL(window.location.href);
+                if (search) url.searchParams.set('search', search);
+                if (desde) url.searchParams.set('desde', desde);
+                if (hasta) url.searchParams.set('hasta', hasta);
+
+                window.location.href = url.toString();
+            });
     </script>
 @endpush
 

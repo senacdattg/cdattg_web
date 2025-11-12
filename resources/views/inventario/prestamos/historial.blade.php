@@ -1,6 +1,14 @@
-@extends('inventario.layouts.base')
+@extends('adminlte::page')
 
 @section('title', 'Historial de Mis Préstamos')
+
+@section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+@endsection
+
+@push('css')
+    @vite(['resources/css/inventario/shared/base.css'])
+@endpush
 
 @section('content')
 <div class="container-fluid">
