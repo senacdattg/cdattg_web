@@ -285,3 +285,24 @@ Route::post('/asistencia/entrada', [RegistroAsistenciaController::class, 'regist
 Route::post('/asistencia/salida', [RegistroAsistenciaController::class, 'registrarSalida']);
 Route::get('/asistencia/jornada', [RegistroAsistenciaController::class, 'obtenerAsistenciasPorJornada']);
 Route::get('/asistencia/fichas', [RegistroAsistenciaController::class, 'obtenerFichasConJornadas']);
+
+// ==========================================
+// WEBSOCKETS - RUTAS PÚBLICAS
+// ==========================================
+
+Route::get('/websocket/estadisticas', [\App\Http\Controllers\WebSocketVisitantesController::class, 'obtenerEstadisticas']);
+Route::post('/websocket/entrada', [\App\Http\Controllers\WebSocketVisitantesController::class, 'registrarEntrada']);
+Route::post('/websocket/salida', [\App\Http\Controllers\WebSocketVisitantesController::class, 'registrarSalida']);
+Route::get('/websocket/visitantes-actuales', [\App\Http\Controllers\WebSocketVisitantesController::class, 'obtenerVisitantesActuales']);
+
+// ==========================================
+// REGISTRO DE PRESENCIA - ESTADÍSTICAS DE PERSONAS DENTRO
+// ==========================================
+
+Route::post('/presencia/entrada', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'registrarEntrada']);
+Route::post('/presencia/salida', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'registrarSalida']);
+Route::get('/presencia/estadisticas', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'estadisticasPersonasDentro']);
+Route::get('/presencia/estadisticas/hoy', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'estadisticasPersonasDentroHoy']);
+Route::get('/presencia/personas-dentro', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'personasDentro']);
+Route::get('/presencia/estadisticas/fecha', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'estadisticasPorFecha']);
+Route::get('/presencia/estadisticas/sede/{sedeId}', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'estadisticasPorSede']);

@@ -478,22 +478,22 @@ textarea.form-control-modern {
 
 .stat-card.stat-success .stat-card-icon {
     background: rgba(86, 171, 47, 0.1);
-    color: #56ab2f;
+    color: #0a2808;
 }
 
 .stat-card.stat-info .stat-card-icon {
     background: rgba(33, 147, 176, 0.1);
-    color: #2193b0;
+    color: #051f28;
 }
 
 .stat-card.stat-warning .stat-card-icon {
     background: rgba(242, 153, 74, 0.1);
-    color: #f2994a;
+    color: #5c2e0e;
 }
 
 .stat-card.stat-danger .stat-card-icon {
     background: rgba(235, 51, 73, 0.1);
-    color: #eb3349;
+    color: #1a0508;
 }
 
 .stat-card-label {
@@ -537,36 +537,36 @@ textarea.form-control-modern {
 
 .btn-action-primary {
     border-color: #239e37;
-    color: #309e56;
+    color: #1a7028;
     background: white;
 }
 
 .btn-action-primary:hover {
-    background: #149527;
+    background: #0d6b1d;
     color: white;
     transform: translateY(-2px);
 }
 
 .btn-action-success {
     border-color: #56ab2f;
-    color: #56ab2f;
+    color: #2d6b1f;
     background: white;
 }
 
 .btn-action-success:hover {
-    background: #56ab2f;
+    background: #3d7a22;
     color: white;
     transform: translateY(-2px);
 }
 
 .btn-action-danger {
     border-color: #eb3349;
-    color: #eb3349;
+    color: #a12032;
     background: white;
 }
 
 .btn-action-danger:hover {
-    background: #eb3349;
+    background: #a12032;
     color: white;
     transform: translateY(-2px);
 }
@@ -641,7 +641,7 @@ textarea.form-control-modern {
 .alert-modern-danger {
     background: linear-gradient(135deg, rgba(235, 51, 73, 0.1) 0%, rgba(244, 92, 67, 0.1) 100%);
     border-left: 4px solid #eb3349;
-    color: #7a1f1f;
+    color: #3a0d0d;
 }
 
 .alert-modern-warning {
@@ -791,34 +791,34 @@ textarea.form-control-modern {
 /* Estilo para vista "Ver Producto" */
 
 /* --- Nombres de los campos --- */
-.product-info-list li strong {
-    color: #505152 !important; 
-    font-family: 'Source Sans Pro', sans-serif !important;
-    font-size: 1rem !important;
-    font-weight: 600 !important; 
-    text-transform: none !important;
-    letter-spacing: 0.3px !important;
+.product-info-card .product-info-list li strong {
+    color: #505152; 
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 1rem;
+    font-weight: 600; 
+    text-transform: none;
+    letter-spacing: 0.3px;
 }
 
 /* --- Información del producto --- */
-.product-info-list li span,
-.product-info-list li {
-    color: #4a5568 !important; 
-    font-family: 'Open Sans', sans-serif !important; 
-    font-size: 0.9rem !important; 
-    font-weight: 400 !important; 
-    text-transform: none !important;
-    letter-spacing: 0.2px !important;
-    line-height: 1.5 !important;
+.product-info-card .product-info-list li span,
+.product-info-card .product-info-list li {
+    color: #4a5568; 
+    font-family: 'Open Sans', sans-serif; 
+    font-size: 0.9rem; 
+    font-weight: 400; 
+    text-transform: none;
+    letter-spacing: 0.2px;
+    line-height: 1.5;
 }
 
 /* --- Quitar estilo de "badges" --- */
-.badge-modern,
-.badge-modern.badge-success,
-.badge-modern.badge-info,
-.badge-modern.badge-dark,
-.badge-modern.badge-secondary,
-.badge-modern.badge-warning {
+.product-info-card .badge-modern,
+.product-info-card .badge-modern.badge-success,
+.product-info-card .badge-modern.badge-info,
+.product-info-card .badge-modern.badge-dark,
+.product-info-card .badge-modern.badge-secondary,
+.product-info-card .badge-modern.badge-warning {
     background: none !important;
     border: none !important;
     box-shadow: none !important;
@@ -831,11 +831,11 @@ textarea.form-control-modern {
 }
 
 /* --- Eliminar íconos dentro de los badges --- */
-.badge-modern i {
+.product-info-card .badge-modern i {
     display: none !important;
 }
 
 /* --- Ajuste general para alineación limpia --- */
-.product-info-list li {
+.product-info-card .product-info-list li {
     margin-bottom: 6px !important;
 }

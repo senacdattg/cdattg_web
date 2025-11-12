@@ -2,6 +2,14 @@
 
 @section('title', 'Gestión de Productos')
 
+@section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+@endsection
+
+@push('css')
+    @vite(['resources/css/inventario/shared/base.css'])
+@endpush
+
 @section('content_header')
     <x-page-header
         icon="fas fa-boxes"
@@ -159,7 +167,7 @@
                     </x-data-table>
                     <div class="float-left pt-2">
                         <small class="text-muted">
-                            Mostrando {{ $productos->firstItem() ?? 0 }} a {{ $productos->lastItem() ?? 0 }} 
+                            Mostrando {{ $productos->firstItem() ?? 0 }} a {{ $productos->lastItem() ?? 0 }}
                             de {{ $productos->total() }} productos
                         </small>
                     </div>
@@ -169,8 +177,8 @@
     </section>
 
     <!-- Modal para escanear código de barras -->
-    <div class="modal fade" id="modalEscanear" tabindex="-1" role="dialog" aria-labelledby="modalEscanearLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal fade" id="modalEscanear" tabindex="-1" aria-labelledby="modalEscanearLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header bg-dark text-white">
                     <h5 class="modal-title" id="modalEscanearLabel">
@@ -183,7 +191,7 @@
 
                 <div class="modal-body text-center">
                     <p>Escanea el código de barras del producto usando el lector.</p>
-                    <input type="text" id="inputCodigoBarras" class="form-control form-control-lg text-center" 
+                    <input type="text" id="inputCodigoBarras" class="form-control form-control-lg text-center"
                         placeholder="Esperando código..." autocomplete="off" autofocus>
                     <div id="resultadoBusqueda" class="mt-3"></div>
                 </div>
@@ -202,6 +210,7 @@
 @push('css')
     @vite([
         'resources/css/inventario/shared/base.css',
+        'resources/js/inventario/escaner.js'
     ])
 @endpush
 
@@ -209,5 +218,5 @@
     <script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
     @vite(['resources/js/pages/formularios-generico.js'])
 @endpush
-<script src="{{ asset('js/inventario/escaner.js') }}"></script>
+
 

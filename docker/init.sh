@@ -13,8 +13,8 @@ echo "📦 Construyendo imágenes Docker..."
 docker-compose build --no-cache app
 
 # Iniciar servicios base
-echo "⏳ Iniciando servicios base (DB, Redis)..."
-docker-compose up -d db redis
+echo "⏳ Iniciando servicios base (DB)..."
+docker-compose up -d db
 
 # Esperar a que MySQL esté listo
 echo "⏳ Esperando a que MySQL esté listo..."

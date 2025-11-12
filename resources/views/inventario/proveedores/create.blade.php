@@ -165,7 +165,12 @@
                                                 name="estado_id"
                                             >
                                                 <option value="">Seleccione un estado</option>
-                                                @foreach(\App\Models\ParametroTema::with(['parametro','tema'])->whereHas('tema', fn($q) => $q->where('name', 'ESTADOS'))->where('status', 1)->get() as $estado)
+                                                @foreach(
+                                                    \App\Models\ParametroTema::with(['parametro','tema'])
+                                                        ->whereHas('tema', fn($q) => $q->where('name', 'ESTADOS'))
+                                                        ->where('status', 1)
+                                                        ->get() as $estado
+                                                )
                                                     <option value="{{ $estado->id }}" {{ old('estado_id') == $estado->id ? 'selected' : '' }}>
                                                         {{ $estado->parametro->name }}
                                                     </option>
@@ -223,7 +228,7 @@
     @include('layout.footer')
 @endsection
 
-<script src="{{ asset('js/inventario/filtro-departamento.js') }}"></script>
+@vite(['resources/js/inventario/filtro-departamento.js'])
 <script>
     // Pasar datos de municipios al JavaScript
     window.municipiosData = @json($municipios->map(function($m) {

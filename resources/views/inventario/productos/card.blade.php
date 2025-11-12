@@ -28,42 +28,54 @@
                     <div class="card">
                         <div class="card-body">
                             <div class="row">
+                                <div class="col-md-5">
+                                    <div class="form-group">
+                                        <label for="search-product">
+                                            <i class="fas fa-search"></i> Buscar Producto
+                                        </label>
+                                        <input 
+                                            type="text" 
+                                            id="search-product" 
+                                            class="form-control" 
+                                            placeholder="Buscar por nombre..."
+                                            value="{{ request('search') }}"
+                                        >
+                                    </div>
+                                </div>
                                 <div class="col-md-4">
                                     <div class="form-group">
-                                        <label><i class="fas fa-search"></i> Buscar Producto</label>
-                                        <input type="text" id="search-product" class="form-control" placeholder="Buscar por nombre o código...">
-                                    </div>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="form-group">
-                                        <label><i class="fas fa-tags"></i> Categoría</label>
-                                        <select id="filter-category" class="form-control">
-                                            <option value="">Todas las categorías</option>
-                                            @foreach($categorias as $categoria)
-                                                <option value="{{ $categoria->id }}">{{ $categoria->name }}</option>
+                                        <label for="filter-type">
+                                            <i class="fas fa-box-open"></i> Tipo de producto
+                                        </label>
+                                        <select
+                                            id="filter-type"
+                                            name="filter-type"
+                                            class="form-control select2"
+                                            data-placeholder="Todos los tipos"
+                                        >
+                                            <option value="">Todos los tipos</option>
+                                            @foreach($tiposProductos as $tipoProducto)
+                                                <option value="{{ $tipoProducto->id }}" 
+                                                    {{ request('tipo_producto_id') == $tipoProducto->id ? 'selected' : '' }}>
+                                                    {{ $tipoProducto->parametro->name }}
+                                                </option>
                                             @endforeach
                                         </select>
                                     </div>
                                 </div>
                                 <div class="col-md-3">
                                     <div class="form-group">
-                                        <label><i class="fas fa-copyright"></i> Marca</label>
-                                        <select id="filter-brand" class="form-control">
-                                            <option value="">Todas las marcas</option>
-                                            @foreach($marcas as $marca)
-                                                <option value="{{ $marca->id }}">{{ $marca->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="form-group">
-                                        <label><i class="fas fa-sort"></i> Ordenar por</label>
-                                        <select id="sort-by" class="form-control">
-                                            <option value="name">Nombre</option>
-                                            <option value="stock-asc">Stock Menor</option>
-                                            <option value="stock-desc">Stock Mayor</option>
-                                            <option value="newest">Más Recientes</option>
+                                        <label for="sort-by">
+                                            <i class="fas fa-sort"></i> Ordenar por
+                                        </label>
+                                        <select 
+                                            id="sort-by" 
+                                            class="form-control"
+                                        >
+                                            <option value="name" {{ request('sort_by', 'name') == 'name' ? 'selected' : '' }}>Nombre</option>
+                                            <option value="stock-asc" {{ request('sort_by') == 'stock-asc' ? 'selected' : '' }}>Stock Menor</option>
+                                            <option value="stock-desc" {{ request('sort_by') == 'stock-desc' ? 'selected' : '' }}>Stock Mayor</option>
+                                            <option value="newest" {{ request('sort_by') == 'newest' ? 'selected' : '' }}>Más Recientes</option>
                                         </select>
                                     </div>
                                 </div>
@@ -78,8 +90,7 @@
                 @forelse($productos as $producto)
                     <div class="col-lg-3 col-md-4 col-sm-6 mb-4 product-card" 
                          data-id="{{ $producto->id }}"
-                         data-category="{{ $producto->categoria_id }}"
-                         data-brand="{{ $producto->marca_id }}"
+                         data-type="{{ $producto->tipo_producto_id }}"
                          data-name="{{ strtolower($producto->producto) }}"
                          data-code="{{ strtolower($producto->codigo_barras) }}">
                         <div class="card h-100 shadow-sm hover-shadow">
@@ -111,6 +122,11 @@
                             <div class="card-body d-flex flex-column">
                                 {{-- Categoría y marca --}}
                                 <div class="mb-2">
+                                    @if($producto->tipoProducto && $producto->tipoProducto->parametro)
+                                        <small class="text-muted d-block">
+                                            <i class="fas fa-box-open"></i> {{ $producto->tipoProducto->parametro->name }}
+                                        </small>
+                                    @endif
                                     <small class="text-muted">
                                         <i class="fas fa-tag"></i> {{ $producto->categoria->name ?? 'Sin categoría' }}
                                     </small>
@@ -206,14 +222,58 @@
     </section>
 
     {{-- Modal simple de detalles del producto --}}
-    <div id="productDetailModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center;">
-        <div style="background:white; border-radius:8px; width:90%; max-width:600px; max-height:90vh; overflow-y:auto; box-shadow:0 4px 20px rgba(0,0,0,0.3);">
+    <div 
+        id="productDetailModal" 
+        style="
+            display:none;
+            position:fixed;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+            background:rgba(0,0,0,0.5);
+            z-index:9999;
+            align-items:center;
+            justify-content:center;
+        "
+    >
+        <div 
+            style="
+                background:white;
+                border-radius:8px;
+                width:90%;
+                max-width:600px;
+                max-height:90vh;
+                overflow-y:auto;
+                box-shadow:0 4px 20px rgba(0,0,0,0.3);
+            "
+        >
             <!-- Header -->
-            <div style="padding:20px; background:#17a2b8; color:white; display:flex; justify-content:space-between; align-items:center; border-radius:8px 8px 0 0;">
+            <div 
+                style="
+                    padding:20px;
+                    background:#17a2b8;
+                    color:white;
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    border-radius:8px 8px 0 0;
+                "
+            >
                 <h5 style="margin:0; font-size:18px;">
                     <i class="fas fa-box"></i> Detalles del Producto
                 </h5>
-                <button onclick="closeProductModal()" aria-label="Cerrar" style="background:none; border:none; color:white; font-size:24px; cursor:pointer;">
+                <button 
+                    onclick="closeProductModal()" 
+                    aria-label="Cerrar" 
+                    style="
+                        background:none;
+                        border:none;
+                        color:white;
+                        font-size:24px;
+                        cursor:pointer;
+                    "
+                >
                     &times;
                 </button>
             </div>
@@ -238,6 +298,8 @@
 @endsection
 
 @push('css')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.6.2/dist/select2-bootstrap4.min.css" rel="stylesheet" />
     @vite([
     'resources/css/inventario/shared/base.css', 
     'resources/css/inventario/card.css', 

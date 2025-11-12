@@ -75,7 +75,8 @@
                                 <ul class="list-group list-group-flush">
                                     @foreach(explode("\n", $programa->requisitos) as $req)
                                         @if(trim($req))
-                                            <li class="list-group-item"><i class="fas fa-check-circle text-success me-2"></i>
+                                            <li class="list-group-item"><i
+                                                class="fas fa-check-circle text-success me-2"></i>
                                                 {{ trim($req) }}</li>
                                         @endif
                                     @endforeach

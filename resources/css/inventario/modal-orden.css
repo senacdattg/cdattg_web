@@ -16,8 +16,8 @@
 
 /* Header del Modal */
 .modal-orden .modal-header {
-    background: linear-gradient(135deg, #66ea99 0%, #4ba252 100%);
-    color: white;
+    background: linear-gradient(135deg, #2d6640 0%, #1f4a2d 100%);
+    color: #ffffff;
     padding: 1.5rem 2rem;
     border: none;
     position: relative;
@@ -137,6 +137,7 @@
 .modal-orden .info-item strong i {
     color: #299a42;
     font-size: 0.9rem;
+    transition: all 0.3s ease;
 }
 
 .modal-orden .info-item .text-muted {
@@ -325,11 +326,6 @@
     .modal-orden .modal-title {
         font-size: 1.25rem;
     }
-}
-
-/* Efectos de Hover en Iconos */
-.modal-orden .info-item strong i {
-    transition: all 0.3s ease;
 }
 
 .modal-orden .info-item:hover strong i {

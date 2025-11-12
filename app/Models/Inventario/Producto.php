@@ -138,6 +138,18 @@ class Producto extends Model
         return $this;
     }
 
+    public function esConsumible(): bool
+    {
+        $this->loadMissing(['tipoProducto.parametro']);
+
+        $tipo = $this->tipoProducto;
+        if ($tipo === null || $tipo->parametro === null) {
+            return false;
+        }
+
+        return strtoupper($tipo->parametro->name) === 'CONSUMIBLE';
+    }
+
     // Obtener el porcentaje de stock actual
     public function getPorcentajeStock($stockMaximo = 100)
     {

@@ -2,6 +2,14 @@
 
 @section('title', 'Gestión de Órdenes')
 
+@section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+@endsection
+
+@push('css')
+    @vite(['resources/css/inventario/shared/base.css'])
+@endpush
+
 @section('content_header')
     <x-page-header
         icon="fas fa-list"
@@ -82,7 +90,7 @@
                                 </td>
                                 <td>
                                     <span class="badge badge-primary">
-                                        <i class="fas fa-boxes"></i> {{ $totalProductos }} 
+                                        <i class="fas fa-boxes"></i> {{ $totalProductos }}
                                         {{ $totalProductos === 1 ? 'producto' : 'productos' }}
                                     </span>
                                 </td>
@@ -109,14 +117,14 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    <a href="{{ route('inventario.ordenes.show', $orden) }}" 
-                                       class="btn btn-sm btn-info" 
+                                    <a href="{{ route('inventario.ordenes.show', $orden) }}"
+                                       class="btn btn-sm btn-info"
                                        title="Ver detalles">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     @if($estadoNombre === 'EN ESPERA')
-                                        <a href="{{ route('inventario.aprobaciones.pendientes') }}" 
-                                           class="btn btn-sm btn-warning" 
+                                        <a href="{{ route('inventario.aprobaciones.pendientes') }}"
+                                           class="btn btn-sm btn-warning"
                                            title="Gestionar">
                                             <i class="fas fa-tasks"></i>
                                         </a>
@@ -133,7 +141,7 @@
                     </x-data-table>
                     <div class="float-left pt-2">
                         <small class="text-muted">
-                            Mostrando {{ $ordenes->firstItem() ?? 0 }} a {{ $ordenes->lastItem() ?? 0 }} 
+                            Mostrando {{ $ordenes->firstItem() ?? 0 }} a {{ $ordenes->lastItem() ?? 0 }}
                             de {{ $ordenes->total() }} órdenes
                         </small>
                     </div>

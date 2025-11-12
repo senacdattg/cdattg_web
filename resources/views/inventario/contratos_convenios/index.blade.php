@@ -2,6 +2,14 @@
 
 @section('title', 'Gestión de Contratos & Convenios')
 
+@section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+@endsection
+
+@push('css')
+    @vite(['resources/css/inventario/shared/base.css'])
+@endpush
+
 @section('content_header')
     <x-page-header
         icon="fas fa-file-contract"
@@ -126,8 +134,8 @@
                     </x-data-table>
                     <div class="float-left pt-2">
                         <small class="text-muted">
-                            Mostrando {{ $contratosConvenios->firstItem() ?? 0 }} a {{ $contratosConvenios->lastItem() ?? 0 }} 
-                            de {{ $contratosConvenios->total() }} contratos/convenios  
+                            Mostrando {{ $contratosConvenios->firstItem() ?? 0 }} a {{ $contratosConvenios->lastItem() ?? 0 }}
+                            de {{ $contratosConvenios->total() }} contratos/convenios
                         </small>
                     </div>
                 </div>
@@ -150,7 +158,7 @@
 
 @push('css')
     @vite([
-        'resources/css/inventario/shared/base.css',    
+        'resources/css/inventario/shared/base.css',
     ])
 @endpush
 

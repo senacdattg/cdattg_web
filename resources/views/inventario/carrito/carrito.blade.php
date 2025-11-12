@@ -2,6 +2,14 @@
 
 @section('title', 'Carrito de Compras')
 
+@section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+@endsection
+
+@push('css')
+    @vite(['resources/css/inventario/shared/base.css'])
+@endpush
+
 @section('content_header')
     <div class="d-flex justify-content-between align-items-center">
         <div>
@@ -55,11 +63,11 @@
                                         </caption>
                                         <thead>
                                             <tr>
-                                                <th width="10%">Imagen</th>
-                                                <th width="35%">Producto</th>
-                                                <th width="15%" class="text-center">Disponible</th>
-                                                <th width="20%" class="text-center">Cantidad</th>
-                                                <th width="10%" class="text-center">Acciones</th>
+                                                <th style="width: 10%;">Imagen</th>
+                                                <th style="width: 35%;">Producto</th>
+                                                <th style="width: 15%;" class="text-center">Disponible</th>
+                                                <th style="width: 20%;" class="text-center">Cantidad</th>
+                                                <th style="width: 10%;" class="text-center">Acciones</th>
                                             </tr>
                                         </thead>
                                         <tbody id="cart-items-body">
@@ -113,32 +121,44 @@
 
                             {{-- Datos del solicitante --}}
                             <div class="form-group">
-                                <label><i class="fas fa-user"></i> Solicitante:</label>
-                                <input type="text" 
-                                       class="form-control" 
-                                       value="{{ auth()->user()->name }}" 
-                                       readonly>
+                                <strong>
+                                    <i class="fas fa-user"></i> Solicitante:
+                                </strong>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    value="{{ auth()->user()->name }}"
+                                    readonly
+                                >
                             </div>
 
                             <div class="form-group">
-                                <label><i class="fas fa-envelope"></i> Correo:</label>
-                                <input type="text" 
-                                       class="form-control" 
-                                       value="{{ auth()->user()->email }}" 
-                                       readonly>
+                                <strong>
+                                    <i class="fas fa-envelope"></i> Correo:
+                                </strong>
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    value="{{ auth()->user()->email }}"
+                                    readonly
+                                >
                             </div>
 
                             {{-- Botones de acción --}}
-                            <button type="button" 
-                                    class="btn btn-success btn-block btn-lg" 
-                                    id="btn-confirm-order"
-                                    disabled>
+                            <button
+                                type="button"
+                                class="btn btn-success btn-block btn-lg"
+                                id="btn-confirm-order"
+                                disabled
+                            >
                                 <i class="fas fa-check"></i> Confirmar Solicitud
                             </button>
 
-                            <button type="button" 
-                                    class="btn btn-outline-secondary btn-block mt-2" 
-                                    id="btn-save-draft">
+                            <button
+                                type="button"
+                                class="btn btn-outline-secondary btn-block mt-2"
+                                id="btn-save-draft"
+                            >
                                 <i class="fas fa-save"></i> Guardar Borrador
                             </button>
                         </div>
@@ -149,46 +169,61 @@
     </section>
 
     {{-- Modal de confirmación de orden --}}
-    <div class="modal fade" id="confirmOrderModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog modal-lg" role="document">
+
+
+    {{-- Modal de confirmación --}}
+    <div
+        class="modal fade"
+        id="confirmOrderModal"
+        tabindex="-1"
+        aria-labelledby="confirmOrderModalLabel"
+        aria-hidden="true">
+        <div
+            class="modal-dialog modal-lg">
             <div class="modal-content">
-                <div class="modal-header bg-success">
-                    <h5 class="modal-title">
-                        <i class="fas fa-check-circle"></i> Confirmar Solicitud
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title" id="confirmOrderModalLabel">
+                        <i class="fas fa-check-circle"></i> Confirmar Orden de Requisición
                     </h5>
-                    <button type="button" class="close" data-dismiss="modal">
-                        <span>&times;</span>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <div class="alert alert-warning">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <strong>Importante:</strong> Al confirmar esta solicitud, los productos serán reservados del stock disponible.
-                    </div>
-                    
-                    <h5 class="mb-3">Resumen de la Solicitud:</h5>
-                    <div id="order-summary-content">
-                        {{-- Se llenará dinámicamente --}}
-                    </div>
+                    <p class="mb-3">
+                        Revisa el detalle de los productos antes de confirmar la solicitud.
+                    </p>
+                    <div id="order-summary-content"></div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
-                        <i class="fas fa-times"></i> Cancelar
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-dismiss="modal">
+                        Cancelar
                     </button>
-                    <button type="button" class="btn btn-success" id="btn-final-confirm">
-                        <i class="fas fa-check"></i> Confirmar y Enviar
+                    <button
+                        type="button"
+                        class="btn btn-success"
+                        id="btn-final-confirm">
+                        <i class="fas fa-paper-plane"></i> Enviar solicitud
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- Modal de producto no disponible --}}
-    <div class="modal fade" id="stockWarningModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
+    {{-- Modal de advertencia de stock --}}
+    <div
+        class="modal fade"
+        id="stockWarningModal"
+        tabindex="-1"
+        aria-labelledby="stockWarningModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header bg-warning">
-                    <h5 class="modal-title">
+                    <h5 class="modal-title" id="stockWarningModalLabel">
                         <i class="fas fa-exclamation-triangle"></i> Stock Insuficiente
                     </h5>
                     <button type="button" class="close" data-dismiss="modal">
@@ -206,7 +241,6 @@
             </div>
         </div>
     </div>
-    
     {{-- Alertas --}}
     @include('layout.alertas')
 @endsection
