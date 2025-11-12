@@ -15,12 +15,19 @@ class TalentoHumanoManager {
             btnEditar: document.getElementById('btn-editar'),
             btnGuardar: document.getElementById('btn-guardar'),
             btnCancelar: document.getElementById('btn-cancelar'),
+            btnRegistrarEntrada: document.getElementById('btn-registrar-entrada'),
+            btnRegistrarSalida: document.getElementById('btn-registrar-salida'),
             formContainer: document.getElementById('form-container'),
             formTitle: document.getElementById('form-title'),
             personaForm: document.getElementById('personaForm'),
             personaIdInput: document.getElementById('persona_id'),
-            actionModeInput: document.getElementById('action_mode')
+            actionModeInput: document.getElementById('action_mode'),
+            modalSede: $('#modalSede'),
+            selectSedeModal: document.getElementById('select_sede_modal'),
+            btnConfirmarSede: document.getElementById('btn-confirmar-sede')
         };
+
+        this.accionPendiente = null; // 'entrada' o 'salida'
 
         this.init();
     }
@@ -48,6 +55,9 @@ class TalentoHumanoManager {
         this.elements.btnEditar.addEventListener('click', () => this.habilitarEdicion());
         this.elements.btnGuardar.addEventListener('click', () => this.guardarPersona());
         this.elements.btnCancelar.addEventListener('click', () => this.cancelar());
+        this.elements.btnRegistrarEntrada.addEventListener('click', () => this.abrirModalSede('entrada'));
+        this.elements.btnRegistrarSalida.addEventListener('click', () => this.abrirModalSede('salida'));
+        this.elements.btnConfirmarSede.addEventListener('click', () => this.ejecutarRegistro());
 
         // Validación en tiempo real
         this.elements.personaForm.querySelectorAll('input, select, textarea').forEach(input => {
@@ -90,6 +100,8 @@ class TalentoHumanoManager {
 
         this.elements.btnEditar.style.display = 'inline-block';
         this.elements.btnGuardar.style.display = 'none';
+        this.elements.btnRegistrarEntrada.style.display = 'inline-block';
+        this.elements.btnRegistrarSalida.style.display = 'inline-block';
 
         this.mostrarAlerta('success', 'Persona encontrada',
             `Se encontró la información de ${data.primer_nombre} ${data.primer_apellido}`);
@@ -117,6 +129,8 @@ class TalentoHumanoManager {
 
         this.elements.btnEditar.style.display = 'none';
         this.elements.btnGuardar.style.display = 'inline-block';
+        this.elements.btnRegistrarEntrada.style.display = 'none';
+        this.elements.btnRegistrarSalida.style.display = 'none';
 
         this.mostrarAlerta('info', 'Nueva persona',
             'Complete los datos para registrar la nueva persona');
@@ -132,6 +146,8 @@ class TalentoHumanoManager {
 
         this.elements.btnEditar.style.display = 'none';
         this.elements.btnGuardar.style.display = 'inline-block';
+        this.elements.btnRegistrarEntrada.style.display = 'none';
+        this.elements.btnRegistrarSalida.style.display = 'none';
         this.elements.formTitle.textContent = 'Editar Información';
     }
 
@@ -179,6 +195,8 @@ class TalentoHumanoManager {
                     this.isEditing = false;
                     this.elements.btnEditar.style.display = 'inline-block';
                     this.elements.btnGuardar.style.display = 'none';
+                    this.elements.btnRegistrarEntrada.style.display = 'inline-block';
+                    this.elements.btnRegistrarSalida.style.display = 'inline-block';
                 }
             }
         } catch (error) {
@@ -390,6 +408,8 @@ class TalentoHumanoManager {
         this.limpiarFormulario();
         this.currentPersona = null;
         this.isEditing = false;
+        this.elements.btnRegistrarEntrada.style.display = 'none';
+        this.elements.btnRegistrarSalida.style.display = 'none';
     }
 
     cancelar() {
@@ -399,9 +419,77 @@ class TalentoHumanoManager {
             this.isEditing = false;
             this.elements.btnEditar.style.display = 'inline-block';
             this.elements.btnGuardar.style.display = 'none';
+            this.elements.btnRegistrarEntrada.style.display = 'inline-block';
+            this.elements.btnRegistrarSalida.style.display = 'inline-block';
             this.elements.formTitle.textContent = 'Información de la Persona';
         } else {
             this.ocultarFormulario();
+        }
+    }
+
+    abrirModalSede(accion) {
+        if (!this.currentPersona || !this.currentPersona.id) {
+            this.mostrarAlerta('warning', 'Atención', 'Debe buscar una persona primero');
+            return;
+        }
+
+        this.accionPendiente = accion;
+        this.elements.selectSedeModal.value = '';
+        this.elements.modalSede.modal('show');
+    }
+
+    async ejecutarRegistro() {
+        const sedeId = this.elements.selectSedeModal.value;
+
+        if (!sedeId) {
+            this.mostrarAlerta('warning', 'Atención', 'Debe seleccionar una sede');
+            return;
+        }
+
+        if (!this.currentPersona || !this.currentPersona.id) {
+            this.mostrarAlerta('error', 'Error', 'No hay una persona seleccionada');
+            return;
+        }
+
+        const personaId = this.currentPersona.id;
+        const accion = this.accionPendiente;
+
+        // Cerrar modal
+        this.elements.modalSede.modal('hide');
+
+        // Deshabilitar botones
+        const btnAccion = accion === 'entrada' ? this.elements.btnRegistrarEntrada : this.elements.btnRegistrarSalida;
+        const textoOriginal = btnAccion.innerHTML;
+        btnAccion.disabled = true;
+        btnAccion.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Procesando...';
+
+        try {
+            const endpoint = accion === 'entrada' 
+                ? '/api/presencia/entrada' 
+                : '/api/presencia/salida';
+
+            const data = {
+                persona_id: personaId,
+                sede_id: parseInt(sedeId)
+            };
+
+            const response = await axios.post(endpoint, data);
+
+            if (response.data.success) {
+                this.mostrarAlerta('success', '¡Éxito!',
+                    accion === 'entrada' 
+                        ? 'Entrada registrada correctamente' 
+                        : 'Salida registrada correctamente');
+            } else {
+                throw new Error(response.data.message || 'Error al registrar');
+            }
+        } catch (error) {
+            const mensaje = error.response?.data?.message || error.message || 'Error al procesar la solicitud';
+            this.mostrarAlerta('error', 'Error', mensaje);
+        } finally {
+            btnAccion.disabled = false;
+            btnAccion.innerHTML = textoOriginal;
+            this.accionPendiente = null;
         }
     }
 

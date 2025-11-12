@@ -55,6 +55,35 @@
                         </div>
                     </div>
 
+                    <!-- Modal para seleccionar sede -->
+                    <div class="modal fade" id="modalSede" tabindex="-1" role="dialog" aria-labelledby="modalSedeLabel" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="modalSedeLabel">Seleccionar Sede</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="form-group">
+                                        <label for="select_sede_modal">Sede <span class="text-danger">*</span></label>
+                                        <select class="form-control" id="select_sede_modal" required>
+                                            <option value="">Seleccione una sede...</option>
+                                            @foreach(\App\Models\Sede::where('status', 1)->get() as $sede)
+                                                <option value="{{ $sede->id }}">{{ $sede->sede }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                    <button type="button" class="btn btn-primary" id="btn-confirmar-sede">Confirmar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div id="form-container" style="display: none;">
                         <div class="card card-outline card-success shadow-sm">
                             <div class="card-header d-flex justify-content-between align-items-center">
@@ -72,6 +101,14 @@
                                     <button type="button" class="btn btn-primary mb-2" id="btn-guardar"
                                         style="display: none;">
                                         <i class="fas fa-save mr-1"></i> Guardar
+                                    </button>
+                                    <button type="button" class="btn btn-success mr-2 mb-2" id="btn-registrar-entrada"
+                                        style="display: none;">
+                                        <i class="fas fa-sign-in-alt mr-1"></i> Registrar Entrada
+                                    </button>
+                                    <button type="button" class="btn btn-danger mb-2" id="btn-registrar-salida"
+                                        style="display: none;">
+                                        <i class="fas fa-sign-out-alt mr-1"></i> Registrar Salida
                                     </button>
                                 </div>
                             </div>
