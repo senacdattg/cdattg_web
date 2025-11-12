@@ -1,4 +1,4 @@
-@extends('complementarios.layout.master-layout-complementarios')
+@extends('complementarios.layout.master')
 @section('title', 'Formulario de Inscripción | SENA')
 @section('css')
     @vite(['resources/css/formulario_inscripcion.css'])
@@ -391,7 +391,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <i class="fas fa-user-plus mr-2"></i>Formulario de Inscripción
                         </h3>
                         <div class="card-tools">
-                            <a href="{{ route('programas-complementarios.publicos') }}" class="btn btn-outline-primary btn-sm">
+                            <a href="{{ route('programas-complementarios.index') }}" class="btn btn-outline-primary btn-sm">
                                 <i class="fas fa-arrow-left mr-1"></i> Volver a Programas
                             </a>
                         </div>
@@ -409,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                         <div class="card-body">
                             <form id="formInscripcion" method="POST"
-                                action="{{ route('programas-complementarios.procesar-inscripcion', $programa->id) }}">
+                                action="{{ route('programas-complementarios.procesar-inscripcion', ['programa' => $programa->id]) }}">
                                 @csrf
                                 <input type="hidden" name="programa_id" value="{{ $programa->id }}">
 
@@ -550,7 +550,5 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         </div>
     </div>
-
-@include('complementarios.layout.footer-complementarios')
 @include('components.modal-terminos')
 @endsection

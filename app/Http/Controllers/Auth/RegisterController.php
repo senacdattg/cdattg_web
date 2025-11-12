@@ -153,7 +153,7 @@ class RegisterController extends Controller
         }
 
         return redirect()
-            ->route('programas-complementarios.publicos')
+            ->route('programas-complementarios.index')
             ->with(
                 'success',
                 '¡Registro Exitoso! Ahora puede inscribirse en los programas complementarios disponibles.'

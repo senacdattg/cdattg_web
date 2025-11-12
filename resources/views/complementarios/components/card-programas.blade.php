@@ -63,7 +63,7 @@
             </div>
         </div>
         <div class="card-footer bg-white border-0 pt-0 pb-4">
-            <a href="{{ route('programa_complementario.ver', ['id' => $programa->id]) }}"
+            <a href="{{ route('programas-complementarios.show', ['programa' => $programa->id]) }}"
                 class="btn btn-outline-primary btn-sm btn-block">
                 <i class="fas fa-eye mr-1"></i> Ver detalles
             </a>

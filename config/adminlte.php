@@ -1,5 +1,14 @@
 <?php
 
+$rutaLogoAdmin = 'vendor/adminlte/dist/img/LogoSena.png';
+$permisoVerProducto = 'VER PRODUCTO';
+$permisoVerCatalogoProducto = 'VER CATALOGO PRODUCTO';
+$permisoVerCategoria = 'VER CATEGORIA';
+$permisoVerMarca = 'VER MARCA';
+$permisoVerProveedor = 'VER PROVEEDOR';
+$permisoVerContrato = 'VER CONTRATO';
+$permisoVerOrden = 'VER ORDEN';
+
 return [
 
     /*
@@ -64,7 +73,7 @@ return [
     */
 
     'logo' => '<b>Admin</b> SENA',
-    'logo_img' => 'vendor/adminlte/dist/img/LogoSena.png',
+    'logo_img' => $rutaLogoAdmin,
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
@@ -86,7 +95,7 @@ return [
     'auth_logo' => [
         'enabled' => false,
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/LogoSena.png',
+            'path' => $rutaLogoAdmin,
             'alt' => 'Auth Logo',
             'class' => '',
             'width' => 50,
@@ -113,7 +122,7 @@ return [
         'enabled' => true,
         'mode' => 'fullscreen',
         'img' => [
-            'path' => 'vendor/adminlte/dist/img/LogoSena.png',
+            'path' => $rutaLogoAdmin,
             'alt' => 'AdminLTE Preloader Image',
             'effect' => 'animation__shake',
             'width' => 60,
@@ -369,7 +378,7 @@ return [
             'type' => 'sidebar-menu-search',
             'text' => 'search',
         ],
-        
+
         // ========================================
         // MÓDULO: INICIO
         // ========================================
@@ -390,9 +399,7 @@ return [
         // ========================================
         // MÓDULO: CONFIGURACIÓN DEL SISTEMA
         // ========================================
-        [
-            
-        ],
+        [],
         [
             'text' => 'Sistema',
             'icon' => 'fas fa-fw fa-cogs',
@@ -428,9 +435,7 @@ return [
         // ========================================
         // MÓDULO: INFRAESTRUCTURA
         // ========================================
-        [
-            
-        ],
+        [],
         [
             'text' => 'Regionales',
             'url' => 'regional',
@@ -523,9 +528,7 @@ return [
         // ========================================
         // MÓDULO: GESTIÓN ACADÉMICA
         // ========================================
-        [
-            
-        ],
+        [],
         [
             'text' => 'Programas de Formación',
             'icon' => 'fas fa-fw fa-book',
@@ -612,9 +615,7 @@ return [
         // ========================================
         // MÓDULO: FICHAS Y CARACTERIZACIÓN
         // ========================================
-        [
-            
-        ],
+        [],
         [
             'text' => 'Fichas de Caracterización',
             'icon' => 'fas fa-fw fa-file-alt',
@@ -657,9 +658,7 @@ return [
         // ========================================
         // MÓDULO: PERSONAL
         // ========================================
-        [
-            
-        ],
+        [],
         [
             'text' => 'Instructores',
             'icon' => 'fas fa-fw fa-chalkboard-teacher',
@@ -708,9 +707,7 @@ return [
         // ========================================
         // MÓDULO: ASISTENCIA
         // ========================================
-        [
-            
-        ],
+        [],
         [
             'text' => 'Tomar Asistencia',
             'url' => 'asistencia',
@@ -740,9 +737,7 @@ return [
         // ========================================
         // MÓDULO: CARNETS
         // ========================================
-        [
-            
-        ],
+        [],
         [
             'text' => 'Gestión de Carnets',
             'icon' => 'fas fa-fw fa-id-card',
@@ -775,7 +770,7 @@ return [
                     'submenu' => [
                         [
                             'text' => 'Ver complementarios',
-                            'url' => 'gestion-programas-complementarios',
+                            'url' => 'complementarios-ofertados',
                             'icon' => 'fas fa-list',
                             'can' => 'VER PROGRAMA COMPLEMENTARIO',
                             'classes' => 'text-sm',
@@ -824,7 +819,15 @@ return [
         [
             'text' => 'Inventario',
             'icon' => 'fa-solid fa-boxes-stacked',
-            'can'  => ['VER PRODUCTO', 'VER CATALOGO PRODUCTO', 'VER CATEGORIA', 'VER MARCA', 'VER PROVEEDOR', 'VER CONTRATO', 'VER ORDEN'],
+            'can'  => [
+                $permisoVerProducto,
+                $permisoVerCatalogoProducto,
+                $permisoVerCategoria,
+                $permisoVerMarca,
+                $permisoVerProveedor,
+                $permisoVerContrato,
+                $permisoVerOrden,
+            ],
             'submenu' => [
                 [
                     'text' => 'Dashboard',
@@ -835,19 +838,22 @@ return [
                 [
                     'text' => 'Productos',
                     'icon' => 'fa-solid fa-box',
-                    'can'  => ['VER PRODUCTO', 'VER CATALOGO PRODUCTO'],
+                    'can'  => [
+                        $permisoVerProducto,
+                        $permisoVerCatalogoProducto,
+                    ],
                     'submenu' => [
                         [
                             'text' => 'Lista de Productos',
                             'url'  => 'inventario/productos',
                             'icon' => 'fa-solid fa-list',
-                            'can'  => 'VER PRODUCTO',
+                            'can'  => $permisoVerProducto,
                         ],
                         [
                             'text' => 'Catálogo de Productos',
                             'url'  => 'inventario/productos/catalogo',
                             'icon' => 'fa-solid fa-th',
-                            'can'  => 'VER CATALOGO PRODUCTO',
+                            'can'  => $permisoVerCatalogoProducto,
                         ],
                         [
                             'text' => 'Crear Producto',
@@ -867,13 +873,13 @@ return [
                     'text' => 'Órdenes',
                     'url'  => 'inventario/ordenes',
                     'icon' => 'fa-solid fa-file-invoice',
-                    'can'  => 'VER ORDEN',
+                    'can'  => $permisoVerOrden,
                     'submenu' => [
                         [
                             'text' => 'Todas las Órdenes',
                             'url'  => 'inventario/ordenes',
                             'icon' => 'fa-solid fa-list',
-                            'can'  => 'VER ORDEN',
+                            'can'  => $permisoVerOrden,
                         ],
                         [
                             'text' => 'Aprobaciones Pendientes',
@@ -885,13 +891,13 @@ return [
                             'text' => 'Órdenes Aprobadas',
                             'url'  => 'inventario/ordenes/completadas',
                             'icon' => 'fa-solid fa-check-circle',
-                            'can'  => 'VER ORDEN',
+                            'can'  => $permisoVerOrden,
                         ],
                         [
                             'text' => 'Órdenes Rechazadas',
                             'url'  => 'inventario/ordenes/rechazadas',
                             'icon' => 'fa-solid fa-times-circle',
-                            'can'  => 'VER ORDEN',
+                            'can'  => $permisoVerOrden,
                         ],
                     ],
                 ],
@@ -917,31 +923,36 @@ return [
                 [
                     'text' => 'Configuración',
                     'icon' => 'fa-solid fa-cog',
-                    'can'  => ['VER CATEGORIA', 'VER MARCA', 'VER PROVEEDOR', 'VER CONTRATO'],
+                    'can'  => [
+                        $permisoVerCategoria,
+                        $permisoVerMarca,
+                        $permisoVerProveedor,
+                        $permisoVerContrato,
+                    ],
                     'submenu' => [
                         [
                             'text' => 'Categorías',
                             'url'  => 'inventario/categorias',
                             'icon' => 'fa-solid fa-tags',
-                            'can'  => 'VER CATEGORIA',
+                            'can'  => $permisoVerCategoria,
                         ],
                         [
                             'text' => 'Marcas',
                             'url'  => 'inventario/marcas',
                             'icon' => 'fa-solid fa-trademark',
-                            'can'  => 'VER MARCA',
+                            'can'  => $permisoVerMarca,
                         ],
                         [
                             'text' => 'Proveedores',
                             'url'  => 'inventario/proveedores',
                             'icon' => 'fa-solid fa-truck',
-                            'can'  => 'VER PROVEEDOR',
+                            'can'  => $permisoVerProveedor,
                         ],
                         [
                             'text' => 'Contratos/Convenios',
                             'url'  => 'inventario/contratos-convenios',
                             'icon' => 'fa-solid fa-file-contract',
-                            'can'  => 'VER CONTRATO',
+                            'can'  => $permisoVerContrato,
                         ],
                     ],
                 ],
@@ -1072,7 +1083,10 @@ return [
                 [
                     'type' => 'css',
                     'asset' => false,
-                    'location' => '//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/themes/blue/pace-theme-center-radar.min.css',
+                    'location' => implode('', [
+                        '//cdnjs.cloudflare.com/ajax/libs/pace/1.0.2/themes/blue',
+                        '/pace-theme-center-radar.min.css',
+                    ]),
                 ],
                 [
                     'type' => 'js',
@@ -1135,6 +1149,3 @@ return [
         'public/css/app.css',
     ],
 ];
-
-
-
