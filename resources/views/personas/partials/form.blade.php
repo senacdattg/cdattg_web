@@ -125,6 +125,7 @@
                         @error('numero_documento')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                        <small id="cedula-feedback" class="form-text"></small>
                     </div>
                     <div class="col-md-6 mb-4">
                         <label for="primer_nombre" class="form-label font-weight-bold">

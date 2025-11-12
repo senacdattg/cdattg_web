@@ -63,6 +63,12 @@ class HttpClient {
             'X-Requested-With': 'XMLHttpRequest',
             Accept: 'application/json'
         };
+
+        // Add CSRF token if available
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (csrfToken) {
+            this.defaultHeaders['X-CSRF-TOKEN'] = csrfToken.getAttribute('content');
+        }
     }
 
     async get(url, config = {}) {
@@ -78,6 +84,33 @@ class HttpClient {
         }
 
         const response = await fetch(url, { headers });
+        if (!response.ok) {
+            const error = new Error(`HTTP ${response.status}`);
+            this.logger.error('Solicitud fallida:', error);
+            throw error;
+        }
+
+        return response.json();
+    }
+
+    async post(url, data = {}, config = {}) {
+        if (!url) {
+            throw new Error('URL requerida para la solicitud.');
+        }
+
+        const headers = { ...this.defaultHeaders, ...(config.headers || {}) };
+
+        if (this.client) {
+            const response = await this.client.post(url, data, { ...config, headers });
+            return response.data;
+        }
+
+        headers['Content-Type'] = 'application/json';
+        const response = await fetch(url, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(data)
+        });
         if (!response.ok) {
             const error = new Error(`HTTP ${response.status}`);
             this.logger.error('Solicitud fallida:', error);
@@ -1377,6 +1410,56 @@ class PreloaderHandler {
     }
 }
 
+class CedulaValidator {
+    constructor() {
+        this.timeout = null;
+        this.http = new HttpClient();
+    }
+
+    attach(forms) {
+        forms.forEach((form) => {
+            const cedulaField = resolveField(form, 'numero_documento');
+            if (!cedulaField) return;
+
+            bindOnce(cedulaField, 'input', (e) => {
+                clearTimeout(this.timeout);
+                const cedula = e.target.value.trim();
+                if (cedula.length >= 5) {
+                    this.timeout = setTimeout(() => {
+                        this.checkCedulaAvailability(cedula);
+                    }, 500);
+                } else {
+                    // Limpiar feedback si es muy corto
+                    const feedback = document.getElementById('cedula-feedback');
+                    if (feedback) {
+                        feedback.textContent = '';
+                    }
+                }
+            }, 'personaCedulaInput');
+        });
+    }
+
+    async checkCedulaAvailability(cedula) {
+        const feedback = document.getElementById('cedula-feedback');
+        if (!feedback) return;
+
+        try {
+            const response = await this.http.post('/api/check-cedula', { cedula });
+
+            if (response.success) {
+                feedback.textContent = 'Cédula ya registrada en el sistema';
+                feedback.className = 'form-text text-danger';
+            } else {
+                feedback.textContent = 'Cédula disponible';
+                feedback.className = 'form-text text-success';
+            }
+        } catch (error) {
+            feedback.textContent = 'Error al verificar cédula';
+            feedback.className = 'form-text text-warning';
+        }
+    }
+}
+
 class PersonaFormManager {
     constructor(config, selectors) {
         this.config = config;
@@ -1390,6 +1473,7 @@ class PersonaFormManager {
         this.age = new AgeValidator(config, selectors);
         this.validation = new ValidationHandler(config);
         this.preloader = new PreloaderHandler(selectors);
+        this.cedulaValidator = new CedulaValidator();
     }
 
     getTargetForms() {
@@ -1415,6 +1499,7 @@ class PersonaFormManager {
         this.input.attach(forms);
         this.caracterizacion.attach();
         this.address.attach();
+        this.cedulaValidator.attach(forms);
 
         try {
             await this.location.init();
