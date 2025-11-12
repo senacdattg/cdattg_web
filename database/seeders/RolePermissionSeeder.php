@@ -336,6 +336,7 @@ class RolePermissionSeeder extends Seeder
             'CREAR ORDEN',
             'DEVOLVER PRESTAMO',
             'VER NOTIFICACION',
+            'VER TALENTO HUMANO',
         ]);
     }
 }
