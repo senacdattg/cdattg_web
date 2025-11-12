@@ -269,7 +269,6 @@ class RolePermissionSeeder extends Seeder
             'CREAR PROGRAMA COMPLEMENTARIO',
             'ELIMINAR ASPIRANTE COMPLEMENTARIO',
             'VER TALENTO HUMANO',
-            'CREAR TALENTO HUMANO',
             'ASIGNACION DE INSTRUCTORES',
         ]);
 
