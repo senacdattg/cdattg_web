@@ -29,7 +29,6 @@ use Illuminate\Support\Facades\Auth;
 class InstructorController extends Controller
 {
     private const MAX_IMPORT_FILE_KB = UploadLimits::IMPORT_FILE_SIZE_KB;
-    private const PERSONAS_JS_FILENAME = 'instructor-create-data.js';
     private const CSV_HEADER_EMAIL = 'CORREO INSTITUCIONAL';
 
     protected $businessRulesService;
@@ -187,65 +186,18 @@ class InstructorController extends Controller
     public function create()
     {
         try {
-            // Obtener personas que no son instructores
-            $personas = Persona::whereDoesntHave('instructor')
-                ->whereHas('user') // Solo personas que tienen usuario
-                ->with(['user', 'tipoDocumento'])
+            $personasDisponibles = Persona::query()
+                ->whereDoesntHave('instructor')
+                ->orderBy('primer_nombre')
+                ->orderBy('primer_apellido')
                 ->get();
-
-            // Preparar datos para JavaScript
-            $personasData = $personas->map(function ($persona) {
-                return [
-                    'id' => $persona->id,
-                    'nombre' => trim(implode(' ', [
-                        $persona->primer_nombre,
-                        $persona->segundo_nombre,
-                        $persona->primer_apellido,
-                        $persona->segundo_apellido,
-                    ])),
-                    'documento' => $persona->numero_documento,
-                    'email' => $persona->email,
-                ];
-            });
-
-            // Generar archivo JavaScript con los datos
-            $jsContent = "// Datos de personas para el formulario de creación de instructor\n";
-            $jsContent .= "// Generado automáticamente desde el controlador\n";
-            $jsContent .= sprintf(
-                "window.personasData = %s;",
-                json_encode(
-                    $personasData,
-                    JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE
-                )
-            );
-
-            // Verificar que el directorio existe
-            $jsPath = public_path('js');
-            if (!is_dir($jsPath)) {
-                mkdir($jsPath, 0755, true);
-            }
-
-            $jsFile = $jsPath . '/' . self::PERSONAS_JS_FILENAME;
-
-            file_put_contents($jsFile, $jsContent);
 
             $regionales = Regional::where('status', 1)->get();
             $especialidades = RedConocimiento::where('status', true)->orderBy('nombre')->get();
 
-            // Debug temporal
-            $jsFileExists = file_exists($jsFile);
-
-            Log::info('Variables pasadas a la vista create:', [
-                'personas_count' => $personas->count(),
-                'regionales_count' => $regionales->count(),
-                'especialidades_count' => $especialidades->count(),
-                'js_file_created' => $jsFileExists,
-                'js_file_size' => $jsFileExists ? filesize($jsFile) : 0,
-            ]);
-
             return view(
                 'Instructores.create',
-                compact('personas', 'regionales', 'especialidades')
+                compact('personasDisponibles', 'regionales', 'especialidades')
             );
         } catch (Exception $e) {
             Log::error('Error al cargar formulario de creación de instructor', [

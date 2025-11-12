@@ -11,17 +11,12 @@
 @endpush
 
 @section('content_header')
-    <x-page-header
-        icon="fas fa-eye"
-        title="Ver Producto"
-        subtitle="Detalles del producto"
-        :breadcrumb="[
-            ['label' => 'Inicio', 'url' => '#'],
-            ['label' => 'Inventario', 'active' => true],
-            ['label' => 'Productos', 'url' => route('inventario.productos.index')],
-            ['label' => $producto->producto, 'active' => true]
-        ]"
-    />
+    <x-page-header icon="fas fa-eye" title="Ver Producto" subtitle="Detalles del producto" :breadcrumb="[
+        ['label' => 'Inicio', 'url' => '#'],
+        ['label' => 'Inventario', 'active' => true],
+        ['label' => 'Productos', 'url' => route('inventario.productos.index')],
+        ['label' => $producto->producto, 'active' => true],
+    ]" />
 @endsection
 
 @section('content')
@@ -45,19 +40,15 @@
                         <i class="fas fa-image"></i> Imagen del Producto
                     </h5>
                     <div class="product-image-wrapper">
-                        <img
-                            src="{{ $producto->imagen ? asset($producto->imagen) : asset('public/img/inventario/producto-default.png') }}"
-                            alt="{{ $producto->producto }}"
-                            class="img-fluid"
-                            style="cursor: pointer;"
-                            data-toggle="modal"
-                            data-target="#imageModal"
-                        >
+                        <img src="{{ $producto->imagen ? asset($producto->imagen) : asset('public/img/inventario/producto-default.png') }}"
+                            alt="{{ $producto->producto }}" class="img-fluid" style="cursor: pointer;"
+                            onclick="$('#imageModal').modal('show'); $('#expandedImage').attr('src', this.src);">
                     </div>
-                    
+
                     {{-- Estadísticas Rápidas --}}
                     <div class="stats-grid mt-4">
-                        <div class="stat-card stat-{{ $producto->cantidad <= 5 ? 'danger' : ($producto->cantidad <= 10 ? 'warning' : 'success') }}">
+                        <div
+                            class="stat-card stat-{{ $producto->cantidad <= 5 ? 'danger' : ($producto->cantidad <= 10 ? 'warning' : 'success') }}">
                             <div class="stat-card-header">
                                 <div class="stat-card-icon">
                                     <i class="fas fa-boxes"></i>
@@ -99,53 +90,51 @@
                                 <strong>Producto:</strong>
                                 <span>{{ $producto->producto }}</span>
                             </li>
-                            
+
                             <li>
                                 <i class="fas fa-cubes"></i>
                                 <strong>Tipo:</strong>
                                 <span>{{ $producto->tipoProducto->parametro->name ?? 'N/A' }}</span>
                             </li>
-                            
+
                             <li>
                                 <i class="fas fa-align-left"></i>
                                 <strong>Descripción:</strong>
                                 <span>{{ $producto->descripcion ?? 'Sin descripción' }}</span>
                             </li>
-                            
+
                             <li>
                                 <i class="fas fa-weight"></i>
                                 <strong>Magnitud:</strong>
                                 <span>{{ $producto->peso }} {{ $producto->unidadMedida->parametro->name ?? '' }}</span>
                             </li>
-                            
+
                             <li>
                                 <i class="fas fa-barcode"></i>
                                 <strong>Código de Barras:</strong>
                                 <span class="badge-modern badge-secondary">{{ $producto->codigo_barras }}</span>
-                                @if($producto->codigo_barras)
+                                @if ($producto->codigo_barras)
                                     <div class="mt-2">
                                         <svg id="barcode-show" style="width:100%"></svg>
                                         <div class="mt-1">
-                                            <a
-                                                target="_blank"
-                                                class="btn btn-xs btn-outline-primary"
-                                                href="{{ route('inventario.productos.etiqueta', $producto->id) }}"
-                                            >
+                                            <a target="_blank" class="btn btn-xs btn-outline-primary"
+                                                href="{{ route('inventario.productos.etiqueta', $producto->id) }}">
                                                 <i class="fas fa-print"></i> Imprimir etiqueta
                                             </a>
                                         </div>
                                     </div>
                                 @endif
                             </li>
-                            
+
                             <li>
                                 <i class="fas fa-check-circle"></i>
                                 <strong>Estado:</strong>
-                                <span class="badge-modern {{ $producto->estado->parametro->name === 'DISPONIBLE' ? 'badge-success' : 'badge-warning' }}">
+                                <span
+                                    class="badge-modern {{ $producto->estado->parametro->name === 'DISPONIBLE' ? 'badge-success' : 'badge-warning' }}">
                                     {{ $producto->estado->parametro->name ?? 'N/A' }}
                                 </span>
                             </li>
-                            
+
                             <li>
                                 <i class="fas fa-folder"></i>
                                 <strong>Categoría:</strong>
@@ -154,7 +143,7 @@
                                     {{ $producto->categoria->name ?? 'N/A' }}
                                 </span>
                             </li>
-                            
+
                             <li>
                                 <i class="fas fa-copyright"></i>
                                 <strong>Marca:</strong>
@@ -162,47 +151,47 @@
                                     {{ $producto->marca->name ?? 'N/A' }}
                                 </span>
                             </li>
-                            
+
                             <li>
                                 <i class="fas fa-building"></i>
                                 <strong>Ambiente:</strong>
                                 <span>{{ $producto->ambiente->title ?? 'N/A' }}</span>
                             </li>
-                            
+
                             <li>
                                 <i class="fas fa-file-contract"></i>
                                 <strong>Contrato/Convenio:</strong>
                                 <span>{{ $producto->contratoConvenio->name ?? 'N/A' }}</span>
                             </li>
-                            
+
                             <li>
                                 <i class="fas fa-truck"></i>
                                 <strong>Proveedor:</strong>
                                 <span>{{ $producto->proveedor->proveedor ?? 'N/A' }}</span>
                             </li>
 
-                            
+
                             <li>
                                 <i class="fas fa-calendar-times"></i>
                                 <strong>Fecha de Vencimiento:</strong>
                                 <span>{{ $producto->fecha_vencimiento ? $producto->fecha_vencimiento->format('d/m/Y') : 'Sin fecha' }}</span>
                             </li>
-                            
+
                             <li>
                                 <i class="fas fa-calendar-plus"></i>
                                 <strong>Fecha de Registro:</strong>
                                 <span>{{ $producto->created_at->format('d/m/Y H:i') }}</span>
                             </li>
-                            
-                            @if($producto->updated_at != $producto->created_at)
+
+                            @if ($producto->updated_at != $producto->created_at)
                                 <li>
                                     <i class="fas fa-calendar-edit"></i>
                                     <strong>Última Actualización:</strong>
                                     <span>{{ $producto->updated_at->format('d/m/Y H:i') }}</span>
                                 </li>
                             @endif
-                            
-                            @if($producto->userCreate)
+
+                            @if ($producto->userCreate)
                                 <li>
                                     <i class="fas fa-user"></i>
                                     <strong>Creado por:</strong>
@@ -215,7 +204,8 @@
 
                 {{-- Estadísticas Adicionales --}}
                 <div class="stats-grid mt-4">
-                    <div class="stat-card stat-{{ $producto->cantidad <= 5 ? 'danger' : ($producto->cantidad <= 10 ? 'warning' : 'success') }}">
+                    <div
+                        class="stat-card stat-{{ $producto->cantidad <= 5 ? 'danger' : ($producto->cantidad <= 10 ? 'warning' : 'success') }}">
                         <div class="stat-card-header">
                             <div class="stat-card-icon">
                                 <i class="fas fa-warehouse"></i>
@@ -241,7 +231,8 @@
                         </div>
                     </div>
 
-                    <div class="stat-card stat-{{ $producto->estado->parametro->name === 'DISPONIBLE' ? 'success' : 'warning' }}">
+                    <div
+                        class="stat-card stat-{{ $producto->estado->parametro->name === 'DISPONIBLE' ? 'success' : 'warning' }}">
                         <div class="stat-card-header">
                             <div class="stat-card-icon">
                                 <i class="fas fa-toggle-on"></i>
@@ -259,21 +250,16 @@
                 {{-- Botones de Acción --}}
                 <div class="action-buttons-container">
                     @can('EDITAR PRODUCTO')
-                        <a
-                            href="{{ route('inventario.productos.edit', $producto->id) }}"
-                            class="btn-action btn-action-primary"
-                        >
+                        <a href="{{ route('inventario.productos.edit', $producto->id) }}"
+                            class="btn-action btn-action-primary">
                             <i class="fas fa-edit"></i>
                             Editar Producto
                         </a>
                     @endcan
 
                     @can('ELIMINAR PRODUCTO')
-                        <form
-                            action="{{ route('inventario.productos.destroy', $producto->id) }}"
-                            method="POST"
-                            class="d-inline formulario-eliminar"
-                        >
+                        <form action="{{ route('inventario.productos.destroy', $producto->id) }}" method="POST"
+                            class="d-inline formulario-eliminar">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="btn-action btn-action-danger">
@@ -296,15 +282,11 @@
 @endsection
 
 @push('css')
-    @vite([
-        'resources/css/inventario/shared/base.css',
-        'resources/css/inventario/inventario.css',
-        'resources/css/inventario/imagen.css',
-    ])
+    @vite(['resources/css/inventario/shared/base.css', 'resources/css/inventario/inventario.css', 'resources/css/inventario/imagen.css'])
 @endpush
 
 @push('js')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
     @vite('resources/js/inventario/imagen.js')
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
     <script>
@@ -333,17 +315,13 @@
         });
 
         // Render del código de barras
-        @if($producto->codigo_barras)
-        JsBarcode(
-            "#barcode-show",
-            "{{ $producto->codigo_barras }}",
-            {
+        @if ($producto->codigo_barras)
+            JsBarcode("#barcode-show", "{{ $producto->codigo_barras }}", {
                 format: "code128",
                 width: 2,
                 height: 60,
                 displayValue: false
-            }
-        );
+            });
         @endif
     </script>
 @endpush

@@ -2,6 +2,7 @@
     <div class="col-12">
         <form method="POST" action="{{ route('programa.store') }}" class="needs-validation" novalidate>
             @csrf
+
             <div class="row">
                 <div class="col-md-6">
                     <div class="form-group mb-3">
@@ -56,6 +57,50 @@
                         @error('nivel_formacion_id')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label class="form-label fw-bold">Horas totales del programa</label>
+                        <input type="number" name="horas_totales" value="{{ old('horas_totales') }}"
+                               class="form-control @error('horas_totales') is-invalid @enderror"
+                               placeholder="Total de horas" min="1" required>
+                        @error('horas_totales')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label class="form-label fw-bold">Horas etapa lectiva</label>
+                        <input type="number" name="horas_etapa_lectiva" value="{{ old('horas_etapa_lectiva') }}"
+                               class="form-control @error('horas_etapa_lectiva') is-invalid @enderror"
+                               placeholder="Horas lectiva" min="1" required>
+                        @error('horas_etapa_lectiva')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-group mb-3">
+                        <label class="form-label fw-bold">Horas etapa productiva</label>
+                        <input type="number" name="horas_etapa_productiva" value="{{ old('horas_etapa_productiva') }}"
+                               class="form-control @error('horas_etapa_productiva') is-invalid @enderror"
+                               placeholder="Horas productiva" min="1" required>
+                        @error('horas_etapa_productiva')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        Las competencias se podrán asociar o quitar desde la edición del programa una vez creado.
                     </div>
                 </div>
             </div>

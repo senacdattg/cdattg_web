@@ -3,188 +3,258 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\User;
+use App\Http\Requests\Auth\RegisterRequest;
+use App\Models\AspiranteComplementario;
 use App\Models\Persona;
+use App\Models\User;
+use App\Repositories\TemaRepository;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
+use Illuminate\View\View;
+use Throwable;
 
 class RegisterController extends Controller
 {
-    public function __construct()
+    public function __construct(private readonly TemaRepository $temaRepository)
     {
         $this->middleware('guest');
     }
-    
-    public function create(Request $request)
+
+    public function create(): View
     {
-        Log::info('RegisterController - Método create llamado', [
-            'all_data' => $request->all(),
-            'method' => $request->method(),
-            'has_csrf' => $request->has('_token'),
-            'csrf_token' => $request->input('_token')
+        return view('user.registro', [
+            'documentos' => $this->resolveDocumentos(),
+            'generos' => $this->resolveGeneros(),
+            'caracterizaciones' => $this->resolveCaracterizaciones(),
+            'vias' => $this->resolveVias(),
+            'cardinales' => $this->resolveCardinales(),
+            'letras' => $this->resolveLetras(),
+
+            'paises' => collect(),
+            'departamentos' => collect(),
+            'municipios' => collect(),
         ]);
+    }
 
-        // Validación completa
-        $validatedData = $request->validate([
-            'tipo_documento' => 'required|integer',
-            'numero_documento' => 'required|string|max:191|unique:personas',
-            'primer_nombre' => 'required|string|max:191',
-            'segundo_nombre' => 'nullable|string|max:191',
-            'primer_apellido' => 'required|string|max:191',
-            'segundo_apellido' => 'nullable|string|max:191',
-            'fecha_nacimiento' => [
-                'required',
-                'date',
-                function ($attribute, $value, $fail) {
-                    $fechaNacimiento = Carbon::parse($value);
-                    $edadMinima = Carbon::now()->subYears(14);
-                    
-                    if ($fechaNacimiento->gt($edadMinima)) {
-                        $fail('Debe tener al menos 14 años para registrarse.');
-                    }
-                },
-            ],
-            'genero' => 'required|integer',
-            'telefono' => 'nullable|string|max:191',
-            'celular' => 'required|string|max:191',
-            'email' => 'required|email|max:191|unique:personas',
-            'pais_id' => 'required|exists:pais,id',
-            'departamento_id' => 'required|exists:departamentos,id',
-            'municipio_id' => 'required|exists:municipios,id',
-            'direccion' => 'required|string|max:191',
-        ]);
+    public function store(RegisterRequest $request): RedirectResponse
+    {
+        $validated = $request->validated();
 
-        Log::info('RegisterController - Validación pasada', ['validated_data' => $validatedData]);
-
-        // Convertir a mayúsculas los campos
-        $validatedData['primer_nombre'] = strtoupper($validatedData['primer_nombre']);
-        $validatedData['segundo_nombre'] = strtoupper($validatedData['segundo_nombre'] ?? '');
-        $validatedData['primer_apellido'] = strtoupper($validatedData['primer_apellido']);
-        $validatedData['segundo_apellido'] = strtoupper($validatedData['segundo_apellido'] ?? '');
-        $validatedData['password'] = bcrypt($validatedData['numero_documento']);
-
-        // Mapear numero_documento a documento para la base de datos
-        $validatedData['documento'] = $validatedData['numero_documento'];
-        unset($validatedData['numero_documento']);
-
-        Log::info('RegisterController - Datos procesados', ['processed_data' => $validatedData]);
-
-        // Verificar si ya existe una persona con el mismo documento o email
-        $personaExistente = Persona::where('numero_documento', $validatedData['documento'])
-            ->orWhere('email', $validatedData['email'])
-            ->first();
-
-        if ($personaExistente) {
-            return back()->withInput()->with('error', 'Ya existe una persona registrada con este número de documento o correo electrónico.');
+        if ($this->personaExists($validated['numero_documento'], $validated['email'])) {
+            return back()
+                ->withInput()
+                ->with('error', 'Ya existe una persona registrada con este número de documento o correo electrónico.');
         }
 
-        // Crear nueva persona usando los datos validados
+        try {
+            [$persona, $user] = DB::transaction(function () use ($validated) {
+                return $this->createPersonaYUsuario($validated);
+            });
+        } catch (Throwable) {
+            return back()->withInput()->with('error', 'No fue posible completar el registro. Intente nuevamente.');
+        }
+
+        $this->actualizarRolesSegunInscripcion($persona, $user);
+
+        Auth::login($user);
+
+        return $this->resolvePostRegistroRedirect($persona, $this->tieneInscripciones($persona));
+    }
+
+    private function personaExists(string $numeroDocumento, string $email): bool
+    {
+        return Persona::where('numero_documento', $numeroDocumento)
+            ->orWhere('email', $email)
+            ->exists();
+    }
+
+    private function createPersonaYUsuario(array $data): array
+    {
         $persona = Persona::create([
-            'tipo_documento' => $validatedData['tipo_documento'],
-            'numero_documento' => $validatedData['documento'],
-            'primer_nombre' => $validatedData['primer_nombre'],
-            'segundo_nombre' => $validatedData['segundo_nombre'] ?? null,
-            'primer_apellido' => $validatedData['primer_apellido'],
-            'segundo_apellido' => $validatedData['segundo_apellido'] ?? null,
-            'fecha_nacimiento' => $validatedData['fecha_nacimiento'],
-            'genero' => $validatedData['genero'],
-            'telefono' => $validatedData['telefono'] ?? null,
-            'celular' => $validatedData['celular'],
-            'email' => $validatedData['email'],
-            'pais_id' => $validatedData['pais_id'],
-            'departamento_id' => $validatedData['departamento_id'],
-            'municipio_id' => $validatedData['municipio_id'],
-            'direccion' => $validatedData['direccion'],
-            'user_create_id' => 1,
-            'user_edit_id' => 1
+            'tipo_documento' => $data['tipo_documento'],
+            'numero_documento' => $data['numero_documento'],
+            'primer_nombre' => strtoupper($data['primer_nombre']),
+            'segundo_nombre' => $this->normalizeOptionalUpper($data['segundo_nombre'] ?? null),
+            'primer_apellido' => strtoupper($data['primer_apellido']),
+            'segundo_apellido' => $this->normalizeOptionalUpper($data['segundo_apellido'] ?? null),
+            'fecha_nacimiento' => $data['fecha_nacimiento'],
+            'genero' => $data['genero'],
+            'telefono' => $data['telefono'] ?? null,
+            'celular' => $data['celular'],
+            'email' => strtolower($data['email']),
+            'pais_id' => $data['pais_id'],
+            'departamento_id' => $data['departamento_id'],
+            'municipio_id' => $data['municipio_id'],
+            'direccion' => $data['direccion'],
+            'user_create_id' => $this->resolveAuditableUserId(),
+            'user_edit_id' => $this->resolveAuditableUserId(),
         ]);
 
-        // Crear cuenta de usuario automáticamente
         $user = User::create([
-            'email' => $request->email,
-            'password' => Hash::make($request->numero_documento), // Usar documento como contraseña
+            'email' => strtolower($data['email']),
+            'password' => Hash::make($data['numero_documento']),
             'status' => 1,
             'persona_id' => $persona->id,
         ]);
 
-        // Asignar rol de visitante
         $user->assignRole('VISITANTE');
 
-        // Verificar si el usuario ya tiene alguna inscripción en programas complementarios
-        $tieneInscripciones = \App\Models\AspiranteComplementario::where('persona_id', $persona->id)->exists();
+        return [$persona, $user];
+    }
 
-        // Si ya tiene inscripciones, cambiar el rol a ASPIRANTE
+    private function actualizarRolesSegunInscripcion(Persona $persona, User $user): void
+    {
+        if (!$this->tieneInscripciones($persona)) {
+            return;
+        }
+
+        $user->removeRole('VISITANTE');
+        $user->assignRole('ASPIRANTE');
+    }
+
+    private function tieneInscripciones(Persona $persona): bool
+    {
+        return AspiranteComplementario::where('persona_id', $persona->id)->exists();
+    }
+
+    private function normalizeOptionalUpper(?string $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+
+        $trimmed = trim($value);
+
+        return $trimmed === '' ? null : strtoupper($trimmed);
+    }
+
+    private function resolvePostRegistroRedirect(Persona $persona, bool $tieneInscripciones): RedirectResponse
+    {
         if ($tieneInscripciones) {
-            $user->removeRole('VISITANTE');
-            $user->assignRole('ASPIRANTE');
+            $inscripcionPendiente = AspiranteComplementario::where('persona_id', $persona->id)
+                ->where('estado', 1)
+                ->whereNull('documento_identidad_path')
+                ->orderBy('created_at', 'desc')
+                ->first();
+
+            if ($inscripcionPendiente) {
+                return redirect()
+                    ->route('programas-complementarios.documentos', [
+                        'id' => $inscripcionPendiente->complementario_id,
+                        'aspirante_id' => $inscripcionPendiente->id,
+                    ])
+                    ->with(
+                        'success',
+                        '¡Registro Exitoso! Complete el proceso subiendo su documento de identidad.'
+                    );
+            }
         }
 
-        // Autenticar al usuario automáticamente
-        Auth::login($user);
-
-        return redirect('/')->with('success', '¡Registro Exitoso! Bienvenido a la plataforma.');
+        return redirect()
+            ->route('programas-complementarios.index')
+            ->with(
+                'success',
+                '¡Registro Exitoso! Ahora puede inscribirse en los programas complementarios disponibles.'
+            );
     }
 
-    public function mostrarFormulario()
+    private function resolveAuditableUserId(): ?int
     {
-        // Obtener tipos de documento y géneros dinámicamente
-        $tiposDocumento = $this->getTiposDocumento();
-        $generos = $this->getGeneros();
-
-        return view('user.registro', compact('tiposDocumento', 'generos'));
-    }
-
-    /**
-     * Método auxiliar para obtener tipos de documento dinámicamente desde el tema-parametro
-     */
-    private function getTiposDocumento()
-    {
-        // Buscar el tema "TIPO DE DOCUMENTO"
-        $temaTipoDocumento = \App\Models\Tema::where('name', 'TIPO DE DOCUMENTO')->first();
-
-        if (!$temaTipoDocumento) {
-            // Fallback: devolver valores hardcodeados si no se encuentra el tema
-            return collect([
-                ['id' => 3, 'name' => 'CEDULA DE CIUDADANIA'],
-                ['id' => 4, 'name' => 'CEDULA DE EXTRANJERIA'],
-                ['id' => 5, 'name' => 'PASAPORTE'],
-                ['id' => 6, 'name' => 'TARJETA DE IDENTIDAD'],
-                ['id' => 7, 'name' => 'REGISTRO CIVIL'],
-                ['id' => 8, 'name' => 'SIN IDENTIFICACION'],
-            ]);
+        if (Auth::check()) {
+            return Auth::id();
         }
 
-        // Obtener parámetros activos del tema
-        return $temaTipoDocumento->parametros()
-            ->where('parametros_temas.status', 1)
-            ->orderBy('parametros.name')
-            ->get(['parametros.id', 'parametros.name']);
-    }
+        $candidates = collect([
+            config('app.audit_default_user_id'),
+            config('registro.audit_default_user_id'),
+        ])->filter(fn($id) => $id !== null)
+            ->map(fn($id) => (int) $id)
+            ->unique()
+            ->values();
 
-    /**
-     * Método auxiliar para obtener géneros dinámicamente desde el tema-parametro
-     */
-    private function getGeneros()
-    {
-        // Buscar el tema "GENERO"
-        $temaGenero = \App\Models\Tema::where('name', 'GENERO')->first();
-
-        if (!$temaGenero) {
-            // Fallback: devolver valores hardcodeados si no se encuentra el tema
-            return collect([
-                ['id' => 9, 'name' => 'MASCULINO'],
-                ['id' => 10, 'name' => 'FEMENINO'],
-                ['id' => 11, 'name' => 'NO DEFINE'],
-            ]);
+        foreach ($candidates as $candidateId) {
+            if (User::whereKey($candidateId)->exists()) {
+                return $candidateId;
+            }
         }
 
-        // Obtener parámetros activos del tema
-        return $temaGenero->parametros()
-            ->where('parametros_temas.status', 1)
-            ->orderBy('parametros.name')
-            ->get(['parametros.id', 'parametros.name']);
+        $adminFallback = User::role('ADMIN')->value('id');
+        if ($adminFallback) {
+            return (int) $adminFallback;
+        }
+
+        return User::orderBy('id')->value('id');
+    }
+
+    private function resolveDocumentos(): object
+    {
+        $tema = $this->temaRepository->obtenerTiposDocumento();
+
+        if ($tema && $tema->parametros?->count()) {
+            return $tema;
+        }
+
+        return (object) [
+            'parametros' => collect(config('registro.fallback_documentos', [])),
+        ];
+    }
+
+    private function resolveGeneros(): object
+    {
+        $tema = $this->temaRepository->obtenerGeneros();
+
+        if ($tema && $tema->parametros?->count()) {
+            return $tema;
+        }
+
+        return (object) [
+            'parametros' => collect(config('registro.fallback_generos', [])),
+        ];
+    }
+
+    private function resolveCaracterizaciones(): object
+    {
+        $tema = $this->temaRepository->obtenerCaracterizacionesComplementarias();
+
+        if ($tema && $tema->parametros?->count()) {
+            return $tema;
+        }
+
+        return (object) ['parametros' => collect()];
+    }
+
+    private function resolveVias(): object
+    {
+        $tema = $this->temaRepository->obtenerVias();
+
+        if ($tema && $tema->parametros?->count()) {
+            return $tema;
+        }
+
+        return (object) ['parametros' => collect()];
+    }
+
+    private function resolveLetras(): object
+    {
+        $tema = $this->temaRepository->obtenerLetras();
+
+        if ($tema && $tema->parametros?->count()) {
+            return $tema;
+        }
+
+        return (object) ['parametros' => collect()];
+    }
+
+    private function resolveCardinales(): object
+    {
+        $tema = $this->temaRepository->obtenerCardinales();
+
+        if ($tema && $tema->parametros?->count()) {
+            return $tema;
+        }
+
+        return (object) ['parametros' => collect()];
     }
 }

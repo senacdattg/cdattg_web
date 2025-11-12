@@ -62,18 +62,6 @@
             border-color: #007bff;
         }
         
-        .person-info {
-            background: #e3f2fd;
-            border: 1px solid #bbdefb;
-            border-radius: 8px;
-            padding: 1rem;
-            margin-top: 1rem;
-            display: none;
-        }
-        .person-info.show {
-            display: block;
-        }
-        
         .floating-save-btn {
             position: fixed;
             bottom: 30px;
@@ -81,7 +69,71 @@
             z-index: 1000;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
+        
+        .select2-container--bootstrap4 .select2-selection--single {
+            min-height: calc(2.1rem);
+            border: 1px solid #ced4da;
+            padding: 0.375rem 0.75rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .select2-container--bootstrap4 .select2-selection--single .select2-selection__rendered {
+            color: #495057;
+            line-height: 1.6;
+            padding-left: 0;
+            font-size: 0.95rem;
+        }
+
+        .select2-container--bootstrap4 .select2-selection--single .select2-selection__placeholder {
+            color: #6c757d;
+            font-style: italic;
+        }
+
+        .select2-container--bootstrap4 .select2-selection--single .select2-selection__arrow {
+            height: 100%;
+            right: 0.75rem;
+        }
+
+        .select2-container--bootstrap4 .select2-dropdown {
+            border-color: #ced4da;
+            border-radius: 0.5rem;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.12);
+            padding-top: 0.25rem;
+            padding-bottom: 0.25rem;
+        }
+
+        .select2-container--bootstrap4 .select2-results__option {
+            padding: 0.55rem 0.85rem;
+            font-size: 0.95rem;
+        }
+
+        .select2-container--bootstrap4 .select2-results__option--highlighted[aria-selected] {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .select2-container--bootstrap4 .select2-results__option[aria-selected=true] {
+            background-color: rgba(0,123,255,0.1);
+            color: #0056b3;
+        }
+
+        .select2-search--dropdown .select2-search__field {
+            padding: 0.45rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.95rem;
+            border: 1px solid #ced4da;
+        }
+
+        .select2-container--bootstrap4 .select2-results__message {
+            padding: 0.4rem 0.75rem;
+            color: #6c757d;
+            font-style: italic;
+        }
     </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ttskch/select2-bootstrap4-theme@1.6.2/dist/select2-bootstrap4.css">
 @endsection
 
 @section('content_header')
@@ -116,38 +168,26 @@
                                 <div class="col-md-12">
                                     <div class="form-section">
                                         <h6><i class="fas fa-user"></i> Seleccionar Persona</h6>
-                                        <div class="form-group">
-                                            <label for="persona_search" class="form-label required-field">Buscar Persona</label>
-                                            <input type="text" id="persona_search" class="form-control" 
-                                                   placeholder="Escriba nombre o documento para buscar...">
-                                            <select name="persona_id" id="persona_id" class="form-control @error('persona_id') is-invalid @enderror" required style="display: none;">
-                                                <option value="">Seleccione una persona</option>
-                                                @if(isset($personas))
-                                                    @foreach($personas as $persona)
-                                                    <option value="{{ $persona->id }}" 
-                                                            data-nombre="{{ $persona->primer_nombre }} {{ $persona->segundo_nombre }} {{ $persona->primer_apellido }} {{ $persona->segundo_apellido }}"
-                                                            data-documento="{{ $persona->numero_documento }}"
-                                                            data-email="{{ $persona->email }}">
-                                                        {{ $persona->primer_nombre }} {{ $persona->primer_apellido }} - {{ $persona->numero_documento }}
-                                                    </option>
+                                        @if ($personasDisponibles->isEmpty())
+                                            <p class="text-muted mb-0">
+                                                No hay personas disponibles sin rol de instructor. Debe registrar nuevas personas o liberar el rol de un instructor existente.
+                                            </p>
+                                        @else
+                                            <div class="form-group">
+                                                <label for="persona_id" class="form-label required-field">Persona</label>
+                                                <select name="persona_id" id="persona_id" class="form-control @error('persona_id') is-invalid @enderror select2" required>
+                                                    <option value="">-- Selecciona una persona --</option>
+                                                    @foreach ($personasDisponibles as $persona)
+                                                        <option value="{{ $persona->id }}" {{ old('persona_id') == $persona->id ? 'selected' : '' }}>
+                                                            {{ $persona->nombre_completo }} — {{ $persona->numero_documento }}
+                                                        </option>
                                                     @endforeach
-                                                @else
-                                                    <option value="" disabled>No hay personas disponibles</option>
-                                                @endif
-                                            </select>
-                                            @error('persona_id')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        
-                                        <div id="search-results" class="mt-2"></div>
-                                        
-                                        <div id="selected-person-info" class="person-info">
-                                            <h6 class="mb-2"><i class="fas fa-user-check text-success"></i> Persona Seleccionada</h6>
-                                            <p class="mb-1"><strong>Nombre:</strong> <span id="selected-name"></span></p>
-                                            <p class="mb-1"><strong>Documento:</strong> <span id="selected-document"></span></p>
-                                            <p class="mb-0"><strong>Email:</strong> <span id="selected-email"></span></p>
-                                        </div>
+                                                </select>
+                                                @error('persona_id')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
 
@@ -229,7 +269,7 @@
                                         <a href="{{ route('instructor.index') }}" class="btn btn-light mr-2">
                                             Cancelar
                                         </a>
-                                        <button type="submit" class="btn btn-primary" id="saveBtn">
+                                        <button type="submit" class="btn btn-primary" id="saveBtn" {{ $personasDisponibles->isEmpty() ? 'disabled' : '' }}>
                                             <i class="fas fa-save mr-1"></i>Crear Instructor
                                         </button>
                                     </div>
@@ -248,6 +288,22 @@
 @endsection
 
 @section('js')
-    <script src="{{ asset('js/instructor-create-data.js') }}"></script>
-    <script src="{{ asset('js/instructor-create.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(function () {
+            const $personaSelect = $('#persona_id');
+
+            if ($personaSelect.length) {
+                $personaSelect.select2({
+                    theme: 'bootstrap4',
+                    placeholder: '-- Selecciona una persona --',
+                    width: '100%',
+                    language: {
+                        noResults: () => 'Sin coincidencias',
+                        searching: () => 'Buscando...'
+                    }
+                });
+            }
+        });
+    </script>
 @endsection

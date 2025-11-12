@@ -51,6 +51,28 @@ wait_for_database() {
     echo "✅ Base de datos disponible."
 }
 
+get_env_app_key() {
+    if [ ! -f ".env" ]; then
+        return 1
+    fi
+
+    local env_app_key
+    env_app_key=$(grep -E '^APP_KEY=' .env | tail -n 1 | cut -d '=' -f2-)
+    env_app_key="${env_app_key%%#*}"
+    env_app_key="${env_app_key%\"}"
+    env_app_key="${env_app_key#\"}"
+    env_app_key="${env_app_key%\'}"
+    env_app_key="${env_app_key#\'}"
+    env_app_key=$(echo "$env_app_key" | xargs)
+
+    if [ -n "$env_app_key" ]; then
+        printf '%s' "$env_app_key"
+        return 0
+    fi
+
+    return 1
+}
+
 # ==================================================
 # === Inicialización
 # ==================================================
@@ -124,23 +146,17 @@ fi
 # ==================================================
 # === Generar APP_KEY si falta
 # ==================================================
-if [ -z "${APP_KEY:-}" ] || grep -qE '^APP_KEY=$' .env 2>/dev/null || [ ! -f ".env" ]; then
+env_app_key="$(get_env_app_key || true)"
+
+if [ -z "$env_app_key" ]; then
     echo "🔑 Generando APP_KEY..."
     php artisan key:generate --force || true
+    env_app_key="$(get_env_app_key || true)"
 fi
 
 # Asegurar que APP_KEY esté exportada en el entorno actual
-if [ -z "${APP_KEY:-}" ] && [ -f ".env" ]; then
-    env_app_key=$(grep -E '^APP_KEY=' .env | tail -n 1 | cut -d '=' -f2-)
-    env_app_key="${env_app_key%%#*}"
-    env_app_key="${env_app_key%%\"}"
-    env_app_key="${env_app_key##\"}"
-    env_app_key="${env_app_key%%\'}"
-    env_app_key="${env_app_key##\'}"
-    env_app_key=$(echo "$env_app_key" | xargs)
-    if [ -n "$env_app_key" ]; then
-        export APP_KEY="$env_app_key"
-    fi
+if [ -z "${APP_KEY:-}" ] && [ -n "$env_app_key" ]; then
+    export APP_KEY="$env_app_key"
 fi
 
 # ==================================================

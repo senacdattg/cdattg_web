@@ -22,8 +22,11 @@ class PaisRepository
      */
     public function obtenerTodos(): Collection
     {
-        return $this->cache('todos', function () {
-            return Pais::orderBy('nombre')->get();
+        return $this->cacheWithTags('todos', function () {
+            return Pais::select(['id', 'pais', 'status'])
+                ->where('status', 1)
+                ->orderBy('pais')
+                ->get();
         }, 1440); // 24 horas
     }
 

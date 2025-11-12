@@ -47,10 +47,23 @@ class TalentoHumanoController extends Controller
         $departamentos = Departamento::where('status', 1)->orderBy('departamento')->get();
         $municipios = collect([]); // Se cargan dinámicamente con JavaScript
         $caracterizaciones = $this->temaRepository->obtenerCaracterizacionesComplementarias();
+        $vias = $this->temaRepository->obtenerVias();
+        $letras = $this->temaRepository->obtenerLetras();
+        $cardinales = $this->temaRepository->obtenerCardinales();
 
         return view(
             'talento-humano.index',
-            compact('documentos', 'generos', 'paises', 'departamentos', 'municipios', 'caracterizaciones')
+            compact(
+                'documentos',
+                'generos',
+                'paises',
+                'departamentos',
+                'municipios',
+                'caracterizaciones',
+                'vias',
+                'letras',
+                'cardinales'
+            )
         );
     }
 }

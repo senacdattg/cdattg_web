@@ -242,7 +242,7 @@
 @endpush
 
 @push('js')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{{ asset('vendor/chart.js/Chart.bundle.min.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Gráfico de Productos Consumibles vs No Consumibles

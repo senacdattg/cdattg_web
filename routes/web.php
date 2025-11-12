@@ -1,11 +1,17 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\DepartamentoController;
-use App\Http\Controllers\MunicipioController;
 use App\Http\Controllers\AsistenceQrController;
+use App\Http\Controllers\Complementarios\AspiranteComplementarioController;
+use App\Http\Controllers\Complementarios\InscripcionComplementarioController;
+use App\Http\Controllers\Complementarios\PerfilComplementarioController;
+use App\Http\Controllers\Complementarios\ProgramaComplementarioController;
+use App\Http\Controllers\Complementarios\ValidacionSofiaController;
+use App\Http\Controllers\DepartamentoController;
 use App\Http\Controllers\GoogleDriveController;
+use App\Http\Controllers\Inventario\ProductoController;
+use App\Http\Controllers\MunicipioController;
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,108 +21,105 @@ use App\Http\Controllers\GoogleDriveController;
 |
 */
 
-Route::get(
-    '/',
-    [App\Http\Controllers\Complementarios\ProgramaComplementarioController::class, 'programasPublicos']
-)->name('home');
-
-// Google Drive OAuth helper routes (para renovar refresh_token y probar conexión)
-Route::get('/google-drive-connect', [GoogleDriveController::class, 'connect'])->name('google.drive.connect');
-Route::get('/google-drive-callback', [GoogleDriveController::class, 'callback'])->name('google.drive.callback');
-Route::get('/google-drive-test', [GoogleDriveController::class, 'test'])->name('google.drive.test');
-
-// Rutas públicas
-foreach (glob(routes_path('autenticacion/public') . '/*.php') as $routeFile) {
-    include_once $routeFile;
-}
-
-Route::get(
-    '/inscripcion',
-    [App\Http\Controllers\Complementarios\InscripcionComplementarioController::class, 'inscripcionGeneral']
-)->name('inscripcion.general');
-Route::post(
-    '/inscripcion',
-    [App\Http\Controllers\Complementarios\InscripcionComplementarioController::class, 'procesarInscripcionGeneral']
-)->name('inscripcion.procesar');
-Route::get(
-    '/programas/{id}',
-    [App\Http\Controllers\Complementarios\ProgramaComplementarioController::class, 'verPrograma']
-)->name('programa_complementario.ver');
-
-// Rutas protegidas
-Route::middleware('auth')->group(function () {
-    $protectedFolders = [
-        'autenticacion/private',
-        'actividades',
-        'usuario',
-        'asistencia',
-        'caracterizacion',
-        'entrada_salida',
-        'infraestructura',
-        'inventario',
-        'jornada_carnet',
-        'personas',
-        'tema_parametro',
-        'ubicacion',
-        'actividades',
-        'complementarios',
-        'talento-humano'
-    ];
-    foreach ($protectedFolders as $folder) {
+$loadRouteFolders = static function (array $folders, array $middleware = ['web']): void {
+    foreach ($folders as $folder) {
         foreach (glob(routes_path($folder) . '/*.php') as $routeFile) {
-            include_once $routeFile;
+            Route::middleware($middleware)->group($routeFile);
         }
     }
+};
 
-    Route::post('/verify-document', [AsistenceQrController::class, 'verifyDocument'])->name('api.verifyDocument');
+Route::middleware('web')->group(function () {
+    Route::get('/', [ProgramaComplementarioController::class, 'programasPublicos'])
+        ->name('home');
 
-    Route::prefix('inventario')->name('inventario.')->group(function () {
-        Route::get('productos/{id}/etiqueta', [App\Http\Controllers\Inventario\ProductoController::class, 'etiqueta'])->name('productos.etiqueta');
-    });
+    Route::prefix('google-drive')
+        ->name('google.drive.')
+        ->group(function () {
+            Route::get('connect', [GoogleDriveController::class, 'connect'])
+                ->name('connect');
+            Route::get('callback', [GoogleDriveController::class, 'callback'])
+                ->name('callback');
+            Route::get('test', [GoogleDriveController::class, 'test'])
+                ->name('test');
+        });
+
+    Route::prefix('programas-complementarios')
+        ->name('programas-complementarios.')
+        ->group(function () {
+            Route::get('/', [ProgramaComplementarioController::class, 'programasPublicos'])
+                ->name('index');
+
+            Route::get('{programa}/inscripcion', [InscripcionComplementarioController::class, 'formularioInscripcion'])
+                ->name('inscripcion');
+            Route::post('{programa}/inscripcion', [InscripcionComplementarioController::class, 'procesarInscripcion'])
+                ->name('procesar-inscripcion');
+            Route::post('{programa}/validar-sofia', [ValidacionSofiaController::class, 'validarSofia'])
+                ->name('validar-sofia');
+            Route::post('{programa}/validar-documento', [AspiranteComplementarioController::class, 'validarDocumentos'])
+                ->name('validar-documento');
+
+            Route::get('{programa}', [ProgramaComplementarioController::class, 'verPrograma'])
+                ->name('show');
+        });
+
+    Route::prefix('inscripcion')
+        ->name('inscripcion.')
+        ->group(function () {
+            Route::get('/', [InscripcionComplementarioController::class, 'inscripcionGeneral'])
+                ->name('general');
+            Route::post('/', [InscripcionComplementarioController::class, 'procesarInscripcionGeneral'])
+                ->name('procesar');
+        });
+
+    Route::get('/sofia-validation-progress/{progressId}', [ValidacionSofiaController::class, 'getValidationProgress'])
+        ->name('sofia-validation.progress');
+
+    Route::get('/departamentos/{pais}', [DepartamentoController::class, 'getByPais'])
+        ->name('departamentos.by.pais');
+    Route::get('/municipios/{departamento}', [MunicipioController::class, 'getByDepartamento'])
+        ->name('municipios.by.departamento');
 });
 
-// Route::get('/perfil', [ProfileController::class, 'index'])->name('profile.index');
-// Route::put('/perfil', [ProfileController::class, 'update'])->name('profile.update');
-// Route::post('/cambiar-password', [ProfileController::class, 'changePassword'])->name('password.change');
+$loadRouteFolders(['autenticacion/public']);
 
-Route::get(
-    '/programas-complementarios',
-    [App\Http\Controllers\Complementarios\ProgramaComplementarioController::class, 'programasPublicos']
-)->name('programas-complementarios.publicos');
-Route::get(
-    '/programas-complementarios/{id}/inscripcion',
-    [App\Http\Controllers\Complementarios\InscripcionComplementarioController::class, 'formularioInscripcion']
-)->name('programas-complementarios.inscripcion');
-Route::post(
-    '/programas-complementarios/{id}/inscripcion',
-    [App\Http\Controllers\Complementarios\InscripcionComplementarioController::class, 'procesarInscripcion']
-)->name('programas-complementarios.procesar-inscripcion');
-Route::get(
-    '/programas-complementarios/{id}/documentos',
-    [App\Http\Controllers\Complementarios\DocumentoComplementarioController::class, 'formularioDocumentos']
-)->name('programas-complementarios.documentos');
-Route::post(
-    '/programas-complementarios/{id}/documentos',
-    [App\Http\Controllers\Complementarios\DocumentoComplementarioController::class, 'subirDocumento']
-)->name('programas-complementarios.subir-documentos');
-Route::post(
-    '/programas-complementarios/{id}/validar-sofia',
-    [App\Http\Controllers\Complementarios\ValidacionSofiaController::class, 'validarSofia']
-)->name('programas-complementarios.validar-sofia');
-Route::post(
-    '/programas-complementarios/{id}/validar-documento',
-    [App\Http\Controllers\Complementarios\AspiranteComplementarioController::class, 'validarDocumentos']
-)->name('programas-complementarios.validar-documento');
-Route::get(
-    '/sofia-validation-progress/{progressId}',
-    [App\Http\Controllers\Complementarios\ValidacionSofiaController::class, 'getValidationProgress']
-)->name('sofia-validation.progress');
+$protectedRouteFolders = [
+    'actividades',
+    'asistencia',
+    'autenticacion/private',
+    'caracterizacion',
+    'complementarios',
+    'entrada_salida',
+    'infraestructura',
+    'inventario',
+    'jornada_carnet',
+    'personas',
+    'talento-humano',
+    'tema_parametro',
+    'ubicacion',
+    'usuario',
+    'websocket_visitantes',
+];
 
-Route::middleware('auth')->group(function () {
+$loadRouteFolders($protectedRouteFolders, ['web', 'auth']);
+
+Route::middleware(['web', 'auth'])->group(function () {
+    Route::post(
+        '/verify-document',
+        [AsistenceQrController::class, 'verifyDocument']
+    )->name('api.verifyDocument');
+
+    Route::prefix('inventario')
+        ->name('inventario.')
+        ->group(function () {
+            Route::get(
+                'productos/{id}/etiqueta',
+                [ProductoController::class, 'etiqueta']
+            )->name('productos.etiqueta');
+        });
+
     Route::get(
         '/mi-perfil',
-        [App\Http\Controllers\Complementarios\PerfilComplementarioController::class, 'Perfil']
+        [PerfilComplementarioController::class, 'Perfil']
     )->name('aspirantes.perfil');
 });
-Route::get('/departamentos/{pais}', [DepartamentoController::class, 'getByPais'])->name('departamentos.by.pais');
-Route::get('/municipios/{departamento}', [MunicipioController::class, 'getByDepartamento'])->name('municipios.by.departamento');

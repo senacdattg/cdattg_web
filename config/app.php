@@ -162,12 +162,12 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Class Aliases
+    | Application Aliases
     |--------------------------------------------------------------------------
     |
     | This array of class aliases will be registered when this application
-    | is started. However, feel free to register as many as you wish as
-    | the aliases are "lazy" loaded so they don't hinder performance.
+    | is started. Feel free to register as many as you wish as the aliases
+    | are "lazy" loaded so they don't hinder performance.
     |
     */
 
@@ -175,4 +175,5 @@ return [
         // 'Example' => App\Facades\Example::class,
     ])->toArray(),
 
+    'audit_default_user_id' => env('AUDIT_DEFAULT_USER_ID'),
 ];

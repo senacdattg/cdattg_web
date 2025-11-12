@@ -2,7 +2,18 @@
 
 @section('css')
     @vite(['resources/css/parametros.css'])
+    <style>
+        .competencias-scroll {
+            max-height: 240px;
+            overflow-y: auto;
+        }
+    </style>
 @endsection
+{{-- EOF --}}
+
+
+
+
 
 @section('content_header')
     <x-page-header 
@@ -32,6 +43,17 @@
                             <form method="POST" action="{{ route('programa.update', $programa->id) }}" class="row">
                                 @csrf
                                 @method('PUT')
+
+                                @php
+                                    $competenciasAsignadas = $programa->competencias ?? collect();
+                                    $valorHorasTotales = old('horas_totales', $programa->horas_totales);
+                                    $valorHorasLectiva = old('horas_etapa_lectiva', $programa->horas_etapa_lectiva);
+                                    $valorHorasProductiva = old(
+                                        'horas_etapa_productiva',
+                                        $programa->horas_etapa_productiva
+                                    );
+                                    $estadoSeleccionado = (int) old('status', $programa->status);
+                                @endphp
 
                                 <div class="col-md-6">
                                     <div class="form-group">
@@ -91,12 +113,81 @@
                                     </div>
                                 </div>
 
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="horas_totales" class="form-label font-weight-bold">
+                                            Horas totales del programa
+                                        </label>
+                                        <input
+                                            type="number"
+                                            name="horas_totales"
+                                            id="horas_totales"
+                                            class="form-control @error('horas_totales') is-invalid @enderror"
+                                            value="{{ $valorHorasTotales }}"
+                                            min="1"
+                                            required
+                                        >
+                                        @error('horas_totales')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="horas_etapa_lectiva" class="form-label font-weight-bold">
+                                            Horas etapa lectiva
+                                        </label>
+                                        <input
+                                            type="number"
+                                            name="horas_etapa_lectiva"
+                                            id="horas_etapa_lectiva"
+                                            class="form-control @error('horas_etapa_lectiva') is-invalid @enderror"
+                                            value="{{ $valorHorasLectiva }}"
+                                            min="1"
+                                            required
+                                        >
+                                        @error('horas_etapa_lectiva')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="horas_etapa_productiva" class="form-label font-weight-bold">
+                                            Horas etapa productiva
+                                        </label>
+                                        <input
+                                            type="number"
+                                            name="horas_etapa_productiva"
+                                            id="horas_etapa_productiva"
+                                            class="form-control @error('horas_etapa_productiva') is-invalid @enderror"
+                                            value="{{ $valorHorasProductiva }}"
+                                            min="1"
+                                            required
+                                        >
+                                        @error('horas_etapa_productiva')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="status" class="form-label font-weight-bold">Estado</label>
-                                        <select name="status" id="status" class="form-control @error('status') is-invalid @enderror" required>
-                                            <option value="1" {{ old('status', $programa->status) == 1 ? 'selected' : '' }}>Activo</option>
-                                            <option value="0" {{ old('status', $programa->status) == 0 ? 'selected' : '' }}>Inactivo</option>
+                                        <select
+                                            name="status"
+                                            id="status"
+                                            class="form-control @error('status') is-invalid @enderror"
+                                            required
+                                        >
+                                            <option value="1" {{ $estadoSeleccionado === 1 ? 'selected' : '' }}>
+                                                Activo
+                                            </option>
+                                            <option value="0" {{ $estadoSeleccionado === 0 ? 'selected' : '' }}>
+                                                Inactivo
+                                            </option>
                                         </select>
                                         @error('status')
                                             <div class="invalid-feedback">{{ $message }}</div>
@@ -117,8 +208,94 @@
                             </form>
                         </div>
                     </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header bg-light">
+                            <h6 class="m-0 font-weight-bold text-primary">
+                                Competencias asociadas
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            @if($competenciasAsignadas->isEmpty())
+                                <p class="text-muted mb-0">
+                                    Este programa no tiene competencias asignadas.
+                                </p>
+                            @else
+                                <div class="table-responsive competencias-scroll">
+                                    <table class="table table-sm table-striped mb-0">
+                                        <caption class="sr-only">
+                                            Competencias asociadas al programa
+                                        </caption>
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 20%;">Código</th>
+                                                <th>Nombre</th>
+                                                <th style="width: 15%;" class="text-center">
+                                                    Asociada a
+                                                </th>
+                                                <th style="width: 15%;" class="text-right">Acciones</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($competenciasAsignadas as $competencia)
+                                                @php
+                                                    $rutaDesasociar = route(
+                                                        'programa.competencia.detach',
+                                                        [$programa->id, $competencia->id]
+                                                    );
+                                                    $mensajeConfirmacion = '¿Quitar esta competencia del programa?';
+                                                @endphp
+                                                <tr>
+                                                    <td>
+                                                        <span class="badge badge-primary">
+                                                            {{ $competencia->codigo }}
+                                                        </span>
+                                                    </td>
+                                                    <td>{{ $competencia->nombre }}</td>
+                                                    <td class="text-center">
+                                                        {{ $competencia->programas_formacion_count }}
+                                                    </td>
+                                                    <td class="text-right">
+                                                        <form
+                                                            method="POST"
+                                                            action="{{ $rutaDesasociar }}"
+                                                            class="d-inline"
+                                                        >
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button
+                                                                type="submit"
+                                                                class="btn btn-outline-danger btn-sm"
+                                                                data-confirm="{{ $mensajeConfirmacion }}"
+                                                                onclick="return confirmarQuitar(this.dataset.confirm);"
+                                                            >
+                                                                <i class="fas fa-times mr-1"></i>Quitar
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <small class="text-muted d-block mt-3">
+                                    Para asociar nuevas competencias utilice el módulo correspondiente.
+                                </small>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 @endsection
+
+@push('js')
+<script>
+    if (typeof window.confirmarQuitar !== 'function') {
+        window.confirmarQuitar = function (mensaje) {
+            return window.confirm(mensaje);
+        };
+    }
+</script>
+@endpush

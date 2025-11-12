@@ -14,18 +14,15 @@ class UpdateCompetenciaRequest extends FormRequest
 
     public function rules(): array
     {
+        $competenciaId = $this->route('competencia');
+
         return [
-            'codigo' => [
-                'required',
-                'string',
-                'max:50',
-                Rule::unique('competencias', 'codigo')->ignore($this->route('competencia'))
-            ],
-            'nombre' => 'required|string|max:500',
-            'descripcion' => 'nullable|string|max:1000',
-            'duracion' => 'required|numeric|min:1|max:9999',
-            'fecha_inicio' => 'required|date|before_or_equal:fecha_fin',
-            'fecha_fin' => 'required|date|after_or_equal:fecha_inicio',
+            'descripcion' => 'required|string|max:1000',
+            'codigo' => 'required|string|max:50|unique:competencias,codigo,' . $competenciaId,
+            'nombre' => 'required|string|max:255',
+            'duracion' => 'required|integer|min:1|max:9999',
+            'programas' => 'sometimes|array',
+            'programas.*' => 'exists:programas_formacion,id',
             'status' => 'nullable|boolean',
         ];
     }
@@ -33,25 +30,22 @@ class UpdateCompetenciaRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'codigo.required' => 'El código es obligatorio.',
+            'descripcion.required' => 'La norma o unidad de competencia es obligatoria.',
+            'descripcion.string' => 'La norma debe ser una cadena de texto.',
+            'descripcion.max' => 'La norma no puede tener más de 1000 caracteres.',
+            'codigo.required' => 'El código de norma es obligatorio.',
             'codigo.string' => 'El código debe ser una cadena de texto.',
             'codigo.max' => 'El código no puede tener más de 50 caracteres.',
-            'codigo.unique' => 'Este código ya está registrado en el sistema. Por favor use uno diferente.',
-            'nombre.required' => 'El nombre es obligatorio.',
+            'codigo.unique' => 'Ya existe una competencia con este código.',
+            'nombre.required' => 'El nombre de la competencia es obligatorio.',
             'nombre.string' => 'El nombre debe ser una cadena de texto.',
-            'nombre.max' => 'El nombre no puede tener más de 500 caracteres.',
-            'descripcion.string' => 'La descripción debe ser una cadena de texto.',
-            'descripcion.max' => 'La descripción no puede tener más de 1000 caracteres.',
-            'duracion.required' => 'La duración es obligatoria.',
-            'duracion.numeric' => 'La duración debe ser un número válido.',
+            'nombre.max' => 'El nombre no puede tener más de 255 caracteres.',
+            'duracion.required' => 'La duración máxima es obligatoria.',
+            'duracion.integer' => 'La duración debe ser un número entero válido.',
             'duracion.min' => 'La duración debe ser de al menos 1 hora.',
             'duracion.max' => 'La duración no puede superar las 9999 horas.',
-            'fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
-            'fecha_inicio.date' => 'La fecha de inicio debe ser una fecha válida.',
-            'fecha_inicio.before_or_equal' => 'La fecha de inicio debe ser anterior o igual a la fecha de fin.',
-            'fecha_fin.required' => 'La fecha de fin es obligatoria.',
-            'fecha_fin.date' => 'La fecha de fin debe ser una fecha válida.',
-            'fecha_fin.after_or_equal' => 'La fecha de fin debe ser igual o posterior a la fecha de inicio.',
+            'programas.array' => 'El formato de los programas seleccionados no es válido.',
+            'programas.*.exists' => 'Alguno de los programas seleccionados no existe.',
             'status.boolean' => 'El estado debe ser verdadero o falso.',
         ];
     }
@@ -59,12 +53,11 @@ class UpdateCompetenciaRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'codigo' => 'código',
-            'nombre' => 'nombre',
-            'descripcion' => 'descripción',
-            'duracion' => 'duración',
-            'fecha_inicio' => 'fecha de inicio',
-            'fecha_fin' => 'fecha de fin',
+            'descripcion' => 'norma o unidad de competencia',
+            'codigo' => 'código de norma',
+            'nombre' => 'nombre de la competencia',
+            'duracion' => 'duración máxima',
+            'programas' => 'programas de formación',
             'status' => 'estado',
         ];
     }

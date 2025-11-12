@@ -1,46 +1,27 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Complementarios\ProgramaComplementarioController;
+use Illuminate\Support\Facades\Route;
 
-Route::get(
-    '/gestion-programas-complementarios',
-    [ProgramaComplementarioController::class, 'gestionProgramasComplementarios']
-)
-    ->name('gestion-programas-complementarios')
-    ->middleware('auth');
+Route::middleware('auth')
+    ->prefix('complementarios-ofertados')
+    ->name('complementarios-ofertados.')
+    ->group(function () {
+        Route::get('/', [ProgramaComplementarioController::class, 'index'])
+            ->name('index');
 
-Route::get(
-    '/complementarios-ofertados/create',
-    [ProgramaComplementarioController::class, 'create']
-)
-    ->name('complementarios-ofertados.create')
-    ->middleware('auth');
+        Route::get('/create', [ProgramaComplementarioController::class, 'create'])
+            ->name('create');
 
-Route::get(
-    '/complementarios-ofertados/{id}/edit',
-    [ProgramaComplementarioController::class, 'edit']
-)
-    ->name('complementarios-ofertados.edit')
-    ->middleware('auth');
+        Route::get('/{programa}/edit', [ProgramaComplementarioController::class, 'edit'])
+            ->name('edit');
 
-Route::post(
-    '/complementarios-ofertados',
-    [ProgramaComplementarioController::class, 'store']
-)
-    ->name('complementarios-ofertados.store')
-    ->middleware('auth');
+        Route::post('/', [ProgramaComplementarioController::class, 'store'])
+            ->name('store');
 
-Route::put(
-    '/complementarios-ofertados/{id}',
-    [ProgramaComplementarioController::class, 'update']
-)
-    ->name('complementarios-ofertados.update')
-    ->middleware('auth');
+        Route::put('/{programa}', [ProgramaComplementarioController::class, 'update'])
+            ->name('update');
 
-Route::delete(
-    '/complementarios-ofertados/{id}',
-    [ProgramaComplementarioController::class, 'destroy']
-)
-    ->name('complementarios-ofertados.destroy')
-    ->middleware('auth');
+        Route::delete('/{programa}', [ProgramaComplementarioController::class, 'destroy'])
+            ->name('destroy');
+    });

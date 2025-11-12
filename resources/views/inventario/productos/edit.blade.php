@@ -473,7 +473,7 @@
 @endsection
 
 @push('js')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
     <script src="https://unpkg.com/html5-qrcode"></script>
     @vite('resources/js/inventario/imagen.js')
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
