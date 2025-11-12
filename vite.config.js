@@ -13,6 +13,7 @@ export default defineConfig({
                 'guias_aprendizaje_css': 'resources/css/guias_aprendizaje.css',
                 'resultados_aprendizaje_css': 'resources/css/resultados-aprendizaje.css',
                 'dias_formacion_css': 'resources/css/dias-formacion.css',
+                'registro_css': 'resources/css/pages/registro.css',
                 'dashboard_superadmin': 'resources/css/dashboards/dashboard-superadmin.css',
                 'caracter_selecter': 'resources/css/Asistencia/caracter_selecter.css',
                 // Inventario CSS files
@@ -50,13 +51,15 @@ export default defineConfig({
                 'inventario_notificaciones': 'resources/js/inventario/notificaciones.js',
                 'inventario_solicitud': 'resources/js/inventario/solicitud.js',
                 // Complementarios files
-                'formulario_inscripcion': 'resources/js/complementarios/formulario-inscripcion.js',
                 'estadisticas_complementarios': 'resources/js/complementarios/estadisticas.js',
                 // Personas files
                 'personas-import': 'resources/js/pages/personas-import.js',
                 'formularios-generico': 'resources/js/pages/formularios-generico.js',
                 'formularios-select-dinamico': 'resources/js/pages/formularios-select-dinamico.js',
                 'talento-humano': 'resources/js/pages/talento-humano.js',
+                'personas-form': 'resources/js/personas/form.js',
+                'confirm-delete-modal': 'resources/js/modules/confirm-delete-modal.js',
+                'bootstrap': 'resources/js/bootstrap.js',
             },
             refresh: true,
         }),
@@ -73,7 +76,7 @@ export default defineConfig({
                 /(^|[/\\])routes([/\\]|$)/,
                 /(^|[/\\])database([/\\]|$)/,
                 /(^|[/\\])public([/\\]|$)/,
-            ],
+            ],
         },
         hmr: {
             host: 'localhost',  // Usa localhost para HMR en el navegador

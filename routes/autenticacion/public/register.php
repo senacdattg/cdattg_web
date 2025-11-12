@@ -1,11 +1,7 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
+use Illuminate\Support\Facades\Route;
 
-// Registro
-Route::controller(RegisterController::class)->group(function () {
-    Route::get('/registro', 'mostrarFormulario')->name('registro');
-    Route::post('/registrarme', 'create')->name('registrarme');
-});
-
+Route::get('/registro', [RegisterController::class, 'create'])->name('registro');
+Route::post('/registrarme', [RegisterController::class, 'store'])->name('registrarme');

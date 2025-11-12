@@ -1,4 +1,4 @@
-@extends('complementarios.layout.master-layout-complementarios')
+@extends('complementarios.layout.master')
 @section('title', 'Formulario de Inscripción | SENA')
 @section('css')
     @vite(['resources/css/formulario_inscripcion.css'])
@@ -28,7 +28,7 @@
                             <i class="fas fa-user-plus mr-2"></i>Formulario de Inscripción
                         </h3>
                         <div class="card-tools">
-                            <a href="{{ route('programas-complementarios.publicos') }}" class="btn btn-outline-primary btn-sm">
+                            <a href="{{ route('programas-complementarios.index') }}" class="btn btn-outline-primary btn-sm">
                                 <i class="fas fa-arrow-left mr-1"></i> Volver a Programas
                             </a>
                         </div>
@@ -46,16 +46,25 @@
                         </div>
                         <div class="card-body">
                             <form id="formInscripcion" method="POST"
-                                action="{{ route('programas-complementarios.procesar-inscripcion', $programa->id) }}">
+                                action="{{ route('programas-complementarios.procesar-inscripcion', ['programa' => $programa->id]) }}">
                                 @csrf
                                 <input type="hidden" name="programa_id" value="{{ $programa->id }}">
 
-                               @include('complementarios.components.form-datos-personales', [
-                                   'context' => 'inscripcion',
-                                   'userData' => $userData ?? []
-                               ])
+                                @include('personas.partials.form', [
+                                    'persona' => null,
+                                    'documentos' => $documentos,
+                                    'generos' => $generos,
+                                    'caracterizaciones' => $caracterizaciones,
+                                    'paises' => $paises,
+                                    'departamentos' => $departamentos,
+                                    'municipios' => $municipios,
+                                    'vias' => $vias,
+                                    'letras' => $letras,
+                                    'cardinales' => $cardinales,
+                                    'showCaracterizacion' => false,
+                                ])
 
-                                <hr class="my-4" style="border-color: #dee2e6;">
+                                <hr class="my-5" style="border-color: #dee2e6;">
 
                                 <div class="card mb-4" style="background-color: #ffffff; border-color: #dee2e6;">
                                     <div class="card-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
@@ -78,8 +87,13 @@
                                                                         name="parametro_id" value="{{ $parametro->id }}"
                                                                         id="parametro_{{ $parametro->id }}">
                                                                     <label class="form-check-label"
+<<<<<<< HEAD:resources/views/complementarios/formulario_inscripcion.blade.php
                                                                         for="parametro_{{ $parametro->id }}">
                                                                         {{ ucwords(str_replace('_', ' ', $parametro->name)) }}
+=======
+                                                                        for="categoria_{{ $hijo->id }}">
+                                                                        {{ $hijo->nombre }}
+>>>>>>> 300a4abbdf2112e6151d181f00ac557a670bb84b:resources/views/complementarios/inscripciones/create.blade.php
                                                                     </label>
                                                                 </div>
                                                             </div>
@@ -99,7 +113,7 @@
                                         <div class="mb-3">
                                             <label for="observaciones" class="form-label" style="color: #343a40;">Observaciones</label>
                                             <textarea class="form-control" id="observaciones" name="observaciones" rows="3"
-                                                placeholder="Información adicional que considere relevante..."></textarea>
+                                                placeholder="Información adicional que considere relevante...">{{ old('observaciones') }}</textarea>
                                         </div>
 
                                         <div class="form-check mb-4">
@@ -178,7 +192,5 @@
             </div>
         </div>
     </div>
-
-@include('complementarios.layout.footer-complementarios')
 @include('components.modal-terminos')
 @endsection

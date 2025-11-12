@@ -15,288 +15,473 @@ class ParametroSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->truncateModel(Parametro::class);
+        $this->resetTable();
 
-        $parametros = [
-            // Estados
-            ['id' => 1, 'name' => 'ACTIVO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 2, 'name' => 'INACTIVO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-
-            // Tipos de documento
-            ['id' => 3, 'name' => 'CEDULA DE CIUDADANIA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 4, 'name' => 'CEDULA DE EXTRANJERIA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 5, 'name' => 'PASAPORTE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 6, 'name' => 'TARJETA DE IDENTIDAD', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 7, 'name' => 'REGISTRO CIVIL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 8, 'name' => 'SIN IDENTIFICACION', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-
-            // Género
-            ['id' => 9, 'name' => 'MASCULINO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 10, 'name' => 'FEMENINO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 11, 'name' => 'NO DEFINE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-
-            // Dias
-            ['id' => 12, 'name' => 'LUNES', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 13, 'name' => 'MARTES', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 14, 'name' => 'MIERCOLES', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 15, 'name' => 'JUEVES', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 16, 'name' => 'VIERNES', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 17, 'name' => 'SABADO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-
-            // Modalidades
-            ['id' => 18, 'name' => 'PRESENCIAL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 19, 'name' => 'VIRTUAL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 20, 'name' => 'A DISTANCIA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-
-            // Niveles de formación
-            ['id' => 21, 'name' => 'TÉCNICO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 22, 'name' => 'TECNÓLOGO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 23, 'name' => 'AUXILIAR', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 24, 'name' => 'OPERARIO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-
-            // Estados de evidencias
-            ['id' => 25, 'name' => 'PENDIENTE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 26, 'name' => 'EN CURSO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 27, 'name' => 'COMPLETADO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-
-            // Tipos de producto
-            ['id' => 28, 'name' => 'CONSUMIBLE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 29, 'name' => 'NO CONSUMIBLE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-
-            // Unidades de medida
-            ['id' => 30, 'name' => 'GRAMOS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 31, 'name' => 'LIBRAS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 32, 'name' => 'KILOGRAMOS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 33, 'name' => 'ARROBA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 34, 'name' => 'QUINTAL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 35, 'name' => 'ONZA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 36, 'name' => 'MILILITROS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 37, 'name' => 'LITROS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 38, 'name' => 'GALONES', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 39, 'name' => 'ONZA LÍQUIDA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 40, 'name' => 'BARRIL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 41, 'name' => 'UNIDADES', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 42, 'name' => 'CAJAS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 43, 'name' => 'METROS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 44, 'name' => 'CENTIMETROS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 45, 'name' => 'PAQUETES', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 46, 'name' => 'ROLLOS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 47, 'name' => 'TABLETAS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 48, 'name' => 'TEST', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 49, 'name' => 'SACKETS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            
-            // Estados de producto
-            ['id' => 50, 'name' => 'DISPONIBLE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 51, 'name' => 'AGOTADO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-
-            // Tipos de orden
-            ['id' => 52, 'name' => 'PRÉSTAMO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 53, 'name' => 'SALIDA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-
-            // Estados de orden
-            ['id' => 54, 'name' => 'EN ESPERA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 55, 'name' => 'APROBADA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 56, 'name' => 'RECHAZADA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            
-            // Estados de aprobaciones
-            ['id' => 57, 'name' => 'ENTREGADA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 58, 'name' => 'EN PRÉSTAMO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-
-            // Categorías
-            ['id' => 59, 'name' => 'EMPAQUE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 60, 'name' => 'EPP', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 61, 'name' => 'EQUIPO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 62, 'name' => 'FUNGIBLE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 63, 'name' => 'INSTRUMENTO MEDICION', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 64, 'name' => 'INSUMO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 65, 'name' => 'REACTIVO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 66, 'name' => 'UTENSILIO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 67, 'name' => 'VIDRIERIA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-
-            // Marcas (Del CSV de laboratorio - sin duplicados ni N/A)
-            ['id' => 68, 'name' => 'LAMOTTE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 69, 'name' => 'PYREX', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 70, 'name' => 'MERCK', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 71, 'name' => 'KIMAX', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 72, 'name' => 'HACH', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 73, 'name' => 'MILLIPORE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 74, 'name' => 'BOECO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 75, 'name' => 'BRAND', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 76, 'name' => 'DURAN', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null], 
-            ['id' => 77, 'name' => 'PANREAC', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 78, 'name' => 'BRIXCO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 79, 'name' => 'CLOROX', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 80, 'name' => 'GOLDENWRAP', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 81, 'name' => 'ARO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 82, 'name' => 'MILWAUKEE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 83, 'name' => 'HANNA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 84, 'name' => 'ALPHA CHEMIKA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 85, 'name' => 'SUPELCO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 86, 'name' => 'CITOTEST', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 87, 'name' => 'BIOPOINTE SCIENTIFIC', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 88, 'name' => 'CITOGLAS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 89, 'name' => 'GLASSCO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 90, 'name' => 'LABSCIENT', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 91, 'name' => 'KIMBLE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 92, 'name' => 'NADIR', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 93, 'name' => 'VIDRIOLAB', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 94, 'name' => 'GOTOPLAS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 95, 'name' => 'PLASTIRED', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 96, 'name' => 'PLASTICOS R&M', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 97, 'name' => 'SCOTCH-BRITE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 98, 'name' => 'TRAMONTINA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 99, 'name' => 'CORONA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 100, 'name' => 'IMUSA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 101, 'name' => 'FARBERWARE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 102, 'name' => 'JGB', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 103, 'name' => 'BAXTER', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 104, 'name' => 'B.D', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 105, 'name' => 'BAYER', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 106, 'name' => 'BIOPONTERCIENTIFIC', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 107, 'name' => 'NANOCOLOR', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 108, 'name' => 'WTW', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 109, 'name' => 'MACHEREY NAGEL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 110, 'name' => 'PHYTOTECH', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 111, 'name' => 'GE HEALTHCARE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 112, 'name' => 'MEDISPO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 113, 'name' => 'MIDMARK', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 114, 'name' => 'VITAL MEDIC', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 115, 'name' => 'MINE MEDICAL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 116, 'name' => 'ZAFIRO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 117, 'name' => 'CHEMI', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 118, 'name' => 'AZUCAR INCAUCA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 119, 'name' => 'MAIZENA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 120, 'name' => 'COLOMBINA-ZEV', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 121, 'name' => 'LUKER', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 122, 'name' => 'SANTO DOMINGO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 123, 'name' => 'BETTY CROCKER', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 124, 'name' => 'GERBER', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 125, 'name' => 'BLANCOX', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 126, 'name' => 'BRILLO AROMA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 127, 'name' => 'BRILLAKING', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 128, 'name' => 'ASEPSIA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 129, 'name' => 'SOLOASEO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 130, 'name' => 'MAXWIPE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 131, 'name' => 'EXAMTEX', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 132, 'name' => 'PROTEXION', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 133, 'name' => 'BODI SAFE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 134, 'name' => 'CRISTAR', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 135, 'name' => 'DIMEDA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 136, 'name' => 'DROFARMA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 137, 'name' => 'INVERFARMA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 138, 'name' => 'BIOLOGIKA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 139, 'name' => 'BIOHALL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 140, 'name' => 'ABCLABORATORIOS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 141, 'name' => 'CIACOMEQ S.A.S', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 142, 'name' => 'LEGAQUIMICOS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 143, 'name' => 'QUINSA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 144, 'name' => 'QUIMPO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 145, 'name' => 'MOL LABS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 146, 'name' => 'METALLURGICA MOTTA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 147, 'name' => 'MOTTA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 148, 'name' => 'LEON', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 149, 'name' => 'ALGARRA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 150, 'name' => 'HOPEX', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 151, 'name' => 'KRAMER', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 152, 'name' => 'MP TOOLS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 153, 'name' => 'PISCICLORO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 154, 'name' => 'FORTILECHE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 155, 'name' => 'COLINAGRO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 156, 'name' => 'CAL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 157, 'name' => 'PINTO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 158, 'name' => 'ROSA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 159, 'name' => 'SAN JORGE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 160, 'name' => 'TROPICAL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 161, 'name' => 'BEISBOL NATURAL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 162, 'name' => 'FRUTUROMA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 163, 'name' => 'POLAROMA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 164, 'name' => 'NOSTALGIA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 165, 'name' => 'PUMP', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 166, 'name' => 'WATER WORKS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 167, 'name' => 'BUFFER POWER', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 168, 'name' => 'AMCOR', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 169, 'name' => 'BESTON', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 170, 'name' => 'GIANT', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 171, 'name' => 'ELITE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 172, 'name' => 'ATHOS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 173, 'name' => 'TUSKA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 174, 'name' => 'VISMARCK', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 175, 'name' => 'VIMACH', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 176, 'name' => 'MIO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 177, 'name' => 'MK', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 178, 'name' => 'MC', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 179, 'name' => 'PD', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 180, 'name' => 'JM', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 181, 'name' => 'FPC', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 182, 'name' => 'CHM', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 183, 'name' => 'SOL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 184, 'name' => 'ZEV', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 185, 'name' => 'ALPHA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 186, 'name' => 'SUPERDENT', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 187, 'name' => 'TONING', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-
-            // Persona caracterización
-            ['id' => 188, 'name' => 'AFROCOLOMBIANO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 189, 'name' => 'AFROCOLOMBIANOS DESPLAZADOS POR LA VIOLENCIA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 190, 'name' => 'AFROCOLOMBIANOS DESPLAZADOS POR LA VIOLENCIA CABEZ', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 191, 'name' => 'INDÍGENA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 192, 'name' => 'INDÍGENAS DESPLAZADOS POR LA VIOLENCIA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 193, 'name' => 'INDÍGENAS DESPLAZADOS POR LA VIOLENCIA CABEZA DE F', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 194, 'name' => 'GITANO ROM', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 195, 'name' => 'PALENQUERO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 196, 'name' => 'RAIZAL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 197, 'name' => 'NEGRO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 198, 'name' => 'MUJER CABEZA DE FAMILIA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 199, 'name' => 'DESPLAZADOS POR LA VIOLENCIA CABEZA DE FAMILIA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 200, 'name' => 'DESPLAZADOS POR FENÓMENOS NATURALES CABEZA DE FAM', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 201, 'name' => 'JÓVENES VULNERABLES', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 202, 'name' => 'ADOLESCENTE TRABAJADOR', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 203, 'name' => 'ADOLESCENTE EN CONFLICTO CON LA LEY PENAL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 204, 'name' => 'PERSONAS EN PROCESO DE REINTEGRACIÓN', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 205, 'name' => 'EMPRENDEDORES', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 206, 'name' => 'MICROEMPRESAS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 207, 'name' => 'ARTESANOS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 208, 'name' => 'CAMPESINO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 209, 'name' => 'SOLDADOS CAMPESINOS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 210, 'name' => 'DISCAPACIDAD INTELECTUAL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 211, 'name' => 'DISCAPACIDAD AUDITIVA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 212, 'name' => 'DISCAPACIDAD FÍSICA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 213, 'name' => 'DISCAPACIDAD VISUAL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 214, 'name' => 'DISCAPACIDAD PSICOSOCIAL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 215, 'name' => 'DISCAPACIDAD MÚLTIPLE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 216, 'name' => 'SORDOCEGUERA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 217, 'name' => 'DESPLAZADOS DISCAPACITADOS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 218, 'name' => 'ABANDONO O DESPOJO FORZADO DE TIERRAS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 219, 'name' => 'ACTOS TERRORISTA ATENTADOS COMBATES ENFRENTAMIENTOS HOSTIGAMIENTOS', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 220, 'name' => 'ADOLESCENTE DESVINCULADO DE GRUPOS ARMADOS ORGANIZ', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 221, 'name' => 'DELITOS CONTRA LA LIBERTAD Y LA INTEGRIDAD SEXUAL EN DESARROLLO DEL CONFLICTO ARMADO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 222, 'name' => 'DESAPARICIÓN FORZADA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 223, 'name' => 'DESPLAZADOS POR LA VIOLENCIA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 224, 'name' => 'RECLUTAMIENTO FORZADO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 225, 'name' => 'SECUESTRO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 226, 'name' => 'HOMICIDIO MASACRE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 227, 'name' => 'HERIDO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 228, 'name' => 'SOBREVIVIENTES MINAS ANTIPERSONALES', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 229, 'name' => 'MINAS ANTIPERSONAL MUNICIÓN SIN EXPLOTAR Y ARTEFACTO EXPLOSIVO IMPROVISADO', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 230, 'name' => 'AMENAZA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 231, 'name' => 'DESPLAZADOS POR FENÓMENOS NATURALES', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 232, 'name' => 'INPEC', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 233, 'name' => 'REMITIDOS POR EL CIE', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 234, 'name' => 'REMITIDOS POR EL PAL', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-            ['id' => 235, 'name' => 'NINGUNA', 'status' => 1, 'user_create_id' => null, 'user_edit_id' => null],
-
-        ];
-
-        foreach ($parametros as $parametro) {
-            Parametro::updateOrCreate(
-                ['id' => $parametro['id']],
-                [
-                    'name' => $parametro['name'],
-                    'status' => $parametro['status'],
-                    'user_create_id' => $parametro['user_create_id'],
-                    'user_edit_id' => $parametro['user_edit_id'],
-                ]
-            );
+        foreach ($this->parametrosConfig() as $parametro) {
+            $this->createParametro($parametro);
         }
+    }
+
+    private function resetTable(): void
+    {
+        if (app()->environment('production')) {
+            // Evita truncados en producción; el seeder opera de forma idempotente.
+            return;
+        }
+
+        $this->truncateModel(Parametro::class);
+    }
+
+    /**
+     * Devuelve la configuración estática de parámetros.
+     *
+     * Centralizar la definición facilita mantenibilidad y evita duplicidad.
+     */
+    private function parametrosConfig(): array
+    {
+        return array_merge(
+            $this->estados(),
+            $this->tiposDocumento(),
+            $this->generos(),
+            $this->dias(),
+            $this->modalidades(),
+            $this->nivelesFormacion(),
+            $this->estadosEvidencias(),
+            $this->productos(),
+            $this->unidadesMedida(),
+            $this->ordenesYAprobaciones(),
+            $this->categorias(),
+            $this->marcas(),
+            $this->personaCaracterizacion(),
+            $this->vias(),
+            $this->letras()
+        );
+    }
+
+    private function estados(): array
+    {
+        return [
+            $this->parametro(1, 'ACTIVO'),
+            $this->parametro(2, 'INACTIVO'),
+        ];
+    }
+
+    private function tiposDocumento(): array
+    {
+        return [
+            $this->parametro(3, 'CEDULA DE CIUDADANIA'),
+            $this->parametro(4, 'CEDULA DE EXTRANJERIA'),
+            $this->parametro(5, 'PASAPORTE'),
+            $this->parametro(6, 'TARJETA DE IDENTIDAD'),
+            $this->parametro(7, 'REGISTRO CIVIL'),
+            $this->parametro(8, 'SIN IDENTIFICACION'),
+        ];
+    }
+
+    private function generos(): array
+    {
+        return [
+            $this->parametro(9, 'MASCULINO'),
+            $this->parametro(10, 'FEMENINO'),
+            $this->parametro(11, 'NO DEFINE'),
+        ];
+    }
+
+    private function dias(): array
+    {
+        return [
+            $this->parametro(12, 'LUNES'),
+            $this->parametro(13, 'MARTES'),
+            $this->parametro(14, 'MIERCOLES'),
+            $this->parametro(15, 'JUEVES'),
+            $this->parametro(16, 'VIERNES'),
+            $this->parametro(17, 'SABADO'),
+        ];
+    }
+
+    private function modalidades(): array
+    {
+        return [
+            $this->parametro(18, 'PRESENCIAL'),
+            $this->parametro(19, 'VIRTUAL'),
+            $this->parametro(20, 'MIXTA'),
+        ];
+    }
+
+    private function nivelesFormacion(): array
+    {
+        return [
+            $this->parametro(21, 'TÉCNICO'),
+            $this->parametro(22, 'TECNÓLOGO'),
+            $this->parametro(23, 'AUXILIAR'),
+            $this->parametro(24, 'OPERARIO'),
+        ];
+    }
+
+    private function estadosEvidencias(): array
+    {
+        return [
+            $this->parametro(25, 'PENDIENTE'),
+            $this->parametro(26, 'EN CURSO'),
+            $this->parametro(27, 'COMPLETADO'),
+        ];
+    }
+
+    private function unidadesMedida(): array
+    {
+        return [
+            $this->parametro(30, 'GRAMOS'),
+            $this->parametro(31, 'LIBRAS'),
+            $this->parametro(32, 'KILOGRAMOS'),
+            $this->parametro(33, 'ARROBA'),
+            $this->parametro(34, 'QUINTAL'),
+            $this->parametro(35, 'ONZA'),
+            $this->parametro(36, 'MILILITROS'),
+            $this->parametro(37, 'LITROS'),
+            $this->parametro(38, 'GALONES'),
+            $this->parametro(39, 'ONZA LÍQUIDA'),
+            $this->parametro(40, 'BARRIL'),
+            $this->parametro(41, 'UNIDADES'),
+            $this->parametro(42, 'CAJAS'),
+            $this->parametro(43, 'METROS'),
+            $this->parametro(44, 'CENTIMETROS'),
+            $this->parametro(45, 'PAQUETES'),
+            $this->parametro(46, 'ROLLOS'),
+            $this->parametro(47, 'TABLETAS'),
+            $this->parametro(48, 'TEST'),
+            $this->parametro(49, 'SACKETS'),
+        ];
+    }
+
+    private function productos(): array
+    {
+        return [
+            $this->parametro(28, 'CONSUMIBLE'),
+            $this->parametro(29, 'NO CONSUMIBLE'),
+            $this->parametro(50, 'DISPONIBLE'),
+            $this->parametro(51, 'AGOTADO'),
+        ];
+    }
+
+    private function ordenesYAprobaciones(): array
+    {
+        return [
+            $this->parametro(52, 'PRÉSTAMO'),
+            $this->parametro(53, 'SALIDA'),
+            $this->parametro(54, 'EN ESPERA'),
+            $this->parametro(55, 'APROBADA'),
+            $this->parametro(56, 'RECHAZADA'),
+            $this->parametro(57, 'ENTREGADA'),
+            $this->parametro(58, 'EN PRÉSTAMO'),
+        ];
+    }
+
+    private function categorias(): array
+    {
+        return [
+            $this->parametro(59, 'EMPAQUE'),
+            $this->parametro(60, 'EPP'),
+            $this->parametro(61, 'EQUIPO'),
+            $this->parametro(62, 'FUNGIBLE'),
+            $this->parametro(63, 'INSTRUMENTO MEDICION'),
+            $this->parametro(64, 'INSUMO'),
+            $this->parametro(65, 'REACTIVO'),
+            $this->parametro(66, 'UTENSILIO'),
+            $this->parametro(67, 'VIDRIERIA'),
+        ];
+    }
+
+    private function marcas(): array
+    {
+        return [
+            $this->parametro(68, 'LAMOTTE'),
+            $this->parametro(69, 'PYREX'),
+            $this->parametro(70, 'MERCK'),
+            $this->parametro(71, 'KIMAX'),
+            $this->parametro(72, 'HACH'),
+            $this->parametro(73, 'MILLIPORE'),
+            $this->parametro(74, 'BOECO'),
+            $this->parametro(75, 'BRAND'),
+            $this->parametro(76, 'DURAN'),
+            $this->parametro(77, 'PANREAC'),
+            $this->parametro(78, 'BRIXCO'),
+            $this->parametro(79, 'CLOROX'),
+            $this->parametro(80, 'GOLDENWRAP'),
+            $this->parametro(81, 'ARO'),
+            $this->parametro(82, 'MILWAUKEE'),
+            $this->parametro(83, 'HANNA'),
+            $this->parametro(84, 'ALPHA CHEMIKA'),
+            $this->parametro(85, 'SUPELCO'),
+            $this->parametro(86, 'CITOTEST'),
+            $this->parametro(87, 'BIOPOINTE SCIENTIFIC'),
+            $this->parametro(88, 'CITOGLAS'),
+            $this->parametro(89, 'GLASSCO'),
+            $this->parametro(90, 'LABSCIENT'),
+            $this->parametro(91, 'KIMBLE'),
+            $this->parametro(92, 'NADIR'),
+            $this->parametro(93, 'VIDRIOLAB'),
+            $this->parametro(94, 'GOTOPLAS'),
+            $this->parametro(95, 'PLASTIRED'),
+            $this->parametro(96, 'PLASTICOS R&M'),
+            $this->parametro(97, 'SCOTCH-BRITE'),
+            $this->parametro(98, 'TRAMONTINA'),
+            $this->parametro(99, 'CORONA'),
+            $this->parametro(100, 'IMUSA'),
+            $this->parametro(101, 'FARBERWARE'),
+            $this->parametro(102, 'JGB'),
+            $this->parametro(103, 'BAXTER'),
+            $this->parametro(104, 'B.D'),
+            $this->parametro(105, 'BAYER'),
+            $this->parametro(106, 'BIOPONTERCIENTIFIC'),
+            $this->parametro(107, 'NANOCOLOR'),
+            $this->parametro(108, 'WTW'),
+            $this->parametro(109, 'MACHEREY NAGEL'),
+            $this->parametro(110, 'PHYTOTECH'),
+            $this->parametro(111, 'GE HEALTHCARE'),
+            $this->parametro(112, 'MEDISPO'),
+            $this->parametro(113, 'MIDMARK'),
+            $this->parametro(114, 'VITAL MEDIC'),
+            $this->parametro(115, 'MINE MEDICAL'),
+            $this->parametro(116, 'ZAFIRO'),
+            $this->parametro(117, 'CHEMI'),
+            $this->parametro(118, 'AZUCAR INCAUCA'),
+            $this->parametro(119, 'MAIZENA'),
+            $this->parametro(120, 'COLOMBINA-ZEV'),
+            $this->parametro(121, 'LUKER'),
+            $this->parametro(122, 'SANTO DOMINGO'),
+            $this->parametro(123, 'BETTY CROCKER'),
+            $this->parametro(124, 'GERBER'),
+            $this->parametro(125, 'BLANCOX'),
+            $this->parametro(126, 'BRILLO AROMA'),
+            $this->parametro(127, 'BRILLAKING'),
+            $this->parametro(128, 'ASEPSIA'),
+            $this->parametro(129, 'SOLOASEO'),
+            $this->parametro(130, 'MAXWIPE'),
+            $this->parametro(131, 'EXAMTEX'),
+            $this->parametro(132, 'PROTEXION'),
+            $this->parametro(133, 'BODI SAFE'),
+            $this->parametro(134, 'CRISTAR'),
+            $this->parametro(135, 'DIMEDA'),
+            $this->parametro(136, 'DROFARMA'),
+            $this->parametro(137, 'INVERFARMA'),
+            $this->parametro(138, 'BIOLOGIKA'),
+            $this->parametro(139, 'BIOHALL'),
+            $this->parametro(140, 'ABCLABORATORIOS'),
+            $this->parametro(141, 'CIACOMEQ S.A.S'),
+            $this->parametro(142, 'LEGAQUIMICOS'),
+            $this->parametro(143, 'QUINSA'),
+            $this->parametro(144, 'QUIMPO'),
+            $this->parametro(145, 'MOL LABS'),
+            $this->parametro(146, 'METALLURGICA MOTTA'),
+            $this->parametro(147, 'MOTTA'),
+            $this->parametro(148, 'LEON'),
+            $this->parametro(149, 'ALGARRA'),
+            $this->parametro(150, 'HOPEX'),
+            $this->parametro(151, 'KRAMER'),
+            $this->parametro(152, 'MP TOOLS'),
+            $this->parametro(153, 'PISCICLORO'),
+            $this->parametro(154, 'FORTILECHE'),
+            $this->parametro(155, 'COLINAGRO'),
+            $this->parametro(156, 'CAL'),
+            $this->parametro(157, 'PINTO'),
+            $this->parametro(158, 'ROSA'),
+            $this->parametro(159, 'SAN JORGE'),
+            $this->parametro(160, 'TROPICAL'),
+            $this->parametro(161, 'BEISBOL NATURAL'),
+            $this->parametro(162, 'FRUTUROMA'),
+            $this->parametro(163, 'POLAROMA'),
+            $this->parametro(164, 'NOSTALGIA'),
+            $this->parametro(165, 'PUMP'),
+            $this->parametro(166, 'WATER WORKS'),
+            $this->parametro(167, 'BUFFER POWER'),
+            $this->parametro(168, 'AMCOR'),
+            $this->parametro(169, 'BESTON'),
+            $this->parametro(170, 'GIANT'),
+            $this->parametro(171, 'ELITE'),
+            $this->parametro(172, 'ATHOS'),
+            $this->parametro(173, 'TUSKA'),
+            $this->parametro(174, 'VISMARCK'),
+            $this->parametro(175, 'VIMACH'),
+            $this->parametro(176, 'MIO'),
+            $this->parametro(177, 'MK'),
+            $this->parametro(178, 'MC'),
+            $this->parametro(179, 'PD'),
+            $this->parametro(180, 'JM'),
+            $this->parametro(181, 'FPC'),
+            $this->parametro(182, 'CHM'),
+            $this->parametro(183, 'SOL'),
+            $this->parametro(184, 'ZEV'),
+            $this->parametro(185, 'ALPHA'),
+            $this->parametro(186, 'SUPERDENT'),
+            $this->parametro(187, 'TONING'),
+        ];
+    }
+
+    private function personaCaracterizacion(): array
+    {
+        return [
+            $this->parametro(188, 'AFROCOLOMBIANO'),
+            $this->parametro(189, 'AFROCOLOMBIANOS DESPLAZADOS POR LA VIOLENCIA'),
+            $this->parametro(
+                190,
+                'AFROCOLOMBIANOS DESPLAZADOS POR LA VIOLENCIA CABEZ'
+            ),
+            $this->parametro(191, 'INDÍGENA'),
+            $this->parametro(192, 'INDÍGENAS DESPLAZADOS POR LA VIOLENCIA'),
+            $this->parametro(
+                193,
+                'INDÍGENAS DESPLAZADOS POR LA VIOLENCIA CABEZA DE F'
+            ),
+            $this->parametro(194, 'GITANO ROM'),
+            $this->parametro(195, 'PALENQUERO'),
+            $this->parametro(196, 'RAIZAL'),
+            $this->parametro(197, 'NEGRO'),
+            $this->parametro(198, 'MUJER CABEZA DE FAMILIA'),
+            $this->parametro(
+                199,
+                'DESPLAZADOS POR LA VIOLENCIA CABEZA DE FAMILIA'
+            ),
+            $this->parametro(
+                200,
+                'DESPLAZADOS POR FENÓMENOS NATURALES CABEZA DE FAM'
+            ),
+            $this->parametro(201, 'JÓVENES VULNERABLES'),
+            $this->parametro(202, 'ADOLESCENTE TRABAJADOR'),
+            $this->parametro(
+                203,
+                'ADOLESCENTE EN CONFLICTO CON LA LEY PENAL'
+            ),
+            $this->parametro(
+                204,
+                'PERSONAS EN PROCESO DE REINTEGRACIÓN'
+            ),
+            $this->parametro(205, 'EMPRENDEDORES'),
+            $this->parametro(206, 'MICROEMPRESAS'),
+            $this->parametro(207, 'ARTESANOS'),
+            $this->parametro(208, 'CAMPESINO'),
+            $this->parametro(209, 'SOLDADOS CAMPESINOS'),
+            $this->parametro(210, 'DISCAPACIDAD INTELECTUAL'),
+            $this->parametro(211, 'DISCAPACIDAD AUDITIVA'),
+            $this->parametro(212, 'DISCAPACIDAD FÍSICA'),
+            $this->parametro(213, 'DISCAPACIDAD VISUAL'),
+            $this->parametro(214, 'DISCAPACIDAD PSICOSOCIAL'),
+            $this->parametro(215, 'DISCAPACIDAD MÚLTIPLE'),
+            $this->parametro(216, 'SORDOCEGUERA'),
+            $this->parametro(217, 'DESPLAZADOS DISCAPACITADOS'),
+            $this->parametro(
+                218,
+                'ABANDONO O DESPOJO FORZADO DE TIERRAS'
+            ),
+            $this->parametro(
+                219,
+                'ACTOS TERRORISTA ATENTADOS COMBATES ENFRENTAMIENTOS '
+                    . 'HOSTIGAMIENTOS'
+            ),
+            $this->parametro(
+                220,
+                'ADOLESCENTE DESVINCULADO DE GRUPOS ARMADOS ORGANIZ'
+            ),
+            $this->parametro(
+                221,
+                'DELITOS CONTRA LA LIBERTAD Y LA INTEGRIDAD SEXUAL EN '
+                    . 'DESARROLLO DEL CONFLICTO ARMADO'
+            ),
+            $this->parametro(222, 'DESAPARICIÓN FORZADA'),
+            $this->parametro(223, 'DESPLAZADOS POR LA VIOLENCIA'),
+            $this->parametro(224, 'RECLUTAMIENTO FORZADO'),
+            $this->parametro(225, 'SECUESTRO'),
+            $this->parametro(226, 'HOMICIDIO MASACRE'),
+            $this->parametro(227, 'HERIDO'),
+            $this->parametro(
+                228,
+                'SOBREVIVIENTES MINAS ANTIPERSONALES'
+            ),
+            $this->parametro(
+                229,
+                'MINAS ANTIPERSONAL MUNICIÓN SIN EXPLOTAR Y ARTEFACTO '
+                    . 'EXPLOSIVO IMPROVISADO'
+            ),
+            $this->parametro(230, 'AMENAZA'),
+            $this->parametro(
+                231,
+                'DESPLAZADOS POR FENÓMENOS NATURALES'
+            ),
+            $this->parametro(232, 'INPEC'),
+            $this->parametro(233, 'REMITIDOS POR EL CIE'),
+            $this->parametro(234, 'REMITIDOS POR EL PAL'),
+            $this->parametro(235, 'NINGUNA'),
+        ];
+    }
+
+    private function vias(): array
+    {
+        return [
+            $this->parametro(236, 'CARRERA'),
+            $this->parametro(237, 'CALLE'),
+            $this->parametro(238, 'TRANSVERSAL'),
+            $this->parametro(239, 'DIAGONAL'),
+            $this->parametro(240, 'AVENIDA'),
+            $this->parametro(241, 'AUTOPISTA'),
+            $this->parametro(242, 'CIRCULAR'),
+            $this->parametro(243, 'VÍA'),
+            $this->parametro(244, 'PASAJE'),
+            $this->parametro(245, 'MANZANA'),
+        ];
+    }
+
+    private function letras(): array
+    {
+        return [
+            $this->parametro(246, 'A'),
+            $this->parametro(247, 'B'),
+            $this->parametro(248, 'C'),
+            $this->parametro(249, 'D'),
+            $this->parametro(250, 'E'),
+            $this->parametro(251, 'F'),
+            $this->parametro(252, 'G'),
+            $this->parametro(253, 'H'),
+            $this->parametro(254, 'I'),
+            $this->parametro(255, 'J'),
+            $this->parametro(256, 'K'),
+            $this->parametro(257, 'L'),
+            $this->parametro(258, 'M'),
+            $this->parametro(259, 'N'),
+            $this->parametro(260, 'O'),
+            $this->parametro(261, 'P'),
+            $this->parametro(262, 'Q'),
+            $this->parametro(263, 'R'),
+            $this->parametro(264, 'S'),
+            $this->parametro(265, 'T'),
+            $this->parametro(266, 'U'),
+            $this->parametro(267, 'V'),
+            $this->parametro(268, 'W'),
+            $this->parametro(269, 'X'),
+            $this->parametro(270, 'Y'),
+            $this->parametro(271, 'Z'),
+        ];
+    }
+
+    private function createParametro(array $parametro): void
+    {
+        Parametro::updateOrCreate(
+            ['id' => $parametro['id']],
+            [
+                'name' => $parametro['name'],
+                'status' => $parametro['status'],
+                'user_create_id' => $parametro['user_create_id'],
+                'user_edit_id' => $parametro['user_edit_id'],
+            ]
+        );
+    }
+
+    private function parametro(int $id, string $name): array
+    {
+        return [
+            'id' => $id,
+            'name' => $name,
+            'status' => 1,
+            'user_create_id' => null,
+            'user_edit_id' => null,
+        ];
     }
 }

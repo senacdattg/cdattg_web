@@ -31,7 +31,7 @@
                     <form method="POST" action="{{ route('personas.store') }}" autocomplete="off">
                         @csrf
 
-                        @include('personas.partials.form', ['showCaracterizacion' => true])
+                        @include('personas.partials.form', ['showCaracterizacion' => true, 'cardinales' => $cardinales])
 
                         <div class="col-12">
                             <hr class="mt-4">
