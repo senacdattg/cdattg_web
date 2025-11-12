@@ -37,8 +37,8 @@ class UsersSeeder extends Seeder
             ]
         );
 
-        if (! $superAdmin->hasRole('SUPER_ADMINISTRADOR')) {
-            $superAdmin->assignRole('SUPER_ADMINISTRADOR');
+        if (! $superAdmin->hasRole('SUPER ADMINISTRADOR')) {
+            $superAdmin->assignRole('SUPER ADMINISTRADOR');
         }
 
         $admin = User::updateOrCreate(
