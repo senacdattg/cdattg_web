@@ -4,6 +4,109 @@
  */
 
 class TalentoHumanoManager {
+
+    static obtenerInstancia() {
+        if (!TalentoHumanoManager.instancia) {
+            TalentoHumanoManager.instancia = new TalentoHumanoManager();
+        }
+        return TalentoHumanoManager.instancia;
+    }
+
+    static inyectarEstilosToast() {
+        if (TalentoHumanoManager.estilosToastInyectados) {
+            return;
+        }
+
+        const style = document.createElement('style');
+        style.id = 'th-toast-styles';
+        const cssRules = [
+            '.th-toast-container {',
+            '    position: fixed;',
+            '    z-index: 9999;',
+            '    display: flex;',
+            '    flex-direction: column;',
+            '    gap: 12px;',
+            '    max-width: 420px;',
+            '    pointer-events: none;',
+            '}',
+            '.th-toast-container.top,',
+            '.th-toast-container.bottom {',
+            '    left: 50%;',
+            '    transform: translateX(-50%);',
+            '}',
+            '.th-toast {',
+            '    display: flex;',
+            '    align-items: flex-start;',
+            '    gap: 14px;',
+            '    background: #ffffff;',
+            '    border-radius: 10px;',
+            '    padding: 14px 16px;',
+            '    box-shadow: 0 12px 30px rgba(0,0,0,0.12);',
+            '    border-left: 5px solid transparent;',
+            '    opacity: 0;',
+            '    transform: translateY(20px);',
+            '    transition: opacity 0.25s ease, transform 0.25s ease;',
+            '    pointer-events: auto;',
+            '}',
+            '.th-toast-show {',
+            '    opacity: 1;',
+            '    transform: translateY(0);',
+            '}',
+            '.th-toast-hide {',
+            '    opacity: 0;',
+            '    transform: translateY(10px);',
+            '}',
+            '.th-toast-icon {',
+            '    flex-shrink: 0;',
+            '    width: 44px;',
+            '    height: 44px;',
+            '    display: flex;',
+            '    align-items: center;',
+            '    justify-content: center;',
+            '    border-radius: 50%;',
+            '    background: rgba(33, 37, 41, 0.1);',
+            '    font-size: 22px;',
+            '}',
+            '.th-toast-content {',
+            '    flex: 1;',
+            '}',
+            '.th-toast-title {',
+            '    font-weight: 600;',
+            '    font-size: 16px;',
+            '    color: #212529;',
+            '    margin-bottom: 4px;',
+            '}',
+            '.th-toast-text {',
+            '    font-size: 14px;',
+            '    color: #495057;',
+            '    line-height: 1.5;',
+            '}',
+            '.th-toast-close {',
+            '    background: transparent;',
+            '    border: none;',
+            '    color: #6c757d;',
+            '    font-size: 18px;',
+            '    cursor: pointer;',
+            '    padding: 0;',
+            '    line-height: 1;',
+            '}',
+            '.th-toast-close:focus {',
+            '    outline: none;',
+            '}',
+            '.th-toast-success { border-left-color: #28a745; }',
+            '.th-toast-error { border-left-color: #dc3545; }',
+            '.th-toast-warning { border-left-color: #ffc107; }',
+            '.th-toast-info { border-left-color: #17a2b8; }',
+            '.th-toast-success .th-toast-icon { color: #28a745; background: rgba(40,167,69,0.1); }',
+            '.th-toast-error .th-toast-icon { color: #dc3545; background: rgba(220,53,69,0.1); }',
+            '.th-toast-warning .th-toast-icon { color: #d39e00; background: rgba(255,193,7,0.15); }',
+            '.th-toast-info .th-toast-icon { color: #17a2b8; background: rgba(23,162,184,0.15); }'
+        ];
+        style.textContent = cssRules.join('\n');
+
+        document.head.appendChild(style);
+        TalentoHumanoManager.estilosToastInyectados = true;
+    }
     constructor() {
         this.searchTimeout = null;
         this.currentPersona = null;
@@ -133,7 +236,7 @@ class TalentoHumanoManager {
         this.elements.btnRegistrarSalida.style.display = 'none';
 
         this.mostrarAlerta('info', 'Nueva persona',
-            'Complete los datos para registrar la nueva persona');
+            'Complete los datos para registrar la nueva persona', { duracion: 4000 });
     }
 
     habilitarEdicion() {
@@ -507,28 +610,87 @@ class TalentoHumanoManager {
         }
     }
 
-    mostrarAlerta(tipo, titulo, texto) {
-        const SwalInstance = window.Swal;
+    mostrarAlerta(tipo, titulo, texto, opciones = {}) {
+        const { duracion = 5000, posicion = 'bottom-end' } = opciones;
+        const duracionMs = Number.isFinite(Number(duracion)) && Number(duracion) > 0
+            ? Number(duracion)
+            : 5000;
 
-        if (!SwalInstance) {
-            window.alert([titulo, texto].filter(Boolean).join('\n'));
-            return;
+        const posiciones = {
+            'top-start': { top: '20px', left: '20px', right: 'auto', bottom: 'auto' },
+            'top-end': { top: '20px', right: '20px', left: 'auto', bottom: 'auto' },
+            'bottom-start': { bottom: '20px', left: '20px', right: 'auto', top: 'auto' },
+            'bottom-end': { bottom: '20px', right: '20px', left: 'auto', top: 'auto' }
+        };
+
+        TalentoHumanoManager.inyectarEstilosToast();
+
+        if (!this.toastContainer || !document.body.contains(this.toastContainer)) {
+            this.toastContainer = document.createElement('div');
+            this.toastContainer.className = 'th-toast-container';
+            document.body.appendChild(this.toastContainer);
         }
 
-        // Usar configuración simple compatible con SweetAlert2 v8
-        SwalInstance.fire({
-            icon: tipo,
-            title: titulo,
-            text: texto,
-            timer: 5000,
-            showConfirmButton: false,
-            position: 'bottom-end',
-            toast: true
+        Object.assign(
+            this.toastContainer.style,
+            posiciones[posicion] || posiciones['bottom-end']
+        );
+
+        const iconosFA = {
+            success: 'fas fa-check-circle',
+            error: 'fas fa-times-circle',
+            warning: 'fas fa-exclamation-triangle',
+            info: 'fas fa-info-circle'
+        };
+
+        const toast = document.createElement('div');
+        toast.className = `th-toast th-toast-${tipo}`;
+        toast.innerHTML = `
+            <div class="th-toast-icon">
+                <i class="${iconosFA[tipo] || iconosFA.info}"></i>
+            </div>
+            <div class="th-toast-content">
+                <div class="th-toast-title">${titulo || ''}</div>
+                ${texto ? `<div class="th-toast-text">${texto}</div>` : ''}
+            </div>
+            <button class="th-toast-close" type="button" aria-label="Cerrar notificación">&times;</button>
+        `;
+
+        const cerrarToast = () => {
+            if (!toast.classList.contains('th-toast-hide')) {
+                toast.classList.remove('th-toast-show');
+                toast.classList.add('th-toast-hide');
+                window.clearTimeout(toast._timeoutId);
+                window.setTimeout(() => {
+                    toast.remove();
+                    if (this.toastContainer && !this.toastContainer.children.length) {
+                        this.toastContainer.remove();
+                        this.toastContainer = null;
+                    }
+                }, 260);
+            }
+        };
+
+        toast.querySelector('.th-toast-close').addEventListener('click', cerrarToast);
+        toast.addEventListener('mouseenter', () => window.clearTimeout(toast._timeoutId));
+        toast.addEventListener('mouseleave', () => {
+            toast._timeoutId = window.setTimeout(cerrarToast, duracionMs);
         });
+
+        this.toastContainer.appendChild(toast);
+
+        // Reflow para activar transición
+        window.getComputedStyle(toast).opacity;
+        toast.classList.add('th-toast-show');
+        toast._timeoutId = window.setTimeout(cerrarToast, duracionMs);
     }
 }
 
+TalentoHumanoManager.instancia = null;
+TalentoHumanoManager.estilosToastInyectados = false;
+
 // Inicializar
 document.addEventListener('DOMContentLoaded', () => {
-    new TalentoHumanoManager();
+    const manager = TalentoHumanoManager.obtenerInstancia();
+    window.talentoHumanoManager = manager;
 });
