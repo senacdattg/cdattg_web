@@ -295,3 +295,14 @@ Route::get('/websocket/estadisticas', [\App\Http\Controllers\WebSocketVisitantes
 Route::post('/websocket/entrada', [\App\Http\Controllers\WebSocketVisitantesController::class, 'registrarEntrada']);
 Route::post('/websocket/salida', [\App\Http\Controllers\WebSocketVisitantesController::class, 'registrarSalida']);
 Route::get('/websocket/visitantes-actuales', [\App\Http\Controllers\WebSocketVisitantesController::class, 'obtenerVisitantesActuales']);
+
+// ==========================================
+// REGISTRO DE PRESENCIA - ESTADÍSTICAS DE PERSONAS DENTRO
+// ==========================================
+
+Route::post('/presencia/entrada', [\App\Http\Controllers\RegistroPresenciaController::class, 'registrarEntrada']);
+Route::post('/presencia/salida', [\App\Http\Controllers\RegistroPresenciaController::class, 'registrarSalida']);
+Route::get('/presencia/estadisticas', [\App\Http\Controllers\RegistroPresenciaController::class, 'estadisticasPersonasDentro']);
+Route::get('/presencia/estadisticas/hoy', [\App\Http\Controllers\RegistroPresenciaController::class, 'estadisticasPersonasDentroHoy']);
+Route::get('/presencia/personas-dentro', [\App\Http\Controllers\RegistroPresenciaController::class, 'personasDentro']);
+Route::get('/presencia/estadisticas/fecha', [\App\Http\Controllers\RegistroPresenciaController::class, 'estadisticasPorFecha']);
