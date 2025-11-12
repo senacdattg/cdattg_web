@@ -143,6 +143,7 @@ return [
         'tablas' => [
             'asistencia_aprendices',
             'entrada_salidas',
+            'registros_presencia',
         ],
         'orden' => 12,
     ],
