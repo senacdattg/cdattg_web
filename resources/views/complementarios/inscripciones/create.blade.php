@@ -87,13 +87,8 @@
                                                                         name="parametro_id" value="{{ $parametro->id }}"
                                                                         id="parametro_{{ $parametro->id }}">
                                                                     <label class="form-check-label"
-<<<<<<< HEAD:resources/views/complementarios/formulario_inscripcion.blade.php
-                                                                        for="parametro_{{ $parametro->id }}">
-                                                                        {{ ucwords(str_replace('_', ' ', $parametro->name)) }}
-=======
                                                                         for="categoria_{{ $hijo->id }}">
                                                                         {{ $hijo->nombre }}
->>>>>>> 300a4abbdf2112e6151d181f00ac557a670bb84b:resources/views/complementarios/inscripciones/create.blade.php
                                                                     </label>
                                                                 </div>
                                                             </div>
