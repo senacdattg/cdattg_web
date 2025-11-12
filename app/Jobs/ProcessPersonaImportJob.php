@@ -15,14 +15,25 @@ class ProcessPersonaImportJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    /**
+     * Identificador de la importación que se está procesando.
+     */
     public int $importId;
 
+    /**
+     * Procesamos la importación en una cola dedicada con ventana amplia para evitar reintentos prematuros.
+     */
+    public string $connection = 'persona-import';
+    public string $queue = 'persona-import';
+
     public int $tries = 3;
-    public int $timeout = 900;
+    public int $timeout;
 
     public function __construct(int $importId)
     {
         $this->importId = $importId;
+        $retryAfter = (int) config('queue.connections.' . $this->connection . '.retry_after', 2400);
+        $this->timeout = max(300, $retryAfter - 120);
     }
 
     public function handle(PersonaImportService $service): void
