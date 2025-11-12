@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
+use App\Models\AsignacionInstructor;
 
 class Instructor extends Model
 {
@@ -83,6 +84,11 @@ class Instructor extends Model
     public function instructorFichas(): HasMany
     {
         return $this->hasMany(InstructorFichaCaracterizacion::class, 'instructor_id');
+    }
+
+    public function asignacionesInstructor(): HasMany
+    {
+        return $this->hasMany(AsignacionInstructor::class, 'instructor_id');
     }
 
 

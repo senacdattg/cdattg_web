@@ -2,6 +2,14 @@
 
 @section('css')
     @vite(['resources/css/parametros.css'])
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css"
+    >
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css"
+    >
 @endsection
 
 @section('content_header')
@@ -46,8 +54,13 @@
                                     <div class="col-md-6">
                                         <div class="form-group mb-3">
                                             <label class="form-label fw-bold">Programa de Formación <span class="text-danger">*</span></label>
-                                            <select class="form-control @error('programa_formacion_id') is-invalid @enderror" 
-                                                    id="programa_formacion_id" name="programa_formacion_id" required>
+                                            <select
+                                                class="form-control select2 @error('programa_formacion_id') is-invalid @enderror"
+                                                id="programa_formacion_id"
+                                                name="programa_formacion_id"
+                                                data-placeholder="Seleccione un programa..."
+                                                required
+                                            >
                                                 <option value="">Seleccione un programa...</option>
                                                 @foreach($programas as $programa)
                                                     <option value="{{ $programa->id }}" 
@@ -95,8 +108,12 @@
                                     <div class="col-md-6">
                                         <div class="form-group mb-3">
                                             <label class="form-label fw-bold">Sede</label>
-                                            <select class="form-control @error('sede_id') is-invalid @enderror" 
-                                                    id="sede_id" name="sede_id">
+                                            <select
+                                                class="form-control select2 @error('sede_id') is-invalid @enderror"
+                                                id="sede_id"
+                                                name="sede_id"
+                                                data-placeholder="Seleccione una sede..."
+                                            >
                                                 <option value="">Seleccione una sede...</option>
                                                 @foreach($sedes ?? [] as $sede)
                                                     <option value="{{ $sede->id }}" {{ old('sede_id') == $sede->id ? 'selected' : '' }}>
@@ -114,8 +131,12 @@
                                     <div class="col-md-6">
                                         <div class="form-group mb-3">
                                             <label class="form-label fw-bold">Instructor Principal</label>
-                                            <select class="form-control @error('instructor_id') is-invalid @enderror" 
-                                                    id="instructor_id" name="instructor_id">
+                                            <select
+                                                class="form-control select2 @error('instructor_id') is-invalid @enderror"
+                                                id="instructor_id"
+                                                name="instructor_id"
+                                                data-placeholder="Seleccione un instructor..."
+                                            >
                                                 <option value="">Seleccione un instructor...</option>
                                                 @foreach($instructores ?? [] as $instructor)
                                                     <option value="{{ $instructor->id }}" {{ old('instructor_id') == $instructor->id ? 'selected' : '' }}>
@@ -141,8 +162,12 @@
                                     <div class="col-md-6">
                                         <div class="form-group mb-3">
                                             <label class="form-label fw-bold">Modalidad de Formación</label>
-                                            <select class="form-control @error('modalidad_formacion_id') is-invalid @enderror" 
-                                                    id="modalidad_formacion_id" name="modalidad_formacion_id">
+                                            <select
+                                                class="form-control select2 @error('modalidad_formacion_id') is-invalid @enderror"
+                                                id="modalidad_formacion_id"
+                                                name="modalidad_formacion_id"
+                                                data-placeholder="Seleccione una modalidad..."
+                                            >
                                                 <option value="">Seleccione una modalidad...</option>
                                                 @foreach($modalidades ?? [] as $modalidad)
                                                     <option value="{{ $modalidad->id }}" {{ old('modalidad_formacion_id') == $modalidad->id ? 'selected' : '' }}>
@@ -160,8 +185,12 @@
                                     <div class="col-md-6">
                                         <div class="form-group mb-3">
                                             <label class="form-label fw-bold">Jornada de Formación</label>
-                                            <select class="form-control @error('jornada_id') is-invalid @enderror" 
-                                                    id="jornada_id" name="jornada_id">
+                                            <select
+                                                class="form-control select2 @error('jornada_id') is-invalid @enderror"
+                                                id="jornada_id"
+                                                name="jornada_id"
+                                                data-placeholder="Seleccione una jornada..."
+                                            >
                                                 <option value="">Seleccione una jornada...</option>
                                                 @foreach($jornadas ?? [] as $jornada)
                                                     <option value="{{ $jornada->id }}" {{ old('jornada_id') == $jornada->id ? 'selected' : '' }}>
@@ -181,8 +210,13 @@
                                     <div class="col-md-6">
                                         <div class="form-group mb-3">
                                             <label class="form-label fw-bold">Ambiente</label>
-                                            <select class="form-control @error('ambiente_id') is-invalid @enderror" 
-                                                    id="ambiente_id" name="ambiente_id" disabled>
+                                            <select
+                                                class="form-control select2 @error('ambiente_id') is-invalid @enderror"
+                                                id="ambiente_id"
+                                                name="ambiente_id"
+                                                data-placeholder="Seleccione un ambiente..."
+                                                disabled
+                                            >
                                                 <option value="">Primero seleccione una sede...</option>
                                             </select>
                                             @error('ambiente_id')
@@ -289,5 +323,6 @@
 @endsection
 
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     @vite(['resources/js/pages/fichas-form.js'])
 @endsection

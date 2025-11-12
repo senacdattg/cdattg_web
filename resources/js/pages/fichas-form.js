@@ -12,11 +12,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     
     // Inicializar Select2
-    if (typeof $ !== 'undefined' && $.fn.select2) {
+    const tieneSelect2 = typeof $ !== 'undefined' && $.fn.select2;
+
+    if (tieneSelect2) {
         $('.select2').select2({
             theme: 'bootstrap-5',
             width: '100%',
-            placeholder: 'Seleccione una opción',
+            placeholder: function() {
+                return $(this).data('placeholder') || 'Seleccione una opción';
+            },
             allowClear: true,
             language: {
                 noResults: function() {
@@ -61,6 +65,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const ambienteSelect = $('#ambiente_id');
         ambienteSelect.prop('disabled', true);
         ambienteSelect.html('<option value="">Cargando ambientes...</option>');
+        if (tieneSelect2) {
+            ambienteSelect.trigger('change');
+        }
         
         $.ajax({
             url: '/ficha/ambientes-por-sede/' + sedeId,
@@ -78,14 +85,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     });
                     
                     ambienteSelect.prop('disabled', false);
+                    if (tieneSelect2) {
+                        ambienteSelect.trigger('change');
+                    }
                     console.log('Ambientes cargados:', response.data.length);
                 } else {
                     ambienteSelect.html('<option value="">Error al cargar ambientes</option>');
+                    if (tieneSelect2) {
+                        ambienteSelect.trigger('change');
+                    }
                     console.error('Error al cargar ambientes:', response.message);
                 }
             },
             error: function(xhr, status, error) {
                 ambienteSelect.html('<option value="">Error al cargar ambientes</option>');
+                if (tieneSelect2) {
+                    ambienteSelect.trigger('change');
+                }
                 console.error('Error AJAX al cargar ambientes:', error);
             }
         });
@@ -115,8 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('Sede del programa:', sedeId);
             
             if (sedeId) {
-                $('#sede_id').val(sedeId);
-                loadAmbientesPorSede(sedeId);
+                $('#sede_id').val(sedeId).trigger('change');
             }
         }
     });
@@ -129,11 +144,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // Limpiar y deshabilitar ambiente
         ambienteSelect.prop('disabled', true);
         ambienteSelect.find('option:not(:first)').remove();
+        if (tieneSelect2) {
+            ambienteSelect.trigger('change');
+        }
         
         if (sedeId) {
             loadAmbientesPorSede(sedeId);
         } else {
             ambienteSelect.html('<option value="">Primero seleccione una sede...</option>');
+            if (tieneSelect2) {
+                ambienteSelect.trigger('change');
+            }
         }
     });
 
@@ -339,25 +360,25 @@ document.addEventListener('DOMContentLoaded', () => {
             const ambienteId = $('#ambiente_id').data('initial-value');
             
             if (sedeId) {
-                $('#sede_id').val(sedeId);
+                $('#sede_id').val(sedeId).trigger('change');
                 loadAmbientesPorSede(sedeId);
             }
             
             if (instructorId) {
-                $('#instructor_id').val(instructorId);
+                $('#instructor_id').val(instructorId).trigger('change');
             }
             
             if (modalidadId) {
-                $('#modalidad_formacion_id').val(modalidadId);
+                $('#modalidad_formacion_id').val(modalidadId).trigger('change');
             }
             
             if (jornadaId) {
-                $('#jornada_id').val(jornadaId);
+                $('#jornada_id').val(jornadaId).trigger('change');
             }
             
             if (ambienteId) {
                 setTimeout(() => {
-                    $('#ambiente_id').val(ambienteId);
+                    $('#ambiente_id').val(ambienteId).trigger('change');
                 }, 500);
             }
         }, 1000);
@@ -371,6 +392,9 @@ document.addEventListener('DOMContentLoaded', () => {
             data.forEach(function(modalidad) {
                 select.append(new Option(modalidad.name, modalidad.id));
             });
+            if (tieneSelect2) {
+                select.trigger('change');
+            }
         });
     }
 
@@ -382,6 +406,9 @@ document.addEventListener('DOMContentLoaded', () => {
             data.forEach(function(jornada) {
                 select.append(new Option(jornada.name, jornada.id));
             });
+            if (tieneSelect2) {
+                select.trigger('change');
+            }
         });
     }
 
@@ -396,6 +423,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     instructor.id
                 ));
             });
+            if (tieneSelect2) {
+                select.trigger('change');
+            }
         });
     }
 
@@ -407,6 +437,9 @@ document.addEventListener('DOMContentLoaded', () => {
             data.forEach(function(sede) {
                 select.append(new Option(sede.nombre, sede.id));
             });
+            if (tieneSelect2) {
+                select.trigger('change');
+            }
         });
     }
 

@@ -50,11 +50,20 @@ class ProgramaFormacionController extends Controller
      *
      * @param string $id El ID del programa de formación a mostrar.
      * @return \Illuminate\View\View La vista que muestra los detalles del programa.
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException Si no se encuentra el programa de formación con el ID proporcionado.
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     *         Si no se encuentra el programa de formación con el ID proporcionado.
      */
     public function show(string $id)
     {
-        $programa = ProgramaFormacion::with(['redConocimiento', 'nivelFormacion', 'userCreated', 'userEdited'])
+        $programa = ProgramaFormacion::with([
+                'redConocimiento',
+                'nivelFormacion',
+                'userCreated',
+                'userEdited',
+                'competencias' => function ($query) {
+                    $query->orderBy('nombre');
+                }
+            ])
             ->findOrFail($id);
 
         return view('programas.show', compact('programa'));
@@ -72,7 +81,7 @@ class ProgramaFormacionController extends Controller
     public function create()
     {
         $redesConocimiento = RedConocimiento::all();
-        $nivelesFormacion = Parametro::whereHas('temas', function($query) {
+        $nivelesFormacion = Parametro::whereHas('temas', function ($query) {
             $query->where('temas.id', 6);
         })->get(); // Tema 6 corresponde a NIVELES DE FORMACION
 
@@ -97,6 +106,9 @@ class ProgramaFormacionController extends Controller
                 'nombre' => $request->input('nombre'),
                 'red_conocimiento_id' => $request->input('red_conocimiento_id'),
                 'nivel_formacion_id' => $request->input('nivel_formacion_id'),
+                'horas_totales' => (int) $request->input('horas_totales'),
+                'horas_etapa_lectiva' => (int) $request->input('horas_etapa_lectiva'),
+                'horas_etapa_productiva' => (int) $request->input('horas_etapa_productiva'),
                 'user_create_id' => Auth::id(),
                 'user_edit_id' => Auth::id(),
                 'status' => true,
@@ -117,13 +129,20 @@ class ProgramaFormacionController extends Controller
      *
      * @param string $id El ID del programa de formación a editar.
      * @return \Illuminate\View\View La vista del formulario de edición con los datos del programa, sedes y tipos de programa.
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException Si no se encuentra el programa de formación con el ID proporcionado.
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     *         Si no se encuentra el programa de formación con el ID proporcionado.
      */
     public function edit(string $id)
     {
-        $programa = ProgramaFormacion::findOrFail($id);
+        $programa = ProgramaFormacion::with([
+            'competencias' => function ($query) {
+                $query->withCount('programasFormacion')
+                    ->orderBy('nombre');
+            }
+        ])->findOrFail($id);
+
         $redesConocimiento = RedConocimiento::all();
-        $nivelesFormacion = Parametro::whereHas('temas', function($query) {
+        $nivelesFormacion = Parametro::whereHas('temas', function ($query) {
             $query->where('temas.id', 6);
         })->get(); // Tema 6 corresponde a NIVELES DE FORMACION
 
@@ -139,12 +158,13 @@ class ProgramaFormacionController extends Controller
      * @return \Illuminate\Http\RedirectResponse Redirige a la página de índice de programas con un mensaje de éxito.
      *
      * @throws \Illuminate\Validation\ValidationException Si la validación de los datos falla.
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException Si no se encuentra el programa de formación con el ID proporcionado.
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     *         Si no se encuentra el programa de formación con el ID proporcionado.
      */
     public function update(UpdateProgramaFormacionRequest $request, string $id)
     {
         try {
-            $programaFormacion = ProgramaFormacion::findOrFail($id);
+            $programaFormacion = ProgramaFormacion::with('competencias')->findOrFail($id);
             
             // Validaciones de negocio adicionales para actualización
             $validationErrors = $this->validateBusinessRules($request, $programaFormacion);
@@ -152,17 +172,19 @@ class ProgramaFormacionController extends Controller
                 return redirect()->back()->withInput()->withErrors($validationErrors);
             }
 
-            $programaFormacion->codigo = $request->input('codigo');
-            $programaFormacion->nombre = $request->input('nombre');
-            $programaFormacion->red_conocimiento_id = $request->input('red_conocimiento_id');
-            $programaFormacion->nivel_formacion_id = $request->input('nivel_formacion_id');
-            $programaFormacion->user_edit_id = Auth::id();
-            
-            if ($request->has('status')) {
-                $programaFormacion->status = $request->input('status');
-            }
-            
-            if ($programaFormacion->save()) {
+            $datosActualizados = [
+                'codigo' => $request->input('codigo'),
+                'nombre' => $request->input('nombre'),
+                'red_conocimiento_id' => $request->input('red_conocimiento_id'),
+                'nivel_formacion_id' => $request->input('nivel_formacion_id'),
+                'horas_totales' => (int) $request->input('horas_totales'),
+                'horas_etapa_lectiva' => (int) $request->input('horas_etapa_lectiva'),
+                'horas_etapa_productiva' => (int) $request->input('horas_etapa_productiva'),
+                'status' => $request->input('status', $programaFormacion->status),
+                'user_edit_id' => Auth::id(),
+            ];
+
+            if ($this->programaService->actualizar($programaFormacion, $datosActualizados)) {
                 Log::info('Programa de formación actualizado exitosamente', [
                     'programa_id' => $programaFormacion->id,
                     'codigo' => $programaFormacion->codigo,
@@ -202,6 +224,8 @@ class ProgramaFormacionController extends Controller
             if (!empty($validationErrors)) {
                 return redirect()->back()->withErrors($validationErrors);
             }
+            
+            $programaFormacion->competencias()->detach();
             
             if ($programaFormacion->delete()) {
                 Log::info('Programa de formación eliminado exitosamente', [
@@ -381,7 +405,14 @@ class ProgramaFormacionController extends Controller
             $programas = ProgramaFormacion::where('red_conocimiento_id', $redConocimientoId)
                 ->where('status', true)
                 ->orderBy('nombre')
-                ->get(['id', 'codigo', 'nombre']);
+                ->get([
+                    'id',
+                    'codigo',
+                    'nombre',
+                    'horas_totales',
+                    'horas_etapa_lectiva',
+                    'horas_etapa_productiva',
+                ]);
 
             return response()->json([
                 'success' => true,
@@ -413,7 +444,14 @@ class ProgramaFormacionController extends Controller
             $programas = ProgramaFormacion::where('nivel_formacion_id', $nivelFormacionId)
                 ->where('status', true)
                 ->orderBy('nombre')
-                ->get(['id', 'codigo', 'nombre']);
+                ->get([
+                    'id',
+                    'codigo',
+                    'nombre',
+                    'horas_totales',
+                    'horas_etapa_lectiva',
+                    'horas_etapa_productiva',
+                ]);
 
             return response()->json([
                 'success' => true,
@@ -444,7 +482,16 @@ class ProgramaFormacionController extends Controller
             $programas = ProgramaFormacion::where('status', true)
                 ->with(['redConocimiento', 'nivelFormacion'])
                 ->orderBy('nombre')
-                ->get(['id', 'codigo', 'nombre', 'red_conocimiento_id', 'nivel_formacion_id']);
+                ->get([
+                    'id',
+                    'codigo',
+                    'nombre',
+                    'red_conocimiento_id',
+                    'nivel_formacion_id',
+                    'horas_totales',
+                    'horas_etapa_lectiva',
+                    'horas_etapa_productiva',
+                ]);
 
             return response()->json([
                 'success' => true,
@@ -534,6 +581,16 @@ class ProgramaFormacionController extends Controller
             }
         }
 
+        // 6. Validar que las horas por etapa no excedan el total
+        $horasTotales = (int) $request->input('horas_totales');
+        $horasLectiva = (int) $request->input('horas_etapa_lectiva');
+        $horasProductiva = (int) $request->input('horas_etapa_productiva');
+
+        if ($horasTotales > 0 && ($horasLectiva + $horasProductiva) !== $horasTotales) {
+            $errors['horas_totales'] = 'La suma de las horas lectivas y productivas '
+                . 'debe ser igual al total de horas del programa.';
+        }
+
         return $errors;
     }
 
@@ -556,13 +613,7 @@ class ProgramaFormacionController extends Controller
             $errors['programa'] = "No se puede eliminar el programa '{$programa->nombre}' porque tiene {$fichasActivas} ficha(s) de caracterización activa(s).";
         }
 
-        // 2. Validar que no tenga competencias asociadas
-        $competenciasCount = $programa->competenciasProgramas()->count();
-        if ($competenciasCount > 0) {
-            $errors['programa'] = "No se puede eliminar el programa '{$programa->nombre}' porque tiene {$competenciasCount} competencia(s) asociada(s).";
-        }
-
-        // 3. Validar que no tenga aprendices asociados
+        // 2. Validar que no tenga aprendices asociados
         $aprendicesCount = $programa->fichasCaracterizacion()
             ->join('aprendices', 'fichas_caracterizacion.id', '=', 'aprendices.ficha_caracterizacion_id')
             ->count();
@@ -648,5 +699,38 @@ class ProgramaFormacionController extends Controller
         // Ya no se requiere que el nombre inicie con el nivel de formación
 
         return $errors;
+    }
+
+    /**
+     * Desasocia una competencia específica de un programa.
+     */
+    public function detachCompetencia(string $programaId, string $competenciaId)
+    {
+        try {
+            $programa = ProgramaFormacion::findOrFail($programaId);
+
+            if (!$programa->competencias()->where('competencias.id', $competenciaId)->exists()) {
+                return redirect()->back()->with('warning', 'La competencia seleccionada no está asociada al programa.');
+            }
+
+            $programa->competencias()->detach($competenciaId);
+
+            Log::info('Competencia desasociada de programa', [
+                'programa_id' => $programaId,
+                'competencia_id' => $competenciaId,
+                'usuario_id' => Auth::id(),
+            ]);
+
+            return redirect()->back()->with('success', 'La competencia fue desasociada del programa.');
+        } catch (\Exception $e) {
+            Log::error('Error al desasociar competencia de programa', [
+                'programa_id' => $programaId,
+                'competencia_id' => $competenciaId,
+                'error' => $e->getMessage(),
+                'usuario_id' => Auth::id(),
+            ]);
+
+            return redirect()->back()->with('error', 'No fue posible desasociar la competencia.');
+        }
     }
 }

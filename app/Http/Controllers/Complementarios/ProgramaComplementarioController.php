@@ -3,47 +3,36 @@
 namespace App\Http\Controllers\Complementarios;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+use App\Http\Requests\Complementarios\StoreProgramaComplementarioRequest;
+use App\Http\Requests\Complementarios\UpdateProgramaComplementarioRequest;
 use App\Models\ComplementarioOfertado;
-use App\Models\Parametro;
-use App\Models\JornadaFormacion;
-use App\Models\Ambiente;
 use App\Services\ComplementarioService;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 
 class ProgramaComplementarioController extends Controller
 {
-    const VALIDATION_RULE_POSITIVE_INTEGER = 'required|integer|min:1';
-    const VALIDATION_RULE_TIME = 'nullable|date_format:H:i';
-
-    protected $complementarioService;
-
-    public function __construct(ComplementarioService $complementarioService)
-    {
-        $this->complementarioService = $complementarioService;
-    }
+    public function __construct(
+        private readonly ComplementarioService $complementarioService
+    ) {}
 
     /**
-     * Mostrar gestión de programas complementarios (Admin)
+     * Listar programas complementarios ofertados (Admin).
      */
-    public function gestionProgramasComplementarios()
+    public function index(): View
     {
-        $programas = ComplementarioOfertado::with([
-            'modalidad.parametro',
-            'jornada',
-            'diasFormacion',
-            'ambiente'
-        ])->get();
-        $modalidades = \App\Models\ParametroTema::where('tema_id', 5)->with('parametro')->get();
-        $jornadas = \App\Models\JornadaFormacion::all();
-        $ambientes = Ambiente::with('piso')->where('status', 1)->orderBy('piso_id')->orderBy('title')->get();
+        $programas = $this->complementarioService
+            ->obtenerProgramas(['modalidad.parametro', 'jornada', 'diasFormacion', 'ambiente']);
+
+        $programas = $this->complementarioService->enriquecerProgramas($programas);
+
         return view(
-            'complementarios.gestion_complementarios.index',
-            compact(
-                'programas',
-                'modalidades',
-                'jornadas',
-                'ambientes'
+            'complementarios.programas.admin.index',
+            array_merge(
+                ['programas' => $programas],
+                $this->complementarioService->obtenerDatosFormulario()
             )
         );
     }
@@ -51,105 +40,78 @@ class ProgramaComplementarioController extends Controller
     /**
      * Mostrar formulario de creación de programa
      */
-    public function create()
+    public function create(): View
     {
-        $modalidades = \App\Models\ParametroTema::where('tema_id', 5)->with('parametro')->get();
-        $jornadas = \App\Models\JornadaFormacion::all();
-        $ambientes = Ambiente::with('piso')->where('status', 1)->orderBy('piso_id')->orderBy('title')->get();
-        return view('complementarios.gestion_complementarios.create', compact('modalidades', 'jornadas', 'ambientes'));
+        return view(
+            'complementarios.programas.admin.create',
+            $this->complementarioService->obtenerDatosFormulario()
+        );
     }
 
     /**
      * Mostrar programas públicos (Vista pública)
      */
-    public function programasPublicos()
+    public function programasPublicos(): View
     {
-        $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion'])
-            ->where('estado', 1)
-            ->get();
+        $programas = $this->complementarioService
+            ->obtenerProgramas(['modalidad.parametro', 'jornada', 'diasFormacion'], estado: 1);
 
-        $programas->each(function ($programa) {
-            $programa->icono = $this->complementarioService->getIconoForPrograma($programa->nombre);
-            $programa->badge_class = $this->complementarioService->getBadgeClassForEstado($programa->estado);
-            $programa->estado_label = $this->complementarioService->getEstadoLabel($programa->estado);
-            $programa->modalidad_nombre = $programa->modalidad->parametro->name ?? null;
-            $programa->jornada_nombre = $programa->jornada->jornada ?? null;
-        });
+        $programas = $this->complementarioService->enriquecerProgramas($programas);
 
-        // Obtener programas en los que el usuario está inscrito
-        $programasInscritosIds = collect();
-        if (Auth::check() && Auth::user()->persona) {
-            $personaId = Auth::user()->persona->id;
-
-            $programasInscritosIds = \App\Models\AspiranteComplementario::where('persona_id', $personaId)
-                ->where('estado', 1)
-                ->pluck('complementario_id');
-        }
-
-        // Obtener tipos de documento y géneros dinámicamente
-        $tiposDocumento = $this->complementarioService->getTiposDocumento();
-        $generos = $this->complementarioService->getGeneros();
-
-        return view(
-            'complementarios.programas_publicos',
-            compact(
-                'programas',
-                'tiposDocumento',
-                'generos',
-                'programasInscritosIds'
-            )
-        );
+        return view('complementarios.programas.public.index', [
+            'programas' => $programas,
+            'tiposDocumento' => $this->complementarioService->getTiposDocumento(),
+            'generos' => $this->complementarioService->getGeneros(),
+        ]);
     }
 
     /**
      * Mostrar todos los programas (Admin)
      */
-    public function verProgramas()
+    public function verProgramas(): View
     {
-        $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion'])->get();
-        $programas->each(function ($programa) {
-            $programa->icono = $this->complementarioService->getIconoForPrograma($programa->nombre);
-            $programa->badge_class = $this->complementarioService->getBadgeClassForEstado($programa->estado);
-            $programa->estado_label = $this->complementarioService->getEstadoLabel($programa->estado);
-        });
-        return view('complementarios.ver_programas', compact('programas'));
+        $programas = $this->complementarioService
+            ->obtenerProgramas(['modalidad.parametro', 'jornada', 'diasFormacion']);
+
+        $programas = $this->complementarioService->enriquecerProgramas($programas);
+
+        return view('complementarios.ver_programas', ['programas' => $programas]);
     }
 
     /**
      * Mostrar programa específico público
      */
-    public function verPrograma($id)
+    public function verPrograma(ComplementarioOfertado $programa): View
     {
-        $programa = ComplementarioOfertado::with(['modalidad', 'jornada', 'diasFormacion'])->findOrFail($id);
+        $programa->load(['modalidad.parametro', 'jornada', 'diasFormacion']);
+        $programa = $this->complementarioService->enriquecerPrograma($programa);
 
         $programaData = [
             'id' => $programa->id,
             'nombre' => $programa->nombre,
             'descripcion' => $programa->descripcion,
             'duracion' => $programa->duracion . ' horas',
-            'icono' => $this->complementarioService->getIconoForPrograma($programa->nombre),
-            'modalidad' => $programa->modalidad->parametro->name ?? 'N/A',
-            'jornada' => $programa->jornada->jornada ?? 'N/A',
-            'dias' => $programa->diasFormacion->map(function ($dia) {
+            'icono' => $programa->icono,
+            'modalidad' => $programa->modalidad_nombre ?? 'N/A',
+            'jornada' => $programa->jornada_nombre ?? 'N/A',
+            'dias' => $programa->diasFormacion->map(static function ($dia) {
                 return $dia->name . ' (' . $dia->pivot->hora_inicio . ' - ' . $dia->pivot->hora_fin . ')';
             })->implode(', '),
             'cupos' => $programa->cupos,
             'estado' => $programa->estado_label,
         ];
 
-        return view('complementarios.ver_programa_publico', compact('programaData'));
+        return view('complementarios.programas.public.show', compact('programaData'));
     }
 
     /**
      * API: Obtener datos de programa para edición
      */
-    public function edit($id)
+    public function edit(ComplementarioOfertado $programa): JsonResponse
     {
-        $programa = ComplementarioOfertado::with(
-            ['modalidad', 'jornada', 'diasFormacion', 'ambiente']
-        )->findOrFail($id);
+        $programa->load(['modalidad', 'jornada', 'diasFormacion', 'ambiente']);
 
-        $dias = $programa->diasFormacion->map(function ($dia) {
+        $dias = $programa->diasFormacion->map(static function ($dia) {
             return [
                 'dia_id' => $dia->id,
                 'hora_inicio' => $dia->pivot->hora_inicio,
@@ -175,73 +137,61 @@ class ProgramaComplementarioController extends Controller
     /**
      * Crear nuevo programa
      */
-    public function store(Request $request)
+    public function store(StoreProgramaComplementarioRequest $request): RedirectResponse
     {
-        $request->validate([
-            'codigo' => 'required|unique:complementarios_ofertados',
-            'nombre' => 'required',
-            'descripcion' => 'nullable',
-            'duracion' => self::VALIDATION_RULE_POSITIVE_INTEGER,
-            'cupos' => self::VALIDATION_RULE_POSITIVE_INTEGER,
-            'estado' => 'required|integer|in:0,1,2',
-            'modalidad_id' => 'required|exists:parametros_temas,id',
-            'jornada_id' => 'required|exists:jornadas_formacion,id',
-            'ambiente_id' => 'required|exists:ambientes,id',
-            'dias' => 'nullable|array',
-            'dias.*.dia_id' => 'exists:parametros_temas,id',
-            'dias.*.hora_inicio' => self::VALIDATION_RULE_TIME,
-            'dias.*.hora_fin' => self::VALIDATION_RULE_TIME,
-        ]);
+        $payload = $request->validated();
 
-        $programa = ComplementarioOfertado::create($request->only([
-            'codigo',
-            'nombre',
-            'descripcion',
-            'duracion',
-            'cupos',
-            'estado',
-            'modalidad_id',
-            'jornada_id',
-            'ambiente_id'
-        ]));
+        DB::transaction(function () use ($payload) {
+            $programa = ComplementarioOfertado::create($this->extractProgramaAtributos($payload));
 
-        if ($request->dias) {
-            foreach ($request->dias as $dia) {
-                $programa->diasFormacion()->attach($dia['dia_id'], [
-                    'hora_inicio' => $dia['hora_inicio'],
-                    'hora_fin' => $dia['hora_fin'],
-                ]);
-            }
-        }
+            $this->complementarioService->sincronizarDiasFormacion($programa, $payload['dias'] ?? null);
+        });
 
-        return redirect()->route('gestion-programas-complementarios')
+        return redirect()
+            ->route('complementarios-ofertados.index')
             ->with('success', 'Programa creado exitosamente.');
     }
 
     /**
      * Actualizar programa
      */
-    public function update(Request $request, $id)
-    {
-        $programa = ComplementarioOfertado::findOrFail($id);
+    public function update(
+        UpdateProgramaComplementarioRequest $request,
+        ComplementarioOfertado $programa
+    ): JsonResponse {
+        $payload = $request->validated();
 
-        $request->validate([
-            'codigo' => 'required|unique:complementarios_ofertados,codigo,' . $id,
-            'nombre' => 'required',
-            'descripcion' => 'nullable',
-            'duracion' => self::VALIDATION_RULE_POSITIVE_INTEGER,
-            'cupos' => self::VALIDATION_RULE_POSITIVE_INTEGER,
-            'estado' => 'required|integer|in:0,1,2',
-            'modalidad_id' => 'required|exists:parametros_temas,id',
-            'jornada_id' => 'required|exists:jornadas_formacion,id',
-            'ambiente_id' => 'required|exists:ambientes,id',
-            'dias' => 'nullable|array',
-            'dias.*.dia_id' => 'exists:parametros_temas,id',
-            'dias.*.hora_inicio' => self::VALIDATION_RULE_TIME,
-            'dias.*.hora_fin' => self::VALIDATION_RULE_TIME,
+        DB::transaction(function () use ($programa, $payload) {
+            $programa->update($this->extractProgramaAtributos($payload));
+
+            $this->complementarioService->sincronizarDiasFormacion($programa, $payload['dias'] ?? null);
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Programa actualizado exitosamente.',
         ]);
+    }
 
-        $programa->update($request->only([
+    /**
+     * Eliminar programa
+     */
+    public function destroy(ComplementarioOfertado $programa): JsonResponse
+    {
+        $programa->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Programa eliminado exitosamente.',
+        ]);
+    }
+
+    /**
+     * Extrae los atributos permitidos para crear o actualizar un programa.
+     */
+    private function extractProgramaAtributos(array $payload): array
+    {
+        return collect($payload)->only([
             'codigo',
             'nombre',
             'descripcion',
@@ -250,30 +200,7 @@ class ProgramaComplementarioController extends Controller
             'estado',
             'modalidad_id',
             'jornada_id',
-            'ambiente_id'
-        ]));
-
-        $programa->diasFormacion()->detach();
-        if ($request->dias) {
-            foreach ($request->dias as $dia) {
-                $programa->diasFormacion()->attach($dia['dia_id'], [
-                    'hora_inicio' => $dia['hora_inicio'],
-                    'hora_fin' => $dia['hora_fin'],
-                ]);
-            }
-        }
-
-        return response()->json(['success' => true, 'message' => 'Programa actualizado exitosamente.']);
-    }
-
-    /**
-     * Eliminar programa
-     */
-    public function destroy($id)
-    {
-        $programa = ComplementarioOfertado::findOrFail($id);
-        $programa->delete();
-
-        return response()->json(['success' => true, 'message' => 'Programa eliminado exitosamente.']);
+            'ambiente_id',
+        ])->toArray();
     }
 }

@@ -1,5 +1,25 @@
 // Funcionalidad para formularios de inscripción y registro
 
+// Constantes de configuración
+const CONFIG = {
+    EDAD_MINIMA: 14,
+    MENSAJE_EDAD_INVALIDA: 'Debe tener al menos 14 años para registrarse.',
+    NINGUNA_LABEL: 'NINGUNA',
+    CAMPOS_TEXTOS: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido'],
+    CAMPOS_NUMERICOS: ['numero_documento', 'telefono', 'celular'],
+    CAMPOS_DIRECCION_NUMERICOS: ['numero_via', 'numero_casa']
+};
+
+// Función para detectar el contexto del formulario
+function getFormContext() {
+    const registroForm = document.getElementById('registroForm');
+    const formInscripcion = document.getElementById('formInscripcion');
+
+    if (registroForm) return 'registro';
+    if (formInscripcion) return 'inscripcion';
+    return 'unknown';
+}
+
 // Constantes de configuración para centralizar reglas de negocio
 const CONFIG = {
     EDAD_MINIMA: 14,

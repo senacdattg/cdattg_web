@@ -2,14 +2,19 @@
 
 namespace App\Services;
 
-use App\Models\ComplementarioOfertado;
+use App\Models\Ambiente;
 use App\Models\AspiranteComplementario;
-use App\Models\Parametro;
-use App\Models\Tema;
-use Illuminate\Support\Facades\Log;
+use App\Models\ComplementarioOfertado;
+use App\Models\JornadaFormacion;
+use App\Models\ParametroTema;
+use App\Repositories\TemaRepository;
+use Illuminate\Database\Eloquent\Collection;
 
 class ComplementarioService
 {
+    public function __construct(
+        private readonly TemaRepository $temaRepository
+    ) {}
     /**
      * Obtener icono para un programa complementario
      */
@@ -56,26 +61,98 @@ class ComplementarioService
     }
 
     /**
+     * Enriquecer un programa con datos auxiliares para la vista.
+     */
+    public function enriquecerPrograma(ComplementarioOfertado $programa): ComplementarioOfertado
+    {
+        $programa->icono = $this->getIconoForPrograma($programa->nombre);
+        $programa->badge_class = $this->getBadgeClassForEstado($programa->estado);
+        $programa->estado_label = $this->getEstadoLabel($programa->estado);
+        $programa->modalidad_nombre = $programa->modalidad->parametro->name ?? null;
+        $programa->jornada_nombre = $programa->jornada->jornada ?? null;
+
+        return $programa;
+    }
+
+    /**
+     * Enriquecer una colección de programas complementarios.
+     */
+    public function enriquecerProgramas(Collection $programas): Collection
+    {
+        return $programas->map(function (ComplementarioOfertado $programa) {
+            return $this->enriquecerPrograma($programa);
+        });
+    }
+
+    /**
+     * Obtener programas con relaciones necesarias para diferentes vistas.
+     */
+    public function obtenerProgramas(array $relations = [], ?int $estado = null): Collection
+    {
+        $query = ComplementarioOfertado::query()->with($relations);
+
+        if (!is_null($estado)) {
+            $query->where('estado', $estado);
+        }
+
+        return $query->get();
+    }
+
+    /**
+     * Sincronizar días de formación garantizando atomicidad.
+     */
+    public function sincronizarDiasFormacion(ComplementarioOfertado $programa, ?array $dias): void
+    {
+        if (empty($dias)) {
+            $programa->diasFormacion()->detach();
+            return;
+        }
+
+        $programa->diasFormacion()->sync(
+            collect($dias)->mapWithKeys(static function ($dia) {
+                return [
+                    $dia['dia_id'] => [
+                        'hora_inicio' => $dia['hora_inicio'],
+                        'hora_fin' => $dia['hora_fin'],
+                    ],
+                ];
+            })->all()
+        );
+    }
+
+    /**
+     * Datos compartidos para vistas de gestión/admin.
+     */
+    public function obtenerDatosFormulario(): array
+    {
+        $modalidades = ParametroTema::query()
+            ->where('tema_id', 5)
+            ->with('parametro')
+            ->get();
+
+        $jornadas = JornadaFormacion::query()->get();
+
+        $ambientes = Ambiente::query()
+            ->with('piso')
+            ->where('status', 1)
+            ->orderBy('piso_id')
+            ->orderBy('title')
+            ->get();
+
+        return compact('modalidades', 'jornadas', 'ambientes');
+    }
+
+    /**
      * Obtener tipos de documento dinámicamente desde el tema-parametro
      */
     public function getTiposDocumento()
     {
-        // Buscar el tema "TIPO DE DOCUMENTO"
-        $temaTipoDocumento = Tema::where('name', 'TIPO DE DOCUMENTO')->first();
+        $temaTipoDocumento = $this->temaRepository->obtenerTiposDocumento();
 
         if (!$temaTipoDocumento) {
-            // Fallback: devolver valores hardcodeados si no se encuentra el tema
-            return collect([
-                ['id' => 3, 'name' => 'CEDULA DE CIUDADANIA'],
-                ['id' => 4, 'name' => 'CEDULA DE EXTRANJERIA'],
-                ['id' => 5, 'name' => 'PASAPORTE'],
-                ['id' => 6, 'name' => 'TARJETA DE IDENTIDAD'],
-                ['id' => 7, 'name' => 'REGISTRO CIVIL'],
-                ['id' => 8, 'name' => 'SIN IDENTIFICACION'],
-            ]);
+            return collect();
         }
 
-        // Obtener parámetros activos del tema
         return $temaTipoDocumento->parametros()
             ->where('parametros_temas.status', 1)
             ->orderBy('parametros.name')
@@ -87,19 +164,12 @@ class ComplementarioService
      */
     public function getGeneros()
     {
-        // Buscar el tema "GENERO"
-        $temaGenero = Tema::where('name', 'GENERO')->first();
+        $temaGenero = $this->temaRepository->obtenerGeneros();
 
         if (!$temaGenero) {
-            // Fallback: devolver valores hardcodeados si no se encuentra el tema
-            return collect([
-                ['id' => 9, 'name' => 'MASCULINO'],
-                ['id' => 10, 'name' => 'FEMENINO'],
-                ['id' => 11, 'name' => 'NO DEFINE'],
-            ]);
+            return collect();
         }
 
-        // Obtener parámetros activos del tema
         return $temaGenero->parametros()
             ->where('parametros_temas.status', 1)
             ->orderBy('parametros.name')
@@ -152,7 +222,8 @@ class ComplementarioService
                 ->where('estado', 1)->count(),
             'aspirantes_aceptados' => AspiranteComplementario::where('complementario_id', $programaId)
                 ->where('estado', 3)->count(),
-            'cupos_disponibles' => $programa->cupos - AspiranteComplementario::where('complementario_id', $programaId)->count(),
+            'cupos_disponibles' => $programa->cupos
+                - AspiranteComplementario::where('complementario_id', $programaId)->count(),
         ];
     }
 }

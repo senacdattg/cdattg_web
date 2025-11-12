@@ -7,7 +7,7 @@
             <i class="fas fa-graduation-cap mr-2"></i>{{ $programaData['nombre'] }}
         </h3>
         <div class="card-tools">
-            <a href="{{ route('programas-complementarios.publicos') }}" class="btn btn-outline-secondary btn-sm">
+            <a href="{{ route('programas-complementarios.index') }}" class="btn btn-outline-secondary btn-sm">
                 <i class="fas fa-arrow-left mr-1"></i> Volver a Programas
             </a>
         </div>
@@ -54,9 +54,8 @@
                                     <span class="description-text">¿ESTÁS INTERESADO?</span>
                                     <p class="text-muted mb-3">Realiza tu inscripción ahora mismo</p>
                                     @auth
-                                    <a href="{{ route('programas-complementarios.inscripcion',
-                                               ['id' => $programaData['id']]) }}"
-                                       class="btn btn-primary btn-block" data-show-preloader>
+                                    <a href="{{ route('programas-complementarios.inscripcion', ['programa' => $programaData['id']]) }}"
+                                        class="btn btn-primary btn-block" data-show-preloader>
                                         <i class="fas fa-user-plus mr-1"></i> Inscribirse
                                     </a>
                                     @else
