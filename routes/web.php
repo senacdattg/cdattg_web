@@ -48,15 +48,19 @@ Route::middleware('web')->group(function () {
         ->name('programas-complementarios.')
         ->group(function () {
             Route::get('/', [ProgramaComplementarioController::class, 'programasPublicos'])
-                ->name('publicos');
-            Route::get('{id}/inscripcion', [InscripcionComplementarioController::class, 'formularioInscripcion'])
+                ->name('index');
+
+            Route::get('{programa}/inscripcion', [InscripcionComplementarioController::class, 'formularioInscripcion'])
                 ->name('inscripcion');
-            Route::post('{id}/inscripcion', [InscripcionComplementarioController::class, 'procesarInscripcion'])
+            Route::post('{programa}/inscripcion', [InscripcionComplementarioController::class, 'procesarInscripcion'])
                 ->name('procesar-inscripcion');
-            Route::post('{id}/validar-sofia', [ValidacionSofiaController::class, 'validarSofia'])
+            Route::post('{programa}/validar-sofia', [ValidacionSofiaController::class, 'validarSofia'])
                 ->name('validar-sofia');
-            Route::post('{id}/validar-documento', [AspiranteComplementarioController::class, 'validarDocumentos'])
+            Route::post('{programa}/validar-documento', [AspiranteComplementarioController::class, 'validarDocumentos'])
                 ->name('validar-documento');
+
+            Route::get('{programa}', [ProgramaComplementarioController::class, 'verPrograma'])
+                ->name('show');
         });
 
     Route::prefix('inscripcion')
@@ -67,9 +71,6 @@ Route::middleware('web')->group(function () {
             Route::post('/', [InscripcionComplementarioController::class, 'procesarInscripcionGeneral'])
                 ->name('procesar');
         });
-
-    Route::get('/programas/{id}', [ProgramaComplementarioController::class, 'verPrograma'])
-        ->name('programa_complementario.ver');
 
     Route::get('/sofia-validation-progress/{progressId}', [ValidacionSofiaController::class, 'getValidationProgress'])
         ->name('sofia-validation.progress');

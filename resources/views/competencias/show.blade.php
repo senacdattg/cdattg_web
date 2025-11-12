@@ -83,27 +83,13 @@
                                             <td class="py-3">{{ $competencia->nombre }}</td>
                                         </tr>
                                         <tr>
-                                            <th class="py-3">Descripción</th>
-                                            <td class="py-3">{{ $competencia->descripcion ?? 'Sin descripción' }}</td>
+                                            <th class="py-3">Norma / Unidad de competencia</th>
+                                            <td class="py-3">{{ $competencia->descripcion ?? 'Sin información' }}</td>
                                         </tr>
                                         <tr>
-                                            <th class="py-3">Duración</th>
+                                            <th class="py-3">Duración máxima</th>
                                             <td class="py-3">
-                                                <span class="badge badge-info">{{ formatear_horas($competencia->duracion) }} horas</span>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="py-3">Fecha de Inicio</th>
-                                            <td class="py-3">
-                                                <i class="far fa-calendar-alt mr-1"></i>
-                                                {{ $competencia->fecha_inicio ? $competencia->fecha_inicio->format('d/m/Y') : 'N/A' }}
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <th class="py-3">Fecha de Fin</th>
-                                            <td class="py-3">
-                                                <i class="far fa-calendar-alt mr-1"></i>
-                                                {{ $competencia->fecha_fin ? $competencia->fecha_fin->format('d/m/Y') : 'N/A' }}
+                                                <span class="badge badge-info">{{ number_format($competencia->duracion ?? 0, 0) }} horas</span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -124,7 +110,19 @@
                                         <tr>
                                             <th class="py-3">Programas de Formación</th>
                                             <td class="py-3">
-                                                <span class="badge badge-info badge-lg">{{ $competencia->programasFormacion->count() }}</span>
+                                                @if ($competencia->programasFormacion->isNotEmpty())
+                                                    <ul class="list-unstyled mb-0">
+                                                        @foreach ($competencia->programasFormacion as $programa)
+                                                            <li class="mb-2">
+                                                                <span class="badge badge-primary mr-2">{{ $programa->codigo }}</span>
+                                                                <span class="font-weight-medium">{{ $programa->nombre }}</span>
+                                                                <span class="badge badge-light text-muted ml-2">{{ number_format($programa->horas_totales ?? 0, 0) }} h</span>
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @else
+                                                    <span class="text-muted">Sin programas asociados</span>
+                                                @endif
                                             </td>
                                         </tr>
                                         <tr>

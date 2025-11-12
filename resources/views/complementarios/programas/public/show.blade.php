@@ -1,4 +1,4 @@
-@extends('complementarios.layout.master-layout-complementarios')
+@extends('complementarios.layout.master')
 @section('title', 'Información del Programa | SENA')
 @section('css')
     @vite(['resources/css/formulario_inscripcion.css'])
@@ -76,8 +76,6 @@
             </div>
         </div>
     </div>
-
-@include('complementarios.layout.footer-complementarios')
 @endsection
 
 <script>

@@ -206,6 +206,15 @@ class SuperAdminSeeder extends Seeder
             // Permisos para talento humano
             'VER TALENTO HUMANO',
             'CREAR TALENTO HUMANO',
+
+            'VER COMPETENCIA',
+            'CREAR COMPETENCIA',
+            'EDITAR COMPETENCIA',
+            'ELIMINAR COMPETENCIA',
+            'GESTIONAR RESULTADOS COMPETENCIA',
+            'CAMBIAR ESTADO COMPETENCIA',
+
+            'ASIGNACION DE INSTRUCTORES',
         ];
 
         // Crear cada permiso si no existe

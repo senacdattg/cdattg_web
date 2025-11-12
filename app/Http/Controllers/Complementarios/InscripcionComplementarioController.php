@@ -44,9 +44,7 @@ class InscripcionComplementarioController extends Controller
         $tiposDocumento = $this->complementarioService->getTiposDocumento();
         $generos = $this->complementarioService->getGeneros();
 
-        return view(
-            'complementarios.inscripcion_general',
-            compact('temasCaracterizacion', 'paises', 'departamentos', 'tiposDocumento', 'generos'));
+        return view('complementarios.inscripciones.general', compact('categoriasConHijos', 'paises', 'departamentos', 'tiposDocumento', 'generos'));
     }
 
     /**
@@ -154,7 +152,7 @@ class InscripcionComplementarioController extends Controller
         $personaAutenticada = Auth::check() ? Auth::user()->persona : null;
         $this->prefillOldInput($personaAutenticada);
 
-        return view('complementarios.formulario_inscripcion', [
+        return view('complementarios.inscripciones.create', [
             'programa' => $programa,
             'categoriasConHijos' => $categoriasConHijos,
             'paises' => $paises,

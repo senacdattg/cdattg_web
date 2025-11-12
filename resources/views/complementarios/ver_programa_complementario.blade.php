@@ -11,7 +11,7 @@
             <p class="text-muted mb-0">Detalle del programa complementario</p>
         </div>
         <div>
-            <a href="{{ route('gestion-programas-complementarios') }}" class="btn btn-outline-primary">
+            <a href="{{ route('complementarios-ofertados.index') }}" class="btn btn-outline-primary">
                 <i class="fas fa-arrow-left me-1"></i> Volver a Gestión
             </a>
         </div>
@@ -90,7 +90,7 @@
                             @php
                                 $programParam = is_object($programa) ? ($programa->id ?? $programa) : $programa;
                             @endphp
-                            <a href="{{ route('programa_complementario.ver', ['programa' => $programParam]) }}"
+                            <a href="{{ route('programas-complementarios.show', ['programa' => $programParam]) }}"
                                 class="btn btn-primary">
                                 <i class="fas fa-eye me-1"></i> Ver en público
                             </a>

@@ -60,6 +60,16 @@ class ResultadosAprendizaje extends Model
                     ->withTimestamps();
     }
 
+    public function asignacionesInstructor()
+    {
+        return $this->belongsToMany(
+            AsignacionInstructor::class,
+            'asignacion_instructor_resultado',
+            'resultado_aprendizaje_id',
+            'asignacion_id'
+        )->withTimestamps();
+    }
+
     /**
      * Relación con la tabla intermedia resultados_aprendizaje_competencia
      */

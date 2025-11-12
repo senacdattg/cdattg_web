@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Repositories\LoginRepository;
 use App\Repositories\AsignacionInstructorLogRepository;
+use App\Repositories\SenasofiaplusValidationLogRepository;
 use App\Models\Login;
 use Illuminate\Support\Facades\Log;
 
@@ -11,13 +12,16 @@ class AuditoriaService
 {
     protected LoginRepository $loginRepo;
     protected AsignacionInstructorLogRepository $asignacionLogRepo;
+    protected SenasofiaplusValidationLogRepository $senasofiaplusLogRepo;
 
     public function __construct(
         LoginRepository $loginRepo,
-        AsignacionInstructorLogRepository $asignacionLogRepo
+        AsignacionInstructorLogRepository $asignacionLogRepo,
+        SenasofiaplusValidationLogRepository $senasofiaplusLogRepo
     ) {
         $this->loginRepo = $loginRepo;
         $this->asignacionLogRepo = $asignacionLogRepo;
+        $this->senasofiaplusLogRepo = $senasofiaplusLogRepo;
     }
 
     /**
@@ -81,6 +85,35 @@ class AuditoriaService
     }
 
     /**
+     * Registra validación de SenaSofiaPlus
+     *
+     * @param int $aspiranteId
+     * @param string $resultado
+     * @param string $mensaje
+     * @param array $detalles
+     * @return void
+     */
+    public function registrarValidacionSenasofiaplus(int $aspiranteId, string $resultado, string $mensaje, array $detalles = []): void
+    {
+        try {
+            $this->senasofiaplusLogRepo->registrar([
+                'aspirante_id' => $aspiranteId,
+                'accion' => 'validar',
+                'detalles' => $detalles,
+                'resultado' => $resultado,
+                'mensaje' => $mensaje,
+                'user_id' => 1, // Bot user
+                'fecha_accion' => now(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error registrando validación SenaSofiaPlus', [
+                'error' => $e->getMessage(),
+                'aspirante_id' => $aspiranteId,
+            ]);
+        }
+    }
+
+    /**
      * Obtiene reporte de auditoría
      *
      * @param string $fechaInicio
@@ -98,6 +131,10 @@ class AuditoriaService
 
         if ($tipo === 'todo' || $tipo === 'asignaciones') {
             $resultado['asignaciones'] = $this->asignacionLogRepo->obtenerAuditoria($fechaInicio, $fechaFin);
+        }
+
+        if ($tipo === 'todo' || $tipo === 'senasofiaplus') {
+            $resultado['senasofiaplus'] = $this->senasofiaplusLogRepo->obtenerAuditoria($fechaInicio, $fechaFin);
         }
 
         return $resultado;

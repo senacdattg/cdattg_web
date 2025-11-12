@@ -21,7 +21,7 @@ class DocumentoComplementarioController extends Controller
         // Obtener aspirante_id de la URL
         $aspiranteId = $request->query('aspirante_id');
 
-        return view('complementarios.formulario_documentos', compact('programa', 'aspiranteId'));
+        return view('complementarios.inscripciones.documents', compact('programa', 'aspirante_id'));
     }
 
     /**
@@ -132,6 +132,6 @@ class DocumentoComplementarioController extends Controller
      */
     public function procesarDocumentos()
     {
-        return view('complementarios.procesamiento_documentos');
+        return view('complementarios.inscripciones.processing');
     }
 }

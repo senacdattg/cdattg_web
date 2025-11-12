@@ -52,6 +52,11 @@ class Competencia extends Model
          ->withPivot('user_create_id', 'user_edit_id');
     }
 
+    public function asignacionesInstructor()
+    {
+        return $this->hasMany(AsignacionInstructor::class, 'competencia_id');
+    }
+
     public function userCreate()
     {
         return $this->belongsTo(User::class, 'user_create_id');

@@ -74,6 +74,54 @@
                                             </td>
                                         </tr>
                                         <tr>
+                                            <th class="py-3">Horas totales</th>
+                                            <td class="py-3">
+                                                <i class="fas fa-hourglass-half mr-1"></i>
+                                                {{ number_format($programa->horas_totales ?? 0) }} horas
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Horas etapa lectiva</th>
+                                            <td class="py-3">
+                                                <i class="fas fa-book-reader mr-1"></i>
+                                                {{ number_format($programa->horas_etapa_lectiva ?? 0) }} horas
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Horas etapa productiva</th>
+                                            <td class="py-3">
+                                                <i class="fas fa-industry mr-1"></i>
+                                                {{ number_format($programa->horas_etapa_productiva ?? 0) }} horas
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3 align-top">Competencias asociadas</th>
+                                            <td class="py-3">
+                                                @if ($programa->competencias->isNotEmpty())
+                                                    <ul class="list-unstyled mb-0">
+                                                        @foreach ($programa->competencias as $competencia)
+                                                            <li class="mb-2">
+                                                                <span class="badge badge-primary mr-2">{{ $competencia->codigo }}</span>
+                                                                <span class="font-weight-medium">{{ $competencia->nombre }}</span>
+                                                                @if ($competencia->duracion)
+                                                                    <span class="badge badge-light text-muted ml-2">
+                                                                        {{ number_format($competencia->duracion, 0) }} h
+                                                                    </span>
+                                                                @endif
+                                                                @if ($competencia->status)
+                                                                    <span class="badge badge-success ml-2">Activa</span>
+                                                                @else
+                                                                    <span class="badge badge-secondary ml-2">Inactiva</span>
+                                                                @endif
+                                                            </li>
+                                                        @endforeach
+                                                    </ul>
+                                                @else
+                                                    <span class="text-muted">Sin competencias asociadas.</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <th class="py-3">Estado</th>
                                             <td class="py-3">
                                                 <span class="status-badge {{ $programa->status ? 'text-success' : 'text-danger' }}">

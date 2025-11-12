@@ -4,7 +4,7 @@
     @vite(['resources/css/formulario_inscripcion.css'])
 @endsection
 @section('content')
-    @include('complementarios.layout.header-complementarios')
+    @include('complementarios.layout.header')
 
     <div class="container-fluid mt-4" style="background-color: #ebf1f4; min-height: 100vh;">
         <div class="row justify-content-center">
@@ -90,9 +90,7 @@
                                                 value="0">
 
                                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                                <a
-                                                    href="{{route('programas-complementarios.inscripcion',
-                                                    $programa->id)}}"
+                                                <a href="{{ route('programas-complementarios.inscripcion', ['programa' => $programa->id]) }}"
                                                     class="btn btn-outline-secondary me-md-2">
                                                     <i class="fas fa-arrow-left mr-1"></i> Volver Atrás
                                                 </a>
@@ -163,13 +161,11 @@
         </div>
     </div>
 
-
-    @include('complementarios.layout.footer-complementarios')
-    <script>
-        // Habilitar botón de envío cuando se selecciona un archivo y se acepta la privacidad
-        const documentoInput = document.getElementById('documento_identidad');
-        const privacidadCheckbox = document.getElementById('acepto_privacidad');
-        const btnEnviar = document.getElementById('btnEnviar');
+<script>
+    // Habilitar botón de envío cuando se selecciona un archivo y se acepta la privacidad
+    const documentoInput = document.getElementById('documento_identidad');
+    const privacidadCheckbox = document.getElementById('acepto_privacidad');
+    const btnEnviar = document.getElementById('btnEnviar');
 
         function actualizarBotonEnviar() {
             const archivoSeleccionado = documentoInput.files.length > 0;

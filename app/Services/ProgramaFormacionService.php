@@ -35,10 +35,11 @@ class ProgramaFormacionService
         return $this->repository->obtenerPorRed($redId);
     }
 
-    public function crear(array $datos): ProgramaFormacion
+    public function crear(array $datos, array $competenciasIds = []): ProgramaFormacion
     {
-        return DB::transaction(function () use ($datos) {
+        return DB::transaction(function () use ($datos, $competenciasIds) {
             $programa = ProgramaFormacion::create($datos);
+            $programa->competencias()->sync($competenciasIds);
             $this->repository->invalidarCache();
 
             Log::info('Programa creado', ['programa_id' => $programa->id]);
@@ -47,12 +48,13 @@ class ProgramaFormacionService
         });
     }
 
-    public function actualizar(int $id, array $datos): bool
+    public function actualizar(ProgramaFormacion $programa, array $datos, ?array $competenciasIds = null): bool
     {
-        return DB::transaction(function () use ($id, $datos) {
-            $actualizado = ProgramaFormacion::where('id', $id)->update($datos);
+        return DB::transaction(function () use ($programa, $datos, $competenciasIds) {
+            $actualizado = $programa->update($datos);
             
-            if ($actualizado) {
+            if ($actualizado && is_array($competenciasIds)) {
+                $programa->competencias()->sync($competenciasIds);
                 $this->repository->invalidarCache();
             }
 

@@ -4,7 +4,7 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.1); border: 1px solid #dee2e6;">
     <div class="container-fluid">
         <a class="navbar-brand text-dark d-flex align-items-center"
-            href="{{ route('programas-complementarios.publicos') }}">
+            href="{{ route('programas-complementarios.index') }}">
             <img src="{{ asset('vendor/adminlte/dist/img/LogoSena.png') }}" alt="SENA Logo"
                 height="40" class="me-2 rounded-circle bg-white p-1">
             <span class="d-none d-lg-inline"><strong>SENA Regional Guaviare</strong></span>
@@ -24,7 +24,7 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark" href="{{ route('programas-complementarios.publicos') }}">
+                    <a class="nav-link text-dark" href="{{ route('programas-complementarios.index') }}">
                         <i class="fas fa-graduation-cap me-1"></i> Programas
                     </a>
                 </li>

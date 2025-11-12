@@ -6,6 +6,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use App\Models\AspiranteComplementario;
 use App\Models\Persona;
+use App\Services\AuditoriaService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -16,6 +17,7 @@ class ValidarSofiaJob implements ShouldQueue
     protected $complementarioId;
     protected $userId;
     protected $progressId;
+    protected AuditoriaService $auditoriaService;
 
     /**
      * Create a new job instance.
@@ -30,8 +32,10 @@ class ValidarSofiaJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(AuditoriaService $auditoriaService): void
     {
+        $this->auditoriaService = $auditoriaService;
+
         Log::info("🚀 Iniciando validación SenaSofiaPlus para programa: {$this->complementarioId}");
 
         // Obtener registro de progreso si existe
@@ -87,12 +91,31 @@ class ValidarSofiaJob implements ShouldQueue
                     $endTime = microtime(true);
                     $duration = round($endTime - $startTime, 2);
 
+                    // Guardar estado anterior para auditoría
+                    $estadoAnterior = $aspirante->persona->estado_sofia;
+
                     // Actualizar estado basado en resultado
                     $nuevoEstado = $this->determinarEstadoSofia($resultado);
                     $aspirante->persona->update(['estado_sofia' => $nuevoEstado]);
 
                     $estadoLabel = $this->getEstadoLabel($nuevoEstado);
                     Log::info("✅ Cédula {$cedula}: {$resultado} -> Estado: {$estadoLabel} (Tiempo: {$duration}s)");
+
+                    // Registrar en auditoría
+                    $resultadoAuditoria = $nuevoEstado === 1 ? 'exitoso' : ($nuevoEstado === 0 ? 'advertencia' : 'exitoso'); // Considerar cualquier validación completada como exitosa
+                    $this->auditoriaService->registrarValidacionSenasofiaplus(
+                        $aspirante->id,
+                        $resultadoAuditoria,
+                        "Validación completada: {$resultado} -> {$estadoLabel}",
+                        [
+                            'cedula' => $cedula,
+                            'resultado_api' => $resultado,
+                            'estado_anterior' => $estadoAnterior,
+                            'estado_nuevo' => $nuevoEstado,
+                            'tiempo_respuesta' => $duration,
+                            'complementario_id' => $this->complementarioId
+                        ]
+                    );
 
                     if ($nuevoEstado === 1) {
                         $exitosos++;
@@ -114,6 +137,20 @@ class ValidarSofiaJob implements ShouldQueue
                         'complementario_id' => $this->complementarioId,
                         'exception' => $e->getTraceAsString()
                     ]);
+
+                    // Registrar error en auditoría
+                    $this->auditoriaService->registrarValidacionSenasofiaplus(
+                        $aspirante->id,
+                        'error',
+                        $errorMsg,
+                        [
+                            'cedula' => $cedula,
+                            'tiempo_respuesta' => $duration ?? null,
+                            'complementario_id' => $this->complementarioId,
+                            'exception_message' => $e->getMessage(),
+                            'exception_type' => get_class($e)
+                        ]
+                    );
 
                     $errores++;
                     $errores_detalle[] = $errorMsg;

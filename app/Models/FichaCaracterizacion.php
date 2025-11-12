@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
+use App\Models\AsignacionInstructor;
 
 class FichaCaracterizacion extends Model
 {
@@ -191,6 +192,11 @@ class FichaCaracterizacion extends Model
             'ficha_id',
             'aprendiz_id'
         )->withTimestamps();
+    }
+
+    public function asignacionesInstructor(): HasMany
+    {
+        return $this->hasMany(AsignacionInstructor::class, 'ficha_id');
     }
 
 

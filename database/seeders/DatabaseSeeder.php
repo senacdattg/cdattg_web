@@ -1,5 +1,7 @@
 <?php
+
 namespace Database\Seeders;
+
 use App\Models\Ambiente;
 use App\Models\Aprendiz;
 use App\Models\AprendizFicha;
@@ -17,11 +19,14 @@ use App\Models\Inventario\Orden;
 use App\Models\Inventario\Producto;
 use App\Models\Inventario\Proveedor;
 use App\Models\Parametro;
+use App\Models\ProgramaFormacion;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use App\Models\CompetenciaPrograma;
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -48,7 +53,6 @@ class DatabaseSeeder extends Seeder
             PisoSeeder::class,
             AmbienteSeeder::class,
             RedConocimientoSeeder::class,
-            ProgramasFormacionSeeder::class,
             JornadaFormacionSeeder::class,
             UpdatePersonasUserFieldsSeeder::class,
             CompetenciaSeeder::class,
@@ -56,7 +60,6 @@ class DatabaseSeeder extends Seeder
             ResultadosCompetenciasSeeder::class,
             GuiasAprendizajeSeeder::class,
             ResultadosGuiasSeeder::class,
-            CompetenciaProgramaSeeder::class,
             ProductoSeeder::class, // Crear productos para agregar al módulo de inventario
             // Complementarios ofertados
             // ComplementariosOfertadosSeeder::class,
@@ -65,6 +68,7 @@ class DatabaseSeeder extends Seeder
             // Categorias de caracterizacion para complementarios
             // CategoriaCaracterizacionComplementariosSeeder::class,
         ]);
+
     }
     private function truncateGeneratedData(): void
     {

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProgramaFormacion extends Model
@@ -19,14 +20,20 @@ class ProgramaFormacion extends Model
         'nombre', 
         'red_conocimiento_id', 
         'nivel_formacion_id',
-        'tipo_programa_id',
         'user_create_id',
         'user_edit_id',
-        'status'
+        'status',
+        'horas_totales',
+        'horas_etapa_lectiva',
+        'horas_etapa_productiva',
+        'tipo_programa_id'
     ];
 
     protected $casts = [
         'status' => 'boolean',
+        'horas_totales' => 'integer',
+        'horas_etapa_lectiva' => 'integer',
+        'horas_etapa_productiva' => 'integer',
     ];
 
     protected static function boot()
@@ -86,6 +93,17 @@ class ProgramaFormacion extends Model
     public function competenciasProgramas(): HasMany
     {
         return $this->hasMany(CompetenciaPrograma::class, 'programa_id');
+    }
+
+    public function competencias(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Competencia::class,
+            'competencia_programa',
+            'programa_id',
+            'competencia_id'
+        )->withTimestamps()
+         ->withPivot('user_create_id', 'user_edit_id');
     }
 
     public function competenciaActual()

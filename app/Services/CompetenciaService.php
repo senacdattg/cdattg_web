@@ -32,7 +32,7 @@ class CompetenciaService
      */
     public function obtenerPorPrograma(int $programaId): Collection
     {
-        return Competencia::whereHas('programaFormacion', function($query) use ($programaId) {
+        return Competencia::whereHas('programasFormacion', function($query) use ($programaId) {
             $query->where('id', $programaId);
         })->get();
     }
