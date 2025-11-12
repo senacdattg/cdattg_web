@@ -54,6 +54,7 @@ class DatabaseSeeder extends Seeder
             JornadaFormacionSeeder::class,
             CompetenciaSeeder::class,
             ProductoSeeder::class, // Crear productos para agregar al módulo de inventario
+            UsersTableSeeder::class,
             // Complementarios ofertados
             // ComplementariosOfertadosSeeder::class,
             // Aspirantes complementarios

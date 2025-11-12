@@ -11,8 +11,9 @@ class RolePermissionSeeder extends Seeder
     public function run()
     {
         // Crear roles usando firstOrCreate para evitar duplicados
-        $superAdministrador = Role::firstOrCreate(['name' => 'SUPER ADMINISTRADOR']);
-        $administrador      = Role::firstOrCreate(['name' => 'ADMINISTRADOR']);
+        $bot = Role::firstOrCreate(['name' => 'BOT']);
+        $superAdmin = Role::firstOrCreate(['name' => 'SUPER ADMINISTRADOR']);
+        $admin      = Role::firstOrCreate(['name' => 'ADMINISTRADOR']);
         $instructor         = Role::firstOrCreate(['name' => 'INSTRUCTOR']);
         $visitante          = Role::firstOrCreate(['name' => 'VISITANTE']);
         $aprendiz           = Role::firstOrCreate(['name' => 'APRENDIZ']);
@@ -222,10 +223,10 @@ class RolePermissionSeeder extends Seeder
         }
 
         // Asignar todos los permisos existentes al SUPER ADMINISTRADOR
-        $superAdministrador->syncPermissions(Permission::all());
+        $superAdmin->syncPermissions(Permission::all());
 
         // Asignar permisos al rol ADMINISTRADOR
-        $administrador->givePermissionTo([
+        $admin->givePermissionTo([
             'CREAR FICHA DE CARACTERIZACION',
             'EDITAR FICHA DE CARACTERIZACION',
             'VER FICHA DE CARACTERIZACION',
