@@ -24,9 +24,9 @@ class ContratoConvenioController extends InventarioController
         $search = $request->input('search');
 
         $contratosConveniosQuery = ContratoConvenio::with([
-            'proveedor', 
-            'estado.parametro', 
-            'userCreate.persona', 
+            'proveedor',
+            'estado.parametro',
+            'userCreate.persona',
             'userUpdate.persona'
         ])->latest();
 
@@ -45,12 +45,12 @@ class ContratoConvenioController extends InventarioController
             ->appends($request->only('search'));
 
         $contratosConvenios->withPath(route('inventario.contratos-convenios.index'));
-        
+
         $estados = ParametroTema::with(['parametro', 'tema'])
             ->whereHas('tema', fn($q) => $q->where('name', 'ESTADOS'))
             ->where('parametros_temas.status', 1)
             ->get();
-        
+
         return view('inventario.contratos_convenios.index', compact('contratosConvenios', 'estados'));
     }
 
