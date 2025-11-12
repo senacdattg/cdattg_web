@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Models\Persona;
 
 class UpdatePersonaRequest extends FormRequest
 {
@@ -22,11 +23,14 @@ class UpdatePersonaRequest extends FormRequest
      */
     public function rules(): array
     {
-        // Se usa route model binding para obtener la instancia de Persona
-        $persona = $this->route('persona');
-        $personaId = $persona ? $persona->id : null;
-        // Se verifica que exista un usuario asociado; de lo contrario, se ignora la validación de unicidad en users
-        $userId = ($persona && $persona->user) ? $persona->user->id : null;
+        $personaId = $this->input('persona_id');
+        $userId = null;
+        if ($personaId) {
+            $persona = Persona::with('user')->find($personaId);
+            if ($persona && $persona->user) {
+                $userId = $persona->user->id;
+            }
+        }
 
         return [
             'tipo_documento'      => 'required',

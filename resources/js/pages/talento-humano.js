@@ -158,6 +158,7 @@ class TalentoHumanoManager {
 
         const formData = new FormData(this.elements.personaForm);
         const isUpdate = this.elements.actionModeInput.value === 'update';
+        const personaId = this.elements.personaIdInput.value;
 
         const btnGuardar = this.elements.btnGuardar;
         const textoOriginal = btnGuardar.innerHTML;
@@ -166,17 +167,21 @@ class TalentoHumanoManager {
 
         try {
             let response;
-            if (isUpdate && this.currentPersona) {
-                response = await axios.post(
-                    `/personas/${this.currentPersona.id}`,
-                    formData,
-                    {
-                        headers: {
-                            'Content-Type': 'multipart/form-data',
-                            'X-HTTP-Method-Override': 'PUT'
+            if (isUpdate) {
+                if (personaId) {
+                    response = await axios.post(
+                        `/personas/${personaId}`,
+                        formData,
+                        {
+                            headers: {
+                                'Content-Type': 'multipart/form-data',
+                                'X-HTTP-Method-Override': 'PUT'
+                            }
                         }
-                    }
-                );
+                    );
+                } else {
+                    throw new Error('ID de persona no encontrado');
+                }
             } else {
                 response = await axios.post('/talento-humano/personas', formData, {
                     headers: { 'Content-Type': 'multipart/form-data' }
@@ -190,6 +195,15 @@ class TalentoHumanoManager {
 
                 if (!isUpdate && response.data.data) {
                     this.mostrarPersonaExistente(response.data.data);
+                } else if (isUpdate && response.data.data) {
+                    // Actualizar el formulario con los nuevos datos
+                    this.llenarFormulario(response.data.data);
+                    this.setFormularioSoloLectura(true);
+                    this.isEditing = false;
+                    this.elements.btnEditar.style.display = 'inline-block';
+                    this.elements.btnGuardar.style.display = 'none';
+                    this.elements.btnRegistrarEntrada.style.display = 'inline-block';
+                    this.elements.btnRegistrarSalida.style.display = 'inline-block';
                 } else {
                     this.setFormularioSoloLectura(true);
                     this.isEditing = false;
@@ -501,77 +515,15 @@ class TalentoHumanoManager {
             return;
         }
 
-        // Iconos FontAwesome más vistosos
-        const iconosFA = {
-            success: '<i class="fas fa-check-circle" style="font-size: 28px;"></i>',
-            error: '<i class="fas fa-times-circle" style="font-size: 28px;"></i>',
-            warning: '<i class="fas fa-exclamation-triangle" style="font-size: 28px;"></i>',
-            info: '<i class="fas fa-info-circle" style="font-size: 28px;"></i>'
-        };
-
-        // Mapeo de tipos a iconos de SweetAlert
-        const iconos = {
-            success: 'success',
-            error: 'error',
-            warning: 'warning',
-            info: 'info'
-        };
-
-        // Configurar Toast de SweetAlert2 con diseño mejorado
-        const Toast = SwalInstance.mixin({
-            toast: true,
-            position: 'bottom-end', // Abajo a la derecha
+        // Usar configuración simple compatible con SweetAlert2 v8
+        SwalInstance.fire({
+            icon: tipo,
+            title: titulo,
+            text: texto,
+            timer: 5000,
             showConfirmButton: false,
-            timer: 5000, // 5 segundos
-            timerProgressBar: true,
-            width: '380px',
-            padding: '0',
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', SwalInstance.stopTimer);
-                toast.addEventListener('mouseleave', SwalInstance.resumeTimer);
-                
-                // Agregar efecto de pulso al icono
-                const iconElement = toast.querySelector('.swal2-icon');
-                if (iconElement) {
-                    iconElement.style.animation = 'pulse 2s infinite';
-                }
-            },
-            customClass: {
-                popup: 'swal2-toast-enhanced',
-                container: 'swal2-toast-container-enhanced'
-            }
-        });
-
-        // Construir HTML mejorado con icono y contenido
-        const iconHTML = iconosFA[tipo] || iconosFA.info;
-        const contenidoHTML = texto 
-            ? `<div style="display: flex; align-items: flex-start; gap: 15px;">
-                <div style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: rgba(255, 255, 255, 0.2); border-radius: 50%;">
-                    ${iconHTML}
-                </div>
-                <div style="flex: 1;">
-                    <div style="font-weight: 600; font-size: 16px; margin-bottom: 6px; color: #212529;">${titulo}</div>
-                    <div style="font-size: 14px; line-height: 1.5; color: #212529;">${texto}</div>
-                </div>
-               </div>`
-            : `<div style="display: flex; align-items: center; gap: 15px;">
-                <div style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: rgba(255, 255, 255, 0.2); border-radius: 50%;">
-                    ${iconHTML}
-                </div>
-                <div style="flex: 1; font-weight: 600; font-size: 16px; color: #212529;">${titulo}</div>
-               </div>`;
-
-        // Mostrar el toast con diseño mejorado
-        Toast.fire({
-            icon: iconos[tipo] || 'info',
-            title: '',
-            html: contenidoHTML,
-            showClass: {
-                popup: 'animate__animated animate__fadeInRight animate__faster'
-            },
-            hideClass: {
-                popup: 'animate__animated animate__fadeOutRight animate__faster'
-            }
+            position: 'bottom-end',
+            toast: true
         });
     }
 }
