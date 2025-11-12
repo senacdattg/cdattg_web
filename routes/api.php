@@ -296,6 +296,15 @@ Route::post('/websocket/salida', [\App\Http\Controllers\WebSocketVisitantesContr
 Route::get('/websocket/visitantes-actuales', [\App\Http\Controllers\WebSocketVisitantesController::class, 'obtenerVisitantesActuales']);
 
 // ==========================================
+// WEBSOCKETS - ENTRADAS/SALIDAS TALENTO HUMANO
+// ==========================================
+
+Route::post('/websocket/entrada-salida/entrada', [\App\Http\Controllers\WebSocketEntradaSalidaController::class, 'registrarEntrada']);
+Route::post('/websocket/entrada-salida/salida', [\App\Http\Controllers\WebSocketEntradaSalidaController::class, 'registrarSalida']);
+Route::get('/websocket/entrada-salida/estadisticas', [\App\Http\Controllers\WebSocketEntradaSalidaController::class, 'obtenerEstadisticas']);
+Route::get('/websocket/entrada-salida/personas-dentro', [\App\Http\Controllers\WebSocketEntradaSalidaController::class, 'obtenerPersonasDentro']);
+
+// ==========================================
 // REGISTRO DE PRESENCIA - ESTADÍSTICAS DE PERSONAS DENTRO
 // ==========================================
 
