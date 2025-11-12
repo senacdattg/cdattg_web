@@ -1428,7 +1428,7 @@ class PreloaderHandler {
 
 class FieldValidator {
     constructor() {
-        this.timeout = null;
+        this.timeouts = {};
         this.http = new HttpClient();
     }
 
@@ -1438,10 +1438,10 @@ class FieldValidator {
             const cedulaField = resolveField(form, 'numero_documento');
             if (cedulaField) {
                 bindOnce(cedulaField, 'input', (e) => {
-                    clearTimeout(this.timeout);
+                    clearTimeout(this.timeouts.cedula);
                     const cedula = e.target.value.trim();
                     if (cedula.length >= 5) {
-                        this.timeout = setTimeout(() => {
+                        this.timeouts.cedula = setTimeout(() => {
                             this.checkCedulaAvailability(cedula);
                         }, 500);
                     } else {
@@ -1458,7 +1458,10 @@ class FieldValidator {
             const celularField = resolveField(form, 'celular');
             if (celularField) {
                 bindOnce(celularField, 'input', (e) => {
-                    this.validatePhoneLength(e.target, 10, 'celular-feedback', 'El celular debe tener exactamente 10 dígitos');
+                    clearTimeout(this.timeouts.celular);
+                    this.timeouts.celular = setTimeout(() => {
+                        this.validatePhoneField(e.target, 10, 'celular-feedback', 'El celular debe tener exactamente 10 dígitos', '/api/check-celular', 'celular');
+                    }, 500);
                 }, 'personaCelularInput');
             }
 
@@ -1466,7 +1469,10 @@ class FieldValidator {
             const telefonoField = resolveField(form, 'telefono');
             if (telefonoField) {
                 bindOnce(telefonoField, 'input', (e) => {
-                    this.validatePhoneLength(e.target, 7, 'telefono-feedback', 'El teléfono fijo debe tener exactamente 7 dígitos');
+                    clearTimeout(this.timeouts.telefono);
+                    this.timeouts.telefono = setTimeout(() => {
+                        this.validatePhoneField(e.target, 7, 'telefono-feedback', 'El teléfono fijo debe tener exactamente 7 dígitos', '/api/check-telefono', 'telefono');
+                    }, 500);
                 }, 'personaTelefonoInput');
             }
         });
@@ -1492,7 +1498,7 @@ class FieldValidator {
         }
     }
 
-    validatePhoneLength(field, requiredLength, feedbackId, message) {
+    async validatePhoneField(field, requiredLength, feedbackId, lengthMessage, apiUrl, fieldName) {
         const feedback = document.getElementById(feedbackId);
         if (!feedback) return;
 
@@ -1506,14 +1512,32 @@ class FieldValidator {
 
         if (/^\d+$/.test(value)) {
             if (value.length === requiredLength) {
-                feedback.textContent = 'Número válido';
-                feedback.className = 'form-text text-success';
-                field.setCustomValidity('');
-                field.classList.remove('is-invalid');
+                // Verificar unicidad
+                feedback.textContent = 'Verificando...';
+                feedback.className = 'form-text text-info';
+                try {
+                    const response = await this.http.post(apiUrl, { [fieldName]: value });
+                    if (response.success) {
+                        feedback.textContent = `${fieldName === 'celular' ? 'Celular' : 'Teléfono'} ya registrado en el sistema`;
+                        feedback.className = 'form-text text-danger';
+                        field.setCustomValidity(`${fieldName === 'celular' ? 'Celular' : 'Teléfono'} ya registrado`);
+                        field.classList.add('is-invalid');
+                    } else {
+                        feedback.textContent = `${fieldName === 'celular' ? 'Celular' : 'Teléfono'} disponible`;
+                        feedback.className = 'form-text text-success';
+                        field.setCustomValidity('');
+                        field.classList.remove('is-invalid');
+                    }
+                } catch (error) {
+                    feedback.textContent = `Error al verificar ${fieldName === 'celular' ? 'celular' : 'teléfono'}`;
+                    feedback.className = 'form-text text-warning';
+                    field.setCustomValidity(`Error al verificar ${fieldName === 'celular' ? 'celular' : 'teléfono'}`);
+                    field.classList.add('is-invalid');
+                }
             } else {
-                feedback.textContent = message;
+                feedback.textContent = lengthMessage;
                 feedback.className = 'form-text text-danger';
-                field.setCustomValidity(message);
+                field.setCustomValidity(lengthMessage);
                 field.classList.add('is-invalid');
             }
         } else {

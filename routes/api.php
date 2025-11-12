@@ -113,6 +113,50 @@ Route::post('/check-cedula', function (Request $request) {
     ]);
 })->name('api.check-cedula');
 
+Route::post('/check-celular', function (Request $request) {
+    $request->validate([
+        'celular' => 'required|string|size:10'
+    ]);
+
+    $persona = \App\Models\Persona::where('celular', trim($request->celular))->first();
+
+    if (!$persona) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Celular disponible',
+            'available' => true
+        ]);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Celular ya registrado',
+        'available' => false
+    ]);
+})->name('api.check-celular');
+
+Route::post('/check-telefono', function (Request $request) {
+    $request->validate([
+        'telefono' => 'required|string|size:7'
+    ]);
+
+    $persona = \App\Models\Persona::where('telefono', trim($request->telefono))->first();
+
+    if (!$persona) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Teléfono disponible',
+            'available' => true
+        ]);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Teléfono ya registrado',
+        'available' => false
+    ]);
+})->name('api.check-telefono');
+
 Route::get('/modalidades', function () {
     return \App\Models\Parametro::where('tema_id', function($query) {
         $query->select('id')
