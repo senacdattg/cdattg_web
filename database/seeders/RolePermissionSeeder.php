@@ -20,7 +20,7 @@ class RolePermissionSeeder extends Seeder
         $aspirante          = Role::firstOrCreate(['name' => 'ASPIRANTE']);
 
         // Definir  un arreglo de permisos para cada grupo
-        $permisos = [   
+        $permisos = [
             // Permisos para parámetros
             'CREAR PARAMETRO',
             'EDITAR PARAMETRO',
@@ -180,7 +180,7 @@ class RolePermissionSeeder extends Seeder
             'programa.edit',
             'programa.delete',
             'programa.search',
-            
+
             // Permisos para resultados de aprendizaje
             'VER RESULTADO APRENDIZAJE',
             'CREAR RESULTADO APRENDIZAJE',
@@ -336,6 +336,8 @@ class RolePermissionSeeder extends Seeder
             'CREAR ORDEN',
             'DEVOLVER PRESTAMO',
             'VER NOTIFICACION',
+            'VER TALENTO HUMANO',
+            'VER PERFIL',
         ]);
     }
 }
