@@ -43,7 +43,7 @@ class DatabaseSeeder extends Seeder
             DepartamentoSeeder::class,
             MunicipioSeeder::class,
             PersonaSeeder::class,
-            UsersTableSeeder::class,
+            UsersSeeder::class,
             RegionalSeeder::class,
             CentroFormacionSeeder::class,
             SedeSeeder::class,
@@ -54,7 +54,6 @@ class DatabaseSeeder extends Seeder
             JornadaFormacionSeeder::class,
             CompetenciaSeeder::class,
             ProductoSeeder::class, // Crear productos para agregar al módulo de inventario
-            UsersTableSeeder::class,
             // Complementarios ofertados
             // ComplementariosOfertadosSeeder::class,
             // Aspirantes complementarios
