@@ -494,13 +494,6 @@ class TalentoHumanoManager {
     }
 
     mostrarAlerta(tipo, titulo, texto) {
-        const iconos = {
-            success: 'success',
-            error: 'error',
-            warning: 'warning',
-            info: 'info'
-        };
-
         const SwalInstance = window.Swal;
 
         if (!SwalInstance) {
@@ -508,24 +501,78 @@ class TalentoHumanoManager {
             return;
         }
 
-        const opciones = {
-            title: titulo,
-            text: texto,
-            confirmButtonText: 'Entendido',
-            confirmButtonColor: tipo === 'success' ? '#28a745' : '#3085d6',
-            allowOutsideClick: true
+        // Iconos FontAwesome más vistosos
+        const iconosFA = {
+            success: '<i class="fas fa-check-circle" style="font-size: 28px;"></i>',
+            error: '<i class="fas fa-times-circle" style="font-size: 28px;"></i>',
+            warning: '<i class="fas fa-exclamation-triangle" style="font-size: 28px;"></i>',
+            info: '<i class="fas fa-info-circle" style="font-size: 28px;"></i>'
         };
 
-        const version = SwalInstance.version || '';
-        const usaTipo = version.startsWith('8.') || version.startsWith('7.') || version === '';
+        // Mapeo de tipos a iconos de SweetAlert
+        const iconos = {
+            success: 'success',
+            error: 'error',
+            warning: 'warning',
+            info: 'info'
+        };
 
-        if (usaTipo) {
-            opciones.type = iconos[tipo] || 'info';
-        } else {
-            opciones.icon = iconos[tipo] || 'info';
-        }
+        // Configurar Toast de SweetAlert2 con diseño mejorado
+        const Toast = SwalInstance.mixin({
+            toast: true,
+            position: 'bottom-end', // Abajo a la derecha
+            showConfirmButton: false,
+            timer: 5000, // 5 segundos
+            timerProgressBar: true,
+            width: '380px',
+            padding: '0',
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', SwalInstance.stopTimer);
+                toast.addEventListener('mouseleave', SwalInstance.resumeTimer);
+                
+                // Agregar efecto de pulso al icono
+                const iconElement = toast.querySelector('.swal2-icon');
+                if (iconElement) {
+                    iconElement.style.animation = 'pulse 2s infinite';
+                }
+            },
+            customClass: {
+                popup: 'swal2-toast-enhanced',
+                container: 'swal2-toast-container-enhanced'
+            }
+        });
 
-        SwalInstance.fire(opciones);
+        // Construir HTML mejorado con icono y contenido
+        const iconHTML = iconosFA[tipo] || iconosFA.info;
+        const contenidoHTML = texto 
+            ? `<div style="display: flex; align-items: flex-start; gap: 15px;">
+                <div style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: rgba(255, 255, 255, 0.2); border-radius: 50%;">
+                    ${iconHTML}
+                </div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; font-size: 16px; margin-bottom: 6px; color: #212529;">${titulo}</div>
+                    <div style="font-size: 14px; line-height: 1.5; color: #212529;">${texto}</div>
+                </div>
+               </div>`
+            : `<div style="display: flex; align-items: center; gap: 15px;">
+                <div style="flex-shrink: 0; display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: rgba(255, 255, 255, 0.2); border-radius: 50%;">
+                    ${iconHTML}
+                </div>
+                <div style="flex: 1; font-weight: 600; font-size: 16px; color: #212529;">${titulo}</div>
+               </div>`;
+
+        // Mostrar el toast con diseño mejorado
+        Toast.fire({
+            icon: iconos[tipo] || 'info',
+            title: '',
+            html: contenidoHTML,
+            showClass: {
+                popup: 'animate__animated animate__fadeInRight animate__faster'
+            },
+            hideClass: {
+                popup: 'animate__animated animate__fadeOutRight animate__faster'
+            }
+        });
     }
 }
 

@@ -135,6 +135,108 @@
 
 @section('css')
     @vite(['resources/css/parametros.css'])
+    <style>
+        /* Estilos personalizados para toasts más vistosos */
+        .swal2-toast.swal2-icon-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+            border-left: 5px solid #1e7e34 !important;
+            box-shadow: 0 8px 20px rgba(40, 167, 69, 0.3) !important;
+        }
+
+        .swal2-toast.swal2-icon-error {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+            border-left: 5px solid #bd2130 !important;
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.3) !important;
+        }
+
+        .swal2-toast.swal2-icon-warning {
+            background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%) !important;
+            border-left: 5px solid #e0a800 !important;
+            box-shadow: 0 8px 20px rgba(255, 193, 7, 0.3) !important;
+        }
+
+        .swal2-toast.swal2-icon-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%) !important;
+            border-left: 5px solid #117a8b !important;
+            box-shadow: 0 8px 20px rgba(23, 162, 184, 0.3) !important;
+        }
+
+        .swal2-toast {
+            border-radius: 12px !important;
+            padding: 20px 25px !important;
+            min-width: 350px !important;
+            backdrop-filter: blur(10px) !important;
+            animation: slideInRight 0.5s ease-out !important;
+        }
+
+        .swal2-toast .swal2-title {
+            color: #212529 !important;
+            font-weight: 600 !important;
+            font-size: 16px !important;
+            margin: 0 0 8px 0 !important;
+            text-align: left !important;
+        }
+
+        .swal2-toast .swal2-html-container {
+            color: #212529 !important;
+            font-size: 14px !important;
+            margin: 0 !important;
+            text-align: left !important;
+            line-height: 1.5 !important;
+        }
+
+        .swal2-toast .swal2-icon {
+            width: 48px !important;
+            height: 48px !important;
+            margin: 0 15px 0 0 !important;
+            border: none !important;
+        }
+
+        .swal2-toast .swal2-icon.swal2-success {
+            border-color: transparent !important;
+        }
+
+        .swal2-toast .swal2-icon .swal2-icon-content {
+            font-size: 28px !important;
+            color: #212529 !important;
+        }
+
+        .swal2-toast .swal2-timer-progress-bar {
+            background: rgba(255, 255, 255, 0.4) !important;
+            height: 4px !important;
+            border-radius: 0 0 12px 12px !important;
+        }
+
+        .swal2-toast .swal2-actions {
+            margin: 0 !important;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .swal2-toast:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2) !important;
+            transition: all 0.3s ease !important;
+        }
+    </style>
 @endsection
 
 @section('js')
