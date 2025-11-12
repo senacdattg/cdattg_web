@@ -13,6 +13,9 @@ Route::middleware('can:CREAR PERSONA')->group(function () {
 
 Route::middleware('can:VER PERSONA')->get('/personas/datatable', [PersonaController::class, 'datatable'])->name('personas.datatable');
 
+// Ruta para redirigir al perfil propio (solo con permiso VER PERFIL)
+Route::middleware('can:VER PERFIL')->get('/personas/mi-perfil', [PersonaController::class, 'miPerfil'])->name('personas.mi-perfil');
+
 Route::resource('personas', PersonaController::class);
 
 Route::middleware('can:CAMBIAR ESTADO PERSONA')->group(function () {

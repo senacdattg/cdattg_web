@@ -110,6 +110,7 @@ class SuperAdminSeeder extends Seeder
             // Permisos para personas
             'CREAR PERSONA',
             'VER PERSONA',
+            'VER PERFIL',
             'EDITAR PERSONA',
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',

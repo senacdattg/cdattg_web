@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\PersonaContactAlert;
@@ -103,6 +104,19 @@ class Persona extends Model
     public function municipio()
     {
         return $this->belongsTo(Municipio::class);
+    }
+
+    /**
+     * Relación con la caracterización principal asociada a la persona.
+     *
+     * Nota: Aunque las caracterizaciones adicionales se gestionan mediante la
+     * tabla pivote `persona_caracterizacion`, algunas vistas todavía consultan
+     * la relación singular `caracterizacion`. Para mantener compatibilidad,
+     * se usa la columna `parametro_id` como referencia.
+     */
+    public function caracterizacion(): BelongsTo
+    {
+        return $this->belongsTo(Parametro::class, 'parametro_id');
     }
 
     /**

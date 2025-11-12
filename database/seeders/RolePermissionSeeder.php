@@ -88,6 +88,7 @@ class RolePermissionSeeder extends Seeder
             //Permisos para crear personas
             'CREAR PERSONA',
             'VER PERSONA',
+            'VER PERFIL',
             'EDITAR PERSONA',
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
@@ -250,6 +251,7 @@ class RolePermissionSeeder extends Seeder
             'ELIMINAR PROGRAMA DE CARACTERIZACION',
             'CREAR PERSONA',
             'VER PERSONA',
+            'VER PERFIL',
             'EDITAR PERSONA',
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
@@ -469,13 +471,12 @@ class RolePermissionSeeder extends Seeder
         // Los aspirantes NO deben tener acceso al módulo de personas
         // Solo pueden ver su propio perfil a través de /mi-perfil
         $aspirante->syncPermissions([
-            // Sin permisos de personas - solo pueden ver su propio perfil
+            'VER PERFIL', // Solo pueden ver su propio perfil
         ]);
 
         // Asignar permisos al rol VISITANTE
         $visitante->givePermissionTo([
-            'VER PERSONA',
-
+            'VER PERFIL',
         ]);
         // Asignar permisos al rol APRENDIZ
         // Los aprendices tienen acceso limitado solo a consultar su propia información
