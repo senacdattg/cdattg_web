@@ -249,6 +249,7 @@
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                       <small id="email-feedback" class="form-text"></small>
                     </div>
                 </div>
             </div>

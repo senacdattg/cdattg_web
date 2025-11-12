@@ -157,6 +157,28 @@ Route::post('/check-telefono', function (Request $request) {
     ]);
 })->name('api.check-telefono');
 
+Route::post('/check-email', function (Request $request) {
+    $request->validate([
+        'email' => 'required|email'
+    ]);
+
+    $persona = \App\Models\Persona::where('email', trim($request->email))->first();
+
+    if (!$persona) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Correo disponible',
+            'available' => true
+        ]);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Correo ya registrado',
+        'available' => false
+    ]);
+})->name('api.check-email');
+
 Route::get('/modalidades', function () {
     return \App\Models\Parametro::where('tema_id', function($query) {
         $query->select('id')

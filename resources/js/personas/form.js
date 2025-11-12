@@ -1475,6 +1475,17 @@ class FieldValidator {
                     }, 500);
                 }, 'personaTelefonoInput');
             }
+
+            // Validación de email
+            const emailField = resolveField(form, 'email');
+            if (emailField) {
+                bindOnce(emailField, 'input', (e) => {
+                    clearTimeout(this.timeouts.email);
+                    this.timeouts.email = setTimeout(() => {
+                        this.validateEmailField(e.target);
+                    }, 500);
+                }, 'personaEmailInput');
+            }
         });
     }
 
@@ -1544,6 +1555,52 @@ class FieldValidator {
             feedback.textContent = 'Solo se permiten números';
             feedback.className = 'form-text text-danger';
             field.setCustomValidity('Solo se permiten números');
+            field.classList.add('is-invalid');
+        }
+    }
+
+    async validateEmailField(field) {
+        const feedback = document.getElementById('email-feedback');
+        if (!feedback) return;
+
+        const value = field.value.trim();
+        if (!value) {
+            feedback.textContent = '';
+            field.setCustomValidity('');
+            field.classList.remove('is-invalid');
+            return;
+        }
+
+        // Validar formato de email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+            feedback.textContent = 'Formato de correo inválido';
+            feedback.className = 'form-text text-danger';
+            field.setCustomValidity('Formato de correo inválido');
+            field.classList.add('is-invalid');
+            return;
+        }
+
+        // Verificar unicidad
+        feedback.textContent = 'Verificando...';
+        feedback.className = 'form-text text-info';
+        try {
+            const response = await this.http.post('/api/check-email', { email: value });
+            if (response.success) {
+                feedback.textContent = 'Correo ya registrado en el sistema';
+                feedback.className = 'form-text text-danger';
+                field.setCustomValidity('Correo ya registrado');
+                field.classList.add('is-invalid');
+            } else {
+                feedback.textContent = 'Correo disponible';
+                feedback.className = 'form-text text-success';
+                field.setCustomValidity('');
+                field.classList.remove('is-invalid');
+            }
+        } catch (error) {
+            feedback.textContent = 'Error al verificar correo';
+            feedback.className = 'form-text text-warning';
+            field.setCustomValidity('Error al verificar correo');
             field.classList.add('is-invalid');
         }
     }
