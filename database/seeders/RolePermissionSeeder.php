@@ -191,7 +191,6 @@ class RolePermissionSeeder extends Seeder
             'ELIMINAR ASPIRANTE COMPLEMENTARIO',
             // Permisos para talento humano
             'VER TALENTO HUMANO',
-            'CREAR TALENTO HUMANO',
 
             'VER FICHAS ASIGNADAS',
             'GESTIONAR DIAS FICHA',
