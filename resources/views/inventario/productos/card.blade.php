@@ -30,7 +30,7 @@
                             <div class="row">
                                 <div class="col-md-5">
                                     <div class="form-group">
-                                        <label>
+                                        <label for="search-product">
                                             <i class="fas fa-search"></i> Buscar Producto
                                         </label>
                                         <input 
@@ -38,6 +38,7 @@
                                             id="search-product" 
                                             class="form-control" 
                                             placeholder="Buscar por nombre..."
+                                            value="{{ request('search') }}"
                                         >
                                     </div>
                                 </div>
@@ -54,26 +55,27 @@
                                         >
                                             <option value="">Todos los tipos</option>
                                             @foreach($tiposProductos as $tipoProducto)
-                                                <option value="{{ $tipoProducto->id }}">
+                                                <option value="{{ $tipoProducto->id }}" 
+                                                    {{ request('tipo_producto_id') == $tipoProducto->id ? 'selected' : '' }}>
                                                     {{ $tipoProducto->parametro->name }}
                                                 </option>
                                             @endforeach
                                         </select>
                                     </div>
                                 </div>
-                                <div class="col-md-2">
+                                <div class="col-md-3">
                                     <div class="form-group">
-                                        <label>
+                                        <label for="sort-by">
                                             <i class="fas fa-sort"></i> Ordenar por
                                         </label>
                                         <select 
                                             id="sort-by" 
                                             class="form-control"
                                         >
-                                            <option value="name">Nombre</option>
-                                            <option value="stock-asc">Stock Menor</option>
-                                            <option value="stock-desc">Stock Mayor</option>
-                                            <option value="newest">Más Recientes</option>
+                                            <option value="name" {{ request('sort_by', 'name') == 'name' ? 'selected' : '' }}>Nombre</option>
+                                            <option value="stock-asc" {{ request('sort_by') == 'stock-asc' ? 'selected' : '' }}>Stock Menor</option>
+                                            <option value="stock-desc" {{ request('sort_by') == 'stock-desc' ? 'selected' : '' }}>Stock Mayor</option>
+                                            <option value="newest" {{ request('sort_by') == 'newest' ? 'selected' : '' }}>Más Recientes</option>
                                         </select>
                                     </div>
                                 </div>
