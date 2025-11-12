@@ -2,6 +2,14 @@
 
 @section('title', 'Gestión de Marcas')
 
+@section('css')
+    <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
+@endsection
+
+@push('css')
+    @vite(['resources/css/inventario/shared/base.css'])
+@endpush
+
 @section('content_header')
     <x-page-header
         icon="fas fa-trademark"
@@ -82,7 +90,7 @@
                     </x-data-table>
                     <div class="float-left pt-2">
                         <small class="text-muted">
-                            Mostrando {{ $marcas->firstItem() ?? 0 }} a {{ $marcas->lastItem() ?? 0 }} 
+                            Mostrando {{ $marcas->firstItem() ?? 0 }} a {{ $marcas->lastItem() ?? 0 }}
                             de {{ $marcas->total() }} marcas
                         </small>
                     </div>

@@ -28,16 +28,50 @@ li {
 .text-dark {
     color: #fdfdfd !important;
 }
+
+.select2-container--bootstrap4 .select2-selection {
+    background-color: #ffffff !important;
+    color: #343a40 !important;
+    border: 1px solid #ced4da !important;
+    height: calc(1.5em + .75rem + 2px) !important;
+    display: flex !important;
+    align-items: center !important;
+    border-radius: .25rem !important;
+    padding: .375rem .75rem !important;
+}
+
+.select2-container--bootstrap4 .select2-selection__rendered {
+    color: #343a40 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    line-height: 1.5 !important;
+}
+
+.select2-container--bootstrap4 .select2-dropdown {
+    background-color: #ffffff !important;
+    color: #343a40 !important;
+    border: 1px solid #ced4da !important;
+    border-radius: .25rem !important;
+}
+
+.select2-container--bootstrap4 .select2-results__option {
+    color: #343a40 !important;
+}
+
+.select2-container--bootstrap4 .select2-results__option--highlighted {
+    background-color: #545454 !important;
+    color: #ffffff !important;
+}
 .dashboard-header
 {
-    background-color: #00041d05 !important;
+    background-color: #54545418 !important;
     color: #ffffff !important;
 }
 
 [class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link.active, [class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link.active:focus, [class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link.active:hover
 {
-    background-color: #007bff !important;
-    color: #343a40 !important;
+    background-color: #0056b3 !important;
+    color: #ffffff !important;
 }
 
 #inventario .text-gray-800 {
@@ -57,6 +91,25 @@ body .content-wrapper {
   );
   padding: 60px 20px 20px;
   min-height: 100vh;
+}
+
+body .main-footer {
+    margin-left: 0 !important;
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+body .main-footer > .container-fluid {
+    padding-left: 260px;
+    padding-right: 30px;
+}
+
+@media (max-width: 991.98px) {
+    body .main-footer > .container-fluid {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
 }
 
 /* Estilos del navbar */

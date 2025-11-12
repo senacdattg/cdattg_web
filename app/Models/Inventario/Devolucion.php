@@ -2,6 +2,7 @@
 
 namespace App\Models\Inventario;
 
+use App\Exceptions\DevolucionException;
 use App\Traits\Seguimiento;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,12 +21,14 @@ class Devolucion extends Model
         'fecha_devolucion',
         'estado_id',
         'observaciones',
+        'cierra_sin_stock',
         'user_create_id',
         'user_update_id'
     ];
 
     protected $casts = [
-        'fecha_devolucion' => 'datetime'
+        'fecha_devolucion' => 'datetime',
+        'cierra_sin_stock' => 'boolean',
     ];
 
 
@@ -36,34 +39,61 @@ class Devolucion extends Model
     }
 
     // Registrar devolución y restaurar stock
-    public static function registrarDevolucion($detalleOrdenId, $cantidadDevuelta, $observaciones = null)
+    public static function registrarDevolucion(int $detalleOrdenId, int $cantidadDevuelta, ?string $observaciones = null): self
     {
-        return DB::transaction(function () use ($detalleOrdenId, $cantidadDevuelta, $observaciones) {
-            // Obtener el detalle de la orden
-            $detalleOrden = DetalleOrden::with('producto')->findOrFail($detalleOrdenId);
+        return DB::transaction(function () use ($detalleOrdenId, $cantidadDevuelta, $observaciones): self {
+            $detalleOrden = DetalleOrden::with(['producto.tipoProducto.parametro', 'devoluciones'])
+                ->findOrFail($detalleOrdenId);
 
-            // Validar que no se devuelva más de lo prestado
-            $cantidadPendiente = $detalleOrden->getCantidadPendiente();
-            if ($cantidadDevuelta > $cantidadPendiente) {
-                throw new \Exception("No puedes devolver más de lo prestado. Cantidad pendiente: {$cantidadPendiente}");
+            if ($detalleOrden->tieneCierreSinStock()) {
+                throw new DevolucionException('Este préstamo ya fue cerrado sin devolución de stock.');
             }
 
-            // Crear el registro de devolución
+            $cantidadPendiente = $detalleOrden->getCantidadPendiente();
+            if ($cantidadPendiente <= 0) {
+                throw new DevolucionException('No hay cantidades pendientes por devolver.');
+            }
+
+            if ($cantidadDevuelta < 0) {
+                throw new DevolucionException('La cantidad devuelta no puede ser negativa.');
+            }
+
+            if ($cantidadDevuelta > $cantidadPendiente) {
+                throw new DevolucionException("No puedes devolver más de lo prestado. Cantidad pendiente: {$cantidadPendiente}");
+            }
+
+            $esCierreSinStock = $cantidadDevuelta === 0;
+            $observacionesDepuradas = $observaciones !== null ? trim($observaciones) : null;
+
+            if ($esCierreSinStock) {
+                if ($observacionesDepuradas === null || $observacionesDepuradas === '') {
+                    throw new DevolucionException('Debes registrar el motivo del consumo total para cerrar sin devolución.');
+                }
+
+                if (!$detalleOrden->producto->esConsumible()) {
+                    throw new DevolucionException('Solo los productos consumibles pueden cerrarse sin devolución de stock.');
+                }
+            }
+
             $devolucion = self::create([
                 'detalle_orden_id' => $detalleOrdenId,
                 'cantidad_devuelta' => $cantidadDevuelta,
                 'fecha_devolucion' => now(),
-                'estado_id' => 1, // Estado por defecto (completado)
-                'observaciones' => $observaciones,
+                'estado_id' => 1,
+                'observaciones' => $observacionesDepuradas,
+                'cierra_sin_stock' => $esCierreSinStock,
                 'user_create_id' => Auth::id(),
                 'user_update_id' => Auth::id()
             ]);
 
-            // Restaurar el stock del producto
-            $producto = $detalleOrden->producto;
-            $producto->devolverStock($cantidadDevuelta);
+            if (!$esCierreSinStock && $cantidadDevuelta > 0) {
+                $detalleOrden->producto->devolverStock($cantidadDevuelta);
+            }
 
-            return $devolucion;
+            return $devolucion->fresh([
+                'detalleOrden.producto',
+                'detalleOrden.orden',
+            ]);
         });
     }
 

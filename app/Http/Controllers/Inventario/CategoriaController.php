@@ -144,7 +144,7 @@ class CategoriaController extends InventarioController
         return view('inventario.categorias.show', [
             'title' => 'Detalle de la categoria',
             'icon' => 'fas fa-eye',
-            'categoria' => $categoria   
+            'categoria' => $categoria
         ]);
     }
 
