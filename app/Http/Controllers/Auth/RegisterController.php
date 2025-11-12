@@ -166,7 +166,26 @@ class RegisterController extends Controller
             return Auth::id();
         }
 
-        return config('app.audit_default_user_id');
+        $candidates = collect([
+            config('app.audit_default_user_id'),
+            config('registro.audit_default_user_id'),
+        ])->filter(fn($id) => $id !== null)
+            ->map(fn($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        foreach ($candidates as $candidateId) {
+            if (User::whereKey($candidateId)->exists()) {
+                return $candidateId;
+            }
+        }
+
+        $adminFallback = User::role('ADMIN')->value('id');
+        if ($adminFallback) {
+            return (int) $adminFallback;
+        }
+
+        return User::orderBy('id')->value('id');
     }
 
     private function resolveDocumentos(): object

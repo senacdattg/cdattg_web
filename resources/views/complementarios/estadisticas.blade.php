@@ -98,15 +98,15 @@
                         </tr>
                     </thead>
                     <tbody id="tabla-programas-demanda">
-                        @foreach($estadisticas['programas_demanda'] as $programa)
-                        <tr>
-                            <td>{{ $programa['programa'] }}</td>
-                            <td>{{ $programa['total_aspirantes'] }}</td>
-                            <td>{{ $programa['aceptados'] }}</td>
-                            <td>{{ $programa['pendientes'] }}</td>
-                            <td>{{ $programa['tasa_aceptacion'] }}%</td>
-                            <td class="text-success"><i class="fas fa-arrow-up"></i> 0%</td>
-                        </tr>
+                        @foreach ($estadisticas['programas_demanda'] as $programa)
+                            <tr>
+                                <td>{{ $programa['programa'] }}</td>
+                                <td>{{ $programa['total_aspirantes'] }}</td>
+                                <td>{{ $programa['aceptados'] }}</td>
+                                <td>{{ $programa['pendientes'] }}</td>
+                                <td>{{ $programa['tasa_aceptacion'] }}%</td>
+                                <td class="text-success"><i class="fas fa-arrow-up"></i> 0%</td>
+                            </tr>
                         @endforeach
                     </tbody>
                 </table>
@@ -125,7 +125,7 @@
 
 @section('js')
     <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ asset('vendor/chart.js/Chart.bundle.min.js') }}"></script>
     <script src="{{ asset('js/complementarios/estadisticas.js') }}"></script>
     <script>
         let inscripcionesChart, programasPieChart;
@@ -156,13 +156,19 @@
             });
 
             // Llenar con datos reales o cero
-            ultimosMeses.forEach(({year, month}) => {
+            ultimosMeses.forEach(({
+                year,
+                month
+            }) => {
                 const key = `${year}-${month}`;
                 labels.push(`${meses[month - 1]} ${year}`);
                 data.push(datosPorMes[key] || 0);
             });
 
-            return { labels, data };
+            return {
+                labels,
+                data
+            };
         }
 
         // Función para inicializar gráficos
@@ -189,9 +195,15 @@
                 },
                 options: {
                     responsive: true,
-                    plugins: { legend: { display: false } },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
                     scales: {
-                        y: { beginAtZero: true }
+                        y: {
+                            beginAtZero: true
+                        }
                     }
                 }
             });
@@ -217,8 +229,8 @@
                 },
                 options: {
                     responsive: true,
-                    plugins: { 
-                        legend: { 
+                    plugins: {
+                        legend: {
                             position: 'bottom',
                             labels: {
                                 boxWidth: 12,
@@ -226,13 +238,13 @@
                                     size: 10
                                 }
                             }
-                        } 
+                        }
                     }
                 }
             });
         }
 
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             // Inicializar gráficos
             inicializarGraficos();
         });

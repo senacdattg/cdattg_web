@@ -48,6 +48,26 @@ class UbicacionService
     }
 
     /**
+     * Obtiene países activos con alias de nombre normalizados
+     *
+     * @return Collection
+     */
+    public function obtenerPaisesActivos(): Collection
+    {
+        return $this->paisRepo->obtenerTodos()
+            ->map(function ($pais) {
+                $nombre = data_get($pais, 'nombre', data_get($pais, 'pais', ''));
+
+                return [
+                    'id' => data_get($pais, 'id'),
+                    'nombre' => $nombre,
+                    'name' => $nombre,
+                    'pais' => $nombre,
+                ];
+            });
+    }
+
+    /**
      * Obtiene departamentos por país (con caché)
      *
      * @param int $paisId
@@ -104,4 +124,3 @@ class UbicacionService
         ];
     }
 }
-

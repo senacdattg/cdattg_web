@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AmbienteController;
+use App\Http\Controllers\Api\UbicacionPublicApiController;
 use App\Http\Controllers\AsistenciaAprendicesController;
 use App\Http\Controllers\BloqueController;
 use App\Http\Controllers\CaracterizacionController;
@@ -87,6 +88,8 @@ Route::get('/fichas-caracterizacion/flutter/{id}', [FichaCaracterizacionFlutterC
 // ==========================================
 // SELECTORES DINÁMICOS
 // ==========================================
+
+Route::get('/paises', [UbicacionPublicApiController::class, 'paises'])->name('api.paises');
 
 Route::get('/modalidades', function () {
     return \App\Models\Parametro::where('tema_id', function($query) {

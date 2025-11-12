@@ -58,6 +58,8 @@ export default defineConfig({
                 'formularios-select-dinamico': 'resources/js/pages/formularios-select-dinamico.js',
                 'talento-humano': 'resources/js/pages/talento-humano.js',
                 'personas-form': 'resources/js/personas/form.js',
+                'confirm-delete-modal': 'resources/js/modules/confirm-delete-modal.js',
+                'bootstrap': 'resources/js/bootstrap.js',
             },
             refresh: true,
         }),

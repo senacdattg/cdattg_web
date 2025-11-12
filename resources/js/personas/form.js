@@ -233,6 +233,10 @@ class AddressHandler {
         this.progressLabel = null;
         this.missingList = null;
         this.previewCard = null;
+        this.optionCache = {
+            via: null,
+            cardinal: null
+        };
     }
 
     attach() {
@@ -286,6 +290,7 @@ class AddressHandler {
         bindOnce(cancelButton, 'click', this.handleCancel, 'personaAddressCancel');
 
         modalInstance.on('shown.bs.modal', () => {
+            this.populateAddressFromInput();
             this.updatePreview();
             this.renderMissingList([]);
             this.toggleSaveButton();
@@ -303,7 +308,7 @@ class AddressHandler {
             event.preventDefault();
         }
 
-        const { address, missing } = this.composeAddress(true);
+        const { address, missing, components } = this.composeAddress(true);
         if (missing.length) {
             this.showValidationError(missing);
             this.highlightMissingFields(missing);
@@ -318,6 +323,7 @@ class AddressHandler {
         if (this.direccionInput) {
             this.direccionInput.value = address;
             this.direccionInput.dispatchEvent(new Event('input', { bubbles: true }));
+            this.setAddressPayload(components);
         }
 
         this.clearAddressFields();
@@ -365,8 +371,6 @@ class AddressHandler {
         const requiredMap = [
             { id: 'tipo_via', value: values.tipoVia },
             { id: 'numero_via', value: values.numeroVia },
-            { id: 'letra_via', value: values.letraVia },
-            { id: 'cardinal_via', value: values.cardinalVia },
             { id: 'numero_casa', value: values.numeroCasa }
         ];
 
@@ -433,10 +437,10 @@ class AddressHandler {
         }
 
         if (requireMandatory && missing.length) {
-            return { address: '', missing };
+            return { address: '', missing, components: values };
         }
 
-        return { address: direccion, missing };
+        return { address: direccion, missing, components: values };
     }
 
     getRequiredFields() {
@@ -614,6 +618,355 @@ class AddressHandler {
     getValue(id) {
         const element = document.getElementById(id);
         return element ? element.value.trim() : '';
+    }
+
+    setValue(id, value) {
+        const element = document.getElementById(id);
+        if (!element) {
+            return;
+        }
+
+        if (element.tagName === 'SELECT') {
+            element.value = value || '';
+            if (!element.value && value) {
+                const option = Array.from(element.options).find((opt) =>
+                    this.normalizeToken(opt.textContent) === this.normalizeToken(value)
+                );
+                if (option) {
+                    element.value = option.value;
+                }
+            }
+            element.dispatchEvent(new Event('change', { bubbles: true }));
+            return;
+        }
+
+        element.value = value || '';
+        element.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    setAddressPayload(components) {
+        if (!this.direccionInput) {
+            return;
+        }
+
+        try {
+            this.direccionInput.dataset.addressPayload = JSON.stringify(components);
+        } catch (error) {
+            console.warn('No fue posible serializar la dirección estructurada.', error);
+        }
+    }
+
+    getAddressPayload() {
+        if (!this.direccionInput || !this.direccionInput.dataset.addressPayload) {
+            return null;
+        }
+
+        try {
+            return JSON.parse(this.direccionInput.dataset.addressPayload);
+        } catch (error) {
+            console.warn('Payload de dirección inválido; se ignorará.', error);
+            return null;
+        }
+    }
+
+    populateAddressFromInput() {
+        const payload = this.getAddressPayload();
+        if (payload) {
+            this.populateFieldsFromComponents(payload);
+            return;
+        }
+
+        const parsed = this.parseAddressString(this.direccionInput?.value || '');
+        if (
+            parsed &&
+            Object.values(parsed).some((value) => {
+                if (typeof value === 'string') {
+                    return value.trim() !== '';
+                }
+                return Boolean(value);
+            })
+        ) {
+            this.populateFieldsFromComponents(parsed);
+            this.setAddressPayload(parsed);
+        }
+    }
+
+    populateFieldsFromComponents(components) {
+        if (!components) {
+            return;
+        }
+
+        const mapping = {
+            tipoVia: 'tipo_via',
+            numeroVia: 'numero_via',
+            letraVia: 'letra_via',
+            bisVia: 'bis_via',
+            cardinalVia: 'cardinal_via',
+            viaSecundariaTipo: 'via_secundaria',
+            numeroViaSecundaria: 'numero_via_secundaria',
+            letraViaSecundaria: 'letra_via_secundaria',
+            bisViaSecundaria: 'bis_via_secundaria',
+            cardinalViaSecundaria: 'cardinal_via_secundaria',
+            numeroCasa: 'numero_casa',
+            complementos: 'complementos',
+            barrio: 'barrio'
+        };
+
+        Object.entries(mapping).forEach(([componentKey, fieldId]) => {
+            if (Object.prototype.hasOwnProperty.call(components, componentKey)) {
+                this.setValue(fieldId, components[componentKey]);
+            }
+        });
+    }
+
+    parseAddressString(address) {
+        if (!address || typeof address !== 'string') {
+            return null;
+        }
+
+        const components = {
+            tipoVia: '',
+            numeroVia: '',
+            letraVia: '',
+            bisVia: '',
+            cardinalVia: '',
+            viaSecundariaTipo: '',
+            numeroViaSecundaria: '',
+            letraViaSecundaria: '',
+            bisViaSecundaria: '',
+            cardinalViaSecundaria: '',
+            numeroCasa: '',
+            complementos: '',
+            barrio: ''
+        };
+
+        const [rawMain, rawBarrio] = address.split(',', 2);
+
+        if (rawBarrio && rawBarrio.trim()) {
+            components.barrio = rawBarrio.trim();
+        }
+
+        if (!rawMain) {
+            return components;
+        }
+
+        const tokens = rawMain
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
+
+        if (!tokens.length) {
+            return components;
+        }
+
+        const hashIndex = tokens.findIndex((token) => this.isHouseNumberMarker(token));
+        let mainTokens = tokens;
+
+        if (hashIndex !== -1) {
+            const { numeroCasa, remainingTokens } = this.extractHouseNumber(
+                tokens[hashIndex],
+                tokens.slice(hashIndex + 1)
+            );
+            components.numeroCasa = numeroCasa;
+            const complementTokens = remainingTokens;
+            if (complementTokens.length) {
+                components.complementos = complementTokens.join(' ');
+            }
+            mainTokens = tokens.slice(0, hashIndex);
+        }
+
+        if (!mainTokens.length) {
+            return components;
+        }
+
+        const viaLabels = this.getViaLabels();
+        let secondaryIndex = -1;
+
+        for (let i = 1; i < mainTokens.length; i++) {
+            const normalized = this.normalizeToken(mainTokens[i]);
+            if (viaLabels.includes(normalized)) {
+                secondaryIndex = i;
+                break;
+            }
+        }
+
+        const principalTokens =
+            secondaryIndex === -1 ? mainTokens : mainTokens.slice(0, secondaryIndex);
+        const secondaryTokens =
+            secondaryIndex === -1 ? [] : mainTokens.slice(secondaryIndex);
+
+        Object.assign(components, this.parsePrincipalTokens(principalTokens));
+        Object.assign(components, this.parseSecondaryTokens(secondaryTokens));
+
+        return components;
+    }
+
+    parsePrincipalTokens(tokens) {
+        const result = {
+            tipoVia: '',
+            numeroVia: '',
+            letraVia: '',
+            bisVia: '',
+            cardinalVia: ''
+        };
+
+        if (!tokens.length) {
+            return result;
+        }
+
+        result.tipoVia = tokens[0];
+
+        const remaining = tokens.slice(1);
+        const cardinalLabels = this.getCardinalLabels();
+
+        for (const token of remaining) {
+            const normalized = this.normalizeToken(token);
+
+            if (!result.numeroVia && /\d/.test(token)) {
+                result.numeroVia = token;
+                continue;
+            }
+
+            if (!result.letraVia && /^[A-Z]$/.test(normalized)) {
+                result.letraVia = normalized;
+                continue;
+            }
+
+            if (!result.bisVia && normalized === 'BIS') {
+                result.bisVia = 'BIS';
+                continue;
+            }
+
+            if (!result.cardinalVia && cardinalLabels.includes(normalized)) {
+                result.cardinalVia = token;
+            }
+        }
+
+        return result;
+    }
+
+    parseSecondaryTokens(tokens) {
+        const result = {
+            viaSecundariaTipo: '',
+            numeroViaSecundaria: '',
+            letraViaSecundaria: '',
+            bisViaSecundaria: '',
+            cardinalViaSecundaria: ''
+        };
+
+        if (!tokens.length) {
+            return result;
+        }
+
+        result.viaSecundariaTipo = tokens[0];
+
+        const remaining = tokens.slice(1);
+        const cardinalLabels = this.getCardinalLabels();
+
+        for (const token of remaining) {
+            const normalized = this.normalizeToken(token);
+
+            if (!result.numeroViaSecundaria && /\d/.test(token)) {
+                result.numeroViaSecundaria = token;
+                continue;
+            }
+
+            if (!result.letraViaSecundaria && /^[A-Z]$/.test(normalized)) {
+                result.letraViaSecundaria = normalized;
+                continue;
+            }
+
+            if (!result.bisViaSecundaria && normalized === 'BIS') {
+                result.bisViaSecundaria = 'BIS';
+                continue;
+            }
+
+            if (!result.cardinalViaSecundaria && cardinalLabels.includes(normalized)) {
+                result.cardinalViaSecundaria = token;
+            }
+        }
+
+        return result;
+    }
+
+    getViaLabels() {
+        if (this.optionCache.via) {
+            return this.optionCache.via;
+        }
+
+        const select = document.getElementById('tipo_via');
+        if (!select) {
+            this.optionCache.via = [];
+            return this.optionCache.via;
+        }
+
+        this.optionCache.via = Array.from(select.options)
+            .map((option) => this.normalizeToken(option.value || option.textContent || ''))
+            .filter(Boolean);
+
+        return this.optionCache.via;
+    }
+
+    getCardinalLabels() {
+        if (this.optionCache.cardinal) {
+            return this.optionCache.cardinal;
+        }
+
+        const select = document.getElementById('cardinal_via');
+        if (!select) {
+            this.optionCache.cardinal = [];
+            return this.optionCache.cardinal;
+        }
+
+        this.optionCache.cardinal = Array.from(select.options)
+            .map((option) => this.normalizeToken(option.value || option.textContent || ''))
+            .filter(Boolean);
+
+        return this.optionCache.cardinal;
+    }
+
+    normalizeToken(token) {
+        return (token || '').toString().trim().toUpperCase();
+    }
+
+    isHouseNumberMarker(token) {
+        if (!token) {
+            return false;
+        }
+
+        const normalized = this.normalizeToken(token);
+
+        if (token.startsWith('#')) {
+            return true;
+        }
+
+        return ['#', 'NO', 'NO.', 'N°', 'NUMERO', 'NUMERO.'].includes(normalized);
+    }
+
+    extractHouseNumber(markerToken, followingTokens) {
+        let numeroCasa = '';
+        const remainingTokens = [...followingTokens];
+
+        const normalizedMarker = this.normalizeToken(markerToken);
+
+        if (markerToken.startsWith('#') && markerToken.length > 1) {
+            numeroCasa = markerToken.slice(1);
+        } else if (normalizedMarker === '#') {
+            if (remainingTokens.length) {
+                numeroCasa = remainingTokens.shift();
+            }
+        } else if (['NUMERO', 'NUMERO.'].includes(normalizedMarker)) {
+            if (remainingTokens.length) {
+                numeroCasa = remainingTokens.shift();
+            }
+        } else {
+            numeroCasa = markerToken.replace(/^#/, '');
+        }
+
+        return {
+            numeroCasa: numeroCasa || '',
+            remainingTokens
+        };
     }
 }
 

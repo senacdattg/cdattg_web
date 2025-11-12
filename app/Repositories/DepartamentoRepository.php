@@ -46,6 +46,23 @@ class DepartamentoRepository
     }
 
     /**
+     * Busca departamentos por nombre
+     *
+     * @param string $termino
+     * @param int|null $paisId
+     * @return Collection
+     */
+    public function buscar(string $termino, ?int $paisId = null): Collection
+    {
+        return Departamento::select(['id', 'departamento as nombre', 'pais_id'])
+            ->when($paisId, fn ($query) => $query->where('pais_id', $paisId))
+            ->where('departamento', 'LIKE', "%{$termino}%")
+            ->orderBy('departamento')
+            ->limit(20)
+            ->get();
+    }
+
+    /**
      * Invalida caché
      *
      * @return void

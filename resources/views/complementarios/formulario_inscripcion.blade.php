@@ -413,12 +413,21 @@ document.addEventListener('DOMContentLoaded', function() {
                                 @csrf
                                 <input type="hidden" name="programa_id" value="{{ $programa->id }}">
 
-                               @include('complementarios.components.form-datos-personales', [
-                                   'context' => 'inscripcion',
-                                   'userData' => $userData ?? []
-                               ])
+                                @include('personas.partials.form', [
+                                    'persona' => null,
+                                    'documentos' => $documentos,
+                                    'generos' => $generos,
+                                    'caracterizaciones' => $caracterizaciones,
+                                    'paises' => $paises,
+                                    'departamentos' => $departamentos,
+                                    'municipios' => $municipios,
+                                    'vias' => $vias,
+                                    'letras' => $letras,
+                                    'cardinales' => $cardinales,
+                                    'showCaracterizacion' => false,
+                                ])
 
-                                <hr class="my-4" style="border-color: #dee2e6;">
+                                <hr class="my-5" style="border-color: #dee2e6;">
 
                                 <div class="card mb-4" style="background-color: #ffffff; border-color: #dee2e6;">
                                     <div class="card-header" style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
@@ -442,7 +451,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                                                         id="categoria_{{ $hijo->id }}">
                                                                     <label class="form-check-label"
                                                                         for="categoria_{{ $hijo->id }}">
-                                                                        {{ ucwords(str_replace('_', ' ', $hijo->nombre)) }}
+                                                                        {{ $hijo->nombre }}
                                                                     </label>
                                                                 </div>
                                                             </div>
@@ -462,7 +471,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                         <div class="mb-3">
                                             <label for="observaciones" class="form-label" style="color: #343a40;">Observaciones</label>
                                             <textarea class="form-control" id="observaciones" name="observaciones" rows="3"
-                                                placeholder="Información adicional que considere relevante..."></textarea>
+                                                placeholder="Información adicional que considere relevante...">{{ old('observaciones') }}</textarea>
                                         </div>
 
                                         <div class="form-check mb-4">

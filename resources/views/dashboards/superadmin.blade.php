@@ -5,12 +5,7 @@
 
 @section('title', 'Dashboard')
 @section('content_header')
-    <x-page-header 
-        icon="fa-home" 
-        title="Página"
-        subtitle="Descripción de la página"
-        :breadcrumb="[]"
-    />
+    <x-page-header icon="fa-home" title="Página" subtitle="Descripción de la página" :breadcrumb="[]" />
 @endsection
 @section('content')
 
@@ -26,7 +21,7 @@
 @endsection
 
 @push('js')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ asset('vendor/chart.js/Chart.bundle.min.js') }}"></script>
     @vite(['resources/js/app.js'])
     @vite(['resources/js/dashboards/superadmin/charts-scripts.js'])
 @endpush
