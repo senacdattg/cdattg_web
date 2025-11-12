@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\RegistroPresenciaService;
+use App\Services\PersonaIngresoSalidaService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
-class RegistroPresenciaController extends Controller
+class PersonaIngresoSalidaController extends Controller
 {
-    protected RegistroPresenciaService $registroPresenciaService;
+    protected PersonaIngresoSalidaService $personaIngresoSalidaService;
 
-    public function __construct(RegistroPresenciaService $registroPresenciaService)
+    public function __construct(PersonaIngresoSalidaService $personaIngresoSalidaService)
     {
-        $this->registroPresenciaService = $registroPresenciaService;
+        $this->personaIngresoSalidaService = $personaIngresoSalidaService;
     }
 
     /**
@@ -24,13 +24,15 @@ class RegistroPresenciaController extends Controller
         try {
             $validated = $request->validate([
                 'persona_id' => 'required|integer|exists:personas,id',
+                'sede_id' => 'required|integer|exists:sedes,id',
                 'ambiente_id' => 'nullable|integer|exists:ambientes,id',
                 'ficha_caracterizacion_id' => 'nullable|integer|exists:fichas_caracterizacion,id',
                 'observaciones' => 'nullable|string|max:1000',
             ]);
 
-            $registro = $this->registroPresenciaService->registrarEntrada(
+            $registro = $this->personaIngresoSalidaService->registrarEntrada(
                 $validated['persona_id'],
+                $validated['sede_id'],
                 $validated['ambiente_id'] ?? null,
                 $validated['ficha_caracterizacion_id'] ?? null,
                 $validated['observaciones'] ?? null
@@ -39,7 +41,7 @@ class RegistroPresenciaController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Entrada registrada correctamente',
-                'data' => $registro->load(['persona', 'ambiente', 'fichaCaracterizacion']),
+                'data' => $registro->load(['persona', 'sede', 'ambiente', 'fichaCaracterizacion']),
             ], 201);
         } catch (\Exception $e) {
             Log::error('Error registrando entrada: ' . $e->getMessage());
@@ -59,11 +61,13 @@ class RegistroPresenciaController extends Controller
         try {
             $validated = $request->validate([
                 'persona_id' => 'required|integer|exists:personas,id',
+                'sede_id' => 'required|integer|exists:sedes,id',
                 'observaciones' => 'nullable|string|max:1000',
             ]);
 
-            $this->registroPresenciaService->registrarSalida(
+            $this->personaIngresoSalidaService->registrarSalida(
                 $validated['persona_id'],
+                $validated['sede_id'],
                 $validated['observaciones'] ?? null
             );
 
@@ -84,10 +88,14 @@ class RegistroPresenciaController extends Controller
     /**
      * Obtener estadísticas de personas dentro del edificio
      */
-    public function estadisticasPersonasDentro(): JsonResponse
+    public function estadisticasPersonasDentro(Request $request): JsonResponse
     {
         try {
-            $estadisticas = $this->registroPresenciaService->obtenerEstadisticasPersonasDentro();
+            $sedeId = $request->query('sede_id'); // Opcional: filtrar por sede
+            
+            $estadisticas = $this->personaIngresoSalidaService->obtenerEstadisticasPersonasDentro(
+                $sedeId ? (int)$sedeId : null
+            );
 
             return response()->json([
                 'success' => true,
@@ -106,10 +114,14 @@ class RegistroPresenciaController extends Controller
     /**
      * Obtener estadísticas de personas dentro HOY
      */
-    public function estadisticasPersonasDentroHoy(): JsonResponse
+    public function estadisticasPersonasDentroHoy(Request $request): JsonResponse
     {
         try {
-            $estadisticas = $this->registroPresenciaService->obtenerEstadisticasPersonasDentroHoy();
+            $sedeId = $request->query('sede_id'); // Opcional: filtrar por sede
+            
+            $estadisticas = $this->personaIngresoSalidaService->obtenerEstadisticasPersonasDentroHoy(
+                $sedeId ? (int)$sedeId : null
+            );
 
             return response()->json([
                 'success' => true,
@@ -131,9 +143,13 @@ class RegistroPresenciaController extends Controller
     public function personasDentro(Request $request): JsonResponse
     {
         try {
+            $sedeId = $request->query('sede_id'); // Opcional: filtrar por sede
             $tipoPersona = $request->query('tipo_persona'); // Opcional: filtrar por tipo
 
-            $personas = $this->registroPresenciaService->obtenerPersonasDentro($tipoPersona);
+            $personas = $this->personaIngresoSalidaService->obtenerPersonasDentro(
+                $sedeId ? (int)$sedeId : null,
+                $tipoPersona
+            );
 
             return response()->json([
                 'success' => true,
@@ -157,9 +173,13 @@ class RegistroPresenciaController extends Controller
         try {
             $validated = $request->validate([
                 'fecha' => 'required|date',
+                'sede_id' => 'nullable|integer|exists:sedes,id',
             ]);
 
-            $estadisticas = $this->registroPresenciaService->obtenerEstadisticasPorFecha($validated['fecha']);
+            $estadisticas = $this->personaIngresoSalidaService->obtenerEstadisticasPorFecha(
+                $validated['fecha'],
+                $validated['sede_id'] ?? null
+            );
 
             return response()->json([
                 'success' => true,
@@ -167,6 +187,28 @@ class RegistroPresenciaController extends Controller
             ], 200);
         } catch (\Exception $e) {
             Log::error('Error obteniendo estadísticas por fecha: ' . $e->getMessage());
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener estadísticas',
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtener estadísticas por sede
+     */
+    public function estadisticasPorSede(Request $request, int $sedeId): JsonResponse
+    {
+        try {
+            $estadisticas = $this->personaIngresoSalidaService->obtenerEstadisticasPorSede($sedeId);
+
+            return response()->json([
+                'success' => true,
+                'data' => $estadisticas,
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error('Error obteniendo estadísticas por sede: ' . $e->getMessage());
             
             return response()->json([
                 'success' => false,

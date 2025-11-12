@@ -2,13 +2,13 @@
 
 namespace App\Services;
 
-use App\Models\RegistroPresencia;
+use App\Models\PersonaIngresoSalida;
 use App\Models\Persona;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
-class RegistroPresenciaService
+class PersonaIngresoSalidaService
 {
     /**
      * Determina el tipo de persona basándose en sus relaciones
@@ -61,20 +61,22 @@ class RegistroPresenciaService
      */
     public function registrarEntrada(
         int $personaId,
+        int $sedeId,
         ?int $ambienteId = null,
         ?int $fichaCaracterizacionId = null,
         ?string $observaciones = null,
         ?int $userId = null
-    ): RegistroPresencia {
-        return DB::transaction(function () use ($personaId, $ambienteId, $fichaCaracterizacionId, $observaciones, $userId) {
-            // Verificar si ya tiene un registro abierto (entrada sin salida)
-            $registroAbierto = RegistroPresencia::where('persona_id', $personaId)
+    ): PersonaIngresoSalida {
+        return DB::transaction(function () use ($personaId, $sedeId, $ambienteId, $fichaCaracterizacionId, $observaciones, $userId) {
+            // Verificar si ya tiene un registro abierto (entrada sin salida) en esta sede
+            $registroAbierto = PersonaIngresoSalida::where('persona_id', $personaId)
+                ->where('sede_id', $sedeId)
                 ->whereNull('timestamp_salida')
                 ->whereDate('fecha_entrada', Carbon::today())
                 ->first();
 
             if ($registroAbierto) {
-                throw new \Exception('Ya existe un registro de entrada sin salida para hoy.');
+                throw new \Exception('Ya existe un registro de entrada sin salida para hoy en esta sede.');
             }
 
             // Determinar tipo de persona
@@ -83,8 +85,9 @@ class RegistroPresenciaService
             $now = Carbon::now();
 
             // Crear registro de entrada
-            $registro = RegistroPresencia::create([
+            $registro = PersonaIngresoSalida::create([
                 'persona_id' => $personaId,
+                'sede_id' => $sedeId,
                 'tipo_persona' => $tipoPersona,
                 'fecha_entrada' => $now->format('Y-m-d'),
                 'hora_entrada' => $now->format('H:i:s'),
@@ -98,6 +101,7 @@ class RegistroPresenciaService
             Log::info('Entrada registrada', [
                 'registro_id' => $registro->id,
                 'persona_id' => $personaId,
+                'sede_id' => $sedeId,
                 'tipo_persona' => $tipoPersona,
                 'timestamp' => $now->toISOString(),
             ]);
@@ -111,19 +115,21 @@ class RegistroPresenciaService
      */
     public function registrarSalida(
         int $personaId,
+        int $sedeId,
         ?string $observaciones = null,
         ?int $userId = null
     ): bool {
-        return DB::transaction(function () use ($personaId, $observaciones, $userId) {
-            // Buscar registro abierto (entrada sin salida)
-            $registro = RegistroPresencia::where('persona_id', $personaId)
+        return DB::transaction(function () use ($personaId, $sedeId, $observaciones, $userId) {
+            // Buscar registro abierto (entrada sin salida) en esta sede
+            $registro = PersonaIngresoSalida::where('persona_id', $personaId)
+                ->where('sede_id', $sedeId)
                 ->whereNull('timestamp_salida')
                 ->whereDate('fecha_entrada', Carbon::today())
                 ->latest('timestamp_entrada')
                 ->first();
 
             if (!$registro) {
-                throw new \Exception('No se encontró un registro de entrada sin salida para hoy.');
+                throw new \Exception('No se encontró un registro de entrada sin salida para hoy en esta sede.');
             }
 
             $now = Carbon::now();
@@ -142,6 +148,7 @@ class RegistroPresenciaService
             Log::info('Salida registrada', [
                 'registro_id' => $registro->id,
                 'persona_id' => $personaId,
+                'sede_id' => $sedeId,
                 'timestamp' => $now->toISOString(),
             ]);
 
@@ -150,12 +157,18 @@ class RegistroPresenciaService
     }
 
     /**
-     * Obtiene estadísticas de personas dentro del edificio
+     * Obtiene estadísticas de personas dentro del edificio (todas las sedes)
      */
-    public function obtenerEstadisticasPersonasDentro(): array
+    public function obtenerEstadisticasPersonasDentro(?int $sedeId = null): array
     {
-        // Contar personas dentro por tipo (entrada sin salida)
-        $personasDentro = RegistroPresencia::dentro()
+        $query = PersonaIngresoSalida::dentro();
+
+        if ($sedeId) {
+            $query->porSede($sedeId);
+        }
+
+        // Contar personas dentro por tipo
+        $personasDentro = $query
             ->select('tipo_persona', DB::raw('COUNT(*) as total'))
             ->groupBy('tipo_persona')
             ->pluck('total', 'tipo_persona')
@@ -175,10 +188,15 @@ class RegistroPresenciaService
     /**
      * Obtiene estadísticas de personas dentro del edificio HOY
      */
-    public function obtenerEstadisticasPersonasDentroHoy(): array
+    public function obtenerEstadisticasPersonasDentroHoy(?int $sedeId = null): array
     {
-        $personasDentro = RegistroPresencia::dentro()
-            ->hoy()
+        $query = PersonaIngresoSalida::dentro()->hoy();
+
+        if ($sedeId) {
+            $query->porSede($sedeId);
+        }
+
+        $personasDentro = $query
             ->select('tipo_persona', DB::raw('COUNT(*) as total'))
             ->groupBy('tipo_persona')
             ->pluck('total', 'tipo_persona')
@@ -198,11 +216,15 @@ class RegistroPresenciaService
     /**
      * Obtiene lista de personas dentro actualmente
      */
-    public function obtenerPersonasDentro(?string $tipoPersona = null): \Illuminate\Database\Eloquent\Collection
+    public function obtenerPersonasDentro(?int $sedeId = null, ?string $tipoPersona = null): \Illuminate\Database\Eloquent\Collection
     {
-        $query = RegistroPresencia::dentro()
-            ->with(['persona', 'ambiente', 'fichaCaracterizacion'])
+        $query = PersonaIngresoSalida::dentro()
+            ->with(['persona', 'sede', 'ambiente', 'fichaCaracterizacion'])
             ->orderBy('timestamp_entrada', 'desc');
+
+        if ($sedeId) {
+            $query->porSede($sedeId);
+        }
 
         if ($tipoPersona) {
             $query->porTipo($tipoPersona);
@@ -214,23 +236,31 @@ class RegistroPresenciaService
     /**
      * Obtiene estadísticas detalladas por fecha
      */
-    public function obtenerEstadisticasPorFecha(string $fecha): array
+    public function obtenerEstadisticasPorFecha(string $fecha, ?int $sedeId = null): array
     {
-        $entradas = RegistroPresencia::porFecha($fecha)
+        $queryEntradas = PersonaIngresoSalida::porFecha($fecha);
+        $querySalidas = PersonaIngresoSalida::porFecha($fecha)->whereNotNull('timestamp_salida');
+        $queryDentro = PersonaIngresoSalida::porFecha($fecha)->dentro();
+
+        if ($sedeId) {
+            $queryEntradas->porSede($sedeId);
+            $querySalidas->porSede($sedeId);
+            $queryDentro->porSede($sedeId);
+        }
+
+        $entradas = $queryEntradas
             ->select('tipo_persona', DB::raw('COUNT(*) as total'))
             ->groupBy('tipo_persona')
             ->pluck('total', 'tipo_persona')
             ->toArray();
 
-        $salidas = RegistroPresencia::porFecha($fecha)
-            ->whereNotNull('timestamp_salida')
+        $salidas = $querySalidas
             ->select('tipo_persona', DB::raw('COUNT(*) as total'))
             ->groupBy('tipo_persona')
             ->pluck('total', 'tipo_persona')
             ->toArray();
 
-        $dentro = RegistroPresencia::porFecha($fecha)
-            ->dentro()
+        $dentro = $queryDentro
             ->select('tipo_persona', DB::raw('COUNT(*) as total'))
             ->groupBy('tipo_persona')
             ->pluck('total', 'tipo_persona')
@@ -238,6 +268,7 @@ class RegistroPresenciaService
 
         return [
             'fecha' => $fecha,
+            'sede_id' => $sedeId,
             'entradas' => [
                 'instructores' => $entradas['instructor'] ?? 0,
                 'aprendices' => $entradas['aprendiz'] ?? 0,
@@ -265,6 +296,21 @@ class RegistroPresenciaService
                 'super_administradores' => $dentro['super_administrador'] ?? 0,
                 'total' => array_sum($dentro),
             ],
+        ];
+    }
+
+    /**
+     * Obtiene estadísticas por sede
+     */
+    public function obtenerEstadisticasPorSede(int $sedeId): array
+    {
+        $estadisticasHoy = $this->obtenerEstadisticasPersonasDentroHoy($sedeId);
+        $estadisticasGenerales = $this->obtenerEstadisticasPersonasDentro($sedeId);
+
+        return [
+            'sede_id' => $sedeId,
+            'hoy' => $estadisticasHoy,
+            'total_dentro' => $estadisticasGenerales,
         ];
     }
 }

@@ -6,7 +6,7 @@ use App\Repositories\AprendizRepository;
 use App\Repositories\FichaRepository;
 use App\Repositories\AsistenciaAprendizRepository;
 use App\Core\Traits\HasCache;
-use App\Services\RegistroPresenciaService;
+use App\Services\PersonaIngresoSalidaService;
 use Illuminate\Support\Facades\DB;
 
 class EstadisticasService
@@ -16,18 +16,18 @@ class EstadisticasService
     protected AprendizRepository $aprendizRepo;
     protected FichaRepository $fichaRepo;
     protected AsistenciaAprendizRepository $asistenciaRepo;
-    protected RegistroPresenciaService $registroPresenciaService;
+    protected PersonaIngresoSalidaService $personaIngresoSalidaService;
 
     public function __construct(
         AprendizRepository $aprendizRepo,
         FichaRepository $fichaRepo,
         AsistenciaAprendizRepository $asistenciaRepo,
-        RegistroPresenciaService $registroPresenciaService
+        PersonaIngresoSalidaService $personaIngresoSalidaService
     ) {
         $this->aprendizRepo = $aprendizRepo;
         $this->fichaRepo = $fichaRepo;
         $this->asistenciaRepo = $asistenciaRepo;
-        $this->registroPresenciaService = $registroPresenciaService;
+        $this->personaIngresoSalidaService = $personaIngresoSalidaService;
         $this->cacheType = 'estadisticas';
     }
 
@@ -99,7 +99,7 @@ class EstadisticasService
                 ],
                 'asistencias_hoy' => \App\Models\AsistenciaAprendiz::whereDate('created_at', today())->count(),
                 // Estadísticas de personas dentro del edificio (en tiempo real)
-                'personas_dentro' => $this->registroPresenciaService->obtenerEstadisticasPersonasDentro(),
+                'personas_dentro' => $this->personaIngresoSalidaService->obtenerEstadisticasPersonasDentro(),
             ];
         }, 15); // 15 minutos
     }

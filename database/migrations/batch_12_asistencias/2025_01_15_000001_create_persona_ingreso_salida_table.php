@@ -11,15 +11,18 @@ return new class extends Migration
      * 
      * Esta tabla registra la entrada y salida de TODAS las personas
      * (instructores, aprendices, visitantes, administrativos, etc.)
-     * para poder contar estadísticas de quién está dentro del edificio.
+     * desde cualquier sede, para poder contar estadísticas de quién está dentro del edificio.
      */
     public function up(): void
     {
-        Schema::create('registros_presencia', function (Blueprint $table) {
+        Schema::create('persona_ingreso_salida', function (Blueprint $table) {
             $table->id();
             
             // Relación con la persona
             $table->foreignId('persona_id')->constrained('personas')->onDelete('cascade');
+            
+            // Relación con la sede (OBLIGATORIO - para saber desde qué sede se registra)
+            $table->foreignId('sede_id')->constrained('sedes')->onDelete('restrict');
             
             // Tipo de persona: instructor, aprendiz, visitante, administrativo, aspirante
             $table->enum('tipo_persona', [
@@ -57,6 +60,8 @@ return new class extends Migration
             // Índices para optimizar consultas de estadísticas
             $table->index(['tipo_persona', 'fecha_entrada']);
             $table->index(['persona_id', 'fecha_entrada']);
+            $table->index(['sede_id', 'fecha_entrada']);
+            $table->index(['sede_id', 'tipo_persona', 'fecha_entrada']);
             $table->index(['timestamp_entrada', 'timestamp_salida']);
         });
     }
@@ -66,7 +71,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('registros_presencia');
+        Schema::dropIfExists('persona_ingreso_salida');
     }
 };
 

@@ -7,14 +7,15 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
 
-class RegistroPresencia extends Model
+class PersonaIngresoSalida extends Model
 {
     use HasFactory;
 
-    protected $table = 'registros_presencia';
+    protected $table = 'persona_ingreso_salida';
 
     protected $fillable = [
         'persona_id',
+        'sede_id',
         'tipo_persona',
         'fecha_entrada',
         'hora_entrada',
@@ -42,6 +43,14 @@ class RegistroPresencia extends Model
     public function persona(): BelongsTo
     {
         return $this->belongsTo(Persona::class, 'persona_id');
+    }
+
+    /**
+     * Relación con Sede
+     */
+    public function sede(): BelongsTo
+    {
+        return $this->belongsTo(Sede::class, 'sede_id');
     }
 
     /**
@@ -115,6 +124,14 @@ class RegistroPresencia extends Model
     public function scopePorTipo($query, string $tipo)
     {
         return $query->where('tipo_persona', $tipo);
+    }
+
+    /**
+     * Scope para filtrar por sede
+     */
+    public function scopePorSede($query, int $sedeId)
+    {
+        return $query->where('sede_id', $sedeId);
     }
 
     /**

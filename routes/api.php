@@ -300,9 +300,10 @@ Route::get('/websocket/visitantes-actuales', [\App\Http\Controllers\WebSocketVis
 // REGISTRO DE PRESENCIA - ESTADÍSTICAS DE PERSONAS DENTRO
 // ==========================================
 
-Route::post('/presencia/entrada', [\App\Http\Controllers\RegistroPresenciaController::class, 'registrarEntrada']);
-Route::post('/presencia/salida', [\App\Http\Controllers\RegistroPresenciaController::class, 'registrarSalida']);
-Route::get('/presencia/estadisticas', [\App\Http\Controllers\RegistroPresenciaController::class, 'estadisticasPersonasDentro']);
-Route::get('/presencia/estadisticas/hoy', [\App\Http\Controllers\RegistroPresenciaController::class, 'estadisticasPersonasDentroHoy']);
-Route::get('/presencia/personas-dentro', [\App\Http\Controllers\RegistroPresenciaController::class, 'personasDentro']);
-Route::get('/presencia/estadisticas/fecha', [\App\Http\Controllers\RegistroPresenciaController::class, 'estadisticasPorFecha']);
+Route::post('/presencia/entrada', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'registrarEntrada']);
+Route::post('/presencia/salida', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'registrarSalida']);
+Route::get('/presencia/estadisticas', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'estadisticasPersonasDentro']);
+Route::get('/presencia/estadisticas/hoy', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'estadisticasPersonasDentroHoy']);
+Route::get('/presencia/personas-dentro', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'personasDentro']);
+Route::get('/presencia/estadisticas/fecha', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'estadisticasPorFecha']);
+Route::get('/presencia/estadisticas/sede/{sedeId}', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'estadisticasPorSede']);
