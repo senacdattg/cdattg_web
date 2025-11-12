@@ -64,13 +64,16 @@ class ProgramaComplementarioController extends Controller
      */
     public function programasPublicos()
     {
-        $programas = ComplementarioOfertado::with([
-            'modalidad.parametro',
-            'jornada',
-            'diasFormacion'
-        ])->where('estado', 1)->get();
+        $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion'])
+            ->where('estado', 1)
+            ->get();
+
         $programas->each(function ($programa) {
             $programa->icono = $this->complementarioService->getIconoForPrograma($programa->nombre);
+            $programa->badge_class = $this->complementarioService->getBadgeClassForEstado($programa->estado);
+            $programa->estado_label = $this->complementarioService->getEstadoLabel($programa->estado);
+            $programa->modalidad_nombre = $programa->modalidad->parametro->name ?? null;
+            $programa->jornada_nombre = $programa->jornada->jornada ?? null;
         });
 
         // Obtener programas en los que el usuario está inscrito

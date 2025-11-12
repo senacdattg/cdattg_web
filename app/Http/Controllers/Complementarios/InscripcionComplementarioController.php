@@ -8,29 +8,25 @@ use App\Models\ComplementarioOfertado;
 use App\Models\Persona;
 use App\Models\AspiranteComplementario;
 use App\Models\User;
-use App\Models\Tema;
 use App\Models\Pais;
 use App\Models\Departamento;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use Spatie\Permission\Models\Role;
 use App\Services\ComplementarioService;
+use App\Repositories\TemaRepository;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class InscripcionComplementarioController extends Controller
 {
     protected $complementarioService;
+    protected $temaRepository;
 
-    private const REQUIRED_INTEGER = 'required|integer';
-    private const REQUIRED_STRING_MAX_191 = 'required|string|max:191';
-    private const NULLABLE_STRING_MAX_191 = 'nullable|string|max:191';
-    private const REQUIRED_EMAIL_MAX_191 = 'required|email|max:191';
-
-    public function __construct(ComplementarioService $complementarioService)
+    public function __construct(ComplementarioService $complementarioService, TemaRepository $temaRepository)
     {
         $this->complementarioService = $complementarioService;
+        $this->temaRepository = $temaRepository;
     }
 
     /**
@@ -38,13 +34,8 @@ class InscripcionComplementarioController extends Controller
      */
     public function inscripcionGeneral()
     {
-        // Obtener temas de caracterización con sus parámetros
-        $temasCaracterizacion = Tema::where('name', 'PERSONA CARACTERIZACION')
-            ->with(['parametros' => function ($query) {
-                $query->where('parametros_temas.status', 1);
-            }])
-            ->where('status', 1)
-            ->get();
+        // Obtener categorías de caracterización principales con sus hijos
+        $categoriasConHijos = $this->obtenerCaracterizacionesAgrupadas();
 
         $paises = Pais::all();
         $departamentos = Departamento::all();
@@ -107,7 +98,7 @@ class InscripcionComplementarioController extends Controller
         }
 
         // Crear nueva persona
-        Persona::create($request->only([
+        $persona = Persona::create($request->only([
             'tipo_documento',
             'numero_documento',
             'primer_nombre',
@@ -123,7 +114,7 @@ class InscripcionComplementarioController extends Controller
             'departamento_id',
             'municipio_id',
             'direccion',
-            'parametro_id'
+            'caracterizacion_id'
         ]));
 
         return redirect()
@@ -139,63 +130,87 @@ class InscripcionComplementarioController extends Controller
         // Permitir acceso a usuarios no autenticados - el formulario crea la cuenta automáticamente
         $programa = ComplementarioOfertado::with(['modalidad.parametro', 'jornada'])->findOrFail($id);
 
-        // Obtener temas de caracterización con sus parámetros
-        $temasCaracterizacion = Tema::where('name', 'PERSONA CARACTERIZACION')
-            ->with([
-                'parametros' => function ($query) {
-                    $query->where('parametros_temas.status', 1);
-                }
-            ])
-            ->where('status', 1)
-            ->get();
+        $documentos = $this->buildTemaPayload(
+            $this->temaRepository->obtenerTiposDocumento(),
+            $this->complementarioService->getTiposDocumento()
+        );
+        $generos = $this->buildTemaPayload(
+            $this->temaRepository->obtenerGeneros(),
+            $this->complementarioService->getGeneros()
+        );
+        $caracterizaciones = $this->buildTemaPayload(
+            $this->temaRepository->obtenerCaracterizacionesComplementarias()
+        );
+        $vias = $this->buildTemaPayload($this->temaRepository->obtenerVias());
+        $letras = $this->buildTemaPayload($this->temaRepository->obtenerLetras());
+        $cardinales = $this->buildTemaPayload($this->temaRepository->obtenerCardinales());
 
         $paises = Pais::all();
         $departamentos = Departamento::all();
+        $municipios = collect();
 
-        // Obtener tipos de documento y géneros dinámicamente
-        $tiposDocumento = $this->complementarioService->getTiposDocumento();
-        $generos = $this->complementarioService->getGeneros();
+        $categoriasConHijos = $this->obtenerCaracterizacionesAgrupadas($caracterizaciones);
 
-        // Inicializar datos del usuario
-        $userData = [];
+        $personaAutenticada = Auth::check() ? Auth::user()->persona : null;
+        $this->prefillOldInput($personaAutenticada);
 
-        // Si el usuario está autenticado, cargar sus datos existentes
-        if (Auth::check()) {
-            $user = Auth::user();
-            if ($user->persona) {
-                $persona = $user->persona;
-                $userData = [
-                    'tipo_documento' => $persona->tipo_documento,
-                    'numero_documento' => $persona->numero_documento,
-                    'primer_nombre' => $persona->primer_nombre,
-                    'segundo_nombre' => $persona->segundo_nombre,
-                    'primer_apellido' => $persona->primer_apellido,
-                    'segundo_apellido' => $persona->segundo_apellido,
-                    'email' => $persona->email,
-                    'fecha_nacimiento' => $persona->fecha_nacimiento,
-                    'genero' => $persona->genero,
-                    'telefono' => $persona->telefono,
-                    'celular' => $persona->celular,
-                    'pais_id' => $persona->pais_id,
-                    'departamento_id' => $persona->departamento_id,
-                    'municipio_id' => $persona->municipio_id,
-                    'direccion' => $persona->direccion,
-                ];
-            }
+        return view('complementarios.formulario_inscripcion', [
+            'programa' => $programa,
+            'categoriasConHijos' => $categoriasConHijos,
+            'paises' => $paises,
+            'departamentos' => $departamentos,
+            'municipios' => $municipios,
+            'documentos' => $documentos,
+            'generos' => $generos,
+            'caracterizaciones' => $caracterizaciones,
+            'vias' => $vias,
+            'letras' => $letras,
+            'cardinales' => $cardinales,
+        ]);
+    }
+
+    private function obtenerCaracterizacionesAgrupadas(?object $caracterizacionesPayload = null): Collection
+    {
+        $payload = $caracterizacionesPayload ?? $this->buildTemaPayload(
+            $this->temaRepository->obtenerCaracterizacionesComplementarias()
+        );
+
+        $parametros = collect($payload->parametros ?? []);
+
+        if ($parametros->isEmpty()) {
+            return collect();
         }
 
-        return view(
-            'complementarios.formulario_inscripcion',
-            compact(
-                'programa',
-                'temasCaracterizacion',
-                'paises',
-                'departamentos',
-                'tiposDocumento',
-                'generos',
-                'userData'
-            )
-        );
+        $hijos = $parametros->map(function ($parametro) {
+            $id = data_get($parametro, 'id');
+            $nombre = data_get($parametro, 'name', data_get($parametro, 'nombre', ''));
+
+            if (!$id) {
+                return null;
+            }
+
+            $formatted = (string) Str::of($nombre ?? '')
+                ->replace('_', ' ')
+                ->lower()
+                ->title();
+
+            return (object) [
+                'id' => $id,
+                'nombre' => $formatted,
+            ];
+        })->filter()->values();
+
+        if ($hijos->isEmpty()) {
+            return collect();
+        }
+
+        return collect([
+            [
+                'id' => $payload->id ?? null,
+                'nombre' => 'Opciones disponibles',
+                'hijos' => $hijos,
+            ],
+        ]);
     }
 
     /**
@@ -287,8 +302,49 @@ class InscripcionComplementarioController extends Controller
             ->first();
 
         if ($personaExistente) {
-            $personaExistente->update($validatedData);
-            return $personaExistente;
+            // Si ya existe, usar esa persona
+            $persona = $personaExistente;
+
+            // Actualizar datos si es necesario
+            $persona->update($request->only([
+                'tipo_documento',
+                'numero_documento',
+                'primer_nombre',
+                'segundo_nombre',
+                'primer_apellido',
+                'segundo_apellido',
+                'fecha_nacimiento',
+                'genero',
+                'telefono',
+                'celular',
+                'email',
+                'pais_id',
+                'departamento_id',
+                'municipio_id',
+                'direccion',
+                'caracterizacion_id'
+            ]));
+        } else {
+            // Crear nueva persona
+            $persona = Persona::create($request->only([
+                'tipo_documento',
+                'numero_documento',
+                'primer_nombre',
+                'segundo_nombre',
+                'primer_apellido',
+                'segundo_apellido',
+                'fecha_nacimiento',
+                'genero',
+                'telefono',
+                'celular',
+                'email',
+                'pais_id',
+                'departamento_id',
+                'municipio_id',
+                'direccion',
+                'caracterizacion_id',
+                'status'
+            ]) + ['user_create_id' => 1, 'user_edit_id' => 1]);
         }
 
         return Persona::create($validatedData + ['user_create_id' => 1, 'user_edit_id' => 1]);
@@ -394,5 +450,70 @@ class InscripcionComplementarioController extends Controller
                 'pero hubo un error al procesar el documento. Por favor contacte al administrador.'
             );
         }
+    }
+
+    private function buildTemaPayload($tema = null, $fallback = null): object
+    {
+        if ($tema && $tema->parametros?->count()) {
+            return $tema;
+        }
+
+        $parametros = $this->normalizeParametrosCollection($fallback);
+
+        return (object) [
+            'parametros' => $parametros,
+        ];
+    }
+
+    private function normalizeParametrosCollection($items): Collection
+    {
+        return collect($items)->map(function ($item) {
+            $id = data_get($item, 'id');
+            $name = data_get($item, 'name', data_get($item, 'nombre', ''));
+
+            if ($id === null) {
+                return null;
+            }
+
+            return (object) [
+                'id' => $id,
+                'name' => strtoupper((string) $name),
+            ];
+        })->filter()->values();
+    }
+
+    private function prefillOldInput($persona): void
+    {
+        if (!$persona instanceof Persona || session()->hasOldInput()) {
+            return;
+        }
+
+        $fechaNacimiento = $persona->fecha_nacimiento;
+        if ($fechaNacimiento && !$fechaNacimiento instanceof Carbon) {
+            try {
+                $fechaNacimiento = Carbon::parse($fechaNacimiento);
+            } catch (\Throwable $th) {
+                $fechaNacimiento = null;
+            }
+        }
+
+        session()->flashInput([
+            'tipo_documento' => $persona->tipo_documento,
+            'numero_documento' => $persona->numero_documento,
+            'primer_nombre' => $persona->primer_nombre,
+            'segundo_nombre' => $persona->segundo_nombre,
+            'primer_apellido' => $persona->primer_apellido,
+            'segundo_apellido' => $persona->segundo_apellido,
+            'email' => $persona->email,
+            'fecha_nacimiento' => $fechaNacimiento ? $fechaNacimiento->format('Y-m-d') : null,
+            'genero' => $persona->genero,
+            'telefono' => $persona->telefono,
+            'celular' => $persona->celular,
+            'pais_id' => $persona->pais_id,
+            'departamento_id' => $persona->departamento_id,
+            'municipio_id' => $persona->municipio_id,
+            'direccion' => $persona->direccion,
+            'caracterizacion_id' => $persona->caracterizacion_id,
+        ]);
     }
 }

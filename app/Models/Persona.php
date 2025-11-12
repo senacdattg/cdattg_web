@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\PersonaContactAlert;
 use App\Models\FichaCaracterizacion;
+use App\Models\Parametro;
 
 class Persona extends Model
 {
@@ -259,16 +260,7 @@ class Persona extends Model
      */
     public function parametroCaracterizacion(): BelongsTo
     {
-        return $this->belongsTo(Parametro::class, 'parametro_id');
-    }
-
-    /**
-     * Alias legacy para acceder a la caracterización principal.
-     * Mantiene compatibilidad con controladores que invocan $persona->caracterizacion.
-     */
-    public function caracterizacion(): BelongsTo
-    {
-        return $this->parametroCaracterizacion();
+        return $this->belongsTo(Parametro::class, 'caracterizacion_id');
     }
 
     public function caracterizacionesComplementarias(): BelongsToMany

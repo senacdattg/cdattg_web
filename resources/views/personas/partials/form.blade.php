@@ -413,7 +413,7 @@
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <select class="form-control address-field" id="letra_via"
-                                                data-required="true" data-label="Letra de vía principal">
+                                                data-label="Letra de vía principal">
                                                 <option value="">Letra</option>
                                                 @forelse ($letraOptions as $letra)
                                                     <option value="{{ $letra['label'] }}">{{ $letra['label'] }}
@@ -436,7 +436,7 @@
                                     <div class="col-md-2">
                                         <div class="form-group">
                                             <select class="form-control address-field" id="cardinal_via"
-                                                data-required="true" data-label="Cardinal de vía principal">
+                                                data-label="Cardinal de vía principal">
                                                 <option value="">Cardinal</option>
                                                 @forelse ($cardinalOptions as $cardinal)
                                                     <option value="{{ $cardinal['label'] }}">

@@ -5,7 +5,7 @@
 /public/storage
 /storage/*.key
 /vendor
-.sonarlint/
+/.sonarlint/
 .env
 .env.backup
 .env.local

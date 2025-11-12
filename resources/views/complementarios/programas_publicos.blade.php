@@ -10,6 +10,7 @@
             background: linear-gradient(180deg, #ffffff 0%, #ebf1f4 100%);
             border: 1px solid #dee2e6;
         }
+
         .hero-banner::after,
         .hero-banner::before {
             content: "";
@@ -17,35 +18,41 @@
             border-radius: 50%;
             pointer-events: none;
         }
+
         .hero-banner::after {
             width: 60vw;
             height: 60vw;
             right: -20vw;
             top: -15vw;
-            background: radial-gradient(circle at center, rgba(255,255,255,0.12), rgba(255,255,255,0) 60%);
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 60%);
             transform: rotate(18deg);
         }
+
         .hero-banner::before {
             width: 40vw;
             height: 40vw;
             left: -15vw;
             bottom: -10vw;
-            background: radial-gradient(circle at center, rgba(255,255,255,0.06), rgba(255,255,255,0) 60%);
+            background: radial-gradient(circle at center, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 60%);
         }
+
         .hero-figure {
             max-height: 320px;
             width: auto;
-            filter: drop-shadow(0 12px 24px rgba(0,0,0,0.25));
+            filter: drop-shadow(0 12px 24px rgba(0, 0, 0, 0.25));
         }
+
         .hero-emphasis {
             font-size: 1.15em;
             text-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
         }
+
         .hero-badge {
             background: #ffffff;
             border: 1px solid #007bff;
             color: #007bff;
         }
+
         @media (max-width: 767.98px) {
             .hero-figure {
                 max-height: 200px;
@@ -62,6 +69,7 @@
             background: #ffffff;
             border-bottom: 1px solid #dee2e6;
         }
+
         .programs-card .badge-success {
             background: #007bff;
         }
@@ -123,8 +131,7 @@
                     @endif
 
                     @if (session('info'))
-                        <div class="alert alert-info alert-dismissible fade show" role="alert"
-                            style="margin-top: 20px;">
+                        <div class="alert alert-info alert-dismissible fade show" role="alert" style="margin-top: 20px;">
                             <i class="fas fa-info-circle mr-2"></i>
                             <strong>Información:</strong> {{ session('info') }}
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
@@ -156,7 +163,6 @@
                             @foreach ($programas as $programa)
                                 @include('complementarios.components.card-programas', [
                                     'programa' => $programa,
-                                    'programasInscritosIds' => $programasInscritosIds ?? collect()
                                 ])
                             @endforeach
                         </div>
