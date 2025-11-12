@@ -69,16 +69,25 @@ class PersonaController extends Controller
         $paises = Pais::where('status', 1)->get();
         $departamentos = Departamento::where('status', 1)->get();
         $municipios = Municipio::where('status', 1)->get();
+        $vias = $this->temaRepo->obtenerVias();
+        $cardinales = $this->temaRepo->obtenerCardinales();
 
         // Cargar los tipos de caracterización
         $caracterizaciones = Tema::with(['parametros' => function ($query) {
             $query->wherePivot('status', 1);
         }])->findOrFail(16);
 
-        return view(
-            'personas.create',
-            compact('documentos', 'generos', 'paises', 'departamentos', 'municipios', 'caracterizaciones')
-        );
+        return view('personas.create', [
+            'documentos' => $documentos,
+            'generos' => $generos,
+            'paises' => $paises,
+            'departamentos' => $departamentos,
+            'municipios' => $municipios,
+            'caracterizaciones' => $caracterizaciones,
+            'vias' => $vias,
+            'letras' => $this->temaRepo->obtenerLetras(),
+            'cardinales' => $cardinales,
+        ]);
     }
 
     /**
@@ -153,6 +162,9 @@ class PersonaController extends Controller
             $query->wherePivot('status', 1);
         }])->findOrFail(16);
 
+        $vias = $this->temaRepo->obtenerVias();
+        $cardinales = $this->temaRepo->obtenerCardinales();
+
         return view('personas.edit', [
             'persona' => $persona,
             'documentos' => $documentos,
@@ -161,6 +173,9 @@ class PersonaController extends Controller
             'departamentos' => $departamentos,
             'municipios' => $municipios,
             'caracterizaciones' => $caracterizaciones,
+            'vias' => $vias,
+            'letras' => $this->temaRepo->obtenerLetras(),
+            'cardinales' => $cardinales,
         ]);
     }
 

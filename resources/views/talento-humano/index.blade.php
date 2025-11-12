@@ -80,7 +80,7 @@
                                     @csrf
                                     <input type="hidden" id="persona_id" name="persona_id">
                                     <input type="hidden" id="action_mode" name="action_mode" value="create">
-                                    @include('personas.partials.form', ['showCaracterizacion' => true])
+                                    @include('personas.partials.form', ['showCaracterizacion' => true, 'cardinales' => $cardinales])
                                 </form>
                             </div>
                             <div class="card-footer d-flex justify-content-end">

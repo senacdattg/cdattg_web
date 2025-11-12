@@ -1,6 +1,6 @@
 // Funcionalidad para formularios de inscripción y registro
 
-// Constantes de configuración
+// Constantes de configuración para centralizar reglas de negocio
 const CONFIG = {
     EDAD_MINIMA: 14,
     MENSAJE_EDAD_INVALIDA: 'Debe tener al menos 14 años para registrarse.',
@@ -10,7 +10,7 @@ const CONFIG = {
     CAMPOS_DIRECCION_NUMERICOS: ['numero_via', 'numero_casa']
 };
 
-// Función para detectar el contexto del formulario
+// Detecta el contexto del formulario (inscripción vs registro) para activar lógica específica
 function getFormContext() {
     const registroForm = document.getElementById('registroForm');
     const formInscripcion = document.getElementById('formInscripcion');
@@ -20,7 +20,7 @@ function getFormContext() {
     return 'unknown';
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const context = getFormContext();
 
     // Inicializar municipios si hay datos guardados
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setupCaracterizacionHandling();
     }
 
-    // Configurar validación de edad mínima
+    // Configurar validación de edad mínima (aplica a ambos contextos si existe el campo)
     setupEdadMinimaValidation();
 
     // Inicializar municipios dinámicos para formularios que lo necesiten
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeMunicipiosDynamic();
     }
 
-    // Para registro, inicializar carga dinámica de países
+    // Para registro, inicializar carga dinámica de países (solo si aplica)
     if (context === 'registro') {
         initializePaisesForRegistro();
     }
@@ -103,7 +103,7 @@ function getUserData() {
 function setupFormValidations() {
     const forms = document.querySelectorAll('#formInscripcion, #registroForm');
     forms.forEach(form => {
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', function (e) {
             if (!validateForm(this)) {
                 e.preventDefault();
             }
@@ -116,8 +116,7 @@ function validateForm(form) {
     let isValid = true;
 
     // Validar nombres y apellidos (solo letras)
-    const camposTexto = ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido'];
-    camposTexto.forEach(campoId => {
+    CONFIG.CAMPOS_TEXTOS.forEach(campoId => {
         const campo = form.querySelector(`#${campoId}`);
         if (campo && campo.value && !/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]+$/.test(campo.value)) {
             alert(`El campo ${campoId.replace('_', ' ')} solo puede contener letras, espacios y guiones.`);
@@ -165,14 +164,17 @@ function setupUppercaseConversion() {
     CONFIG.CAMPOS_TEXTOS.forEach(campoId => {
         const campo = document.getElementById(campoId);
         if (campo) {
-            campo.addEventListener('input', function() {
+            campo.addEventListener('input', function () {
                 // Convertir a mayúsculas y remover números
                 this.value = this.value.toUpperCase().replace(/\d/g, '');
             });
 
             // Validación en tiempo real - prevenir números durante escritura
-            campo.addEventListener('keypress', function(e) {
-                const char = String.fromCharCode(e.key || e.keyCode || e.which);
+            campo.addEventListener('keypress', function (e) {
+                const char = e.key;
+                if (!char || char.length !== 1) {
+                    return true;
+                }
                 // Permitir letras, espacios, guiones, tildes y teclas de control
                 if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]$/.test(char) &&
                     !e.ctrlKey && !e.altKey && !e.metaKey) {
@@ -216,7 +218,7 @@ function setupMunicipioLoading() {
     const departamentoSelect = document.getElementById('departamento_id');
 
     if (paisSelect) {
-        paisSelect.addEventListener('change', function() {
+        paisSelect.addEventListener('change', function () {
             loadDepartamentosForPais(this.value);
             // Limpiar municipios cuando cambia el país
             const municipioSelect = document.getElementById('municipio_id');
@@ -227,7 +229,7 @@ function setupMunicipioLoading() {
     }
 
     if (departamentoSelect) {
-        departamentoSelect.addEventListener('change', function() {
+        departamentoSelect.addEventListener('change', function () {
             loadMunicipiosForDepartamento(this.value);
         });
     }
@@ -238,7 +240,7 @@ function initializeMunicipiosDynamic() {
     // Configurar carga dinámica de municipios
     const departamentoSelect = document.getElementById('departamento_id');
     if (departamentoSelect) {
-        departamentoSelect.addEventListener('change', function() {
+        departamentoSelect.addEventListener('change', function () {
             loadMunicipiosForDepartamento(this.value);
         });
     }
@@ -246,7 +248,7 @@ function initializeMunicipiosDynamic() {
     // Configurar carga de departamentos si hay país seleccionado
     const paisSelect = document.getElementById('pais_id');
     if (paisSelect) {
-        paisSelect.addEventListener('change', function() {
+        paisSelect.addEventListener('change', function () {
             loadDepartamentosForPais(this.value);
             // Limpiar municipios cuando cambia el país
             const municipioSelect = document.getElementById('municipio_id');
@@ -258,7 +260,6 @@ function initializeMunicipiosDynamic() {
 }
 
 // Función común para procesar respuestas de API de ubicaciones
-// Maneja Collections de Laravel que se serializan como objetos
 function processLocationData(data, entityType) {
     return extractItemsFromResponse(data, entityType);
 }
@@ -279,19 +280,18 @@ function extractItemsFromResponse(data, entityType) {
 
 // Extraer datos crudos de diferentes formatos de respuesta
 function extractRawData(data, entityType) {
-    // Prioridad 1: {success: true, data: [...]}
     if (data.success !== undefined && data.data !== undefined) {
         return data.data;
     }
-    // Prioridad 2: {data: [...]}
+
     if (data.data !== undefined) {
         return data.data;
     }
-    // Prioridad 3: {departamentos: [...]} o {municipios: [...]}
+
     if (data[entityType] !== undefined) {
         return data[entityType];
     }
-    // Prioridad 4: El objeto completo parece ser una Collection
+
     return data;
 }
 
@@ -329,10 +329,8 @@ function populateLocationSelect(selectElement, items, selectedId, entityType) {
     items.forEach(item => {
         const option = document.createElement('option');
         option.value = item.id;
-        // Manejar diferentes nombres de campo
         const label = item.nombre ?? item[entityType] ?? item.name ?? item.label ?? '';
         option.textContent = label || `ID ${item.id}`;
-        // Seleccionar el item si coincide con el ID proporcionado
         if (selectedId && item.id == selectedId) {
             option.selected = true;
         }
@@ -345,9 +343,7 @@ function loadDepartamentosForPais(paisId, selectedDepartamentoId = null) {
     const departamentoSelect = document.getElementById('departamento_id');
     if (!departamentoSelect) return;
 
-    // Limpiar select y mostrar opción por defecto
     departamentoSelect.innerHTML = '<option value="">Seleccione...</option>';
-
     if (!paisId) return;
 
     fetch(`/departamentos/${paisId}`)
@@ -373,7 +369,6 @@ function loadMunicipiosForDepartamento(departamentoId, municipioIdToSelect = nul
     if (!municipioSelect) return;
 
     municipioSelect.innerHTML = '<option value="">Seleccione...</option>';
-
     if (!departamentoId) return;
 
     fetch(`/municipios/${departamentoId}`)
@@ -400,7 +395,7 @@ function setupAddressForm() {
     const cancelButton = document.getElementById('cancelAddress');
 
     if (toggleButton) {
-        toggleButton.addEventListener('click', function() {
+        toggleButton.addEventListener('click', function () {
             const addressForm = document.getElementById('addressForm');
             const isVisible = addressForm.classList.contains('show');
             const button = this;
@@ -422,7 +417,6 @@ function setupAddressForm() {
         cancelButton.addEventListener('click', cancelAddress);
     }
 
-    // Validación de números en campos de dirección
     CONFIG.CAMPOS_DIRECCION_NUMERICOS.forEach(fieldId => {
         const element = document.getElementById(fieldId);
         if (element) {
@@ -432,29 +426,21 @@ function setupAddressForm() {
 }
 
 // Inicializar setupAddressForm cuando el DOM esté listo
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     setupAddressForm();
 });
 
-
-
-
 // Cancelar edición de dirección
 function cancelAddress() {
-    // Ocultar el formulario
     $('#addressForm').collapse('hide');
-
-    // Limpiar campos
     document.querySelectorAll('.address-field').forEach(field => field.value = '');
 }
 
-// Función auxiliar para obtener valor de campo
 function getFieldValue(fieldId) {
     const field = document.getElementById(fieldId);
     return field ? field.value.trim() : '';
 }
 
-// Función auxiliar para construir dirección con campos nuevos
 function buildNewAddressFormat(tipoVia, numeroVia, letraVia, numeroCasa, viaSecundaria, complementos, barrio) {
     let direccion = `${tipoVia} ${numeroVia}`;
     if (letraVia) direccion += letraVia;
@@ -465,21 +451,17 @@ function buildNewAddressFormat(tipoVia, numeroVia, letraVia, numeroCasa, viaSecu
     return direccion;
 }
 
-// Función auxiliar para construir dirección con campos antiguos
 function buildOldAddressFormat(carrera, calle, numeroCasa, numeroApartamento) {
     let direccion = `Carrera ${carrera} Calle ${calle} #${numeroCasa}`;
     if (numeroApartamento) direccion += ` Apt ${numeroApartamento}`;
     return direccion;
 }
 
-// Función auxiliar para validar campos obligatorios
 function validateAddressFields(tipoVia, numeroVia, numeroCasa, carrera, calle) {
     return (tipoVia && numeroVia && numeroCasa) || (carrera && calle && numeroCasa);
 }
 
-// Función auxiliar para limpiar campos
 function clearAddressFields() {
-    // Limpiar campos nuevos
     document.querySelectorAll('.address-field').forEach(field => {
         if (field.type === 'select-one') {
             field.selectedIndex = 0;
@@ -488,7 +470,6 @@ function clearAddressFields() {
         }
     });
 
-    // Limpiar campos antiguos
     const oldFields = ['carrera', 'calle', 'numero_apartamento'];
     oldFields.forEach(fieldId => {
         const field = document.getElementById(fieldId);
@@ -502,43 +483,61 @@ function clearAddressFields() {
     });
 }
 
+function collectNewAddressFields() {
+    return {
+        tipoVia: getFieldValue('tipo_via'),
+        numeroVia: getFieldValue('numero_via'),
+        letraVia: getFieldValue('letra_via'),
+        viaSecundaria: getFieldValue('via_secundaria'),
+        numeroCasa: getFieldValue('numero_casa'),
+        complementos: getFieldValue('complementos'),
+        barrio: getFieldValue('barrio')
+    };
+}
+
+function collectOldAddressFields() {
+    return {
+        carrera: getFieldValue('carrera'),
+        calle: getFieldValue('calle'),
+        numeroApartamento: getFieldValue('numero_apartamento')
+    };
+}
+
+function resolveDireccion(newFields, oldFields) {
+    const { tipoVia, numeroVia, letraVia, numeroCasa, viaSecundaria, complementos, barrio } = newFields;
+    const { carrera, calle, numeroApartamento } = oldFields;
+
+    if (validateAddressFields(tipoVia, numeroVia, numeroCasa, carrera, calle)) {
+        if (tipoVia && numeroVia && numeroCasa) {
+            return buildNewAddressFormat(tipoVia, numeroVia, letraVia, numeroCasa, viaSecundaria, complementos, barrio);
+        }
+
+        return buildOldAddressFormat(carrera, calle, numeroCasa, numeroApartamento);
+    }
+
+    return null;
+}
+
+function applyDireccion(direccion) {
+    document.getElementById('direccion').value = direccion;
+    $('#addressForm').collapse('hide');
+    clearAddressFields();
+}
+
 // Guardar dirección estructurada
 function saveAddress() {
-    // Obtener valores de campos nuevos
-    const tipoVia = getFieldValue('tipo_via');
-    const numeroVia = getFieldValue('numero_via');
-    const letraVia = getFieldValue('letra_via');
-    const viaSecundaria = getFieldValue('via_secundaria');
-    const numeroCasa = getFieldValue('numero_casa');
-    const complementos = getFieldValue('complementos');
-    const barrio = getFieldValue('barrio');
+    const newFields = collectNewAddressFields();
+    const oldFields = collectOldAddressFields();
 
-    // Obtener valores de campos antiguos
-    const carrera = getFieldValue('carrera');
-    const calle = getFieldValue('calle');
-    const numeroApartamento = getFieldValue('numero_apartamento');
-
-    // Validar campos obligatorios
-    if (!validateAddressFields(tipoVia, numeroVia, numeroCasa, carrera, calle)) {
+    const direccion = resolveDireccion(newFields, oldFields);
+    if (!direccion) {
         alert('Por favor complete todos los campos obligatorios: Tipo de vía, Número de vía y Número de casa.');
         return;
     }
 
-    // Construir dirección según el formato disponible
-    const direccion = (tipoVia && numeroVia && numeroCasa)
-        ? buildNewAddressFormat(tipoVia, numeroVia, letraVia, numeroCasa, viaSecundaria, complementos, barrio)
-        : buildOldAddressFormat(carrera, calle, numeroCasa, numeroApartamento);
-
-    // Asignar al campo principal y ocultar formulario
-    document.getElementById('direccion').value = direccion;
-    $('#addressForm').collapse('hide');
-
-    // Limpiar campos
-    clearAddressFields();
+    applyDireccion(direccion);
 }
 
-
-// Función auxiliar para encontrar radio button de "NINGUNA"
 function findNingunaRadio(radios) {
     for (const radio of radios) {
         const label = document.querySelector(`label[for="${radio.id}"]`);
@@ -549,13 +548,10 @@ function findNingunaRadio(radios) {
     return null;
 }
 
-// Función auxiliar para manejar cambio de selección en radios
 function handleRadioChange(radio, ningunaRadio, allRadios) {
     if (radio !== ningunaRadio && radio.checked) {
-        // Si se selecciona cualquier opción que no sea "NINGUNA", deseleccionar "NINGUNA"
         ningunaRadio.checked = false;
     } else if (radio === ningunaRadio && radio.checked) {
-        // Si se selecciona "NINGUNA", deseleccionar todas las demás opciones
         allRadios.forEach(otherRadio => {
             if (otherRadio !== ningunaRadio) {
                 otherRadio.checked = false;
@@ -564,7 +560,6 @@ function handleRadioChange(radio, ningunaRadio, allRadios) {
     }
 }
 
-// Función auxiliar para resetear selección a "NINGUNA"
 function resetToNinguna(ningunaRadio, allRadios) {
     ningunaRadio.checked = true;
     allRadios.forEach(radio => {
@@ -574,25 +569,18 @@ function resetToNinguna(ningunaRadio, allRadios) {
     });
 }
 
-// Configurar manejo de caracterización (parámetros)
 function setupCaracterizacionHandling() {
     const caracterizacionRadios = document.querySelectorAll('input[name="parametro_id"]');
     const ningunaRadio = findNingunaRadio(caracterizacionRadios);
-
-    // Si no se encuentra "NINGUNA", salir
     if (!ningunaRadio) return;
 
-    // Establecer "NINGUNA" como seleccionada por defecto
     ningunaRadio.checked = true;
-
-    // Agregar event listeners a todos los radio buttons
     caracterizacionRadios.forEach(radio => {
         radio.addEventListener('change', () => {
             handleRadioChange(radio, ningunaRadio, caracterizacionRadios);
         });
     });
 
-    // Manejar el evento de reset del formulario
     const forms = document.querySelectorAll('#formInscripcion, #registroForm');
     forms.forEach(form => {
         form.addEventListener('reset', () => {
@@ -601,21 +589,18 @@ function setupCaracterizacionHandling() {
     });
 }
 
-// Función auxiliar para calcular fecha límite de edad mínima
 function calcularFechaLimiteEdadMinima() {
     const fechaLimite = new Date();
     fechaLimite.setFullYear(fechaLimite.getFullYear() - CONFIG.EDAD_MINIMA);
     return fechaLimite;
 }
 
-// Función auxiliar para validar edad
 function validarEdad(fechaNacimiento) {
     const fechaSeleccionada = new Date(fechaNacimiento);
     const fechaLimite = calcularFechaLimiteEdadMinima();
     return fechaSeleccionada <= fechaLimite;
 }
 
-// Función auxiliar para mostrar/ocultar mensaje de error de edad
 function toggleMensajeErrorEdad(inputElement, mostrar) {
     if (mostrar) {
         inputElement.setCustomValidity(CONFIG.MENSAJE_EDAD_INVALIDA);
@@ -639,27 +624,23 @@ function toggleMensajeErrorEdad(inputElement, mostrar) {
     }
 }
 
-// Configurar validación de edad mínima
 function setupEdadMinimaValidation() {
     const fechaNacimientoInput = document.getElementById('fecha_nacimiento');
     if (!fechaNacimientoInput) return;
 
-    // Establecer el atributo max si no está ya establecido
     if (!fechaNacimientoInput.getAttribute('max')) {
         const fechaMaximaStr = calcularFechaLimiteEdadMinima().toISOString().split('T')[0];
         fechaNacimientoInput.setAttribute('max', fechaMaximaStr);
     }
 
-    // Validar cuando cambia la fecha
-    fechaNacimientoInput.addEventListener('change', function() {
+    fechaNacimientoInput.addEventListener('change', function () {
         const esValida = validarEdad(this.value);
         toggleMensajeErrorEdad(this, !esValida);
     });
 
-    // Validar al enviar el formulario
     const forms = document.querySelectorAll('#formInscripcion, #registroForm');
     forms.forEach(form => {
-        form.addEventListener('submit', function(e) {
+        form.addEventListener('submit', function (e) {
             if (!validarEdad(fechaNacimientoInput.value)) {
                 e.preventDefault();
                 fechaNacimientoInput.focus();
@@ -671,12 +652,10 @@ function setupEdadMinimaValidation() {
     });
 }
 
-// Función para inicializar países dinámicamente para registro
 function initializePaisesForRegistro() {
     const paisSelect = document.getElementById('pais_id');
     if (!paisSelect) return;
 
-    // Limpiar select y mostrar opción por defecto
     paisSelect.innerHTML = '<option value="">Seleccione...</option>';
 
     fetch('/paises')

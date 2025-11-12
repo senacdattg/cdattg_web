@@ -27,10 +27,59 @@
             ->values()
             ->all();
     }
-    $departamentoUrlTemplate = route('departamentos.by.pais', ['pais' => '__ID__']);
-    $municipioUrlTemplate = route('municipios.by.departamento', ['departamento' => '__ID__']);
+    $departamentoUrlTemplate = \Illuminate\Support\Facades\Route::has('departamentos.by.pais')
+        ? route('departamentos.by.pais', ['pais' => '__ID__'])
+        : null;
+    $municipioUrlTemplate = \Illuminate\Support\Facades\Route::has('municipios.by.departamento')
+        ? route('municipios.by.departamento', ['departamento' => '__ID__'])
+        : null;
     $oldDepartamentoId = old('departamento_id', $isEdit ? $persona->departamento_id : null);
     $oldMunicipioId = old('municipio_id', $isEdit ? $persona->municipio_id : null);
+
+    $viasParametros = isset($vias) ? collect($vias->parametros ?? []) : collect();
+    $viaOptions = $viasParametros
+        ->map(function ($parametro) {
+            $label = $parametro->name ?? ($parametro->nombre ?? ($parametro['name'] ?? ($parametro['nombre'] ?? null)));
+
+            return [
+                'id' => $parametro->id ?? ($parametro['id'] ?? null),
+                'label' => $label ? trim($label) : null,
+            ];
+        })
+        ->filter(fn($via) => $via['id'] !== null && $via['label'])
+        ->unique('label')
+        ->sortBy('label')
+        ->values();
+
+    $letrasParametros = isset($letras) ? collect($letras->parametros ?? []) : collect();
+    $letraOptions = $letrasParametros
+        ->map(function ($parametro) {
+            $label = $parametro->name ?? ($parametro->nombre ?? ($parametro['name'] ?? ($parametro['nombre'] ?? null)));
+
+            return [
+                'id' => $parametro->id ?? ($parametro['id'] ?? null),
+                'label' => $label ? trim($label) : null,
+            ];
+        })
+        ->filter(fn($letra) => $letra['id'] !== null && $letra['label'])
+        ->unique('label')
+        ->sortBy('label')
+        ->values();
+
+    $cardinalParametros = isset($cardinales) ? collect($cardinales->parametros ?? []) : collect();
+    $cardinalOptions = $cardinalParametros
+        ->map(function ($parametro) {
+            $label = $parametro->name ?? ($parametro->nombre ?? ($parametro['name'] ?? ($parametro['nombre'] ?? null)));
+
+            return [
+                'id' => $parametro->id ?? ($parametro['id'] ?? null),
+                'label' => $label ? trim($label) : null,
+            ];
+        })
+        ->filter(fn($cardinal) => $cardinal['id'] !== null && $cardinal['label'])
+        ->unique('label')
+        ->sortBy('label')
+        ->values();
 @endphp
 
 <div class="row">
@@ -128,6 +177,9 @@
                         <input type="date" id="fecha_nacimiento" name="fecha_nacimiento"
                             class="form-control @error('fecha_nacimiento') is-invalid @enderror"
                             value="{{ old('fecha_nacimiento', $fechaNacimientoValor) }}" required>
+                        <small class="form-text text-muted">
+                            Debe tener al menos 14 años para registrarse.
+                        </small>
                         @error('fecha_nacimiento')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
@@ -165,20 +217,20 @@
             <div class="card-body pt-0">
                 <div class="row">
                     <div class="col-md-6 mb-4">
-                        <label for="telefono" class="form-label font-weight-bold">Teléfono</label>
-                        <input type="text" id="telefono" name="telefono"
-                            class="form-control @error('telefono') is-invalid @enderror"
-                            value="{{ old('telefono', $isEdit ? $persona->telefono : '') }}">
-                        @error('telefono')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="col-md-6 mb-4">
                         <label for="celular" class="form-label font-weight-bold">Celular</label>
                         <input type="text" id="celular" name="celular"
                             class="form-control @error('celular') is-invalid @enderror"
                             value="{{ old('celular', $isEdit ? $persona->celular : '') }}">
                         @error('celular')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label for="telefono" class="form-label font-weight-bold">Teléfono</label>
+                        <input type="text" id="telefono" name="telefono"
+                            class="form-control @error('telefono') is-invalid @enderror"
+                            value="{{ old('telefono', $isEdit ? $persona->telefono : '') }}">
+                        @error('telefono')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -209,10 +261,13 @@
                         <label for="pais_id" class="form-label font-weight-bold">País</label>
                         @php
                             $oldPaisId = old('pais_id', $isEdit ? $persona->pais_id : null);
+                            $paisesEndpoint = \Illuminate\Support\Facades\Route::has('api.paises')
+                                ? route('api.paises')
+                                : url('/api/paises');
                         @endphp
                         <select name="pais_id" id="pais_id"
                             class="form-control @error('pais_id') is-invalid @enderror"
-                            data-initial-value="{{ $oldPaisId }}">
+                            data-initial-value="{{ $oldPaisId }}" data-url="{{ $paisesEndpoint }}">
                             <option value="" disabled {{ $oldPaisId ? '' : 'selected' }}>
                                 Seleccione un país
                             </option>
@@ -265,12 +320,241 @@
                     </div>
                     <div class="col-md-6 mb-0">
                         <label for="direccion" class="form-label font-weight-bold">Dirección</label>
-                        <input type="text" id="direccion" name="direccion"
-                            class="form-control @error('direccion') is-invalid @enderror"
-                            value="{{ old('direccion', $isEdit ? $persona->direccion : '') }}">
-                        @error('direccion')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <div class="input-group">
+                            <input type="text" id="direccion" name="direccion"
+                                class="form-control @error('direccion') is-invalid @enderror"
+                                value="{{ old('direccion', $isEdit ? $persona->direccion : '') }}"
+                                placeholder="Usa el asistente para ingresar una dirección estructurada" readonly>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-primary" id="toggleAddressForm"
+                                    aria-haspopup="dialog" aria-controls="addressModal">
+                                    <i class="fas fa-map-marker-alt mr-1"></i>Editar
+                                </button>
+                            </div>
+                            @error('direccion')
+                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        <small class="form-text text-muted">
+                            Haz clic en el campo o en “Editar” para capturar la dirección de forma estructurada.
+                        </small>
+                    </div>
+                </div>
+
+                <div class="modal fade" id="addressModal" tabindex="-1" role="dialog"
+                    aria-labelledby="addressModalLabel" aria-hidden="true" data-backdrop="static"
+                    data-keyboard="false">
+                    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header bg-primary text-white">
+                                <h5 class="modal-title" id="addressModalLabel">Ingresar dirección estructurada</h5>
+                                <button type="button" class="close text-white" data-dismiss="modal"
+                                    aria-label="Cerrar">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="alert alert-info border-info d-flex align-items-start" role="alert">
+                                    <i class="fas fa-info-circle fa-lg mr-2 mt-1 text-info"></i>
+                                    <div>
+                                        <strong>Consejo:</strong>
+                                        <p class="mb-0 small">
+                                            Usa el formato estructurado para asegurar notificaciones y
+                                            georreferenciación correctas.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div id="addressError" class="alert alert-danger d-none" role="alert"></div>
+                                <div class="card border-light bg-light mb-4" id="addressPreviewCard">
+                                    <div class="card-body py-3">
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge badge-primary badge-pill mr-3">
+                                                <i class="fas fa-map-pin"></i>
+                                            </span>
+                                            <div>
+                                                <span class="text-muted text-uppercase small d-block">
+                                                    Vista previa
+                                                </span>
+                                                <p id="addressPreview" class="mb-0 font-weight-bold text-primary"
+                                                    aria-live="polite">
+                                                    Completa los campos obligatorios para ver la dirección
+                                                    estructurada.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h6 class="text-uppercase text-muted small font-weight-bold mb-3">
+                                    Vía principal
+                                </h6>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <select class="form-control address-field" id="tipo_via"
+                                                data-required="true" data-label="Tipo de vía principal">
+                                                <option value="">Seleccione...</option>
+                                                @forelse ($viaOptions as $via)
+                                                    <option value="{{ $via['label'] }}">{{ $via['label'] }}</option>
+                                                @empty
+                                                    <option value="" disabled>
+                                                        No hay vías configuradas
+                                                    </option>
+                                                @endforelse
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control address-field" id="numero_via"
+                                                placeholder="Ej: 72" data-required="true"
+                                                data-label="Número de vía principal">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <select class="form-control address-field" id="letra_via"
+                                                data-required="true" data-label="Letra de vía principal">
+                                                <option value="">Letra</option>
+                                                @forelse ($letraOptions as $letra)
+                                                    <option value="{{ $letra['label'] }}">{{ $letra['label'] }}
+                                                    </option>
+                                                @empty
+                                                    <option value="" disabled>No hay letras configuradas</option>
+                                                @endforelse
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <select class="form-control address-field" id="bis_via"
+                                                data-label="Complemento BIS principal">
+                                                <option value="">Sin BIS</option>
+                                                <option value="BIS">BIS</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <select class="form-control address-field" id="cardinal_via"
+                                                data-required="true" data-label="Cardinal de vía principal">
+                                                <option value="">Cardinal</option>
+                                                @forelse ($cardinalOptions as $cardinal)
+                                                    <option value="{{ $cardinal['label'] }}">
+                                                        {{ $cardinal['label'] }}
+                                                    </option>
+                                                @empty
+                                                    <option value="" disabled>No hay cardinales configurados
+                                                    </option>
+                                                @endforelse
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h6 class="text-uppercase text-muted small font-weight-bold mb-3">
+                                    Vía secundaria
+                                </h6>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <select class="form-control address-field" id="via_secundaria"
+                                                data-label="Tipo de vía secundaria">
+                                                <option value="">Seleccione...</option>
+                                                @forelse ($viaOptions as $via)
+                                                    <option value="{{ $via['label'] }}">{{ $via['label'] }}</option>
+                                                @empty
+                                                    <option value="" disabled>
+                                                        No hay vías configuradas
+                                                    </option>
+                                                @endforelse
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control address-field"
+                                                id="numero_via_secundaria" placeholder="Ej: 34" maxlength="10"
+                                                data-label="Número de vía secundaria">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <select class="form-control address-field" id="letra_via_secundaria"
+                                                data-label="Letra de vía secundaria">
+                                                <option value="">Letra</option>
+                                                @forelse ($letraOptions as $letra)
+                                                    <option value="{{ $letra['label'] }}">{{ $letra['label'] }}
+                                                    </option>
+                                                @empty
+                                                    <option value="" disabled>No hay letras configuradas</option>
+                                                @endforelse
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <select class="form-control address-field" id="bis_via_secundaria"
+                                                data-label="Complemento BIS secundario">
+                                                <option value="">Sin BIS</option>
+                                                <option value="BIS">BIS</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <select class="form-control address-field" id="cardinal_via_secundaria"
+                                                data-label="Cardinal de vía secundaria">
+                                                <option value="">Cardinal</option>
+                                                @forelse ($cardinalOptions as $cardinal)
+                                                    <option value="{{ $cardinal['label'] }}">
+                                                        {{ $cardinal['label'] }}
+                                                    </option>
+                                                @empty
+                                                    <option value="" disabled>No hay cardinales configurados
+                                                    </option>
+                                                @endforelse
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="numero_casa">5. Número de casa o edificio *</label>
+                                            <input type="text" class="form-control address-field" id="numero_casa"
+                                                placeholder="Ej: 34-15, 45-20, 12" data-required="true"
+                                                data-label="Número de casa o edificio">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="complementos">6. Complementos</label>
+                                            <input type="text" class="form-control address-field"
+                                                id="complementos"
+                                                placeholder="Ej: Apto 301, Bloque 2, Oficina 5 (opcional)"
+                                                data-label="Complementos">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="barrio">7. Barrio o vereda</label>
+                                            <input type="text" class="form-control address-field" id="barrio"
+                                                placeholder="Ej: Centro, La Candelaria (opcional)"
+                                                data-label="Barrio o vereda">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" id="cancelAddress">
+                                    <i class="fas fa-times mr-2"></i>Cancelar
+                                </button>
+                                <button type="button" class="btn btn-primary" id="saveAddress" disabled>
+                                    <i class="fas fa-save mr-2"></i>Guardar dirección
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -412,97 +696,8 @@
     @endif
 </div>
 
-@push('js')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // ==========================================
-            // Manejo de caracterización (seleccionar todo/limpiar)
-            // ==========================================
-            const selectAllBtn = document.querySelector('[data-action="caracterizacion-select-all"]');
-            const clearBtn = document.querySelector('[data-action="caracterizacion-clear"]');
-            const groups = document.querySelectorAll('.caracterizacion-group');
-
-            const toggleCheckboxes = (checked) => {
-                groups.forEach(group => {
-                    group.querySelectorAll('input[type="checkbox"]').forEach(chk => {
-                        chk.checked = checked;
-                    });
-                });
-            };
-
-            if (selectAllBtn) {
-                selectAllBtn.addEventListener('click', function() {
-                    toggleCheckboxes(true);
-                });
-            }
-
-            if (clearBtn) {
-                clearBtn.addEventListener('click', function() {
-                    toggleCheckboxes(false);
-                });
-            }
-
-            // ==========================================
-            // Validación "NINGUNA" vs otras caracterizaciones
-            // ==========================================
-            const caracterizacionCheckboxes = document.querySelectorAll('input[name="caracterizacion_ids[]"]');
-            const ningunaCbx = document.querySelector('input[name="caracterizacion_ids[]"][value="235"]');
-
-            if (ningunaCbx && caracterizacionCheckboxes.length > 0) {
-                caracterizacionCheckboxes.forEach(checkbox => {
-                    checkbox.addEventListener('change', function() {
-                        if (this.value === '235' && this.checked) {
-                            // Si marcó "NINGUNA", desmarcar todas las demás
-                            caracterizacionCheckboxes.forEach(cbx => {
-                                if (cbx.value !== '235') {
-                                    cbx.checked = false;
-                                }
-                            });
-                        } else if (this.value !== '235' && this.checked) {
-                            // Si marcó otra opción, desmarcar "NINGUNA"
-                            if (ningunaCbx) {
-                                ningunaCbx.checked = false;
-                            }
-                        }
-                    });
-                });
-            }
-
-            // ==========================================
-            // Conversión automática a mayúsculas
-            // ==========================================
-            const camposTexto = ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido'];
-            camposTexto.forEach(campo => {
-                const elemento = document.getElementsByName(campo)[0];
-                if (elemento) {
-                    elemento.addEventListener('input', function() {
-                        this.value = this.value.toUpperCase();
-                    });
-                }
-            });
-
-            // ==========================================
-            // Validación de solo números
-            // ==========================================
-            function soloNumeros(event) {
-                const key = event.key;
-                if (event.ctrlKey || event.altKey || event.metaKey) {
-                    return true;
-                }
-                if (!/^\d$/.test(key)) {
-                    event.preventDefault();
-                    return false;
-                }
-                return true;
-            }
-
-            const camposNumericos = ['numero_documento', 'telefono', 'celular'];
-            camposNumericos.forEach(campo => {
-                const elemento = document.getElementsByName(campo)[0];
-                if (elemento) {
-                    elemento.addEventListener('keypress', soloNumeros);
-                }
-            });
-        });
-    </script>
-@endpush
+@once
+    @push('js')
+        @vite('resources/js/personas/form.js')
+    @endpush
+@endonce

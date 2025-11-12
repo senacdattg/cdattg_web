@@ -27,7 +27,7 @@
                 @csrf
                 @method('PUT')
 
-                @include('personas.partials.form', ['showCaracterizacion' => true])
+                @include('personas.partials.form', ['showCaracterizacion' => true, 'cardinales' => $cardinales])
 
                 <div class="card shadow-sm border-0 mt-4 mb-5">
                     <div class="card-body d-flex justify-content-between align-items-center">
