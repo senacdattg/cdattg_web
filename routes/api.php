@@ -91,6 +91,94 @@ Route::get('/fichas-caracterizacion/flutter/{id}', [FichaCaracterizacionFlutterC
 
 Route::get('/paises', [UbicacionPublicApiController::class, 'paises'])->name('api.paises');
 
+Route::post('/check-cedula', function (Request $request) {
+    $request->validate([
+        'cedula' => 'required|string|max:20'
+    ]);
+
+    $persona = app(\App\Services\PersonaService::class)->buscarPorDocumento(trim($request->cedula));
+
+    if (!$persona) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Cédula disponible',
+            'available' => true
+        ]);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Cédula ya registrada',
+        'available' => false
+    ]);
+})->name('api.check-cedula');
+
+Route::post('/check-celular', function (Request $request) {
+    $request->validate([
+        'celular' => 'required|string|size:10'
+    ]);
+
+    $persona = \App\Models\Persona::where('celular', trim($request->celular))->first();
+
+    if (!$persona) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Celular disponible',
+            'available' => true
+        ]);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Celular ya registrado',
+        'available' => false
+    ]);
+})->name('api.check-celular');
+
+Route::post('/check-telefono', function (Request $request) {
+    $request->validate([
+        'telefono' => 'required|string|size:7'
+    ]);
+
+    $persona = \App\Models\Persona::where('telefono', trim($request->telefono))->first();
+
+    if (!$persona) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Teléfono disponible',
+            'available' => true
+        ]);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Teléfono ya registrado',
+        'available' => false
+    ]);
+})->name('api.check-telefono');
+
+Route::post('/check-email', function (Request $request) {
+    $request->validate([
+        'email' => 'required|email'
+    ]);
+
+    $persona = \App\Models\Persona::where('email', trim($request->email))->first();
+
+    if (!$persona) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Correo disponible',
+            'available' => true
+        ]);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Correo ya registrado',
+        'available' => false
+    ]);
+})->name('api.check-email');
+
 Route::get('/modalidades', function () {
     return \App\Models\Parametro::where('tema_id', function($query) {
         $query->select('id')
