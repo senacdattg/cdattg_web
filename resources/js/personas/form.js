@@ -1,7 +1,7 @@
 const CONFIG = {
-    TEXT_FIELDS: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido'],
+    TEXT_FIELDS: ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido', 'complementos', 'barrio'],
     NUMERIC_FIELDS: ['numero_documento', 'telefono', 'celular'],
-    ADDRESS_NUMERIC_FIELDS: ['numero_via', 'numero_casa'],
+    ADDRESS_NUMERIC_FIELDS: ['numero_via', 'numero_via_secundaria', 'numero_casa'],
     NINGUNA_LABEL: 'NINGUNA',
     MODAL_SELECTOR: '#addressModal',
     TOGGLE_SELECTOR: '#toggleAddressForm',
@@ -95,7 +95,25 @@ class InputHandler {
     }
 
     attach(forms) {
-        this.attachUppercase(forms);
+        const fieldsAlfa = ['primer_nombre', 'segundo_nombre', 'primer_apellido', 'segundo_apellido'];
+        fieldsAlfa.forEach((fieldName) => {
+            forms.forEach((form) => {
+                const field = resolveField(form, fieldName);
+                bindOnce(field, 'input', () => {
+                    field.value = field.value.toUpperCase().replace(/\d/g, '');
+                }, `personaUpper_${fieldName}`);
+            });
+        });
+
+        const fieldsUpper = this.config.TEXT_FIELDS.filter((name) => !fieldsAlfa.includes(name));
+        fieldsUpper.forEach((fieldName) => {
+            forms.forEach((form) => {
+                const field = resolveField(form, fieldName);
+                bindOnce(field, 'input', () => {
+                    field.value = field.value.toUpperCase();
+                }, `personaUpper_${fieldName}`);
+            });
+        });
         this.attachNumeric(forms);
     }
 
@@ -104,7 +122,7 @@ class InputHandler {
             forms.forEach((form) => {
                 const field = resolveField(form, fieldName);
                 bindOnce(field, 'input', () => {
-                    field.value = field.value.toUpperCase().replace(/\d/g, '');
+                    field.value = field.value.toUpperCase();
                 }, `personaUpper_${fieldName}`);
             });
         });
@@ -202,6 +220,19 @@ class AddressHandler {
     constructor(config, numericGuard) {
         this.config = config;
         this.numericGuard = numericGuard;
+        this.handleFieldChange = this.handleFieldChange.bind(this);
+        this.handleSave = this.handleSave.bind(this);
+        this.handleCancel = this.handleCancel.bind(this);
+        this.errorContainer = null;
+        this.previewContainer = null;
+        this.saveButton = null;
+        this.direccionInput = null;
+        this.openModal = null;
+        this.closeModal = null;
+        this.progressBar = null;
+        this.progressLabel = null;
+        this.missingList = null;
+        this.previewCard = null;
     }
 
     attach() {
@@ -212,13 +243,26 @@ class AddressHandler {
         }
 
         const toggleButton = DomFacade.find(this.config.TOGGLE_SELECTOR);
-        const direccionInput = DomFacade.find(this.config.DIRECCION_SELECTOR);
-        const saveButton = document.getElementById('saveAddress');
+        this.direccionInput = DomFacade.find(this.config.DIRECCION_SELECTOR);
+        this.saveButton = document.getElementById('saveAddress');
         const cancelButton = document.getElementById('cancelAddress');
+        this.errorContainer = document.getElementById('addressError');
+        this.previewContainer = document.getElementById('addressPreview');
+        this.progressBar = document.getElementById('addressProgress');
+        this.progressLabel = document.getElementById('addressProgressLabel');
+        this.missingList = document.getElementById('addressMissingList');
+        this.previewCard = document.getElementById('addressPreviewCard');
 
         this.config.ADDRESS_NUMERIC_FIELDS.forEach((fieldId) => {
             const field = document.getElementById(fieldId);
             bindOnce(field, 'keypress', this.numericGuard, `personaAddressNumeric_${fieldId}`);
+        });
+
+        DomFacade.findAll('.address-field').forEach((field) => {
+            bindOnce(field, 'input', this.handleFieldChange, `personaAddressInput_${field.id}`);
+            if (field && field.tagName === 'SELECT') {
+                bindOnce(field, 'change', this.handleFieldChange, `personaAddressChange_${field.id}`);
+            }
         });
 
         const openModal = () => {
@@ -231,68 +275,323 @@ class AddressHandler {
             toggleButton?.setAttribute('aria-expanded', 'false');
         };
 
-        bindOnce(toggleButton, 'click', openModal, 'personaAddressToggle');
-        bindOnce(direccionInput, 'focus', openModal, 'personaAddressFocus');
-        bindOnce(direccionInput, 'click', openModal, 'personaAddressClick');
+        this.openModal = openModal;
+        this.closeModal = closeModal;
 
-        bindOnce(saveButton, 'click', () => {
-            const direccion = this.buildAddress();
-            if (!direccion) {
+        bindOnce(toggleButton, 'click', openModal, 'personaAddressToggle');
+        bindOnce(this.direccionInput, 'focus', openModal, 'personaAddressFocus');
+        bindOnce(this.direccionInput, 'click', openModal, 'personaAddressClick');
+
+        bindOnce(this.saveButton, 'click', this.handleSave, 'personaAddressSave');
+        bindOnce(cancelButton, 'click', this.handleCancel, 'personaAddressCancel');
+
+        modalInstance.on('shown.bs.modal', () => {
+            this.updatePreview();
+            this.renderMissingList([]);
+            this.toggleSaveButton();
+            this.focusFirstField();
+        });
+        modalInstance.on('hidden.bs.modal', () => this.clearAddressFields());
+
+        this.clearValidationState();
+        this.updatePreview();
+        this.toggleSaveButton();
+    }
+
+    handleSave(event) {
+        if (event) {
+            event.preventDefault();
+        }
+
+        const { address, missing } = this.composeAddress(true);
+        if (missing.length) {
+            this.showValidationError(missing);
+            this.highlightMissingFields(missing);
+            this.renderMissingList(missing);
+            this.toggleSaveButton();
+            return;
+        }
+
+        this.clearValidationState();
+        this.renderMissingList([]);
+
+        if (this.direccionInput) {
+            this.direccionInput.value = address;
+            this.direccionInput.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+
+        this.clearAddressFields();
+        this.closeModal?.();
+    }
+
+    handleCancel(event) {
+        if (event) {
+            event.preventDefault();
+        }
+
+        this.clearAddressFields();
+        this.renderMissingList([]);
+        this.closeModal?.();
+    }
+
+    handleFieldChange(event) {
+        if (event && event.currentTarget) {
+            this.clearFieldError(event.currentTarget);
+        }
+
+        this.showValidationError([]);
+        this.renderMissingList([]);
+        this.updatePreview();
+        this.toggleSaveButton();
+    }
+
+    composeAddress(requireMandatory = false) {
+        const values = {
+            tipoVia: this.getValue('tipo_via'),
+            numeroVia: this.getValue('numero_via'),
+            letraVia: this.getValue('letra_via'),
+            bisVia: this.getValue('bis_via'),
+            cardinalVia: this.getValue('cardinal_via'),
+            viaSecundariaTipo: this.getValue('via_secundaria'),
+            numeroViaSecundaria: this.getValue('numero_via_secundaria'),
+            letraViaSecundaria: this.getValue('letra_via_secundaria'),
+            bisViaSecundaria: this.getValue('bis_via_secundaria'),
+            cardinalViaSecundaria: this.getValue('cardinal_via_secundaria'),
+            numeroCasa: this.getValue('numero_casa'),
+            complementos: this.getValue('complementos'),
+            barrio: this.getValue('barrio')
+        };
+
+        const requiredMap = [
+            { id: 'tipo_via', value: values.tipoVia },
+            { id: 'numero_via', value: values.numeroVia },
+            { id: 'letra_via', value: values.letraVia },
+            { id: 'cardinal_via', value: values.cardinalVia },
+            { id: 'numero_casa', value: values.numeroCasa }
+        ];
+
+        const missing = requiredMap.filter((field) => !field.value).map((field) => field.id);
+
+        const segments = [];
+
+        const principalParts = [];
+        if (values.tipoVia) {
+            principalParts.push(values.tipoVia);
+        }
+        if (values.numeroVia) {
+            principalParts.push(values.numeroVia);
+        }
+        if (values.letraVia) {
+            principalParts.push(values.letraVia);
+        }
+        if (values.bisVia) {
+            principalParts.push(values.bisVia);
+        }
+        if (values.cardinalVia) {
+            principalParts.push(values.cardinalVia);
+        }
+
+        const principal = principalParts.join(' ').trim();
+        if (principal) {
+            segments.push(principal);
+        }
+
+        const secondaryParts = [];
+        if (values.viaSecundariaTipo) {
+            secondaryParts.push(values.viaSecundariaTipo);
+        }
+        if (values.numeroViaSecundaria) {
+            secondaryParts.push(values.numeroViaSecundaria);
+        }
+        if (values.letraViaSecundaria) {
+            secondaryParts.push(values.letraViaSecundaria);
+        }
+        if (values.bisViaSecundaria) {
+            secondaryParts.push(values.bisViaSecundaria);
+        }
+        if (values.cardinalViaSecundaria) {
+            secondaryParts.push(values.cardinalViaSecundaria);
+        }
+
+        const secondary = secondaryParts.join(' ').trim();
+        if (secondary) {
+            segments.push(secondary);
+        }
+
+        if (values.numeroCasa) {
+            segments.push(`#${values.numeroCasa}`);
+        }
+
+        if (values.complementos) {
+            segments.push(values.complementos);
+        }
+
+        let direccion = segments.join(' ').trim();
+
+        if (values.barrio) {
+            direccion = direccion ? `${direccion}, ${values.barrio}` : values.barrio;
+        }
+
+        if (requireMandatory && missing.length) {
+            return { address: '', missing };
+        }
+
+        return { address: direccion, missing };
+    }
+
+    getRequiredFields() {
+        return DomFacade.findAll('.address-field[data-required="true"]');
+    }
+
+    getFieldLabel(id) {
+        const element = document.getElementById(id);
+
+        if (!element) {
+            return id;
+        }
+
+        if (element.dataset.label) {
+            return element.dataset.label;
+        }
+
+        const label = element.closest('.form-group')?.querySelector('label');
+        return label ? label.textContent.trim() : id;
+    }
+
+    showValidationError(missing) {
+        if (!this.errorContainer) {
+            return;
+        }
+
+        if (!missing.length) {
+            this.errorContainer.classList.add('d-none');
+            this.errorContainer.innerHTML = '';
+            return;
+        }
+
+        const labels = missing.map((id) => this.getFieldLabel(id));
+        this.errorContainer.innerHTML =
+            `<strong>Completa los campos obligatorios:</strong> ${labels.join(', ')}`;
+        this.errorContainer.classList.remove('d-none');
+        this.renderMissingList(missing);
+    }
+
+    highlightMissingFields(missing) {
+        const requiredFields = this.getRequiredFields();
+
+        requiredFields.forEach((field) => {
+            if (!field) {
                 return;
             }
 
-            if (direccionInput) {
-                direccionInput.value = direccion;
-                direccionInput.dispatchEvent(new Event('input', { bubbles: true }));
+            if (missing.includes(field.id)) {
+                field.classList.add('is-invalid');
+                field.setAttribute('aria-invalid', 'true');
+            } else {
+                field.classList.remove('is-invalid');
+                field.removeAttribute('aria-invalid');
             }
-
-            this.clearAddressFields();
-            closeModal();
-        }, 'personaAddressSave');
-
-        bindOnce(cancelButton, 'click', () => {
-            this.clearAddressFields();
-            closeModal();
-        }, 'personaAddressCancel');
-
-        modalInstance.on('hidden.bs.modal', () => this.clearAddressFields());
+        });
     }
 
-    buildAddress() {
-        const tipoVia = this.getValue('tipo_via');
-        const numeroVia = this.getValue('numero_via');
-        const letraVia = this.getValue('letra_via');
-        const viaSecundaria = this.getValue('via_secundaria');
-        const numeroCasa = this.getValue('numero_casa');
-        const complementos = this.getValue('complementos');
-        const barrio = this.getValue('barrio');
-
-        if (!tipoVia || !numeroVia || !numeroCasa) {
-            alert('Completa Tipo de vía, Número de vía y Número de casa.');
-            return null;
+    renderMissingList(missing) {
+        if (!this.missingList) {
+            return;
         }
 
-        let direccion = `${tipoVia} ${numeroVia}`;
-
-        if (letraVia) {
-            direccion += letraVia;
+        if (!missing || !missing.length) {
+            this.missingList.classList.add('d-none');
+            this.missingList.innerHTML = '';
+            return;
         }
 
-        direccion += ` #${numeroCasa}`;
+        this.missingList.classList.remove('d-none');
+        this.missingList.innerHTML = '';
 
-        if (viaSecundaria) {
-            direccion += ` ${viaSecundaria}`;
+        missing.forEach((id) => {
+            const item = document.createElement('li');
+            item.className = 'list-group-item d-flex align-items-center py-2';
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-exclamation-circle text-warning mr-2';
+            const text = document.createElement('span');
+            text.textContent = this.getFieldLabel(id);
+            item.appendChild(icon);
+            item.appendChild(text);
+            this.missingList.appendChild(item);
+        });
+    }
+
+    clearValidationState() {
+        this.highlightMissingFields([]);
+        this.showValidationError([]);
+        this.renderMissingList([]);
+    }
+
+    toggleSaveButton() {
+        if (!this.saveButton) {
+            return;
         }
 
-        if (complementos) {
-            direccion += ` ${complementos}`;
+        const { missing } = this.composeAddress(true);
+        this.saveButton.disabled = missing.length > 0;
+        this.updateProgress();
+    }
+
+    updatePreview() {
+        if (!this.previewContainer) {
+            return;
         }
 
-        if (barrio) {
-            direccion += `, ${barrio}`;
+        const { address } = this.composeAddress(false);
+        const hasAddress = Boolean(address);
+        const defaultMessage =
+            'Completa los campos obligatorios para ver la dirección estructurada.';
+
+        this.previewContainer.textContent = hasAddress ? address : defaultMessage;
+        this.previewContainer.classList.toggle('text-primary', hasAddress);
+        this.previewContainer.classList.toggle('text-muted', !hasAddress);
+
+        if (this.previewCard) {
+            this.previewCard.classList.toggle('shadow', hasAddress);
+            this.previewCard.classList.toggle('shadow-sm', !hasAddress);
+            this.previewCard.classList.toggle('border', hasAddress);
+            this.previewCard.classList.toggle('border-primary', hasAddress);
+            this.previewCard.classList.toggle('border-0', !hasAddress);
+        }
+    }
+
+    updateProgress() {
+        if (!this.progressBar || !this.progressLabel) {
+            return;
         }
 
-        return direccion;
+        const requiredFields = this.getRequiredFields();
+        const total = requiredFields.length || 1;
+        const completed = requiredFields.filter((field) => field && field.value.trim()).length;
+        const percentage = Math.round((completed / total) * 100);
+
+        this.progressBar.style.width = `${percentage}%`;
+        this.progressBar.setAttribute('aria-valuenow', String(percentage));
+        this.progressBar.classList.toggle('bg-success', percentage === 100);
+        this.progressBar.classList.toggle('bg-primary', percentage !== 100);
+        this.progressLabel.textContent = `${percentage}% completado (${completed}/${total})`;
+    }
+
+    focusFirstField() {
+        const firstField = document.getElementById('tipo_via');
+
+        if (firstField && typeof firstField.focus === 'function') {
+            window.requestAnimationFrame(() => firstField.focus());
+        }
+    }
+
+    clearFieldError(field) {
+        if (!field) {
+            return;
+        }
+
+        field.classList.remove('is-invalid');
+        field.removeAttribute('aria-invalid');
     }
 
     clearAddressFields() {
@@ -302,7 +601,14 @@ class AddressHandler {
             } else {
                 field.value = '';
             }
+
+            this.clearFieldError(field);
         });
+
+        this.clearValidationState();
+        this.updatePreview();
+        this.updateProgress();
+        this.toggleSaveButton();
     }
 
     getValue(id) {
@@ -558,7 +864,10 @@ class LocationService {
             return null;
         }
 
-        const sanitizedBase = fallbackBase.replace(/\/+$/, '');
+        let sanitizedBase = fallbackBase;
+        while (sanitizedBase.endsWith('/')) {
+            sanitizedBase = sanitizedBase.slice(0, -1);
+        }
         return `${sanitizedBase}/${value}`;
     }
 }

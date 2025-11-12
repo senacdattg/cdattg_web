@@ -8,9 +8,12 @@ use App\Models\AspiranteComplementario;
 use App\Models\Persona;
 use App\Models\User;
 use App\Repositories\TemaRepository;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\View\View;
+use Throwable;
 
 class RegisterController extends Controller
 {
@@ -19,20 +22,23 @@ class RegisterController extends Controller
         $this->middleware('guest');
     }
 
-    public function create()
+    public function create(): View
     {
         return view('user.registro', [
             'documentos' => $this->resolveDocumentos(),
             'generos' => $this->resolveGeneros(),
             'caracterizaciones' => $this->resolveCaracterizaciones(),
+            'vias' => $this->resolveVias(),
+            'cardinales' => $this->resolveCardinales(),
+            'letras' => $this->resolveLetras(),
+
             'paises' => collect(),
             'departamentos' => collect(),
             'municipios' => collect(),
-            'showCaracterizacion' => false,
         ]);
     }
 
-    public function store(RegisterRequest $request)
+    public function store(RegisterRequest $request): RedirectResponse
     {
         $validated = $request->validated();
 
@@ -46,7 +52,7 @@ class RegisterController extends Controller
             [$persona, $user] = DB::transaction(function () use ($validated) {
                 return $this->createPersonaYUsuario($validated);
             });
-        } catch (\Throwable $exception) {
+        } catch (Throwable) {
             return back()->withInput()->with('error', 'No fue posible completar el registro. Intente nuevamente.');
         }
 
@@ -124,7 +130,7 @@ class RegisterController extends Controller
         return $trimmed === '' ? null : strtoupper($trimmed);
     }
 
-    private function resolvePostRegistroRedirect(Persona $persona, bool $tieneInscripciones)
+    private function resolvePostRegistroRedirect(Persona $persona, bool $tieneInscripciones): RedirectResponse
     {
         if ($tieneInscripciones) {
             $inscripcionPendiente = AspiranteComplementario::where('persona_id', $persona->id)
@@ -163,7 +169,7 @@ class RegisterController extends Controller
         return config('app.audit_default_user_id');
     }
 
-    private function resolveDocumentos()
+    private function resolveDocumentos(): object
     {
         $tema = $this->temaRepository->obtenerTiposDocumento();
 
@@ -176,7 +182,7 @@ class RegisterController extends Controller
         ];
     }
 
-    private function resolveGeneros()
+    private function resolveGeneros(): object
     {
         $tema = $this->temaRepository->obtenerGeneros();
 
@@ -189,9 +195,42 @@ class RegisterController extends Controller
         ];
     }
 
-    private function resolveCaracterizaciones()
+    private function resolveCaracterizaciones(): object
     {
         $tema = $this->temaRepository->obtenerCaracterizacionesComplementarias();
+
+        if ($tema && $tema->parametros?->count()) {
+            return $tema;
+        }
+
+        return (object) ['parametros' => collect()];
+    }
+
+    private function resolveVias(): object
+    {
+        $tema = $this->temaRepository->obtenerVias();
+
+        if ($tema && $tema->parametros?->count()) {
+            return $tema;
+        }
+
+        return (object) ['parametros' => collect()];
+    }
+
+    private function resolveLetras(): object
+    {
+        $tema = $this->temaRepository->obtenerLetras();
+
+        if ($tema && $tema->parametros?->count()) {
+            return $tema;
+        }
+
+        return (object) ['parametros' => collect()];
+    }
+
+    private function resolveCardinales(): object
+    {
+        $tema = $this->temaRepository->obtenerCardinales();
 
         if ($tema && $tema->parametros?->count()) {
             return $tema;

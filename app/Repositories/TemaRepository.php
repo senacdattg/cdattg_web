@@ -76,6 +76,49 @@ class TemaRepository
     }
 
     /**
+     * Obtiene vias
+     *
+     * @return Tema|null
+     */
+    public function obtenerVias(): ?Tema
+    {
+        return $this->encontrarConParametros(17);
+    }
+
+    /**
+     * Obtiene letras
+     *
+     * @return Tema|null
+     */
+    public function obtenerLetras(): ?Tema
+    {
+        return $this->encontrarConParametros(18);
+    }
+
+    /**
+     * Obtiene cardinales
+     *
+     * @return Tema|null
+     */
+    public function obtenerCardinales(): ?Tema
+    {
+        $tema = $this->encontrarConParametros(18);
+
+        if (!$tema) {
+            return null;
+        }
+
+        $parametros = $tema->parametros()
+            ->wherePivotIn('parametro_id', [250, 259, 260, 264])
+            ->orderBy('name')
+            ->get();
+
+        $tema->setRelation('parametros', $parametros);
+
+        return $tema;
+    }
+
+    /**
      * Invalida caché
      *
      * @return void

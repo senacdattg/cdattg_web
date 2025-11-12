@@ -43,6 +43,7 @@
                         'paises' => $paises,
                         'departamentos' => $departamentos,
                         'municipios' => $municipios,
+                        'cardinales' => $cardinales,
                     ])
 
                     <div class="row mt-4">

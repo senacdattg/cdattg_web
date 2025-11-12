@@ -35,6 +35,51 @@
         : null;
     $oldDepartamentoId = old('departamento_id', $isEdit ? $persona->departamento_id : null);
     $oldMunicipioId = old('municipio_id', $isEdit ? $persona->municipio_id : null);
+
+    $viasParametros = isset($vias) ? collect($vias->parametros ?? []) : collect();
+    $viaOptions = $viasParametros
+        ->map(function ($parametro) {
+            $label = $parametro->name ?? ($parametro->nombre ?? ($parametro['name'] ?? ($parametro['nombre'] ?? null)));
+
+            return [
+                'id' => $parametro->id ?? ($parametro['id'] ?? null),
+                'label' => $label ? trim($label) : null,
+            ];
+        })
+        ->filter(fn($via) => $via['id'] !== null && $via['label'])
+        ->unique('label')
+        ->sortBy('label')
+        ->values();
+
+    $letrasParametros = isset($letras) ? collect($letras->parametros ?? []) : collect();
+    $letraOptions = $letrasParametros
+        ->map(function ($parametro) {
+            $label = $parametro->name ?? ($parametro->nombre ?? ($parametro['name'] ?? ($parametro['nombre'] ?? null)));
+
+            return [
+                'id' => $parametro->id ?? ($parametro['id'] ?? null),
+                'label' => $label ? trim($label) : null,
+            ];
+        })
+        ->filter(fn($letra) => $letra['id'] !== null && $letra['label'])
+        ->unique('label')
+        ->sortBy('label')
+        ->values();
+
+    $cardinalParametros = isset($cardinales) ? collect($cardinales->parametros ?? []) : collect();
+    $cardinalOptions = $cardinalParametros
+        ->map(function ($parametro) {
+            $label = $parametro->name ?? ($parametro->nombre ?? ($parametro['name'] ?? ($parametro['nombre'] ?? null)));
+
+            return [
+                'id' => $parametro->id ?? ($parametro['id'] ?? null),
+                'label' => $label ? trim($label) : null,
+            ];
+        })
+        ->filter(fn($cardinal) => $cardinal['id'] !== null && $cardinal['label'])
+        ->unique('label')
+        ->sortBy('label')
+        ->values();
 @endphp
 
 <div class="row">
@@ -172,20 +217,20 @@
             <div class="card-body pt-0">
                 <div class="row">
                     <div class="col-md-6 mb-4">
-                        <label for="telefono" class="form-label font-weight-bold">Teléfono</label>
-                        <input type="text" id="telefono" name="telefono"
-                            class="form-control @error('telefono') is-invalid @enderror"
-                            value="{{ old('telefono', $isEdit ? $persona->telefono : '') }}">
-                        @error('telefono')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                    <div class="col-md-6 mb-4">
                         <label for="celular" class="form-label font-weight-bold">Celular</label>
                         <input type="text" id="celular" name="celular"
                             class="form-control @error('celular') is-invalid @enderror"
                             value="{{ old('celular', $isEdit ? $persona->celular : '') }}">
                         @error('celular')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <label for="telefono" class="form-label font-weight-bold">Teléfono</label>
+                        <input type="text" id="telefono" name="telefono"
+                            class="form-control @error('telefono') is-invalid @enderror"
+                            value="{{ old('telefono', $isEdit ? $persona->telefono : '') }}">
+                        @error('telefono')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
@@ -319,57 +364,154 @@
                                         </p>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="tipo_via">1. Tipo de vía principal *</label>
-                                            <select class="form-control address-field" id="tipo_via"
-                                                data-required="true">
-                                                <option value="">Seleccione...</option>
-                                                <option value="Carrera">Carrera</option>
-                                                <option value="Calle">Calle</option>
-                                                <option value="Transversal">Transversal</option>
-                                                <option value="Diagonal">Diagonal</option>
-                                                <option value="Avenida">Avenida</option>
-                                                <option value="Autopista">Autopista</option>
-                                                <option value="Circular">Circular</option>
-                                                <option value="Vía">Vía</option>
-                                                <option value="Pasaje">Pasaje</option>
-                                                <option value="Manzana">Manzana</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="numero_via">2. Número o nombre de vía principal *</label>
-                                            <input type="text" class="form-control address-field" id="numero_via"
-                                                placeholder="Ej: 9A, 7 Bis, 45" data-required="true">
+                                <div id="addressError" class="alert alert-danger d-none" role="alert"></div>
+                                <div class="card border-light bg-light mb-4" id="addressPreviewCard">
+                                    <div class="card-body py-3">
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge badge-primary badge-pill mr-3">
+                                                <i class="fas fa-map-pin"></i>
+                                            </span>
+                                            <div>
+                                                <span class="text-muted text-uppercase small d-block">
+                                                    Vista previa
+                                                </span>
+                                                <p id="addressPreview" class="mb-0 font-weight-bold text-primary"
+                                                    aria-live="polite">
+                                                    Completa los campos obligatorios para ver la dirección
+                                                    estructurada.
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                                <h6 class="text-uppercase text-muted small font-weight-bold mb-3">
+                                    Vía principal
+                                </h6>
                                 <div class="row">
-                                    <div class="col-md-6">
+                                    <div class="col-md-3">
                                         <div class="form-group">
-                                            <label for="letra_via">3. Letra o complemento de vía principal</label>
-                                            <input type="text" class="form-control address-field" id="letra_via"
-                                                placeholder="Ej: A, B, Bis (opcional)" maxlength="5">
+                                            <select class="form-control address-field" id="tipo_via"
+                                                data-required="true" data-label="Tipo de vía principal">
+                                                <option value="">Seleccione...</option>
+                                                @forelse ($viaOptions as $via)
+                                                    <option value="{{ $via['label'] }}">{{ $via['label'] }}</option>
+                                                @empty
+                                                    <option value="" disabled>
+                                                        No hay vías configuradas
+                                                    </option>
+                                                @endforelse
+                                            </select>
                                         </div>
                                     </div>
-                                    <div class="col-md-6">
+                                    <div class="col-md-2">
                                         <div class="form-group">
-                                            <label for="via_secundaria">4. Vía secundaria o intersección</label>
-                                            <select class="form-control address-field" id="via_secundaria">
+                                            <input type="text" class="form-control address-field" id="numero_via"
+                                                placeholder="Ej: 72" data-required="true"
+                                                data-label="Número de vía principal">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <select class="form-control address-field" id="letra_via"
+                                                data-required="true" data-label="Letra de vía principal">
+                                                <option value="">Letra</option>
+                                                @forelse ($letraOptions as $letra)
+                                                    <option value="{{ $letra['label'] }}">{{ $letra['label'] }}
+                                                    </option>
+                                                @empty
+                                                    <option value="" disabled>No hay letras configuradas</option>
+                                                @endforelse
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <select class="form-control address-field" id="bis_via"
+                                                data-label="Complemento BIS principal">
+                                                <option value="">Sin BIS</option>
+                                                <option value="BIS">BIS</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <select class="form-control address-field" id="cardinal_via"
+                                                data-required="true" data-label="Cardinal de vía principal">
+                                                <option value="">Cardinal</option>
+                                                @forelse ($cardinalOptions as $cardinal)
+                                                    <option value="{{ $cardinal['label'] }}">
+                                                        {{ $cardinal['label'] }}
+                                                    </option>
+                                                @empty
+                                                    <option value="" disabled>No hay cardinales configurados
+                                                    </option>
+                                                @endforelse
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h6 class="text-uppercase text-muted small font-weight-bold mb-3">
+                                    Vía secundaria
+                                </h6>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group">
+                                            <select class="form-control address-field" id="via_secundaria"
+                                                data-label="Tipo de vía secundaria">
                                                 <option value="">Seleccione...</option>
-                                                <option value="Carrera">Carrera</option>
-                                                <option value="Calle">Calle</option>
-                                                <option value="Transversal">Transversal</option>
-                                                <option value="Diagonal">Diagonal</option>
-                                                <option value="Avenida">Avenida</option>
-                                                <option value="Autopista">Autopista</option>
-                                                <option value="Circular">Circular</option>
-                                                <option value="Vía">Vía</option>
-                                                <option value="Pasaje">Pasaje</option>
-                                                <option value="Manzana">Manzana</option>
+                                                @forelse ($viaOptions as $via)
+                                                    <option value="{{ $via['label'] }}">{{ $via['label'] }}</option>
+                                                @empty
+                                                    <option value="" disabled>
+                                                        No hay vías configuradas
+                                                    </option>
+                                                @endforelse
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <input type="text" class="form-control address-field"
+                                                id="numero_via_secundaria" placeholder="Ej: 34" maxlength="10"
+                                                data-label="Número de vía secundaria">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <select class="form-control address-field" id="letra_via_secundaria"
+                                                data-label="Letra de vía secundaria">
+                                                <option value="">Letra</option>
+                                                @forelse ($letraOptions as $letra)
+                                                    <option value="{{ $letra['label'] }}">{{ $letra['label'] }}
+                                                    </option>
+                                                @empty
+                                                    <option value="" disabled>No hay letras configuradas</option>
+                                                @endforelse
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <select class="form-control address-field" id="bis_via_secundaria"
+                                                data-label="Complemento BIS secundario">
+                                                <option value="">Sin BIS</option>
+                                                <option value="BIS">BIS</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-2">
+                                        <div class="form-group">
+                                            <select class="form-control address-field" id="cardinal_via_secundaria"
+                                                data-label="Cardinal de vía secundaria">
+                                                <option value="">Cardinal</option>
+                                                @forelse ($cardinalOptions as $cardinal)
+                                                    <option value="{{ $cardinal['label'] }}">
+                                                        {{ $cardinal['label'] }}
+                                                    </option>
+                                                @empty
+                                                    <option value="" disabled>No hay cardinales configurados
+                                                    </option>
+                                                @endforelse
                                             </select>
                                         </div>
                                     </div>
@@ -379,7 +521,8 @@
                                         <div class="form-group">
                                             <label for="numero_casa">5. Número de casa o edificio *</label>
                                             <input type="text" class="form-control address-field" id="numero_casa"
-                                                placeholder="Ej: 34-15, 45-20, 12" data-required="true">
+                                                placeholder="Ej: 34-15, 45-20, 12" data-required="true"
+                                                data-label="Número de casa o edificio">
                                         </div>
                                     </div>
                                     <div class="col-md-6">
@@ -387,7 +530,8 @@
                                             <label for="complementos">6. Complementos</label>
                                             <input type="text" class="form-control address-field"
                                                 id="complementos"
-                                                placeholder="Ej: Apto 301, Bloque 2, Oficina 5 (opcional)">
+                                                placeholder="Ej: Apto 301, Bloque 2, Oficina 5 (opcional)"
+                                                data-label="Complementos">
                                         </div>
                                     </div>
                                 </div>
@@ -396,19 +540,8 @@
                                         <div class="form-group">
                                             <label for="barrio">7. Barrio o vereda</label>
                                             <input type="text" class="form-control address-field" id="barrio"
-                                                placeholder="Ej: Centro, La Candelaria (opcional)">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="alert alert-light border mt-4">
-                                            <small>
-                                                <strong>Ejemplo:</strong><br>
-                                                <span class="text-muted">Carrera 9A BIS #34-15 Este Apto 301,
-                                                    Barrio Centro</span><br>
-                                                <span class="text-muted">
-                                                    Los campos marcados con * son obligatorios.
-                                                </span>
-                                            </small>
+                                                placeholder="Ej: Centro, La Candelaria (opcional)"
+                                                data-label="Barrio o vereda">
                                         </div>
                                     </div>
                                 </div>
@@ -417,7 +550,7 @@
                                 <button type="button" class="btn btn-secondary" id="cancelAddress">
                                     <i class="fas fa-times mr-2"></i>Cancelar
                                 </button>
-                                <button type="button" class="btn btn-primary" id="saveAddress">
+                                <button type="button" class="btn btn-primary" id="saveAddress" disabled>
                                     <i class="fas fa-save mr-2"></i>Guardar dirección
                                 </button>
                             </div>
