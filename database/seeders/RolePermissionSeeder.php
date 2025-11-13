@@ -326,16 +326,16 @@ class RolePermissionSeeder extends Seeder
         // Los aprendices tienen acceso limitado solo a consultar su propia información
         $aprendiz->syncPermissions([
             // Permisos de inventario para APRENDIZ (solo catálogo y carrito, NO lista de productos ni configuraciones)
-            'VER CATALOGO PRODUCTO',
-            'BUSCAR PRODUCTO',
-            'VER CARRITO',
-            'AGREGAR CARRITO',
-            'ACTUALIZAR CARRITO',
-            'ELIMINAR CARRITO',
-            'VACIAR CARRITO',
-            'CREAR ORDEN',
-            'DEVOLVER PRESTAMO',
-            'VER NOTIFICACION',
+            // 'VER CATALOGO PRODUCTO',
+            // 'BUSCAR PRODUCTO',
+            // 'VER CARRITO',
+            // 'AGREGAR CARRITO',
+            // 'ACTUALIZAR CARRITO',
+            // 'ELIMINAR CARRITO',
+            // 'VACIAR CARRITO',
+            // 'CREAR ORDEN',
+            // 'DEVOLVER PRESTAMO',
+            // 'VER NOTIFICACION',
             'VER TALENTO HUMANO',
             'VER PERFIL',
         ]);
