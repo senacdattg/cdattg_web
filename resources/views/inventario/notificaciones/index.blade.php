@@ -16,7 +16,6 @@
         subtitle="Administra tus notificaciones del sistema"
         :breadcrumb="[
             ['label' => 'Inicio', 'url' => '#'],
-            ['label' => 'Inventario', 'active' => true],
             ['label' => 'Notificaciones', 'active' => true]
         ]"
     />
@@ -35,24 +34,26 @@
                                     <span class="badge badge-primary">{{ $notificaciones->total() }}</span>
                                 @endif
                             </h3>
-                            <div class="card-tools">
-                                <button 
-                                    type="button" 
-                                    class="btn btn-sm btn-primary mr-1" 
-                                    id="marcar-todas-leidas" 
-                                    title="Marcar todas como leídas"
-                                >
-                                    <i class="fas fa-check-double"></i> Marcar leídas
-                                </button>
-                                <button 
-                                    type="button" 
-                                    class="btn btn-sm btn-danger" 
-                                    id="vaciar-notificaciones" 
-                                    title="Eliminar todas las notificaciones"
-                                >
-                                    <i class="fas fa-trash-alt"></i> Vaciar todo
-                                </button>
-                            </div>
+                            @if($notificaciones->count() > 0)
+                                <div class="card-tools">
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-sm btn-primary mr-1" 
+                                        id="marcar-todas-leidas" 
+                                        title="Marcar todas como leídas"
+                                    >
+                                        <i class="fas fa-check-double"></i> Marcar leídas
+                                    </button>
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-sm btn-danger" 
+                                        id="vaciar-notificaciones" 
+                                        title="Eliminar todas las notificaciones"
+                                    >
+                                        <i class="fas fa-trash-alt"></i> Vaciar todo
+                                    </button>
+                                </div>
+                            @endif
                         </div>
                         <div class="card-body p-0">
                             @if($notificaciones->count() > 0)

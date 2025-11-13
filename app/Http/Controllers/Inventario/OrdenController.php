@@ -262,6 +262,10 @@ class OrdenController extends InventarioController
             'fecha_devolucion' => 'required_if:tipo,prestamo|nullable|date|after:today',
             'descripcion' => self::RULE_REQUIRED_STRING,
             'carrito' => 'required|json' // El carrito viene como JSON desde el frontend
+        ], [
+            'fecha_devolucion.after' => 'La fecha de devolución debe ser posterior a hoy.',
+            'fecha_devolucion.required_if' => 'La fecha de devolución es obligatoria para préstamos.',
+            'fecha_devolucion.date' => 'La fecha de devolución debe ser una fecha válida.',
         ]);
 
         try {
