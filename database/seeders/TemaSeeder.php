@@ -53,7 +53,7 @@ class TemaSeeder extends Seeder
             [
                 'id'       => 2,
                 'name'     => 'TIPO DE DOCUMENTO',
-                'paramIds' => range(3, 8),
+                'paramIds' => array_merge(range(3, 8), range(274, 275)),
             ],
             [
                 'id'       => 3,
@@ -63,7 +63,7 @@ class TemaSeeder extends Seeder
             [
                 'id'       => 4,
                 'name'     => 'DIAS',
-                'paramIds' => range(12, 17),
+                'paramIds' => [range(12, 18), [276]],
             ],
             [
                 'id'       => 5,
@@ -161,6 +161,13 @@ class TemaSeeder extends Seeder
         $syncData = [];
 
         foreach ($paramIds as $paramId) {
+            if (is_array($paramId)) {
+                foreach ($paramId as $nestedId) {
+                    $syncData[$nestedId] = ['status' => 1];
+                }
+                continue;
+            }
+
             $syncData[$paramId] = ['status' => 1];
         }
 
