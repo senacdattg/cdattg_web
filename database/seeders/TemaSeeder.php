@@ -128,12 +128,12 @@ class TemaSeeder extends Seeder
             [
                 'id'       => 17,
                 'name'     => 'VÍAS',
-                'paramIds' => range(236, 245),
+                'paramIds' => range(236, 247),
             ],
             [
                 'id'       => 18,
                 'name'     => 'LETRAS',
-                'paramIds' => range(246, 271),
+                'paramIds' => range(248, 273),
             ],
         ];
     }
