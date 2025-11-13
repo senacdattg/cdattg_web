@@ -44,8 +44,7 @@ class PersonaController extends Controller
         $this->ubicacionService = $ubicacionService;
         $this->temaRepo = $temaRepo;
 
-        // Restringir acceso a aspirantes - no pueden ver el módulo de personas
-        // EXCEPTO para ver su propio perfil (métodos show y mi-perfil con permiso VER PERFIL)
+        // Restringir acceso a aspirantes sin permisos específicos
         $this->middleware(function ($request, $next) {
             $user = $request->user();
             if (!$user instanceof User) {
@@ -66,8 +65,12 @@ class PersonaController extends Controller
                 return $next($request);
             }
 
-            // Bloquear a aspirantes en otras rutas del módulo
-            if ($user->hasRole('ASPIRANTE')) {
+            // Bloquear aspirantes solo si carecen de permisos para el módulo
+            if (
+                $user->hasRole('ASPIRANTE')
+                && !$user->can(self::PERMISSION_VIEW_PERSON)
+                && !$user->can(self::PERMISSION_VIEW_PROFILE)
+            ) {
                 abort(403, 'No tienes permiso para acceder a este módulo.');
             }
 
