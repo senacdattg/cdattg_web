@@ -170,7 +170,7 @@ class WebSocketEntradaSalidaController extends Controller
         try {
             // Obtener estadísticas reales de la base de datos
             $hoy = now()->toDateString();
-            
+
             $total_entradas_hoy = PersonaIngresoSalida::whereDate('fecha_entrada', $hoy)->count();
             $total_salidas_hoy = PersonaIngresoSalida::whereDate('fecha_salida', $hoy)->count();
             $personas_actualmente_dentro = PersonaIngresoSalida::whereNull('timestamp_salida')->count();
@@ -202,39 +202,40 @@ class WebSocketEntradaSalidaController extends Controller
      * Obtener lista de personas actualmente dentro
      */
     public function obtenerPersonasDentro()
-    {
-        try {
-            // Obtener personas que están dentro actualmente (sin salida registrada)
-            $personasDentro = PersonaIngresoSalida::with(['persona', 'sede'])
-                ->whereNull('timestamp_salida')
-                ->get()
-                ->map(function ($registro) {
-                    return [
-                        'persona_id' => $registro->persona_id,
-                        'numero_documento' => $registro->persona->numero_documento ?? 'N/A',
-                        'nombre_completo' => $registro->persona->nombre_completo ?? 'N/A',
-                        'sede' => $registro->sede->sede ?? 'N/A',
-                        'tipo_persona' => $registro->tipo_persona,
-                        'fecha_entrada' => $registro->fecha_entrada,
-                        'hora_entrada' => $registro->hora_entrada,
-                        'timestamp_entrada' => $registro->timestamp_entrada,
-                    ];
-                });
+{
+    try {
+        // Obtener personas que están dentro actualmente (sin salida registrada)
+        $personasDentro = PersonaIngresoSalida::with(['persona', 'sede'])
+            ->whereNull('timestamp_salida')
+            ->get()
+            ->map(function ($registro) {
+                return [
+                    'persona_id' => $registro->persona_id,
+                    'numero_documento' => $registro->persona->numero_documento ?? 'N/A',
+                    'nombre_completo' => $registro->persona->nombre_completo ?? 'N/A',
+                    'sede' => $registro->sede->sede ?? 'N/A',
+                    'tipo_persona' => $registro->tipo_persona,
+                    'fecha_entrada' => $registro->fecha_entrada,
+                    'hora_entrada' => $registro->hora_entrada,
+                    'timestamp_entrada' => $registro->timestamp_entrada,
+                ];
+            })
+            ->values()  // ✅ Agregar esto para resetear las keys
+            ->toArray();  // ✅ Agregar esto para convertir a array
 
-            return response()->json([
-                'success' => true,
-                'data' => $personasDentro
-            ]);
+        return response()->json([
+            'success' => true,
+            'data' => $personasDentro  // Ahora es un array, no una Collection
+        ]);
+    } catch (\Exception $e) {
+        Log::error('Error al obtener personas dentro', [
+            'error' => $e->getMessage()
+        ]);
 
-        } catch (\Exception $e) {
-            Log::error('Error al obtener personas dentro', [
-                'error' => $e->getMessage()
-            ]);
-
-            return response()->json([
-                'success' => false,
-                'message' => 'Error al obtener personas dentro: ' . $e->getMessage()
-            ], 500);
-        }
+        return response()->json([
+            'success' => false,
+            'message' => 'Error al obtener personas dentro: ' . $e->getMessage()
+        ], 500);
     }
+}
 }
