@@ -107,6 +107,19 @@ class Persona extends Model
     }
 
     /**
+     * Relación con la caracterización principal asociada a la persona.
+     *
+     * Nota: Aunque las caracterizaciones adicionales se gestionan mediante la
+     * tabla pivote `persona_caracterizacion`, algunas vistas todavía consultan
+     * la relación singular `caracterizacion`. Para mantener compatibilidad,
+     * se usa la columna `parametro_id` como referencia.
+     */
+    public function caracterizacion(): BelongsTo
+    {
+        return $this->belongsTo(Parametro::class, 'parametro_id');
+    }
+
+    /**
      * Relación One-to-One con Aprendiz.
      * Una persona puede ser un aprendiz.
      *

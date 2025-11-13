@@ -23,7 +23,7 @@ class TemaRepository
      */
     public function obtenerConParametros(): Collection
     {
-        return $this->cache('con_parametros', function () {
+        return $this->cacheWithTags('con_parametros', function () {
             return Tema::with(['parametros' => function ($query) {
                 $query->wherePivot('status', 1);
             }])->get();
@@ -38,7 +38,7 @@ class TemaRepository
      */
     public function encontrarConParametros(int $id): ?Tema
     {
-        return $this->cache("tema.{$id}.parametros", function () use ($id) {
+        return $this->cacheWithTags("tema.{$id}.parametros", function () use ($id) {
             return Tema::with(['parametros' => function ($query) {
                 $query->wherePivot('status', 1);
             }])->find($id);

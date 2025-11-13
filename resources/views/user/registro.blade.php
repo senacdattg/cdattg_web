@@ -44,6 +44,7 @@
                         'departamentos' => $departamentos,
                         'municipios' => $municipios,
                         'cardinales' => $cardinales,
+                        'showCaracterizacion' => true,
                     ])
 
                     <div class="row mt-4">

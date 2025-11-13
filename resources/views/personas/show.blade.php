@@ -5,11 +5,18 @@
 @endsection
 
 @section('content_header')
-    <x-page-header icon="fa-cogs" title="Personas" subtitle="Gestión de personas del sistema" :breadcrumb="[
-        ['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'],
-        ['label' => 'Personas', 'url' => route('personas.index'), 'icon' => 'fa-cog'],
-        ['label' => $persona->nombre_completo, 'icon' => 'fa-user', 'active' => true],
-    ]" />
+    @if(!isset($soloPerfil) || !$soloPerfil)
+        <x-page-header icon="fa-cogs" title="Personas" subtitle="Gestión de personas del sistema" :breadcrumb="[
+            ['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'],
+            ['label' => 'Personas', 'url' => route('personas.index'), 'icon' => 'fa-cog'],
+            ['label' => $persona->nombre_completo, 'icon' => 'fa-user', 'active' => true],
+        ]" />
+    @else
+        <x-page-header icon="fa-user" title="Mi Perfil" subtitle="Información personal" :breadcrumb="[
+            ['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'],
+            ['label' => 'Mi Perfil', 'icon' => 'fa-user', 'active' => true],
+        ]" />
+    @endif
 @endsection
 
 @section('content')
@@ -17,9 +24,15 @@
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
-                    <a class="btn btn-outline-secondary" href="{{ route('personas.index') }}">
-                        <i class="fas fa-arrow-left mr-1"></i> Volver
-                    </a>
+                    @if(!isset($soloPerfil) || !$soloPerfil)
+                        <a class="btn btn-outline-secondary" href="{{ route('personas.index') }}">
+                            <i class="fas fa-arrow-left mr-1"></i> Volver
+                        </a>
+                    @else
+                        <a class="btn btn-outline-secondary" href="{{ route('verificarLogin') }}">
+                            <i class="fas fa-arrow-left mr-1"></i> Volver al inicio
+                        </a>
+                    @endif
                 </div>
                 <div>
                     @can('EDITAR PERSONA')
@@ -306,71 +319,73 @@
                         </div>
                     </div>
 
-                    <div class="card shadow-sm border-0">
-                        <div class="card-header bg-white border-0">
-                            <h5 class="card-title m-0 text-primary">
-                                <i class="fas fa-clipboard-list mr-2"></i>Auditoría
-                            </h5>
-                        </div>
-                        <div class="card-body pt-0">
-                            <div class="row">
-                                <div class="col-md-6 mb-4">
-                                    <span class="text-muted text-uppercase small d-block">Usuario que crea</span>
-                                    <p class="h6 mb-0">
-                                        @if ($persona->userCreatedBy && $persona->userCreatedBy->persona)
-                                            {{ $persona->userCreatedBy->persona->nombre_completo }}
-                                        @else
-                                            <span class="badge badge-warning text-dark">Sin información</span>
-                                        @endif
-                                    </p>
-                                </div>
-                                <div class="col-md-6 mb-4">
-                                    <span class="text-muted text-uppercase small d-block">Fecha de creación</span>
-                                    <p class="h6 mb-0">
-                                        @if ($persona->created_at)
-                                            {{ $persona->created_at->diffForHumans() }}
-                                        @else
-                                            <span class="badge badge-warning text-dark">Sin información</span>
-                                        @endif
-                                    </p>
-                                </div>
-                                <div class="col-md-6 mb-4">
-                                    <span class="text-muted text-uppercase small d-block">Usuario que modifica</span>
-                                    <p class="h6 mb-0">
-                                        @if ($persona->userUpdatedBy && $persona->userUpdatedBy->persona)
-                                            {{ $persona->userUpdatedBy->persona->nombre_completo }}
-                                        @else
-                                            <span class="badge badge-warning text-dark">Sin información</span>
-                                        @endif
-                                    </p>
-                                </div>
-                                <div class="col-md-6 mb-0">
-                                    <span class="text-muted text-uppercase small d-block">Última modificación</span>
-                                    <p class="h6 mb-0">
-                                        @if ($persona->updated_at)
-                                            {{ $persona->updated_at->diffForHumans() }}
-                                        @else
-                                            <span class="badge badge-warning text-dark">Sin información</span>
-                                        @endif
-                                    </p>
-                                </div>
-                                <div class="col-md-6 mb-4">
-                                    <span class="text-muted text-uppercase small d-block">Estado del usuario</span>
-                                    <p class="h6 mb-0">
-                                        <span class="badge {{ $estadoBadgeClass }}">{{ $estadoLabel }}</span>
-                                    </p>
-                                </div>
-                                <div class="col-md-6 mb-0">
-                                    <span class="text-muted text-uppercase small d-block">Registro en SOFIA</span>
-                                    <p class="h6 mb-0">
-                                        <span class="badge {{ $estadoSofiaBadgeClass }} text-white">
-                                            {{ $estadoSofiaLabel }}
-                                        </span>
-                                    </p>
+                    @if(!isset($soloPerfil) || !$soloPerfil)
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-white border-0">
+                                <h5 class="card-title m-0 text-primary">
+                                    <i class="fas fa-clipboard-list mr-2"></i>Auditoría
+                                </h5>
+                            </div>
+                            <div class="card-body pt-0">
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <span class="text-muted text-uppercase small d-block">Usuario que crea</span>
+                                        <p class="h6 mb-0">
+                                            @if ($persona->userCreatedBy && $persona->userCreatedBy->persona)
+                                                {{ $persona->userCreatedBy->persona->nombre_completo }}
+                                            @else
+                                                <span class="badge badge-warning text-dark">Sin información</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <span class="text-muted text-uppercase small d-block">Fecha de creación</span>
+                                        <p class="h6 mb-0">
+                                            @if ($persona->created_at)
+                                                {{ $persona->created_at->diffForHumans() }}
+                                            @else
+                                                <span class="badge badge-warning text-dark">Sin información</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <span class="text-muted text-uppercase small d-block">Usuario que modifica</span>
+                                        <p class="h6 mb-0">
+                                            @if ($persona->userUpdatedBy && $persona->userUpdatedBy->persona)
+                                                {{ $persona->userUpdatedBy->persona->nombre_completo }}
+                                            @else
+                                                <span class="badge badge-warning text-dark">Sin información</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6 mb-0">
+                                        <span class="text-muted text-uppercase small d-block">Última modificación</span>
+                                        <p class="h6 mb-0">
+                                            @if ($persona->updated_at)
+                                                {{ $persona->updated_at->diffForHumans() }}
+                                            @else
+                                                <span class="badge badge-warning text-dark">Sin información</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <span class="text-muted text-uppercase small d-block">Estado del usuario</span>
+                                        <p class="h6 mb-0">
+                                            <span class="badge {{ $estadoBadgeClass }}">{{ $estadoLabel }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6 mb-0">
+                                        <span class="text-muted text-uppercase small d-block">Registro en SOFIA</span>
+                                        <p class="h6 mb-0">
+                                            <span class="badge {{ $estadoSofiaBadgeClass }} text-white">
+                                                {{ $estadoSofiaLabel }}
+                                            </span>
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>

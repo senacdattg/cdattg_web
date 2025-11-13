@@ -4,6 +4,14 @@
 /public/hot
 /public/storage
 /storage/*.key
+/storage/app/public/*
+!storage/app/public/.gitignore
+/storage/framework/*
+!storage/framework/.gitignore
+/storage/logs/*
+!storage/logs/.gitignore
+/bootstrap/cache/*
+!bootstrap/cache/.gitignore
 /vendor
 /.sonarlint/
 .env
@@ -20,4 +28,3 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
-.sonarlint/

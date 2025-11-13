@@ -37,14 +37,30 @@ class PersonaController extends Controller
         $this->temaRepo = $temaRepo;
 
         // Restringir acceso a aspirantes - no pueden ver el módulo de personas
+        // EXCEPTO para ver su propio perfil (métodos show y mi-perfil con permiso VER PERFIL)
         $this->middleware(function ($request, $next) {
-            if ($request->user()?->hasRole('ASPIRANTE')) {
+            $user = $request->user();
+            $routeName = $request->route()->getName();
+            
+            // Permitir acceso a mi-perfil si tiene VER PERFIL
+            if ($routeName === 'personas.mi-perfil' && $user?->can('VER PERFIL')) {
+                return $next($request);
+            }
+            
+            // Permitir acceso a show si tiene VER PERFIL o VER PERSONA
+            if ($routeName === 'personas.show' && ($user?->can('VER PERFIL') || $user?->can('VER PERSONA'))) {
+                return $next($request);
+            }
+            
+            // Bloquear a aspirantes en otras rutas del módulo
+            if ($user?->hasRole('ASPIRANTE')) {
                 abort(403, 'No tienes permiso para acceder a este módulo.');
             }
+            
             return $next($request);
         });
 
-        $this->middleware('can:VER PERSONA')->only(['index', 'show']);
+        $this->middleware('can:VER PERSONA')->only(['index']);
         $this->middleware('can:CREAR PERSONA')->only(['create', 'store']);
         $this->middleware('can:EDITAR PERSONA')->only(['edit', 'update']);
         $this->middleware('can:ELIMINAR PERSONA')->only('destroy');
@@ -57,6 +73,29 @@ class PersonaController extends Controller
     public function index()
     {
         return view('personas.index');
+    }
+
+    /**
+     * Redirige al usuario a su propio perfil.
+     * Solo accesible para usuarios con permiso 'VER PERFIL'.
+     */
+    public function miPerfil()
+    {
+        $user = Auth::user();
+
+        // Verificar permiso
+        if (!$user->can('VER PERFIL')) {
+            abort(403, 'No tienes permiso para ver tu perfil.');
+        }
+
+        // Obtener la persona del usuario autenticado
+        if (!$user->persona_id) {
+            return redirect()->route('verificarLogin')
+                ->with('error', 'No se encontró información de persona para este usuario.');
+        }
+
+        // Redirigir al show de su propia persona
+        return redirect()->route('personas.show', $user->persona_id);
     }
 
     /**
@@ -117,20 +156,57 @@ class PersonaController extends Controller
      */
     public function show(Persona $persona)
     {
-        $persona->loadMissing([
-            'tipoDocumento',
-            'tipoGenero',
-            'pais',
-            'departamento',
-            'municipio',
-            'caracterizacionesComplementarias',
-            'caracterizacion',
-            'user.roles',
-            'userCreatedBy.persona',
-            'userUpdatedBy.persona'
-        ]);
+        $user = Auth::user();
 
-        return view('personas.show', ['persona' => $persona]);
+        // Verificar si el usuario tiene permiso 'VER PERSONA' (puede ver cualquier persona)
+        if ($user->can('VER PERSONA')) {
+            // Usuario con permiso completo, puede ver cualquier persona
+            $persona->loadMissing([
+                'tipoDocumento',
+                'tipoGenero',
+                'pais',
+                'departamento',
+                'municipio',
+                'caracterizacionesComplementarias',
+                'caracterizacion',
+                'user.roles',
+                'userCreatedBy.persona',
+                'userUpdatedBy.persona'
+            ]);
+
+            return view('personas.show', [
+                'persona' => $persona,
+                'soloPerfil' => false
+            ]);
+        }
+
+        // Verificar si el usuario tiene permiso 'VER PERFIL' (solo puede ver su propio perfil)
+        if ($user->can('VER PERFIL')) {
+            // Verificar que el usuario solo pueda ver su propio perfil
+            if ($user->persona_id !== $persona->id) {
+                abort(403, 'No tienes permiso para ver este perfil. Solo puedes ver tu propio perfil.');
+            }
+
+            // Usuario solo puede ver su propio perfil
+            $persona->loadMissing([
+                'tipoDocumento',
+                'tipoGenero',
+                'pais',
+                'departamento',
+                'municipio',
+                'caracterizacionesComplementarias',
+                'caracterizacion',
+                'user.roles',
+            ]);
+
+            return view('personas.show', [
+                'persona' => $persona,
+                'soloPerfil' => true
+            ]);
+        }
+
+        // Si no tiene ninguno de los permisos, denegar acceso
+        abort(403, 'No tienes permiso para ver este perfil.');
     }
 
     /**

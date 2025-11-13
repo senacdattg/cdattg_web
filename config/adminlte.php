@@ -431,7 +431,6 @@ return [
             'icon' => 'fas fa-fw fa-users',
             'can' => 'VER PERSONA',
         ],
-
         // ========================================
         // MÓDULO: INFRAESTRUCTURA
         // ========================================

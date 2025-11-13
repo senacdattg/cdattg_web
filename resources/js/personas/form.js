@@ -63,6 +63,12 @@ class HttpClient {
             'X-Requested-With': 'XMLHttpRequest',
             Accept: 'application/json'
         };
+
+        // Add CSRF token if available
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (csrfToken) {
+            this.defaultHeaders['X-CSRF-TOKEN'] = csrfToken.getAttribute('content');
+        }
     }
 
     async get(url, config = {}) {
@@ -78,6 +84,33 @@ class HttpClient {
         }
 
         const response = await fetch(url, { headers });
+        if (!response.ok) {
+            const error = new Error(`HTTP ${response.status}`);
+            this.logger.error('Solicitud fallida:', error);
+            throw error;
+        }
+
+        return response.json();
+    }
+
+    async post(url, data = {}, config = {}) {
+        if (!url) {
+            throw new Error('URL requerida para la solicitud.');
+        }
+
+        const headers = { ...this.defaultHeaders, ...(config.headers || {}) };
+
+        if (this.client) {
+            const response = await this.client.post(url, data, { ...config, headers });
+            return response.data;
+        }
+
+        headers['Content-Type'] = 'application/json';
+        const response = await fetch(url, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(data)
+        });
         if (!response.ok) {
             const error = new Error(`HTTP ${response.status}`);
             this.logger.error('Solicitud fallida:', error);
@@ -1321,8 +1354,8 @@ class ValidationHandler {
         return (
             this.validateTextFields(form) &&
             this.validateNumericField(form, '#numero_documento', 'El número de documento solo puede contener números.') &&
-            this.validateNumericField(form, '#telefono', 'El teléfono fijo solo puede contener números.') &&
-            this.validateNumericField(form, '#celular', 'El celular solo puede contener números.')
+            this.validatePhoneField(form, '#telefono', 7, 'El teléfono fijo debe tener exactamente 7 dígitos.') &&
+            this.validatePhoneField(form, '#celular', 10, 'El celular debe tener exactamente 10 dígitos.')
         );
     }
 
@@ -1358,6 +1391,22 @@ class ValidationHandler {
         field.focus();
         return false;
     }
+
+    validatePhoneField(form, selector, exactLength, message) {
+        const field = form.querySelector(selector);
+        if (!field || !field.value) {
+            return true;
+        }
+
+        if (/^\d+$/.test(field.value) && field.value.length === exactLength) {
+            return true;
+        }
+
+        // Instead of alert, set custom validity for inline feedback
+        field.setCustomValidity(message);
+        field.classList.add('is-invalid');
+        return false;
+    }
 }
 
 class PreloaderHandler {
@@ -1377,6 +1426,186 @@ class PreloaderHandler {
     }
 }
 
+class FieldValidator {
+    constructor() {
+        this.timeouts = {};
+        this.http = new HttpClient();
+    }
+
+    attach(forms) {
+        forms.forEach((form) => {
+            // Validación de cédula
+            const cedulaField = resolveField(form, 'numero_documento');
+            if (cedulaField) {
+                bindOnce(cedulaField, 'input', (e) => {
+                    clearTimeout(this.timeouts.cedula);
+                    const cedula = e.target.value.trim();
+                    if (cedula.length >= 5) {
+                        this.timeouts.cedula = setTimeout(() => {
+                            this.checkCedulaAvailability(cedula);
+                        }, 500);
+                    } else {
+                        // Limpiar feedback si es muy corto
+                        const feedback = document.getElementById('cedula-feedback');
+                        if (feedback) {
+                            feedback.textContent = '';
+                        }
+                    }
+                }, 'personaCedulaInput');
+            }
+
+            // Validación de celular
+            const celularField = resolveField(form, 'celular');
+            if (celularField) {
+                bindOnce(celularField, 'input', (e) => {
+                    clearTimeout(this.timeouts.celular);
+                    this.timeouts.celular = setTimeout(() => {
+                        this.validatePhoneField(e.target, 10, 'celular-feedback', 'El celular debe tener exactamente 10 dígitos', '/api/check-celular', 'celular');
+                    }, 500);
+                }, 'personaCelularInput');
+            }
+
+            // Validación de teléfono
+            const telefonoField = resolveField(form, 'telefono');
+            if (telefonoField) {
+                bindOnce(telefonoField, 'input', (e) => {
+                    clearTimeout(this.timeouts.telefono);
+                    this.timeouts.telefono = setTimeout(() => {
+                        this.validatePhoneField(e.target, 7, 'telefono-feedback', 'El teléfono fijo debe tener exactamente 7 dígitos', '/api/check-telefono', 'telefono');
+                    }, 500);
+                }, 'personaTelefonoInput');
+            }
+
+            // Validación de email
+            const emailField = resolveField(form, 'email');
+            if (emailField) {
+                bindOnce(emailField, 'input', (e) => {
+                    clearTimeout(this.timeouts.email);
+                    this.timeouts.email = setTimeout(() => {
+                        this.validateEmailField(e.target);
+                    }, 500);
+                }, 'personaEmailInput');
+            }
+        });
+    }
+
+    async checkCedulaAvailability(cedula) {
+        const feedback = document.getElementById('cedula-feedback');
+        if (!feedback) return;
+
+        try {
+            const response = await this.http.post('/api/check-cedula', { cedula });
+
+            if (response.success) {
+                feedback.textContent = 'Cédula ya registrada en el sistema';
+                feedback.className = 'form-text text-danger';
+            } else {
+                feedback.textContent = 'Cédula disponible';
+                feedback.className = 'form-text text-success';
+            }
+        } catch (error) {
+            feedback.textContent = 'Error al verificar cédula';
+            feedback.className = 'form-text text-warning';
+        }
+    }
+
+    async validatePhoneField(field, requiredLength, feedbackId, lengthMessage, apiUrl, fieldName) {
+        const feedback = document.getElementById(feedbackId);
+        if (!feedback) return;
+
+        const value = field.value.trim();
+        if (!value) {
+            feedback.textContent = '';
+            field.setCustomValidity('');
+            field.classList.remove('is-invalid');
+            return;
+        }
+
+        if (/^\d+$/.test(value)) {
+            if (value.length === requiredLength) {
+                // Verificar unicidad
+                feedback.textContent = 'Verificando...';
+                feedback.className = 'form-text text-info';
+                try {
+                    const response = await this.http.post(apiUrl, { [fieldName]: value });
+                    if (response.success) {
+                        feedback.textContent = `${fieldName === 'celular' ? 'Celular' : 'Teléfono'} ya registrado en el sistema`;
+                        feedback.className = 'form-text text-danger';
+                        field.setCustomValidity(`${fieldName === 'celular' ? 'Celular' : 'Teléfono'} ya registrado`);
+                        field.classList.add('is-invalid');
+                    } else {
+                        feedback.textContent = `${fieldName === 'celular' ? 'Celular' : 'Teléfono'} disponible`;
+                        feedback.className = 'form-text text-success';
+                        field.setCustomValidity('');
+                        field.classList.remove('is-invalid');
+                    }
+                } catch (error) {
+                    feedback.textContent = `Error al verificar ${fieldName === 'celular' ? 'celular' : 'teléfono'}`;
+                    feedback.className = 'form-text text-warning';
+                    field.setCustomValidity(`Error al verificar ${fieldName === 'celular' ? 'celular' : 'teléfono'}`);
+                    field.classList.add('is-invalid');
+                }
+            } else {
+                feedback.textContent = lengthMessage;
+                feedback.className = 'form-text text-danger';
+                field.setCustomValidity(lengthMessage);
+                field.classList.add('is-invalid');
+            }
+        } else {
+            feedback.textContent = 'Solo se permiten números';
+            feedback.className = 'form-text text-danger';
+            field.setCustomValidity('Solo se permiten números');
+            field.classList.add('is-invalid');
+        }
+    }
+
+    async validateEmailField(field) {
+        const feedback = document.getElementById('email-feedback');
+        if (!feedback) return;
+
+        const value = field.value.trim();
+        if (!value) {
+            feedback.textContent = '';
+            field.setCustomValidity('');
+            field.classList.remove('is-invalid');
+            return;
+        }
+
+        // Validar formato de email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+            feedback.textContent = 'Formato de correo inválido';
+            feedback.className = 'form-text text-danger';
+            field.setCustomValidity('Formato de correo inválido');
+            field.classList.add('is-invalid');
+            return;
+        }
+
+        // Verificar unicidad
+        feedback.textContent = 'Verificando...';
+        feedback.className = 'form-text text-info';
+        try {
+            const response = await this.http.post('/api/check-email', { email: value });
+            if (response.success) {
+                feedback.textContent = 'Correo ya registrado en el sistema';
+                feedback.className = 'form-text text-danger';
+                field.setCustomValidity('Correo ya registrado');
+                field.classList.add('is-invalid');
+            } else {
+                feedback.textContent = 'Correo disponible';
+                feedback.className = 'form-text text-success';
+                field.setCustomValidity('');
+                field.classList.remove('is-invalid');
+            }
+        } catch (error) {
+            feedback.textContent = 'Error al verificar correo';
+            feedback.className = 'form-text text-warning';
+            field.setCustomValidity('Error al verificar correo');
+            field.classList.add('is-invalid');
+        }
+    }
+}
+
 class PersonaFormManager {
     constructor(config, selectors) {
         this.config = config;
@@ -1390,6 +1619,7 @@ class PersonaFormManager {
         this.age = new AgeValidator(config, selectors);
         this.validation = new ValidationHandler(config);
         this.preloader = new PreloaderHandler(selectors);
+        this.fieldValidator = new FieldValidator();
     }
 
     getTargetForms() {
@@ -1415,6 +1645,7 @@ class PersonaFormManager {
         this.input.attach(forms);
         this.caracterizacion.attach();
         this.address.attach();
+        this.fieldValidator.attach(forms);
 
         try {
             await this.location.init();

@@ -50,6 +50,14 @@ return [
             'after_commit' => false,
         ],
 
+        'persona-import' => [
+            'driver' => 'database',
+            'table' => 'jobs',
+            'queue' => 'persona-import',
+            'retry_after' => env('QUEUE_PERSONA_IMPORT_RETRY_AFTER', 2400),
+            'after_commit' => false,
+        ],
+
         'beanstalkd' => [
             'driver' => 'beanstalkd',
             'host' => 'localhost',

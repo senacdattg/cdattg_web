@@ -72,6 +72,8 @@ class RegisterController extends Controller
 
     private function createPersonaYUsuario(array $data): array
     {
+        $caracterizacionIds = $this->extractCaracterizacionIds($data);
+
         $persona = Persona::create([
             'tipo_documento' => $data['tipo_documento'],
             'numero_documento' => $data['numero_documento'],
@@ -100,6 +102,8 @@ class RegisterController extends Controller
         ]);
 
         $user->assignRole('VISITANTE');
+
+        $this->syncCaracterizaciones($persona, $caracterizacionIds);
 
         return [$persona, $user];
     }
@@ -158,6 +162,34 @@ class RegisterController extends Controller
                 'success',
                 '¡Registro Exitoso! Ahora puede inscribirse en los programas complementarios disponibles.'
             );
+    }
+
+    /**
+     * @param array<string,mixed> $data
+     * @return array<int,int>
+     */
+    private function extractCaracterizacionIds(array $data): array
+    {
+        return collect($data['caracterizacion_ids'] ?? [])
+            ->filter()
+            ->map(fn($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    /**
+     * @param array<int,int> $caracterizacionIds
+     */
+    private function syncCaracterizaciones(Persona $persona, array $caracterizacionIds): void
+    {
+        $persona->caracterizacionesComplementarias()->sync($caracterizacionIds);
+
+        if (!empty($caracterizacionIds)) {
+            $persona->updateQuietly([
+                'parametro_id' => $caracterizacionIds[0],
+            ]);
+        }
     }
 
     private function resolveAuditableUserId(): ?int
