@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Services\PersonaService;
 use App\Exceptions\PersonaException;
 use App\Services\UbicacionService;
@@ -14,16 +13,21 @@ use App\Models\Departamento;
 use App\Models\Municipio;
 use App\Http\Requests\StorePersonaRequest;
 use App\Http\Requests\UpdatePersonaRequest;
+use App\Http\Requests\UpdatePersonaRoleRequest;
+use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 class PersonaController extends Controller
 {
     private const PERMISSION_VIEW_PROFILE = 'VER PERFIL';
     private const PERMISSION_VIEW_PERSON = 'VER PERSONA';
+    private const PERMISSION_ASSIGN_PERMISSIONS = 'ASIGNAR PERMISOS';
     private const ERROR_USER_NOT_RESOLVED = 'No se pudo determinar el usuario autenticado.';
 
     protected PersonaService $personaService;
@@ -75,6 +79,7 @@ class PersonaController extends Controller
         $this->middleware('can:EDITAR PERSONA')->only(['edit', 'update']);
         $this->middleware('can:ELIMINAR PERSONA')->only('destroy');
         $this->middleware('can:CAMBIAR ESTADO USUARIO')->only('cambiarEstadoUser');
+        $this->middleware('can:ASIGNAR PERMISOS')->only('updateRole');
     }
 
     /**
@@ -195,9 +200,14 @@ class PersonaController extends Controller
                 'userUpdatedBy.persona'
             ]);
 
+            $rolesDisponibles = $user->can(self::PERMISSION_ASSIGN_PERMISSIONS)
+                ? Role::orderBy('name')->get()
+                : collect();
+
             return view('personas.show', [
                 'persona' => $persona,
-                'soloPerfil' => false
+                'soloPerfil' => false,
+                'rolesDisponibles' => $rolesDisponibles,
             ]);
         }
 
@@ -222,7 +232,8 @@ class PersonaController extends Controller
 
             return view('personas.show', [
                 'persona' => $persona,
-                'soloPerfil' => true
+                'soloPerfil' => true,
+                'rolesDisponibles' => collect(),
             ]);
         }
 
@@ -478,6 +489,37 @@ class PersonaController extends Controller
             Log::error("Error al cambiar estado de la persona (ID: {$id}): " . $e->getMessage());
 
             return redirect()->back()->with('error', 'No se pudo actualizar el estado.');
+        }
+    }
+
+    public function updateRole(UpdatePersonaRoleRequest $request, Persona $persona)
+    {
+        if (!$persona->user) {
+            return redirect()
+                ->back()
+                ->with('error', 'La persona no tiene un usuario asociado.');
+        }
+
+        $roleName = $request->validated()['role'];
+
+        try {
+            DB::transaction(static function () use ($persona, $roleName) {
+                $persona->user->syncRoles([$roleName]);
+            });
+
+            return redirect()
+                ->route('personas.show', $persona->id)
+                ->with('success', 'Rol actualizado correctamente.');
+        } catch (\Throwable $exception) {
+            Log::error('Error al actualizar el rol de la persona', [
+                'persona_id' => $persona->id,
+                'role' => $roleName,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return redirect()
+                ->back()
+                ->with('error', 'No se pudo actualizar el rol de la persona.');
         }
     }
 

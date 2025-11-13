@@ -386,6 +386,62 @@
                                             </span>
                                         </p>
                                     </div>
+                                @can('ASIGNAR PERMISOS')
+                                    <div class="col-12">
+                                        <hr class="mt-4 mb-4">
+                                        @php
+                                            $rolesActuales = $persona->user ? $persona->user->roles->pluck('name')->toArray() : [];
+                                            $rolSeleccionado = $rolesActuales[0] ?? null;
+                                        @endphp
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <span class="text-muted text-uppercase small">Rol actual</span>
+                                            <div>
+                                                @forelse ($rolesActuales as $rol)
+                                                    <span class="badge badge-primary mr-1">{{ $rol }}</span>
+                                                @empty
+                                                    <span class="badge badge-warning text-dark">Sin rol asignado</span>
+                                                @endforelse
+                                            </div>
+                                        </div>
+                                        @if ($persona->user)
+                                            @if ($rolesDisponibles->isEmpty())
+                                                <div class="alert alert-warning mb-0">
+                                                    No hay roles disponibles para asignar.
+                                                </div>
+                                            @else
+                                                <form method="POST" action="{{ route('personas.update-role', $persona) }}">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <div class="form-group mb-3">
+                                                        <label for="role" class="small text-muted text-uppercase d-block">Actualizar rol</label>
+                                                        <select id="role" name="role" class="form-control @error('role') is-invalid @enderror">
+                                                            <option value="">Seleccione una opción</option>
+                                                            @foreach ($rolesDisponibles as $rol)
+                                                                <option value="{{ $rol->name }}" {{ $rolSeleccionado === $rol->name ? 'selected' : '' }}>
+                                                                    {{ $rol->name }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                        @error('role')
+                                                            <div class="invalid-feedback d-block">
+                                                                {{ $message }}
+                                                            </div>
+                                                        @enderror
+                                                    </div>
+                                                    <div class="d-flex justify-content-end">
+                                                        <button type="submit" class="btn btn-primary">
+                                                            <i class="fas fa-sync-alt mr-1"></i>Actualizar rol
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            @endif
+                                        @else
+                                            <div class="alert alert-warning mb-0">
+                                                La persona no tiene usuario asociado.
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endcan
                                 </div>
                             </div>
                         </div>

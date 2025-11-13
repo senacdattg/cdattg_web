@@ -317,11 +317,13 @@ class RolePermissionSeeder extends Seeder
         $aspirante->syncPermissions([
             'VER PROGRAMA COMPLEMENTARIO',
             'VER PERFIL', // Solo pueden ver su propio perfil
+            'EDITAR PERSONA',
         ]);
 
         // Asignar permisos al rol VISITANTE
         $visitante->givePermissionTo([
             'VER PERFIL',
+            'EDITAR PERSONA',
         ]);
         // Asignar permisos al rol APRENDIZ
         // Los aprendices tienen acceso limitado solo a consultar su propia información
@@ -339,6 +341,7 @@ class RolePermissionSeeder extends Seeder
             // 'VER NOTIFICACION',
             'VER TALENTO HUMANO',
             'VER PERFIL',
+            'EDITAR PERSONA',
         ]);
     }
 }
