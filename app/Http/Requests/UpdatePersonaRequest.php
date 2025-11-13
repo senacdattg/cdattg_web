@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use App\Models\Persona;
+use App\Models\User;
 
 class UpdatePersonaRequest extends FormRequest
 {
@@ -24,25 +24,32 @@ class UpdatePersonaRequest extends FormRequest
     public function rules(): array
     {
         $personaId = $this->input('persona_id');
-        $userId = null;
-        if ($personaId) {
-            $persona = Persona::with('user')->find($personaId);
-            if ($persona && $persona->user) {
-                $userId = $persona->user->id;
-            }
+        $userId = $this->input('persona_user_id');
+
+        if ($personaId && !$userId) {
+            $userId = User::where('persona_id', $personaId)->value('id');
         }
 
         return [
             'tipo_documento'      => 'required',
-            'numero_documento'    => 'required',
+            'numero_documento'    => [
+                'required',
+                Rule::unique('personas', 'numero_documento')->ignore($personaId),
+            ],
             'primer_nombre'       => 'required|string',
             'segundo_nombre'      => 'nullable|string',
             'primer_apellido'     => 'required|string',
             'segundo_apellido'    => 'nullable|string',
             'fecha_nacimiento'    => 'required|date',
             'genero'              => 'required',
-            'telefono'            => 'nullable|unique:personas,telefono,' . $personaId,
-            'celular'             => 'nullable|unique:personas,celular,' . $personaId,
+            'telefono'            => [
+                'nullable',
+                Rule::unique('personas', 'telefono')->ignore($personaId),
+            ],
+            'celular'             => [
+                'nullable',
+                Rule::unique('personas', 'celular')->ignore($personaId),
+            ],
             'email'               => [
                 'required',
                 'email',

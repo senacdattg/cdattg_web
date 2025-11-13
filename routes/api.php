@@ -19,6 +19,8 @@ use App\Http\Controllers\SedeController;
 use App\Http\Controllers\AsistenceQrController;
 use App\Http\Controllers\RegistroAsistenciaController;
 use Illuminate\Http\Request;
+use App\Models\Persona;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -114,13 +116,14 @@ Route::post('/check-cedula', function (Request $request) {
 })->name('api.check-cedula');
 
 Route::post('/check-celular', function (Request $request) {
-    $request->validate([
-        'celular' => 'required|string|size:10'
+    $data = $request->validate([
+        'celular' => 'required|string|size:10',
+        'persona_id' => 'nullable|integer|exists:personas,id',
     ]);
 
-    $persona = \App\Models\Persona::where('celular', trim($request->celular))->first();
+    $persona = Persona::where('celular', trim($data['celular']))->first();
 
-    if (!$persona) {
+    if (!$persona || (!empty($data['persona_id']) && $persona->id === (int) $data['persona_id'])) {
         return response()->json([
             'success' => false,
             'message' => 'Celular disponible',
@@ -136,13 +139,14 @@ Route::post('/check-celular', function (Request $request) {
 })->name('api.check-celular');
 
 Route::post('/check-telefono', function (Request $request) {
-    $request->validate([
-        'telefono' => 'required|string|size:7'
+    $data = $request->validate([
+        'telefono' => 'required|string|size:7',
+        'persona_id' => 'nullable|integer|exists:personas,id',
     ]);
 
-    $persona = \App\Models\Persona::where('telefono', trim($request->telefono))->first();
+    $persona = Persona::where('telefono', trim($data['telefono']))->first();
 
-    if (!$persona) {
+    if (!$persona || (!empty($data['persona_id']) && $persona->id === (int) $data['persona_id'])) {
         return response()->json([
             'success' => false,
             'message' => 'Teléfono disponible',
@@ -158,24 +162,36 @@ Route::post('/check-telefono', function (Request $request) {
 })->name('api.check-telefono');
 
 Route::post('/check-email', function (Request $request) {
-    $request->validate([
-        'email' => 'required|email'
+    $data = $request->validate([
+        'email' => 'required|email',
+        'persona_id' => 'nullable|integer|exists:personas,id',
     ]);
 
-    $persona = \App\Models\Persona::where('email', trim($request->email))->first();
+    $email = trim($data['email']);
+    $personaId = !empty($data['persona_id']) ? (int) $data['persona_id'] : null;
 
-    if (!$persona) {
+    $persona = Persona::where('email', $email)->first();
+    if ($persona && ($personaId === null || $persona->id !== $personaId)) {
         return response()->json([
-            'success' => false,
-            'message' => 'Correo disponible',
-            'available' => true
+            'success' => true,
+            'message' => 'Correo ya registrado',
+            'available' => false
+        ]);
+    }
+
+    $user = User::where('email', $email)->first();
+    if ($user && ($personaId === null || $user->persona_id !== $personaId)) {
+        return response()->json([
+            'success' => true,
+            'message' => 'Correo ya registrado',
+            'available' => false
         ]);
     }
 
     return response()->json([
-        'success' => true,
-        'message' => 'Correo ya registrado',
-        'available' => false
+        'success' => false,
+        'message' => 'Correo disponible',
+        'available' => true
     ]);
 })->name('api.check-email');
 
