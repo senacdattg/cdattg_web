@@ -53,7 +53,7 @@ class TemaSeeder extends Seeder
             [
                 'id'       => 2,
                 'name'     => 'TIPO DE DOCUMENTO',
-                'paramIds' => array_merge(range(3, 8), range(74, 75)),
+                'paramIds' => array_merge(range(3, 8), range(274, 275)),
             ],
             [
                 'id'       => 3,
