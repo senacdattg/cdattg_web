@@ -315,6 +315,7 @@ class RolePermissionSeeder extends Seeder
         // Los aspirantes NO deben tener acceso al módulo de personas
         // Solo pueden ver su propio perfil a través de /mi-perfil
         $aspirante->syncPermissions([
+            'VER PROGRAMA COMPLEMENTARIO',
             'VER PERFIL', // Solo pueden ver su propio perfil
         ]);
 
