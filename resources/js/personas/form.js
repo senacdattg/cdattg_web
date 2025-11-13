@@ -7,9 +7,6 @@ const CONFIG = {
     TOGGLE_SELECTOR: '#toggleAddressForm',
     DIRECCION_SELECTOR: '#direccion',
     CARACTERIZACION_CHECKBOX_FIELD: 'input[name="caracterizacion_ids[]"]',
-    SELECT_ALL_ACTION: '[data-action="caracterizacion-select-all"]',
-    CLEAR_ACTION: '[data-action="caracterizacion-clear"]',
-    GROUP_SELECTOR: '.caracterizacion-group',
     EDAD_MINIMA: 14,
     MENSAJE_EDAD_INVALIDA: 'Debe tener al menos 14 años para registrarse.'
 };
@@ -193,19 +190,6 @@ class CaracterizacionHandler {
             return;
         }
 
-        const selectAllButton = document.querySelector(this.config.SELECT_ALL_ACTION);
-        const clearButton = document.querySelector(this.config.CLEAR_ACTION);
-
-        bindOnce(selectAllButton, 'click', (event) => {
-            event.preventDefault();
-            this.toggleCheckboxes(true);
-        }, 'personaCaracterizacionSelectAll');
-
-        bindOnce(clearButton, 'click', (event) => {
-            event.preventDefault();
-            this.toggleCheckboxes(false);
-        }, 'personaCaracterizacionClear');
-
         const ningunaCheckbox = this.findNingunaCheckbox(checkboxes);
 
         checkboxes.forEach((checkbox) => {
@@ -224,14 +208,6 @@ class CaracterizacionHandler {
                     ningunaCheckbox.checked = false;
                 }
             }, `personaCaracterizacion_${checkbox.id || checkbox.name}`);
-        });
-    }
-
-    toggleCheckboxes(checked) {
-        DomFacade.findAll(this.config.GROUP_SELECTOR).forEach((group) => {
-            group.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
-                checkbox.checked = checked;
-            });
         });
     }
 

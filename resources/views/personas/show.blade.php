@@ -5,7 +5,7 @@
 @endsection
 
 @section('content_header')
-    @if(!isset($soloPerfil) || !$soloPerfil)
+    @if (!isset($soloPerfil) || !$soloPerfil)
         <x-page-header icon="fa-cogs" title="Personas" subtitle="Gestión de personas del sistema" :breadcrumb="[
             ['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'],
             ['label' => 'Personas', 'url' => route('personas.index'), 'icon' => 'fa-cog'],
@@ -24,7 +24,7 @@
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div>
-                    @if(!isset($soloPerfil) || !$soloPerfil)
+                    @if (!isset($soloPerfil) || !$soloPerfil)
                         <a class="btn btn-outline-secondary" href="{{ route('personas.index') }}">
                             <i class="fas fa-arrow-left mr-1"></i> Volver
                         </a>
@@ -77,8 +77,10 @@
                                     </a>
                                 @endif
                                 @if ($persona->celular)
-                                    <a class="btn btn-sm btn-light mx-1 mb-2"
-                                        href="https://wa.me/{{ $persona->celular }}" target="_blank">
+                                    <a
+                                        class="btn btn-sm btn-light mx-1 mb-2"
+                                        href="https://wa.me/{{ $persona->celular }}"
+                                        target="_blank">
                                         <i class="fab fa-whatsapp mr-1 text-success"></i> WhatsApp
                                     </a>
                                 @endif
@@ -177,7 +179,7 @@
                                     <span class="text-muted text-uppercase small d-block">Edad</span>
                                     <p class="h6 mb-0">
                                         @if ($persona->edad)
-                                            {{ $persona->edad }} años
+                                            {{ $persona->edad }} AÑOS
                                         @else
                                             <span class="badge badge-warning text-dark">Sin información</span>
                                         @endif
@@ -319,7 +321,7 @@
                         </div>
                     </div>
 
-                    @if(!isset($soloPerfil) || !$soloPerfil)
+                    @if (!isset($soloPerfil) || !$soloPerfil)
                         <div class="card shadow-sm border-0">
                             <div class="card-header bg-white border-0">
                                 <h5 class="card-title m-0 text-primary">
@@ -349,7 +351,9 @@
                                         </p>
                                     </div>
                                     <div class="col-md-6 mb-4">
-                                        <span class="text-muted text-uppercase small d-block">Usuario que modifica</span>
+                                        <span class="text-muted text-uppercase small d-block">
+                                            Usuario que modifica
+                                        </span>
                                         <p class="h6 mb-0">
                                             @if ($persona->userUpdatedBy && $persona->userUpdatedBy->persona)
                                                 {{ $persona->userUpdatedBy->persona->nombre_completo }}

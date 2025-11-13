@@ -569,75 +569,58 @@
                 </div>
             </div>
         </div>
-
-        @php
-            $showCaracterizacion = $showCaracterizacion ?? $isEdit;
-        @endphp
-
-        @if ($showCaracterizacion)
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
-                    <h5 class="card-title m-0 text-primary">
-                        <i class="fas fa-layer-group mr-2"></i> Caracterización
-                    </h5>
-                    <div class="btn-group btn-group-sm" role="group" aria-label="Acciones caracterización">
-                        <button type="button" class="btn btn-outline-secondary"
-                            data-action="caracterizacion-select-all">
-                            <i class="fas fa-check-double mr-1"></i> Seleccionar todo
-                        </button>
-                        <button type="button" class="btn btn-outline-secondary" data-action="caracterizacion-clear">
-                            <i class="fas fa-eraser mr-1"></i> Limpiar
-                        </button>
-                    </div>
-                </div>
-                <div class="card-body pt-0">
-                    <p class="text-muted small mb-3">
-                        Marca una o varias categorías que describan la caracterización de la persona.
-                        Puedes combinar múltiples opciones según corresponda.
-                    </p>
-
-                    <div class="accordion" id="caracterizacionesAccordion">
-                        @php
-                            $parametrosCaracterizacion = $caracterizaciones->parametros ?? collect();
-                        @endphp
-
-                        @if ($parametrosCaracterizacion->isEmpty())
-                            <div class="alert alert-light mb-0">
-                                No hay categorías de caracterización disponibles por el momento.
-                            </div>
-                        @else
-                            <div class="row caracterizacion-group">
-                                @foreach ($parametrosCaracterizacion as $parametro)
-                                    <div class="col-md-6 col-lg-4 mb-2">
-                                        <div class="custom-control custom-checkbox">
-                                            @php
-                                                $isChecked = in_array(
-                                                    $parametro->id,
-                                                    $caracterizacionesSeleccionadas,
-                                                    true,
-                                                );
-                                            @endphp
-                                            <input type="checkbox" class="custom-control-input"
-                                                id="caracterizacion-{{ $parametro->id }}"
-                                                name="caracterizacion_ids[]" value="{{ $parametro->id }}"
-                                                {{ $isChecked ? 'checked' : '' }}>
-                                            <label class="custom-control-label"
-                                                for="caracterizacion-{{ $parametro->id }}">
-                                                {{ $parametro->name }}
-                                            </label>
-                                        </div>
-                                    </div>
-                                @endforeach
-                            </div>
-                        @endif
-                    </div>
-
-                    @error('caracterizacion_ids')
-                        <div class="invalid-feedback d-block">{{ $message }}</div>
-                    @enderror
-                </div>
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white border-0">
+                <h5 class="card-title m-0 text-primary">
+                    <i class="fas fa-layer-group mr-2"></i> Caracterización
+                </h5>
             </div>
-        @endif
+            <div class="card-body pt-0">
+                <p class="text-muted small mb-3">
+                    Marca una o varias categorías que describan la caracterización de la persona.
+                    Puedes combinar múltiples opciones según corresponda.
+                </p>
+
+                <div class="accordion" id="caracterizacionesAccordion">
+                    @php
+                        $parametrosCaracterizacion = $caracterizaciones->parametros ?? collect();
+                    @endphp
+
+                    @if ($parametrosCaracterizacion->isEmpty())
+                        <div class="alert alert-light mb-0">
+                            No hay categorías de caracterización disponibles por el momento.
+                        </div>
+                    @else
+                        <div class="row caracterizacion-group">
+                            @foreach ($parametrosCaracterizacion as $parametro)
+                                <div class="col-md-6 col-lg-4 mb-2">
+                                    <div class="custom-control custom-checkbox">
+                                        @php
+                                            $isChecked = in_array(
+                                                $parametro->id,
+                                                $caracterizacionesSeleccionadas,
+                                                true,
+                                            );
+                                        @endphp
+                                        <input type="checkbox" class="custom-control-input"
+                                            id="caracterizacion-{{ $parametro->id }}" name="caracterizacion_ids[]"
+                                            value="{{ $parametro->id }}" {{ $isChecked ? 'checked' : '' }}>
+                                        <label class="custom-control-label"
+                                            for="caracterizacion-{{ $parametro->id }}">
+                                            {{ $parametro->name }}
+                                        </label>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+
+                @error('caracterizacion_ids')
+                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                @enderror
+            </div>
+        </div>
     </div>
 
     @if ($isEdit)

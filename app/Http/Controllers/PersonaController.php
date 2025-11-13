@@ -22,6 +22,10 @@ use App\Models\User;
 
 class PersonaController extends Controller
 {
+    private const PERMISSION_VIEW_PROFILE = 'VER PERFIL';
+    private const PERMISSION_VIEW_PERSON = 'VER PERSONA';
+    private const ERROR_USER_NOT_RESOLVED = 'No se pudo determinar el usuario autenticado.';
+
     protected PersonaService $personaService;
     protected UbicacionService $ubicacionService;
     protected TemaRepository $temaRepo;
@@ -40,23 +44,29 @@ class PersonaController extends Controller
         // EXCEPTO para ver su propio perfil (métodos show y mi-perfil con permiso VER PERFIL)
         $this->middleware(function ($request, $next) {
             $user = $request->user();
+            if (!$user instanceof User) {
+                abort(403, self::ERROR_USER_NOT_RESOLVED);
+            }
             $routeName = $request->route()->getName();
-            
+
             // Permitir acceso a mi-perfil si tiene VER PERFIL
-            if ($routeName === 'personas.mi-perfil' && $user?->can('VER PERFIL')) {
+            if ($routeName === 'personas.mi-perfil' && $user->can(self::PERMISSION_VIEW_PROFILE)) {
                 return $next($request);
             }
-            
+
             // Permitir acceso a show si tiene VER PERFIL o VER PERSONA
-            if ($routeName === 'personas.show' && ($user?->can('VER PERFIL') || $user?->can('VER PERSONA'))) {
+            if (
+                $routeName === 'personas.show'
+                && ($user->can(self::PERMISSION_VIEW_PROFILE) || $user->can(self::PERMISSION_VIEW_PERSON))
+            ) {
                 return $next($request);
             }
-            
+
             // Bloquear a aspirantes en otras rutas del módulo
-            if ($user?->hasRole('ASPIRANTE')) {
+            if ($user->hasRole('ASPIRANTE')) {
                 abort(403, 'No tienes permiso para acceder a este módulo.');
             }
-            
+
             return $next($request);
         });
 
@@ -81,10 +91,15 @@ class PersonaController extends Controller
      */
     public function miPerfil()
     {
+        /** @var User|null $user */
         $user = Auth::user();
 
+        if (!$user instanceof User) {
+            abort(403, self::ERROR_USER_NOT_RESOLVED);
+        }
+
         // Verificar permiso
-        if (!$user->can('VER PERFIL')) {
+        if (!$user->can(self::PERMISSION_VIEW_PROFILE)) {
             abort(403, 'No tienes permiso para ver tu perfil.');
         }
 
@@ -104,11 +119,12 @@ class PersonaController extends Controller
     public function create()
     {
         $documentos = $this->temaRepo->obtenerTiposDocumento();
-        $generos = $this->temaRepo->obtenerGeneros();
-        $paises = Pais::where('status', 1)->get();
+        $generos    = $this->temaRepo->obtenerGeneros();
+        $paises     = Pais::where('status', 1)->get();
         $departamentos = Departamento::where('status', 1)->get();
         $municipios = Municipio::where('status', 1)->get();
-        $vias = $this->temaRepo->obtenerVias();
+        $vias       = $this->temaRepo->obtenerVias();
+        $letras     = $this->temaRepo->obtenerLetras();
         $cardinales = $this->temaRepo->obtenerCardinales();
 
         // Cargar los tipos de caracterización
@@ -124,7 +140,7 @@ class PersonaController extends Controller
             'municipios' => $municipios,
             'caracterizaciones' => $caracterizaciones,
             'vias' => $vias,
-            'letras' => $this->temaRepo->obtenerLetras(),
+            'letras' => $letras,
             'cardinales' => $cardinales,
         ]);
     }
@@ -156,10 +172,15 @@ class PersonaController extends Controller
      */
     public function show(Persona $persona)
     {
+        /** @var User|null $user */
         $user = Auth::user();
 
+        if (!$user instanceof User) {
+            abort(403, self::ERROR_USER_NOT_RESOLVED);
+        }
+
         // Verificar si el usuario tiene permiso 'VER PERSONA' (puede ver cualquier persona)
-        if ($user->can('VER PERSONA')) {
+        if ($user->can(self::PERMISSION_VIEW_PERSON)) {
             // Usuario con permiso completo, puede ver cualquier persona
             $persona->loadMissing([
                 'tipoDocumento',
@@ -181,7 +202,7 @@ class PersonaController extends Controller
         }
 
         // Verificar si el usuario tiene permiso 'VER PERFIL' (solo puede ver su propio perfil)
-        if ($user->can('VER PERFIL')) {
+        if ($user->can(self::PERMISSION_VIEW_PROFILE)) {
             // Verificar que el usuario solo pueda ver su propio perfil
             if ($user->persona_id !== $persona->id) {
                 abort(403, 'No tienes permiso para ver este perfil. Solo puedes ver tu propio perfil.');
@@ -260,54 +281,59 @@ class PersonaController extends Controller
      */
     public function update(UpdatePersonaRequest $request, Persona $persona)
     {
+        $expectsJson = $request->expectsJson() || $request->wantsJson();
+        $successPayload = null;
+        $errorMessage = null;
+
         try {
             $this->personaService->actualizar($persona, $request->validated());
 
-            if ($request->expectsJson() || $request->wantsJson()) {
-                $persona->loadMissing(['caracterizacionesComplementarias']);
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Información actualizada exitosamente',
-                    'data' => [
-                        'id' => $persona->id,
-                        'tipo_documento' => $persona->tipo_documento,
-                        'numero_documento' => $persona->numero_documento,
-                        'primer_nombre' => $persona->primer_nombre,
-                        'segundo_nombre' => $persona->segundo_nombre,
-                        'primer_apellido' => $persona->primer_apellido,
-                        'segundo_apellido' => $persona->segundo_apellido,
-                        'fecha_nacimiento' => $persona->fecha_nacimiento,
-                        'genero' => $persona->genero,
-                        'telefono' => $persona->telefono,
-                        'celular' => $persona->celular,
-                        'email' => $persona->email,
-                        'pais_id' => $persona->pais_id,
-                        'departamento_id' => $persona->departamento_id,
-                        'municipio_id' => $persona->municipio_id,
-                        'direccion' => $persona->direccion,
-                        'caracterizaciones' => $persona->caracterizacionesComplementarias->pluck('id')->toArray(),
-                    ]
-                ]);
-            }
-
-            return redirect()->route('personas.show', $persona->id)
-                ->with('success', 'Información actualizada exitosamente');
+            $persona->loadMissing(['caracterizacionesComplementarias']);
+            $successPayload = [
+                'success' => true,
+                'message' => 'Información actualizada exitosamente',
+                'data' => [
+                    'id' => $persona->id,
+                    'tipo_documento' => $persona->tipo_documento,
+                    'numero_documento' => $persona->numero_documento,
+                    'primer_nombre' => $persona->primer_nombre,
+                    'segundo_nombre' => $persona->segundo_nombre,
+                    'primer_apellido' => $persona->primer_apellido,
+                    'segundo_apellido' => $persona->segundo_apellido,
+                    'fecha_nacimiento' => $persona->fecha_nacimiento,
+                    'genero' => $persona->genero,
+                    'telefono' => $persona->telefono,
+                    'celular' => $persona->celular,
+                    'email' => $persona->email,
+                    'pais_id' => $persona->pais_id,
+                    'departamento_id' => $persona->departamento_id,
+                    'municipio_id' => $persona->municipio_id,
+                    'direccion' => $persona->direccion,
+                    'caracterizaciones' => $persona->caracterizacionesComplementarias->pluck('id')->toArray(),
+                ],
+            ];
         } catch (\Throwable $e) {
             Log::error("Error al actualizar la persona (ID: {$persona->id}): " . $e->getMessage());
-
-            if ($request->expectsJson() || $request->wantsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error al actualizar la información. Por favor, inténtelo de nuevo.'
-                ], 500);
-            }
-
-            return redirect()->back()->withErrors([
-                'error' => 'Error al actualizar la información. Por favor, inténtelo de nuevo '
-                    . 'o comuníquese con el administrador del sistema.'
-            ]);
+            $errorMessage = 'Error al actualizar la información. Por favor, inténtelo de nuevo.';
         }
+
+        if ($expectsJson) {
+            $payload = $successPayload ?? [
+                'success' => false,
+                'message' => $errorMessage,
+            ];
+
+            return response()->json($payload, $successPayload ? 200 : 500);
+        }
+
+        if ($successPayload) {
+            return redirect()->route('personas.show', $persona->id)
+                ->with('success', $successPayload['message']);
+        }
+
+        return redirect()->back()->withErrors([
+            'error' => $errorMessage . ' Comuníquese con el administrador si el problema persiste.',
+        ]);
     }
 
     /**
