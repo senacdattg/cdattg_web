@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Exceptions\ImportFileNotFoundException;
+use App\Exceptions\ImportHeaderMismatchException;
 use App\Jobs\ProcessPersonaImportJob;
 use App\Models\Parametro;
 use App\Models\Persona;
@@ -11,8 +13,10 @@ use App\Models\PersonaImportIssue;
 use App\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -20,39 +24,45 @@ use PhpOffice\PhpSpreadsheet\Reader\IReadFilter;
 
 class PersonaImportService
 {
-    private const CHUNK_SIZE = 750;
+    private const CHUNK_SIZE = 250;
+    private const EMAIL_PLACEHOLDER_DOMAIN = 'visitante.local';
+
+    private const DOC_CEDULA_CIUDADANIA = 'CEDULA DE CIUDADANIA';
+    private const DOC_CEDULA_EXTRANJERIA = 'CEDULA DE EXTRANJERIA';
+    private const DOC_PASAPORTE = 'PASAPORTE';
+    private const DOC_PERMISO_PROTECCION = 'PERMISO POR PROTECCION TEMPORAL';
+    private const DOC_TARJETA_IDENTIDAD = 'TARJETA DE IDENTIDAD';
+    private const DOC_REGISTRO_CIVIL = 'REGISTRO CIVIL';
+    private const DOC_SIN_IDENTIFICACION = 'SIN IDENTIFICACION';
 
     private array $headerMap = [];
     private array $documentSeen = [];
-    private array $emailSeen = [];
-    private array $celularSeen = [];
-    private array $telefonoSeen = [];
     private array $documentAliasMap = [
-        'CC' => 'CEDULA DE CIUDADANIA',
-        'CEDULA DE CIUDADANIA' => 'CEDULA DE CIUDADANIA',
-        'CEDULA CIUDADANIA' => 'CEDULA DE CIUDADANIA',
-        'CEDULA' => 'CEDULA DE CIUDADANIA',
-        'C.C.' => 'CEDULA DE CIUDADANIA',
-        'CE' => 'CEDULA DE EXTRANJERIA',
-        'C.E.' => 'CEDULA DE EXTRANJERIA',
-        'CEDULA DE EXTRANJERIA' => 'CEDULA DE EXTRANJERIA',
-        'PASAPORTE' => 'PASAPORTE',
-        'PA' => 'PASAPORTE',
-        'PPT' => 'PERMISO POR PROTECCION TEMPORAL',
-        'PERMISO POR PROTECCION TEMPORAL' => 'PERMISO POR PROTECCION TEMPORAL',
-        'PERMISO POR PROTECCIÓN TEMPORAL' => 'PERMISO POR PROTECCION TEMPORAL',
-        'PERMISO PROTECCION TEMPORAL' => 'PERMISO POR PROTECCION TEMPORAL',
-        'TI' => 'TARJETA DE IDENTIDAD',
-        'T.I.' => 'TARJETA DE IDENTIDAD',
-        'TARJETA DE IDENTIDAD' => 'TARJETA DE IDENTIDAD',
-        'RC' => 'REGISTRO CIVIL',
-        'R.C.' => 'REGISTRO CIVIL',
-        'REGISTRO CIVIL' => 'REGISTRO CIVIL',
-        'SIN DOCUMENTO' => 'SIN IDENTIFICACION',
-        'SIN' => 'SIN IDENTIFICACION',
-        'SD' => 'SIN IDENTIFICACION',
-        'S/D' => 'SIN IDENTIFICACION',
-        'SIN IDENTIFICACION' => 'SIN IDENTIFICACION',
+        'CC' => self::DOC_CEDULA_CIUDADANIA,
+        'CEDULA DE CIUDADANIA' => self::DOC_CEDULA_CIUDADANIA,
+        'CEDULA CIUDADANIA' => self::DOC_CEDULA_CIUDADANIA,
+        'CEDULA' => self::DOC_CEDULA_CIUDADANIA,
+        'C.C.' => self::DOC_CEDULA_CIUDADANIA,
+        'CE' => self::DOC_CEDULA_EXTRANJERIA,
+        'C.E.' => self::DOC_CEDULA_EXTRANJERIA,
+        'CEDULA DE EXTRANJERIA' => self::DOC_CEDULA_EXTRANJERIA,
+        'PASAPORTE' => self::DOC_PASAPORTE,
+        'PA' => self::DOC_PASAPORTE,
+        'PPT' => self::DOC_PERMISO_PROTECCION,
+        'PERMISO POR PROTECCION TEMPORAL' => self::DOC_PERMISO_PROTECCION,
+        'PERMISO POR PROTECCIÓN TEMPORAL' => self::DOC_PERMISO_PROTECCION,
+        'PERMISO PROTECCION TEMPORAL' => self::DOC_PERMISO_PROTECCION,
+        'TI' => self::DOC_TARJETA_IDENTIDAD,
+        'T.I.' => self::DOC_TARJETA_IDENTIDAD,
+        'TARJETA DE IDENTIDAD' => self::DOC_TARJETA_IDENTIDAD,
+        'RC' => self::DOC_REGISTRO_CIVIL,
+        'R.C.' => self::DOC_REGISTRO_CIVIL,
+        'REGISTRO CIVIL' => self::DOC_REGISTRO_CIVIL,
+        'SIN DOCUMENTO' => self::DOC_SIN_IDENTIFICACION,
+        'SIN' => self::DOC_SIN_IDENTIFICACION,
+        'SD' => self::DOC_SIN_IDENTIFICACION,
+        'S/D' => self::DOC_SIN_IDENTIFICACION,
+        'SIN IDENTIFICACION' => self::DOC_SIN_IDENTIFICACION,
     ];
 
     private array $documentoCache = [];
@@ -86,12 +96,18 @@ class PersonaImportService
 
     public function procesar(PersonaImport $import): void
     {
-        $import->update(['status' => 'processing', 'processed_rows' => 0, 'success_count' => 0, 'duplicate_count' => 0, 'missing_contact_count' => 0]);
+        $import->update([
+            'status' => 'processing',
+            'processed_rows' => 0,
+            'success_count' => 0,
+            'duplicate_count' => 0,
+            'missing_contact_count' => 0,
+        ]);
 
         $rutaArchivo = Storage::disk($import->disk)->path($import->path);
 
         if (!file_exists($rutaArchivo)) {
-            throw new \RuntimeException("El archivo de importación no existe en la ruta: {$rutaArchivo}");
+            throw new ImportFileNotFoundException($rutaArchivo);
         }
 
         $reader = IOFactory::createReaderForFile($rutaArchivo);
@@ -155,7 +171,7 @@ class PersonaImportService
                     $this->headerMap = $this->resolverEncabezados($columns);
 
                     if (empty($this->headerMap)) {
-                        throw new \RuntimeException('El encabezado del archivo no coincide con el formato esperado.');
+                        throw new ImportHeaderMismatchException();
                     }
 
                     continue;
@@ -200,43 +216,19 @@ class PersonaImportService
                 }
 
                 try {
-                    $persona = Persona::create([
-                        'tipo_documento' => $resultadoDuplicados['tipo_documento_id'],
-                        'numero_documento' => $data['numero_documento'],
-                        'primer_nombre' => $data['primer_nombre'],
-                        'segundo_nombre' => Arr::get($data, 'segundo_nombre'),
-                        'primer_apellido' => Arr::get($data, 'primer_apellido'),
-                        'segundo_apellido' => Arr::get($data, 'segundo_apellido'),
-                        'telefono' => Arr::get($data, 'telefono'),
-                        'celular' => Arr::get($data, 'celular'),
-                        'email' => Arr::get($data, 'email'),
-                        'status' => 1,
-                        'user_create_id' => $import->user_id,
-                        'user_edit_id' => $import->user_id,
-                    ]);
-
-                    if ($persona->email && $persona->numero_documento && !$persona->user) {
-                        $this->crearUsuarioVisitante($persona);
-                    }
-
                     $faltantes = [
                         'missing_email' => empty($data['email']),
                         'missing_celular' => empty($data['celular']),
                         'missing_telefono' => empty($data['telefono']),
                     ];
 
-                    if (in_array(true, $faltantes, true)) {
-                        PersonaContactAlert::create([
-                            'persona_id' => $persona->id,
-                            'persona_import_id' => $import->id,
-                            'missing_email' => $faltantes['missing_email'],
-                            'missing_celular' => $faltantes['missing_celular'],
-                            'missing_telefono' => $faltantes['missing_telefono'],
-                            'raw_payload' => $data,
-                        ]);
-
-                        $missingContact++;
-                    }
+                    $this->persistirPersonaConUsuario(
+                        $resultadoDuplicados,
+                        $data,
+                        $import,
+                        $faltantes,
+                        $missingContact
+                    );
 
                     $success++;
                 } catch (\Throwable $e) {
@@ -255,6 +247,7 @@ class PersonaImportService
                         'numero_documento' => Arr::get($data, 'numero_documento'),
                         'email' => Arr::get($data, 'email'),
                         'celular' => Arr::get($data, 'celular'),
+                        'error_message' => $e->getMessage(),
                         'raw_payload' => $data,
                     ]);
                 }
@@ -284,6 +277,12 @@ class PersonaImportService
 
     private function warmDocumentoCache(): void
     {
+        if (! Schema::hasTable('parametros')) {
+            Log::warning('La tabla "parametros" no existe; los tipos de documento se resolverán como null');
+            $this->documentoCache = [];
+            return;
+        }
+
         $names = array_unique(array_values($this->documentAliasMap));
         $this->documentoCache = Parametro::whereIn('name', $names)
             ->pluck('id', 'name')
@@ -302,15 +301,54 @@ class PersonaImportService
         $map = [];
 
         $headerTargets = [
-            'tipo_documento' => ['tipo de documento', 'tipodocumento'],
-            'numero_documento' => ['numero de documento', 'número de documento', 'numero documento', 'documento', 'documento identidad'],
-            'primer_nombre' => ['primer nombre', 'nombre', 'nombre1'],
-            'segundo_nombre' => ['segundo nombre', 'nombre2'],
-            'primer_apellido' => ['primer apellido', 'apellido', 'apellido1'],
-            'segundo_apellido' => ['segundo apellido', 'apellido2'],
-            'email' => ['correo electronico', 'correo electrónico', 'correo', 'email'],
-            'celular' => ['celular', 'telefono celular', 'teléfono celular', 'movil', 'móvil'],
-            'telefono' => ['telefono', 'teléfono', 'telefono fijo', 'teléfono fijo'],
+            'tipo_documento' => [
+                'tipo de documento',
+                'tipodocumento',
+            ],
+            'numero_documento' => [
+                'numero de documento',
+                'número de documento',
+                'numero documento',
+                'documento',
+                'documento identidad',
+            ],
+            'primer_nombre' => [
+                'primer nombre',
+                'nombre',
+                'nombre1',
+            ],
+            'segundo_nombre' => [
+                'segundo nombre',
+                'nombre2',
+            ],
+            'primer_apellido' => [
+                'primer apellido',
+                'apellido',
+                'apellido1',
+            ],
+            'segundo_apellido' => [
+                'segundo apellido',
+                'apellido2',
+            ],
+            'email' => [
+                'correo electronico',
+                'correo electrónico',
+                'correo',
+                'email',
+            ],
+            'celular' => [
+                'celular',
+                'telefono celular',
+                'teléfono celular',
+                'movil',
+                'móvil',
+            ],
+            'telefono' => [
+                'telefono',
+                'teléfono',
+                'telefono fijo',
+                'teléfono fijo',
+            ],
         ];
 
         foreach ($row as $column => $value) {
@@ -365,101 +403,101 @@ class PersonaImportService
 
     private function consultarExistencias(array $records): array
     {
-        $documentos = array_values(array_unique(array_filter(array_map(fn($item) => $item['data']['numero_documento'] ?? null, $records))));
-        $emails = array_values(array_unique(array_filter(array_map(fn($item) => $item['data']['email'] ?? null, $records))));
-        $celulares = array_values(array_unique(array_filter(array_map(fn($item) => $item['data']['celular'] ?? null, $records))));
-        $telefonos = array_values(array_unique(array_filter(array_map(fn($item) => $item['data']['telefono'] ?? null, $records))));
+        $documentos = array_values(
+            array_unique(
+                array_filter(
+                    array_map(fn($item) => $item['data']['numero_documento'] ?? null, $records)
+                )
+            )
+        );
+
+        if (empty($documentos)) {
+            return ['documentos' => []];
+        }
+
+        $existentes = Persona::whereIn('numero_documento', $documentos)
+            ->pluck('numero_documento')
+            ->map(fn($doc) => (string) $doc)
+            ->toArray();
 
         return [
-            'documentos' => empty($documentos) ? [] : Persona::whereIn('numero_documento', $documentos)->pluck('numero_documento')->map(fn($doc) => (string) $doc)->toArray(),
-            'emails' => empty($emails) ? [] : Persona::whereIn('email', $emails)->pluck('email')->map(fn($email) => Str::lower($email))->toArray(),
-            'celulares' => empty($celulares) ? [] : Persona::whereIn('celular', $celulares)->pluck('celular')->map(fn($cel) => $cel)->toArray(),
-            'telefonos' => empty($telefonos) ? [] : Persona::whereIn('telefono', $telefonos)->pluck('telefono')->map(fn($tel) => $tel)->toArray(),
+            'documentos' => $existentes,
         ];
     }
 
-    private function validarDuplicados(array $data, array $existsCaches, PersonaImport $import, int $rowNumber, array $raw): array
-    {
+    private function validarDuplicados(
+        array $data,
+        array $existsCaches,
+        PersonaImport $import,
+        int $rowNumber,
+        array $raw
+    ): array {
         $esDuplicado = false;
         $tipoDocumentoId = $data['tipo_documento_id'] ?? null;
 
         $numeroDocumento = $data['numero_documento'] ?? null;
         $email = $data['email'] ?? null;
         $celular = $data['celular'] ?? null;
-        $telefono = $data['telefono'] ?? null;
-
-        if (!$numeroDocumento) {
+        if (! $numeroDocumento) {
             $esDuplicado = true;
-            $this->registrarIssue($import, $rowNumber, 'missing_document', $numeroDocumento, $email, $celular, $raw);
-            return ['es_duplicado' => true, 'tipo_documento_id' => $tipoDocumentoId];
+            $this->registrarIssue(
+                $import,
+                $rowNumber,
+                'missing_document',
+                $numeroDocumento,
+                $email,
+                $celular,
+                $raw
+            );
+
+            return [
+                'es_duplicado' => true,
+                'tipo_documento_id' => $tipoDocumentoId,
+            ];
         }
 
         if (empty($data['primer_nombre']) || empty($data['primer_apellido'])) {
             $esDuplicado = true;
-            $this->registrarIssue($import, $rowNumber, 'missing_required_fields', $numeroDocumento, $email, $celular, $raw);
-            return ['es_duplicado' => true, 'tipo_documento_id' => $tipoDocumentoId];
+            $this->registrarIssue(
+                $import,
+                $rowNumber,
+                'missing_required_fields',
+                $numeroDocumento,
+                $email,
+                $celular,
+                $raw
+            );
+
+            return [
+                'es_duplicado' => true,
+                'tipo_documento_id' => $tipoDocumentoId,
+            ];
         }
 
         if (isset($this->documentSeen[$numeroDocumento])) {
             $esDuplicado = true;
-            $this->registrarIssue($import, $rowNumber, 'duplicate_document_in_file', $numeroDocumento, $email, $celular, $raw);
+            $this->registrarIssue(
+                $import,
+                $rowNumber,
+                'duplicate_document_in_file',
+                $numeroDocumento,
+                $email,
+                $celular,
+                $raw
+            );
         } elseif (in_array($numeroDocumento, $existsCaches['documentos'], true)) {
             $esDuplicado = true;
-            $this->registrarIssue($import, $rowNumber, 'duplicate_document_existing', $numeroDocumento, $email, $celular, $raw);
+            $this->registrarIssue(
+                $import,
+                $rowNumber,
+                'duplicate_document_existing',
+                $numeroDocumento,
+                $email,
+                $celular,
+                $raw
+            );
         } else {
             $this->documentSeen[$numeroDocumento] = true;
-        }
-
-        if ($email) {
-            $emailKey = Str::lower($email);
-            if (isset($this->emailSeen[$emailKey])) {
-                $esDuplicado = true;
-                $this->registrarIssue($import, $rowNumber, 'duplicate_email_in_file', $numeroDocumento, $email, $celular, $raw);
-            } elseif (in_array($emailKey, $existsCaches['emails'], true)) {
-                if ($this->limpiarCampoDuplicado('email', $emailKey, $numeroDocumento)) {
-                    $existsCaches['emails'] = array_values(array_diff($existsCaches['emails'], [$emailKey]));
-                    $this->emailSeen[$emailKey] = true;
-                } else {
-                    $esDuplicado = true;
-                    $this->registrarIssue($import, $rowNumber, 'duplicate_email_existing', $numeroDocumento, $email, $celular, $raw);
-                }
-            } else {
-                $this->emailSeen[$emailKey] = true;
-            }
-        }
-
-        if ($celular) {
-            if (isset($this->celularSeen[$celular])) {
-                $esDuplicado = true;
-                $this->registrarIssue($import, $rowNumber, 'duplicate_celular_in_file', $numeroDocumento, $email, $celular, $raw);
-            } elseif (in_array($celular, $existsCaches['celulares'], true)) {
-                if ($this->limpiarCampoDuplicado('celular', $celular, $numeroDocumento)) {
-                    $existsCaches['celulares'] = array_values(array_diff($existsCaches['celulares'], [$celular]));
-                    $this->celularSeen[$celular] = true;
-                } else {
-                    $esDuplicado = true;
-                    $this->registrarIssue($import, $rowNumber, 'duplicate_celular_existing', $numeroDocumento, $email, $celular, $raw);
-                }
-            } else {
-                $this->celularSeen[$celular] = true;
-            }
-        }
-
-        if ($telefono) {
-            if (isset($this->telefonoSeen[$telefono])) {
-                $esDuplicado = true;
-                $this->registrarIssue($import, $rowNumber, 'duplicate_telefono_in_file', $numeroDocumento, $email, $celular, $raw);
-            } elseif (in_array($telefono, $existsCaches['telefonos'], true)) {
-                if ($this->limpiarCampoDuplicado('telefono', $telefono, $numeroDocumento)) {
-                    $existsCaches['telefonos'] = array_values(array_diff($existsCaches['telefonos'], [$telefono]));
-                    $this->telefonoSeen[$telefono] = true;
-                } else {
-                    $esDuplicado = true;
-                    $this->registrarIssue($import, $rowNumber, 'duplicate_telefono_existing', $numeroDocumento, $email, $celular, $raw);
-                }
-            } else {
-                $this->telefonoSeen[$telefono] = true;
-            }
         }
 
         return [
@@ -468,51 +506,135 @@ class PersonaImportService
         ];
     }
 
-    private function limpiarCampoDuplicado(string $campo, string $valor, string $numeroDocumento): bool
-    {
-        $personas = Persona::where($campo, $valor)->get();
-
-        if ($personas->isEmpty()) {
-            return false;
-        }
-
-        $actualizado = false;
-
-        foreach ($personas as $persona) {
-            if ((string) $persona->numero_documento !== (string) $numeroDocumento) {
-                $persona->update([$campo => null]);
-                $actualizado = true;
-            }
-        }
-
-        return $actualizado;
-    }
-
     private function crearUsuarioVisitante(Persona $persona): void
     {
-        $existingUser = User::where('email', $persona->email)->first();
-        
-        if ($existingUser) {
-            if (!$existingUser->persona_id) {
-                $existingUser->update(['persona_id' => $persona->id]);
+        $email = $this->resolverEmailUsuario($persona);
+
+        $usuarioRelacionado = $persona->user;
+        if ($usuarioRelacionado) {
+            if ($usuarioRelacionado->email !== $email) {
+                $correoOcupado = User::where('email', $email)
+                    ->where('id', '!=', $usuarioRelacionado->id)
+                    ->exists();
+
+                if (! $correoOcupado) {
+                    $usuarioRelacionado->forceFill(['email' => $email])->save();
+                } else {
+                    $this->asegurarRolVisitante($usuarioRelacionado);
+                    return;
+                }
             }
+
+            $this->asegurarRolVisitante($usuarioRelacionado);
+            return;
+        }
+
+        $usuarioPorEmail = User::where('email', $email)->first();
+        if ($usuarioPorEmail) {
+            if ($usuarioPorEmail->persona_id !== $persona->id) {
+                $usuarioPorEmail->forceFill(['persona_id' => $persona->id])->save();
+            }
+            $this->asegurarRolVisitante($usuarioPorEmail);
             return;
         }
 
         $user = User::create([
-            'email' => $persona->email,
-            'password' => Hash::make($persona->numero_documento),
+            'email' => $email,
+            'password' => Hash::make($this->resolverClaveInicial($persona)),
             'status' => 1,
             'persona_id' => $persona->id,
         ]);
 
-        if (!$user->hasRole('VISITANTE')) {
+        $this->asegurarRolVisitante($user);
+    }
+
+    /**
+     * Obtiene el email aplicable al usuario asociado a la persona.
+     * Genera un correo placeholder en caso de que la persona no tenga correo.
+     */
+    private function resolverEmailUsuario(Persona $persona): string
+    {
+        $emailOriginal = $persona->getRawOriginal('email');
+        if ($emailOriginal) {
+            return Str::lower(trim($emailOriginal));
+        }
+
+        return sprintf('persona-%d@%s', $persona->id, self::EMAIL_PLACEHOLDER_DOMAIN);
+    }
+
+    /**
+     * Determina la clave inicial para usuarios derivados de importación.
+     * Priorizamos el número de documento para mantener fricción baja.
+     */
+    private function resolverClaveInicial(Persona $persona): string
+    {
+        $numeroDocumento = $persona->numero_documento;
+
+        if (is_string($numeroDocumento) && $numeroDocumento !== '') {
+            return $numeroDocumento;
+        }
+
+        return Str::random(12);
+    }
+
+    private function asegurarRolVisitante(User $user): void
+    {
+        if (! $user->hasRole('VISITANTE')) {
             $user->assignRole('VISITANTE');
         }
     }
 
-    private function registrarIssue(PersonaImport $import, int $rowNumber, string $issueType, ?string $documento, ?string $email, ?string $celular, array $raw): void
-    {
+    private function persistirPersonaConUsuario(
+        array $resultadoDuplicados,
+        array $data,
+        PersonaImport $import,
+        array $faltantes,
+        int &$missingContact
+    ): void {
+        DB::transaction(function () use ($resultadoDuplicados, $data, $import, $faltantes, &$missingContact) {
+            $persona = Persona::create([
+                'tipo_documento' => $resultadoDuplicados['tipo_documento_id'],
+                'numero_documento' => $data['numero_documento'],
+                'primer_nombre' => $data['primer_nombre'],
+                'segundo_nombre' => Arr::get($data, 'segundo_nombre'),
+                'primer_apellido' => Arr::get($data, 'primer_apellido'),
+                'segundo_apellido' => Arr::get($data, 'segundo_apellido'),
+                'telefono' => Arr::get($data, 'telefono'),
+                'celular' => Arr::get($data, 'celular'),
+                'email' => Arr::get($data, 'email'),
+                'status' => 1,
+                'user_create_id' => $import->user_id,
+                'user_edit_id' => $import->user_id,
+            ]);
+
+            $this->crearUsuarioVisitante($persona);
+
+            if (! in_array(true, $faltantes, true)) {
+                return;
+            }
+
+            PersonaContactAlert::create([
+                'persona_id' => $persona->id,
+                'persona_import_id' => $import->id,
+                'missing_email' => $faltantes['missing_email'],
+                'missing_celular' => $faltantes['missing_celular'],
+                'missing_telefono' => $faltantes['missing_telefono'],
+                'raw_payload' => $data,
+            ]);
+
+            $missingContact++;
+        });
+    }
+
+    private function registrarIssue(
+        PersonaImport $import,
+        int $rowNumber,
+        string $issueType,
+        ?string $documento,
+        ?string $email,
+        ?string $celular,
+        array $raw
+    ): void {
         PersonaImportIssue::create([
             'persona_import_id' => $import->id,
             'row_number' => $rowNumber,
