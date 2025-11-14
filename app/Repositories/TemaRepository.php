@@ -2,20 +2,12 @@
 
 namespace App\Repositories;
 
-use App\Core\Traits\HasCache;
 use App\Models\Tema;
 use Illuminate\Database\Eloquent\Collection;
 
 class TemaRepository
 {
-    use HasCache;
 
-
-    public function __construct()
-    {
-        $this->cacheType = 'temas';
-        $this->cacheTags = ['temas', 'configuracion'];
-    }
     /**
      * Obtiene todos los temas con parámetros activos
      *
@@ -23,11 +15,17 @@ class TemaRepository
      */
     public function obtenerConParametros(): Collection
     {
+<<<<<<< HEAD
         return $this->cacheWithTags('con_parametros', function () {
             return Tema::with(['parametros' => function ($query) {
                 $query->wherePivot('status', 1);
             }])->get();
         }, 1440); // 24 horas
+=======
+        return Tema::with(['parametros' => function ($query) {
+            $query->wherePivot('status', 1);
+        }])->get();
+>>>>>>> origin/develop
     }
 
     /**
@@ -38,11 +36,17 @@ class TemaRepository
      */
     public function encontrarConParametros(int $id): ?Tema
     {
+<<<<<<< HEAD
         return $this->cacheWithTags("tema.{$id}.parametros", function () use ($id) {
             return Tema::with(['parametros' => function ($query) {
                 $query->wherePivot('status', 1);
             }])->find($id);
         }, 1440);
+=======
+        return Tema::with(['parametros' => function ($query) {
+            $query->wherePivot('status', 1);
+        }])->find($id);
+>>>>>>> origin/develop
     }
 
     /**
@@ -116,15 +120,5 @@ class TemaRepository
         $tema->setRelation('parametros', $parametros);
 
         return $tema;
-    }
-
-    /**
-     * Invalida caché
-     *
-     * @return void
-     */
-    public function invalidarCache(): void
-    {
-        $this->flushCache();
     }
 }

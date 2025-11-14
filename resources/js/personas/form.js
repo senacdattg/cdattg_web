@@ -7,9 +7,6 @@ const CONFIG = {
     TOGGLE_SELECTOR: '#toggleAddressForm',
     DIRECCION_SELECTOR: '#direccion',
     CARACTERIZACION_CHECKBOX_FIELD: 'input[name="caracterizacion_ids[]"]',
-    SELECT_ALL_ACTION: '[data-action="caracterizacion-select-all"]',
-    CLEAR_ACTION: '[data-action="caracterizacion-clear"]',
-    GROUP_SELECTOR: '.caracterizacion-group',
     EDAD_MINIMA: 14,
     MENSAJE_EDAD_INVALIDA: 'Debe tener al menos 14 años para registrarse.'
 };
@@ -193,19 +190,6 @@ class CaracterizacionHandler {
             return;
         }
 
-        const selectAllButton = document.querySelector(this.config.SELECT_ALL_ACTION);
-        const clearButton = document.querySelector(this.config.CLEAR_ACTION);
-
-        bindOnce(selectAllButton, 'click', (event) => {
-            event.preventDefault();
-            this.toggleCheckboxes(true);
-        }, 'personaCaracterizacionSelectAll');
-
-        bindOnce(clearButton, 'click', (event) => {
-            event.preventDefault();
-            this.toggleCheckboxes(false);
-        }, 'personaCaracterizacionClear');
-
         const ningunaCheckbox = this.findNingunaCheckbox(checkboxes);
 
         checkboxes.forEach((checkbox) => {
@@ -224,14 +208,6 @@ class CaracterizacionHandler {
                     ningunaCheckbox.checked = false;
                 }
             }, `personaCaracterizacion_${checkbox.id || checkbox.name}`);
-        });
-    }
-
-    toggleCheckboxes(checked) {
-        DomFacade.findAll(this.config.GROUP_SELECTOR).forEach((group) => {
-            group.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
-                checkbox.checked = checked;
-            });
         });
     }
 
@@ -1280,6 +1256,8 @@ class AgeValidator {
         }
 
         forms.forEach((form) => {
+            const personaIdField = form.querySelector('#persona_id');
+            const personaId = personaIdField ? personaIdField.value : null;
             bindOnce(form, 'submit', (event) => {
                 if (!this.validateAge(field)) {
                     event.preventDefault();
@@ -1460,7 +1438,15 @@ class FieldValidator {
                 bindOnce(celularField, 'input', (e) => {
                     clearTimeout(this.timeouts.celular);
                     this.timeouts.celular = setTimeout(() => {
-                        this.validatePhoneField(e.target, 10, 'celular-feedback', 'El celular debe tener exactamente 10 dígitos', '/api/check-celular', 'celular');
+                        this.validatePhoneField(
+                            e.target,
+                            10,
+                            'celular-feedback',
+                            'El celular debe tener exactamente 10 dígitos',
+                            '/api/check-celular',
+                            'celular',
+                            personaId
+                        );
                     }, 500);
                 }, 'personaCelularInput');
             }
@@ -1471,7 +1457,15 @@ class FieldValidator {
                 bindOnce(telefonoField, 'input', (e) => {
                     clearTimeout(this.timeouts.telefono);
                     this.timeouts.telefono = setTimeout(() => {
-                        this.validatePhoneField(e.target, 7, 'telefono-feedback', 'El teléfono fijo debe tener exactamente 7 dígitos', '/api/check-telefono', 'telefono');
+                        this.validatePhoneField(
+                            e.target,
+                            7,
+                            'telefono-feedback',
+                            'El teléfono fijo debe tener exactamente 7 dígitos',
+                            '/api/check-telefono',
+                            'telefono',
+                            personaId
+                        );
                     }, 500);
                 }, 'personaTelefonoInput');
             }
@@ -1482,7 +1476,7 @@ class FieldValidator {
                 bindOnce(emailField, 'input', (e) => {
                     clearTimeout(this.timeouts.email);
                     this.timeouts.email = setTimeout(() => {
-                        this.validateEmailField(e.target);
+                        this.validateEmailField(e.target, personaId);
                     }, 500);
                 }, 'personaEmailInput');
             }
@@ -1509,7 +1503,7 @@ class FieldValidator {
         }
     }
 
-    async validatePhoneField(field, requiredLength, feedbackId, lengthMessage, apiUrl, fieldName) {
+    async validatePhoneField(field, requiredLength, feedbackId, lengthMessage, apiUrl, fieldName, personaId = null) {
         const feedback = document.getElementById(feedbackId);
         if (!feedback) return;
 
@@ -1527,7 +1521,11 @@ class FieldValidator {
                 feedback.textContent = 'Verificando...';
                 feedback.className = 'form-text text-info';
                 try {
-                    const response = await this.http.post(apiUrl, { [fieldName]: value });
+                    const payload = { [fieldName]: value };
+                    if (personaId) {
+                        payload.persona_id = personaId;
+                    }
+                    const response = await this.http.post(apiUrl, payload);
                     if (response.success) {
                         feedback.textContent = `${fieldName === 'celular' ? 'Celular' : 'Teléfono'} ya registrado en el sistema`;
                         feedback.className = 'form-text text-danger';
@@ -1559,7 +1557,7 @@ class FieldValidator {
         }
     }
 
-    async validateEmailField(field) {
+    async validateEmailField(field, personaId = null) {
         const feedback = document.getElementById('email-feedback');
         if (!feedback) return;
 
@@ -1585,7 +1583,11 @@ class FieldValidator {
         feedback.textContent = 'Verificando...';
         feedback.className = 'form-text text-info';
         try {
-            const response = await this.http.post('/api/check-email', { email: value });
+            const payload = { email: value };
+            if (personaId) {
+                payload.persona_id = personaId;
+            }
+            const response = await this.http.post('/api/check-email', payload);
             if (response.success) {
                 feedback.textContent = 'Correo ya registrado en el sistema';
                 feedback.className = 'form-text text-danger';

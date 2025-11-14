@@ -1,9 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Municipio extends Model
 {
@@ -18,8 +20,10 @@ class Municipio extends Model
     {
         parent::boot();
 
-        static::saving(function ($municipio) {
-            $municipio->municipio = strtoupper($municipio->municipio);
+        static::saving(function (self $municipio): void {
+            $municipio->municipio = $municipio->municipio !== null
+                ? Str::upper($municipio->municipio)
+                : null;
         });
     }
 

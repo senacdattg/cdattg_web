@@ -11,6 +11,326 @@ class ParametroSeeder extends Seeder
     use TruncatesTables;
 
     /**
+     * Catálogos de parámetros base organizados por temática.
+     *
+     * Mantener las colecciones en constantes reduce la cantidad de métodos en la clase
+     * y facilita su reutilización en seeders especializados.
+     */
+    private const CATALOGOS = [
+        'estados' => [
+            1 => 'ACTIVO',
+            2 => 'INACTIVO',
+        ],
+        'tipos_documento' => [
+            3 => 'CÉDULA DE CIUDADANÍA',
+            4 => 'CÉDULA DE EXTRANJERÍA',
+            5 => 'PASAPORTE',
+            6 => 'TARJETA DE IDENTIDAD',
+            7 => 'REGISTRO CIVIL',
+            8 => 'SIN IDENTIFICACIÓN',
+        ],
+        'generos' => [
+            9 => 'MASCULINO',
+            10 => 'FEMENINO',
+            11 => 'NO DEFINE',
+        ],
+        'dias' => [
+            12 => 'LUNES',
+            13 => 'MARTES',
+            14 => 'MIERCOLES',
+            15 => 'JUEVES',
+            16 => 'VIERNES',
+            17 => 'SABADO',
+        ],
+        'modalidades' => [
+            18 => 'PRESENCIAL',
+            19 => 'VIRTUAL',
+            20 => 'MIXTA',
+        ],
+        'niveles_formacion' => [
+            21 => 'TÉCNICO',
+            22 => 'TECNÓLOGO',
+            23 => 'AUXILIAR',
+            24 => 'OPERARIO',
+        ],
+        'estados_evidencias' => [
+            25 => 'PENDIENTE',
+            26 => 'EN CURSO',
+            27 => 'COMPLETADO',
+        ],
+        'productos' => [
+            28 => 'CONSUMIBLE',
+            29 => 'NO CONSUMIBLE',
+            50 => 'DISPONIBLE',
+            51 => 'AGOTADO',
+        ],
+        'unidades_medida' => [
+            30 => 'GRAMOS',
+            31 => 'LIBRAS',
+            32 => 'KILOGRAMOS',
+            33 => 'ARROBA',
+            34 => 'QUINTAL',
+            35 => 'ONZA',
+            36 => 'MILILITROS',
+            37 => 'LITROS',
+            38 => 'GALONES',
+            39 => 'ONZA LÍQUIDA',
+            40 => 'BARRIL',
+            41 => 'UNIDADES',
+            42 => 'CAJAS',
+            43 => 'METROS',
+            44 => 'CENTIMETROS',
+            45 => 'PAQUETES',
+            46 => 'ROLLOS',
+            47 => 'TABLETAS',
+            48 => 'TEST',
+            49 => 'SACKETS',
+        ],
+        'ordenes_aprobaciones' => [
+            52 => 'PRÉSTAMO',
+            53 => 'SALIDA',
+            54 => 'EN ESPERA',
+            55 => 'APROBADA',
+            56 => 'RECHAZADA',
+            57 => 'ENTREGADA',
+            58 => 'EN PRÉSTAMO',
+        ],
+        'categorias' => [
+            59 => 'EMPAQUE',
+            60 => 'EPP',
+            61 => 'EQUIPO',
+            62 => 'FUNGIBLE',
+            63 => 'INSTRUMENTO MEDICION',
+            64 => 'INSUMO',
+            65 => 'REACTIVO',
+            66 => 'UTENSILIO',
+            67 => 'VIDRIERIA',
+        ],
+        'marcas' => [
+            68 => 'LAMOTTE',
+            69 => 'PYREX',
+            70 => 'MERCK',
+            71 => 'KIMAX',
+            72 => 'HACH',
+            73 => 'MILLIPORE',
+            74 => 'BOECO',
+            75 => 'BRAND',
+            76 => 'DURAN',
+            77 => 'PANREAC',
+            78 => 'BRIXCO',
+            79 => 'CLOROX',
+            80 => 'GOLDENWRAP',
+            81 => 'ARO',
+            82 => 'MILWAUKEE',
+            83 => 'HANNA',
+            84 => 'ALPHA CHEMIKA',
+            85 => 'SUPELCO',
+            86 => 'CITOTEST',
+            87 => 'BIOPOINTE SCIENTIFIC',
+            88 => 'CITOGLAS',
+            89 => 'GLASSCO',
+            90 => 'LABSCIENT',
+            91 => 'KIMBLE',
+            92 => 'NADIR',
+            93 => 'VIDRIOLAB',
+            94 => 'GOTOPLAS',
+            95 => 'PLASTIRED',
+            96 => 'PLASTICOS R&M',
+            97 => 'SCOTCH-BRITE',
+            98 => 'TRAMONTINA',
+            99 => 'CORONA',
+            100 => 'IMUSA',
+            101 => 'FARBERWARE',
+            102 => 'JGB',
+            103 => 'BAXTER',
+            104 => 'B.D',
+            105 => 'BAYER',
+            106 => 'BIOPONTERCIENTIFIC',
+            107 => 'NANOCOLOR',
+            108 => 'WTW',
+            109 => 'MACHEREY NAGEL',
+            110 => 'PHYTOTECH',
+            111 => 'GE HEALTHCARE',
+            112 => 'MEDISPO',
+            113 => 'MIDMARK',
+            114 => 'VITAL MEDIC',
+            115 => 'MINE MEDICAL',
+            116 => 'ZAFIRO',
+            117 => 'CHEMI',
+            118 => 'AZUCAR INCAUCA',
+            119 => 'MAIZENA',
+            120 => 'COLOMBINA-ZEV',
+            121 => 'LUKER',
+            122 => 'SANTO DOMINGO',
+            123 => 'BETTY CROCKER',
+            124 => 'GERBER',
+            125 => 'BLANCOX',
+            126 => 'BRILLO AROMA',
+            127 => 'BRILLAKING',
+            128 => 'ASEPSIA',
+            129 => 'SOLOASEO',
+            130 => 'MAXWIPE',
+            131 => 'EXAMTEX',
+            132 => 'PROTEXION',
+            133 => 'BODI SAFE',
+            134 => 'CRISTAR',
+            135 => 'DIMEDA',
+            136 => 'DROFARMA',
+            137 => 'INVERFARMA',
+            138 => 'BIOLOGIKA',
+            139 => 'BIOHALL',
+            140 => 'ABCLABORATORIOS',
+            141 => 'CIACOMEQ S.A.S',
+            142 => 'LEGAQUIMICOS',
+            143 => 'QUINSA',
+            144 => 'QUIMPO',
+            145 => 'MOL LABS',
+            146 => 'METALLURGICA MOTTA',
+            147 => 'MOTTA',
+            148 => 'LEON',
+            149 => 'ALGARRA',
+            150 => 'HOPEX',
+            151 => 'KRAMER',
+            152 => 'MP TOOLS',
+            153 => 'PISCICLORO',
+            154 => 'FORTILECHE',
+            155 => 'COLINAGRO',
+            156 => 'CAL',
+            157 => 'PINTO',
+            158 => 'ROSA',
+            159 => 'SAN JORGE',
+            160 => 'TROPICAL',
+            161 => 'BEISBOL NATURAL',
+            162 => 'FRUTUROMA',
+            163 => 'POLAROMA',
+            164 => 'NOSTALGIA',
+            165 => 'PUMP',
+            166 => 'WATER WORKS',
+            167 => 'BUFFER POWER',
+            168 => 'AMCOR',
+            169 => 'BESTON',
+            170 => 'GIANT',
+            171 => 'ELITE',
+            172 => 'ATHOS',
+            173 => 'TUSKA',
+            174 => 'VISMARCK',
+            175 => 'VIMACH',
+            176 => 'MIO',
+            177 => 'MK',
+            178 => 'MC',
+            179 => 'PD',
+            180 => 'JM',
+            181 => 'FPC',
+            182 => 'CHM',
+            183 => 'SOL',
+            184 => 'ZEV',
+            185 => 'ALPHA',
+            186 => 'SUPERDENT',
+            187 => 'TONING',
+        ],
+        'persona_caracterizacion' => [
+            188 => 'AFROCOLOMBIANO',
+            189 => 'AFROCOLOMBIANOS DESPLAZADOS POR LA VIOLENCIA',
+            190 => 'AFROCOLOMBIANOS DESPLAZADOS POR LA VIOLENCIA CABEZ',
+            191 => 'INDÍGENA',
+            192 => 'INDÍGENAS DESPLAZADOS POR LA VIOLENCIA',
+            193 => 'INDÍGENAS DESPLAZADOS POR LA VIOLENCIA CABEZA DE F',
+            194 => 'GITANO ROM',
+            195 => 'PALENQUERO',
+            196 => 'RAIZAL',
+            197 => 'NEGRO',
+            198 => 'MUJER CABEZA DE FAMILIA',
+            199 => 'DESPLAZADOS POR LA VIOLENCIA CABEZA DE FAMILIA',
+            200 => 'DESPLAZADOS POR FENÓMENOS NATURALES CABEZA DE FAM',
+            201 => 'JÓVENES VULNERABLES',
+            202 => 'ADOLESCENTE TRABAJADOR',
+            203 => 'ADOLESCENTE EN CONFLICTO CON LA LEY PENAL',
+            204 => 'PERSONAS EN PROCESO DE REINTEGRACIÓN',
+            205 => 'EMPRENDEDORES',
+            206 => 'MICROEMPRESAS',
+            207 => 'ARTESANOS',
+            208 => 'CAMPESINO',
+            209 => 'SOLDADOS CAMPESINOS',
+            210 => 'DISCAPACIDAD INTELECTUAL',
+            211 => 'DISCAPACIDAD AUDITIVA',
+            212 => 'DISCAPACIDAD FÍSICA',
+            213 => 'DISCAPACIDAD VISUAL',
+            214 => 'DISCAPACIDAD PSICOSOCIAL',
+            215 => 'DISCAPACIDAD MÚLTIPLE',
+            216 => 'SORDOCEGUERA',
+            217 => 'DESPLAZADOS DISCAPACITADOS',
+            218 => 'ABANDONO O DESPOJO FORZADO DE TIERRAS',
+            219 => 'ACTOS TERRORISTA ATENTADOS COMBATES ENFRENTAMIENTOS HOSTIGAMIENTOS',
+            220 => 'ADOLESCENTE DESVINCULADO DE GRUPOS ARMADOS ORGANIZ',
+            221 => 'DELITOS CONTRA LA LIBERTAD Y LA INTEGRIDAD SEXUAL EN DESARROLLO DEL CONFLICTO ARMADO',
+            222 => 'DESAPARICIÓN FORZADA',
+            223 => 'DESPLAZADOS POR LA VIOLENCIA',
+            224 => 'RECLUTAMIENTO FORZADO',
+            225 => 'SECUESTRO',
+            226 => 'HOMICIDIO MASACRE',
+            227 => 'HERIDO',
+            228 => 'SOBREVIVIENTES MINAS ANTIPERSONALES',
+            229 => 'MINAS ANTIPERSONAL MUNICIÓN SIN EXPLOTAR Y ARTEFACTO EXPLOSIVO IMPROVISADO',
+            230 => 'AMENAZA',
+            231 => 'DESPLAZADOS POR FENÓMENOS NATURALES',
+            232 => 'INPEC',
+            233 => 'REMITIDOS POR EL CIE',
+            234 => 'REMITIDOS POR EL PAL',
+            235 => 'NINGUNA',
+        ],
+        'vias' => [
+            236 => 'CARRERA',
+            237 => 'CALLE',
+            238 => 'TRANSVERSAL',
+            239 => 'DIAGONAL',
+            240 => 'AVENIDA',
+            241 => 'AUTOPISTA',
+            242 => 'CIRCULAR',
+            243 => 'VÍA',
+            244 => 'PASAJE',
+            245 => 'MANZANA',
+            246 => 'RUTA',
+            247 => 'KM',
+        ],
+        'letras' => [
+            248 => 'A',
+            249 => 'B',
+            250 => 'C',
+            251 => 'D',
+            252 => 'E',
+            253 => 'F',
+            254 => 'G',
+            255 => 'H',
+            256 => 'I',
+            257 => 'J',
+            258 => 'K',
+            259 => 'L',
+            260 => 'M',
+            261 => 'N',
+            262 => 'O',
+            263 => 'P',
+            264 => 'Q',
+            265 => 'R',
+            266 => 'S',
+            267 => 'T',
+            268 => 'U',
+            269 => 'V',
+            270 => 'W',
+            271 => 'X',
+            272 => 'Y',
+            273 => 'Z',
+        ],
+        'documentos_extranjeros' => [
+            274 => 'PERMISO POR PROTECCIÓN ESPECIAL',
+            275 => 'PERMISO POR PROTECCION TEMPORAL',
+        ],
+
+        'dias_faltantes' => [
+            276 => 'DOMINGO',
+        ],
+    ];
+
+    /**
      * Run the database seeds.
      */
     public function run(): void
@@ -39,428 +359,15 @@ class ParametroSeeder extends Seeder
      */
     private function parametrosConfig(): array
     {
-        return array_merge(
-            $this->estados(),
-            $this->tiposDocumento(),
-            $this->generos(),
-            $this->dias(),
-            $this->modalidades(),
-            $this->nivelesFormacion(),
-            $this->estadosEvidencias(),
-            $this->productos(),
-            $this->unidadesMedida(),
-            $this->ordenesYAprobaciones(),
-            $this->categorias(),
-            $this->marcas(),
-            $this->personaCaracterizacion(),
-            $this->vias(),
-            $this->letras()
-        );
-    }
+        $parametros = [];
 
-    private function estados(): array
-    {
-        return [
-            $this->parametro(1, 'ACTIVO'),
-            $this->parametro(2, 'INACTIVO'),
-        ];
-    }
+        foreach (self::CATALOGOS as $catalogo) {
+            foreach ($catalogo as $id => $name) {
+                $parametros[] = $this->parametro($id, $name);
+            }
+        }
 
-    private function tiposDocumento(): array
-    {
-        return [
-            $this->parametro(3, 'CEDULA DE CIUDADANIA'),
-            $this->parametro(4, 'CEDULA DE EXTRANJERIA'),
-            $this->parametro(5, 'PASAPORTE'),
-            $this->parametro(6, 'TARJETA DE IDENTIDAD'),
-            $this->parametro(7, 'REGISTRO CIVIL'),
-            $this->parametro(8, 'SIN IDENTIFICACION'),
-        ];
-    }
-
-    private function generos(): array
-    {
-        return [
-            $this->parametro(9, 'MASCULINO'),
-            $this->parametro(10, 'FEMENINO'),
-            $this->parametro(11, 'NO DEFINE'),
-        ];
-    }
-
-    private function dias(): array
-    {
-        return [
-            $this->parametro(12, 'LUNES'),
-            $this->parametro(13, 'MARTES'),
-            $this->parametro(14, 'MIERCOLES'),
-            $this->parametro(15, 'JUEVES'),
-            $this->parametro(16, 'VIERNES'),
-            $this->parametro(17, 'SABADO'),
-        ];
-    }
-
-    private function modalidades(): array
-    {
-        return [
-            $this->parametro(18, 'PRESENCIAL'),
-            $this->parametro(19, 'VIRTUAL'),
-            $this->parametro(20, 'MIXTA'),
-        ];
-    }
-
-    private function nivelesFormacion(): array
-    {
-        return [
-            $this->parametro(21, 'TÉCNICO'),
-            $this->parametro(22, 'TECNÓLOGO'),
-            $this->parametro(23, 'AUXILIAR'),
-            $this->parametro(24, 'OPERARIO'),
-        ];
-    }
-
-    private function estadosEvidencias(): array
-    {
-        return [
-            $this->parametro(25, 'PENDIENTE'),
-            $this->parametro(26, 'EN CURSO'),
-            $this->parametro(27, 'COMPLETADO'),
-        ];
-    }
-
-    private function unidadesMedida(): array
-    {
-        return [
-            $this->parametro(30, 'GRAMOS'),
-            $this->parametro(31, 'LIBRAS'),
-            $this->parametro(32, 'KILOGRAMOS'),
-            $this->parametro(33, 'ARROBA'),
-            $this->parametro(34, 'QUINTAL'),
-            $this->parametro(35, 'ONZA'),
-            $this->parametro(36, 'MILILITROS'),
-            $this->parametro(37, 'LITROS'),
-            $this->parametro(38, 'GALONES'),
-            $this->parametro(39, 'ONZA LÍQUIDA'),
-            $this->parametro(40, 'BARRIL'),
-            $this->parametro(41, 'UNIDADES'),
-            $this->parametro(42, 'CAJAS'),
-            $this->parametro(43, 'METROS'),
-            $this->parametro(44, 'CENTIMETROS'),
-            $this->parametro(45, 'PAQUETES'),
-            $this->parametro(46, 'ROLLOS'),
-            $this->parametro(47, 'TABLETAS'),
-            $this->parametro(48, 'TEST'),
-            $this->parametro(49, 'SACKETS'),
-        ];
-    }
-
-    private function productos(): array
-    {
-        return [
-            $this->parametro(28, 'CONSUMIBLE'),
-            $this->parametro(29, 'NO CONSUMIBLE'),
-            $this->parametro(50, 'DISPONIBLE'),
-            $this->parametro(51, 'AGOTADO'),
-        ];
-    }
-
-    private function ordenesYAprobaciones(): array
-    {
-        return [
-            $this->parametro(52, 'PRÉSTAMO'),
-            $this->parametro(53, 'SALIDA'),
-            $this->parametro(54, 'EN ESPERA'),
-            $this->parametro(55, 'APROBADA'),
-            $this->parametro(56, 'RECHAZADA'),
-            $this->parametro(57, 'ENTREGADA'),
-            $this->parametro(58, 'EN PRÉSTAMO'),
-        ];
-    }
-
-    private function categorias(): array
-    {
-        return [
-            $this->parametro(59, 'EMPAQUE'),
-            $this->parametro(60, 'EPP'),
-            $this->parametro(61, 'EQUIPO'),
-            $this->parametro(62, 'FUNGIBLE'),
-            $this->parametro(63, 'INSTRUMENTO MEDICION'),
-            $this->parametro(64, 'INSUMO'),
-            $this->parametro(65, 'REACTIVO'),
-            $this->parametro(66, 'UTENSILIO'),
-            $this->parametro(67, 'VIDRIERIA'),
-        ];
-    }
-
-    private function marcas(): array
-    {
-        return [
-            $this->parametro(68, 'LAMOTTE'),
-            $this->parametro(69, 'PYREX'),
-            $this->parametro(70, 'MERCK'),
-            $this->parametro(71, 'KIMAX'),
-            $this->parametro(72, 'HACH'),
-            $this->parametro(73, 'MILLIPORE'),
-            $this->parametro(74, 'BOECO'),
-            $this->parametro(75, 'BRAND'),
-            $this->parametro(76, 'DURAN'),
-            $this->parametro(77, 'PANREAC'),
-            $this->parametro(78, 'BRIXCO'),
-            $this->parametro(79, 'CLOROX'),
-            $this->parametro(80, 'GOLDENWRAP'),
-            $this->parametro(81, 'ARO'),
-            $this->parametro(82, 'MILWAUKEE'),
-            $this->parametro(83, 'HANNA'),
-            $this->parametro(84, 'ALPHA CHEMIKA'),
-            $this->parametro(85, 'SUPELCO'),
-            $this->parametro(86, 'CITOTEST'),
-            $this->parametro(87, 'BIOPOINTE SCIENTIFIC'),
-            $this->parametro(88, 'CITOGLAS'),
-            $this->parametro(89, 'GLASSCO'),
-            $this->parametro(90, 'LABSCIENT'),
-            $this->parametro(91, 'KIMBLE'),
-            $this->parametro(92, 'NADIR'),
-            $this->parametro(93, 'VIDRIOLAB'),
-            $this->parametro(94, 'GOTOPLAS'),
-            $this->parametro(95, 'PLASTIRED'),
-            $this->parametro(96, 'PLASTICOS R&M'),
-            $this->parametro(97, 'SCOTCH-BRITE'),
-            $this->parametro(98, 'TRAMONTINA'),
-            $this->parametro(99, 'CORONA'),
-            $this->parametro(100, 'IMUSA'),
-            $this->parametro(101, 'FARBERWARE'),
-            $this->parametro(102, 'JGB'),
-            $this->parametro(103, 'BAXTER'),
-            $this->parametro(104, 'B.D'),
-            $this->parametro(105, 'BAYER'),
-            $this->parametro(106, 'BIOPONTERCIENTIFIC'),
-            $this->parametro(107, 'NANOCOLOR'),
-            $this->parametro(108, 'WTW'),
-            $this->parametro(109, 'MACHEREY NAGEL'),
-            $this->parametro(110, 'PHYTOTECH'),
-            $this->parametro(111, 'GE HEALTHCARE'),
-            $this->parametro(112, 'MEDISPO'),
-            $this->parametro(113, 'MIDMARK'),
-            $this->parametro(114, 'VITAL MEDIC'),
-            $this->parametro(115, 'MINE MEDICAL'),
-            $this->parametro(116, 'ZAFIRO'),
-            $this->parametro(117, 'CHEMI'),
-            $this->parametro(118, 'AZUCAR INCAUCA'),
-            $this->parametro(119, 'MAIZENA'),
-            $this->parametro(120, 'COLOMBINA-ZEV'),
-            $this->parametro(121, 'LUKER'),
-            $this->parametro(122, 'SANTO DOMINGO'),
-            $this->parametro(123, 'BETTY CROCKER'),
-            $this->parametro(124, 'GERBER'),
-            $this->parametro(125, 'BLANCOX'),
-            $this->parametro(126, 'BRILLO AROMA'),
-            $this->parametro(127, 'BRILLAKING'),
-            $this->parametro(128, 'ASEPSIA'),
-            $this->parametro(129, 'SOLOASEO'),
-            $this->parametro(130, 'MAXWIPE'),
-            $this->parametro(131, 'EXAMTEX'),
-            $this->parametro(132, 'PROTEXION'),
-            $this->parametro(133, 'BODI SAFE'),
-            $this->parametro(134, 'CRISTAR'),
-            $this->parametro(135, 'DIMEDA'),
-            $this->parametro(136, 'DROFARMA'),
-            $this->parametro(137, 'INVERFARMA'),
-            $this->parametro(138, 'BIOLOGIKA'),
-            $this->parametro(139, 'BIOHALL'),
-            $this->parametro(140, 'ABCLABORATORIOS'),
-            $this->parametro(141, 'CIACOMEQ S.A.S'),
-            $this->parametro(142, 'LEGAQUIMICOS'),
-            $this->parametro(143, 'QUINSA'),
-            $this->parametro(144, 'QUIMPO'),
-            $this->parametro(145, 'MOL LABS'),
-            $this->parametro(146, 'METALLURGICA MOTTA'),
-            $this->parametro(147, 'MOTTA'),
-            $this->parametro(148, 'LEON'),
-            $this->parametro(149, 'ALGARRA'),
-            $this->parametro(150, 'HOPEX'),
-            $this->parametro(151, 'KRAMER'),
-            $this->parametro(152, 'MP TOOLS'),
-            $this->parametro(153, 'PISCICLORO'),
-            $this->parametro(154, 'FORTILECHE'),
-            $this->parametro(155, 'COLINAGRO'),
-            $this->parametro(156, 'CAL'),
-            $this->parametro(157, 'PINTO'),
-            $this->parametro(158, 'ROSA'),
-            $this->parametro(159, 'SAN JORGE'),
-            $this->parametro(160, 'TROPICAL'),
-            $this->parametro(161, 'BEISBOL NATURAL'),
-            $this->parametro(162, 'FRUTUROMA'),
-            $this->parametro(163, 'POLAROMA'),
-            $this->parametro(164, 'NOSTALGIA'),
-            $this->parametro(165, 'PUMP'),
-            $this->parametro(166, 'WATER WORKS'),
-            $this->parametro(167, 'BUFFER POWER'),
-            $this->parametro(168, 'AMCOR'),
-            $this->parametro(169, 'BESTON'),
-            $this->parametro(170, 'GIANT'),
-            $this->parametro(171, 'ELITE'),
-            $this->parametro(172, 'ATHOS'),
-            $this->parametro(173, 'TUSKA'),
-            $this->parametro(174, 'VISMARCK'),
-            $this->parametro(175, 'VIMACH'),
-            $this->parametro(176, 'MIO'),
-            $this->parametro(177, 'MK'),
-            $this->parametro(178, 'MC'),
-            $this->parametro(179, 'PD'),
-            $this->parametro(180, 'JM'),
-            $this->parametro(181, 'FPC'),
-            $this->parametro(182, 'CHM'),
-            $this->parametro(183, 'SOL'),
-            $this->parametro(184, 'ZEV'),
-            $this->parametro(185, 'ALPHA'),
-            $this->parametro(186, 'SUPERDENT'),
-            $this->parametro(187, 'TONING'),
-        ];
-    }
-
-    private function personaCaracterizacion(): array
-    {
-        return [
-            $this->parametro(188, 'AFROCOLOMBIANO'),
-            $this->parametro(189, 'AFROCOLOMBIANOS DESPLAZADOS POR LA VIOLENCIA'),
-            $this->parametro(
-                190,
-                'AFROCOLOMBIANOS DESPLAZADOS POR LA VIOLENCIA CABEZ'
-            ),
-            $this->parametro(191, 'INDÍGENA'),
-            $this->parametro(192, 'INDÍGENAS DESPLAZADOS POR LA VIOLENCIA'),
-            $this->parametro(
-                193,
-                'INDÍGENAS DESPLAZADOS POR LA VIOLENCIA CABEZA DE F'
-            ),
-            $this->parametro(194, 'GITANO ROM'),
-            $this->parametro(195, 'PALENQUERO'),
-            $this->parametro(196, 'RAIZAL'),
-            $this->parametro(197, 'NEGRO'),
-            $this->parametro(198, 'MUJER CABEZA DE FAMILIA'),
-            $this->parametro(
-                199,
-                'DESPLAZADOS POR LA VIOLENCIA CABEZA DE FAMILIA'
-            ),
-            $this->parametro(
-                200,
-                'DESPLAZADOS POR FENÓMENOS NATURALES CABEZA DE FAM'
-            ),
-            $this->parametro(201, 'JÓVENES VULNERABLES'),
-            $this->parametro(202, 'ADOLESCENTE TRABAJADOR'),
-            $this->parametro(
-                203,
-                'ADOLESCENTE EN CONFLICTO CON LA LEY PENAL'
-            ),
-            $this->parametro(
-                204,
-                'PERSONAS EN PROCESO DE REINTEGRACIÓN'
-            ),
-            $this->parametro(205, 'EMPRENDEDORES'),
-            $this->parametro(206, 'MICROEMPRESAS'),
-            $this->parametro(207, 'ARTESANOS'),
-            $this->parametro(208, 'CAMPESINO'),
-            $this->parametro(209, 'SOLDADOS CAMPESINOS'),
-            $this->parametro(210, 'DISCAPACIDAD INTELECTUAL'),
-            $this->parametro(211, 'DISCAPACIDAD AUDITIVA'),
-            $this->parametro(212, 'DISCAPACIDAD FÍSICA'),
-            $this->parametro(213, 'DISCAPACIDAD VISUAL'),
-            $this->parametro(214, 'DISCAPACIDAD PSICOSOCIAL'),
-            $this->parametro(215, 'DISCAPACIDAD MÚLTIPLE'),
-            $this->parametro(216, 'SORDOCEGUERA'),
-            $this->parametro(217, 'DESPLAZADOS DISCAPACITADOS'),
-            $this->parametro(
-                218,
-                'ABANDONO O DESPOJO FORZADO DE TIERRAS'
-            ),
-            $this->parametro(
-                219,
-                'ACTOS TERRORISTA ATENTADOS COMBATES ENFRENTAMIENTOS '
-                    . 'HOSTIGAMIENTOS'
-            ),
-            $this->parametro(
-                220,
-                'ADOLESCENTE DESVINCULADO DE GRUPOS ARMADOS ORGANIZ'
-            ),
-            $this->parametro(
-                221,
-                'DELITOS CONTRA LA LIBERTAD Y LA INTEGRIDAD SEXUAL EN '
-                    . 'DESARROLLO DEL CONFLICTO ARMADO'
-            ),
-            $this->parametro(222, 'DESAPARICIÓN FORZADA'),
-            $this->parametro(223, 'DESPLAZADOS POR LA VIOLENCIA'),
-            $this->parametro(224, 'RECLUTAMIENTO FORZADO'),
-            $this->parametro(225, 'SECUESTRO'),
-            $this->parametro(226, 'HOMICIDIO MASACRE'),
-            $this->parametro(227, 'HERIDO'),
-            $this->parametro(
-                228,
-                'SOBREVIVIENTES MINAS ANTIPERSONALES'
-            ),
-            $this->parametro(
-                229,
-                'MINAS ANTIPERSONAL MUNICIÓN SIN EXPLOTAR Y ARTEFACTO '
-                    . 'EXPLOSIVO IMPROVISADO'
-            ),
-            $this->parametro(230, 'AMENAZA'),
-            $this->parametro(
-                231,
-                'DESPLAZADOS POR FENÓMENOS NATURALES'
-            ),
-            $this->parametro(232, 'INPEC'),
-            $this->parametro(233, 'REMITIDOS POR EL CIE'),
-            $this->parametro(234, 'REMITIDOS POR EL PAL'),
-            $this->parametro(235, 'NINGUNA'),
-        ];
-    }
-
-    private function vias(): array
-    {
-        return [
-            $this->parametro(236, 'CARRERA'),
-            $this->parametro(237, 'CALLE'),
-            $this->parametro(238, 'TRANSVERSAL'),
-            $this->parametro(239, 'DIAGONAL'),
-            $this->parametro(240, 'AVENIDA'),
-            $this->parametro(241, 'AUTOPISTA'),
-            $this->parametro(242, 'CIRCULAR'),
-            $this->parametro(243, 'VÍA'),
-            $this->parametro(244, 'PASAJE'),
-            $this->parametro(245, 'MANZANA'),
-            $this->parametro(246, 'RUTA'),
-            $this->parametro(247, 'KM'),
-        ];
-    }
-
-    private function letras(): array
-    {
-        return [
-            $this->parametro(248, 'A'),
-            $this->parametro(249, 'B'),
-            $this->parametro(250, 'C'),
-            $this->parametro(251, 'D'),
-            $this->parametro(252, 'E'),
-            $this->parametro(253, 'F'),
-            $this->parametro(254, 'G'),
-            $this->parametro(255, 'H'),
-            $this->parametro(256, 'I'),
-            $this->parametro(257, 'J'),
-            $this->parametro(258, 'K'),
-            $this->parametro(259, 'L'),
-            $this->parametro(260, 'M'),
-            $this->parametro(261, 'N'),
-            $this->parametro(262, 'O'),
-            $this->parametro(263, 'P'),
-            $this->parametro(264, 'Q'),
-            $this->parametro(265, 'R'),
-            $this->parametro(266, 'S'),
-            $this->parametro(267, 'T'),
-            $this->parametro(268, 'U'),
-            $this->parametro(269, 'V'),
-            $this->parametro(270, 'W'),
-            $this->parametro(271, 'X'),
-            $this->parametro(272, 'Y'),
-            $this->parametro(273, 'Z'),
-        ];
+        return $parametros;
     }
 
     private function createParametro(array $parametro): void

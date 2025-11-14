@@ -6,6 +6,12 @@
 @section('content')
     @include('complementarios.layout.header')
 
+    @php
+        $aspiranteEmail = $aspirante_id
+            ? strtolower(optional(optional(\App\Models\AspiranteComplementario::find($aspirante_id))->persona)->email)
+            : 'N/A';
+    @endphp
+
     <div class="container-fluid mt-4" style="background-color: #ebf1f4; min-height: 100vh;">
         <div class="row justify-content-center">
             <div class="col-lg-10 col-xl-8">
@@ -44,8 +50,11 @@
                             <div class="col-md-8">
                                 <div class="card" style="background-color: #ffffff; border-color: #dee2e6;">
                                     <div class="card-header"
-                                        style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
-                                        <h5 class="mb-0"><i class="fas fa-id-card mr-2"></i>Documento de Identidad</h5>
+                                        style="background-color: #ffffff; color: #343a40;
+                                            border-left: 4px solid #007bff;">
+                                        <h5 class="mb-0">
+                                            <i class="fas fa-id-card mr-2"></i>Documento de Identidad
+                                        </h5>
                                     </div>
                                     <div class="card-body">
                                         <div class="alert alert-info">
@@ -59,15 +68,15 @@
 
 
                                         <form id="formDocumentos" method="POST"
-                                            action="{{ route('programas-complementarios.subir-documentos',
-                                            ['id' => $programa->id]) }}"
+                                            action="{{ route('programas-complementarios.subir-documentos', [
+                                                'id' => $programa->id,
+                                            ]) }}"
                                             enctype="multipart/form-data">
                                             @csrf
                                             <input type="hidden" name="aspirante_id" value="{{ $aspirante_id }}">
 
                                             <div class="mb-4">
-                                                <label
-                                                for="documento_identidad" class="form-label">
+                                                <label for="documento_identidad" class="form-label">
                                                     Documento de Identidad (PDF)*
                                                 </label>
                                                 <input type="file" class="form-control" id="documento_identidad"
@@ -90,7 +99,9 @@
                                                 value="0">
 
                                             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                                                <a href="{{ route('programas-complementarios.inscripcion', ['programa' => $programa->id]) }}"
+                                                <a href="{{ route('programas-complementarios.inscripcion', [
+                                                    'programa' => $programa->id,
+                                                ]) }}"
                                                     class="btn btn-outline-secondary me-md-2">
                                                     <i class="fas fa-arrow-left mr-1"></i> Volver Atrás
                                                 </a>
@@ -106,7 +117,8 @@
                             <div class="col-md-4">
                                 <div class="card card-widget widget-user">
                                     <div class="widget-user-header"
-                                        style="background-color: #ffffff; color: #343a40; border-left: 4px solid #007bff;">
+                                        style="background-color: #ffffff; color: #343a40;
+                                            border-left: 4px solid #007bff;">
                                         <h3 class="widget-user-username">Información del Programa</h3>
                                         <h5 class="widget-user-desc">{{ $programa->nombre }}</h5>
                                     </div>
@@ -119,9 +131,12 @@
                                                     <div class="row">
                                                         <div class="col-6">
                                                             <div class="description-block">
-                                                                <span class="description-text">DURACIÓN</span>
+                                                                <span class="description-text">
+                                                                    DURACIÓN
+                                                                </span>
                                                                 <h5 class="description-header">
-                                                                    {{formatear_horas($programa->duracion) }} horas</h5>
+                                                                    {{ formatear_horas($programa->duracion) }} horas
+                                                                </h5>
                                                             </div>
                                                         </div>
                                                         <div class="col-6">
@@ -136,15 +151,20 @@
                                                     <div class="row">
                                                         <div class="col-6">
                                                             <div class="description-block">
-                                                                <span class="description-text">JORNADA</span>
+                                                                <span class="description-text">
+                                                                    JORNADA
+                                                                </span>
                                                                 <h5 class="description-header">
-                                                                    {{ $programa->jornada->jornada ?? 'N/A' }}</h5>
+                                                                    {{ $programa->jornada->jornada ?? 'N/A' }}
+                                                                </h5>
                                                             </div>
                                                         </div>
                                                         <div class="col-6">
                                                             <div class="description-block">
                                                                 <span class="description-text">CUPO</span>
-                                                                <h5 class="description-header">{{$programa->cupos}}</h5>
+                                                                <h5 class="description-header">
+                                                                    {{ $programa->cupos }}
+                                                                </h5>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -161,17 +181,25 @@
         </div>
     </div>
 
-<script>
-    // Habilitar botón de envío cuando se selecciona un archivo y se acepta la privacidad
-    const documentoInput = document.getElementById('documento_identidad');
-    const privacidadCheckbox = document.getElementById('acepto_privacidad');
-    const btnEnviar = document.getElementById('btnEnviar');
+    <script>
+        // Habilitar botón de envío cuando se selecciona un archivo y se acepta la privacidad
+        const documentoInput = document.getElementById('documento_identidad');
+        const privacidadCheckbox = document.getElementById('acepto_privacidad');
+        const btnEnviar = document.getElementById('btnEnviar');
+        const formDocumentos = document.getElementById('formDocumentos');
+
+        const isMobileDevice = window.matchMedia('(pointer:coarse)').matches ||
+            /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
         function actualizarBotonEnviar() {
             const archivoSeleccionado = documentoInput.files.length > 0;
             const privacidadAceptada = privacidadCheckbox.checked;
 
             btnEnviar.disabled = !(archivoSeleccionado && privacidadAceptada);
+        }
+
+        if (isMobileDevice) {
+            btnEnviar.disabled = false;
         }
 
         documentoInput.addEventListener('change', actualizarBotonEnviar);
@@ -217,6 +245,26 @@
             console.log('Checkbox cambiado, valor hidden:', document.getElementById('acepto_privacidad_hidden')
                 .value);
         });
+
+        if (formDocumentos) {
+            formDocumentos.addEventListener('submit', (event) => {
+                const archivoSeleccionado = documentoInput.files.length > 0;
+                const privacidadAceptada = privacidadCheckbox.checked;
+
+                if (!(archivoSeleccionado && privacidadAceptada)) {
+                    event.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Faltan datos por completar',
+                        text: 'Selecciona el documento e indica que aceptas la política de privacidad antes de ' +
+                            'continuar.',
+                        confirmButtonText: 'Entendido'
+                    });
+                }
+            }, {
+                once: false
+            });
+        }
 
         // Validación del formulario
         document.getElementById('formDocumentos').addEventListener('submit', function(e) {
@@ -282,7 +330,8 @@
         console.log('=== PÁGINA DE SUBIDA DE DOCUMENTOS CARGADA ===');
         console.log('Programa ID:', {{ $programa->id }});
         console.log('Aspirante ID:', {{ $aspirante_id }});
-        console.log('URL de envío:', '{{ route('programas-complementarios.subir-documentos', $programa->id) }}');
+        const uploadUrlLog = '{{ route('programas-complementarios.subir-documentos', $programa->id) }}';
+        console.log('URL de envío:', uploadUrlLog);
 
         // Mostrar SweetAlert si hay mensaje de éxito (cuenta creada)
         @if (session('success'))
@@ -291,7 +340,7 @@
                 title: '¡Cuenta creada exitosamente!',
                 html: `
                 <p>Se ha creado su cuenta de usuario.</p>
-                <p><strong>Usuario:</strong> {{ $aspirante_id ? strtolower(\App\Models\AspiranteComplementario::find($aspirante_id)->persona->email) : 'N/A' }}</p>
+                <p><strong>Usuario:</strong> {{ $aspiranteEmail }}</p>
                 <p><strong>Contraseña:</strong> Tu contraseña es tu documento de identidad registrado</p>
                 <p class="text-muted">Guarde esta información en un lugar seguro.</p>
             `,

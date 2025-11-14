@@ -67,7 +67,8 @@ class RegisterController extends Controller
     {
         return Persona::where('numero_documento', $numeroDocumento)
             ->orWhere('email', $email)
-            ->exists();
+            ->exists()
+            || User::where('email', $email)->exists();
     }
 
     private function createPersonaYUsuario(array $data): array
@@ -206,18 +207,18 @@ class RegisterController extends Controller
             ->unique()
             ->values();
 
-        foreach ($candidates as $candidateId) {
-            if (User::whereKey($candidateId)->exists()) {
-                return $candidateId;
-            }
+        $resolvedId = $candidates
+            ->first(fn($candidateId) => User::whereKey($candidateId)->exists());
+
+        if (!$resolvedId) {
+            $resolvedId = User::role('ADMIN')->value('id');
         }
 
-        $adminFallback = User::role('ADMIN')->value('id');
-        if ($adminFallback) {
-            return (int) $adminFallback;
+        if (!$resolvedId) {
+            $resolvedId = User::orderBy('id')->value('id');
         }
 
-        return User::orderBy('id')->value('id');
+        return $resolvedId ? (int) $resolvedId : null;
     }
 
     private function resolveDocumentos(): object

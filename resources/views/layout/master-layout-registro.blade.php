@@ -31,26 +31,56 @@
     @endif
 
     @if (session('error'))
-        <div class="alert alert-danger alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
-            <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: 'Error',
+                    text: '{{ session("error") }}',
+                    icon: 'error',
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#dc3545',
+                    customClass: {
+                        popup: 'animated fadeInDown',
+                        confirmButton: 'btn btn-danger'
+                    },
+                    buttonsStyling: false,
+                    background: '#fff',
+                    backdrop: `rgba(0,0,0,0.4)`,
+                    padding: '1.25em',
+                    width: '400px'
+                });
+            });
+        </script>
     @endif
 
     {{-- Mostrar errores de validación en bloque --}}
     @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show position-fixed" style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
-            <ul class="mb-0">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                Swal.fire({
+                    title: 'Errores de validación',
+                    html: `
+                        <ul class="text-left" style="list-style-position: inside;">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    `,
+                    icon: 'error',
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#dc3545',
+                    customClass: {
+                        popup: 'animated fadeInDown',
+                        confirmButton: 'btn btn-danger'
+                    },
+                    buttonsStyling: false,
+                    background: '#fff',
+                    backdrop: `rgba(0,0,0,0.4)`,
+                    padding: '1.25em',
+                    width: '500px'
+                });
+            });
+        </script>
     @endif
 
     @yield('content')
