@@ -17,9 +17,9 @@ namespace App\Configuration;
 final class UploadLimits
 {
     /**
-     * Tamaño máximo para importación de archivos Excel/CSV (8MB).
+     * Tamaño máximo para importación de archivos Excel (8MB).
      */
-    public const IMPORT_FILE_SIZE_KB = 8192;
+    public const IMPORT_FILE_SIZE_KB = 25600;
     public const IMPORT_FILE_SIZE_BYTES = self::IMPORT_FILE_SIZE_KB * 1024;
     public const IMPORT_FILE_SIZE_MB = self::IMPORT_FILE_SIZE_KB / 1024;
 
@@ -33,7 +33,7 @@ final class UploadLimits
      * Tamaño máximo del contenido HTTP para importaciones (8MB).
      * Mantenerlo alineado con el límite del archivo evita sobrecargas del buffer de entrada.
      */
-    public const IMPORT_CONTENT_LENGTH_BYTES = 8 * 1024 * 1024; // 8MB
+    public const IMPORT_CONTENT_LENGTH_BYTES = self::IMPORT_FILE_SIZE_KB * 1024;
 
     /**
      * Tamaño máximo para documentos complementarios (5MB).
@@ -60,11 +60,6 @@ final class UploadLimits
         'xls' => [
             'application/vnd.ms-excel',
             'application/msexcel',
-        ],
-        'csv' => [
-            'text/csv',
-            'text/plain',
-            'application/csv',
         ],
     ];
 

@@ -21,10 +21,10 @@ class ProcessPersonaImportJob implements ShouldQueue
     public int $importId;
 
     /**
-     * Procesamos la importación en una cola dedicada con ventana amplia para evitar reintentos prematuros.
+     * Cola dedicada para importaciones con configuración independiente.
      */
-    public string $connection = 'persona-import';
-    public string $queue = 'persona-import';
+    private const CONNECTION = 'persona-import';
+    private const QUEUE = 'persona-import';
 
     public int $tries = 3;
     public int $timeout;
@@ -32,7 +32,10 @@ class ProcessPersonaImportJob implements ShouldQueue
     public function __construct(int $importId)
     {
         $this->importId = $importId;
-        $retryAfter = (int) config('queue.connections.' . $this->connection . '.retry_after', 2400);
+        $this->onConnection(self::CONNECTION);
+        $this->onQueue(self::QUEUE);
+
+        $retryAfter = (int) config('queue.connections.' . self::CONNECTION . '.retry_after', 2400);
         $this->timeout = max(300, $retryAfter - 120);
     }
 
