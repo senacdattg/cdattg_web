@@ -398,6 +398,7 @@ Route::get('/websocket/estadisticas', [\App\Http\Controllers\WebSocketVisitantes
 Route::post('/websocket/entrada', [\App\Http\Controllers\WebSocketVisitantesController::class, 'registrarEntrada']);
 Route::post('/websocket/salida', [\App\Http\Controllers\WebSocketVisitantesController::class, 'registrarSalida']);
 Route::get('/websocket/visitantes-actuales', [\App\Http\Controllers\WebSocketVisitantesController::class, 'obtenerVisitantesActuales']);
+Route::get('/websocket/entradas-por-hora', [\App\Http\Controllers\WebSocketVisitantesController::class, 'obtenerEntradasPorHora']);
 
 // ==========================================
 // REGISTRO DE PRESENCIA - ESTADÍSTICAS DE PERSONAS DENTRO

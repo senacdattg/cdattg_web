@@ -10,6 +10,7 @@ use App\Services\EstadisticasService;
 use App\Services\PersonaIngresoSalidaService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Role;
@@ -187,6 +188,52 @@ class WebSocketVisitantesController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al obtener visitantes actuales',
+            ], 500);
+        }
+    }
+
+    /**
+     * Entradas por hora (para gráficos).
+     */
+    public function obtenerEntradasPorHora(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'fecha' => 'nullable|date',
+                'sede_id' => 'nullable|integer|exists:sedes,id',
+            ]);
+
+            $fecha = $validated['fecha'] ?? today()->toDateString();
+
+            $query = PersonaIngresoSalida::whereDate('fecha_entrada', $fecha);
+
+            if (!empty($validated['sede_id'])) {
+                $query->where('sede_id', $validated['sede_id']);
+            }
+
+            $entradas = $query
+                ->select([
+                    DB::raw('DATE_FORMAT(timestamp_entrada, "%H:00") as hora'),
+                    DB::raw('COUNT(*) as total'),
+                ])
+                ->groupBy('hora')
+                ->orderBy('hora')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'fecha' => $fecha,
+                    'sede_id' => $validated['sede_id'] ?? null,
+                    'series' => $entradas,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error obteniendo entradas por hora: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener entradas por hora',
             ], 500);
         }
     }

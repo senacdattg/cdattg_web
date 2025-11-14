@@ -39,27 +39,19 @@ class EstadisticasService
     private function buildDashboardGeneral(): array
     {
         // Obtener usuarios por rol usando Spatie Permission
-        $superAdminUsers = \App\Models\User::whereHas('roles', function($query) {
+        $superAdminUsers = \App\Models\User::whereHas('roles', function ($query) {
             $query->where('name', 'SUPER ADMINISTRADOR');
         })->get();
         
-        $adminUsers = \App\Models\User::whereHas('roles', function($query) {
+        $adminUsers = \App\Models\User::whereHas('roles', function ($query) {
             $query->where('name', 'ADMINISTRADOR');
         })->get();
         
-        $instructorUsers = \App\Models\User::whereHas('roles', function($query) {
-            $query->where('name', 'INSTRUCTOR');
-        })->get();
-        
-        $visitanteUsers = \App\Models\User::whereHas('roles', function($query) {
+        $visitanteUsers = \App\Models\User::whereHas('roles', function ($query) {
             $query->where('name', 'VISITANTE');
         })->get();
         
-        $aprendizUsers = \App\Models\User::whereHas('roles', function($query) {
-            $query->where('name', 'APRENDIZ');
-        })->get();
-        
-        $aspiranteUsers = \App\Models\User::whereHas('roles', function($query) {
+        $aspiranteUsers = \App\Models\User::whereHas('roles', function ($query) {
             $query->where('name', 'ASPIRANTE');
         })->get();
         
@@ -96,7 +88,7 @@ class EstadisticasService
                     'inactivos' => $aspiranteUsers->where('status', false)->count(),
                 ],
             ],
-            'asistencias_hoy' => $this->personaIngresoSalidaService->obtenerEstadisticasPersonasDentroHoy()['total'],
+            'asistencias_hoy' => \App\Models\PersonaIngresoSalida::whereDate('fecha_entrada', today())->count(),
             // Estadísticas de personas dentro del edificio (en tiempo real)
             'personas_dentro' => $this->personaIngresoSalidaService->obtenerEstadisticasPersonasDentro(),
         ];
