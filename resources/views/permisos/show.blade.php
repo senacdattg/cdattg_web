@@ -277,9 +277,13 @@
                                 </div>
 
                                 <div class="text-center mt-3">
-                                    <button type="submit" class="btn btn-sm btn-light">
-                                        <i class="fas fa-save text-success"></i> Guardar Cambios
-                                    </button>
+                                    @if($user->id != auth()->id())
+                                        <button type="submit" class="btn btn-sm btn-light">
+                                            <i class="fas fa-save text-success"></i> Guardar Cambios
+                                        </button>
+                                    @else
+                                        <span class="text-muted">No puedes modificar tus propios permisos.</span>
+                                    @endif
                                 </div>
                             </form>
                         </div>
@@ -367,9 +371,13 @@
                                     </div>
 
                                     <div class="text-center mt-3">
-                                        <button type="submit" class="btn btn-sm btn-light">
-                                            <i class="fas fa-save text-success"></i> Guardar Cambios
-                                        </button>
+                                        @if($user->id != auth()->id())
+                                            <button type="submit" class="btn btn-sm btn-light">
+                                                <i class="fas fa-save text-success"></i> Guardar Cambios
+                                            </button>
+                                        @else
+                                            <span class="text-muted">No puedes modificar tus propios roles.</span>
+                                        @endif
                                     </div>
                                 </form>
                             </div>

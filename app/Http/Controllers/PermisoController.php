@@ -86,6 +86,11 @@ class PermisoController extends Controller
                 ? '<span class="badge badge-success">ACTIVO</span>'
                 : '<span class="badge badge-danger">INACTIVO</span>';
 
+            $acciones = '';
+            if ($user->id != auth()->id()) {
+                $acciones = '<div class="btn-group" role="group"><a class="btn btn-sm btn-light" href="' . route('permiso.show', $user->id) . '" title="Ver Permisos"><i class="fas fa-eye text-warning"></i></a></div>';
+            }
+
             return [
                 'index' => $start + $index + 1,
                 'nombre' => $user->persona->nombre_completo ?? 'N/A',
@@ -93,7 +98,7 @@ class PermisoController extends Controller
                 'email' => $user->persona->email ?? 'N/A',
                 'roles' => $rolesHtml,
                 'estado' => $statusBadge,
-                'acciones' => '<div class="btn-group" role="group"><a class="btn btn-sm btn-light" href="' . route('permiso.show', $user->id) . '" title="Ver Permisos"><i class="fas fa-eye text-warning"></i></a></div>',
+                'acciones' => $acciones,
             ];
         });
 
@@ -113,6 +118,11 @@ class PermisoController extends Controller
         try {
             $permisosUser = $request->input('permisos', []);
             $userId = $request->user_id;
+
+            // Prevenir que el usuario modifique sus propios permisos
+            if ($userId == auth()->id()) {
+                return redirect()->back()->with('error', 'No puedes modificar tus propios permisos.');
+            }
 
             $this->permisoService->asignarPermisos($userId, $permisosUser);
 

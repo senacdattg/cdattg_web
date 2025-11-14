@@ -41,6 +41,11 @@ class UserController extends Controller
                 'available_roles.*' => 'required|string|exists:roles,name',
             ]);
 
+            // Prevenir que el usuario modifique sus propios roles
+            if ($data['user_id'] == auth()->id()) {
+                return redirect()->back()->with('error', 'No puedes modificar tus propios roles.');
+            }
+
             $existingRoles = $request->input('roles', []);
             $newRoles = $request->input('available_roles', []);
             $allRoles = array_unique(array_merge($existingRoles, $newRoles));
