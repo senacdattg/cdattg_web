@@ -173,6 +173,30 @@ class PersonaService
     }
 
     /**
+     * Crea un usuario asociado a una persona existente.
+     *
+     * @throws PersonaException
+     */
+    public function crearUsuarioParaPersona(Persona $persona): User
+    {
+        if ($persona->user) {
+            throw new PersonaException('La persona ya tiene un usuario asociado.');
+        }
+
+        if (empty($persona->email)) {
+            throw new PersonaException('La persona no tiene correo registrado.');
+        }
+
+        if (empty($persona->numero_documento)) {
+            throw new PersonaException('La persona no tiene número de documento registrado.');
+        }
+
+        return DB::transaction(function () use ($persona) {
+            return $this->crearUsuarioPersona($persona);
+        });
+    }
+
+    /**
      * Crea usuario asociado a persona
      *
      * @param Persona $persona

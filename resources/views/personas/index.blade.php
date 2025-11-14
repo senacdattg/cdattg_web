@@ -270,6 +270,51 @@
 
             $('[data-toggle="tooltip"]').tooltip();
 
+            $(document).on('submit', '.create-user-form', function (event) {
+                const $form = $(this);
+                const disabledFlag = ($form.data('disabled') || '').toString() === 'true';
+                const errorMessage = $form.data('error') || 'Actualiza la información de correo y documento antes de crear el usuario.';
+
+                if (disabledFlag) {
+                    event.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'No es posible crear el usuario',
+                        text: errorMessage,
+                        confirmButtonText: 'Entendido',
+                        confirmButtonColor: '#d33'
+                    });
+                    return;
+                }
+
+                if ($form.data('confirmed')) {
+                    return true;
+                }
+
+                event.preventDefault();
+
+                const personaNombre = $('<div>').text($form.data('persona-nombre') || '').html();
+                const personaEmail = $('<div>').text($form.data('persona-email') || '').html();
+                const personaDocumento = $('<div>').text($form.data('numero-documento') || '').html();
+
+                Swal.fire({
+                    title: 'Crear usuario',
+                    html: `Se creará el usuario <strong>${personaEmail}</strong><br>` +
+                        `La contraseña temporal será el número de documento: <strong>${personaDocumento}</strong>`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fas fa-user-plus mr-1"></i> Crear usuario',
+                    cancelButtonText: '<i class="fas fa-times mr-1"></i> Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $form.data('confirmed', true);
+                        $form.submit();
+                    }
+                });
+            });
+
             const $estadoFilter = $('#filtro-estado');
             const $totalGeneral = $('#total-personas');
             const $totalFiltrado = $('#total-personas-filtradas');

@@ -81,7 +81,7 @@ class PersonaController extends Controller
 
         $this->middleware('can:VER PERSONA')->only(['index']);
         $this->middleware('can:CREAR PERSONA')->only(['create', 'store']);
-        $this->middleware('can:EDITAR PERSONA')->only(['edit', 'update']);
+        $this->middleware('can:EDITAR PERSONA')->only(['edit', 'update', 'createUser']);
         $this->middleware('can:ELIMINAR PERSONA')->only('destroy');
         $this->middleware('can:CAMBIAR ESTADO USUARIO')->only('cambiarEstadoUser');
         $this->middleware('can:ASIGNAR PERMISOS')->only('updateRole');
@@ -577,6 +577,42 @@ class PersonaController extends Controller
             return redirect()
                 ->back()
                 ->with('error', 'No se pudo restablecer la contraseña.');
+        }
+    }
+
+    public function createUser(Persona $persona): RedirectResponse
+    {
+        if ($persona->user) {
+            return redirect()
+                ->back()
+                ->with('error', 'La persona ya tiene un usuario asociado.');
+        }
+
+        if (empty($persona->email) || empty($persona->numero_documento)) {
+            return redirect()
+                ->back()
+                ->with('error', 'No es posible crear el usuario porque faltan datos de correo o documento.');
+        }
+
+        try {
+            $this->personaService->crearUsuarioParaPersona($persona);
+
+            return redirect()
+                ->route('personas.show', $persona->id)
+                ->with('success', 'Usuario creado correctamente. La contraseña inicial es el número de documento.');
+        } catch (PersonaException $exception) {
+            return redirect()
+                ->back()
+                ->with('error', $exception->getMessage());
+        } catch (\Throwable $exception) {
+            Log::error('Error al crear usuario para persona', [
+                'persona_id' => $persona->id,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return redirect()
+                ->back()
+                ->with('error', 'No se pudo crear el usuario. Inténtalo nuevamente.');
         }
     }
 

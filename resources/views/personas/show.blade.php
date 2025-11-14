@@ -23,7 +23,7 @@
     <section class="content mt-4">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
+                <div class="d-flex align-items-center">
                     @if (!isset($soloPerfil) || !$soloPerfil)
                         <a class="btn btn-outline-secondary" href="{{ route('personas.index') }}">
                             <i class="fas fa-arrow-left mr-1"></i> Volver
@@ -34,14 +34,48 @@
                         </a>
                     @endif
                 </div>
-                <div>
+                <div class="d-flex align-items-center">
                     @can('EDITAR PERSONA')
-                        <a class="btn btn-primary" href="{{ route('personas.edit', $persona->id) }}">
+                        <a class="btn btn-primary mr-2" href="{{ route('personas.edit', $persona->id) }}">
                             <i class="fas fa-edit mr-1"></i> Editar
                         </a>
                     @endcan
+                    @can('EDITAR PERSONA')
+                        @if (!$persona->user)
+                            @php
+                                $faltanCorreo = empty($persona->email);
+                                $faltanDocumento = empty($persona->numero_documento);
+                                $motivos = collect([
+                                    $faltanCorreo ? 'La persona no tiene correo registrado.' : null,
+                                    $faltanDocumento ? 'La persona no tiene número de documento registrado.' : null,
+                                ])->filter()->implode(' ');
+                                $botonDeshabilitado = $faltanCorreo || $faltanDocumento;
+                            @endphp
+                            <button
+                                type="button"
+                                class="btn btn-outline-success"
+                                id="crear-usuario-btn"
+                                data-toggle="tooltip"
+                                data-placement="bottom"
+                                title="{{ $botonDeshabilitado ? ($motivos ?: 'Completa los datos antes de crear el usuario.') : 'Crear usuario con las credenciales predeterminadas.' }}"
+                                data-email="{{ $persona->email ?? '' }}"
+                                data-documento="{{ $persona->numero_documento ?? '' }}"
+                                data-nombre="{{ $persona->nombre_completo }}"
+                                data-disabled="{{ $botonDeshabilitado ? 'true' : 'false' }}"
+                                data-error="{{ $motivos }}">
+                                <i class="fas fa-user-plus mr-1"></i> Crear usuario
+                            </button>
+                        @endif
+                    @endcan
                 </div>
             </div>
+            @can('EDITAR PERSONA')
+                @if (!$persona->user)
+                    <form id="crear-usuario-form" action="{{ route('personas.create-user', $persona) }}" method="POST" class="d-none">
+                        @csrf
+                    </form>
+                @endif
+            @endcan
             <div class="row">
                 <div class="col-lg-4 mb-4">
                     <div class="card shadow-sm border-0 h-100">
@@ -473,4 +507,59 @@
 
 @section('js')
     @vite(['resources/js/parametros.js'])
+    @stack('js')
 @endsection
+
+@push('js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof $ === 'function') {
+                $('[data-toggle="tooltip"]').tooltip();
+            }
+
+            const trigger = document.getElementById('crear-usuario-btn');
+            const form = document.getElementById('crear-usuario-form');
+
+            if (!trigger || !form) {
+                return;
+            }
+
+            trigger.addEventListener('click', function () {
+                const isDisabled = trigger.dataset.disabled === 'true';
+                const email = trigger.dataset.email || '';
+                const documento = trigger.dataset.documento || '';
+                const mensajeError = trigger.dataset.error || 'Actualiza el correo y el documento antes de crear el usuario.';
+
+                if (isDisabled) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'No es posible crear el usuario',
+                        text: mensajeError,
+                        confirmButtonText: 'Entendido',
+                        confirmButtonColor: '#d33'
+                    });
+                    return;
+                }
+
+                const emailSeguro = $('<div>').text(email).html();
+                const documentoSeguro = $('<div>').text(documento).html();
+
+                Swal.fire({
+                    title: 'Crear usuario',
+                    html: `Se creará el usuario <strong>${emailSeguro}</strong><br>` +
+                        `La contraseña temporal será el número de documento: <strong>${documentoSeguro}</strong>`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fas fa-user-plus mr-1"></i> Crear usuario',
+                    cancelButtonText: '<i class="fas fa-times mr-1"></i> Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+@endpush

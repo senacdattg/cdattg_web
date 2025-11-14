@@ -38,6 +38,35 @@
     @endcan
 
     @can('EDITAR PERSONA')
+        @php
+            $tieneUsuario = $persona->user !== null;
+            $faltanCorreo = empty($persona->email);
+            $faltanDocumento = empty($persona->numero_documento);
+            $puedeCrearUsuario = !$tieneUsuario && !$faltanCorreo && !$faltanDocumento;
+            $motivosCrear = collect([
+                $tieneUsuario ? 'La persona ya tiene un usuario asociado.' : null,
+                $faltanCorreo ? 'La persona no tiene correo registrado.' : null,
+                $faltanDocumento ? 'La persona no tiene número de documento registrado.' : null,
+            ])->filter()->implode(' ');
+        @endphp
+        <form class="d-inline create-user-form"
+              action="{{ route('personas.create-user', $persona->id) }}"
+              method="POST"
+              title="{{ $puedeCrearUsuario ? 'Crear usuario' : ($motivosCrear ?: 'No es posible crear el usuario.') }}"
+              style="display: inline-block; margin-right: 2px;"
+              data-persona-nombre="{{ $persona->nombre_completo }}"
+              data-persona-email="{{ $persona->email }}"
+              data-numero-documento="{{ $persona->numero_documento }}"
+              data-error="{{ $motivosCrear }}"
+              data-disabled="{{ $puedeCrearUsuario ? 'false' : 'true' }}">
+            @csrf
+            <button type="submit" class="btn btn-sm btn-light" @if (!$puedeCrearUsuario) disabled @endif>
+                <i class="fas fa-user-plus text-success"></i>
+            </button>
+        </form>
+    @endcan
+
+    @can('EDITAR PERSONA')
         <a href="{{ route('personas.edit', $persona->id) }}"
            class="btn btn-sm btn-light"
            title="Editar"
