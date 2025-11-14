@@ -83,13 +83,16 @@ class WebSocketHandler {
 
         const data = event.data;
         const tipo = data.tipo === 'entrada' ? 'Entrada' : 'Salida';
-        const message = `${tipo} registrada: Persona ID ${data.persona_id}`;
+        const nombrePersona = data.nombre_completo || `Persona ID ${data.persona_id}`;
+        const sedeDescripcion = data.sede_nombre || data.sede_id || 'N/A';
+        const numeroDocumento = data.numero_documento || 'N/A';
+        const message = `${tipo} registrada: ${nombrePersona}`;
 
         this.showNotification(message, data.tipo === 'entrada' ? 'success' : 'info', {
             icon: data.tipo === 'entrada' ? 'fas fa-sign-in-alt' : 'fas fa-sign-out-alt',
             title: `${tipo} Registrada`,
-            subtitle: `Rol: ${data.rol} | Sede: ${data.sede_id}`,
-            body: `Persona ID: ${data.persona_id} registró ${data.tipo} a las ${this.formatTime(data.timestamp)}`
+            subtitle: `Rol: ${data.rol} | Sede: ${sedeDescripcion}`,
+            body: `${nombrePersona} (${numeroDocumento}) registró ${data.tipo} a las ${this.formatTime(data.timestamp)}`
         });
 
         // Actualizar la interfaz si estamos en la página de talento humano
@@ -125,7 +128,18 @@ class WebSocketHandler {
         if (!timeString) return 'N/A';
 
         try {
-            const time = new Date(`2000-01-01T${timeString}`);
+            let date;
+
+            if (typeof timeString === 'string' && timeString.includes('T')) {
+                date = new Date(timeString);
+            } else {
+                date = new Date(`2000-01-01T${timeString}`);
+            }
+
+            if (Number.isNaN(date.getTime())) {
+                return timeString;
+            }
+
             return time.toLocaleTimeString('es-ES', {
                 hour: '2-digit',
                 minute: '2-digit'
@@ -282,10 +296,14 @@ class WebSocketHandler {
         if (!tbody) return;
 
         const newRow = document.createElement('tr');
+        const nombrePersona = data.nombre_completo || `Persona ID ${data.persona_id}`;
+        const sedeDescripcion = data.sede_nombre || data.sede_id || 'N/A';
+        const numeroDocumento = data.numero_documento || 'N/A';
         newRow.innerHTML = `
             <td>${data.persona_id}</td>
+            <td>${nombrePersona}<br><small>${numeroDocumento}</small></td>
             <td>${data.rol}</td>
-            <td>${data.sede_id}</td>
+            <td>${sedeDescripcion}</td>
             <td>${data.tipo === 'entrada' ? '<span class="badge badge-success">Entrada</span>' : '<span class="badge badge-info">Salida</span>'}</td>
             <td>${this.formatTime(data.timestamp)}</td>
         `;

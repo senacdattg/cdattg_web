@@ -48,24 +48,23 @@ ENV NODE_ENV=$NODE_ENV
 
 WORKDIR /app
 
-# --- Dependencias Node ---
+# --- Copiar archivos de configuración y dependencias ---
 COPY package.json package-lock.json ./
 
+# --- Instalar dependencias completas para que Vite exista ---
 RUN set -eux; \
-    if [ -f package-lock.json ] && [ -s package-lock.json ]; then \
-        npm ci || (echo "⚠️ npm ci falló, usando npm install como fallback..."; npm install); \
-    else \
-        echo "⚠️ package-lock.json no encontrado o vacío, usando npm install..."; \
-        npm install; \
-    fi;
+    NODE_ENV=development npm ci || npm install;
 
-# --- Copiar código fuente para build ---
-COPY resources ./resources
+# --- Copiar código fuente necesario para build ---
 COPY vite.config.js ./vite.config.js
+COPY resources ./resources
 COPY public ./public
 
-# --- Compilar assets de producción ---
-RUN npm run build && npm prune --omit=dev
+# --- Compilar assets ---
+RUN npm run build
+
+# --- Quitar dependencias de desarrollo para dejar limpio ---
+RUN npm prune --omit=dev
 
 
 # =========================================
