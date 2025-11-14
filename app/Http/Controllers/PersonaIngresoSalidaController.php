@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\VisitanteActualizado;
 use App\Models\PersonaIngresoSalida;
 use App\Services\PersonaIngresoSalidaService;
 use Illuminate\Http\Request;
@@ -43,6 +44,7 @@ class PersonaIngresoSalidaController extends Controller
 
             $validated = $request->validate($rules);
 
+            /** @var PersonaIngresoSalida $registro */
             $registro = $this->personaIngresoSalidaService->registrarEntrada(
                 $validated['persona_id'],
                 $validated['sede_id'],
@@ -59,11 +61,19 @@ class PersonaIngresoSalidaController extends Controller
             if (Schema::hasColumn('persona_ingreso_salida', 'ficha_caracterizacion_id')) {
                 $relaciones[] = 'fichaCaracterizacion';
             }
+            $relaciones[] = 'persona.user.roles';
+
+            $registro->loadMissing($relaciones);
+
+            broadcast(new VisitanteActualizado(
+                $this->buildVisitantePayload($registro, 'entrada'),
+                'entrada'
+            ));
 
             return response()->json([
                 'success' => true,
                 'message' => 'Entrada registrada correctamente',
-                'data' => $registro->load($relaciones),
+                'data' => $registro,
             ], 201);
         } catch (\Exception $e) {
             Log::error('Error registrando entrada: ' . $e->getMessage());
@@ -101,11 +111,19 @@ class PersonaIngresoSalidaController extends Controller
             if (Schema::hasColumn('persona_ingreso_salida', 'ficha_caracterizacion_id')) {
                 $relaciones[] = 'fichaCaracterizacion';
             }
+            $relaciones[] = 'persona.user.roles';
+
+            $registro->loadMissing($relaciones);
+
+            broadcast(new VisitanteActualizado(
+                $this->buildVisitantePayload($registro, 'salida'),
+                'salida'
+            ));
 
             return response()->json([
                 'success' => true,
                 'message' => 'Salida registrada correctamente',
-                'data' => $registro->load($relaciones),
+                'data' => $registro,
             ], 200);
         } catch (\Exception $e) {
             Log::error('Error registrando salida: ' . $e->getMessage());
@@ -198,6 +216,58 @@ class PersonaIngresoSalidaController extends Controller
     }
 
     /**
+     * Obtener registros del día con nombre, apellidos, sede, entrada y salida.
+     */
+    public function registrosDiarios(Request $request): JsonResponse
+    {
+        try {
+            $validated = $request->validate([
+                'fecha' => 'nullable|date',
+                'sede_id' => 'nullable|integer|exists:sedes,id',
+            ]);
+
+            $fecha = $validated['fecha'] ?? today()->toDateString();
+
+            $query = PersonaIngresoSalida::with(['persona', 'sede'])
+                ->whereDate('fecha_entrada', $fecha)
+                ->orderBy('timestamp_entrada');
+
+            if (!empty($validated['sede_id'])) {
+                $query->where('sede_id', $validated['sede_id']);
+            }
+
+            $registros = $query->get()->map(function (PersonaIngresoSalida $registro) {
+                $persona = $registro->persona;
+
+                return [
+                    'persona_id' => $registro->persona_id,
+                    'nombre' => $persona ? trim($persona->primer_nombre . ' ' . ($persona->segundo_nombre ?? '')) : null,
+                    'apellidos' => $persona ? trim($persona->primer_apellido . ' ' . ($persona->segundo_apellido ?? '')) : null,
+                    'sede' => $registro->sede?->sede,
+                    'hora_entrada' => optional($registro->timestamp_entrada)->format('H:i:s'),
+                    'hora_salida' => optional($registro->timestamp_salida)->format('H:i:s'),
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'fecha' => $fecha,
+                    'sede_id' => $validated['sede_id'] ?? null,
+                    'registros' => $registros,
+                ],
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error obteniendo registros diarios: ' . $e->getMessage());
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener registros diarios',
+            ], 500);
+        }
+    }
+
+    /**
      * Obtener estadísticas por fecha
      */
     public function estadisticasPorFecha(Request $request): JsonResponse
@@ -247,6 +317,39 @@ class PersonaIngresoSalidaController extends Controller
                 'message' => self::ERROR_ESTADISTICAS,
             ], 500);
         }
+    }
+
+    /**
+     * @param PersonaIngresoSalida $registro
+     * @param string $tipo
+     * @return array<string,mixed>
+     */
+    private function buildVisitantePayload(PersonaIngresoSalida $registro, string $tipo): array
+    {
+        $persona = $registro->persona;
+        $nombre = $persona
+            ? trim(sprintf(
+                '%s %s %s %s',
+                $persona->primer_nombre,
+                $persona->segundo_nombre,
+                $persona->primer_apellido,
+                $persona->segundo_apellido
+            ))
+            : null;
+
+        $rolNombre = $persona?->user?->roles?->first()?->name;
+
+        return [
+            'id' => $persona?->id ?? $registro->persona_id,
+            'nombre' => $nombre ?: 'SIN NOMBRE',
+            'documento' => $persona->numero_documento ?? null,
+            'rol' => $rolNombre ?? 'SIN ROL',
+            'sede' => $registro->sede?->sede,
+            'ambiente' => null,
+            'hora_entrada' => optional($registro->timestamp_entrada)->toIso8601String(),
+            'hora_salida' => optional($registro->timestamp_salida)->toIso8601String(),
+            'tipo' => $tipo,
+        ];
     }
 }
 

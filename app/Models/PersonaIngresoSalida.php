@@ -52,14 +52,6 @@ class PersonaIngresoSalida extends Model
     }
 
     /**
-     * Relación con Ambiente
-     */
-    public function ambiente(): BelongsTo
-    {
-        return $this->belongsTo(Ambiente::class, 'ambiente_id');
-    }
-
-    /**
      * Relación con User que creó el registro
      */
     public function userCreatedBy(): BelongsTo
@@ -106,18 +98,6 @@ class PersonaIngresoSalida extends Model
     public function scopeDentro($query)
     {
         return $query->whereNull('timestamp_salida');
-    }
-
-    /**
-     * Scope para filtrar por tipo de persona
-     */
-    public function scopePorTipo($query, string $tipo)
-    {
-        if (!Schema::hasColumn($this->getTable(), 'tipo_persona')) {
-            return $query;
-        }
-
-        return $query->where('tipo_persona', $tipo);
     }
 
     /**

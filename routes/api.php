@@ -411,3 +411,4 @@ Route::get('/presencia/estadisticas/hoy', [\App\Http\Controllers\PersonaIngresoS
 Route::get('/presencia/personas-dentro', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'personasDentro']);
 Route::get('/presencia/estadisticas/fecha', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'estadisticasPorFecha']);
 Route::get('/presencia/estadisticas/sede/{sedeId}', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'estadisticasPorSede']);
+Route::get('/presencia/registros-diarios', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'registrosDiarios']);
