@@ -17,9 +17,11 @@ use App\Http\Requests\UpdatePersonaRoleRequest;
 use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 
@@ -523,6 +525,43 @@ class PersonaController extends Controller
             return redirect()
                 ->back()
                 ->with('error', 'No se pudo actualizar el rol de la persona.');
+        }
+    }
+
+    public function resetPassword(Persona $persona): RedirectResponse
+    {
+        if (!$persona->user) {
+            return redirect()
+                ->back()
+                ->with('error', 'La persona no tiene un usuario asociado.');
+        }
+
+        if (empty($persona->numero_documento)) {
+            return redirect()
+                ->back()
+                ->with('error', 'La persona no tiene número de documento registrado.');
+        }
+
+        try {
+            DB::transaction(static function () use ($persona): void {
+                $documento = (string) $persona->numero_documento;
+                $persona->user->forceFill([
+                    'password' => Hash::make($documento),
+                ])->save();
+            });
+
+            return redirect()
+                ->back()
+                ->with('success', 'Contraseña restablecida correctamente.');
+        } catch (\Throwable $exception) {
+            Log::error('Error al restablecer contraseña de persona', [
+                'persona_id' => $persona->id,
+                'error' => $exception->getMessage(),
+            ]);
+
+            return redirect()
+                ->back()
+                ->with('error', 'No se pudo restablecer la contraseña.');
         }
     }
 

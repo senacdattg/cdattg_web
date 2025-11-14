@@ -102,6 +102,7 @@ class RolePermissionSeeder extends Seeder
             'EDITAR PERSONA',
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+            'RESTABLECER PASSWORD',
             // Permisos para inventario
             // Productos
             'CREAR PRODUCTO',
@@ -248,6 +249,7 @@ class RolePermissionSeeder extends Seeder
             'VER PERSONA',
             'EDITAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+            'RESTABLECER PASSWORD',
 
             // Permisos para redes de conocimiento
             'CREAR RED CONOCIMIENTO',

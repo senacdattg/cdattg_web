@@ -20,6 +20,8 @@ Route::resource('personas', PersonaController::class);
 
 Route::middleware('can:ASIGNAR PERMISOS')->patch('/personas/{persona}/rol', [PersonaController::class, 'updateRole'])->name('personas.update-role');
 
+Route::middleware('can:RESTABLECER PASSWORD')->post('/personas/{persona}/reset-password', [PersonaController::class, 'resetPassword'])->name('personas.reset-password');
+
 Route::middleware('can:CAMBIAR ESTADO PERSONA')->group(function () {
     Route::put('/personas/{id}/cambiarEstadoPersona', [PersonaController::class, 'cambiarEstadoPersona'])->name('persona.cambiarEstadoPersona');
 });
