@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PersonaIngresoSalida;
 use App\Services\PersonaIngresoSalidaService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Schema;
 
 class PersonaIngresoSalidaController extends Controller
 {
+    private const ERROR_ESTADISTICAS = 'Error al obtener estadísticas';
+
     protected PersonaIngresoSalidaService $personaIngresoSalidaService;
 
     public function __construct(PersonaIngresoSalidaService $personaIngresoSalidaService)
@@ -23,16 +26,30 @@ class PersonaIngresoSalidaController extends Controller
     public function registrarEntrada(Request $request): JsonResponse
     {
         try {
-            $validated = $request->validate([
+            $rules = [
                 'persona_id' => 'required|integer|exists:personas,id',
                 'sede_id' => 'required|integer|exists:sedes,id',
-                'rol_id' => 'required|integer|exists:roles,id',
-            ]);
+                'rol_id' => 'nullable|integer|exists:roles,id',
+                'observaciones' => 'nullable|string|max:1000',
+            ];
+
+            if (Schema::hasColumn('persona_ingreso_salida', 'ambiente_id')) {
+                $rules['ambiente_id'] = 'nullable|integer|exists:ambientes,id';
+            }
+
+            if (Schema::hasColumn('persona_ingreso_salida', 'ficha_caracterizacion_id')) {
+                $rules['ficha_caracterizacion_id'] = 'nullable|integer|exists:fichas_caracterizacion,id';
+            }
+
+            $validated = $request->validate($rules);
 
             $registro = $this->personaIngresoSalidaService->registrarEntrada(
                 $validated['persona_id'],
                 $validated['sede_id'],
-                $validated['rol_id']
+                $validated['rol_id'] ?? null,
+                $validated['ambiente_id'] ?? null,
+                $validated['ficha_caracterizacion_id'] ?? null,
+                $validated['observaciones'] ?? null
             );
 
             $relaciones = ['persona', 'sede'];
@@ -70,15 +87,25 @@ class PersonaIngresoSalidaController extends Controller
                 'observaciones' => 'nullable|string|max:1000',
             ]);
 
-            $this->personaIngresoSalidaService->registrarSalida(
+            /** @var PersonaIngresoSalida $registro */
+            $registro = $this->personaIngresoSalidaService->registrarSalida(
                 $validated['persona_id'],
                 $validated['sede_id'],
                 $validated['observaciones'] ?? null
             );
 
+            $relaciones = ['persona', 'sede'];
+            if (Schema::hasColumn('persona_ingreso_salida', 'ambiente_id')) {
+                $relaciones[] = 'ambiente';
+            }
+            if (Schema::hasColumn('persona_ingreso_salida', 'ficha_caracterizacion_id')) {
+                $relaciones[] = 'fichaCaracterizacion';
+            }
+
             return response()->json([
                 'success' => true,
                 'message' => 'Salida registrada correctamente',
+                'data' => $registro->load($relaciones),
             ], 200);
         } catch (\Exception $e) {
             Log::error('Error registrando salida: ' . $e->getMessage());
@@ -111,7 +138,7 @@ class PersonaIngresoSalidaController extends Controller
             
             return response()->json([
                 'success' => false,
-                'message' => 'Error al obtener estadísticas',
+                'message' => self::ERROR_ESTADISTICAS,
             ], 500);
         }
     }
@@ -137,7 +164,7 @@ class PersonaIngresoSalidaController extends Controller
             
             return response()->json([
                 'success' => false,
-                'message' => 'Error al obtener estadísticas',
+                'message' => self::ERROR_ESTADISTICAS,
             ], 500);
         }
     }
@@ -195,7 +222,7 @@ class PersonaIngresoSalidaController extends Controller
             
             return response()->json([
                 'success' => false,
-                'message' => 'Error al obtener estadísticas',
+                'message' => self::ERROR_ESTADISTICAS,
             ], 500);
         }
     }
@@ -217,7 +244,7 @@ class PersonaIngresoSalidaController extends Controller
             
             return response()->json([
                 'success' => false,
-                'message' => 'Error al obtener estadísticas',
+                'message' => self::ERROR_ESTADISTICAS,
             ], 500);
         }
     }
