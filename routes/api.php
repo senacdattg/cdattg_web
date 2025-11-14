@@ -76,6 +76,17 @@ Route::middleware(['web', 'auth', 'can:ASIGNAR PERMISOS'])->group(function () {
 });
 
 // ==========================================
+// ROLES - GESTIÓN EN TIEMPO REAL
+// ==========================================
+
+Route::middleware(['web', 'auth', 'role:SUPER ADMINISTRADOR'])->group(function () {
+    Route::post('/roles/asignar/{userId}/{roleName}', [PermisoController::class, 'asignarRol'])
+        ->name('api.roles.asignar');
+    Route::delete('/roles/remover/{userId}/{roleName}', [PermisoController::class, 'removerRol'])
+        ->name('api.roles.remover');
+});
+
+// ==========================================
 // FICHAS DE CARACTERIZACIÓN - GENERALES
 // ==========================================
 
