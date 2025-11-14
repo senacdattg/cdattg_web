@@ -205,6 +205,10 @@ class PersonaController extends Controller
                 'userUpdatedBy.persona'
             ]);
 
+            $rolesAsignados = $persona->user?->roles
+                ? $persona->user->roles->pluck('name')->unique()->values()
+                : collect();
+
             $rolesDisponibles = $user->can(self::PERMISSION_ASSIGN_PERMISSIONS)
                 ? Role::orderBy('name')->get()
                 : collect();
@@ -213,6 +217,7 @@ class PersonaController extends Controller
                 'persona' => $persona,
                 'soloPerfil' => false,
                 'rolesDisponibles' => $rolesDisponibles,
+                'rolesAsignados' => $rolesAsignados,
             ]);
         }
 
@@ -235,10 +240,15 @@ class PersonaController extends Controller
                 'user.roles',
             ]);
 
+            $rolesAsignados = $persona->user?->roles
+                ? $persona->user->roles->pluck('name')->unique()->values()
+                : collect();
+
             return view('personas.show', [
                 'persona' => $persona,
                 'soloPerfil' => true,
                 'rolesDisponibles' => collect(),
+                'rolesAsignados' => $rolesAsignados,
             ]);
         }
 
@@ -505,20 +515,25 @@ class PersonaController extends Controller
                 ->with('error', 'La persona no tiene un usuario asociado.');
         }
 
-        $roleName = $request->validated()['role'];
+        $rolesSeleccionados = collect($request->validated()['roles'] ?? [])
+            ->map(static fn(string $role) => trim($role))
+            ->filter(static fn(string $role) => $role !== '')
+            ->unique()
+            ->values();
 
         try {
-            DB::transaction(static function () use ($persona, $roleName) {
-                $persona->user->syncRoles([$roleName]);
+            DB::transaction(static function () use ($persona, $rolesSeleccionados) {
+                $user = $persona->user;
+                $user->syncRoles($rolesSeleccionados->all());
             });
 
             return redirect()
                 ->route('personas.show', $persona->id)
-                ->with('success', 'Rol actualizado correctamente.');
+                ->with('success', 'Roles actualizados correctamente.');
         } catch (\Throwable $exception) {
             Log::error('Error al actualizar el rol de la persona', [
                 'persona_id' => $persona->id,
-                'role' => $roleName,
+                'roles' => $rolesSeleccionados->all(),
                 'error' => $exception->getMessage(),
             ]);
 

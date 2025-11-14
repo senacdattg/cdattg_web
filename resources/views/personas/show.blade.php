@@ -51,11 +51,17 @@
                             <h3 class="profile-username font-weight-bold">{{ $persona->nombre_completo }}</h3>
 
                             @php
-                                $rolesPersona = $persona->user?->getRoleNames();
+                                $rolesPersona = ($rolesAsignados ?? collect())->sort()->values();
                             @endphp
                             <div class="mb-3">
-                                @if ($rolesPersona && $rolesPersona->isNotEmpty())
-                                    <p class="text-muted mb-0">{{ $rolesPersona->implode(', ') }}</p>
+                                @if ($rolesPersona->isNotEmpty())
+                                    <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                        @foreach ($rolesPersona as $rol)
+                                            <span class="badge badge-info text-white px-3 py-2 mr-2 mb-2">
+                                                <i class="fas fa-user-tag mr-1"></i>{{ $rol }}
+                                            </span>
+                                        @endforeach
+                                    </div>
                                 @else
                                     <span class="badge badge-warning text-dark px-3 py-2">
                                         <i class="fas fa-exclamation-triangle mr-1"></i>Sin roles asignados
@@ -390,51 +396,60 @@
                                     <div class="col-12">
                                         <hr class="mt-4 mb-4">
                                         @php
-                                            $rolesActuales = $persona->user ? $persona->user->roles->pluck('name')->toArray() : [];
-                                            $rolSeleccionado = $rolesActuales[0] ?? null;
+                                            $rolesActuales = isset($rolesAsignados) ? $rolesAsignados : collect();
                                         @endphp
-                                        <div class="d-flex justify-content-between align-items-center mb-3">
-                                            <span class="text-muted text-uppercase small">Rol actual</span>
-                                            <div>
-                                                @forelse ($rolesActuales as $rol)
-                                                    <span class="badge badge-primary mr-1">{{ $rol }}</span>
-                                                @empty
-                                                    <span class="badge badge-warning text-dark">Sin rol asignado</span>
-                                                @endforelse
-                                            </div>
-                                        </div>
-                                        @if ($persona->user)
-                                            @if ($rolesDisponibles->isEmpty())
-                                                <div class="alert alert-warning mb-0">
-                                                    No hay roles disponibles para asignar.
-                                                </div>
-                                            @else
-                                                <form method="POST" action="{{ route('personas.update-role', $persona) }}">
-                                                    @csrf
-                                                    @method('PATCH')
-                                                    <div class="form-group mb-3">
-                                                        <label for="role" class="small text-muted text-uppercase d-block">Actualizar rol</label>
-                                                        <select id="role" name="role" class="form-control @error('role') is-invalid @enderror">
-                                                            <option value="">Seleccione una opción</option>
-                                                            @foreach ($rolesDisponibles as $rol)
-                                                                <option value="{{ $rol->name }}" {{ $rolSeleccionado === $rol->name ? 'selected' : '' }}>
-                                                                    {{ $rol->name }}
-                                                                </option>
-                                                            @endforeach
-                                                        </select>
-                                                        @error('role')
-                                                            <div class="invalid-feedback d-block">
-                                                                {{ $message }}
+                                            @if ($persona->user)
+                                            <form method="POST" action="{{ route('personas.update-role', $persona) }}">
+                                                @csrf
+                                                @method('PATCH')
+                                                <div class="form-group mb-3">
+                                                    <label class="small text-muted text-uppercase d-block mb-2">Seleccionar roles</label>
+                                                    <div class="row">
+                                                        @forelse ($rolesDisponibles as $rol)
+                                                            @php
+                                                                $inputId = 'role-' . \Illuminate\Support\Str::slug($rol->name);
+                                                                $asignado = $rolesActuales->contains($rol->name);
+                                                            @endphp
+                                                            <div class="col-md-6 mb-2">
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        class="custom-control-input"
+                                                                        id="{{ $inputId }}"
+                                                                        name="roles[]"
+                                                                        value="{{ $rol->name }}"
+                                                                        @if ($asignado) checked @endif
+                                                                    >
+                                                                    <label class="custom-control-label" for="{{ $inputId }}">
+                                                                        {{ $rol->name }}
+                                                                    </label>
+                                                                </div>
                                                             </div>
-                                                        @enderror
+                                                        @empty
+                                                            <div class="col-12">
+                                                                <div class="alert alert-warning mb-0">
+                                                                    No hay roles disponibles en el sistema.
+                                                                </div>
+                                                            </div>
+                                                        @endforelse
                                                     </div>
-                                                    <div class="d-flex justify-content-end">
-                                                        <button type="submit" class="btn btn-primary">
-                                                            <i class="fas fa-sync-alt mr-1"></i>Actualizar rol
-                                                        </button>
-                                                    </div>
-                                                </form>
-                                            @endif
+                                                    @error('roles')
+                                                        <div class="invalid-feedback d-block">
+                                                            {{ $message }}
+                                                        </div>
+                                                    @enderror
+                                                    @error('roles.*')
+                                                        <div class="invalid-feedback d-block">
+                                                            {{ $message }}
+                                                        </div>
+                                                    @enderror
+                                                </div>
+                                                <div class="d-flex justify-content-end">
+                                                    <button type="submit" class="btn btn-primary" @if ($rolesDisponibles->isEmpty()) disabled @endif>
+                                                        <i class="fas fa-user-edit mr-1"></i>Actualizar roles
+                                                    </button>
+                                                </div>
+                                            </form>
                                         @else
                                             <div class="alert alert-warning mb-0">
                                                 La persona no tiene usuario asociado.

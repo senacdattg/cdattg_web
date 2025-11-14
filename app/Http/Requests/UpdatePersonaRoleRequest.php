@@ -15,8 +15,11 @@ class UpdatePersonaRoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'role' => [
-                'required',
+            'roles' => [
+                'nullable',
+                'array',
+            ],
+            'roles.*' => [
                 'string',
                 Rule::exists('roles', 'name'),
             ],
@@ -26,8 +29,8 @@ class UpdatePersonaRoleRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'role.required' => 'Debes seleccionar un rol.',
-            'role.exists' => 'El rol seleccionado no es válido.',
+            'roles.array' => 'La selección de roles no es válida.',
+            'roles.*.exists' => 'Alguno de los roles seleccionados no es válido.',
         ];
     }
 }
