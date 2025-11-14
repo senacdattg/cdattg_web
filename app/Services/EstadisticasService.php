@@ -96,7 +96,7 @@ class EstadisticasService
                     'inactivos' => $aspiranteUsers->where('status', false)->count(),
                 ],
             ],
-            'asistencias_hoy' => \App\Models\AsistenciaAprendiz::whereDate('created_at', today())->count(),
+            'asistencias_hoy' => $this->personaIngresoSalidaService->obtenerEstadisticasPersonasDentroHoy()['total'],
             // Estadísticas de personas dentro del edificio (en tiempo real)
             'personas_dentro' => $this->personaIngresoSalidaService->obtenerEstadisticasPersonasDentro(),
         ];
