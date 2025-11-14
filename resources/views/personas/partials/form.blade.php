@@ -623,7 +623,15 @@
         </div>
     </div>
 
-    @if ($isEdit)
+@php
+    $usuarioAutenticado = auth()->user();
+    $rolesRestringidos = ['ASPIRANTE', 'APRENDIZ', 'VISITANTE'];
+    $mostrarResumen = $isEdit
+        && $usuarioAutenticado
+        && !$usuarioAutenticado->hasAnyRole($rolesRestringidos);
+@endphp
+
+@if ($mostrarResumen)
         <div class="col-lg-4">
             @php
                 $estadoLabel = $persona->status === 1 ? 'Activo' : 'Inactivo';

@@ -22,6 +22,21 @@
         </a>
     @endcan
 
+    @can('RESTABLECER PASSWORD')
+        <form class="d-inline reset-password-form"
+              action="{{ route('personas.reset-password', $persona->id) }}"
+              method="POST"
+              title="Restablecer contraseña"
+              style="display: inline-block; margin-right: 2px;"
+              data-persona-nombre="{{ $persona->nombre_completo }}"
+              data-numero-documento="{{ $persona->numero_documento }}">
+            @csrf
+            <button type="submit" class="btn btn-sm btn-light">
+                <i class="fas fa-key text-secondary"></i>
+            </button>
+        </form>
+    @endcan
+
     @can('EDITAR PERSONA')
         <a href="{{ route('personas.edit', $persona->id) }}"
            class="btn btn-sm btn-light"

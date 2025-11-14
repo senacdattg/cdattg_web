@@ -461,6 +461,39 @@
                     }
                 });
             });
+
+            $(document).on('submit', '.reset-password-form', function(e) {
+                const $form = $(this);
+
+                if ($form.data('confirmed')) {
+                    return true;
+                }
+
+                e.preventDefault();
+                const personaNombre = $form.data('persona-nombre');
+                const numeroDocumento = $form.data('numero-documento');
+
+                const nombreSeguro = $('<div>').text(personaNombre).html();
+                const documentoSeguro = $('<div>').text(numeroDocumento).html();
+
+                Swal.fire({
+                    title: 'Restablecer contraseña',
+                    html: `¿Deseas restablecer la contraseña de <strong>${nombreSeguro}</strong>?<br>` +
+                        `<small>La nueva contraseña será su número de documento: <strong>${documentoSeguro}</strong></small>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fas fa-key mr-1"></i> Sí, restablecer',
+                    cancelButtonText: '<i class="fas fa-times mr-1"></i> Cancelar',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        $form.data('confirmed', true);
+                        $form.submit();
+                    }
+                });
+            });
         });
     </script>
 @endsection

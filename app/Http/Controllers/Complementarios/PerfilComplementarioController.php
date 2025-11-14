@@ -49,6 +49,14 @@ class PerfilComplementarioController extends Controller
         $tiposDocumento = $this->complementarioService->getTiposDocumento();
         $generos = $this->complementarioService->getGeneros();
 
-        return view('personas.show', compact('persona', 'aspirantes', 'user', 'tiposDocumento', 'generos'));
+        return view('personas.show', [
+            'persona' => $persona,
+            'aspirantes' => $aspirantes,
+            'user' => $user,
+            'tiposDocumento' => $tiposDocumento,
+            'generos' => $generos,
+            'soloPerfil' => true,
+            'rolesDisponibles' => collect(),
+        ]);
     }
 }

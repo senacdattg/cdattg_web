@@ -102,6 +102,7 @@ class RolePermissionSeeder extends Seeder
             'EDITAR PERSONA',
             'ELIMINAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+            'RESTABLECER PASSWORD',
             // Permisos para inventario
             // Productos
             'CREAR PRODUCTO',
@@ -248,6 +249,7 @@ class RolePermissionSeeder extends Seeder
             'VER PERSONA',
             'EDITAR PERSONA',
             'CAMBIAR ESTADO PERSONA',
+            'RESTABLECER PASSWORD',
 
             // Permisos para redes de conocimiento
             'CREAR RED CONOCIMIENTO',
@@ -317,11 +319,13 @@ class RolePermissionSeeder extends Seeder
         $aspirante->syncPermissions([
             'VER PROGRAMA COMPLEMENTARIO',
             'VER PERFIL', // Solo pueden ver su propio perfil
+            'EDITAR PERSONA',
         ]);
 
         // Asignar permisos al rol VISITANTE
         $visitante->givePermissionTo([
             'VER PERFIL',
+            'EDITAR PERSONA',
         ]);
         // Asignar permisos al rol APRENDIZ
         // Los aprendices tienen acceso limitado solo a consultar su propia información
@@ -339,6 +343,7 @@ class RolePermissionSeeder extends Seeder
             // 'VER NOTIFICACION',
             'VER TALENTO HUMANO',
             'VER PERFIL',
+            'EDITAR PERSONA',
         ]);
     }
 }
