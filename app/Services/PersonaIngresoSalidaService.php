@@ -7,6 +7,7 @@ use App\Models\Persona;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class PersonaIngresoSalidaService
 {
@@ -62,12 +63,13 @@ class PersonaIngresoSalidaService
     public function registrarEntrada(
         int $personaId,
         int $sedeId,
+        int $rolId,
         ?int $ambienteId = null,
         ?int $fichaCaracterizacionId = null,
         ?string $observaciones = null,
         ?int $userId = null
     ): PersonaIngresoSalida {
-        return DB::transaction(function () use ($personaId, $sedeId, $ambienteId, $fichaCaracterizacionId, $observaciones, $userId) {
+        return DB::transaction(function () use ($personaId, $sedeId, $rolId, $ambienteId, $userId) {
             // Verificar si ya tiene un registro abierto (entrada sin salida) en esta sede
             $registroAbierto = PersonaIngresoSalida::where('persona_id', $personaId)
                 ->where('sede_id', $sedeId)
@@ -85,22 +87,20 @@ class PersonaIngresoSalidaService
             $now = Carbon::now();
 
             // Crear registro de entrada
-            $registro = PersonaIngresoSalida::create([
+            $data = [
                 'persona_id' => $personaId,
                 'sede_id' => $sedeId,
-                'tipo_persona' => $tipoPersona,
+                'rol_id' => $rolId,
                 'fecha_entrada' => $now->format('Y-m-d'),
                 'hora_entrada' => $now->format('H:i:s'),
                 'timestamp_entrada' => $now,
-                'ambiente_id' => $ambienteId,
-                'ficha_caracterizacion_id' => $fichaCaracterizacionId,
-                'observaciones' => $observaciones,
                 'user_create_id' => $userId ?? auth()->id(),
-            ]);
+            ];
+
+            $registro = PersonaIngresoSalida::create($data);
 
             Log::info('Entrada registrada', [
                 'registro_id' => $registro->id,
-                'persona_id' => $personaId,
                 'sede_id' => $sedeId,
                 'tipo_persona' => $tipoPersona,
                 'timestamp' => $now->toISOString(),

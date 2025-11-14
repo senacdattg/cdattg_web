@@ -6,6 +6,7 @@ use App\Services\PersonaIngresoSalidaService;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class PersonaIngresoSalidaController extends Controller
 {
@@ -25,23 +26,27 @@ class PersonaIngresoSalidaController extends Controller
             $validated = $request->validate([
                 'persona_id' => 'required|integer|exists:personas,id',
                 'sede_id' => 'required|integer|exists:sedes,id',
-                'ambiente_id' => 'nullable|integer|exists:ambientes,id',
-                'ficha_caracterizacion_id' => 'nullable|integer|exists:fichas_caracterizacion,id',
-                'observaciones' => 'nullable|string|max:1000',
+                'rol_id' => 'required|integer|exists:roles,id',
             ]);
 
             $registro = $this->personaIngresoSalidaService->registrarEntrada(
                 $validated['persona_id'],
                 $validated['sede_id'],
-                $validated['ambiente_id'] ?? null,
-                $validated['ficha_caracterizacion_id'] ?? null,
-                $validated['observaciones'] ?? null
+                $validated['rol_id']
             );
+
+            $relaciones = ['persona', 'sede'];
+            if (Schema::hasColumn('persona_ingreso_salida', 'ambiente_id')) {
+                $relaciones[] = 'ambiente';
+            }
+            if (Schema::hasColumn('persona_ingreso_salida', 'ficha_caracterizacion_id')) {
+                $relaciones[] = 'fichaCaracterizacion';
+            }
 
             return response()->json([
                 'success' => true,
                 'message' => 'Entrada registrada correctamente',
-                'data' => $registro->load(['persona', 'sede', 'ambiente', 'fichaCaracterizacion']),
+                'data' => $registro->load($relaciones),
             ], 201);
         } catch (\Exception $e) {
             Log::error('Error registrando entrada: ' . $e->getMessage());

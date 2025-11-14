@@ -343,6 +343,19 @@ class TalentoHumanoManager {
             }
         });
 
+        const rolInput = document.getElementById('rol_persona');
+        if (rolInput) {
+            const rolId =
+                data?.user?.role?.id ??
+                data?.user?.role_id ??
+                data?.rol_persona_id ??
+                data?.rol_id ??
+                data?.role_id ??
+                '';
+            rolInput.value = Number.isFinite(Number.parseInt(rolId, 10)) ? rolId : '';
+            rolInput.name = 'rol_persona_id';
+        }
+
         // Cargar ubicación con soporte dinámico
         const handler = window.selectDinamicoHandler;
         const paisSelect = $('#pais_id');
@@ -513,6 +526,12 @@ class TalentoHumanoManager {
             input.disabled = false;
             input.readOnly = false;
         });
+
+        form.querySelectorAll('input[type="hidden"]').forEach(input => {
+            if (['persona_id', 'rol_persona'].includes(input.id)) {
+                input.value = '';
+            }
+        });
     }
 
     limpiarTodo() {
@@ -557,9 +576,37 @@ class TalentoHumanoManager {
 
     async ejecutarRegistro() {
         const sedeId = this.elements.selectSedeModal.value;
+        // Constante para obtener una variable oculta del form (ejemplo: rol_id)
+        const rolInput =
+            this.elements.personaForm.querySelector('input[name="rol_persona"]') ||
+            this.elements.personaForm.querySelector('input[name="rol_persona_id"]');
+        const rolIdValue = rolInput?.value?.trim() ?? '';
+        const rolFallback = this.currentPersona
+            ? (
+                this.currentPersona.user?.role?.id ??
+                this.currentPersona.user?.role_id ??
+                this.currentPersona.rol_persona_id ??
+                this.currentPersona.rol_id ??
+                this.currentPersona.role_id ??
+                ''
+            )
+            : '';
+        const rawRolId = rolIdValue || (typeof rolFallback === 'number' ? rolFallback.toString() : `${rolFallback || ''}`);
 
         if (!sedeId) {
             this.mostrarAlerta('warning', 'Atención', 'Debe seleccionar una sede');
+            return;
+        }
+
+        if (!rawRolId.trim()) {
+            this.mostrarAlerta('error', 'Error', 'No se encontró el rol asociado a la persona');
+            return;
+        }
+
+        const rolId = Number.parseInt(rawRolId, 10);
+
+        if (Number.isNaN(rolId)) {
+            this.mostrarAlerta('error', 'Error', 'El rol asociado a la persona es inválido');
             return;
         }
 
@@ -587,7 +634,9 @@ class TalentoHumanoManager {
 
             const data = {
                 persona_id: personaId,
-                sede_id: parseInt(sedeId)
+                sede_id: parseInt(sedeId),
+                rol_id: rolId
+
             };
 
             const response = await axios.post(endpoint, data);
