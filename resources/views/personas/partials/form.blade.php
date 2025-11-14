@@ -98,7 +98,7 @@
                 <div class="row">
                     <div class="col-md-6 mb-4">
                         <label for="tipo_documento" class="form-label font-weight-bold">
-                            Tipo de documento
+                            Tipo de documento <span class="text-danger">*</span>
                         </label>
                         <select name="tipo_documento" id="tipo_documento"
                             class="form-control @error('tipo_documento') is-invalid @enderror" required>
@@ -121,7 +121,7 @@
                     </div>
                     <div class="col-md-6 mb-4">
                         <label for="numero_documento" class="form-label font-weight-bold">
-                            Número de documento
+                            Número de documento <span class="text-danger">*</span>
                         </label>
                         <input type="text" id="numero_documento" name="numero_documento"
                             class="form-control @error('numero_documento') is-invalid @enderror"
@@ -133,7 +133,7 @@
                     </div>
                     <div class="col-md-6 mb-4">
                         <label for="primer_nombre" class="form-label font-weight-bold">
-                            Primer nombre
+                            Primer nombre <span class="text-danger">*</span>
                         </label>
                         <input type="text" id="primer_nombre" name="primer_nombre"
                             class="form-control @error('primer_nombre') is-invalid @enderror"
@@ -155,7 +155,7 @@
                     </div>
                     <div class="col-md-6 mb-4">
                         <label for="primer_apellido" class="form-label font-weight-bold">
-                            Primer apellido
+                            Primer apellido <span class="text-danger">*</span>
                         </label>
                         <input type="text" id="primer_apellido" name="primer_apellido"
                             class="form-control @error('primer_apellido') is-invalid @enderror"
@@ -177,7 +177,7 @@
                     </div>
                     <div class="col-md-6 mb-4">
                         <label for="fecha_nacimiento" class="form-label font-weight-bold">
-                            Fecha de nacimiento
+                            Fecha de nacimiento <span class="text-danger">*</span>
                         </label>
                         <input type="date" id="fecha_nacimiento" name="fecha_nacimiento"
                             class="form-control @error('fecha_nacimiento') is-invalid @enderror"
@@ -190,7 +190,8 @@
                         @enderror
                     </div>
                     <div class="col-md-6 mb-4">
-                        <label for="genero" class="form-label font-weight-bold">Género</label>
+                        <label for="genero" class="form-label font-weight-bold">Género <span
+                                class="text-danger">*</span></label>
                         <select name="genero" id="genero" class="form-control @error('genero') is-invalid @enderror"
                             required>
                             @php
@@ -245,7 +246,7 @@
                     </div>
                     <div class="col-md-12 mb-0">
                         <label for="email" class="form-label font-weight-bold">
-                            Correo electrónico
+                            Correo electrónico <span class="text-danger">*</span>
                         </label>
                         <input type="email" id="email" name="email"
                             class="form-control @error('email') is-invalid @enderror"
@@ -268,7 +269,8 @@
             <div class="card-body pt-0">
                 <div class="row">
                     <div class="col-md-6 mb-4">
-                        <label for="pais_id" class="form-label font-weight-bold">País</label>
+                        <label for="pais_id" class="form-label font-weight-bold">País <span
+                                class="text-danger">*</span></label>
                         @php
                             $oldPaisId = old('pais_id', $isEdit ? $persona->pais_id : null);
                             $paisesEndpoint = \Illuminate\Support\Facades\Route::has('api.paises')
@@ -277,7 +279,7 @@
                         @endphp
                         <select name="pais_id" id="pais_id"
                             class="form-control @error('pais_id') is-invalid @enderror"
-                            data-initial-value="{{ $oldPaisId }}" data-url="{{ $paisesEndpoint }}">
+                            data-initial-value="{{ $oldPaisId }}" data-url="{{ $paisesEndpoint }}" required>
                             <option value="" disabled {{ $oldPaisId ? '' : 'selected' }}>
                                 Seleccione un país
                             </option>
@@ -293,12 +295,12 @@
                     </div>
                     <div class="col-md-6 mb-4">
                         <label for="departamento_id" class="form-label font-weight-bold">
-                            Departamento
+                            Departamento <span class="text-danger">*</span>
                         </label>
                         <select name="departamento_id" id="departamento_id"
                             class="form-control @error('departamento_id') is-invalid @enderror"
                             data-initial-value="{{ $oldDepartamentoId }}"
-                            data-url-template="{{ $departamentoUrlTemplate }}">
+                            data-url-template="{{ $departamentoUrlTemplate }}" required>
                             <option value="" disabled {{ $oldDepartamentoId ? '' : 'selected' }}>
                                 Seleccione un departamento
                             </option>
@@ -314,11 +316,12 @@
                         @enderror
                     </div>
                     <div class="col-md-6 mb-4">
-                        <label for="municipio_id" class="form-label font-weight-bold">Municipio</label>
+                        <label for="municipio_id" class="form-label font-weight-bold">Municipio <span
+                                class="text-danger">*</span></label>
                         <select name="municipio_id" id="municipio_id"
                             class="form-control @error('municipio_id') is-invalid @enderror"
                             data-initial-value="{{ $oldMunicipioId }}"
-                            data-url-template="{{ $municipioUrlTemplate }}">
+                            data-url-template="{{ $municipioUrlTemplate }}" required>
                             <option value="" disabled selected>
                                 Seleccione un municipio
                             </option>
