@@ -71,3 +71,127 @@
         </div>
     </div>
 @endsection
+
+@push('js')
+    {{-- Fix temporal para validación de registro - eliminar después de compilar assets --}}
+    <script>
+        console.log('🔧 [REGISTRO] Iniciando parche de validación...');
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('📄 [REGISTRO] DOM cargado');
+
+            const form = document.getElementById('registroForm');
+            if (!form) {
+                console.error('❌ [REGISTRO] Formulario #registroForm no encontrado');
+                return;
+            }
+
+            console.log('✅ [REGISTRO] Formulario encontrado');
+
+            // CLONAR el formulario para eliminar todos los event listeners previos
+            // Esto elimina la validación de formularios-select-dinamico.js
+            const nuevoForm = form.cloneNode(true);
+            form.parentNode.replaceChild(nuevoForm, form);
+            console.log('✅ [REGISTRO] Listeners antiguos eliminados');
+
+            nuevoForm.addEventListener('submit', function(e) {
+                console.log('🔍 [REGISTRO] Validando antes de enviar...');
+
+                const camposRequeridos = [{
+                        id: 'tipo_documento',
+                        nombre: 'Tipo de Documento'
+                    },
+                    {
+                        id: 'numero_documento',
+                        nombre: 'Número de Documento'
+                    },
+                    {
+                        id: 'primer_nombre',
+                        nombre: 'Primer Nombre'
+                    },
+                    {
+                        id: 'primer_apellido',
+                        nombre: 'Primer Apellido'
+                    },
+                    {
+                        id: 'fecha_nacimiento',
+                        nombre: 'Fecha de Nacimiento'
+                    },
+                    {
+                        id: 'genero',
+                        nombre: 'Género'
+                    },
+                    {
+                        id: 'email',
+                        nombre: 'Correo Electrónico'
+                    },
+                    {
+                        id: 'pais_id',
+                        nombre: 'País'
+                    },
+                    {
+                        id: 'departamento_id',
+                        nombre: 'Departamento'
+                    },
+                    {
+                        id: 'municipio_id',
+                        nombre: 'Municipio'
+                    }
+                ];
+
+                let valido = true;
+                let primerCampoInvalido = null;
+                let camposFaltantes = [];
+
+                camposRequeridos.forEach(campo => {
+                    const elemento = document.getElementById(campo.id);
+                    const valor = elemento ? elemento.value.trim() : '';
+
+                    console.log(`  ${campo.nombre}: ${valor ? '✅ OK' : '❌ VACÍO'}`);
+
+                    if (elemento && !valor) {
+                        elemento.classList.add('is-invalid');
+                        if (!primerCampoInvalido) {
+                            primerCampoInvalido = elemento;
+                        }
+                        camposFaltantes.push(campo.nombre);
+                        valido = false;
+                    } else if (elemento) {
+                        elemento.classList.remove('is-invalid');
+                    }
+                });
+
+                if (!valido) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    console.error('❌ [REGISTRO] Validación fallida. Campos faltantes:', camposFaltantes);
+
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Campos requeridos',
+                        html: '<strong>Complete todos los campos obligatorios marcados con *</strong><br><br>' +
+                            '<div style="text-align: left; color: #666;">Faltan:<br>' +
+                            camposFaltantes.map(c => '• ' + c).join('<br>') + '</div>',
+                        confirmButtonText: 'Entendido',
+                        confirmButtonColor: '#3085d6',
+                        allowOutsideClick: false
+                    });
+
+                    if (primerCampoInvalido) {
+                        setTimeout(() => {
+                            primerCampoInvalido.focus();
+                            primerCampoInvalido.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center'
+                            });
+                        }, 100);
+                    }
+                } else {
+                    console.log('✅ [REGISTRO] Validación exitosa, enviando formulario...');
+                }
+            });
+
+            console.log('✅✅✅ [REGISTRO] Validación configurada correctamente');
+        });
+    </script>
+@endpush

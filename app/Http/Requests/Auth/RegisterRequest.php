@@ -43,7 +43,7 @@ class RegisterRequest extends FormRequest
             ],
             'genero' => ['required', 'integer'],
             'telefono' => ['nullable', 'string', 'max:' . 7],
-            'celular' => ['required', 'string', 'max:' . 10],
+            'celular' => ['nullable', 'string', 'max:' . 10],
             'email' => [
                 'required',
                 'email',
@@ -54,7 +54,7 @@ class RegisterRequest extends FormRequest
             'pais_id' => ['required', 'exists:pais,id'],
             'departamento_id' => ['required', 'exists:departamentos,id'],
             'municipio_id' => ['required', 'exists:municipios,id'],
-            'direccion' => ['required', 'string', 'max:' . self::STRING_MAX_LENGTH],
+            'direccion' => ['nullable', 'string', 'max:' . self::STRING_MAX_LENGTH],
             'caracterizacion_ids' => ['required', 'array', 'min:1'],
             'caracterizacion_ids.*' => ['integer', 'exists:parametros,id'],
         ];

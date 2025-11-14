@@ -1,6 +1,25 @@
 import Swal from 'sweetalert2';
 
 document.addEventListener('DOMContentLoaded', () => {
+    const mostrarAlerta = (config = {}) => {
+        if (Swal && typeof Swal.fire === 'function') {
+            return Swal.fire(config);
+        }
+
+        const icon = config.icon ? `[${String(config.icon).toUpperCase()}] ` : '';
+        const title = config.title ?? '';
+        const message = config.text ?? config.html ?? '';
+
+        if (config.showCancelButton) {
+            const confirmado = window.confirm(`${icon}${title}\n\n${message}`);
+            return Promise.resolve({ isConfirmed: confirmado });
+        }
+
+        window.alert(`${icon}${title}\n\n${message}`);
+        return Promise.resolve({});
+    };
+
+    window.mostrarAlerta = mostrarAlerta;
     const form = document.getElementById('form-import-personas');
     const btnIniciar = document.getElementById('btn-iniciar-import');
     const panelProgreso = document.getElementById('panel-progreso');
@@ -13,6 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const contadorFaltantes = document.getElementById('contador-faltantes');
     const tablaIncidencias = document.getElementById('tabla-incidencias');
     const btnRecargarIncidencias = document.getElementById('btn-recargar-incidencias');
+    const btnDetenerImport = document.getElementById('btn-detener-import');
+    const selectImportacionActiva = document.getElementById('select-importacion-activa');
+    const urlDestroyTemplate = document.getElementById('url-import-destroy')?.value;
 
     const urlStore = document.getElementById('url-import-store')?.value;
     const urlStatusTemplate = document.getElementById('url-import-status')?.value;
@@ -20,20 +42,59 @@ document.addEventListener('DOMContentLoaded', () => {
     let pollingInterval = null;
     let currentImportId = null;
 
+    const obtenerCsrfToken = () => {
+        const metaToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (metaToken) {
+            return metaToken;
+        }
+
+        const inputToken = form?.querySelector('input[name="_token"]')?.value;
+        return inputToken ?? '';
+    };
+
     const inicializarProgreso = () => {
         panelProgreso?.classList.remove('d-none');
-        contadorProgreso.textContent = '0 / 0';
-        porcentajeProgreso.textContent = '0%';
-        barraProgreso.style.width = '0%';
-        estadoImportacion.textContent = 'PENDIENTE';
-        estadoImportacion.className = 'badge bg-secondary';
-        contadorExitosos.textContent = '0';
-        contadorDuplicados.textContent = '0';
-        contadorFaltantes.textContent = '0';
-        tablaIncidencias.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Sin incidencias registradas.</td></tr>';
+        if (contadorProgreso) contadorProgreso.textContent = '0 / 0';
+        if (porcentajeProgreso) porcentajeProgreso.textContent = '0%';
+        if (barraProgreso) barraProgreso.style.width = '0%';
+        if (estadoImportacion) {
+            estadoImportacion.textContent = 'PENDIENTE';
+            estadoImportacion.className = 'badge bg-secondary';
+        }
+        if (contadorExitosos) contadorExitosos.textContent = '0';
+        if (contadorDuplicados) contadorDuplicados.textContent = '0';
+        if (contadorFaltantes) contadorFaltantes.textContent = '0';
+        if (tablaIncidencias) {
+            tablaIncidencias.innerHTML = '<tr><td colspan="5" class="text-center text-muted py-3">Sin incidencias registradas.</td></tr>';
+        }
+    };
+
+    const actualizarControlesMonitoreo = (importId, status) => {
+        if (selectImportacionActiva) {
+            if (importId) {
+                let opcion = selectImportacionActiva.querySelector(`option[value="${importId}"]`);
+                if (!opcion) {
+                    opcion = document.createElement('option');
+                    opcion.value = importId;
+                    opcion.textContent = `#${importId}`;
+                    selectImportacionActiva.appendChild(opcion);
+                }
+                selectImportacionActiva.value = String(importId);
+                selectImportacionActiva.disabled = false;
+            } else {
+                selectImportacionActiva.value = '';
+            }
+        }
+
+        if (btnDetenerImport) {
+            const enProceso = status === 'processing' || status === 'pending';
+            btnDetenerImport.disabled = !(importId && enProceso);
+        }
     };
 
     const actualizarIncidencias = (issues) => {
+        if (!tablaIncidencias) return;
+
         const lista = Array.isArray(issues) ? issues : Object.values(issues ?? {});
         tablaIncidencias.innerHTML = '';
 
@@ -77,7 +138,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         estadoImportacion.textContent = statusLabels[status] || status.toUpperCase();
         estadoImportacion.className = 'badge';
-        
+
         if (status === 'completed') {
             estadoImportacion.classList.add('bg-success');
             barraProgreso.classList.remove('progress-bar-animated');
@@ -102,21 +163,28 @@ document.addEventListener('DOMContentLoaded', () => {
             btnRecargarIncidencias.disabled = false;
 
             if (status === 'failed' && datos.import.error_message) {
-                Swal.fire({
+                mostrarAlerta({
                     icon: 'error',
                     title: 'Importación fallida',
                     text: datos.import.error_message,
                 });
             } else if (status === 'completed') {
-                Swal.fire({
+                mostrarAlerta({
                     icon: 'success',
                     title: 'Importación finalizada',
                     text: 'El procesamiento del archivo ha concluido.',
                     timer: 2500,
                     showConfirmButton: false,
                 });
+
+                // Recargar la página después de la alerta para refrescar el historial
+                setTimeout(() => {
+                    window.location.reload();
+                }, 3000);
             }
         }
+
+        actualizarControlesMonitoreo(datos.import.id, status);
     };
 
     const detenerMonitoreo = () => {
@@ -128,6 +196,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const monitorearImportacion = (importId) => {
         currentImportId = importId;
+        actualizarControlesMonitoreo(importId, 'processing');
         const urlStatus = urlStatusTemplate.replace('__ID__', importId);
 
         const ejecutarConsulta = async () => {
@@ -146,7 +215,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 actualizarProgreso(datos);
             } catch (error) {
                 detenerMonitoreo();
-                Swal.fire({
+                mostrarAlerta({
                     icon: 'error',
                     title: 'Error de monitoreo',
                     text: error.message,
@@ -163,28 +232,30 @@ document.addEventListener('DOMContentLoaded', () => {
         event.preventDefault();
 
         if (!urlStore) {
-            Swal.fire({ icon: 'error', title: 'Configuración incompleta', text: 'No se encontró la ruta para importar.' });
+            mostrarAlerta({ icon: 'error', title: 'Configuración incompleta', text: 'No se encontró la ruta para importar.' });
             return;
         }
 
         const archivoInput = document.getElementById('archivo_excel');
         if (!archivoInput?.files?.length) {
-            Swal.fire({ icon: 'warning', title: 'Archivo requerido', text: 'Selecciona un archivo para continuar.' });
+            mostrarAlerta({ icon: 'warning', title: 'Archivo requerido', text: 'Selecciona un archivo para continuar.' });
             return;
         }
 
         const formData = new FormData(form);
         const tokenElement = form.querySelector('input[name="_token"]');
-        
+
         if (!tokenElement) {
-            Swal.fire({ icon: 'error', title: 'Error de seguridad', text: 'No se encontró el token CSRF. Por favor, recarga la página.' });
+            mostrarAlerta({ icon: 'error', title: 'Error de seguridad', text: 'No se encontró el token CSRF. Por favor, recarga la página.' });
             return;
         }
-        
+
         const token = tokenElement.value;
 
-        btnIniciar.disabled = true;
-        btnIniciar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Procesando...';
+        if (btnIniciar) {
+            btnIniciar.disabled = true;
+            btnIniciar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Procesando...';
+        }
 
         try {
             const respuesta = await fetch(urlStore, {
@@ -192,6 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'X-CSRF-TOKEN': token,
                     'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
                 },
                 body: formData,
             });
@@ -202,13 +274,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const data = await respuesta.json();
-            
+
             btnRecargarIncidencias.disabled = true;
             inicializarProgreso();
-            
-            Swal.fire({ 
-                icon: 'info', 
-                title: 'Importación iniciada', 
+            actualizarControlesMonitoreo(data.import_id, 'processing');
+
+            mostrarAlerta({
+                icon: 'info',
+                title: 'Importación iniciada',
                 text: 'El archivo se está procesando. El progreso se actualizará automáticamente.',
                 timer: 2000,
                 showConfirmButton: false
@@ -218,10 +291,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 monitorearImportacion(data.import_id);
             }, 500);
         } catch (error) {
-            Swal.fire({ icon: 'error', title: 'Error', text: error.message });
+            mostrarAlerta({ icon: 'error', title: 'Error', text: error.message });
         } finally {
-            btnIniciar.disabled = false;
-            btnIniciar.innerHTML = '<i class="fas fa-play"></i> Iniciar importación';
+            if (btnIniciar) {
+                btnIniciar.disabled = false;
+                btnIniciar.innerHTML = '<i class="fas fa-play"></i> Iniciar importación';
+            }
         }
     });
 
@@ -231,11 +306,87 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    selectImportacionActiva?.addEventListener('change', () => {
+        const seleccion = selectImportacionActiva.value;
+        if (!seleccion) {
+            return;
+        }
+
+        monitorearImportacion(seleccion);
+    });
+
+    btnDetenerImport?.addEventListener('click', async () => {
+        if (!currentImportId || !urlDestroyTemplate) {
+            return;
+        }
+
+        const csrfToken = obtenerCsrfToken();
+        if (!csrfToken) {
+            mostrarAlerta({
+                icon: 'error',
+                title: 'Token CSRF ausente',
+                text: 'No fue posible obtener el token de seguridad. Recarga la página e intenta de nuevo.',
+            });
+            return;
+        }
+
+        const confirmar = await mostrarAlerta({
+            icon: 'warning',
+            title: '¿Detener importación?',
+            text: 'Se cancelará el proceso y se eliminarán los registros asociados.',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, detener',
+            cancelButtonText: 'Cancelar',
+            reverseButtons: true,
+        });
+
+        if (!confirmar.isConfirmed) {
+            return;
+        }
+
+        try {
+            btnDetenerImport.disabled = true;
+            const respuesta = await fetch(urlDestroyTemplate.replace('__ID__', currentImportId), {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+
+            if (!respuesta.ok) {
+                const errorData = await respuesta.json().catch(() => ({}));
+                throw new Error(errorData.message || 'No fue posible detener la importación.');
+            }
+
+            detenerMonitoreo();
+            mostrarAlerta({
+                icon: 'success',
+                title: 'Importación detenida',
+                text: 'Se eliminó la importación y su historial.',
+                timer: 2000,
+                showConfirmButton: false,
+            });
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 1200);
+        } catch (error) {
+            mostrarAlerta({
+                icon: 'error',
+                title: 'Error',
+                text: error.message,
+            });
+            btnDetenerImport.disabled = false;
+        }
+    });
+
     document.querySelectorAll('.form-eliminar-import').forEach((form) => {
         form.addEventListener('submit', async (event) => {
             event.preventDefault();
 
-            const result = await Swal.fire({
+            const result = await mostrarAlerta({
                 icon: 'warning',
                 title: '¿Eliminar importación?',
                 text: 'Se eliminará el registro y el archivo cargado como evidencia.',

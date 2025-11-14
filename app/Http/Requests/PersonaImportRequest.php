@@ -33,11 +33,13 @@ class PersonaImportRequest extends FormRequest
             'archivo_excel' => [
                 'required',
                 'file',
-                'mimes:xlsx,xls,csv',
+                'mimes:xlsx,xls',
                 'max:' . self::MAX_FILE_SIZE_KB,
                 function (string $attribute, $value, $fail) {
                     /** @var \Illuminate\Http\UploadedFile|null $uploadedFile */
-                    $uploadedFile = $this->file($attribute);
+                    $uploadedFile = $value instanceof \Illuminate\Http\UploadedFile
+                        ? $value
+                        : $this->file($attribute);
 
                     $this->validateFileIntegrity($uploadedFile, $fail);
                 },
@@ -55,7 +57,7 @@ class PersonaImportRequest extends FormRequest
         return [
             'archivo_excel.required' => 'Debes seleccionar un archivo para importar.',
             'archivo_excel.file' => 'El archivo proporcionado no es válido.',
-            'archivo_excel.mimes' => 'El archivo debe ser de tipo Excel (.xlsx, .xls) o CSV.',
+            'archivo_excel.mimes' => 'El archivo debe ser de tipo Excel (.xlsx o .xls).',
             'archivo_excel.max' => "El archivo no debe superar los {$maxSizeMB}MB.",
         ];
     }

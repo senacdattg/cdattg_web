@@ -59,7 +59,7 @@ class UpdatePersonaRequest extends FormRequest
             'pais_id'             => 'required|exists:pais,id',
             'departamento_id'     => 'required|exists:departamentos,id',
             'municipio_id'        => 'required|exists:municipios,id',
-            'direccion'           => 'required|string|max:255',
+            'direccion'           => 'nullable|string|max:255',
             'caracterizacion_ids'   => 'nullable|array',
             'caracterizacion_ids.*' => 'integer|exists:parametros,id',
         ];

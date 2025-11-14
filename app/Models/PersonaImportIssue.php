@@ -17,6 +17,7 @@ class PersonaImportIssue extends Model
         'numero_documento',
         'email',
         'celular',
+        'error_message',
         'raw_payload',
     ];
 

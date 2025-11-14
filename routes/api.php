@@ -14,6 +14,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\MunicipioController;
 use App\Http\Controllers\ParametroController;
+use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\PisoController;
 use App\Http\Controllers\SedeController;
 use App\Http\Controllers\AsistenceQrController;
@@ -61,6 +62,28 @@ Route::post('authenticate', [LoginController::class, 'authenticate']);
 Route::post('logout', [LogoutController::class, 'logout']);
 Route::get('/user', function (Request $request) {
     return $request->user();
+});
+
+// ==========================================
+// PERMISOS - GESTIÓN EN TIEMPO REAL
+// ==========================================
+
+Route::middleware(['web', 'auth', 'can:ASIGNAR PERMISOS'])->group(function () {
+    Route::post('/permisos/asignar/{userId}/{permissionName}', [PermisoController::class, 'asignarPermiso'])
+        ->name('api.permisos.asignar');
+    Route::delete('/permisos/remover/{userId}/{permissionName}', [PermisoController::class, 'removerPermiso'])
+        ->name('api.permisos.remover');
+});
+
+// ==========================================
+// ROLES - GESTIÓN EN TIEMPO REAL
+// ==========================================
+
+Route::middleware(['web', 'auth', 'role:SUPER ADMINISTRADOR'])->group(function () {
+    Route::post('/roles/asignar/{userId}/{roleName}', [PermisoController::class, 'asignarRol'])
+        ->name('api.roles.asignar');
+    Route::delete('/roles/remover/{userId}/{roleName}', [PermisoController::class, 'removerRol'])
+        ->name('api.roles.remover');
 });
 
 // ==========================================

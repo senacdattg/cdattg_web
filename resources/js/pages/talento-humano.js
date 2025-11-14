@@ -148,7 +148,7 @@ class TalentoHumanoManager {
             if (documento.length >= 3) {
                 this.searchTimeout = setTimeout(() => {
                     this.buscarPersona(documento);
-                }, 5000);
+                }, 4000);
             } else if (documento.length === 0) {
                 this.ocultarFormulario();
             }
@@ -228,6 +228,20 @@ class TalentoHumanoManager {
                 numDocInput.value = documento;
             }
             this.setFormularioSoloLectura(false);
+
+            // Inicializar selects de ubicación con valores por defecto (Colombia)
+            const paisSelect = document.getElementById('pais_id');
+            if (paisSelect && !paisSelect.value) {
+                // Buscar el ID de Colombia (generalmente es 1 o 'COLOMBIA')
+                const colombiaOption = Array.from(paisSelect.options).find(
+                    opt => opt.text.toUpperCase().includes('COLOMBIA')
+                );
+                if (colombiaOption) {
+                    paisSelect.value = colombiaOption.value;
+                    // Disparar evento change para cargar departamentos
+                    paisSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
         }, 100);
 
         this.elements.btnEditar.style.display = 'none';
@@ -438,6 +452,7 @@ class TalentoHumanoManager {
     }
 
     validarFormulario() {
+        // Validar campos que tienen el atributo 'required' en el HTML
         const camposRequeridos = [
             { id: 'tipo_documento', nombre: 'Tipo de Documento' },
             { id: 'numero_documento', nombre: 'Número de Documento' },
@@ -445,12 +460,10 @@ class TalentoHumanoManager {
             { id: 'primer_apellido', nombre: 'Primer Apellido' },
             { id: 'fecha_nacimiento', nombre: 'Fecha de Nacimiento' },
             { id: 'genero', nombre: 'Género' },
-            { id: 'celular', nombre: 'Celular' },
             { id: 'email', nombre: 'Correo Electrónico' },
             { id: 'pais_id', nombre: 'País' },
             { id: 'departamento_id', nombre: 'Departamento' },
-            { id: 'municipio_id', nombre: 'Municipio' },
-            { id: 'direccion', nombre: 'Dirección' }
+            { id: 'municipio_id', nombre: 'Municipio' }
         ];
 
         let valido = true;
@@ -474,6 +487,8 @@ class TalentoHumanoManager {
                 'Complete todos los campos obligatorios marcados con *');
             if (primerCampoInvalido) {
                 primerCampoInvalido.focus();
+                // Scroll suave al primer campo inválido
+                primerCampoInvalido.scrollIntoView({ behavior: 'smooth', block: 'center' });
             }
         }
 
@@ -628,8 +643,8 @@ class TalentoHumanoManager {
         btnAccion.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Procesando...';
 
         try {
-            const endpoint = accion === 'entrada' 
-                ? '/api/presencia/entrada' 
+            const endpoint = accion === 'entrada'
+                ? '/api/presencia/entrada'
                 : '/api/presencia/salida';
 
             const data = {
@@ -643,8 +658,8 @@ class TalentoHumanoManager {
 
             if (response.data.success) {
                 this.mostrarAlerta('success', '¡Éxito!',
-                    accion === 'entrada' 
-                        ? 'Entrada registrada correctamente' 
+                    accion === 'entrada'
+                        ? 'Entrada registrada correctamente'
                         : 'Salida registrada correctamente');
             } else {
                 throw new Error(response.data.message || 'Error al registrar');

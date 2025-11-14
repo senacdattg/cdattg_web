@@ -76,6 +76,45 @@ class UserService
         });
     }
 
+    public function agregarRoles(int $userId, array $roles): bool
+    {
+        if (empty($roles)) {
+            return true;
+        }
+
+        return DB::transaction(function () use ($userId, $roles) {
+            $user = User::findOrFail($userId);
+
+            $rolesValidos = collect($roles)
+                ->map(static fn(string $rol) => strtoupper($rol))
+                ->unique()
+                ->values();
+
+            $rolesDisponibles = \Spatie\Permission\Models\Role::whereIn('name', $rolesValidos)->pluck('name');
+
+            if ($rolesDisponibles->isEmpty()) {
+                return true;
+            }
+
+            $rolesPrevios = $user->roles->pluck('name');
+
+            $rolesDisponibles->each(static function (string $rol) use ($user): void {
+                if (!$user->hasRole($rol)) {
+                    $user->assignRole($rol);
+                }
+            });
+
+            Log::info('Roles agregados al usuario', [
+                'user_id' => $userId,
+                'roles_previos' => $rolesPrevios->all(),
+                'roles_nuevos' => $rolesDisponibles->all(),
+                'roles_finales' => $user->roles->pluck('name')->all(),
+            ]);
+
+            return true;
+        });
+    }
+
     /**
      * Obtiene usuarios por rol
      *
