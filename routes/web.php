@@ -30,6 +30,39 @@ $loadRouteFolders = static function (array $folders, array $middleware = ['web']
 };
 
 Route::middleware('web')->group(function () {
+    // Ruta principal del dashboard Flutter (debe ir antes de otras rutas)
+    Route::get('/dashboard-ingreso-salida', function () {
+        $indexPath = public_path('dashboard-ingreso-salida/index.html');
+        
+        if (!file_exists($indexPath)) {
+            return response('Dashboard no encontrado. Asegúrate de haber copiado los archivos. Ruta funcionando correctamente.', 404)
+                ->header('Content-Type', 'text/plain');
+        }
+        
+        return response()->file($indexPath);
+    });
+
+    // Ruta catch-all para assets y rutas internas de Flutter
+    Route::get('/dashboard-ingreso-salida/{path}', function ($path) {
+        $filePath = public_path("dashboard-ingreso-salida/{$path}");
+        
+        // Si el archivo existe, servirlo con el Content-Type correcto
+        if (file_exists($filePath) && is_file($filePath)) {
+            $mimeType = mime_content_type($filePath);
+            return response()->file($filePath, [
+                'Content-Type' => $mimeType ?: 'application/octet-stream',
+            ]);
+        }
+        
+        // Si no existe, devolver index.html (para rutas internas de Flutter)
+        $indexPath = public_path('dashboard-ingreso-salida/index.html');
+        if (file_exists($indexPath)) {
+            return response()->file($indexPath);
+        }
+        
+        abort(404);
+    })->where('path', '.*');
+
     Route::get('/', [ProgramaComplementarioController::class, 'programasPublicos'])
         ->name('home');
 
