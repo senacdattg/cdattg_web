@@ -34,6 +34,12 @@ class WebSocketHandler {
                 this.handleNuevaAsistenciaRegistrada(event);
             });
 
+        // Canal para entradas/salidas de talento humano
+        this.echo.channel('entradas-salidas')
+            .listen('EntradaSalidaRegistrada', (event) => {
+                this.handleEntradaSalidaRegistrada(event);
+            });
+
         console.log('WebSocket channels configurados correctamente');
     }
 
@@ -72,6 +78,27 @@ class WebSocketHandler {
         this.updateAsistenciaInterface(data);
     }
 
+    handleEntradaSalidaRegistrada(event) {
+        console.log('Entrada/Salida registrada:', event);
+
+        const data = event.data;
+        const tipo = data.tipo === 'entrada' ? 'Entrada' : 'Salida';
+        const nombrePersona = data.nombre_completo || `Persona ID ${data.persona_id}`;
+        const sedeDescripcion = data.sede_nombre || data.sede_id || 'N/A';
+        const numeroDocumento = data.numero_documento || 'N/A';
+        const message = `${tipo} registrada: ${nombrePersona}`;
+
+        this.showNotification(message, data.tipo === 'entrada' ? 'success' : 'info', {
+            icon: data.tipo === 'entrada' ? 'fas fa-sign-in-alt' : 'fas fa-sign-out-alt',
+            title: `${tipo} Registrada`,
+            subtitle: `Rol: ${data.rol} | Sede: ${sedeDescripcion}`,
+            body: `${nombrePersona} (${numeroDocumento}) registró ${data.tipo} a las ${this.formatTime(data.timestamp)}`
+        });
+
+        // Actualizar la interfaz si estamos en la página de talento humano
+        this.updateEntradaSalidaInterface(data);
+    }
+
     showNotification(message, type = 'info', options = {}) {
         // Usar AdminLTE Toast si está disponible
         if (typeof $.fn.toast !== 'undefined' && typeof Toasts !== 'undefined') {
@@ -101,7 +128,18 @@ class WebSocketHandler {
         if (!timeString) return 'N/A';
 
         try {
-            const time = new Date(`2000-01-01T${timeString}`);
+            let date;
+
+            if (typeof timeString === 'string' && timeString.includes('T')) {
+                date = new Date(timeString);
+            } else {
+                date = new Date(`2000-01-01T${timeString}`);
+            }
+
+            if (Number.isNaN(date.getTime())) {
+                return timeString;
+            }
+
             return time.toLocaleTimeString('es-ES', {
                 hour: '2-digit',
                 minute: '2-digit'
@@ -202,6 +240,99 @@ class WebSocketHandler {
             this.echo.disconnect();
             this.initialized = false;
         }
+    }
+
+    updateEntradaSalidaInterface(data) {
+        // Actualizar contadores en la página de talento humano
+        const entradaCounter = document.getElementById('entrada-counter');
+        const salidaCounter = document.getElementById('salida-counter');
+        const personasDentroCounter = document.getElementById('personas-dentro-counter');
+
+        if (data.tipo === 'entrada') {
+            if (entradaCounter) {
+                const currentCount = parseInt(entradaCounter.textContent) || 0;
+                entradaCounter.textContent = currentCount + 1;
+                entradaCounter.classList.add('text-success');
+                setTimeout(() => {
+                    entradaCounter.classList.remove('text-success');
+                }, 2000);
+            }
+            if (personasDentroCounter) {
+                const currentCount = parseInt(personasDentroCounter.textContent) || 0;
+                personasDentroCounter.textContent = currentCount + 1;
+                personasDentroCounter.classList.add('text-success');
+                setTimeout(() => {
+                    personasDentroCounter.classList.remove('text-success');
+                }, 2000);
+            }
+        } else if (data.tipo === 'salida') {
+            if (salidaCounter) {
+                const currentCount = parseInt(salidaCounter.textContent) || 0;
+                salidaCounter.textContent = currentCount + 1;
+                salidaCounter.classList.add('text-info');
+                setTimeout(() => {
+                    salidaCounter.classList.remove('text-info');
+                }, 2000);
+            }
+            if (personasDentroCounter) {
+                const currentCount = parseInt(personasDentroCounter.textContent) || 0;
+                personasDentroCounter.textContent = Math.max(0, currentCount - 1);
+                personasDentroCounter.classList.add('text-warning');
+                setTimeout(() => {
+                    personasDentroCounter.classList.remove('text-warning');
+                }, 2000);
+            }
+        }
+
+        // Actualizar tabla de entradas/salidas si existe
+        const entradaSalidaTable = document.getElementById('entrada-salida-table');
+        if (entradaSalidaTable) {
+            this.addRowToEntradaSalidaTable(data);
+        }
+    }
+
+    addRowToEntradaSalidaTable(data) {
+        const tbody = document.querySelector('#entrada-salida-table tbody');
+        if (!tbody) return;
+
+        const newRow = document.createElement('tr');
+        const nombrePersona = data.nombre_completo || `Persona ID ${data.persona_id}`;
+        const sedeDescripcion = data.sede_nombre || data.sede_id || 'N/A';
+        const numeroDocumento = data.numero_documento || 'N/A';
+        newRow.innerHTML = `
+            <td>${data.persona_id}</td>
+            <td>${nombrePersona}<br><small>${numeroDocumento}</small></td>
+            <td>${data.rol}</td>
+            <td>${sedeDescripcion}</td>
+            <td>${data.tipo === 'entrada' ? '<span class="badge badge-success">Entrada</span>' : '<span class="badge badge-info">Salida</span>'}</td>
+            <td>${this.formatTime(data.timestamp)}</td>
+        `;
+
+        // Agregar efecto de entrada
+        newRow.style.opacity = '0';
+        newRow.style.transform = 'translateY(-20px)';
+        tbody.insertBefore(newRow, tbody.firstChild);
+
+        // Animación de entrada
+        setTimeout(() => {
+            newRow.style.transition = 'all 0.3s ease';
+            newRow.style.opacity = '1';
+            newRow.style.transform = 'translateY(0)';
+        }, 100);
+
+        // Remover fila después de 10 segundos si es solo para mostrar la notificación
+        setTimeout(() => {
+            if (newRow.parentNode) {
+                newRow.style.transition = 'all 0.3s ease';
+                newRow.style.opacity = '0';
+                newRow.style.transform = 'translateY(-20px)';
+                setTimeout(() => {
+                    if (newRow.parentNode) {
+                        newRow.remove();
+                    }
+                }, 300);
+            }
+        }, 10000);
     }
 }
 
