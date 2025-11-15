@@ -7,13 +7,38 @@ use App\Models\Persona;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
+use Spatie\Permission\Models\Role;
 
 class PersonaIngresoSalidaService
 {
+    private const ROLE_CATEGORY_MAP = [
+        'SUPER ADMINISTRADOR' => 'super_administradores',
+        'ADMINISTRADOR' => 'administrativos',
+        'INSTRUCTOR' => 'instructores',
+        'VISITANTE' => 'visitantes',
+        'APRENDIZ' => 'aprendices',
+        'ASPIRANTE' => 'aspirantes',
+    ];
+
+    /**
+     * Cache local para resolver roles por nombre.
+     *
+     * @var array<string, int|null>
+     */
+    private array $roleNameCache = [];
+
+    /**
+     * Cache local para resolver nombres de rol por id.
+     *
+     * @var array<int, string|null>
+     */
+    private array $roleIdNameCache = [];
+
     /**
      * Determina el tipo de persona basándose en sus relaciones
      */
-    public function determinarTipoPersona(int $personaId): string
+    public function determinarTipoPersona(int $personaId): int
     {
         $persona = Persona::with(['instructor', 'aprendiz', 'user.roles'])->find($personaId);
 
@@ -21,39 +46,35 @@ class PersonaIngresoSalidaService
             throw new \Exception("Persona no encontrada con ID: {$personaId}");
         }
 
-        // Verificar si es instructor
-        if ($persona->instructor) {
-            return 'instructor';
-        }
-
-        // Verificar si es aprendiz
-        if ($persona->aprendiz) {
-            return 'aprendiz';
-        }
-
-        // Verificar roles del usuario
         if ($persona->user) {
-            $roles = $persona->user->roles->pluck('name')->map(fn($r) => strtoupper($r));
-
-            if ($roles->contains('SUPER ADMINISTRADOR')) {
-                return 'super_administrador';
-            }
-
-            if ($roles->contains('ADMINISTRADOR')) {
-                return 'administrativo';
-            }
-
-            if ($roles->contains('VISITANTE')) {
-                return 'visitante';
-            }
-
-            if ($roles->contains('ASPIRANTE')) {
-                return 'aspirante';
+            $rol = $persona->user->roles->first();
+            if ($rol) {
+                $this->cacheRoleName((int) $rol->id, $rol->name);
+                return (int) $rol->id;
             }
         }
 
-        // Por defecto, si no se puede determinar, se considera visitante
-        return 'visitante';
+        if ($persona->instructor) {
+            $rolId = $this->resolveRoleId('INSTRUCTOR');
+            if ($rolId !== null) {
+                return $rolId;
+            }
+        }
+
+        if ($persona->aprendiz) {
+            $rolId = $this->resolveRoleId('APRENDIZ');
+            if ($rolId !== null) {
+                return $rolId;
+            }
+        }
+
+        $rolId = $this->resolveRoleId('VISITANTE');
+
+        if ($rolId === null) {
+            throw new \Exception('No se pudo resolver un rol válido para la persona.');
+        }
+
+        return $rolId;
     }
 
     /**
@@ -62,12 +83,13 @@ class PersonaIngresoSalidaService
     public function registrarEntrada(
         int $personaId,
         int $sedeId,
+        ?int $rolId = null,
         ?int $ambienteId = null,
         ?int $fichaCaracterizacionId = null,
         ?string $observaciones = null,
         ?int $userId = null
     ): PersonaIngresoSalida {
-        return DB::transaction(function () use ($personaId, $sedeId, $ambienteId, $fichaCaracterizacionId, $observaciones, $userId) {
+        return DB::transaction(function () use ($personaId, $sedeId, $rolId, $ambienteId, $fichaCaracterizacionId, $observaciones, $userId) {
             // Verificar si ya tiene un registro abierto (entrada sin salida) en esta sede
             $registroAbierto = PersonaIngresoSalida::where('persona_id', $personaId)
                 ->where('sede_id', $sedeId)
@@ -79,30 +101,53 @@ class PersonaIngresoSalidaService
                 throw new \Exception('Ya existe un registro de entrada sin salida para hoy en esta sede.');
             }
 
-            // Determinar tipo de persona
-            $tipoPersona = $this->determinarTipoPersona($personaId);
+            // Determinar rol calculado para referencia
+            $rolCalculado = $this->determinarTipoPersona($personaId);
+            $rolAsignado = $rolId ?? $rolCalculado;
 
             $now = Carbon::now();
 
             // Crear registro de entrada
-            $registro = PersonaIngresoSalida::create([
+            $data = [
                 'persona_id' => $personaId,
                 'sede_id' => $sedeId,
-                'tipo_persona' => $tipoPersona,
+                'rol_id' => $rolAsignado,
                 'fecha_entrada' => $now->format('Y-m-d'),
                 'hora_entrada' => $now->format('H:i:s'),
                 'timestamp_entrada' => $now,
-                'ambiente_id' => $ambienteId,
-                'ficha_caracterizacion_id' => $fichaCaracterizacionId,
-                'observaciones' => $observaciones,
                 'user_create_id' => $userId ?? auth()->id(),
-            ]);
+            ];
+
+            $registro = PersonaIngresoSalida::create($data);
+
+            $camposActualizados = false;
+
+            if ($ambienteId !== null && Schema::hasColumn($registro->getTable(), 'ambiente_id')) {
+                $registro->ambiente_id = $ambienteId;
+                $camposActualizados = true;
+            }
+
+            if ($fichaCaracterizacionId !== null && Schema::hasColumn($registro->getTable(), 'ficha_caracterizacion_id')) {
+                $registro->ficha_caracterizacion_id = $fichaCaracterizacionId;
+                $camposActualizados = true;
+            }
+
+            if ($observaciones !== null && Schema::hasColumn($registro->getTable(), 'observaciones')) {
+                $registro->observaciones = $observaciones;
+                $camposActualizados = true;
+            }
+
+            if ($camposActualizados) {
+                $registro->save();
+            }
 
             Log::info('Entrada registrada', [
                 'registro_id' => $registro->id,
-                'persona_id' => $personaId,
                 'sede_id' => $sedeId,
-                'tipo_persona' => $tipoPersona,
+                'rol_id' => $rolAsignado,
+                'rol_calculado' => $rolCalculado,
+                'rol_nombre' => $this->getRoleNameById($rolAsignado),
+                'rol_proporcionado' => $rolId,
                 'timestamp' => $now->toISOString(),
             ]);
 
@@ -118,7 +163,7 @@ class PersonaIngresoSalidaService
         int $sedeId,
         ?string $observaciones = null,
         ?int $userId = null
-    ): bool {
+    ): PersonaIngresoSalida {
         return DB::transaction(function () use ($personaId, $sedeId, $observaciones, $userId) {
             // Buscar registro abierto (entrada sin salida) en esta sede
             $registro = PersonaIngresoSalida::where('persona_id', $personaId)
@@ -145,14 +190,18 @@ class PersonaIngresoSalidaService
                 'user_edit_id' => $userId ?? auth()->id(),
             ]);
 
+            $registro->refresh();
+
             Log::info('Salida registrada', [
                 'registro_id' => $registro->id,
                 'persona_id' => $personaId,
                 'sede_id' => $sedeId,
+                'rol_id' => $registro->rol_id,
+                'rol_nombre' => $this->getRoleNameById((int) $registro->rol_id),
                 'timestamp' => $now->toISOString(),
             ]);
 
-            return true;
+            return $registro;
         });
     }
 
@@ -167,22 +216,9 @@ class PersonaIngresoSalidaService
             $query->porSede($sedeId);
         }
 
-        // Contar personas dentro por tipo
-        $personasDentro = $query
-            ->select('tipo_persona', DB::raw('COUNT(*) as total'))
-            ->groupBy('tipo_persona')
-            ->pluck('total', 'tipo_persona')
-            ->toArray();
+        $conteos = $this->compileCountsByRole($query);
 
-        return [
-            'instructores' => $personasDentro['instructor'] ?? 0,
-            'aprendices' => $personasDentro['aprendiz'] ?? 0,
-            'visitantes' => $personasDentro['visitante'] ?? 0,
-            'administrativos' => $personasDentro['administrativo'] ?? 0,
-            'aspirantes' => $personasDentro['aspirante'] ?? 0,
-            'super_administradores' => $personasDentro['super_administrador'] ?? 0,
-            'total' => array_sum($personasDentro),
-        ];
+        return $this->mapCountsToCategories($conteos);
     }
 
     /**
@@ -196,21 +232,9 @@ class PersonaIngresoSalidaService
             $query->porSede($sedeId);
         }
 
-        $personasDentro = $query
-            ->select('tipo_persona', DB::raw('COUNT(*) as total'))
-            ->groupBy('tipo_persona')
-            ->pluck('total', 'tipo_persona')
-            ->toArray();
+        $conteos = $this->compileCountsByRole($query);
 
-        return [
-            'instructores' => $personasDentro['instructor'] ?? 0,
-            'aprendices' => $personasDentro['aprendiz'] ?? 0,
-            'visitantes' => $personasDentro['visitante'] ?? 0,
-            'administrativos' => $personasDentro['administrativo'] ?? 0,
-            'aspirantes' => $personasDentro['aspirante'] ?? 0,
-            'super_administradores' => $personasDentro['super_administrador'] ?? 0,
-            'total' => array_sum($personasDentro),
-        ];
+        return $this->mapCountsToCategories($conteos);
     }
 
     /**
@@ -248,54 +272,12 @@ class PersonaIngresoSalidaService
             $queryDentro->porSede($sedeId);
         }
 
-        $entradas = $queryEntradas
-            ->select('tipo_persona', DB::raw('COUNT(*) as total'))
-            ->groupBy('tipo_persona')
-            ->pluck('total', 'tipo_persona')
-            ->toArray();
-
-        $salidas = $querySalidas
-            ->select('tipo_persona', DB::raw('COUNT(*) as total'))
-            ->groupBy('tipo_persona')
-            ->pluck('total', 'tipo_persona')
-            ->toArray();
-
-        $dentro = $queryDentro
-            ->select('tipo_persona', DB::raw('COUNT(*) as total'))
-            ->groupBy('tipo_persona')
-            ->pluck('total', 'tipo_persona')
-            ->toArray();
-
         return [
             'fecha' => $fecha,
             'sede_id' => $sedeId,
-            'entradas' => [
-                'instructores' => $entradas['instructor'] ?? 0,
-                'aprendices' => $entradas['aprendiz'] ?? 0,
-                'visitantes' => $entradas['visitante'] ?? 0,
-                'administrativos' => $entradas['administrativo'] ?? 0,
-                'aspirantes' => $entradas['aspirante'] ?? 0,
-                'super_administradores' => $entradas['super_administrador'] ?? 0,
-                'total' => array_sum($entradas),
-            ],
-            'salidas' => [
-                'instructores' => $salidas['instructor'] ?? 0,
-                'aprendices' => $salidas['aprendiz'] ?? 0,
-                'visitantes' => $salidas['visitante'] ?? 0,
-                'administrativos' => $salidas['administrativo'] ?? 0,
-                'aspirantes' => $salidas['aspirante'] ?? 0,
-                'super_administradores' => $salidas['super_administrador'] ?? 0,
-                'total' => array_sum($salidas),
-            ],
-            'dentro' => [
-                'instructores' => $dentro['instructor'] ?? 0,
-                'aprendices' => $dentro['aprendiz'] ?? 0,
-                'visitantes' => $dentro['visitante'] ?? 0,
-                'administrativos' => $dentro['administrativo'] ?? 0,
-                'aspirantes' => $dentro['aspirante'] ?? 0,
-                'super_administradores' => $dentro['super_administrador'] ?? 0,
-                'total' => array_sum($dentro),
-            ],
+            'entradas' => $this->mapCountsToCategories($this->compileCountsByRole($queryEntradas)),
+            'salidas' => $this->mapCountsToCategories($this->compileCountsByRole($querySalidas)),
+            'dentro' => $this->mapCountsToCategories($this->compileCountsByRole($queryDentro)),
         ];
     }
 
@@ -312,6 +294,122 @@ class PersonaIngresoSalidaService
             'hoy' => $estadisticasHoy,
             'total_dentro' => $estadisticasGenerales,
         ];
+    }
+
+    /**
+     * Devuelve la estructura base de categorías.
+     */
+    private function baseCategories(): array
+    {
+        return [
+            'instructores' => 0,
+            'aprendices' => 0,
+            'visitantes' => 0,
+            'administrativos' => 0,
+            'aspirantes' => 0,
+            'super_administradores' => 0,
+            'total' => 0,
+        ];
+    }
+
+    /**
+     * Convierte los conteos agrupados por rol en categorías de salida.
+     *
+     * @param array<int, int> $conteos
+     */
+    private function mapCountsToCategories(array $conteos): array
+    {
+        $resultado = $this->baseCategories();
+
+        if (empty($conteos)) {
+            return $resultado;
+        }
+
+        foreach ($conteos as $rolId => $total) {
+            $nombreRol = $this->getRoleNameById((int) $rolId);
+
+            if (!$nombreRol) {
+                $resultado['visitantes'] += $total;
+                $resultado['total'] += $total;
+                continue;
+            }
+
+            $categoria = self::ROLE_CATEGORY_MAP[$nombreRol] ?? 'visitantes';
+            $resultado[$categoria] += $total;
+            $resultado['total'] += $total;
+        }
+
+        return $resultado;
+    }
+
+    /**
+     * Obtiene conteos agrupados por rol para la consulta dada.
+     *
+     * @param \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder $query
+     * @return array<int, int>
+     */
+    private function compileCountsByRole($query): array
+    {
+        return $query
+            ->select('rol_id', DB::raw('COUNT(*) as total'))
+            ->groupBy('rol_id')
+            ->pluck('total', 'rol_id')
+            ->map(fn ($total) => (int) $total)
+            ->toArray();
+    }
+
+    /**
+     * Resuelve el id de un rol a partir de su nombre (mayúsculas).
+     */
+    private function resolveRoleId(string $roleName): ?int
+    {
+        $normalized = strtoupper($roleName);
+
+        if (array_key_exists($normalized, $this->roleNameCache)) {
+            return $this->roleNameCache[$normalized];
+        }
+
+        $role = Role::whereRaw('UPPER(name) = ?', [$normalized])->first(['id', 'name']);
+
+        if (!$role) {
+            $this->roleNameCache[$normalized] = null;
+            return null;
+        }
+
+        $this->cacheRoleName((int) $role->id, $role->name);
+
+        return $this->roleNameCache[$normalized];
+    }
+
+    /**
+     * Obtiene el nombre del rol (en mayúsculas) por id.
+     */
+    private function getRoleNameById(int $roleId): ?string
+    {
+        if (array_key_exists($roleId, $this->roleIdNameCache)) {
+            return $this->roleIdNameCache[$roleId];
+        }
+
+        $role = Role::find($roleId, ['id', 'name']);
+
+        if (!$role) {
+            $this->roleIdNameCache[$roleId] = null;
+            return null;
+        }
+
+        $this->cacheRoleName((int) $role->id, $role->name);
+
+        return $this->roleIdNameCache[$roleId];
+    }
+
+    /**
+     * Cachea la relación entre id y nombre de un rol.
+     */
+    private function cacheRoleName(int $roleId, string $roleName): void
+    {
+        $normalized = strtoupper($roleName);
+        $this->roleIdNameCache[$roleId] = $normalized;
+        $this->roleNameCache[$normalized] = $roleId;
     }
 }
 

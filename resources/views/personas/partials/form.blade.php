@@ -97,6 +97,12 @@
             <div class="card-body pt-0">
                 <div class="row">
                     <div class="col-md-6 mb-4">
+                        @php
+                            $rolPersonaId = isset($persona)
+                                ? ($persona->user?->roles?->first()?->id ?? '')
+                                : '';
+                        @endphp
+                        <input type="hidden" name="rol_persona_id" id="rol_persona" value="{{ $rolPersonaId }}">
                         <label for="tipo_documento" class="form-label font-weight-bold">
                             Tipo de documento <span class="text-danger">*</span>
                         </label>

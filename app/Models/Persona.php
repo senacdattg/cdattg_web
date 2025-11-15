@@ -12,6 +12,7 @@ use Laravel\Sanctum\HasApiTokens;
 use App\Models\PersonaContactAlert;
 use App\Models\FichaCaracterizacion;
 use App\Models\Parametro;
+use App\Models\Role;
 
 class Persona extends Model
 {
@@ -69,6 +70,13 @@ class Persona extends Model
     public function user()
     {
         return $this->hasOne(User::class, 'persona_id');
+    }
+
+    public function role()
+    {
+        if ($this->user) {
+            return $this->user->role->id;
+        }
     }
 
     public function tipoDocumento()

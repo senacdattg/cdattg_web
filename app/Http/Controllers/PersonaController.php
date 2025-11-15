@@ -639,7 +639,8 @@ class PersonaController extends Controller
             ]);
         }
 
-        $persona->loadMissing(['caracterizacionesComplementarias']);
+        $persona->loadMissing(['caracterizacionesComplementarias', 'user.roles']);
+        $rol = $persona->user?->roles?->first();
 
         return response()->json([
             'success' => true,
@@ -662,6 +663,8 @@ class PersonaController extends Controller
                 'municipio_id' => $persona->municipio_id,
                 'direccion' => $persona->direccion,
                 'caracterizaciones' => $persona->caracterizacionesComplementarias->pluck('id')->toArray(),
+                'rol_persona_id' => $rol?->id,
+                'rol_persona_nombre' => $rol?->name,
             ],
             'show_form' => false
         ]);
@@ -684,7 +687,8 @@ class PersonaController extends Controller
                 'user_id' => Auth::id()
             ]);
 
-            $persona->loadMissing(['caracterizacionesComplementarias']);
+            $persona->loadMissing(['caracterizacionesComplementarias', 'user.roles']);
+            $rol = $persona->user?->roles?->first();
 
             return response()->json([
                 'success' => true,
@@ -706,6 +710,8 @@ class PersonaController extends Controller
                     'municipio_id' => $persona->municipio_id,
                     'direccion' => $persona->direccion,
                     'caracterizaciones' => $persona->caracterizacionesComplementarias->pluck('id')->toArray(),
+                    'rol_persona_id' => $rol?->id,
+                    'rol_persona_nombre' => $rol?->name,
                 ]
             ]);
         } catch (\Illuminate\Database\QueryException $e) {

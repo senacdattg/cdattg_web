@@ -65,7 +65,8 @@ class PersonaService
             'pais',
             'departamento',
             'municipio',
-            'caracterizacionesComplementarias'
+            'caracterizacionesComplementarias',
+            'user.roles'
         ])->where('numero_documento', $numeroDocumento)->first();
     }
 
@@ -92,7 +93,7 @@ class PersonaService
             // Crear usuario asociado
             $this->crearUsuarioPersona($persona);
 
-            return $persona->fresh(['caracterizacionesComplementarias', 'user']);
+            return $persona->fresh(['caracterizacionesComplementarias', 'user.roles']);
         });
     }
 
@@ -120,9 +121,11 @@ class PersonaService
                 $this->userRepo->actualizar($persona->user->id, [
                     'email' => $persona->email,
                 ]);
+
+                $persona->user->loadMissing('roles');
             }
 
-            return $persona->fresh(['caracterizacionesComplementarias', 'user']);
+            return $persona->fresh(['caracterizacionesComplementarias', 'user.roles']);
         });
     }
 

@@ -24,15 +24,7 @@ return new class extends Migration
             // Relación con la sede (OBLIGATORIO - para saber desde qué sede se registra)
             $table->foreignId('sede_id')->constrained('sedes')->onDelete('restrict');
             
-            // Tipo de persona: instructor, aprendiz, visitante, administrativo, aspirante
-            $table->enum('tipo_persona', [
-                'instructor',
-                'aprendiz', 
-                'visitante',
-                'administrativo',
-                'aspirante',
-                'super_administrador'
-            ])->index();
+            $table->foreignId('rol_id')->constrained('roles')->onDelete('restrict');
             
             // Fecha y hora de entrada
             $table->date('fecha_entrada')->index();
@@ -44,12 +36,8 @@ return new class extends Migration
             $table->time('hora_salida')->nullable();
             $table->timestamp('timestamp_salida')->nullable();
             
-            // Campos opcionales para contexto
-            $table->foreignId('ambiente_id')->nullable()->constrained('ambientes')->onDelete('set null');
-            $table->foreignId('ficha_caracterizacion_id')->nullable()->constrained('fichas_caracterizacion')->onDelete('set null');
-            
             // Observaciones o notas adicionales
-            $table->text('observaciones')->nullable();
+            // $table->text('observaciones')->nullable();
             
             // Auditoría
             $table->foreignId('user_create_id')->nullable()->constrained('users')->onDelete('set null');
@@ -58,10 +46,9 @@ return new class extends Migration
             $table->timestamps();
             
             // Índices para optimizar consultas de estadísticas
-            $table->index(['tipo_persona', 'fecha_entrada']);
+            $table->index(['rol_id', 'fecha_entrada']);
             $table->index(['persona_id', 'fecha_entrada']);
             $table->index(['sede_id', 'fecha_entrada']);
-            $table->index(['sede_id', 'tipo_persona', 'fecha_entrada']);
             $table->index(['timestamp_entrada', 'timestamp_salida']);
         });
     }

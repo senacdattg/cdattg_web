@@ -25,7 +25,6 @@ services:
       RUN_BUILD_ASSETS: ${RUN_BUILD_ASSETS:-false}
     ports:
       - "8080:8080"
-      - "8081:8081"
     volumes:
       - type: ${APP_CODE_VOLUME_TYPE:-bind}
         source: ${APP_CODE_SOURCE:-./}
@@ -50,6 +49,35 @@ services:
       interval: 15s
       timeout: 5s
       retries: 3
+    networks:
+      - cdattg_net
+
+  # ===========================================
+  # === REVERB (WebSocket Server)
+  # ===========================================
+  reverb:
+    profiles: ["produccion", "local", "testing"]
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.app
+    image: ${APP_IMAGE_PREFIX:-cdattg_asistence_web}-app:${BUILD_ENV:-production}
+    container_name: cdattg_reverb
+    env_file:
+      - ${COMPOSE_ENV_FILE:-.env}
+    environment:
+      - REVERB_SERVER_HOST=0.0.0.0
+      - REVERB_SERVER_PORT=8082
+      - WAIT_FOR_DB=false
+      - RUN_MIGRATIONS=false
+      - RUN_MIGRATIONS_FRESH=false
+      - RUN_SEEDERS=false
+      - CACHE_BOOTSTRAP=false
+      - RUN_BUILD_ASSETS=false
+    ports:
+      - "8082:8082"
+    command: php artisan reverb:start --port=8082
+    depends_on:
+      - app
     networks:
       - cdattg_net
 

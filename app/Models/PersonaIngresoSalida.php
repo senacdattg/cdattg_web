@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Schema;
 
 class PersonaIngresoSalida extends Model
 {
@@ -16,16 +17,13 @@ class PersonaIngresoSalida extends Model
     protected $fillable = [
         'persona_id',
         'sede_id',
-        'tipo_persona',
+        'rol_id',
         'fecha_entrada',
         'hora_entrada',
         'timestamp_entrada',
         'fecha_salida',
         'hora_salida',
         'timestamp_salida',
-        'ambiente_id',
-        'ficha_caracterizacion_id',
-        'observaciones',
         'user_create_id',
         'user_edit_id',
     ];
@@ -51,22 +49,6 @@ class PersonaIngresoSalida extends Model
     public function sede(): BelongsTo
     {
         return $this->belongsTo(Sede::class, 'sede_id');
-    }
-
-    /**
-     * Relación con Ambiente
-     */
-    public function ambiente(): BelongsTo
-    {
-        return $this->belongsTo(Ambiente::class, 'ambiente_id');
-    }
-
-    /**
-     * Relación con FichaCaracterizacion
-     */
-    public function fichaCaracterizacion(): BelongsTo
-    {
-        return $this->belongsTo(FichaCaracterizacion::class, 'ficha_caracterizacion_id');
     }
 
     /**
@@ -116,14 +98,6 @@ class PersonaIngresoSalida extends Model
     public function scopeDentro($query)
     {
         return $query->whereNull('timestamp_salida');
-    }
-
-    /**
-     * Scope para filtrar por tipo de persona
-     */
-    public function scopePorTipo($query, string $tipo)
-    {
-        return $query->where('tipo_persona', $tipo);
     }
 
     /**
