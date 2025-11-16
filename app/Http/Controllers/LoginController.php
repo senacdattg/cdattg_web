@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Persona;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
 
 class LoginController extends Controller
@@ -25,50 +24,58 @@ class LoginController extends Controller
                 'password' => 'required|string|min:6',
             ]);
 
-            if (Auth::attempt($credentials)) {
+            $response = null;
+            $remember = $request->boolean('remember');
+            if (Auth::attempt($credentials, $remember)) {
+                // Regenerar la sesión para proteger contra fixation
+                $request->session()->regenerate();
                 $user = Auth::user();
 
                 // Verificar si la cuenta está inactiva
                 if ($user->status == 0) {
-                    Log::warning("Intento de inicio de sesión de usuario inactivo: ID {$user->id}");
                     Auth::logout();
-                    return back()->withInput()->withErrors(['error' => 'La cuenta se encuentra inactiva']);
+                    $response = back()
+                        ->withInput()
+                        ->withErrors(['error' => 'La cuenta se encuentra inactiva']);
+                } else {
+                    // Verificar si hay un parámetro de redirección (primero del input POST, luego del query string)
+                    $redirect = $request->input('redirect') ?: $request->query('redirect');
+                    if ($redirect) {
+                        // Redirigir al formulario de inscripción con los datos del usuario pre-llenados
+                        $response = redirect(
+                            '/programas-complementarios/' . $redirect . '/inscripcion'
+                        )
+                            ->with('user_data', $this->getUserDataForForm($user))
+                            ->with(
+                                'success',
+                                '¡Sesión Iniciada! Complete su información para finalizar la inscripción.'
+                            );
+                    } else {
+                        // Redirigir al dashboard principal (/home) para usuarios normales
+                        $response = redirect('/home')->with('success', '¡Sesión Iniciada!');
+                    }
                 }
-
-                // Verificar si hay un parámetro de redirección (primero del input POST, luego del query string)
-                $redirect = $request->input('redirect') ?: $request->query('redirect');
-                Log::info('LoginController - Verificando redirect', [
-                    'redirect_input' => $request->input('redirect'),
-                    'redirect_query' => $request->query('redirect'),
-                    'redirect_final' => $redirect,
-                    'has_redirect' => !empty($redirect),
-                    'all_input' => $request->all(),
-                    'all_query_params' => $request->query()
-                ]);
-                if ($redirect) {
-                    Log::info('LoginController - Redirigiendo a formulario de inscripción', ['redirect_id' => $redirect]);
-                    // Redirigir al formulario de inscripción con los datos del usuario pre-llenados
-                    return redirect('/programas-complementarios/' . $redirect . '/inscripcion')
-                        ->with('user_data', $this->getUserDataForForm($user))
-                        ->with('success', '¡Sesión Iniciada! Complete su información para finalizar la inscripción.');
-                }
-
-                Log::info('LoginController - No hay redirect, redirigiendo a /home');
-                // Redirigir al dashboard principal (/home) para usuarios normales
-                return redirect('/home')->with('success', '¡Sesión Iniciada!');
             } else {
-                Log::warning("Fallo en el inicio de sesión para el correo: {$request->email}");
-
-                return back()->withInput()->withErrors(['error' => 'Correo o contraseña inválidos']);
+                $response = back()
+                    ->withInput()
+                    ->withErrors(['error' => 'Correo o contraseña inválidos']);
             }
+            return $response;
         } catch (QueryException $e) {
             // Captura de excepciones de conexión a la base de datos
-            Log::error('Error de conexión a la base de datos: ' . $e->getMessage());
-            return back()->withInput()->withErrors(['error' => 'Error al conectar con la base de datos. Por favor, inténtelo de nuevo más tarde.']);
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'error' =>
+                    'Error al conectar con la base de datos. Por favor, inténtelo de nuevo más tarde.',
+                ]);
         } catch (\Exception $e) {
-            Log::error('Error al iniciar sesión: ' . $e->getMessage());
 
-            return back()->withInput()->withErrors(['error' => 'Error al iniciar sesión. Por favor, inténtelo de nuevo más tarde.']);
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'error' => 'Error al iniciar sesión. Por favor, inténtelo de nuevo más tarde.',
+                ]);
         }
     }
 

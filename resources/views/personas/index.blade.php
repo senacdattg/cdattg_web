@@ -244,12 +244,55 @@
 @endsection
 
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Asegurar objeto global para otros scripts que usan Swal directamente
+        (function() {
+            if (typeof window.Swal === 'undefined' && typeof Swal !== 'undefined') {
+                window.Swal = Swal;
+            }
+            if (typeof window.Swal === 'undefined') {
+                window.Swal = {
+                    fire: function(options) {
+                        try {
+                            const title = options && options.title ? options.title + '\n' : '';
+                            const text = options && options.text ? options.text : (options && options.html ?
+                                options.html.replace(/<[^>]*>?/gm, '') : '');
+                            alert(title + text);
+                        } catch (e) {
+                            alert('Operación realizada');
+                        }
+                        return Promise.resolve({
+                            isConfirmed: true
+                        });
+                    }
+                };
+            }
+        })();
+    </script>
     @vite(['resources/js/app.js', 'resources/js/parametros.js', 'resources/js/pages/formularios-generico.js'])
     <script>
         $(function() {
+            function safeSwal(options) {
+                if (window.Swal && typeof window.Swal.fire === 'function') {
+                    return window.Swal.fire(options);
+                }
+                // Fallback básico si SweetAlert2 no está disponible
+                try {
+                    const title = options && options.title ? options.title + '\n' : '';
+                    const text = options && options.text ? options.text : (options && options.html ? options.html
+                        .replace(/<[^>]*>?/gm, '') : '');
+                    alert(title + text);
+                } catch (e) {
+                    alert('Operación realizada');
+                }
+                return Promise.resolve({
+                    isConfirmed: true
+                });
+            }
             // Mostrar mensajes flash con SweetAlert2
             @if (session('success'))
-                Swal.fire({
+                safeSwal({
                     icon: 'success',
                     title: '¡Éxito!',
                     text: '{{ session('success') }}',
@@ -259,7 +302,7 @@
             @endif
 
             @if (session('error'))
-                Swal.fire({
+                safeSwal({
                     icon: 'error',
                     title: 'Error',
                     text: '{{ session('error') }}',
@@ -270,14 +313,15 @@
 
             $('[data-toggle="tooltip"]').tooltip();
 
-            $(document).on('submit', '.create-user-form', function (event) {
+            $(document).on('submit', '.create-user-form', function(event) {
                 const $form = $(this);
                 const disabledFlag = ($form.data('disabled') || '').toString() === 'true';
-                const errorMessage = $form.data('error') || 'Actualiza la información de correo y documento antes de crear el usuario.';
+                const errorMessage = $form.data('error') ||
+                    'Actualiza la información de correo y documento antes de crear el usuario.';
 
                 if (disabledFlag) {
                     event.preventDefault();
-                    Swal.fire({
+                    safeSwal({
                         icon: 'warning',
                         title: 'No es posible crear el usuario',
                         text: errorMessage,
@@ -297,7 +341,7 @@
                 const personaEmail = $('<div>').text($form.data('persona-email') || '').html();
                 const personaDocumento = $('<div>').text($form.data('numero-documento') || '').html();
 
-                Swal.fire({
+                safeSwal({
                     title: 'Crear usuario',
                     html: `Se creará el usuario <strong>${personaEmail}</strong><br>` +
                         `La contraseña temporal será el número de documento: <strong>${personaDocumento}</strong>`,
@@ -356,7 +400,7 @@
                             callback(json);
                         })
                         .catch(function(error) {
-                            Swal.fire({
+                            safeSwal({
                                 title: 'Error al cargar personas',
                                 text: 'No se pudieron cargar las personas. Por favor, intente nuevamente.',
                                 icon: 'error',
@@ -487,7 +531,7 @@
                 // Sanitizar el nombre para prevenir XSS
                 const nombreSeguro = $('<div>').text(personaNombre).html();
 
-                Swal.fire({
+                safeSwal({
                     title: '¿Estás seguro?',
                     html: `Se eliminará la persona:<br><strong>${nombreSeguro}</strong><br>` +
                         `<small class="text-danger">Esta acción también eliminará el usuario asociado</small>`,
@@ -521,10 +565,14 @@
                 const nombreSeguro = $('<div>').text(personaNombre).html();
                 const documentoSeguro = $('<div>').text(numeroDocumento).html();
 
-                Swal.fire({
+                safeSwal({
                     title: 'Restablecer contraseña',
-                    html: `¿Deseas restablecer la contraseña de <strong>${nombreSeguro}</strong>?<br>` +
-                        `<small>La nueva contraseña será su número de documento: <strong>${documentoSeguro}</strong></small>`,
+                    html: '¿Deseas restablecer la contraseña de <strong>' +
+                        nombreSeguro +
+                        '</strong>?<br>' +
+                        '<small>La nueva contraseña será su número de documento: <strong>' +
+                        documentoSeguro +
+                        '</strong></small>',
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#3085d6',

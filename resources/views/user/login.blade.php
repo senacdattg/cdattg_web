@@ -2,10 +2,11 @@
 
 @section('content')
     <div class="login-box">
-        <div class="card card-outline card-primary">
+        <div class="card card-outline card-primary shadow-sm">
             <div class="card-header text-center">
                 {{-- Logo del SENA --}}
-                <img src="{{ asset('dist/img/LogoSena.png') }}" alt="Logo del sena" style="width: 150px; height: auto;">
+                <img src="{{ asset('dist/img/LogoSena.png') }}" alt="Logo del sena" class="img-fluid"
+                    style="max-width: 150px; height: auto;">
                 <h1>Bienvenido</h1>
             </div>
 
@@ -58,14 +59,17 @@
                         <label for="email">Usuario</label>
                         <div class="input-group">
                             <input type="email" class="form-control @error('email') is-invalid @enderror" name="email"
-                                id="email" placeholder="Correo" value="{{ old('email') }}" required
-                                autofocus>
-                            <div class="input-group-append">
-                                <div class="input-group-text">
-                                    <span class="fas fa-envelope"></span>
-                                </div>
+                                id="email" placeholder="correo@dominio.com" value="{{ old('email') }}" required
+                                autofocus autocomplete="username" inputmode="email" aria-describedby="emailHelp">
+                            <div class="input-group-append d-none d-sm-flex">
+                                <span class="input-group-text">
+                                    <i class="fas fa-envelope" aria-hidden="true"></i>
+                                </span>
                             </div>
                         </div>
+                        <small
+                            id="emailHelp"
+                            class="form-text text-muted">Use su correo registrado en el sistema.</small>
                         @error('email')
                             <span class="text-danger small">{{ $message }}</span>
                         @enderror
@@ -76,11 +80,13 @@
                         <label for="password">Contraseña</label>
                         <div class="input-group">
                             <input type="password" class="form-control @error('password') is-invalid @enderror"
-                                name="password" id="password" placeholder="Contraseña" required>
+                                name="password" id="password" placeholder="Contraseña" required
+                                autocomplete="current-password" aria-describedby="passwordToggle">
                             <div class="input-group-append">
-                                <div class="input-group-text">
-                                    <span class="fas fa-lock"></span>
-                                </div>
+                                <button type="button" id="passwordToggle" class="btn btn-outline-secondary"
+                                    aria-label="Mostrar u ocultar contraseña">
+                                    <i class="fas fa-eye" aria-hidden="true"></i>
+                                </button>
                             </div>
                         </div>
                         @error('password')
@@ -88,10 +94,28 @@
                         @enderror
                     </div>
 
+                    {{-- Recordarme --}}
+                    <div class="form-group form-check">
+                        <input type="checkbox" class="form-check-input" id="remember" name="remember" value="1"
+                            {{ old('remember') ? 'checked' : '' }}>
+                        <label class="form-check-label" for="remember">Recordarme</label>
+                    </div>
+
+                    {{-- Olvidó su contraseña --}}
+                    @if (Route::has('password.request'))
+                        <div class="d-flex justify-content-end mb-3">
+                            <a href="{{ route('password.request') }}" class="small">¿Olvidó su contraseña?</a>
+                        </div>
+                    @endif
+
                     {{-- Botón de inicio de sesión --}}
                     <div class="row d-flex justify-content-center">
-                        <div class="col-6">
-                            <button type="submit" class="btn btn-outline-success btn-block">Iniciar Sesión</button>
+                        <div class="col-12 col-sm-10 col-md-8 col-lg-6">
+                            <button type="submit" id="loginSubmit" class="btn btn-outline-success btn-lg btn-block">
+                                <span class="spinner-border spinner-border-sm mr-2 d-none" role="status"
+                                    aria-hidden="true"></span>
+                                Iniciar Sesión
+                            </button>
                         </div>
                     </div>
 
@@ -99,7 +123,7 @@
 
                 {{-- Botón para volver a la página principal --}}
                 <div class="row mt-3 d-flex justify-content-center">
-                    <div class="col-6">
+                    <div class="col-12 col-sm-10 col-md-8 col-lg-6">
                         <a href="{{ route('home') }}" class="btn btn-outline-secondary btn-block">
                             <i class="fas fa-arrow-left mr-2"></i>Volver al Inicio
                         </a>
@@ -108,4 +132,35 @@
             </div>
         </div>
     </div>
+    <script>
+        (function() {
+            const passwordInput = document.getElementById('password');
+            const toggleBtn = document.getElementById('passwordToggle');
+            const submitBtn = document.getElementById('loginSubmit');
+            const spinner = submitBtn ? submitBtn.querySelector('.spinner-border') : null;
+
+            if (toggleBtn && passwordInput) {
+                toggleBtn.addEventListener('click', function() {
+                    const isPassword = passwordInput.getAttribute('type') === 'password';
+                    passwordInput.setAttribute('type', isPassword ? 'text' : 'password');
+                    const icon = this.querySelector('i');
+                    if (icon) {
+                        icon.classList.toggle('fa-eye');
+                        icon.classList.toggle('fa-eye-slash');
+                    }
+                    passwordInput.focus();
+                });
+            }
+
+            const form = document.querySelector('form[action="{{ route('iniciarSesion') }}"]');
+            if (form && submitBtn) {
+                form.addEventListener('submit', function() {
+                    submitBtn.setAttribute('disabled', 'disabled');
+                    if (spinner) {
+                        spinner.classList.remove('d-none');
+                    }
+                });
+            }
+        })();
+    </script>
 @endsection

@@ -131,7 +131,12 @@
                     @endif
 
                     @if (session('info'))
-                        <div class="alert alert-info alert-dismissible fade show" role="alert" style="margin-top: 20px;">
+                        <div
+                            class="alert alert-info alert-dismissible fade show"
+                            role="alert"
+                            style="margin-top: 20px;"
+                            id="info-alert"
+                        >
                             <i class="fas fa-info-circle mr-2"></i>
                             <strong>Información:</strong> {{ session('info') }}
                             <button type="button" class="close" data-dismiss="alert" aria-label="Close">
