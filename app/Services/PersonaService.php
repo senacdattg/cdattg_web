@@ -89,7 +89,11 @@ class PersonaService
 
             $this->syncCaracterizaciones($persona, $caracterizacionesIds);
 
-            // Ya no se crea usuario automáticamente
+            // Si la persona tiene correo, crear usuario y asignar rol VISITANTE
+            if (!empty($persona->email)) {
+                $this->crearUsuarioPersona($persona);
+            }
+
             return $persona->fresh(['caracterizacionesComplementarias', 'user']);
         });
     }
