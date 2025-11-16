@@ -447,7 +447,6 @@ class TalentoHumanoManager {
             { id: 'primer_apellido', nombre: 'Primer Apellido' },
             { id: 'fecha_nacimiento', nombre: 'Fecha de Nacimiento' },
             { id: 'genero', nombre: 'Género' },
-            { id: 'email', nombre: 'Correo Electrónico' },
             { id: 'pais_id', nombre: 'País' },
             { id: 'departamento_id', nombre: 'Departamento' },
             { id: 'municipio_id', nombre: 'Municipio' }

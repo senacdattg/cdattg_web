@@ -165,7 +165,7 @@ class PersonaController extends Controller
 
             return redirect()->route('personas.index')->with(
                 'success',
-                'La persona y su usuario fueron creados exitosamente en el sistema.'
+                'La persona fue creada exitosamente en el sistema.'
             );
         } catch (\Throwable $e) {
             Log::error('Error al registrar persona: ' . $e->getMessage());
@@ -582,38 +582,9 @@ class PersonaController extends Controller
 
     public function createUser(Persona $persona): RedirectResponse
     {
-        if ($persona->user) {
-            return redirect()
-                ->back()
-                ->with('error', 'La persona ya tiene un usuario asociado.');
-        }
-
-        if (empty($persona->email) || empty($persona->numero_documento)) {
-            return redirect()
-                ->back()
-                ->with('error', 'No es posible crear el usuario porque faltan datos de correo o documento.');
-        }
-
-        try {
-            $this->personaService->crearUsuarioParaPersona($persona);
-
-            return redirect()
-                ->route('personas.show', $persona->id)
-                ->with('success', 'Usuario creado correctamente. La contraseña inicial es el número de documento.');
-        } catch (PersonaException $exception) {
-            return redirect()
-                ->back()
-                ->with('error', $exception->getMessage());
-        } catch (\Throwable $exception) {
-            Log::error('Error al crear usuario para persona', [
-                'persona_id' => $persona->id,
-                'error' => $exception->getMessage(),
-            ]);
-
-            return redirect()
-                ->back()
-                ->with('error', 'No se pudo crear el usuario. Inténtalo nuevamente.');
-        }
+        return redirect()
+            ->back()
+            ->with('error', 'La creación de usuarios está deshabilitada temporalmente.');
     }
 
     /**

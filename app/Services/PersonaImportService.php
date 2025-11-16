@@ -607,7 +607,7 @@ class PersonaImportService
                 'user_edit_id' => $import->user_id,
             ]);
 
-            $this->crearUsuarioVisitante($persona);
+            // Ya no se crea usuario automáticamente durante la importación
 
             if (! in_array(true, $faltantes, true)) {
                 return;

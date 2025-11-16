@@ -122,10 +122,6 @@
                         nombre: 'Género'
                     },
                     {
-                        id: 'email',
-                        nombre: 'Correo Electrónico'
-                    },
-                    {
                         id: 'pais_id',
                         nombre: 'País'
                     },

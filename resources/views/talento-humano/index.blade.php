@@ -56,7 +56,8 @@
                     </div>
 
                     <!-- Modal para seleccionar sede -->
-                    <div class="modal fade" id="modalSede" tabindex="-1" role="dialog" aria-labelledby="modalSedeLabel" aria-hidden="true">
+                    <div class="modal fade" id="modalSede" tabindex="-1" role="dialog" aria-labelledby="modalSedeLabel"
+                        aria-hidden="true">
                         <div class="modal-dialog" role="document">
                             <div class="modal-content">
                                 <div class="modal-header">
@@ -70,7 +71,7 @@
                                         <label for="select_sede_modal">Sede <span class="text-danger">*</span></label>
                                         <select class="form-control" id="select_sede_modal" required>
                                             <option value="">Seleccione una sede...</option>
-                                            @foreach(\App\Models\Sede::where('status', 1)->get() as $sede)
+                                            @foreach (\App\Models\Sede::where('status', 1)->get() as $sede)
                                                 <option value="{{ $sede->id }}">{{ $sede->sede }}</option>
                                             @endforeach
                                         </select>
@@ -78,7 +79,8 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
-                                    <button type="button" class="btn btn-primary" id="btn-confirmar-sede">Confirmar</button>
+                                    <button type="button" class="btn btn-primary"
+                                        id="btn-confirmar-sede">Confirmar</button>
                                 </div>
                             </div>
                         </div>
@@ -117,7 +119,10 @@
                                     @csrf
                                     <input type="hidden" id="persona_id" name="persona_id">
                                     <input type="hidden" id="action_mode" name="action_mode" value="create">
-                                    @include('personas.partials.form', ['showCaracterizacion' => true, 'cardinales' => $cardinales])
+                                    @include('personas.partials.form', [
+                                        'showCaracterizacion' => true,
+                                        'cardinales' => $cardinales,
+                                    ])
                                 </form>
                             </div>
                             <div class="card-footer d-flex justify-content-end">
@@ -216,6 +221,7 @@
                 transform: translateX(100%);
                 opacity: 0;
             }
+
             to {
                 transform: translateX(0);
                 opacity: 1;
@@ -223,9 +229,12 @@
         }
 
         @keyframes pulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: scale(1);
             }
+
             50% {
                 transform: scale(1.05);
             }
@@ -242,99 +251,4 @@
 @section('js')
     @vite(['resources/js/app.js', 'resources/js/pages/formularios-select-dinamico.js', 'resources/js/pages/talento-humano.js'])
     @stack('js')
-    
-    {{-- Fix temporal para validación - eliminar después de compilar assets --}}
-    <script>
-    console.log('🔧 Iniciando parche de validación...');
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('📄 DOM cargado, buscando TalentoHumanoManager...');
-        
-        // Esperar a que TalentoHumanoManager esté disponible
-        const intervalo = setInterval(function() {
-            if (window.talentoHumanoManager) {
-                clearInterval(intervalo);
-                console.log('✅ TalentoHumanoManager encontrado!');
-                
-                // Sobrescribir el método validarFormulario
-                const manager = window.talentoHumanoManager;
-                
-                manager.validarFormulario = function() {
-                    console.log('🔍 Iniciando validación de formulario...');
-                    
-                    const camposRequeridos = [
-                        { id: 'tipo_documento', nombre: 'Tipo de Documento' },
-                        { id: 'numero_documento', nombre: 'Número de Documento' },
-                        { id: 'primer_nombre', nombre: 'Primer Nombre' },
-                        { id: 'primer_apellido', nombre: 'Primer Apellido' },
-                        { id: 'fecha_nacimiento', nombre: 'Fecha de Nacimiento' },
-                        { id: 'genero', nombre: 'Género' },
-                        { id: 'email', nombre: 'Correo Electrónico' },
-                        { id: 'pais_id', nombre: 'País' },
-                        { id: 'departamento_id', nombre: 'Departamento' },
-                        { id: 'municipio_id', nombre: 'Municipio' }
-                    ];
-
-                    let valido = true;
-                    let primerCampoInvalido = null;
-                    let camposFaltantes = [];
-
-                    camposRequeridos.forEach(campo => {
-                        const elemento = document.getElementById(campo.id);
-                        const valor = elemento ? elemento.value.trim() : '';
-                        
-                        console.log(`  ${campo.nombre}: ${valor ? '✅ OK' : '❌ VACÍO'}`);
-                        
-                        if (elemento && !valor) {
-                            elemento.classList.add('is-invalid');
-                            if (!primerCampoInvalido) {
-                                primerCampoInvalido = elemento;
-                            }
-                            camposFaltantes.push(campo.nombre);
-                            valido = false;
-                        } else if (elemento) {
-                            elemento.classList.remove('is-invalid');
-                        }
-                    });
-
-                    if (!valido) {
-                        console.error('❌ Validación fallida. Campos faltantes:', camposFaltantes);
-                        
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'Campos requeridos',
-                            html: '<strong>Complete todos los campos obligatorios marcados con *</strong><br><br>' +
-                                  '<div style="text-align: left; color: #666;">Faltan:<br>' +
-                                  camposFaltantes.map(c => '• ' + c).join('<br>') + '</div>',
-                            confirmButtonText: 'Entendido',
-                            confirmButtonColor: '#3085d6',
-                            allowOutsideClick: false
-                        });
-                        
-                        if (primerCampoInvalido) {
-                            setTimeout(() => {
-                                primerCampoInvalido.focus();
-                                primerCampoInvalido.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            }, 100);
-                        }
-                    } else {
-                        console.log('✅ Validación exitosa, todos los campos completos');
-                    }
-
-                    return valido;
-                };
-                
-                console.log('✅✅✅ Validación de formulario PARCHEADA correctamente');
-            }
-        }, 100);
-        
-        // Timeout de seguridad
-        setTimeout(() => {
-            clearInterval(intervalo);
-            if (!window.talentoHumanoManager) {
-                console.error('❌ TalentoHumanoManager no se encontró después de 5 segundos');
-            }
-        }, 5000);
-    });
-    </script>
 @endsection

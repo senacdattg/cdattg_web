@@ -89,9 +89,7 @@ class PersonaService
 
             $this->syncCaracterizaciones($persona, $caracterizacionesIds);
 
-            // Crear usuario asociado
-            $this->crearUsuarioPersona($persona);
-
+            // Ya no se crea usuario automáticamente
             return $persona->fresh(['caracterizacionesComplementarias', 'user']);
         });
     }

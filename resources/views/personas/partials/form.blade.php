@@ -246,11 +246,11 @@
                     </div>
                     <div class="col-md-12 mb-0">
                         <label for="email" class="form-label font-weight-bold">
-                            Correo electrónico <span class="text-danger">*</span>
+                            Correo electrónico
                         </label>
                         <input type="email" id="email" name="email"
                             class="form-control @error('email') is-invalid @enderror"
-                            value="{{ old('email', $isEdit ? $persona->email : '') }}" required>
+                            value="{{ old('email', $isEdit ? $persona->email : '') }}">
                         @error('email')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
