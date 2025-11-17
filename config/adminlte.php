@@ -9,6 +9,21 @@ $permisoVerProveedor = 'VER PROVEEDOR';
 $permisoVerContrato = 'VER CONTRATO';
 $permisoVerOrden = 'VER ORDEN';
 
+// Constantes para permisos duplicados
+$permisoVerProgramaCaracterizacion = 'VER PROGRAMA DE CARACTERIZACION';
+$permisoVerCompetencia = 'VER COMPETENCIA';
+$permisoVerResultadoAprendizaje = 'VER RESULTADO APRENDIZAJE';
+$permisoVerSede = 'VER SEDE';
+$permisoVerBloque = 'VER BLOQUE';
+$permisoVerPiso = 'VER PISO';
+$permisoVerAmbiente = 'VER AMBIENTE';
+$permisoVerParametro = 'VER PARAMETRO';
+$permisoVerTema = 'VER TEMA';
+
+// Constantes para íconos duplicados
+$iconoLista = 'fas fa-fw fa-list';
+$iconoAgregar = 'fas fa-fw fa-plus';
+
 return [
 
     /*
@@ -123,7 +138,7 @@ return [
         'mode' => 'fullscreen',
         'img' => [
             'path' => $rutaLogoAdmin,
-            'alt' => 'AdminLTE Preloader Image',
+            'alt' => 'Servicio Nacional de Aprendizaje - SENA',
             'effect' => 'animation__shake',
             'width' => 60,
             'height' => 60,
@@ -392,299 +407,225 @@ return [
         [
             'text' => 'Notificaciones',
             'url'  => 'inventario/notificaciones',
-            'icon' => 'fas fa-bell',
+            'icon' => 'fas fa-fw fa-bell',
             'can'  => 'VER NOTIFICACION',
         ],
         // ========================================
-        // MÓDULO: CONFIGURACIÓN DEL SISTEMA
+        // GESTIÓN ACADÉMICA
         // ========================================
-        [],
         [
-            'text' => 'Sistema',
-            'icon' => 'fas fa-fw fa-cogs',
-            'can' => ['VER PARAMETRO', 'VER TEMA', 'ASIGNAR PERMISOS'],
-            'submenu' => [
-                [
-                    'text' => 'Parámetros',
-                    'url' => 'parametro',
-                    'icon' => 'fas fa-fw fa-sliders-h',
-                    'can' => 'VER PARAMETRO',
-                ],
-                [
-                    'text' => 'Temas',
-                    'url' => 'tema',
-                    'icon' => 'fas fa-fw fa-paint-brush',
-                    'can' => 'VER TEMA',
-                ],
-                [
-                    'text' => 'Permisos',
-                    'url' => 'permiso',
-                    'icon' => 'fas fa-fw fa-lock',
-                    'can' => 'ASIGNAR PERMISOS',
-                ],
-            ],
+            'header' => 'GESTIÓN ACADÉMICA',
         ],
-        [
-            'text' => 'Personas',
-            'url' => 'personas',
-            'icon' => 'fas fa-fw fa-users',
-            'can' => 'VER PERSONA',
-        ],
-        // ========================================
-        // MÓDULO: INFRAESTRUCTURA
-        // ========================================
-        [],
-        [
-            'text' => 'Regionales',
-            'url' => 'regional',
-            'icon' => 'fas fa-fw fa-map-marker-alt',
-            'can' => 'VER REGIONAL',
-        ],
-        [
-            'text' => 'Centros de Formación',
-            'url' => 'centros',
-            'icon' => 'fas fa-fw fa-school',
-            'can' => 'VER CENTROS DE FORMACION',
-        ],
-        [
-            'text' => 'Sedes',
-            'icon' => 'fas fa-fw fa-building',
-            'can' => 'VER SEDE',
-            'submenu' => [
-                [
-                    'text' => 'Ver Sedes',
-                    'url' => 'sede',
-                    'icon' => 'fas fa-fw fa-list',
-                    'can' => 'VER SEDE',
-                ],
-                [
-                    'text' => 'Crear Sede',
-                    'url' => 'sede/create',
-                    'icon' => 'fas fa-fw fa-plus',
-                    'can' => 'CREAR SEDE',
-                ],
-            ],
-        ],
-        [
-            'text' => 'Bloques',
-            'icon' => 'fas fa-fw fa-th-large',
-            'can' => 'VER BLOQUE',
-            'submenu' => [
-                [
-                    'text' => 'Ver Bloques',
-                    'url' => 'bloque',
-                    'icon' => 'fas fa-fw fa-list',
-                    'can' => 'VER BLOQUE',
-                ],
-                [
-                    'text' => 'Crear Bloque',
-                    'url' => 'bloque/create',
-                    'icon' => 'fas fa-fw fa-plus',
-                    'can' => 'CREAR BLOQUE',
-                ],
-            ],
-        ],
-        [
-            'text' => 'Pisos',
-            'icon' => 'fas fa-fw fa-layer-group',
-            'can' => 'VER PISO',
-            'submenu' => [
-                [
-                    'text' => 'Ver Pisos',
-                    'url' => 'piso',
-                    'icon' => 'fas fa-fw fa-list',
-                    'can' => 'VER PISO',
-                ],
-                [
-                    'text' => 'Crear Piso',
-                    'url' => 'piso/create',
-                    'icon' => 'fas fa-fw fa-plus',
-                    'can' => 'CREAR PISO',
-                ],
-            ],
-        ],
-        [
-            'text' => 'Ambientes',
-            'icon' => 'fas fa-fw fa-door-open',
-            'can' => 'VER AMBIENTE',
-            'submenu' => [
-                [
-                    'text' => 'Ver Ambientes',
-                    'url' => 'ambiente',
-                    'icon' => 'fas fa-fw fa-list',
-                    'can' => 'VER AMBIENTE',
-                ],
-                [
-                    'text' => 'Crear Ambiente',
-                    'url' => 'ambiente/create',
-                    'icon' => 'fas fa-fw fa-plus',
-                    'can' => 'CREAR AMBIENTE',
-                ],
-            ],
-        ],
-
-        // ========================================
-        // MÓDULO: GESTIÓN ACADÉMICA
-        // ========================================
-        [],
         [
             'text' => 'Programas de Formación',
-            'icon' => 'fas fa-fw fa-book',
-            'can' => ['VER PROGRAMA DE CARACTERIZACION', 'programa.index'],
+            'icon' => 'fas fa-fw fa-graduation-cap',
+            'can' => [$permisoVerProgramaCaracterizacion, 'programa.index'],
             'submenu' => [
                 [
-                    'text' => 'Ver Programas',
-                    'url' => 'programa',
-                    'icon' => 'fas fa-fw fa-list',
-                    'can' => ['VER PROGRAMA DE CARACTERIZACION', 'programa.index'],
+                    'text' => 'Programas Técnicos',
+                    'icon' => 'fas fa-fw fa-book',
+                    'submenu' => [
+                        [
+                            'text' => 'Ver Programas',
+                            'url' => 'programa',
+                            'icon' => $iconoLista,
+                            'can' => [$permisoVerProgramaCaracterizacion, 'programa.index'],
+                        ],
+                        [
+                            'text' => 'Crear Programa',
+                            'url' => 'programa/create',
+                            'icon' => $iconoAgregar,
+                            'can' => [$permisoVerProgramaCaracterizacion, 'programa.create'],
+                        ],
+                        [
+                            'text' => 'Redes de Conocimiento',
+                            'url' => 'red-conocimiento',
+                            'icon' => 'fas fa-fw fa-network-wired',
+                            'can' => ['VER RED CONOCIMIENTO', 'CREAR RED CONOCIMIENTO'],
+                        ],
+                    ],
                 ],
                 [
-                    'text' => 'Crear Programa',
-                    'url' => 'programa/create',
-                    'icon' => 'fas fa-fw fa-plus',
-                    'can' => ['VER PROGRAMA DE CARACTERIZACION', 'programa.create'],
+                    'text' => 'Programas Complementarios',
+                    'icon' => 'fas fa-fw fa-certificate',
+                    'can' => $permisoVerProgramaCaracterizacion,
+                    'submenu' => [
+                        [
+                            'text' => 'Ver Complementarios',
+                            'url' => 'complementarios-ofertados',
+                            'icon' => $iconoLista,
+                            'can' => 'VER PROGRAMA COMPLEMENTARIO',
+                        ],
+                        [
+                            'text' => 'Crear Complementario',
+                            'url' => 'complementarios-ofertados/create',
+                            'icon' => $iconoAgregar,
+                            'can' => 'CREAR PROGRAMA COMPLEMENTARIO',
+                        ],
+                        [
+                            'text' => 'Gestión de Aspirantes',
+                            'url' => 'gestion-aspirantes',
+                            'icon' => 'fas fa-fw fa-users',
+                            'can' => [$permisoVerProgramaCaracterizacion],
+                        ],
+                        [
+                            'text' => 'Estadísticas',
+                            'url' => 'estadisticas',
+                            'icon' => 'fas fa-fw fa-chart-line',
+                            'can' => 'VER ESTADISTICAS',
+                        ],
+                        [
+                            'text' => 'Procesar Documentos',
+                            'url' => 'procesar-documentos',
+                            'icon' => 'fas fa-fw fa-file-signature',
+                            'can' => [$permisoVerProgramaCaracterizacion],
+                        ],
+                    ],
                 ],
             ],
         ],
         [
-            'text' => 'Redes de Conocimiento',
-            'url' => 'red-conocimiento',
-            'icon' => 'fas fa-fw fa-network-wired',
-            'can' => ['VER RED CONOCIMIENTO', 'CREAR RED CONOCIMIENTO'],
-        ],
-        [
-            'text' => 'Competencias',
-            'icon' => 'fas fa-fw fa-clipboard-list',
-            'can' => ['VER COMPETENCIA', 'CREAR COMPETENCIA'],
+            'text' => 'Competencias y Resultados',
+            'icon' => 'fas fa-fw fa-clipboard-check',
+            'can' => [$permisoVerCompetencia, $permisoVerResultadoAprendizaje],
             'submenu' => [
                 [
-                    'text' => 'Ver Competencias',
-                    'route' => 'competencias.index',
-                    'icon' => 'fas fa-fw fa-list',
-                    'can' => 'VER COMPETENCIA',
+                    'text' => 'Competencias',
+                    'icon' => 'fas fa-fw fa-clipboard-list',
+                    'can' => [$permisoVerCompetencia, 'CREAR COMPETENCIA'],
+                    'submenu' => [
+                        [
+                            'text' => 'Ver Competencias',
+                            'route' => 'competencias.index',
+                            'icon' => $iconoLista,
+                            'can' => $permisoVerCompetencia,
+                        ],
+                        [
+                            'text' => 'Crear Competencia',
+                            'route' => 'competencias.create',
+                            'icon' => $iconoAgregar,
+                            'can' => 'CREAR COMPETENCIA',
+                        ],
+                    ],
                 ],
                 [
-                    'text' => 'Crear Competencia',
-                    'route' => 'competencias.create',
-                    'icon' => 'fas fa-fw fa-plus',
-                    'can' => 'CREAR COMPETENCIA',
+                    'text' => 'Resultados de Aprendizaje',
+                    'icon' => 'fas fa-fw fa-trophy',
+                    'can' => [$permisoVerResultadoAprendizaje, 'CREAR RESULTADO APRENDIZAJE'],
+                    'submenu' => [
+                        [
+                            'text' => 'Ver Resultados',
+                            'url' => 'resultados-aprendizaje',
+                            'icon' => $iconoLista,
+                            'can' => $permisoVerResultadoAprendizaje,
+                        ],
+                        [
+                            'text' => 'Crear Resultado',
+                            'url' => 'resultados-aprendizaje/create',
+                            'icon' => $iconoAgregar,
+                            'can' => 'CREAR RESULTADO APRENDIZAJE',
+                        ],
+                    ],
+                ],
+                [
+                    'text' => 'Guías de Aprendizaje',
+                    'icon' => 'fas fa-fw fa-book-open',
+                    'can' => ['VER GUIA APRENDIZAJE', 'CREAR GUIA APRENDIZAJE'],
+                    'submenu' => [
+                        [
+                            'text' => 'Ver Guías',
+                            'url' => 'guias-aprendizaje',
+                            'icon' => $iconoLista,
+                            'can' => 'VER GUIA APRENDIZAJE',
+                        ],
+                        [
+                            'text' => 'Crear Guía',
+                            'url' => 'guias-aprendizaje/create',
+                            'icon' => $iconoAgregar,
+                            'can' => 'CREAR GUIA APRENDIZAJE',
+                        ],
+                    ],
                 ],
             ],
         ],
         [
-            'text' => 'Resultados de Aprendizaje',
-            'icon' => 'fas fa-fw fa-trophy',
-            'can' => ['VER RESULTADO APRENDIZAJE', 'CREAR RESULTADO APRENDIZAJE'],
-            'submenu' => [
-                [
-                    'text' => 'Ver Resultados',
-                    'url' => 'resultados-aprendizaje',
-                    'icon' => 'fas fa-fw fa-list',
-                    'can' => 'VER RESULTADO APRENDIZAJE',
-                ],
-                [
-                    'text' => 'Crear Resultado',
-                    'url' => 'resultados-aprendizaje/create',
-                    'icon' => 'fas fa-fw fa-plus',
-                    'can' => 'CREAR RESULTADO APRENDIZAJE',
-                ],
-            ],
-        ],
-        [
-            'text' => 'Asignaciones de Instructores',
-            'icon' => 'fas fa-fw fa-user-check',
-            'url' => 'asignaciones/instructores',
-            'can' => ['ASIGNACION DE INSTRUCTORES'],
-        ],
-        [
-            'text' => 'Guías de Aprendizaje',
-            'icon' => 'fas fa-fw fa-book-open',
-            'can' => ['VER GUIA APRENDIZAJE', 'CREAR GUIA APRENDIZAJE'],
-            'submenu' => [
-                [
-                    'text' => 'Ver Guías',
-                    'url' => 'guias-aprendizaje',
-                    'icon' => 'fas fa-fw fa-list',
-                    'can' => 'VER GUIA APRENDIZAJE',
-                ],
-                [
-                    'text' => 'Crear Guía',
-                    'url' => 'guias-aprendizaje/create',
-                    'icon' => 'fas fa-fw fa-plus',
-                    'can' => 'CREAR GUIA APRENDIZAJE',
-                ],
-            ],
-        ],
-
-        // ========================================
-        // MÓDULO: FICHAS Y CARACTERIZACIÓN
-        // ========================================
-        [],
-        [
-            'text' => 'Fichas de Caracterización',
+            'text' => 'Fichas y Jornadas',
             'icon' => 'fas fa-fw fa-file-alt',
-            'can' => ['VER FICHA CARACTERIZACION', 'VER PROGRAMA DE CARACTERIZACION'],
+            'can' => ['VER FICHA CARACTERIZACION', 'VER JORNADA'],
             'submenu' => [
                 [
-                    'text' => 'Ver Fichas',
-                    'url' => 'fichaCaracterizacion',
-                    'icon' => 'fas fa-fw fa-list',
-                    'can' => 'VER FICHA CARACTERIZACION',
+                    'text' => 'Fichas de Caracterización',
+                    'icon' => 'fas fa-fw fa-file-alt',
+                    'submenu' => [
+                        [
+                            'text' => 'Ver Fichas',
+                            'url' => 'fichaCaracterizacion',
+                            'icon' => $iconoLista,
+                            'can' => 'VER FICHA CARACTERIZACION',
+                        ],
+                        [
+                            'text' => 'Crear Ficha',
+                            'url' => 'fichaCaracterizacion/create',
+                            'icon' => $iconoAgregar,
+                            'can' => 'CREAR FICHA CARACTERIZACION',
+                        ],
+                    ],
                 ],
                 [
-                    'text' => 'Crear Ficha',
-                    'url' => 'fichaCaracterizacion/create',
-                    'icon' => 'fas fa-fw fa-plus',
-                    'can' => 'CREAR FICHA CARACTERIZACION',
-                ],
-            ],
-        ],
-        [
-            'text' => 'Jornadas de Formación',
-            'icon' => 'fas fa-fw fa-calendar-alt',
-            'can' => ['VER JORNADA', 'VER PROGRAMA DE CARACTERIZACION'],
-            'submenu' => [
-                [
-                    'text' => 'Ver Jornadas',
-                    'url' => 'jornada',
-                    'icon' => 'fas fa-fw fa-list',
-                    'can' => 'VER JORNADA',
-                ],
-                [
-                    'text' => 'Crear Jornada',
-                    'url' => 'jornada/create',
-                    'icon' => 'fas fa-fw fa-plus',
-                    'can' => 'CREAR JORNADA',
+                    'text' => 'Jornadas de Formación',
+                    'icon' => 'fas fa-fw fa-calendar-alt',
+                    'submenu' => [
+                        [
+                            'text' => 'Ver Jornadas',
+                            'url' => 'jornada',
+                            'icon' => $iconoLista,
+                            'can' => 'VER JORNADA',
+                        ],
+                        [
+                            'text' => 'Crear Jornada',
+                            'url' => 'jornada/create',
+                            'icon' => $iconoAgregar,
+                            'can' => 'CREAR JORNADA',
+                        ],
+                    ],
                 ],
             ],
         ],
 
         // ========================================
-        // MÓDULO: PERSONAL
+        // GESTIÓN DE PERSONAL
         // ========================================
-        [],
+        [
+            'header' => 'GESTIÓN DE PERSONAL',
+        ],
         [
             'text' => 'Instructores',
             'icon' => 'fas fa-fw fa-chalkboard-teacher',
-            'can' => 'VER PROGRAMA DE CARACTERIZACION',
+            'can' => $permisoVerProgramaCaracterizacion,
             'submenu' => [
                 [
                     'text' => 'Ver Instructores',
                     'url' => 'instructor',
-                    'icon' => 'fas fa-fw fa-list',
-                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
+                    'icon' => $iconoLista,
+                    'can' => $permisoVerProgramaCaracterizacion,
                 ],
                 [
                     'text' => 'Crear Instructor',
                     'url' => 'instructor/create',
-                    'icon' => 'fas fa-fw fa-plus',
-                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
+                    'icon' => $iconoAgregar,
+                    'can' => $permisoVerProgramaCaracterizacion,
                 ],
                 [
                     'text' => 'Importar CSV',
                     'url' => 'createImportarCSV',
                     'icon' => 'fas fa-fw fa-file-csv',
-                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
+                    'can' => $permisoVerProgramaCaracterizacion,
+                ],
+                [
+                    'text' => 'Asignaciones',
+                    'url' => 'asignaciones/instructores',
+                    'icon' => 'fas fa-fw fa-user-check',
+                    'can' => ['ASIGNACION DE INSTRUCTORES'],
                 ],
             ],
         ],
@@ -696,133 +637,206 @@ return [
                 [
                     'text' => 'Ver Aprendices',
                     'url' => 'aprendices',
-                    'icon' => 'fas fa-fw fa-list',
+                    'icon' => $iconoLista,
                     'can' => 'VER APRENDIZ',
                 ],
                 [
                     'text' => 'Crear Aprendiz',
                     'url' => 'aprendices/create',
-                    'icon' => 'fas fa-fw fa-plus',
+                    'icon' => $iconoAgregar,
                     'can' => 'CREAR APRENDIZ',
                 ],
-            ],
-        ],
-
-        // ========================================
-        // MÓDULO: ASISTENCIA
-        // ========================================
-        [],
-        [
-            'text' => 'Tomar Asistencia',
-            'url' => 'asistencia',
-            'icon' => 'fas fa-fw fa-check-square',
-            'can' => 'TOMAR ASISTENCIA',
-        ],
-        [
-            'text' => 'Consultar Asistencias',
-            'icon' => 'fas fa-fw fa-clipboard-check',
-            'can' => ['VER ASISTENCIA', 'VER PROGRAMA DE CARACTERIZACION'],
-            'submenu' => [
                 [
-                    'text' => 'Consultas',
-                    'url' => 'consulta',
-                    'icon' => 'fas fa-fw fa-search',
-                    'can' => 'VER CONSULTA',
-                ],
-                [
-                    'text' => 'Consulta Personalizada',
-                    'url' => '#',
-                    'icon' => 'fas fa-fw fa-filter',
-                    'can' => 'VER PROGRAMA DE CARACTERIZACION',
-                ],
-            ],
-        ],
-
-        // ========================================
-        // MÓDULO: CARNETS
-        // ========================================
-        [],
-        [
-            'text' => 'Gestión de Carnets',
-            'icon' => 'fas fa-fw fa-id-card',
-            'can' => ['VER PROGRAMA DE CARACTERIZACION', 'VER CREAR CARNET'],
-            'submenu' => [
-                [
-                    'text' => 'Administrar Carnets',
-                    'url' => 'administrar-carnet',
-                    'icon' => 'fas fa-fw fa-tasks',
-                    'can' => 'VER ADMINISTRAR CARNET',
-                ],
-                [
-                    'text' => 'Crear Carnet',
-                    'url' => 'carnet',
-                    'icon' => 'fas fa-fw fa-plus',
-                    'can' => ['VER PROGRAMA DE CARACTERIZACION', 'VER CREAR CARNET'],
-                ],
-            ],
-        ],
-        // Gestion de complementarios
-        [
-            'text' => 'Complementarios',
-            'icon' => 'fas fa-folder-open',
-            'can' => 'VER PROGRAMA DE CARACTERIZACION',
-            'submenu' => [
-                [
-                    'text' => 'Gestión complementarios',
-                    'icon' => 'fas fa-graduation-cap',
-                    'classes' => 'text-sm',
+                    'text' => 'Gestión de Carnets',
+                    'icon' => 'fas fa-fw fa-id-card',
+                    'can' => [$permisoVerProgramaCaracterizacion, 'VER CREAR CARNET'],
                     'submenu' => [
                         [
-                            'text' => 'Ver complementarios',
-                            'url' => 'complementarios-ofertados',
-                            'icon' => 'fas fa-list',
-                            'can' => 'VER PROGRAMA COMPLEMENTARIO',
-                            'classes' => 'text-sm',
+                            'text' => 'Administrar Carnets',
+                            'url' => 'administrar-carnet',
+                            'icon' => 'fas fa-fw fa-tasks',
+                            'can' => 'VER ADMINISTRAR CARNET',
                         ],
                         [
-                            'text' => 'Crear complementario',
-                            'url' => 'complementarios-ofertados/create',
-                            'icon' => 'fas fa-plus',
-                            'can' => 'CREAR PROGRAMA COMPLEMENTARIO',
-                            'classes' => 'text-sm',
+                            'text' => 'Crear Carnet',
+                            'url' => 'carnet',
+                            'icon' => $iconoAgregar,
+                            'can' => [$permisoVerProgramaCaracterizacion, 'VER CREAR CARNET'],
                         ],
                     ],
                 ],
+            ],
+        ],
+        [
+            'text' => 'Personas',
+            'url' => 'personas',
+            'icon' => 'fas fa-fw fa-users',
+            'can' => 'VER PERSONA',
+        ],
+        [
+            'text' => 'Talento Humano',
+            'url' => 'talento-humano',
+            'icon' => 'fas fa-fw fa-user-tie',
+            'can' => 'VER TALENTO HUMANO',
+        ],
+
+        // ========================================
+        // CONTROL Y SEGUIMIENTO
+        // ========================================
+        [
+            'header' => 'CONTROL Y SEGUIMIENTO',
+        ],
+        [
+            'text' => 'Asistencia',
+            'icon' => 'fas fa-fw fa-user-check',
+            'can' => ['TOMAR ASISTENCIA', 'VER ASISTENCIA'],
+            'submenu' => [
                 [
-                    'text' => 'Gestion de aspirantes',
-                    'url' => 'gestion-aspirantes',
-                    'icon' => 'fas fa-users',
-                    'can' => [
-                        'VER PROGRAMA DE CARACTERIZACION',
-                        'CREAR PROGRAMA DE CARACTERIZACION',
-                        'EDITAR PROGRAMA DE CARACTERIZACION',
-                        'ELIMINAR PROGRAMA DE CARACTERIZACION',
+                    'text' => 'Tomar Asistencia',
+                    'url' => 'asistencia',
+                    'icon' => 'fas fa-fw fa-check-square',
+                    'can' => 'TOMAR ASISTENCIA',
+                ],
+                [
+                    'text' => 'Consultar Asistencias',
+                    'icon' => 'fas fa-fw fa-clipboard-check',
+                    'can' => ['VER ASISTENCIA', $permisoVerProgramaCaracterizacion],
+                    'submenu' => [
+                        [
+                            'text' => 'Consultas',
+                            'url' => 'consulta',
+                            'icon' => 'fas fa-fw fa-search',
+                            'can' => 'VER CONSULTA',
+                        ],
+                        [
+                            'text' => 'Consulta Personalizada',
+                            'url' => '#',
+                            'icon' => 'fas fa-fw fa-filter',
+                            'can' => $permisoVerProgramaCaracterizacion,
+                        ],
                     ],
-                ],
-                [
-                    'text' => 'Estadisticas',
-                    'url' => 'estadisticas',
-                    'icon' => 'fas fa-chart-line',
-                    'can' => 'VER ESTADISTICAS',
-                ],
-                [
-                    'text' => 'Procesar documentos',
-                    'url' => 'procesar-documentos',
-                    'icon' => 'fas fa-file-signature',
-                    'can' => [
-                        'VER PROGRAMA DE CARACTERIZACION',
-                        'CREAR PROGRAMA DE CARACTERIZACION',
-                        'EDITAR PROGRAMA DE CARACTERIZACION',
-                        'ELIMINAR PROGRAMA DE CARACTERIZACION',
-                    ]
                 ],
             ],
         ],
 
-        // Inventario
+        // ========================================
+        // INFRAESTRUCTURA FÍSICA
+        // ========================================
+        [
+            'header' => 'INFRAESTRUCTURA',
+        ],
+        [
+            'text' => 'Organización Territorial',
+            'icon' => 'fas fa-fw fa-map-marked-alt',
+            'can' => ['VER REGIONAL', 'VER CENTROS DE FORMACION'],
+            'submenu' => [
+                [
+                    'text' => 'Regionales',
+                    'url' => 'regional',
+                    'icon' => 'fas fa-fw fa-map-marker-alt',
+                    'can' => 'VER REGIONAL',
+                ],
+                [
+                    'text' => 'Centros de Formación',
+                    'url' => 'centros',
+                    'icon' => 'fas fa-fw fa-school',
+                    'can' => 'VER CENTROS DE FORMACION',
+                ],
+            ],
+        ],
+        [
+            'text' => 'Instalaciones',
+            'icon' => 'fas fa-fw fa-building',
+            'can' => [$permisoVerSede, $permisoVerBloque, $permisoVerPiso, $permisoVerAmbiente],
+            'submenu' => [
+                [
+                    'text' => 'Sedes',
+                    'icon' => 'fas fa-fw fa-building',
+                    'can' => $permisoVerSede,
+                    'submenu' => [
+                        [
+                            'text' => 'Ver Sedes',
+                            'url' => 'sede',
+                            'icon' => $iconoLista,
+                            'can' => $permisoVerSede,
+                        ],
+                        [
+                            'text' => 'Crear Sede',
+                            'url' => 'sede/create',
+                            'icon' => $iconoAgregar,
+                            'can' => 'CREAR SEDE',
+                        ],
+                    ],
+                ],
+                [
+                    'text' => 'Bloques',
+                    'icon' => 'fas fa-fw fa-th-large',
+                    'can' => $permisoVerBloque,
+                    'submenu' => [
+                        [
+                            'text' => 'Ver Bloques',
+                            'url' => 'bloque',
+                            'icon' => $iconoLista,
+                            'can' => $permisoVerBloque,
+                        ],
+                        [
+                            'text' => 'Crear Bloque',
+                            'url' => 'bloque/create',
+                            'icon' => $iconoAgregar,
+                            'can' => 'CREAR BLOQUE',
+                        ],
+                    ],
+                ],
+                [
+                    'text' => 'Pisos',
+                    'icon' => 'fas fa-fw fa-layer-group',
+                    'can' => $permisoVerPiso,
+                    'submenu' => [
+                        [
+                            'text' => 'Ver Pisos',
+                            'url' => 'piso',
+                            'icon' => $iconoLista,
+                            'can' => $permisoVerPiso,
+                        ],
+                        [
+                            'text' => 'Crear Piso',
+                            'url' => 'piso/create',
+                            'icon' => $iconoAgregar,
+                            'can' => 'CREAR PISO',
+                        ],
+                    ],
+                ],
+                [
+                    'text' => 'Ambientes',
+                    'icon' => 'fas fa-fw fa-door-open',
+                    'can' => $permisoVerAmbiente,
+                    'submenu' => [
+                        [
+                            'text' => 'Ver Ambientes',
+                            'url' => 'ambiente',
+                            'icon' => $iconoLista,
+                            'can' => $permisoVerAmbiente,
+                        ],
+                        [
+                            'text' => 'Crear Ambiente',
+                            'url' => 'ambiente/create',
+                            'icon' => $iconoAgregar,
+                            'can' => 'CREAR AMBIENTE',
+                        ],
+                    ],
+                ],
+            ],
+        ],
+
+        // ========================================
+        // INVENTARIO
+        // ========================================
+        [
+            'header' => 'INVENTARIO',
+        ],
         [
             'text' => 'Inventario',
-            'icon' => 'fa-solid fa-boxes-stacked',
+            'icon' => 'fas fa-fw fa-boxes',
             'can'  => [
                 $permisoVerProducto,
                 $permisoVerCatalogoProducto,
@@ -836,12 +850,12 @@ return [
                 [
                     'text' => 'Dashboard',
                     'url'  => 'inventario/dashboard',
-                    'icon' => 'fa-solid fa-chart-bar',
+                    'icon' => 'fas fa-fw fa-chart-bar',
                     'can'  => 'VER DASHBOARD INVENTARIO',
                 ],
                 [
                     'text' => 'Productos',
-                    'icon' => 'fa-solid fa-box',
+                    'icon' => 'fas fa-fw fa-box',
                     'can'  => [
                         $permisoVerProducto,
                         $permisoVerCatalogoProducto,
@@ -850,19 +864,19 @@ return [
                         [
                             'text' => 'Lista de Productos',
                             'url'  => 'inventario/productos',
-                            'icon' => 'fa-solid fa-list',
+                            'icon' => $iconoLista,
                             'can'  => $permisoVerProducto,
                         ],
                         [
                             'text' => 'Catálogo de Productos',
                             'url'  => 'inventario/productos/catalogo',
-                            'icon' => 'fa-solid fa-th',
+                            'icon' => 'fas fa-fw fa-th',
                             'can'  => $permisoVerCatalogoProducto,
                         ],
                         [
                             'text' => 'Crear Producto',
                             'url'  => 'inventario/productos/create',
-                            'icon' => 'fa-solid fa-plus',
+                            'icon' => $iconoAgregar,
                             'can'  => 'CREAR PRODUCTO',
                         ],
                     ],
@@ -870,63 +884,62 @@ return [
                 [
                     'text' => 'Carrito Sena',
                     'url'  => 'inventario/carrito-sena',
-                    'icon' => 'fa-solid fa-cart-plus',
+                    'icon' => 'fas fa-fw fa-shopping-cart',
                     'can'  => 'VER CARRITO',
                 ],
                 [
                     'text' => 'Órdenes',
-                    'url'  => 'inventario/ordenes',
-                    'icon' => 'fa-solid fa-file-invoice',
+                    'icon' => 'fas fa-fw fa-file-invoice',
                     'can'  => $permisoVerOrden,
                     'submenu' => [
                         [
                             'text' => 'Todas las Órdenes',
                             'url'  => 'inventario/ordenes',
-                            'icon' => 'fa-solid fa-list',
+                            'icon' => $iconoLista,
                             'can'  => $permisoVerOrden,
                         ],
                         [
                             'text' => 'Aprobaciones Pendientes',
                             'url'  => 'inventario/aprobaciones/pendientes',
-                            'icon' => 'fa-solid fa-hourglass-half',
+                            'icon' => 'fas fa-fw fa-hourglass-half',
                             'can'  => 'APROBAR ORDEN',
                         ],
                         [
                             'text' => 'Órdenes Aprobadas',
                             'url'  => 'inventario/ordenes/completadas',
-                            'icon' => 'fa-solid fa-check-circle',
+                            'icon' => 'fas fa-fw fa-check-circle',
                             'can'  => $permisoVerOrden,
                         ],
                         [
                             'text' => 'Órdenes Rechazadas',
                             'url'  => 'inventario/ordenes/rechazadas',
-                            'icon' => 'fa-solid fa-times-circle',
+                            'icon' => 'fas fa-fw fa-times-circle',
                             'can'  => $permisoVerOrden,
                         ],
                     ],
                 ],
                 [
                     'text' => 'Devoluciones',
-                    'icon' => 'fa-solid fa-undo',
+                    'icon' => 'fas fa-fw fa-undo',
                     'can'  => 'DEVOLVER PRESTAMO',
                     'submenu' => [
                         [
                             'text' => 'Préstamos Pendientes',
                             'url'  => 'inventario/devoluciones',
-                            'icon' => 'fa-solid fa-clock',
+                            'icon' => 'fas fa-fw fa-clock',
                             'can'  => 'DEVOLVER PRESTAMO',
                         ],
                         [
                             'text' => 'Historial Devoluciones',
                             'url'  => 'inventario/devoluciones-historial',
-                            'icon' => 'fa-solid fa-history',
+                            'icon' => 'fas fa-fw fa-history',
                             'can'  => 'VER DEVOLUCION',
                         ],
                     ],
                 ],
                 [
                     'text' => 'Configuración',
-                    'icon' => 'fa-solid fa-cog',
+                    'icon' => 'fas fa-fw fa-cog',
                     'can'  => [
                         $permisoVerCategoria,
                         $permisoVerMarca,
@@ -937,25 +950,25 @@ return [
                         [
                             'text' => 'Categorías',
                             'url'  => 'inventario/categorias',
-                            'icon' => 'fa-solid fa-tags',
+                            'icon' => 'fas fa-fw fa-tags',
                             'can'  => $permisoVerCategoria,
                         ],
                         [
                             'text' => 'Marcas',
                             'url'  => 'inventario/marcas',
-                            'icon' => 'fa-solid fa-trademark',
+                            'icon' => 'fas fa-fw fa-trademark',
                             'can'  => $permisoVerMarca,
                         ],
                         [
                             'text' => 'Proveedores',
                             'url'  => 'inventario/proveedores',
-                            'icon' => 'fa-solid fa-truck',
+                            'icon' => 'fas fa-fw fa-truck',
                             'can'  => $permisoVerProveedor,
                         ],
                         [
                             'text' => 'Contratos/Convenios',
                             'url'  => 'inventario/contratos-convenios',
-                            'icon' => 'fa-solid fa-file-contract',
+                            'icon' => 'fas fa-fw fa-file-contract',
                             'can'  => $permisoVerContrato,
                         ],
                     ],
@@ -963,15 +976,43 @@ return [
             ],
         ],
 
-
         // ========================================
-        // MÓDULO: TALENTO HUMANO
+        // CONFIGURACIÓN DEL SISTEMA
         // ========================================
         [
-            'text' => 'Talento Humano',
-            'url' => 'talento-humano',
-            'icon' => 'fas fa-fw fa-users',
-            'can' => 'VER TALENTO HUMANO',
+            'header' => 'CONFIGURACIÓN',
+        ],
+        [
+            'text' => 'Sistema',
+            'icon' => 'fas fa-fw fa-cogs',
+            'can' => [$permisoVerParametro, $permisoVerTema, 'ASIGNAR PERMISOS'],
+            'submenu' => [
+                [
+                    'text' => 'Configuración General',
+                    'icon' => 'fas fa-fw fa-wrench',
+                    'can' => [$permisoVerParametro, $permisoVerTema],
+                    'submenu' => [
+                        [
+                            'text' => 'Parámetros',
+                            'url' => 'parametro',
+                            'icon' => 'fas fa-fw fa-sliders-h',
+                            'can' => $permisoVerParametro,
+                        ],
+                        [
+                            'text' => 'Temas',
+                            'url' => 'tema',
+                            'icon' => 'fas fa-fw fa-paint-brush',
+                            'can' => $permisoVerTema,
+                        ],
+                    ],
+                ],
+                [
+                    'text' => 'Permisos',
+                    'url' => 'permiso',
+                    'icon' => 'fas fa-fw fa-lock',
+                    'can' => 'ASIGNAR PERMISOS',
+                ],
+            ],
         ],
     ],
 
