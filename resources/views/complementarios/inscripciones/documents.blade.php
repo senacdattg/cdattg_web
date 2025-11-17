@@ -1,5 +1,5 @@
-@extends('layout.master-layout-registro')
-@extends('layout.alertas')
+@extends('layouts.master-layout-registro')
+@extends('layouts.alertas')
 @section('css')
     @vite(['resources/css/formulario_inscripcion.css'])
 @endsection

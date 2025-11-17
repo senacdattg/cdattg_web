@@ -311,10 +311,10 @@
     </script>
 
     {{-- Alertas --}}
-    @include('layout.alertas')
+    @include('layouts.alertas')
 
     {{-- Footer --}}
-    @include('layout.footer')
+    @include('layouts.footer')
 @endsection
 
 @push('css')

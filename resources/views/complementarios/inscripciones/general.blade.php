@@ -1,4 +1,4 @@
-@extends('layout.master-layout-registro')
+@extends('layouts.master-layout-registro')
 @section('content')
     <div class="content-wrapper">
         <section class="content-header">

@@ -183,6 +183,6 @@
 @endsection
 
 @section('footer')
-    @include('layout.footer')
-    @include('layout.alertas')
+    @include('layouts.footer')
+    @include('layouts.alertas')
 @endsection

@@ -263,10 +263,10 @@
     </div>
 
     {{-- Alertas --}}
-    @include('layout.alertas')
+    @include('layouts.alertas')
     
     {{-- Footer SENA --}}
-    @include('layout.footer')
+    @include('layouts.footer')
 @endsection
 
 @push('css')

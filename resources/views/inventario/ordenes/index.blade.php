@@ -151,12 +151,12 @@
     </section>
 
     {{-- Alertas --}}
-    @include('layout.alertas')
+    @include('layouts.alertas')
 @endsection
 
 @section('footer')
     {{-- Footer SENA --}}
-    @include('layout.footer')
+    @include('layouts.footer')
 @endsection
 
 @push('css')

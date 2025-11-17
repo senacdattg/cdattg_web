@@ -223,7 +223,7 @@
     </div>
 
     {{-- Footer SENA --}}
-    @include('layout.footer')
+    @include('layouts.footer')
 @endsection
 
 @push('css')

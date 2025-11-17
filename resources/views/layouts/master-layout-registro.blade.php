@@ -1,4 +1,4 @@
-@include('layout.header-registro')
+@include('layouts.header-registro')
 <div class="main-content">
     {{-- Mostrar mensajes de éxito o error --}}
     @if (session('success'))
@@ -85,4 +85,4 @@
 
     @yield('content')
 </div>
-@include('layout.footer-registro')
+@include('layouts.footer-registro')

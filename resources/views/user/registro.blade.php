@@ -1,4 +1,4 @@
-@extends('layout.master-layout-registro')
+@extends('layouts.master-layout-registro')
 
 @push('styles')
     @vite('resources/css/pages/registro.css')

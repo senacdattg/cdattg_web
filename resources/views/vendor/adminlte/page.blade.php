@@ -16,19 +16,19 @@
     <div class="wrapper">
 
         {{-- Preloader Animation (fullscreen mode) --}}
-        @if($preloaderHelper->isPreloaderEnabled())
+        @if ($preloaderHelper->isPreloaderEnabled())
             @include('adminlte::partials.common.preloader')
         @endif
 
         {{-- Top Navbar --}}
-        @if($layoutHelper->isLayoutTopnavEnabled())
-            @include('layout.header')
+        @if ($layoutHelper->isLayoutTopnavEnabled())
+            @include('adminlte::partials.navbar.navbar-layout-topnav')
         @else
-            @include('layout.header')
+            @include('adminlte::partials.navbar.navbar')
         @endif
 
         {{-- Left Main Sidebar --}}
-        @if(!$layoutHelper->isLayoutTopnavEnabled())
+        @if (!$layoutHelper->isLayoutTopnavEnabled())
             @include('adminlte::partials.sidebar.left-sidebar')
         @endif
 
@@ -40,12 +40,10 @@
         @endempty
 
         {{-- Footer --}}
-        @hasSection('footer')
-            @include('adminlte::partials.footer.footer')
-        @endif
+        @include('adminlte::partials.footer.footer')
 
         {{-- Right Control Sidebar --}}
-        @if($layoutHelper->isRightSidebarEnabled())
+        @if ($layoutHelper->isRightSidebarEnabled())
             @include('adminlte::partials.sidebar.right-sidebar')
         @endif
 

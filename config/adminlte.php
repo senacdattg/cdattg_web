@@ -142,7 +142,7 @@ return [
     |
     */
 
-    'usermenu_enabled' => true,
+    'usermenu_enabled' => false,
     'usermenu_header' => false,
     'usermenu_header_class' => 'bg-primary',
     'usermenu_image' => false,
@@ -226,7 +226,7 @@ return [
     'sidebar_mini' => 'lg',
     'sidebar_collapse' => false,
     'sidebar_collapse_auto_size' => false,
-    'sidebar_collapse_remember' => false,
+    'sidebar_collapse_remember' => true,
     'sidebar_collapse_remember_no_transition' => true,
     'sidebar_scrollbar_theme' => 'os-theme-light',
     'sidebar_scrollbar_auto_hide' => 'l',
@@ -350,13 +350,12 @@ return [
             'submenu' => [
                 [
                     'text' => 'Mi Perfil',
-                    'url' => '/mi-perfil',
+                    'route' => 'profile.index',
                     'icon' => 'fas fa-user-circle text-info',
-                    'can' => 'VER MI PERFIL',
                 ],
                 [
                     'text' => 'Cambiar Contraseña',
-                    'url' => 'cambiar-password',
+                    'route' => 'password.change',
                     'icon' => 'fas fa-key text-warning',
                 ],
                 [
@@ -393,7 +392,7 @@ return [
         [
             'text' => 'Notificaciones',
             'url'  => 'inventario/notificaciones',
-            'icon' => 'fa-solid fa-bell',
+            'icon' => 'fas fa-bell',
             'can'  => 'VER NOTIFICACION',
         ],
         // ========================================
@@ -765,7 +764,7 @@ return [
         // Gestion de complementarios
         [
             'text' => 'Complementarios',
-            'icon' => 'fa-solid fa-folder-open',
+            'icon' => 'fas fa-folder-open',
             'can' => 'VER PROGRAMA DE CARACTERIZACION',
             'submenu' => [
                 [
@@ -1131,7 +1130,7 @@ return [
     |
     */
 
-    'livewire' => false,
+    'livewire' => true,
 
     'custom_css' => [
         'css/custom.css',

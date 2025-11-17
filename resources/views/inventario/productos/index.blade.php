@@ -203,7 +203,7 @@
     <x-confirm-delete-modal />
 
     {{-- Alertas --}}
-    @include('layout.alertas')
+    @include('layouts.alertas')
 @endsection
 
 

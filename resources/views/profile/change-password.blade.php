@@ -1,129 +1,167 @@
 @extends('adminlte::page')
 
-@section('title', 'Cambiar Contraseña')
+@section('css')
+    @vite(['resources/css/parametros.css'])
+@endsection
 
 @section('content_header')
-<div class="container-fluid">
-    <div class="row mb-2">
-        <div class="col-sm-6">
-            <h1 class="m-0">Cambiar Contraseña</h1>
-        </div>
-        <div class="col-sm-6">
-            <ol class="breadcrumb float-sm-right">
-                <li class="breadcrumb-item"><a href="{{ route('#') }}">Inicio</a></li>
-                <li class="breadcrumb-item"><a href="{{ route('profile.index') }}">Mi Perfil</a></li>
-                <li class="breadcrumb-item active">Cambiar Contraseña</li>
-            </ol>
-        </div>
-    </div>
-</div>
-@stop
+    <x-page-header icon="fa-key" title="Cambiar Contraseña" subtitle="Actualiza tu contraseña de acceso" :breadcrumb="[
+        ['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'],
+        ['label' => 'Mi Perfil', 'url' => route('profile.index'), 'icon' => 'fa-user'],
+        ['label' => 'Cambiar Contraseña', 'icon' => 'fa-key', 'active' => true],
+    ]" />
+@endsection
 
 @section('content')
-<div class="container-fluid">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary">
-                    <h3 class="card-title">
-                        <i class="fas fa-key mr-2"></i>Cambiar Contraseña
-                    </h3>
-                </div>
-                <div class="card-body">
-                    @if(session('success'))
+    <section class="content mt-4">
+        <div class="container-fluid">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-6">
+                    <div class="mb-3">
+                        <a class="btn btn-outline-secondary btn-sm" href="{{ route('profile.index') }}" title="Volver">
+                            <i class="fas fa-arrow-left mr-1"></i> Volver
+                        </a>
+                    </div>
+
+                    @if (session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
-                            {{ session('success') }}
-                            <button type="button" class="close" data-dismiss="alert">
+                            <i class="fas fa-check-circle mr-2"></i>
+                            <strong>Éxito:</strong> {{ session('success') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                     @endif
 
-                    @if(session('error'))
+                    @if (session('error'))
                         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                            {{ session('error') }}
-                            <button type="button" class="close" data-dismiss="alert">
+                            <i class="fas fa-exclamation-circle mr-2"></i>
+                            <strong>Error:</strong> {{ session('error') }}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                     @endif
 
-                    <form method="PUT" action="{{ route('password.change') }}">
-                        @csrf
-                        <div class="form-group">
-                            <label for="current_password">Contraseña Actual</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">
-                                        <i class="fas fa-lock"></i>
-                                    </span>
-                                </div>
-                                <input type="password" name="current_password" id="current_password" 
-                                    class="form-control @error('current_password') is-invalid @enderror">
-                                @error('current_password')
-                                    <span class="invalid-feedback">{{ $message }}</span>
-                                @enderror
-                            </div>
+                    <div class="card shadow-sm no-hover">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                                <i class="fas fa-key mr-2"></i>Actualizar Contraseña
+                            </h5>
                         </div>
+                        <div class="card-body">
+                            <form method="POST" action="{{ route('password.change') }}" autocomplete="off">
+                                @csrf
+                                @method('PUT')
 
-                        <div class="form-group">
-                            <label for="password">Nueva Contraseña</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">
-                                        <i class="fas fa-key"></i>
-                                    </span>
+                                {{-- Contraseña Actual --}}
+                                <div class="form-group">
+                                    <label for="current_password">Contraseña Actual</label>
+                                    <div class="input-group">
+                                        <input type="password" name="current_password" id="current_password"
+                                            class="form-control @error('current_password') is-invalid @enderror"
+                                            placeholder="Ingrese su contraseña actual" autocomplete="current-password">
+                                        <div class="input-group-append">
+                                            <div class="input-group-text">
+                                                <span class="fas fa-lock"></span>
+                                            </div>
+                                        </div>
+                                        @error('current_password')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
                                 </div>
-                                <input type="password" name="password" id="password" 
-                                    class="form-control @error('password') is-invalid @enderror">
-                                @error('password')
-                                    <span class="invalid-feedback">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        </div>
 
-                        <div class="form-group">
-                            <label for="password_confirmation">Confirmar Nueva Contraseña</label>
-                            <div class="input-group">
-                                <div class="input-group-prepend">
-                                    <span class="input-group-text">
-                                        <i class="fas fa-key"></i>
-                                    </span>
+                                {{-- Nueva Contraseña --}}
+                                <div class="form-group">
+                                    <label for="password">Nueva Contraseña</label>
+                                    <div class="input-group">
+                                        <input type="password" name="password" id="password"
+                                            class="form-control @error('password') is-invalid @enderror"
+                                            placeholder="Ingrese su nueva contraseña" autocomplete="new-password">
+                                        <div class="input-group-append">
+                                            <button type="button" id="passwordToggle" class="btn btn-outline-secondary"
+                                                aria-label="Mostrar u ocultar contraseña">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        @error('password')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        La contraseña debe tener al menos 8 caracteres.
+                                    </small>
                                 </div>
-                                <input type="password" name="password_confirmation" id="password_confirmation" 
-                                    class="form-control">
-                            </div>
-                        </div>
 
-                        <div class="form-group mb-0">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save mr-2"></i>Actualizar Contraseña
-                            </button>
-                            <a href="{{ route('profile.index') }}" class="btn btn-secondary">
-                                <i class="fas fa-times mr-2"></i>Cancelar
-                            </a>
+                                {{-- Confirmar Contraseña --}}
+                                <div class="form-group">
+                                    <label for="password_confirmation">Confirmar Nueva Contraseña</label>
+                                    <div class="input-group">
+                                        <input type="password" name="password_confirmation" id="password_confirmation"
+                                            class="form-control @error('password_confirmation') is-invalid @enderror"
+                                            placeholder="Confirme su nueva contraseña" autocomplete="new-password">
+                                        <div class="input-group-append">
+                                            <button type="button" id="passwordConfirmToggle"
+                                                class="btn btn-outline-secondary"
+                                                aria-label="Mostrar u ocultar confirmación">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                        </div>
+                                        @error('password_confirmation')
+                                            <span class="invalid-feedback" role="alert">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <hr class="mt-4">
+                                <div class="d-flex flex-column flex-sm-row justify-content-center gap-2">
+                                    <a href="{{ route('profile.index') }}" class="btn btn-outline-secondary btn-sm">
+                                        <i class="fas fa-times mr-1"></i> Cancelar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-save mr-1"></i> Actualizar Contraseña
+                                    </button>
+                                </div>
+                            </form>
                         </div>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-@stop
+    </section>
+@endsection
 
-@section('css')
-<style>
-.card {
-    border: none;
-    border-radius: 0.5rem;
-}
-.card-header {
-    border-radius: 0.5rem 0.5rem 0 0 !important;
-    color: white;
-}
-.input-group-text {
-    border-radius: 0.25rem 0 0 0.25rem;
-    background-color: #f8f9fa;
-}
-</style>
-@stop
+@section('footer')
+    @include('layouts.footer')
+@endsection
+
+@push('js')
+    <script>
+        (function() {
+            const toggle = (inputId, btnId) => {
+                const input = document.getElementById(inputId);
+                const btn = document.getElementById(btnId);
+                if (!input || !btn) return;
+                btn.addEventListener('click', function() {
+                    const isPwd = input.getAttribute('type') === 'password';
+                    input.setAttribute('type', isPwd ? 'text' : 'password');
+                    const icon = this.querySelector('i');
+                    if (icon) {
+                        icon.classList.toggle('fa-eye');
+                        icon.classList.toggle('fa-eye-slash');
+                    }
+                    input.focus();
+                });
+            };
+            toggle('password', 'passwordToggle');
+            toggle('password_confirmation', 'passwordConfirmToggle');
+        })();
+    </script>
+@endpush
