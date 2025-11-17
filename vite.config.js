@@ -53,7 +53,6 @@ export default defineConfig({
                 // Complementarios files
                 'estadisticas_complementarios': 'resources/js/complementarios/estadisticas.js',
                 // Personas files
-                'personas-import': 'resources/js/pages/personas-import.js',
                 'formularios-generico': 'resources/js/pages/formularios-generico.js',
                 'formularios-select-dinamico': 'resources/js/pages/formularios-select-dinamico.js',
                 'talento-humano': 'resources/js/pages/talento-humano.js',

@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+@extends('inventario.layouts.base')
 
 @section('title', 'Carrito de Compras')
 
@@ -242,7 +242,7 @@
         </div>
     </div>
     {{-- Alertas --}}
-    @include('layouts.alertas')
+    {{-- Notificaciones manejadas globalmente por sweetalert2-notifications --}}
 @endsection
 
 @section('footer')
@@ -260,6 +260,5 @@
 @endpush
 
 @push('js')
-    <script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
     @vite('resources/js/inventario/carrito.js')
 @endpush

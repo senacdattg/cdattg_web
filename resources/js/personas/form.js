@@ -144,6 +144,17 @@ class InputHandler {
                 }, `personaUpper_${fieldName}`);
             });
         });
+
+        // Convertir email a mayúsculas
+        forms.forEach((form) => {
+            const emailField = resolveField(form, 'email');
+            if (emailField) {
+                bindOnce(emailField, 'input', () => {
+                    emailField.value = emailField.value.toUpperCase();
+                }, 'personaUpper_email');
+            }
+        });
+
         this.attachNumeric(forms);
     }
 
@@ -1065,6 +1076,14 @@ class LocationService {
         const paisSelect = DomFacade.find(this.selectors.PAIS);
         const departamentoSelect = DomFacade.find(this.selectors.DEPARTAMENTO);
 
+        if (!paisSelect || !departamentoSelect) {
+            return;
+        }
+
+        // Limpiar flags anteriores para permitir reasignación después de navegación Livewire
+        delete paisSelect.dataset.personaPaisListener;
+        delete departamentoSelect.dataset.personaDepartamentoListener;
+
         bindOnce(paisSelect, 'change', (event) => {
             const paisId = event.target.value;
             void this.loadDepartamentos(paisId);
@@ -1140,7 +1159,11 @@ class LocationService {
             return;
         }
 
-        this.populateSelect(municipioSelect, [], this.PLACEHOLDERS.municipios, selectedId, 'municipio');
+        // Guardar el valor actual antes de limpiar
+        const currentValue = municipioSelect.value || selectedId;
+
+        // Limpiar el select pero mantener el valor si existe
+        this.populateSelect(municipioSelect, [], this.PLACEHOLDERS.municipios, currentValue || selectedId, 'municipio');
 
         const endpoint = this.resolveEndpoint(municipioSelect, '/municipios', departamentoId);
         if (!endpoint) {
@@ -1156,7 +1179,21 @@ class LocationService {
                 return;
             }
 
-            this.populateSelect(municipioSelect, collection, this.PLACEHOLDERS.municipios, selectedId, 'municipio');
+            // Usar el valor guardado o el selectedId proporcionado
+            const valueToSelect = selectedId || currentValue;
+            this.populateSelect(municipioSelect, collection, this.PLACEHOLDERS.municipios, valueToSelect, 'municipio');
+
+            // Asegurar que el valor se establezca correctamente después de poblar
+            if (valueToSelect) {
+                // Pequeño delay para asegurar que el DOM esté actualizado
+                setTimeout(() => {
+                    if (municipioSelect.value !== String(valueToSelect)) {
+                        municipioSelect.value = String(valueToSelect);
+                        // Disparar evento change para notificar a otros listeners
+                        municipioSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                }, 10);
+            }
         } catch (error) {
             console.error('Error cargando municipios:', error);
             this.setMessage(municipioSelect, 'Error cargando municipios');
@@ -1168,20 +1205,28 @@ class LocationService {
             return;
         }
 
+        // Guardar el valor actual si existe y no hay selectedId
+        const currentValue = selectedId ? null : select.value;
+
         select.innerHTML = '';
 
         const placeholderOption = document.createElement('option');
         placeholderOption.value = '';
         placeholderOption.textContent = placeholder;
-        if (!selectedId) {
+        if (!selectedId && !currentValue) {
             placeholderOption.selected = true;
         }
         select.appendChild(placeholderOption);
 
         if (!Array.isArray(items) || !items.length) {
+            // Si hay un valor actual y no hay items, intentar mantenerlo
+            if (currentValue) {
+                select.value = currentValue;
+            }
             return;
         }
 
+        let hasSelected = false;
         items.forEach((item) => {
             const option = document.createElement('option');
             option.value = item.id ?? '';
@@ -1190,9 +1235,26 @@ class LocationService {
             if (selectedId && String(item.id) === String(selectedId)) {
                 option.selected = true;
                 placeholderOption.selected = false;
+                hasSelected = true;
+            } else if (currentValue && String(item.id) === String(currentValue)) {
+                option.selected = true;
+                placeholderOption.selected = false;
+                hasSelected = true;
             }
 
             select.appendChild(option);
+        });
+
+        // Asegurar que el valor se establezca correctamente
+        // Usar requestAnimationFrame para asegurar que el DOM esté completamente actualizado
+        requestAnimationFrame(() => {
+            const valueToSet = selectedId || (currentValue && hasSelected ? currentValue : null);
+            if (valueToSet) {
+                const valueStr = String(valueToSet);
+                if (select.value !== valueStr) {
+                    select.value = valueStr;
+                }
+            }
         });
     }
 
@@ -1685,9 +1747,43 @@ class PersonaFormManager {
 
 const personaFormManager = new PersonaFormManager(CONFIG, SELECTORS);
 
-document.addEventListener('DOMContentLoaded', () => {
+function initPersonaForm() {
+    // Verificar que los elementos del formulario existan
+    const paisSelect = document.getElementById('pais_id');
+    const departamentoSelect = document.getElementById('departamento_id');
+    const municipioSelect = document.getElementById('municipio_id');
+
+    if (!paisSelect && !departamentoSelect && !municipioSelect) {
+        // Si no hay formulario de persona en esta página, no hacer nada
+        return;
+    }
+
     void personaFormManager.initialize(false);
-});
+}
+
+// Inicializar en carga inicial
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPersonaForm);
+} else {
+    // Si el DOM ya está listo, inicializar inmediatamente
+    setTimeout(initPersonaForm, 50);
+}
+
+// Reinicializar cuando Livewire navega (SPA)
+if (window.Livewire) {
+    document.addEventListener('livewire:navigated', function () {
+        // Delay mayor para asegurar que el DOM esté completamente actualizado y los scripts cargados
+        setTimeout(function () {
+            // Verificar que el script se haya cargado
+            if (typeof personaFormManager !== 'undefined') {
+                initPersonaForm();
+            } else {
+                // Si el script aún no está cargado, esperar un poco más
+                setTimeout(initPersonaForm, 200);
+            }
+        }, 400);
+    });
+}
 
 window.PersonaForm = {
     init: (force = true) => personaFormManager.init(force),

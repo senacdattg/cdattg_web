@@ -1,4 +1,5 @@
-<aside class="main-sidebar {{ config('adminlte.classes_sidebar', 'sidebar-dark-primary elevation-4') }}">
+<aside class="main-sidebar {{ config('adminlte.classes_sidebar', 'sidebar-dark-primary elevation-4') }}"
+    @if (config('adminlte.livewire')) wire:ignore @endif>
 
     {{-- Sidebar brand logo --}}
     @if (config('adminlte.logo_img_xl'))

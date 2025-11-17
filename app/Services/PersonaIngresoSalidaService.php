@@ -2,14 +2,18 @@
 
 namespace App\Services;
 
+use App\Exceptions\PersonaException;
 use App\Models\PersonaIngresoSalida;
 use App\Models\Persona;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class PersonaIngresoSalidaService
 {
+    private const COUNT_TOTAL = 'COUNT(*) as total';
+
     /**
      * Determina el tipo de persona basándose en sus relaciones
      */
@@ -18,42 +22,33 @@ class PersonaIngresoSalidaService
         $persona = Persona::with(['instructor', 'aprendiz', 'user.roles'])->find($personaId);
 
         if (!$persona) {
-            throw new \Exception("Persona no encontrada con ID: {$personaId}");
+            throw new PersonaException("Persona no encontrada con ID: {$personaId}");
         }
+
+        $tipoPersona = 'visitante'; // Por defecto
 
         // Verificar si es instructor
         if ($persona->instructor) {
-            return 'instructor';
-        }
-
-        // Verificar si es aprendiz
-        if ($persona->aprendiz) {
-            return 'aprendiz';
-        }
-
-        // Verificar roles del usuario
-        if ($persona->user) {
+            $tipoPersona = 'instructor';
+        } elseif ($persona->aprendiz) {
+            // Verificar si es aprendiz
+            $tipoPersona = 'aprendiz';
+        } elseif ($persona->user) {
+            // Verificar roles del usuario
             $roles = $persona->user->roles->pluck('name')->map(fn($r) => strtoupper($r));
 
             if ($roles->contains('SUPER ADMINISTRADOR')) {
-                return 'super_administrador';
-            }
-
-            if ($roles->contains('ADMINISTRADOR')) {
-                return 'administrativo';
-            }
-
-            if ($roles->contains('VISITANTE')) {
-                return 'visitante';
-            }
-
-            if ($roles->contains('ASPIRANTE')) {
-                return 'aspirante';
+                $tipoPersona = 'super_administrador';
+            } elseif ($roles->contains('ADMINISTRADOR')) {
+                $tipoPersona = 'administrativo';
+            } elseif ($roles->contains('VISITANTE')) {
+                $tipoPersona = 'visitante';
+            } elseif ($roles->contains('ASPIRANTE')) {
+                $tipoPersona = 'aspirante';
             }
         }
 
-        // Por defecto, si no se puede determinar, se considera visitante
-        return 'visitante';
+        return $tipoPersona;
     }
 
     /**
@@ -67,7 +62,14 @@ class PersonaIngresoSalidaService
         ?string $observaciones = null,
         ?int $userId = null
     ): PersonaIngresoSalida {
-        return DB::transaction(function () use ($personaId, $sedeId, $ambienteId, $fichaCaracterizacionId, $observaciones, $userId) {
+        return DB::transaction(function () use (
+            $personaId,
+            $sedeId,
+            $ambienteId,
+            $fichaCaracterizacionId,
+            $observaciones,
+            $userId
+        ) {
             // Verificar si ya tiene un registro abierto (entrada sin salida) en esta sede
             $registroAbierto = PersonaIngresoSalida::where('persona_id', $personaId)
                 ->where('sede_id', $sedeId)
@@ -76,7 +78,7 @@ class PersonaIngresoSalidaService
                 ->first();
 
             if ($registroAbierto) {
-                throw new \Exception('Ya existe un registro de entrada sin salida para hoy en esta sede.');
+                throw new PersonaException('Ya existe un registro de entrada sin salida para hoy en esta sede.');
             }
 
             // Determinar tipo de persona
@@ -95,7 +97,7 @@ class PersonaIngresoSalidaService
                 'ambiente_id' => $ambienteId,
                 'ficha_caracterizacion_id' => $fichaCaracterizacionId,
                 'observaciones' => $observaciones,
-                'user_create_id' => $userId ?? auth()->id(),
+                'user_create_id' => $userId ?? Auth::id(),
             ]);
 
             Log::info('Entrada registrada', [
@@ -103,7 +105,7 @@ class PersonaIngresoSalidaService
                 'persona_id' => $personaId,
                 'sede_id' => $sedeId,
                 'tipo_persona' => $tipoPersona,
-                'timestamp' => $now->toISOString(),
+                'timestamp' => $now->toDateTimeString(),
             ]);
 
             return $registro;
@@ -129,7 +131,7 @@ class PersonaIngresoSalidaService
                 ->first();
 
             if (!$registro) {
-                throw new \Exception('No se encontró un registro de entrada sin salida para hoy en esta sede.');
+                throw new PersonaException('No se encontró un registro de entrada sin salida para hoy en esta sede.');
             }
 
             $now = Carbon::now();
@@ -139,17 +141,17 @@ class PersonaIngresoSalidaService
                 'fecha_salida' => $now->format('Y-m-d'),
                 'hora_salida' => $now->format('H:i:s'),
                 'timestamp_salida' => $now,
-                'observaciones' => $registro->observaciones 
+                'observaciones' => $registro->observaciones
                     ? ($registro->observaciones . "\nSalida: " . ($observaciones ?? ''))
                     : ($observaciones ?? null),
-                'user_edit_id' => $userId ?? auth()->id(),
+                'user_edit_id' => $userId ?? Auth::id(),
             ]);
 
             Log::info('Salida registrada', [
                 'registro_id' => $registro->id,
                 'persona_id' => $personaId,
                 'sede_id' => $sedeId,
-                'timestamp' => $now->toISOString(),
+                'timestamp' => $now->toDateTimeString(),
             ]);
 
             return true;
@@ -169,7 +171,7 @@ class PersonaIngresoSalidaService
 
         // Contar personas dentro por tipo
         $personasDentro = $query
-            ->select('tipo_persona', DB::raw('COUNT(*) as total'))
+            ->select('tipo_persona', DB::raw(self::COUNT_TOTAL))
             ->groupBy('tipo_persona')
             ->pluck('total', 'tipo_persona')
             ->toArray();
@@ -197,7 +199,7 @@ class PersonaIngresoSalidaService
         }
 
         $personasDentro = $query
-            ->select('tipo_persona', DB::raw('COUNT(*) as total'))
+            ->select('tipo_persona', DB::raw(self::COUNT_TOTAL))
             ->groupBy('tipo_persona')
             ->pluck('total', 'tipo_persona')
             ->toArray();
@@ -216,7 +218,10 @@ class PersonaIngresoSalidaService
     /**
      * Obtiene lista de personas dentro actualmente
      */
-    public function obtenerPersonasDentro(?int $sedeId = null, ?string $tipoPersona = null): \Illuminate\Database\Eloquent\Collection
+    public function obtenerPersonasDentro(
+        ?int $sedeId = null,
+        ?string $tipoPersona = null
+    ): \Illuminate\Database\Eloquent\Collection
     {
         $query = PersonaIngresoSalida::dentro()
             ->with(['persona', 'sede', 'ambiente', 'fichaCaracterizacion'])
@@ -249,19 +254,19 @@ class PersonaIngresoSalidaService
         }
 
         $entradas = $queryEntradas
-            ->select('tipo_persona', DB::raw('COUNT(*) as total'))
+            ->select('tipo_persona', DB::raw(self::COUNT_TOTAL))
             ->groupBy('tipo_persona')
             ->pluck('total', 'tipo_persona')
             ->toArray();
 
         $salidas = $querySalidas
-            ->select('tipo_persona', DB::raw('COUNT(*) as total'))
+            ->select('tipo_persona', DB::raw(self::COUNT_TOTAL))
             ->groupBy('tipo_persona')
             ->pluck('total', 'tipo_persona')
             ->toArray();
 
         $dentro = $queryDentro
-            ->select('tipo_persona', DB::raw('COUNT(*) as total'))
+            ->select('tipo_persona', DB::raw(self::COUNT_TOTAL))
             ->groupBy('tipo_persona')
             ->pluck('total', 'tipo_persona')
             ->toArray();

@@ -1,17 +1,17 @@
 @inject('layoutHelper', 'JeroenNoten\LaravelAdminLte\Helpers\LayoutHelper')
 @inject('preloaderHelper', 'JeroenNoten\LaravelAdminLte\Helpers\preloaderHelper')
 
-@if($layoutHelper->isLayoutTopnavEnabled())
-    @php( $def_container_class = 'container' )
+@if ($layoutHelper->isLayoutTopnavEnabled())
+    @php($def_container_class = 'container')
 @else
-    @php( $def_container_class = 'container-fluid' )
+    @php($def_container_class = 'container-fluid')
 @endif
 
 {{-- Default Content Wrapper --}}
-<div class="{{ $layoutHelper->makeContentWrapperClasses() }}">
+<div class="{{ $layoutHelper->makeContentWrapperClasses() }}" @if (config('adminlte.livewire')) id="main-content" @endif>
 
     {{-- Preloader Animation (cwrapper mode) --}}
-    @if($preloaderHelper->isPreloaderEnabled('cwrapper'))
+    @if ($preloaderHelper->isPreloaderEnabled('cwrapper'))
         @include('adminlte::partials.common.preloader')
     @endif
 

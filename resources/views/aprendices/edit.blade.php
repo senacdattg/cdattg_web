@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
+@section('plugins.Select2', true)
+
 @section('css')
     @vite(['resources/css/parametros.css'])
-    <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2-bootstrap4.min.css') }}">
 @endsection
 
 @section('content_header')
@@ -119,7 +119,7 @@
 
 @section('footer')
     @include('layouts.footer')
-    @include('layouts.alertas')
+    {{-- Notificaciones manejadas globalmente por sweetalert2-notifications --}}
 @endsection
 
 @section('js')

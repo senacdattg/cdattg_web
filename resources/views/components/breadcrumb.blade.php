@@ -6,15 +6,15 @@
             @if(isset($item['active']) && $item['active'])
                 <li class="breadcrumb-item active" aria-current="page">
                     @if(isset($item['icon']))
-                        <i class="fas {{ $item['icon'] }}"></i> 
+                        <i class="fas {{ $item['icon'] }}"></i>
                     @endif
                     {{ $item['label'] }}
                 </li>
             @else
                 <li class="breadcrumb-item">
-                    <a href="{{ $item['url'] ?? '#' }}" class="link_right_header">
+                    <a href="{{ $item['url'] ?? '#' }}" class="link_right_header" wire:navigate>
                         @if(isset($item['icon']))
-                            <i class="fas {{ $item['icon'] }}"></i> 
+                            <i class="fas {{ $item['icon'] }}"></i>
                         @endif
                         {{ $item['label'] }}
                     </a>

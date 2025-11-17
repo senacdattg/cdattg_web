@@ -1,5 +1,5 @@
 @extends('layouts.master-layout-registro')
-@extends('layouts.alertas')
+{{-- Notificaciones manejadas globalmente por sweetalert2-notifications --}}
 @section('css')
     @vite(['resources/css/formulario_inscripcion.css'])
 @endsection

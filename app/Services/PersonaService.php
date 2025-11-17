@@ -245,6 +245,22 @@ class PersonaService
         $persona->caracterizacionesComplementarias()->sync($caracterizacionesIds);
     }
 
+    /**
+     * Crea una persona sin usuario (para importaciones masivas)
+     *
+     * @param array $datos
+     * @param int $userId ID del usuario que realiza la importación
+     * @return Persona
+     */
+    public function crearSinUsuario(array $datos, int $userId): Persona
+    {
+        $datos['user_create_id'] = $userId;
+        $datos['user_edit_id'] = $userId;
+        $datos['status'] = $datos['status'] ?? 1;
+
+        return Persona::create($datos);
+    }
+
     protected function obtenerIdUsuarioAutenticado(): int
     {
         $userId = Auth::id();

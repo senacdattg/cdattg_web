@@ -693,8 +693,8 @@ class TalentoHumanoManager {
 
         this.toastContainer.appendChild(toast);
 
-        // Reflow para activar transición
-        window.getComputedStyle(toast).opacity;
+        // Reflow para activar transición (forzar recálculo del navegador)
+        const _ = window.getComputedStyle(toast).opacity;
         toast.classList.add('th-toast-show');
         toast._timeoutId = window.setTimeout(cerrarToast, duracionMs);
     }

@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+@extends('inventario.layouts.base')
 
 @section('title', 'Notificaciones')
 
@@ -241,7 +241,7 @@
             </div>
         </div>
     </section>
-  @include('layouts.alertas')
+  {{-- Notificaciones manejadas globalmente por sweetalert2-notifications --}}
 @endsection
 
 @section('footer')
@@ -252,10 +252,10 @@
 
 @section('js')
 <!-- SweetAlert2 -->
-<script src="{{ asset('vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
 <!-- Script de notificaciones -->
 @vite(['resources/js/inventario/notificaciones.js'])
 @endsection
+
 
 
 

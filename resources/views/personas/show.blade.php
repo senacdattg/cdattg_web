@@ -25,18 +25,21 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <div class="d-flex align-items-center">
                     @if (!isset($soloPerfil) || !$soloPerfil)
-                        <a class="btn btn-outline-secondary" href="{{ route('personas.index') }}">
+                        <a class="btn btn-outline-secondary" href="{{ route('personas.index') }}"
+                            @if(config('adminlte.livewire')) wire:navigate @endif>
                             <i class="fas fa-arrow-left mr-1"></i> Volver
                         </a>
                     @else
-                        <a class="btn btn-outline-secondary" href="{{ route('verificarLogin') }}">
+                        <a class="btn btn-outline-secondary" href="{{ route('verificarLogin') }}"
+                            @if(config('adminlte.livewire')) wire:navigate @endif>
                             <i class="fas fa-arrow-left mr-1"></i> Volver al inicio
                         </a>
                     @endif
                 </div>
                 <div class="d-flex align-items-center">
                     @can('EDITAR PERSONA')
-                        <a class="btn btn-primary mr-2" href="{{ route('personas.edit', $persona->id) }}">
+                        <a class="btn btn-primary mr-2" href="{{ route('personas.edit', $persona->id) }}"
+                            @if(config('adminlte.livewire')) wire:navigate @endif>
                             <i class="fas fa-edit mr-1"></i> Editar
                         </a>
                     @endcan

@@ -110,8 +110,9 @@
     @include('layouts.footer')
 @endsection
 
+@section('plugins.Chartjs', true)
+
 @section('js')
-    <script src="{{ asset('vendor/chart.js/Chart.bundle.min.js') }}"></script>
     @vite(['resources/js/parametros.js'])
     @vite(['resources/js/pages/formularios-generico.js'])
 @endsection

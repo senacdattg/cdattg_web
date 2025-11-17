@@ -1,29 +1,30 @@
 /**
  * Estilos para el módulo de notificaciones
  * Sistema de notificaciones compacto y eficiente
+ * IMPORTANTE: Todos los estilos están scopeados a .inventario-module para no afectar el resto de la app
  */
 
 /* Estilos generales para las notificaciones */
-.list-group-item {
+.inventario-module .list-group-item {
     padding: 0.75rem 1rem;
     transition: all 0.3s ease;
     border-left: 3px solid transparent;
 }
 
 /* Notificaciones no leídas */
-.list-group-item.list-group-item-light {
+.inventario-module .list-group-item.list-group-item-light {
     background-color: #f8f9fc;
     border-left-color: #007bff;
 }
 
 /* Hover effect */
-.list-group-item:hover {
+.inventario-module .list-group-item:hover {
     background-color: #f1f3f5;
     transform: translateX(2px);
 }
 
 /* Títulos compactos */
-.list-group-item h6 {
+.inventario-module .list-group-item h6 {
     font-size: 0.95rem;
     font-weight: 600;
     margin-bottom: 0.25rem;
@@ -31,62 +32,62 @@
 }
 
 /* Texto del cuerpo */
-.list-group-item .small {
+.inventario-module .list-group-item .small {
     font-size: 0.875rem;
     line-height: 1.4;
     color: #495057;
 }
 
 /* Iconos */
-.list-group-item i.fa-lg {
+.inventario-module .list-group-item i.fa-lg {
     font-size: 1.5rem;
 }
 
 /* Badges */
-.list-group-item .badge {
+.inventario-module .list-group-item .badge {
     font-size: 0.75rem;
     padding: 0.25em 0.5em;
     font-weight: 500;
 }
 
 /* Botones de acción compactos */
-.list-group-item .btn-sm {
+.inventario-module .list-group-item .btn-sm {
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
     line-height: 1.2;
 }
 
 /* Timestamp */
-.list-group-item small.text-muted {
+.inventario-module .list-group-item small.text-muted {
     font-size: 0.75rem;
     color: #6c757d !important;
 }
 
 /* Footer de paginación */
-.card-footer {
+.inventario-module .card-footer {
     background-color: #f8f9fa;
     padding: 0.75rem 1rem;
 }
 
 /* Ajustes para dispositivos móviles */
 @media (max-width: 768px) {
-    .list-group-item {
+    .inventario-module .list-group-item {
         padding: 0.5rem 0.75rem;
     }
     
-    .list-group-item h6 {
+    .inventario-module .list-group-item h6 {
         font-size: 0.875rem;
     }
     
-    .list-group-item .small {
+    .inventario-module .list-group-item .small {
         font-size: 0.8rem;
     }
     
-    .list-group-item i.fa-lg {
+    .inventario-module .list-group-item i.fa-lg {
         font-size: 1.25rem;
     }
     
-    .list-group-item .btn-sm {
+    .inventario-module .list-group-item .btn-sm {
         padding: 0.15rem 0.35rem;
         font-size: 0.7rem;
     }
@@ -104,105 +105,107 @@
     }
 }
 
-.list-group-item.removing {
+.inventario-module .list-group-item.removing {
     animation: fadeOutRight 0.3s ease forwards;
 }
 
 /* Estado de carga */
-.loading-notification {
+.inventario-module .loading-notification {
     opacity: 0.6;
     pointer-events: none;
 }
 
 /* Badge de contador en el header */
-.card-title .badge {
+.inventario-module .card-title .badge {
     vertical-align: middle;
     margin-left: 0.5rem;
 }
 
 /* Botones del header */
-.card-tools .btn-sm {
+.inventario-module .card-tools .btn-sm {
     font-size: 0.875rem;
 }
 
-.text {
+.inventario-module .text {
     color: #555 !important;
 }
 
-.text strong {
+.inventario-module .text strong {
    color: #555 !important;
 }
 
 /* Separador visual entre notificaciones */
-.list-group-item + .list-group-item {
+.inventario-module .list-group-item + .list-group-item {
     border-top-width: 1px;
 }
 
 /* Notificaciones vacías */
-.text-center.py-5 {
+.inventario-module .text-center.py-5 {
     padding: 3rem 1rem !important;
 }
 
-.text-center.py-5 i {
+.inventario-module .text-center.py-5 i {
     font-size: 4rem;
     color: #dee2e6;
 }
 
-/* Fondo general */
-body {
+/* Fondo general solo para inventario */
+body.inventario-module {
     background: linear-gradient(to bottom, #CACCCE, #CACCCE);
     margin: 0;
     min-height: 100vh;
 }
 
-h1 {
+body.inventario-module h1 {
     color: #fdfdfd !important;
 }
 
-li {
+body.inventario-module li {
     color: #fdfdfd !important;
 }
 
-#text strong {
+body.inventario-module #text strong {
     color: #5f5b5b !important;
 }
 
-#text p {
+body.inventario-module #text p {
     color: #5f5b5b !important;
 }
 
-.bg-light {
+body.inventario-module .bg-light {
     background-color: #72cd79 !important;
 }
-.text-muted {
+
+body.inventario-module .text-muted {
     color: #fdfdfd !important;
 }
 
-.text-dark {
+body.inventario-module .text-dark {
     color: #fdfdfd !important;
 }
-.dashboard-header
-{
+
+body.inventario-module .dashboard-header {
     background-color: #00041d05 !important;
     color: #ffffff !important;
 }
 
-[class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link.active, [class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link.active:focus, [class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link.active:hover
-{
+body.inventario-module [class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link.active,
+body.inventario-module [class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link.active:focus,
+body.inventario-module [class*=sidebar-dark-] .nav-treeview>.nav-item>.nav-link.active:hover {
     background-color: #0056b3 !important;
     color: #ffffff !important;
 }
 
-#inventario .text-gray-800 {
+body.inventario-module #inventario .text-gray-800 {
     color: #f2f3f4 !important;
 }
 
-#municipio_id {
+body.inventario-module #municipio_id {
     padding: .375rem .75rem !important;
 }
 
 /* Fondo específico solo para el módulo de inventario */
-body .content-wrapper {
+body.inventario-module .content-wrapper {
   background: linear-gradient(to bottom, 
     #000627 0%, 
     #5E6771 50%, 
@@ -212,31 +215,32 @@ body .content-wrapper {
   min-height: 100vh;
 }
 
-/* Estilos del navbar */
-.main-header.navbar { 
+/* Estilos del navbar solo para inventario */
+body.inventario-module .main-header.navbar { 
     background-color: #00041D !important;
 }
 
-.main-header.navbar .nav-link {
+body.inventario-module .main-header.navbar .nav-link {
     color: #ffffff !important;
 }
 
-.main-header.navbar .nav-link:hover {
+body.inventario-module .main-header.navbar .nav-link:hover {
     color: #30d668 !important; 
 }
 
-.main-header.navbar .navbar-brand {
+body.inventario-module .main-header.navbar .navbar-brand {
     color: #ffffff !important;
 }
 
-.main-header.navbar .user-menu .nav-link {
+body.inventario-module .main-header.navbar .user-menu .nav-link {
     color: #ffffff !important;
 }
 
-.main-header.navbar .nav-item i {
+body.inventario-module .main-header.navbar .nav-item i {
     color: #ffffff !important;
 }
-.row {
+
+body.inventario-module .row {
     margin-left: 0 !important;
     margin-right: 0 !important;
 }

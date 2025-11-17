@@ -2,7 +2,7 @@
 
 {{-- Activar plugins de AdminLTE --}}
 @section('plugins.Datatables', true)
-@section('plugins.Sweetalert2', true)
+{{-- SweetAlert2 activado globalmente en config/adminlte.php --}}
 
 @section('css')
     @vite(['resources/css/parametros.css'])
@@ -77,27 +77,7 @@
     @vite(['resources/js/app.js', 'resources/js/parametros.js'])
     <script>
         $(function() {
-            // Mostrar mensajes flash con SweetAlert2
-            @if (session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Éxito!',
-                    text: '{{ session('success') }}',
-                    confirmButtonText: 'Entendido',
-                    confirmButtonColor: '#28a745'
-                });
-            @endif
-
-            @if (session('error'))
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: '{{ session('error') }}',
-                    confirmButtonText: 'Entendido',
-                    confirmButtonColor: '#d33'
-                });
-            @endif
-
+            // Las notificaciones flash se manejan globalmente en la plantilla base
             $('[data-toggle="tooltip"]').tooltip();
 
             const permisosTable = $('#permisos-table').DataTable({

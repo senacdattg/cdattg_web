@@ -1,9 +1,9 @@
 @inject('layoutHelper', 'JeroenNoten\LaravelAdminLte\Helpers\LayoutHelper')
 
-<nav
-    class="main-header navbar
+<nav class="main-header navbar
     {{ config('adminlte.classes_topnav_nav', 'navbar-expand') }}
-    {{ config('adminlte.classes_topnav', 'navbar-white navbar-light') }}">
+    {{ config('adminlte.classes_topnav', 'navbar-white navbar-light') }}"
+    @if (config('adminlte.livewire')) wire:ignore @endif>
 
     {{-- Navbar left links --}}
     <ul class="navbar-nav">

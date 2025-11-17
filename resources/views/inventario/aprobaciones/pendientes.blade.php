@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+@extends('inventario.layouts.base')
 
 @section('title', 'Aprobaciones Pendientes')
 
@@ -362,4 +362,5 @@
 <!-- Script de aprobaciones -->
 @vite(['resources/js/inventario/aprobaciones.js'])
 @endpush
+
 

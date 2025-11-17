@@ -1,6 +1,6 @@
 @extends('adminlte::page')
 
-@section('plugins.Sweetalert2', true)
+{{-- SweetAlert2 activado globalmente en config/adminlte.php --}}
 
 @section('title', 'Talento Humano')
 
@@ -78,7 +78,10 @@
                                     </div>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                                    <button
+                                        type="button"
+                                        class="btn btn-secondary"
+                                        data-dismiss="modal">Cancelar</button>
                                     <button type="button" class="btn btn-primary"
                                         id="btn-confirmar-sede">Confirmar</button>
                                 </div>

@@ -173,4 +173,129 @@ export class AlertHandler {
         }
         return Promise.resolve({ isConfirmed: false });
     }
+
+    /**
+     * Muestra confirmación de eliminación con diseño personalizado
+     */
+    showDeleteConfirmation(itemName) {
+        if (!this.options.Swal && typeof Swal !== 'undefined') {
+            this.options.Swal = Swal;
+        }
+        if (!this.options.Swal) {
+            const confirmMessage = '¿Está seguro de eliminar ' + itemName + '? ' +
+                'Esta acción no se puede deshacer.';
+            return Promise.resolve({
+                isConfirmed: confirm(confirmMessage)
+            });
+        }
+        return this.options.Swal.fire({
+            title: '¿Eliminar importación?',
+            html: `
+                <div class="text-center">
+                    <i class="fas fa-trash-alt text-danger mb-3" style="font-size: 3rem;"></i>
+                    <p class="mb-2">
+                        ¿Está seguro de eliminar <strong class="text-danger">${itemName}</strong>?
+                    </p>
+                    <small class="text-muted">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Esta acción no se puede deshacer.
+                    </small>
+                </div>
+            `,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#dc3545',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: '<i class="fas fa-trash"></i> Sí, eliminar',
+            cancelButtonText: '<i class="fas fa-times"></i> Cancelar',
+            focusConfirm: false,
+            reverseButtons: true
+        });
+    }
+
+    /**
+     * Muestra errores de validación formateados
+     */
+    showValidationErrors(errors) {
+        if (!this.options.Swal && typeof Swal !== 'undefined') {
+            this.options.Swal = Swal;
+        }
+        if (!this.options.Swal) {
+            let errorText = 'Errores de validación:\n';
+            for (let field in errors) {
+                if (errors.hasOwnProperty(field)) {
+                    errors[field].forEach(error => {
+                        errorText += '- ' + error + '\n';
+                    });
+                }
+            }
+            alert(errorText);
+            return;
+        }
+        let errorsHtml = '<ul class="text-left mb-0">';
+        for (let field in errors) {
+            if (errors.hasOwnProperty(field)) {
+                errors[field].forEach(error => {
+                    errorsHtml += '<li>' + error + '</li>';
+                });
+            }
+        }
+        errorsHtml += '</ul>';
+
+        return this.options.Swal.fire({
+            icon: 'error',
+            title: 'Errores de validación',
+            html: errorsHtml,
+            confirmButtonText: 'Entendido'
+        });
+    }
+
+    /**
+     * Muestra info con timer (sin botón de confirmación)
+     */
+    showInfoWithTimer(title, message, timer = 2000) {
+        if (!this.options.Swal && typeof Swal !== 'undefined') {
+            this.options.Swal = Swal;
+        }
+        if (!this.options.Swal) return;
+        return this.options.Swal.fire({
+            icon: 'info',
+            title: title,
+            text: message,
+            timer: timer,
+            showConfirmButton: false
+        });
+    }
+
+    /**
+     * Muestra éxito con timer (sin botón de confirmación)
+     */
+    showSuccessWithTimer(title, message, timer = 2500) {
+        if (!this.options.Swal && typeof Swal !== 'undefined') {
+            this.options.Swal = Swal;
+        }
+        if (!this.options.Swal) return;
+        return this.options.Swal.fire({
+            icon: 'success',
+            title: title,
+            text: message,
+            timer: timer,
+            showConfirmButton: false
+        });
+    }
+}
+
+// Instancia global para uso directo sin necesidad de instanciar
+let globalAlertHandler = null;
+
+/**
+ * Obtiene o crea la instancia global de AlertHandler
+ */
+export function getGlobalAlertHandler() {
+    if (!globalAlertHandler) {
+        globalAlertHandler = new AlertHandler({
+            Swal: typeof Swal !== 'undefined' ? Swal : null
+        });
+    }
+    return globalAlertHandler;
 }

@@ -1,4 +1,6 @@
-@extends('adminlte::page')
+@extends('inventario.layouts.base')
+
+@section('plugins.Chartjs', true)
 
 @section('title', 'Dashboard de Inventario')
 
@@ -242,7 +244,6 @@
 @endpush
 
 @push('js')
-<script src="{{ asset('vendor/chart.js/Chart.bundle.min.js') }}"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     // Gráfico de Productos Consumibles vs No Consumibles

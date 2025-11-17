@@ -27,16 +27,8 @@ class PersonaImportController extends Controller
 
     public function create(): View
     {
-        $importaciones = PersonaImport::query()
-            ->with(['user.persona'])
-            ->withCount('issues')
-            ->orderByDesc('created_at')
-            ->limit(12)
-            ->get();
-
-        return view('personas.import', [
-            'importaciones' => $importaciones,
-        ]);
+        // Los datos ahora los maneja el componente Livewire
+        return view('personas.import');
     }
 
     public function store(PersonaImportRequest $request): JsonResponse

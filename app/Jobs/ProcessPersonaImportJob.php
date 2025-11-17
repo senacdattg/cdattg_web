@@ -23,8 +23,8 @@ class ProcessPersonaImportJob implements ShouldQueue
     /**
      * Cola dedicada para importaciones con configuración independiente.
      */
-    private const CONNECTION = 'persona-import';
-    private const QUEUE = 'persona-import';
+    private const CONNECTION = 'long-running';
+    private const QUEUE = 'long-running';
 
     public int $tries = 3;
     public int $timeout;

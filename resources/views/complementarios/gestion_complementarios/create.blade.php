@@ -4,8 +4,7 @@
 
 @section('css')
     <link href="{{ asset('css/parametros.css') }}" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2-bootstrap4.min.css') }}">
+    {{-- Select2 cargado por AdminLTE nativo --}}
     <style>
         .form-section {
             background: #f8f9fa;
@@ -154,8 +153,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    <a class="btn btn-outline-secondary btn-sm mb-3"
-                        href="{{ route('gestion-programas-complementarios') }}">
+                    <a class="btn btn-outline-secondary btn-sm mb-3" href="{{ route('gestion-programas-complementarios') }}">
                         <i class="fas fa-arrow-left mr-1"></i> Volver
                     </a>
 
@@ -204,13 +202,12 @@
                                         </div>
 
                                         <div class="form-group">
-                                            <label for="descripcion"
-                                            class="form-label required-field">Descripción</label>
+                                            <label for="descripcion" class="form-label required-field">Descripción</label>
                                             <textarea name="descripcion" id="descripcion" rows="4"
                                                 class="form-control
                                                 @error('descripcion') is-invalid
-                                                @enderror" placeholder="Describa el programa de formación..."
-                                                required>{{ old('descripcion') }}</textarea>
+                                                @enderror"
+                                                placeholder="Describa el programa de formación..." required>{{ old('descripcion') }}</textarea>
                                             @error('descripcion')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -223,8 +220,7 @@
                                     <div class="form-section">
                                         <h6><i class="fas fa-cog"></i> Configuración</h6>
                                         <div class="form-group">
-                                            <label for="duracion"
-                                            class="form-label required-field">Duración (horas)</label>
+                                            <label for="duracion" class="form-label required-field">Duración (horas)</label>
                                             <input type="number" name="duracion" id="duracion"
                                                 class="form-control @error('duracion') is-invalid @enderror"
                                                 value="{{ old('duracion') }}" min="1" max="1000" required>
@@ -249,11 +245,11 @@
                                     <div class="form-section">
                                         <h6><i class="fas fa-calendar-alt"></i> Modalidad y Jornada</h6>
                                         <div class="form-group">
-                                            <label for="modalidad_id"
-                                            class="form-label required-field">Modalidad</label>
+                                            <label for="modalidad_id" class="form-label required-field">Modalidad</label>
                                             <select name="modalidad_id" id="modalidad_id"
                                                 class="form-control
-                                                @error('modalidad_id') is-invalid @enderror" required>
+                                                @error('modalidad_id') is-invalid @enderror"
+                                                required>
                                                 <option value="">Seleccione una modalidad</option>
                                                 @foreach ($modalidades as $modalidad)
                                                     <option value="{{ $modalidad->id }}"
@@ -365,8 +361,9 @@
     @include('layouts.footer')
 @endsection
 
+@section('plugins.Select2', true)
+
 @section('js')
-    <script src="{{ asset('plugins/select2/js/select2.full.min.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Inicializar Select2 si está disponible

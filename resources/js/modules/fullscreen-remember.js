@@ -22,17 +22,25 @@
 
     /**
      * Activa el modo fullscreen
+     * IMPORTANTE: Solo debe llamarse como respuesta a una interacción del usuario
      */
     function enterFullscreen() {
         const element = document.documentElement;
-        if (element.requestFullscreen) {
-            element.requestFullscreen().catch(() => { });
-        } else if (element.webkitRequestFullscreen) {
-            element.webkitRequestFullscreen();
-        } else if (element.mozRequestFullScreen) {
-            element.mozRequestFullScreen();
-        } else if (element.msRequestFullscreen) {
-            element.msRequestFullscreen();
+        try {
+            if (element.requestFullscreen) {
+                element.requestFullscreen().catch(() => {
+                    // Silenciar errores de permisos - es normal si no hay interacción del usuario
+                });
+            } else if (element.webkitRequestFullscreen) {
+                element.webkitRequestFullscreen();
+            } else if (element.mozRequestFullScreen) {
+                element.mozRequestFullScreen();
+            } else if (element.msRequestFullscreen) {
+                element.msRequestFullscreen();
+            }
+        } catch (e) {
+            // Silenciar errores - los navegadores bloquean fullscreen sin interacción del usuario
+            // Esto es comportamiento esperado y no necesita mostrarse en consola
         }
     }
 
@@ -57,15 +65,9 @@
         if (savedState === 'true' && !isFullscreen()) {
             try {
                 enterFullscreen();
-                // Verificar si se activó correctamente después de un breve delay
-                setTimeout(() => {
-                    if (!isFullscreen()) {
-                        // Si falló, intentar de nuevo en el próximo evento
-                        console.warn('Fullscreen no se pudo activar automáticamente. Requiere interacción del usuario.');
-                    }
-                }, 100);
             } catch (e) {
-                console.warn('Error al restaurar fullscreen:', e);
+                // Silenciar errores - es normal si no hay interacción del usuario válida
+                // El fullscreen se restaurará en la próxima interacción del usuario
             }
         }
     }
@@ -101,18 +103,8 @@
             // Si Livewire está disponible, escuchar sus eventos de navegación
             function setupLivewireHooks() {
                 if (typeof Livewire !== 'undefined' && Livewire.hook) {
-                    // Restaurar fullscreen después de que Livewire actualice la página
-                    Livewire.hook('morph.updated', () => {
-                        const savedState = localStorage.getItem(STORAGE_KEY);
-                        if (savedState === 'true' && !isFullscreen()) {
-                            // Esperar un momento para que el DOM se estabilice
-                            setTimeout(() => {
-                                attemptRestoreFullscreen();
-                            }, 200);
-                        }
-                    });
-
-                    // También escuchar cuando Livewire navega
+                    // NO restaurar fullscreen automáticamente después de actualizaciones de Livewire
+                    // Solo guardar el estado para restaurarlo cuando el usuario interactúe
                     Livewire.hook('morph.updating', () => {
                         // Guardar estado antes de que Livewire actualice
                         saveState();
@@ -124,15 +116,8 @@
                         saveState();
                     });
 
-                    // Escuchar cuando Livewire completa la navegación
-                    Livewire.hook('navigated', () => {
-                        const savedState = localStorage.getItem(STORAGE_KEY);
-                        if (savedState === 'true' && !isFullscreen()) {
-                            setTimeout(() => {
-                                attemptRestoreFullscreen();
-                            }, 300);
-                        }
-                    });
+                    // NO restaurar automáticamente en navigated - esperar interacción del usuario
+                    // El fullscreen se restaurará cuando el usuario haga clic, toque, etc.
                 } else {
                     // Si Livewire aún no está listo, intentar de nuevo
                     setTimeout(setupLivewireHooks, 100);
@@ -178,35 +163,16 @@
                         $(document).on(event + '.fullscreen-restore', tryRestore);
                     });
 
-                    // También intentar restaurar cuando la página se vuelve visible
-                    $(document).on('visibilitychange.fullscreen-restore', function () {
-                        if (!document.hidden && !isFullscreen() && !restoreAttempted) {
-                            // Esperar un momento y luego intentar restaurar
-                            setTimeout(() => {
-                                if (!restoreAttempted) {
-                                    attemptRestoreFullscreen();
-                                    restoreAttempted = true;
-                                }
-                            }, 100);
-                        }
-                    });
+                    // NO intentar restaurar en visibilitychange sin interacción del usuario
+                    // Los navegadores bloquean requestFullscreen sin interacción del usuario
                 }
             }
 
             // Configurar restauración automática
             setupAutoRestore();
 
-            // También intentar restaurar cuando el DOM esté completamente listo
-            if (savedState === 'true' && !isFullscreen()) {
-                // Esperar un poco más para asegurar que todo esté cargado
-                setTimeout(() => {
-                    if (!restoreAttempted && !isFullscreen()) {
-                        // Marcar que intentaremos restaurar en la próxima interacción
-                        restoreAttempted = false;
-                        setupAutoRestore();
-                    }
-                }, 500);
-            }
+            // NO intentar restaurar automáticamente al cargar la página
+            // Solo restaurar cuando el usuario interactúe (click, touch, etc.)
 
             // Guardar estado inicial
             saveState();

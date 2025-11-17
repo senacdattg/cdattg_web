@@ -98,5 +98,5 @@
 
 @section('footer')
     @include('layouts.footer')
-    @include('layouts.alertas')
+    {{-- Notificaciones manejadas globalmente por sweetalert2-notifications --}}
 @endsection
