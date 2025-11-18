@@ -341,7 +341,7 @@ Buscar por:
 
 ---
 
-**Fecha de Implementación:** 18 de Octubre 2025  
+**Fecha de Implementación:** 2025-11-17  
 **Versión:** 1.0  
 **Módulo:** Fichas de Caracterización → Gestión de Instructores → Días de Formación
 

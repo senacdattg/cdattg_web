@@ -4,7 +4,7 @@ Esta aplicación Laravel para gestión de programas complementarios del SENA inc
 
 ## Arquitectura de Contenedores
 
-- **app**: Aplicación Laravel (PHP 8.1 + Node.js)
+- **app**: Aplicación Laravel (PHP 8.3+ + Node.js)
 - **nginx**: Servidor web y proxy reverso
 - **db**: Base de datos MySQL 8.0
 - **redis**: Cache y sesiones
@@ -21,7 +21,7 @@ Esta aplicación Laravel para gestión de programas complementarios del SENA inc
 ### 1. Clonar el repositorio
 ```bash
 git clone <repository-url>
-cd cdattg_asistence_web
+cd academica_web
 ```
 
 ### 2. Configurar variables de entorno
@@ -49,7 +49,7 @@ docker-compose up -d
 
 - **Aplicación principal**: http://localhost:8000
 - **Validador Playwright**: http://localhost:3000
-- **Base de datos**: localhost:3306 (usuario: cdattg_user, password: password)
+- **Base de datos**: localhost:3306 (usuario: root, password: según configuración)
 
 ## Comandos Útiles
 
@@ -175,7 +175,7 @@ docker-compose logs app | grep -i playwright
 **Nota**: Si las validaciones no funcionan, verificar que:
 1. El contenedor `playwright` esté corriendo (`docker-compose ps`)
 2. La variable `PLAYWRIGHT_SERVICE_URL` esté configurada correctamente en `.env`
-3. Ambos contenedores (`app` y `playwright`) estén en la misma red Docker (`cdattg_net`)
+3. Ambos contenedores (`app` y `playwright`) estén en la misma red Docker (ver `docker-compose.yml`)
 
 ### Problemas de permisos
 ```bash
@@ -204,3 +204,9 @@ docker-compose exec app tail -f /var/log/supervisor/*.log
 
 # Logs de Nginx
 docker-compose logs nginx
+```
+
+---
+
+**Última actualización:** 2025-11-17  
+**Versión del proyecto:** Laravel 12.0, PHP 8.3+

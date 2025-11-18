@@ -124,5 +124,5 @@ Al abrir la vista de editar:
 ---
 
 **Estado:** ✅ CORREGIDO  
-**Fecha:** 19 de Octubre 2025
+**Fecha:** 2025-11-17
 

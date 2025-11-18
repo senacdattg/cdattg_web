@@ -241,3 +241,8 @@ Para migrar una vista existente:
 - Mantienen la compatibilidad con el sistema de permisos existente
 - Siguen las convenciones de diseño del sistema
 - Son fáciles de personalizar mediante parámetros
+
+---
+
+**Última actualización:** 2025-11-17  
+**Versión:** Laravel 12.0, Blade Components

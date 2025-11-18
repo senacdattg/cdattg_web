@@ -302,7 +302,7 @@ Ficha    | Programa        | Instructor Líder      | Sede     | Estado
 
 ---
 
-**Fecha de Finalización:** 19 de Octubre 2025  
+**Fecha de Finalización:** 2025-11-17  
 **Estado:** ✅ PRODUCCIÓN  
 **Calidad:** ⭐⭐⭐⭐⭐
 
