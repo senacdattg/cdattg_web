@@ -14,7 +14,7 @@ class PasswordResetController extends Controller
 {
     public function request()
     {
-        return view('auth.passwords.email');
+        return view('adminlte::auth.passwords.email');
     }
 
     public function email(Request $request)

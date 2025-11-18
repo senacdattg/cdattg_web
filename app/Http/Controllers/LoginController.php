@@ -13,7 +13,7 @@ class LoginController extends Controller
 {
     public function index()
     {
-        return view('welcome');
+        return view('adminlte::auth.login');
     }
 
     public function iniciarSesion(Request $request)

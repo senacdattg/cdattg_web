@@ -67,6 +67,9 @@ if (pusherKey) {
         enabledTransports: ['ws', 'wss'],
     });
 } else {
-    console.warn('Pusher no está configurado: se omitió la inicialización de Laravel Echo.');
+    // Solo mostrar warning en desarrollo
+    if (process.env.NODE_ENV === 'development' || import.meta.env?.MODE === 'development') {
+        console.warn('Pusher no está configurado: se omitió la inicialización de Laravel Echo.');
+    }
     window.Echo = null;
 }

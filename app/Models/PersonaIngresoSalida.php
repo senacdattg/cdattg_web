@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class PersonaIngresoSalida extends Model
@@ -148,6 +149,32 @@ class PersonaIngresoSalida extends Model
     public function scopeHoy($query)
     {
         return $query->whereDate('fecha_entrada', Carbon::today());
+    }
+
+    /**
+     * Obtiene los valores del enum tipo_persona dinámicamente desde la base de datos
+     */
+    public static function obtenerTiposPersonaDisponibles(): array
+    {
+        $column = DB::select("SHOW COLUMNS FROM persona_ingreso_salida WHERE Field = 'tipo_persona'");
+        
+        if (empty($column)) {
+            return [];
+        }
+
+        $type = $column[0]->Type;
+        
+        // Extraer valores del enum: enum('valor1','valor2','valor3')
+        preg_match("/^enum\((.*)\)$/", $type, $matches);
+        
+        if (empty($matches[1])) {
+            return [];
+        }
+
+        // Separar y limpiar los valores
+        $values = str_getcsv($matches[1], ',', "'");
+        
+        return array_map('trim', $values);
     }
 }
 

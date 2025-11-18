@@ -55,7 +55,6 @@ export default defineConfig({
                 // Personas files
                 'formularios-generico': 'resources/js/pages/formularios-generico.js',
                 'formularios-select-dinamico': 'resources/js/pages/formularios-select-dinamico.js',
-                'talento-humano': 'resources/js/pages/talento-humano.js',
                 'gestion-especializada': 'resources/js/pages/gestion-especializada.js',
                 'permisos': 'resources/js/pages/permisos.js',
                 'personas-form': 'resources/js/personas/form.js',

@@ -20,6 +20,21 @@
 @section('adminlte_css')
     @stack('css')
     @yield('css')
+    <style>
+        /* Ocultar logo duplicado en login */
+        .login-logo,
+        .register-logo,
+        .password-logo,
+        .sena-mini-logo,
+        body .sena-mini-logo,
+        html .sena-mini-logo,
+        .login-page .sena-mini-logo,
+        .register-page .sena-mini-logo {
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
+        }
+    </style>
 @stop
 
 @section('classes_body'){{ $bodyClasses }}@stop
@@ -27,11 +42,10 @@
 @section('body')
     <div class="{{ $authType }}-box">
 
-        {{-- Logo --}}
+        {{-- Logo - Oculto para evitar duplicación, ahora se muestra en el header de la card --}}
+        {{-- 
         <div class="{{ $authType }}-logo">
             <a href="{{ $dashboardUrl }}">
-
-                {{-- Logo Image --}}
                 @if (config('adminlte.auth_logo.enabled', false))
                     <img src="{{ asset(config('adminlte.auth_logo.img.path')) }}"
                          alt="{{ config('adminlte.auth_logo.img.alt') }}"
@@ -48,12 +62,9 @@
                     <img src="{{ asset(config('adminlte.logo_img')) }}"
                          alt="{{ config('adminlte.logo_img_alt') }}" height="50">
                 @endif
-
-                {{-- Logo Label --}}
-                {!! config('adminlte.logo', '<b>Admin</b>LTE') !!}
-
             </a>
         </div>
+        --}}
 
         {{-- Card Box --}}
         <div class="card {{ config('adminlte.classes_auth_card', 'card-outline card-primary') }}">

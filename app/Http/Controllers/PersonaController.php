@@ -600,7 +600,7 @@ class PersonaController extends Controller
     }
 
     /**
-     * Consulta una persona por número de documento (usado por Talento Humano)
+     * Consulta una persona por número de documento (usado por Ingreso y Salida)
      *
      * @param Request $request
      * @return JsonResponse
@@ -651,7 +651,7 @@ class PersonaController extends Controller
     }
 
     /**
-     * Crea una persona desde una petición JSON (usado por Talento Humano)
+     * Crea una persona desde una petición JSON (usado por Ingreso y Salida)
      *
      * @param StorePersonaRequest $request
      * @return JsonResponse
@@ -661,7 +661,7 @@ class PersonaController extends Controller
         try {
             $persona = $this->personaService->crear($request->validated());
 
-            Log::info('Persona creada desde Talento Humano', [
+            Log::info('Persona creada desde Ingreso y Salida', [
                 'persona_id' => $persona->id,
                 'numero_documento' => $persona->numero_documento,
                 'user_id' => Auth::id()

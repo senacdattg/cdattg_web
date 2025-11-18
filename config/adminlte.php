@@ -673,18 +673,18 @@ return [
             'icon' => 'fas fa-fw fa-users',
             'can' => 'VER PERSONA',
         ],
-        [
-            'text' => 'Talento Humano',
-            'url' => 'talento-humano',
-            'icon' => 'fas fa-fw fa-user-tie',
-            'can' => 'VER TALENTO HUMANO',
-        ],
 
         // ========================================
         // CONTROL Y SEGUIMIENTO
         // ========================================
         [
             'header' => 'CONTROL Y SEGUIMIENTO',
+        ],
+        [
+            'text' => 'Ingreso y Salida',
+            'url' => 'control-seguimiento/ingreso-salida',
+            'icon' => 'fas fa-fw fa-sign-in-alt',
+            'can' => 'VER INGRESO SALIDA',
         ],
         [
             'text' => 'Asistencia',

@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
         programaSelector: '#programa_formacion_id'
     });
 
-    // Exponer instancia global para integraciones dinámicas (ej. Talento Humano)
+    // Exponer instancia global para integraciones dinámicas (ej. Ingreso y Salida)
     window.selectDinamicoHandler = selectDinamico;
 
     // Validación de formulario

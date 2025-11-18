@@ -1,21 +1,48 @@
 @extends('adminlte::auth.auth-page', ['authType' => 'login'])
 
 @php
-    $loginUrl = View::getSection('login_url') ?? config('adminlte.login_url', 'login');
-    $passResetUrl = View::getSection('password_reset_url') ?? config('adminlte.password_reset_url', 'password/reset');
-
-    if (config('adminlte.use_route_url', false)) {
-        $loginUrl = $loginUrl ? route($loginUrl) : '';
-        $passResetUrl = $passResetUrl ? route($passResetUrl) : '';
-    } else {
-        $loginUrl = $loginUrl ? url($loginUrl) : '';
-        $passResetUrl = $passResetUrl ? url($passResetUrl) : '';
-    }
+    $loginUrl = View::getSection('login_url') ?? route('login.index');
+    $passResetUrl = View::getSection('password_reset_url') ?? route('password.update');
 @endphp
 
-@section('auth_header', __('adminlte::adminlte.password_reset_message'))
+@section('auth_header')
+    <div class="text-center">
+        @if (config('adminlte.auth_logo.enabled', false))
+            <img src="{{ asset(config('adminlte.auth_logo.img.path')) }}"
+                 alt="{{ config('adminlte.auth_logo.img.alt') }}"
+                 @if (config('adminlte.auth_logo.img.class', null))
+                    class="{{ config('adminlte.auth_logo.img.class') }} mb-3"
+                 @else
+                    class="mb-3"
+                 @endif
+                 style="max-width: 200px; height: auto;">
+        @else
+            <img src="{{ asset(config('adminlte.logo_img')) }}"
+                 alt="{{ config('adminlte.logo_img_alt') }}"
+                 class="mb-3"
+                 style="max-width: 200px; height: auto;">
+        @endif
+        <h4 class="mb-0 mt-2">{{ __('adminlte::adminlte.password_reset_message') }}</h4>
+    </div>
+@stop
 
 @section('auth_body')
+    {{-- Mostrar errores de validación --}}
+    @if ($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle mr-2"></i>
+            <strong>Por favor corrija los siguientes errores:</strong>
+            <ul class="mb-0 mt-2 pl-3">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    @endif
+
     <form action="{{ $passResetUrl }}" method="post">
         @csrf
 
@@ -93,7 +120,7 @@
 @section('auth_footer')
     <p class="my-0">
         <a href="{{ $loginUrl }}">
-            {{ __('adminlte::adminlte.i_already_have_a_membership') }}
+            <i class="fas fa-arrow-left mr-1"></i>{{ __('adminlte::adminlte.i_already_have_a_membership') }}
         </a>
     </p>
 @stop
