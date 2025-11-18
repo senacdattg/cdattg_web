@@ -58,9 +58,14 @@ class RegisterController extends Controller
 
         $this->actualizarRolesSegunInscripcion($persona, $user);
 
+        // Enviar email de verificación
+        $user->sendEmailVerificationNotification();
+
         Auth::login($user);
 
-        return $this->resolvePostRegistroRedirect($persona, $this->tieneInscripciones($persona));
+        return redirect()
+            ->route('verification.notice')
+            ->with('success', '¡Registro exitoso! Por favor, verifica tu correo electrónico antes de continuar.');
     }
 
     private function personaExists(string $numeroDocumento, string $email): bool
@@ -135,35 +140,6 @@ class RegisterController extends Controller
         return $trimmed === '' ? null : strtoupper($trimmed);
     }
 
-    private function resolvePostRegistroRedirect(Persona $persona, bool $tieneInscripciones): RedirectResponse
-    {
-        if ($tieneInscripciones) {
-            $inscripcionPendiente = AspiranteComplementario::where('persona_id', $persona->id)
-                ->where('estado', 1)
-                ->whereNull('documento_identidad_path')
-                ->orderBy('created_at', 'desc')
-                ->first();
-
-            if ($inscripcionPendiente) {
-                return redirect()
-                    ->route('programas-complementarios.documentos', [
-                        'id' => $inscripcionPendiente->complementario_id,
-                        'aspirante_id' => $inscripcionPendiente->id,
-                    ])
-                    ->with(
-                        'success',
-                        '¡Registro Exitoso! Complete el proceso subiendo su documento de identidad.'
-                    );
-            }
-        }
-
-        return redirect()
-            ->route('programas-complementarios.index')
-            ->with(
-                'success',
-                '¡Registro Exitoso! Ahora puede inscribirse en los programas complementarios disponibles.'
-            );
-    }
 
     /**
      * @param array<string,mixed> $data

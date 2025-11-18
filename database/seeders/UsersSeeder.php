@@ -13,88 +13,69 @@ class UsersSeeder extends Seeder
      */
     public function run(): void
     {
-        $bot = User::updateOrCreate(
-            ['email' => 'bot@dataguaviare.com'],
+        $users = [
             [
-                'password' => Hash::make('Guaviare25.'),
-                'status' => 1,
+                'email' => 'info@dataguaviare.com.co',
+                'password' => 'Guaviare25.',
                 'persona_id' => 1,
-                'email_verified_at' => now(),
-            ]
-        );
-
-        if (! $bot->hasRole('BOT')) {
-            $bot->assignRole('BOT');
-        }
-
-        $superAdmin = User::updateOrCreate(
-            ['email' => 'superadmin@dataguaviare.com'],
+                'role' => 'BOT',
+            ],
             [
-                'password' => Hash::make('Guaviare25.'),
-                'status' => 1,
+                'email' => 'superadmin@dataguaviare.com',
+                'password' => 'Guaviare25.',
                 'persona_id' => 2,
-                'email_verified_at' => now(),
-            ]
-        );
-
-        if (! $superAdmin->hasRole('SUPER ADMINISTRADOR')) {
-            $superAdmin->assignRole('SUPER ADMINISTRADOR');
-        }
-
-        $admin = User::updateOrCreate(
-            ['email' => 'admin@dataguaviare.com'],
+                'role' => 'SUPER ADMINISTRADOR',
+            ],
             [
-                'password' => Hash::make('Guaviare25.'),
-                'status' => 1,
+                'email' => 'admin@dataguaviare.com',
+                'password' => 'Guaviare25.',
                 'persona_id' => 2,
-                'email_verified_at' => now(),
-            ]
-        );
-
-        if (! $admin->hasRole('ADMINISTRADOR')) {
-            $admin->assignRole('ADMINISTRADOR');
-        }
-
-        $instructor = User::updateOrCreate(
-            ['email' => 'instructor@dataguaviare.com'],
+                'role' => 'ADMINISTRADOR',
+            ],
             [
-                'password' => Hash::make('Guaviare25.'),
-                'status' => 1,
+                'email' => 'instructor@dataguaviare.com',
+                'password' => 'Guaviare25.',
                 'persona_id' => 3,
-                'email_verified_at' => now(),
-            ]
-        );
-
-        if (! $instructor->hasRole('INSTRUCTOR')) {
-            $instructor->assignRole('INSTRUCTOR');
-        }
-
-        $aprendiz1 = User::updateOrCreate(
-            ['email' => 'aprendiz1@dataguaviare.com'],
+                'role' => 'INSTRUCTOR',
+            ],
             [
-                'password' => Hash::make('Guaviare25!'),
-                'status' => 1,
+                'email' => 'aprendiz1@dataguaviare.com',
+                'password' => 'Guaviare25!',
                 'persona_id' => 5,
-                'email_verified_at' => now(),
-            ]
-        );
-
-        if (! $aprendiz1->hasRole('APRENDIZ')) {
-            $aprendiz1->assignRole('APRENDIZ');
-        }
-
-        $aprendiz2 = User::updateOrCreate(
-            ['email' => 'aprendiz2@dataguaviare.com'],
+                'role' => 'APRENDIZ',
+            ],
             [
-                'password' => Hash::make('Guaviare25!'),
-                'status' => 1,
+                'email' => 'aprendiz2@dataguaviare.com',
+                'password' => 'Guaviare25!',
                 'persona_id' => 6,
+                'role' => 'APRENDIZ',
+            ],
+        ];
+
+        foreach ($users as $userData) {
+            $this->createOrUpdateUser($userData);
+        }
+    }
+
+    /**
+     * Crea o actualiza un usuario y asigna su rol
+     *
+     * @param array<string, mixed> $userData
+     */
+    private function createOrUpdateUser(array $userData): void
+    {
+        $user = User::updateOrCreate(
+            ['email' => $userData['email']],
+            [
+                'password' => Hash::make($userData['password']),
+                'status' => 1,
+                'persona_id' => $userData['persona_id'],
                 'email_verified_at' => now(),
             ]
         );
 
-        if (! $aprendiz2->hasRole('APRENDIZ')) {
-            $aprendiz2->assignRole('APRENDIZ');
+        if (!$user->hasRole($userData['role'])) {
+            $user->assignRole($userData['role']);
         }
     }
 }

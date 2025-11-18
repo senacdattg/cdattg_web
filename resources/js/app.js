@@ -6,6 +6,7 @@ import './modules/fullscreen-remember';
 import './modules/preloader';
 import './modules/sidebar-persist';
 import './modules/tracking-prevention-suppress';
+import './modules/livewire-logout-fix';
 import { suppressTrackingPreventionErrors } from './modules/tracking-prevention-suppress';
 import { getGlobalAlertHandler } from './modules/alert-handler';
 

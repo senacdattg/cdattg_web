@@ -363,6 +363,9 @@ class InscripcionComplementarioController extends Controller
                 'persona_id' => $persona->id,
             ]);
             $user->assignRole('ASPIRANTE');
+            
+            // Enviar email de verificación automáticamente
+            $user->sendEmailVerificationNotification();
         } elseif ($existingUser->hasRole('VISITANTE')) {
             $existingUser->removeRole('VISITANTE');
             $existingUser->assignRole('ASPIRANTE');

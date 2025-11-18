@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
 
@@ -28,17 +29,61 @@ class PasswordResetController extends Controller
             ]
         );
 
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
+        $errorMessage = null;
+        $successMessage = null;
 
-        if ($status === Password::RESET_LINK_SENT) {
-            return back()->with('success', 'Hemos enviado un enlace de restablecimiento a su correo.');
+        try {
+            $status = Password::sendResetLink(
+                $request->only('email')
+            );
+
+            if ($status === Password::RESET_LINK_SENT) {
+                $successMessage = 'Hemos enviado un enlace de restablecimiento a su correo.';
+            } else {
+                $errorMessage = 'No encontramos un usuario con ese correo.';
+            }
+        } catch (\Exception $e) {
+            $errorDetails = [
+                'message' => $e->getMessage(),
+                'email' => $request->email,
+                'mail_config' => [
+                    'host' => config('mail.mailers.smtp.host'),
+                    'port' => config('mail.mailers.smtp.port'),
+                    'encryption' => config('mail.mailers.smtp.encryption'),
+                    'username' => config('mail.mailers.smtp.username'),
+                ],
+            ];
+
+            Log::error('Error al enviar enlace de restablecimiento', $errorDetails);
+
+            // Detectar diferentes tipos de errores de mail
+            $errorMessage = 'Ocurrió un error al procesar su solicitud. Por favor, inténtelo de nuevo.';
+
+            $errorMsg = $e->getMessage();
+
+            if (str_contains($errorMsg, 'Connection could not be established') ||
+                str_contains($errorMsg, 'mailpit') ||
+                str_contains($errorMsg, 'getaddrinfo')) {
+                $errorMessage = 'Error de conexión con el servidor de correo. '
+                    . 'Verifique la configuración del servidor SMTP.';
+            } elseif (str_contains($errorMsg, 'Authentication') ||
+                      str_contains($errorMsg, '535') ||
+                      str_contains($errorMsg, 'Invalid login') ||
+                      str_contains($errorMsg, 'authentication failed')) {
+                $errorMessage = 'Error de autenticación con el servidor de correo. '
+                    . 'Verifique que el usuario y contraseña sean correctos en el archivo .env.';
+            } elseif (str_contains($errorMsg, 'SSL') ||
+                      str_contains($errorMsg, 'TLS') ||
+                      str_contains($errorMsg, 'certificate')) {
+                $errorMessage = 'Error de certificado SSL. Verifique la configuración de encriptación.';
+            }
         }
 
-        return back()->withErrors([
-            'email' => 'No encontramos un usuario con ese correo.',
-        ]);
+        if ($successMessage) {
+            return back()->with('success', $successMessage);
+        }
+
+        return back()->withErrors(['email' => $errorMessage])->withInput();
     }
 
     public function showResetForm(Request $request, string $token)

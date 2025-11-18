@@ -118,9 +118,10 @@ class PersonaService
 
             $this->syncCaracterizaciones($persona, $caracterizacionesIds);
 
-            if ($persona->user) {
+            // Sincronizar email con el usuario relacionado si existe
+            if ($persona->user && isset($datos['email'])) {
                 $this->userRepo->actualizar($persona->user->id, [
-                    'email' => $persona->email,
+                    'email' => $datos['email'],
                 ]);
             }
 
@@ -215,6 +216,9 @@ class PersonaService
 
         // Asignar rol VISITANTE por defecto
         $user->assignRole('VISITANTE');
+
+        // Enviar email de verificación automáticamente
+        $user->sendEmailVerificationNotification();
 
         return $user;
     }

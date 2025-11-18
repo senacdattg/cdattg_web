@@ -71,6 +71,9 @@ class ImportService
                     ]);
 
                     $user->assignRole('INSTRUCTOR');
+                    
+                    // Enviar email de verificación automáticamente
+                    $user->sendEmailVerificationNotification();
 
                     \App\Models\Instructor::create([
                         'persona_id' => $persona->id,

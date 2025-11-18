@@ -3,16 +3,25 @@
 namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\Inventario\Notificacion;
 
+/**
+ * Modelo User
+ *
+ * @method bool hasVerifiedEmail() Determina si el usuario ha verificado su correo electrónico
+ * @method bool markEmailAsVerified() Marca el correo electrónico del usuario como verificado
+ * @method void sendEmailVerificationNotification() Envía la notificación de verificación de correo
+ */
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles, MustVerifyEmailTrait;
 
     /**
      * Especificar la tabla de notificaciones personalizada
@@ -65,6 +74,25 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    /**
+     * Boot del modelo para sincronizar email con persona
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        // Sincronizar email con persona al crear o actualizar
+        static::saving(function ($user) {
+            // Si el email cambió y hay una persona relacionada, sincronizar
+            if ($user->isDirty('email') && $user->persona_id) {
+                // Usar DB directo para evitar loops infinitos
+                DB::table('personas')
+                    ->where('id', $user->persona_id)
+                    ->update(['email' => $user->email]);
+            }
+        });
+    }
 
     public function persona()
     {
