@@ -50,9 +50,6 @@ class DatabaseSeeder extends Seeder
             BloqueSeeder::class,
             PisoSeeder::class,
             AmbienteSeeder::class,
-            RedConocimientoSeeder::class,
-            JornadaFormacionSeeder::class,
-            CompetenciaSeeder::class,
             ProductoSeeder::class, // Crear productos para agregar al módulo de inventario
             // Complementarios ofertados
             // ComplementariosOfertadosSeeder::class,

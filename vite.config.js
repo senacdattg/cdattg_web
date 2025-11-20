@@ -66,7 +66,7 @@ export default defineConfig({
     ],
     server: {
         host: '0.0.0.0',  // Escucha en todas las interfaces de red
-        port: 5173,
+        port: 5174,
         strictPort: true,
         watch: {
             ignored: [

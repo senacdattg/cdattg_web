@@ -416,6 +416,7 @@ return [
         [
             'header' => 'GESTIÓN ACADÉMICA',
         ],
+        /*
         [
             'text' => 'Programas de Formación',
             'icon' => 'fas fa-fw fa-graduation-cap',
@@ -484,6 +485,20 @@ return [
                 ],
             ],
         ],
+        */
+
+        [
+            'text' => 'Redes de conocimiento',
+            'icon' => 'fas fa-fw fa-network-wired',
+            'can' => ['VER RED CONOCIMIENTO'],
+            'route' => 'red-conocimiento.index',
+        ],
+        [
+            'text' => 'Programas de formación',
+            'icon' => 'fas fa-fw fa-graduation-cap',
+            'can' => ['VER PROGRAMA DE FORMACION'],
+            'route' => 'programa.index',
+        ],
         [
             'text' => 'Competencias y Resultados',
             'icon' => 'fas fa-fw fa-clipboard-check',
@@ -491,60 +506,21 @@ return [
             'submenu' => [
                 [
                     'text' => 'Competencias',
+                    'route' => 'competencias.index',
                     'icon' => 'fas fa-fw fa-clipboard-list',
-                    'can' => [$permisoVerCompetencia, 'CREAR COMPETENCIA'],
-                    'submenu' => [
-                        [
-                            'text' => 'Ver Competencias',
-                            'route' => 'competencias.index',
-                            'icon' => $iconoLista,
-                            'can' => $permisoVerCompetencia,
-                        ],
-                        [
-                            'text' => 'Crear Competencia',
-                            'route' => 'competencias.create',
-                            'icon' => $iconoAgregar,
-                            'can' => 'CREAR COMPETENCIA',
-                        ],
-                    ],
+                    'can' => [$permisoVerCompetencia]
                 ],
                 [
                     'text' => 'Resultados de Aprendizaje',
                     'icon' => 'fas fa-fw fa-trophy',
-                    'can' => [$permisoVerResultadoAprendizaje, 'CREAR RESULTADO APRENDIZAJE'],
-                    'submenu' => [
-                        [
-                            'text' => 'Ver Resultados',
-                            'url' => 'resultados-aprendizaje',
-                            'icon' => $iconoLista,
-                            'can' => $permisoVerResultadoAprendizaje,
-                        ],
-                        [
-                            'text' => 'Crear Resultado',
-                            'url' => 'resultados-aprendizaje/create',
-                            'icon' => $iconoAgregar,
-                            'can' => 'CREAR RESULTADO APRENDIZAJE',
-                        ],
-                    ],
+                    'can' => [$permisoVerResultadoAprendizaje],
+                    'route' => 'resultados-aprendizaje.index',
                 ],
                 [
                     'text' => 'Guías de Aprendizaje',
                     'icon' => 'fas fa-fw fa-book-open',
-                    'can' => ['VER GUIA APRENDIZAJE', 'CREAR GUIA APRENDIZAJE'],
-                    'submenu' => [
-                        [
-                            'text' => 'Ver Guías',
-                            'url' => 'guias-aprendizaje',
-                            'icon' => $iconoLista,
-                            'can' => 'VER GUIA APRENDIZAJE',
-                        ],
-                        [
-                            'text' => 'Crear Guía',
-                            'url' => 'guias-aprendizaje/create',
-                            'icon' => $iconoAgregar,
-                            'can' => 'CREAR GUIA APRENDIZAJE',
-                        ],
-                    ],
+                    'can' => ['VER GUIA APRENDIZAJE'],
+                    'route' => 'guias-aprendizaje.index',
                 ],
             ],
         ],
@@ -556,38 +532,14 @@ return [
                 [
                     'text' => 'Fichas de Caracterización',
                     'icon' => 'fas fa-fw fa-file-alt',
-                    'submenu' => [
-                        [
-                            'text' => 'Ver Fichas',
-                            'url' => 'fichaCaracterizacion',
-                            'icon' => $iconoLista,
-                            'can' => 'VER FICHA CARACTERIZACION',
-                        ],
-                        [
-                            'text' => 'Crear Ficha',
-                            'url' => 'fichaCaracterizacion/create',
-                            'icon' => $iconoAgregar,
-                            'can' => 'CREAR FICHA CARACTERIZACION',
-                        ],
-                    ],
+                    'route' => 'fichaCaracterizacion.index',
+                    'can' => ['VER FICHA CARACTERIZACION'],
                 ],
                 [
                     'text' => 'Jornadas de Formación',
                     'icon' => 'fas fa-fw fa-calendar-alt',
-                    'submenu' => [
-                        [
-                            'text' => 'Ver Jornadas',
-                            'url' => 'jornada',
-                            'icon' => $iconoLista,
-                            'can' => 'VER JORNADA',
-                        ],
-                        [
-                            'text' => 'Crear Jornada',
-                            'url' => 'jornada/create',
-                            'icon' => $iconoAgregar,
-                            'can' => 'CREAR JORNADA',
-                        ],
-                    ],
+                    'route' => 'jornada.index',
+                    'can' => ['VER JORNADA'],
                 ],
             ],
         ],
@@ -601,78 +553,22 @@ return [
         [
             'text' => 'Instructores',
             'icon' => 'fas fa-fw fa-chalkboard-teacher',
-            'can' => $permisoVerProgramaCaracterizacion,
-            'submenu' => [
-                [
-                    'text' => 'Ver Instructores',
-                    'url' => 'instructor',
-                    'icon' => $iconoLista,
-                    'can' => $permisoVerProgramaCaracterizacion,
-                ],
-                [
-                    'text' => 'Crear Instructor',
-                    'url' => 'instructor/create',
-                    'icon' => $iconoAgregar,
-                    'can' => $permisoVerProgramaCaracterizacion,
-                ],
-                [
-                    'text' => 'Importar CSV',
-                    'url' => 'createImportarCSV',
-                    'icon' => 'fas fa-fw fa-file-csv',
-                    'can' => $permisoVerProgramaCaracterizacion,
-                ],
-                [
-                    'text' => 'Asignaciones',
-                    'url' => 'asignaciones/instructores',
-                    'icon' => 'fas fa-fw fa-user-check',
-                    'can' => ['ASIGNACION DE INSTRUCTORES'],
-                ],
-            ],
+            'can' => ['VER INSTRUCTOR'],
+            'route' => 'instructor.index',
         ],
         [
             'text' => 'Aprendices',
             'icon' => 'fas fa-fw fa-user-graduate',
             'can' => 'VER APRENDIZ',
-            'submenu' => [
-                [
-                    'text' => 'Ver Aprendices',
-                    'url' => 'aprendices',
-                    'icon' => $iconoLista,
-                    'can' => 'VER APRENDIZ',
-                ],
-                [
-                    'text' => 'Crear Aprendiz',
-                    'url' => 'aprendices/create',
-                    'icon' => $iconoAgregar,
-                    'can' => 'CREAR APRENDIZ',
-                ],
-                [
-                    'text' => 'Gestión de Carnets',
-                    'icon' => 'fas fa-fw fa-id-card',
-                    'can' => [$permisoVerProgramaCaracterizacion, 'VER CREAR CARNET'],
-                    'submenu' => [
-                        [
-                            'text' => 'Administrar Carnets',
-                            'url' => 'administrar-carnet',
-                            'icon' => 'fas fa-fw fa-tasks',
-                            'can' => 'VER ADMINISTRAR CARNET',
-                        ],
-                        [
-                            'text' => 'Crear Carnet',
-                            'url' => 'carnet',
-                            'icon' => $iconoAgregar,
-                            'can' => [$permisoVerProgramaCaracterizacion, 'VER CREAR CARNET'],
-                        ],
-                    ],
-                ],
-            ],
+            'route' => 'aprendices.index',
         ],
-        [
-            'text' => 'Personas',
-            'url' => 'personas',
-            'icon' => 'fas fa-fw fa-users',
-            'can' => 'VER PERSONA',
-        ],
+
+        // [
+        //     'text' => 'Personas',
+        //     'url' => 'personas',
+        //     'icon' => 'fas fa-fw fa-users',
+        //     'can' => 'VER PERSONA',
+        // ],
 
         // ========================================
         // CONTROL Y SEGUIMIENTO
@@ -680,12 +576,12 @@ return [
         [
             'header' => 'CONTROL Y SEGUIMIENTO',
         ],
-        [
-            'text' => 'Ingreso y Salida',
-            'url' => 'control-seguimiento/ingreso-salida',
-            'icon' => 'fas fa-fw fa-sign-in-alt',
-            'can' => 'VER INGRESO SALIDA',
-        ],
+        // [
+        //     'text' => 'Ingreso y Salida',
+        //     'url' => 'control-seguimiento/ingreso-salida',
+        //     'icon' => 'fas fa-fw fa-sign-in-alt',
+        //     'can' => 'VER INGRESO SALIDA',
+        // ],
         [
             'text' => 'Asistencia',
             'icon' => 'fas fa-fw fa-user-check',
@@ -831,150 +727,150 @@ return [
         // ========================================
         // INVENTARIO
         // ========================================
-        [
-            'header' => 'INVENTARIO',
-        ],
-        [
-            'text' => 'Inventario',
-            'icon' => 'fas fa-fw fa-boxes',
-            'can'  => [
-                $permisoVerProducto,
-                $permisoVerCatalogoProducto,
-                $permisoVerCategoria,
-                $permisoVerMarca,
-                $permisoVerProveedor,
-                $permisoVerContrato,
-                $permisoVerOrden,
-            ],
-            'submenu' => [
-                [
-                    'text' => 'Dashboard',
-                    'url'  => 'inventario/dashboard',
-                    'icon' => 'fas fa-fw fa-chart-bar',
-                    'can'  => 'VER DASHBOARD INVENTARIO',
-                ],
-                [
-                    'text' => 'Productos',
-                    'icon' => 'fas fa-fw fa-box',
-                    'can'  => [
-                        $permisoVerProducto,
-                        $permisoVerCatalogoProducto,
-                    ],
-                    'submenu' => [
-                        [
-                            'text' => 'Lista de Productos',
-                            'url'  => 'inventario/productos',
-                            'icon' => $iconoLista,
-                            'can'  => $permisoVerProducto,
-                        ],
-                        [
-                            'text' => 'Catálogo de Productos',
-                            'url'  => 'inventario/productos/catalogo',
-                            'icon' => 'fas fa-fw fa-th',
-                            'can'  => $permisoVerCatalogoProducto,
-                        ],
-                        [
-                            'text' => 'Crear Producto',
-                            'url'  => 'inventario/productos/create',
-                            'icon' => $iconoAgregar,
-                            'can'  => 'CREAR PRODUCTO',
-                        ],
-                    ],
-                ],
-                [
-                    'text' => 'Carrito Sena',
-                    'url'  => 'inventario/carrito-sena',
-                    'icon' => 'fas fa-fw fa-shopping-cart',
-                    'can'  => 'VER CARRITO',
-                ],
-                [
-                    'text' => 'Órdenes',
-                    'icon' => 'fas fa-fw fa-file-invoice',
-                    'can'  => $permisoVerOrden,
-                    'submenu' => [
-                        [
-                            'text' => 'Todas las Órdenes',
-                            'url'  => 'inventario/ordenes',
-                            'icon' => $iconoLista,
-                            'can'  => $permisoVerOrden,
-                        ],
-                        [
-                            'text' => 'Aprobaciones Pendientes',
-                            'url'  => 'inventario/aprobaciones/pendientes',
-                            'icon' => 'fas fa-fw fa-hourglass-half',
-                            'can'  => 'APROBAR ORDEN',
-                        ],
-                        [
-                            'text' => 'Órdenes Aprobadas',
-                            'url'  => 'inventario/ordenes/completadas',
-                            'icon' => 'fas fa-fw fa-check-circle',
-                            'can'  => $permisoVerOrden,
-                        ],
-                        [
-                            'text' => 'Órdenes Rechazadas',
-                            'url'  => 'inventario/ordenes/rechazadas',
-                            'icon' => 'fas fa-fw fa-times-circle',
-                            'can'  => $permisoVerOrden,
-                        ],
-                    ],
-                ],
-                [
-                    'text' => 'Devoluciones',
-                    'icon' => 'fas fa-fw fa-undo',
-                    'can'  => 'DEVOLVER PRESTAMO',
-                    'submenu' => [
-                        [
-                            'text' => 'Préstamos Pendientes',
-                            'url'  => 'inventario/devoluciones',
-                            'icon' => 'fas fa-fw fa-clock',
-                            'can'  => 'DEVOLVER PRESTAMO',
-                        ],
-                        [
-                            'text' => 'Historial Devoluciones',
-                            'url'  => 'inventario/devoluciones-historial',
-                            'icon' => 'fas fa-fw fa-history',
-                            'can'  => 'VER DEVOLUCION',
-                        ],
-                    ],
-                ],
-                [
-                    'text' => 'Configuración',
-                    'icon' => 'fas fa-fw fa-cog',
-                    'can'  => [
-                        $permisoVerCategoria,
-                        $permisoVerMarca,
-                        $permisoVerProveedor,
-                        $permisoVerContrato,
-                    ],
-                    'submenu' => [
-                        [
-                            'text' => 'Categorías',
-                            'url'  => 'inventario/categorias',
-                            'icon' => 'fas fa-fw fa-tags',
-                            'can'  => $permisoVerCategoria,
-                        ],
-                        [
-                            'text' => 'Marcas',
-                            'url'  => 'inventario/marcas',
-                            'icon' => 'fas fa-fw fa-trademark',
-                            'can'  => $permisoVerMarca,
-                        ],
-                        [
-                            'text' => 'Proveedores',
-                            'url'  => 'inventario/proveedores',
-                            'icon' => 'fas fa-fw fa-truck',
-                            'can'  => $permisoVerProveedor,
-                        ],
-                        [
-                            'text' => 'Contratos/Convenios',
-                            'url'  => 'inventario/contratos-convenios',
-                            'icon' => 'fas fa-fw fa-file-contract',
-                            'can'  => $permisoVerContrato,
-                        ],
-                    ],
-                ],
-            ],
-        ],
+        // [
+        //     'header' => 'INVENTARIO',
+        // ],
+        // [
+        //     'text' => 'Inventario',
+        //     'icon' => 'fas fa-fw fa-boxes',
+        //     'can'  => [
+        //         $permisoVerProducto,
+        //         $permisoVerCatalogoProducto,
+        //         $permisoVerCategoria,
+        //         $permisoVerMarca,
+        //         $permisoVerProveedor,
+        //         $permisoVerContrato,
+        //         $permisoVerOrden,
+        //     ],
+        //     'submenu' => [
+        //         [
+        //             'text' => 'Dashboard',
+        //             'url'  => 'inventario/dashboard',
+        //             'icon' => 'fas fa-fw fa-chart-bar',
+        //             'can'  => 'VER DASHBOARD INVENTARIO',
+        //         ],
+        //         [
+        //             'text' => 'Productos',
+        //             'icon' => 'fas fa-fw fa-box',
+        //             'can'  => [
+        //                 $permisoVerProducto,
+        //                 $permisoVerCatalogoProducto,
+        //             ],
+        //             'submenu' => [
+        //                 [
+        //                     'text' => 'Lista de Productos',
+        //                     'url'  => 'inventario/productos',
+        //                     'icon' => $iconoLista,
+        //                     'can'  => $permisoVerProducto,
+        //                 ],
+        //                 [
+        //                     'text' => 'Catálogo de Productos',
+        //                     'url'  => 'inventario/productos/catalogo',
+        //                     'icon' => 'fas fa-fw fa-th',
+        //                     'can'  => $permisoVerCatalogoProducto,
+        //                 ],
+        //                 [
+        //                     'text' => 'Crear Producto',
+        //                     'url'  => 'inventario/productos/create',
+        //                     'icon' => $iconoAgregar,
+        //                     'can'  => 'CREAR PRODUCTO',
+        //                 ],
+        //             ],
+        //         ],
+        //         [
+        //             'text' => 'Carrito Sena',
+        //             'url'  => 'inventario/carrito-sena',
+        //             'icon' => 'fas fa-fw fa-shopping-cart',
+        //             'can'  => 'VER CARRITO',
+        //         ],
+        //         [
+        //             'text' => 'Órdenes',
+        //             'icon' => 'fas fa-fw fa-file-invoice',
+        //             'can'  => $permisoVerOrden,
+        //             'submenu' => [
+        //                 [
+        //                     'text' => 'Todas las Órdenes',
+        //                     'url'  => 'inventario/ordenes',
+        //                     'icon' => $iconoLista,
+        //                     'can'  => $permisoVerOrden,
+        //                 ],
+        //                 [
+        //                     'text' => 'Aprobaciones Pendientes',
+        //                     'url'  => 'inventario/aprobaciones/pendientes',
+        //                     'icon' => 'fas fa-fw fa-hourglass-half',
+        //                     'can'  => 'APROBAR ORDEN',
+        //                 ],
+        //                 [
+        //                     'text' => 'Órdenes Aprobadas',
+        //                     'url'  => 'inventario/ordenes/completadas',
+        //                     'icon' => 'fas fa-fw fa-check-circle',
+        //                     'can'  => $permisoVerOrden,
+        //                 ],
+        //                 [
+        //                     'text' => 'Órdenes Rechazadas',
+        //                     'url'  => 'inventario/ordenes/rechazadas',
+        //                     'icon' => 'fas fa-fw fa-times-circle',
+        //                     'can'  => $permisoVerOrden,
+        //                 ],
+        //             ],
+        //         ],
+        //         [
+        //             'text' => 'Devoluciones',
+        //             'icon' => 'fas fa-fw fa-undo',
+        //             'can'  => 'DEVOLVER PRESTAMO',
+        //             'submenu' => [
+        //                 [
+        //                     'text' => 'Préstamos Pendientes',
+        //                     'url'  => 'inventario/devoluciones',
+        //                     'icon' => 'fas fa-fw fa-clock',
+        //                     'can'  => 'DEVOLVER PRESTAMO',
+        //                 ],
+        //                 [
+        //                     'text' => 'Historial Devoluciones',
+        //                     'url'  => 'inventario/devoluciones-historial',
+        //                     'icon' => 'fas fa-fw fa-history',
+        //                     'can'  => 'VER DEVOLUCION',
+        //                 ],
+        //             ],
+        //         ],
+        //         [
+        //             'text' => 'Configuración',
+        //             'icon' => 'fas fa-fw fa-cog',
+        //             'can'  => [
+        //                 $permisoVerCategoria,
+        //                 $permisoVerMarca,
+        //                 $permisoVerProveedor,
+        //                 $permisoVerContrato,
+        //             ],
+        //             'submenu' => [
+        //                 [
+        //                     'text' => 'Categorías',
+        //                     'url'  => 'inventario/categorias',
+        //                     'icon' => 'fas fa-fw fa-tags',
+        //                     'can'  => $permisoVerCategoria,
+        //                 ],
+        //                 [
+        //                     'text' => 'Marcas',
+        //                     'url'  => 'inventario/marcas',
+        //                     'icon' => 'fas fa-fw fa-trademark',
+        //                     'can'  => $permisoVerMarca,
+        //                 ],
+        //                 [
+        //                     'text' => 'Proveedores',
+        //                     'url'  => 'inventario/proveedores',
+        //                     'icon' => 'fas fa-fw fa-truck',
+        //                     'can'  => $permisoVerProveedor,
+        //                 ],
+        //                 [
+        //                     'text' => 'Contratos/Convenios',
+        //                     'url'  => 'inventario/contratos-convenios',
+        //                     'icon' => 'fas fa-fw fa-file-contract',
+        //                     'can'  => $permisoVerContrato,
+        //                 ],
+        //             ],
+        //         ],
+        //     ],
+        // ],
 
         // ========================================
         // CONFIGURACIÓN DEL SISTEMA

@@ -135,6 +135,11 @@ class TemaSeeder extends Seeder
                 'name'     => 'LETRAS',
                 'paramIds' => range(248, 273),
             ],
+            [
+                'id'       => 19,
+                'name'     => 'JORNADAS',
+                'paramIds' => range(277, 280),
+            ],
         ];
     }
 

@@ -328,6 +328,13 @@ class ParametroSeeder extends Seeder
         'dias_faltantes' => [
             276 => 'DOMINGO',
         ],
+
+        'jornadas' => [
+            277 => 'MAÑANA',
+            278 => 'TARDE',
+            279 => 'NOCHE',
+            280 => 'FINES DE SEMANA',
+        ],
     ];
 
     /**
