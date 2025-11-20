@@ -29,13 +29,13 @@ class UsersSeeder extends Seeder
             [
                 'email' => 'admin@dataguaviare.com',
                 'password' => 'Guaviare25.',
-                'persona_id' => 2,
+                'persona_id' => 3,
                 'role' => 'ADMINISTRADOR',
             ],
             [
                 'email' => 'instructor@dataguaviare.com',
                 'password' => 'Guaviare25.',
-                'persona_id' => 3,
+                'persona_id' => 4,
                 'role' => 'INSTRUCTOR',
             ],
             [

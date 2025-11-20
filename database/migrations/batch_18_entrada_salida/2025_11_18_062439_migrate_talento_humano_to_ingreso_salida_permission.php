@@ -20,6 +20,12 @@ return new class extends Migration
      */
     public function up(): void
     {
+        // Verify that the permissions table exists
+        if (!Schema::hasTable('permissions')) {
+            Log::warning('La tabla permissions no existe. Esta migración requiere que batch_02_permisos haya sido ejecutado primero.');
+            return;
+        }
+
         DB::transaction(function () {
             $nuevoPermiso = $this->crearNuevoPermiso();
             $permisoAntiguo = Permission::where('name', 'VER TALENTO HUMANO')->first();
@@ -42,6 +48,12 @@ return new class extends Migration
      */
     public function down(): void
     {
+        // Verify that the permissions table exists
+        if (!Schema::hasTable('permissions')) {
+            Log::warning('La tabla permissions no existe. Esta migración requiere que batch_02_permisos haya sido ejecutado primero.');
+            return;
+        }
+
         DB::transaction(function () {
             $permisoNuevo = Permission::where('name', 'VER INGRESO SALIDA')->first();
             $permisoAntiguo = Permission::firstOrCreate(

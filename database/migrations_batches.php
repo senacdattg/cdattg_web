@@ -215,4 +215,14 @@ return [
         ],
         'orden' => 17,
     ],
+    'batch_18_entrada_salida' => [
+        'descripcion' => 'Módulo de Entradas y Salidas',
+        'dependencias' => [
+            'batch_01_permisos',
+        ],
+    ],
+    'tablas' => [
+        'reporte_salida_automatica'
+    ],
+    'orden' => 18,
 ];

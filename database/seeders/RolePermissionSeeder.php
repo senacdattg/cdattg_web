@@ -366,6 +366,9 @@ class RolePermissionSeeder extends Seeder
             'EDITAR PROGRAMA DE FORMACION',
             'ELIMINAR PROGRAMA DE FORMACION',
             'CAMBIAR ESTADO PROGRAMA DE FORMACION',
+            'programa.index',
+            'programa.show',
+            'programa.search',
         ];
     }
 
