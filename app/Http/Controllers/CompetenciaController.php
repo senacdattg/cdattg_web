@@ -81,8 +81,9 @@ class CompetenciaController extends Controller
             $query->orderBy('codigo', 'asc');
             
             $competencias = $query->paginate(10)->withQueryString();
+            $programas = ProgramaFormacion::orderBy('nombre')->get(['id', 'codigo', 'nombre']);
             
-            return view('competencias.index', compact('competencias'));
+            return view('competencias.index', compact('competencias', 'programas'));
             
         } catch (Exception $e) {
             Log::error('Error al obtener lista de competencias: ' . $e->getMessage());

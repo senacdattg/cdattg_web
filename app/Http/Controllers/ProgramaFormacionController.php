@@ -21,12 +21,13 @@ class ProgramaFormacionController extends Controller
         $this->middleware('auth');
         $this->programaService = $programaService;
         
-        $this->middleware('permission:programa.index')->only('index');
-        $this->middleware('permission:programa.show')->only('show');
-        $this->middleware('permission:programa.create')->only('create', 'store');
-        $this->middleware('permission:programa.edit')->only('edit', 'update');
-        $this->middleware('permission:programa.delete')->only('destroy');
-        $this->middleware('permission:programa.search')->only('search');
+        $this->middleware('permission:VER PROGRAMAS DE FORMACION')->only('index');
+        $this->middleware('permission:VER PROGRAMA DE FORMACION')->only('show');
+        $this->middleware('permission:CREAR PROGRAMA DE FORMACION')->only('create', 'store');
+        $this->middleware('permission:EDITAR PROGRAMA DE FORMACION')->only('edit', 'update');
+        $this->middleware('permission:ELIMINAR PROGRAMA DE FORMACION')->only('destroy');
+        $this->middleware('permission:VER PROGRAMAS DE FORMACION')->only('search');
+        $this->middleware('permission:CAMBIAR ESTADO PROGRAMA DE FORMACION')->only('cambiarEstado');
     }
 
     /**

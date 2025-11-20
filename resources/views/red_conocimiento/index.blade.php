@@ -20,14 +20,15 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-12">
-                <x-table-filters 
-                    action="{{ route('red-conocimiento.store') }}"
-                    method="POST"
-                    title="Crear Red de Conocimiento"
-                    icon="fa-plus-circle"
-                >
-                    @include('red_conocimiento.create')
-                </x-table-filters>
+                @can('CREAR RED CONOCIMIENTO')
+                    <div class="card shadow-sm mb-4 no-hover">
+                        <div class="card-header bg-white py-3 d-flex align-items-center">
+                            <a href="{{ route('red-conocimiento.create') }}" class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1 text-decoration-none">
+                                <i class="fas fa-plus-circle mr-2"></i> Crear Red de Conocimiento
+                            </a>
+                        </div>
+                    </div>
+                @endcan
 
                 <x-data-table 
                         title="Lista de Redes de Conocimiento"
@@ -64,6 +65,7 @@
                                         showPermission="VER RED CONOCIMIENTO"
                                         editPermission="EDITAR RED CONOCIMIENTO"
                                         deletePermission="ELIMINAR RED CONOCIMIENTO"
+                                        
                                     />
                                 </td>
                             </tr>

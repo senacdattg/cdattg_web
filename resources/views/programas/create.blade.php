@@ -7,8 +7,19 @@
                 <div class="col-md-6">
                     <div class="form-group mb-3">
                         <label class="form-label fw-bold">Código del Programa</label>
-                        <input type="text" name="codigo" value="{{ old('codigo') }}" class="form-control @error('codigo') is-invalid @enderror" 
-                               placeholder="Ingrese el código (6 dígitos)" maxlength="6" required>
+                        <input 
+                            type="number" 
+                            name="codigo" 
+                            value="{{ old('codigo') }}" 
+                            class="form-control @error('codigo') is-invalid @enderror" 
+                            placeholder="Ingrese el código (6 dígitos)" 
+                            maxlength="6" 
+                            required
+                            inputmode="numeric"
+                            pattern="[0-9]{6}"
+                            min="0"
+                            oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0,6)"
+                        >
                         @error('codigo')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

@@ -420,7 +420,7 @@ return [
         [
             'text' => 'Programas de Formación',
             'icon' => 'fas fa-fw fa-graduation-cap',
-            'can' => [$permisoVerProgramaCaracterizacion, 'programa.index'],
+            'can' => [$permisoVerProgramaCaracterizacion],
             'submenu' => [
                 [
                     'text' => 'Programas Técnicos',
@@ -430,13 +430,13 @@ return [
                             'text' => 'Ver Programas',
                             'url' => 'programa',
                             'icon' => $iconoLista,
-                            'can' => [$permisoVerProgramaCaracterizacion, 'programa.index'],
+                            'can' => [$permisoVerProgramaCaracterizacion],
                         ],
                         [
                             'text' => 'Crear Programa',
                             'url' => 'programa/create',
                             'icon' => $iconoAgregar,
-                            'can' => [$permisoVerProgramaCaracterizacion, 'programa.create'],
+                            'can' => [$permisoVerProgramaCaracterizacion],
                         ],
                         [
                             'text' => 'Redes de Conocimiento',

@@ -178,14 +178,14 @@
                         <div class="card-footer bg-white">
                             <div class="row">
                                 <div class="col-md-6">
-                                    @can('programa.edit')
+                                    @can('EDITAR PROGRAMA DE FORMACION')
                                         <a href="{{ route('programa.edit', $programa->id) }}" class="btn btn-primary">
                                             <i class="fas fa-edit mr-1"></i>Editar Programa
                                         </a>
                                     @endcan
                                 </div>
                                 <div class="col-md-6 text-right">
-                                    @can('programa.delete')
+                                    @can('ELIMINAR PROGRAMA DE FORMACION')
                                         <form action="{{ route('programa.destroy', $programa->id) }}" method="POST" class="d-inline formulario-eliminar">
                                             @csrf
                                             @method('DELETE')

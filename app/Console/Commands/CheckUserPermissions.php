@@ -159,10 +159,10 @@ class CheckUserPermissions extends Command
                 $groups['INVENTARIO']->push($permission);
             } elseif (str_contains($name, 'APRENDIZ')) {
                 $groups['APRENDICES']->push($permission);
-            } elseif (str_contains($name, 'PROGRAMA') || $name === 'programa.index' || 
-                      $name === 'programa.show' || $name === 'programa.create' || 
-                      $name === 'programa.edit' || $name === 'programa.delete' || 
-                      $name === 'programa.search') {
+            } elseif (str_contains($name, 'PROGRAMA') || $name === 'VER PROGRAMAS DE FORMACION' || 
+                      $name === 'VER PROGRAMA DE FORMACION' || $name === 'CREAR PROGRAMA DE FORMACION' || 
+                      $name === 'EDITAR PROGRAMA DE FORMACION' || $name === 'ELIMINAR PROGRAMA DE FORMACION' || 
+                      $name === 'CAMBIAR ESTADO PROGRAMA DE FORMACION') {
                 $groups['PROGRAMAS']->push($permission);
             } elseif (str_contains($name, 'COMPETENCIA') || str_contains($name, 'RAP') || 
                       str_contains($name, 'RESULTADO')) {

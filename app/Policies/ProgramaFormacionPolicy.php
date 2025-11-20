@@ -13,7 +13,7 @@ class ProgramaFormacionPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('programa.index');
+        return $user->can('VER PROGRAMAS DE FORMACION');
     }
 
     /**
@@ -21,7 +21,7 @@ class ProgramaFormacionPolicy
      */
     public function view(User $user, ProgramaFormacion $programaFormacion): bool
     {
-        return $user->can('programa.show');
+        return $user->can('VER PROGRAMA DE FORMACION');
     }
 
     /**
@@ -29,7 +29,7 @@ class ProgramaFormacionPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('programa.create');
+        return $user->can('CREAR PROGRAMA DE FORMACION');
     }
 
     /**
@@ -37,7 +37,7 @@ class ProgramaFormacionPolicy
      */
     public function update(User $user, ProgramaFormacion $programaFormacion): bool
     {
-        return $user->can('programa.edit');
+        return $user->can('EDITAR PROGRAMA DE FORMACION');
     }
 
     /**
@@ -45,7 +45,7 @@ class ProgramaFormacionPolicy
      */
     public function delete(User $user, ProgramaFormacion $programaFormacion): bool
     {
-        return $user->can('programa.delete');
+        return $user->can('ELIMINAR PROGRAMA DE FORMACION');
     }
 
     /**
@@ -53,7 +53,7 @@ class ProgramaFormacionPolicy
      */
     public function restore(User $user, ProgramaFormacion $programaFormacion): bool
     {
-        return $user->can('programa.edit');
+        return $user->can('EDITAR PROGRAMA DE FORMACION');
     }
 
     /**
@@ -61,7 +61,7 @@ class ProgramaFormacionPolicy
      */
     public function forceDelete(User $user, ProgramaFormacion $programaFormacion): bool
     {
-        return $user->can('programa.delete');
+        return $user->can('ELIMINAR PROGRAMA DE FORMACION');
     }
 
     /**
@@ -69,7 +69,7 @@ class ProgramaFormacionPolicy
      */
     public function search(User $user): bool
     {
-        return $user->can('programa.search');
+        return $user->can('VER PROGRAMAS DE FORMACION');
     }
 
     /**
@@ -77,7 +77,7 @@ class ProgramaFormacionPolicy
      */
     public function cambiarEstado(User $user, ProgramaFormacion $programaFormacion): bool
     {
-        return $user->can('programa.edit');
+        return $user->can('EDITAR PROGRAMA DE FORMACION');
     }
 
     /**
@@ -85,7 +85,7 @@ class ProgramaFormacionPolicy
      */
     public function getByRedConocimiento(User $user): bool
     {
-        return $user->can('programa.index');
+        return $user->can('VER PROGRAMAS DE FORMACION');
     }
 
     /**
@@ -93,7 +93,7 @@ class ProgramaFormacionPolicy
      */
     public function getByNivelFormacion(User $user): bool
     {
-        return $user->can('programa.index');
+        return $user->can('VER PROGRAMAS DE FORMACION');
     }
 
     /**
@@ -101,6 +101,6 @@ class ProgramaFormacionPolicy
      */
     public function getActivos(User $user): bool
     {
-        return $user->can('programa.index');
+        return $user->can('VER PROGRAMAS DE FORMACION');
     }
 }

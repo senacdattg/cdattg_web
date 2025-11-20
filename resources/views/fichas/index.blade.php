@@ -2,6 +2,8 @@
 
 @section('css')
 @vite(['resources/css/parametros.css'])
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
 @endsection
 
 @section('content_header')
@@ -23,13 +25,27 @@
         <div class="row">
             <div class="col-12">
                 @can('CREAR FICHA CARACTERIZACION')
-                <div class="card shadow-sm mb-4 no-hover">
-                    <div class="card-header bg-white py-3 d-flex align-items-center">
-                        <a href="{{ route('fichaCaracterizacion.create') }}" class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1 text-decoration-none">
-                            <i class="fas fa-plus-circle mr-2"></i> Crear Ficha de Caracterización
-                        </a>
+                    <div class="accordion mb-4" id="accordionCrearFicha">
+                        <div class="card shadow-sm no-hover">
+                            <div class="card-header bg-white py-3 d-flex align-items-center" id="headingCrearFicha">
+                                <h2 class="mb-0 w-100">
+                                    <button
+                                        class="btn btn-link w-100 text-left d-flex align-items-center text-decoration-none font-weight-bold text-primary px-0"
+                                        type="button" data-toggle="collapse" data-target="#collapseCrearFicha"
+                                        aria-expanded="false" aria-controls="collapseCrearFicha">
+                                        <i class="fas fa-plus-circle mr-2"></i> Crear Ficha de Caracterización
+                                        <i class="fas fa-chevron-down ml-auto"></i>
+                                    </button>
+                                </h2>
+                            </div>
+                            <div id="collapseCrearFicha" class="collapse" aria-labelledby="headingCrearFicha"
+                                data-parent="#accordionCrearFicha">
+                                <div class="card-body">
+                                    @include('fichas.create')
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
                 @endcan
 
                 <x-data-table
@@ -151,5 +167,6 @@
 @endsection
 
 @section('js')
-@vite(['resources/js/pages/fichas-index.js'])
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+@vite(['resources/js/pages/fichas-index.js', 'resources/js/pages/fichas-form.js'])
 @endsection

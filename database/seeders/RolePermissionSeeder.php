@@ -186,6 +186,7 @@ class RolePermissionSeeder extends Seeder
             'CAMBIAR ESTADO INSTRUCTOR',
 
             'GESTIONAR ESPECIALIDADES INSTRUCTOR',
+            'ASIGNACION DE INSTRUCTORES',
         ];
     }
 
@@ -213,14 +214,7 @@ class RolePermissionSeeder extends Seeder
             'GESTIONAR DIAS FICHA',
             'GESTIONAR APRENDICES FICHA',
             'GESTIONAR APRENDICES',
-            'CAMBIAR ESTADO FICHA',
-
-            'ASIGNACION DE INSTRUCTORES',
-            'VER PROGRAMA DE CARACTERIZACION',
-            'CREAR PROGRAMA DE CARACTERIZACION',
-            'EDITAR PROGRAMA DE CARACTERIZACION',
-            'ELIMINAR PROGRAMA DE CARACTERIZACION',
-            'CAMBIAR ESTADO PROGRAMA DE CARACTERIZACION',
+            'CAMBIAR ESTADO FICHA'
         ];
     }
 
@@ -351,6 +345,7 @@ class RolePermissionSeeder extends Seeder
             'EDITAR APRENDIZ',
             'ELIMINAR APRENDIZ',
             'CAMBIAR ESTADO APRENDIZ',
+
         ];
     }
 
@@ -366,9 +361,6 @@ class RolePermissionSeeder extends Seeder
             'EDITAR PROGRAMA DE FORMACION',
             'ELIMINAR PROGRAMA DE FORMACION',
             'CAMBIAR ESTADO PROGRAMA DE FORMACION',
-            'programa.index',
-            'programa.show',
-            'programa.search',
         ];
     }
 
@@ -466,9 +458,8 @@ class RolePermissionSeeder extends Seeder
             $this->getPermisosRedesConocimiento(),
             $this->getPermisosAprendices(),
             [
-                'programa.index',
-                'programa.show',
-                'programa.search',
+                'VER PROGRAMAS DE FORMACION',
+                'VER PROGRAMA DE FORMACION',
                 self::PERMISO_VER_NOTIFICACION,
                 'VER ESTADISTICAS',
                 self::PERMISO_VER_PROGRAMA_COMPLEMENTARIO,
@@ -496,9 +487,8 @@ class RolePermissionSeeder extends Seeder
                 'GESTIONAR DIAS FICHA',
                 'GESTIONAR APRENDICES FICHA',
                 'CAMBIAR ESTADO FICHA',
-                'programa.index',
-                'programa.show',
-                'programa.search',
+                'VER PROGRAMAS DE FORMACION',
+                'VER PROGRAMA DE FORMACION',
             ],
             $this->getPermisosResultadosAprendizaje(),
             [
