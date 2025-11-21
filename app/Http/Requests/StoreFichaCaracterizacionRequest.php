@@ -17,12 +17,15 @@ class StoreFichaCaracterizacionRequest extends FormRequest
     public function authorize()
     {
         $user = $this->user();
-        $canCreate = $user->can('CREAR PROGRAMA DE CARACTERIZACION');
+        // Verificar ambos permisos por compatibilidad
+        $canCreate = $user->can('CREAR FICHA CARACTERIZACION') || $user->can('CREAR FICHA DE CARACTERIZACION');
         
         \Log::info('StoreFichaCaracterizacionRequest authorize', [
             'user_id' => $user->id,
             'user_roles' => $user->getRoleNames(),
             'can_create' => $canCreate,
+            'has_crear_ficha' => $user->can('CREAR FICHA CARACTERIZACION'),
+            'has_crear_ficha_de' => $user->can('CREAR FICHA DE CARACTERIZACION'),
             'permissions' => $user->getAllPermissions()->pluck('name')
         ]);
         
@@ -57,11 +60,11 @@ class StoreFichaCaracterizacionRequest extends FormRequest
                 'exists:programas_formacion,id'
             ],
 
-            // Validación de fechas (al crear debe ser fecha futura)
+            // Validación de fechas (puede ser desde hace 2 años hasta el futuro)
             'fecha_inicio' => [
                 'required',
                 'date',
-                'after_or_equal:today'
+                'after_or_equal:' . now()->subYears(2)->format('Y-m-d')
             ],
             'fecha_fin' => [
                 'required',
@@ -165,7 +168,7 @@ class StoreFichaCaracterizacionRequest extends FormRequest
             // Mensajes para fechas
             'fecha_inicio.required' => 'La fecha de inicio es obligatoria.',
             'fecha_inicio.date' => 'La fecha de inicio debe ser una fecha válida.',
-            'fecha_inicio.after_or_equal' => 'La fecha de inicio no puede ser anterior a hoy.',
+            'fecha_inicio.after_or_equal' => 'La fecha de inicio no puede ser anterior a hace 2 años.',
             'fecha_fin.required' => 'La fecha de fin es obligatoria.',
             'fecha_fin.date' => 'La fecha de fin debe ser una fecha válida.',
             'fecha_fin.after' => 'La fecha de fin debe ser posterior a la fecha de inicio.',

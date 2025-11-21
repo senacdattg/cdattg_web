@@ -45,7 +45,10 @@
                         <label for="fecha_inicio" class="form-label fw-bold">Fecha de Inicio <span
                                 class="text-danger">*</span></label>
                         <input type="date" class="form-control @error('fecha_inicio') is-invalid @enderror"
-                            id="fecha_inicio" name="fecha_inicio" value="{{ old('fecha_inicio') }}" required>
+                            id="fecha_inicio" name="fecha_inicio" 
+                            value="{{ old('fecha_inicio') }}" 
+                            min="{{ \Carbon\Carbon::now()->subYears(2)->format('Y-m-d') }}"
+                            required>
                         @error('fecha_inicio')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
