@@ -234,7 +234,7 @@ class CreateInstructor extends Component
             
             session()->flash('success', '¡Instructor asignado exitosamente!');
             
-            return $this->redirect(route('instructor.index'));
+            $this->redirect(route('instructor.index'));
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Las validaciones se manejan automáticamente por Livewire
             throw $e;
@@ -254,14 +254,14 @@ class CreateInstructor extends Component
             'persona_id' => 'required|exists:personas,id',
             'regional_id' => 'required|exists:regionals,id',
             'centro_formacion_id' => 'nullable|exists:centro_formacions,id',
-            'tipo_vinculacion_id' => 'nullable|exists:parametro_temas,id',
+            'tipo_vinculacion_id' => 'nullable|exists:parametros_temas,id',
             'jornadas' => 'nullable|array',
-            'jornadas.*' => 'exists:parametro_temas,id',
+            'jornadas.*' => 'exists:parametros_temas,id',
             'fecha_ingreso_sena' => 'nullable|date|before_or_equal:today',
             'anos_experiencia' => 'nullable|integer|min:0|max:50',
             'experiencia_instructor_meses' => 'nullable|integer|min:0',
             'experiencia_laboral' => 'nullable|string|max:1000',
-            'nivel_academico_id' => 'nullable|exists:parametro_temas,id',
+            'nivel_academico_id' => 'nullable|exists:parametros_temas,id',
             'formacion_pedagogia' => 'nullable|string|max:500',
             'titulos_obtenidos' => 'nullable|array',
             'titulos_obtenidos.*' => 'nullable|string|max:255',

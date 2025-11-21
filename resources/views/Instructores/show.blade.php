@@ -207,9 +207,29 @@
                                         <tr>
                                             <th class="py-3">Fecha de Nacimiento</th>
                                             <td class="py-3">
-                                                @if($instructor->persona->fecha_de_nacimiento)
+                                                @if($instructor->persona->fecha_nacimiento)
                                                     <i class="far fa-calendar-alt mr-1"></i>
-                                                    {{ \Carbon\Carbon::parse($instructor->persona->fecha_de_nacimiento)->format('d/m/Y') }}
+                                                    @php
+                                                        $fechaNacimiento = $instructor->persona->fecha_nacimiento;
+                                                        try {
+                                                            if ($fechaNacimiento instanceof \Carbon\Carbon) {
+                                                                $fechaFormateada = $fechaNacimiento->format('d/m/Y');
+                                                            } elseif (is_string($fechaNacimiento)) {
+                                                                // Intentar formato d/m/Y primero
+                                                                if (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $fechaNacimiento)) {
+                                                                    $fechaFormateada = $fechaNacimiento;
+                                                                } else {
+                                                                    // Intentar parsear formato estándar
+                                                                    $fechaFormateada = \Carbon\Carbon::parse($fechaNacimiento)->format('d/m/Y');
+                                                                }
+                                                            } else {
+                                                                $fechaFormateada = \Carbon\Carbon::parse($fechaNacimiento)->format('d/m/Y');
+                                                            }
+                                                        } catch (\Exception $e) {
+                                                            $fechaFormateada = $fechaNacimiento;
+                                                        }
+                                                    @endphp
+                                                    {{ $fechaFormateada }}
                                                 @else
                                                     <span class="text-muted">No registrado</span>
                                                 @endif

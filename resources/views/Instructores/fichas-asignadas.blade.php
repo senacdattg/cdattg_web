@@ -92,7 +92,7 @@
         icon="fa-clipboard-list" 
         title="Fichas Asignadas"
         subtitle="Gestión de fichas del instructor"
-        :breadcrumb="[['label' => '{{ $instructorActual->persona->primer_nombre }} {{ $instructorActual->persona->primer_apellido }}', 'url' => route('instructor.show', $instructorActual->id) , 'icon' => 'fa-user'], ['label' => 'Fichas asignadas', 'icon' => 'fa-clipboard-list', 'active' => true]]"
+        :breadcrumb="[['label' => $instructorActual->persona->primer_nombre . ' ' . $instructorActual->persona->primer_apellido, 'url' => route('instructor.show', $instructorActual->id) , 'icon' => 'fa-user'], ['label' => 'Fichas asignadas', 'icon' => 'fa-clipboard-list', 'active' => true]]"
     />
 @endsection
 

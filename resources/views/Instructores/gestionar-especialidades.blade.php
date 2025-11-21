@@ -73,10 +73,11 @@
             margin-bottom: 1rem;
         }
     </style>
-    
+@endsection
+
 @section('js')
     @vite(['resources/js/pages/gestion-especializada.js'])
-@endsection
+    <script>
         // Función para confirmar asignación de especialidad principal
         function confirmarAsignacionPrincipal(especialidadNombre) {
             return Swal.fire({
@@ -214,7 +215,7 @@
         icon="fa-graduation-cap" 
         title="Especialidades"
         subtitle="Gestión de especialidades del instructor"
-        :breadcrumb="[['label' => '{{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}', 'url' => route('instructor.show', $instructor->id) , 'icon' => 'fa-user'], ['label' => 'Especialidades', 'icon' => 'fa-graduation-cap', 'active' => true]]"
+        :breadcrumb="[['label' => $instructor->persona->primer_nombre . ' ' . $instructor->persona->primer_apellido, 'url' => route('instructor.show', $instructor->id) , 'icon' => 'fa-user'], ['label' => 'Especialidades', 'icon' => 'fa-graduation-cap', 'active' => true]]"
     />
 @endsection
 
@@ -435,8 +436,4 @@
 
 @section('footer')
     @include('layouts.footer')
-@endsection
-
-@section('js')
-    @vite(['resources/js/pages/gestion-especializada.js'])
 @endsection

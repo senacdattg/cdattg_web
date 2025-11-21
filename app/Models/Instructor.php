@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use App\Models\AsignacionInstructor;
 use App\Models\ProgramaFormacion;
 use App\Models\ParametroTema;
@@ -345,11 +346,38 @@ class Instructor extends Model
      */
     public function getEdadAttribute(): int
     {
-        if (!$this->persona || !$this->persona->fecha_de_nacimiento) {
+        if (!$this->persona || !$this->persona->fecha_nacimiento) {
             return 0;
         }
 
-        return Carbon::parse($this->persona->fecha_de_nacimiento)->age;
+        try {
+            $fechaNacimiento = $this->persona->fecha_nacimiento;
+            
+            // Si ya es una instancia de Carbon, usarla directamente
+            if ($fechaNacimiento instanceof Carbon) {
+                return $fechaNacimiento->age;
+            }
+            
+            // Si es string, intentar parsear en diferentes formatos
+            if (is_string($fechaNacimiento)) {
+                // Intentar formato d/m/Y primero (formato común en español)
+                if (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $fechaNacimiento)) {
+                    return Carbon::createFromFormat('d/m/Y', $fechaNacimiento)->age;
+                }
+                // Si no, intentar formato estándar Y-m-d
+                return Carbon::parse($fechaNacimiento)->age;
+            }
+            
+            // Si es otro tipo, intentar parsear directamente
+            return Carbon::parse($fechaNacimiento)->age;
+        } catch (\Exception $e) {
+            Log::warning('Error al calcular edad del instructor', [
+                'instructor_id' => $this->id,
+                'fecha_nacimiento' => $this->persona->fecha_nacimiento ?? null,
+                'error' => $e->getMessage()
+            ]);
+            return 0;
+        }
     }
 
     /**

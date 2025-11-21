@@ -335,11 +335,124 @@ class InstructorController extends Controller
             ])->findOrFail(3);
 
             $regionales = Regional::where('status', 1)->get();
+            
+            // Obtener centros de formación según la regional del instructor
+            $centrosFormacion = collect([]);
+            if ($instructor->regional_id) {
+                $centrosFormacion = \App\Models\CentroFormacion::where('regional_id', $instructor->regional_id)
+                    ->where('status', true)
+                    ->orderBy('nombre')
+                    ->get();
+            }
+            
+            // Obtener especialidades (RedConocimiento) disponibles según la regional del instructor
+            $especialidades = collect([]);
+            if ($instructor->regional_id) {
+                $especialidades = RedConocimiento::where('regionals_id', $instructor->regional_id)
+                    ->where('status', true)
+                    ->orderBy('nombre')
+                    ->get();
+            }
+            
+            // Obtener tipos de vinculación desde parametros_temas
+            $tiposVinculacion = \App\Models\ParametroTema::whereHas('tema', function($q) {
+                $q->where('name', 'LIKE', '%TIPOS DE VINCULACION%');
+            })->whereHas('parametro', function($query) {
+                $query->where('status', true);
+            })->where('status', true)
+              ->with('parametro')
+              ->get()
+              ->sortBy(function($pt) {
+                  return $pt->parametro->name;
+              })
+              ->values();
+            
+            // Obtener niveles académicos desde parametros_temas
+            $nivelesAcademicos = \App\Models\ParametroTema::whereHas('tema', function($q) {
+                $q->where('name', 'LIKE', '%NIVELES ACADEMICOS%');
+            })->whereHas('parametro', function($query) {
+                $query->where('status', true);
+            })->where('status', true)
+              ->with('parametro')
+              ->get()
+              ->sortBy(function($pt) {
+                  return $pt->parametro->name;
+              })
+              ->values();
+            
+            // Obtener jornadas de trabajo desde parametros_temas
+            // Primero obtener el tema JORNADAS
+            $temaJornadas = \App\Models\Tema::where('name', 'JORNADAS')->first();
+            
+            if ($temaJornadas) {
+                $jornadasTrabajo = \App\Models\ParametroTema::where('tema_id', $temaJornadas->id)
+                    ->whereHas('parametro', function($query) {
+                        $query->where('status', true);
+                    })
+                    ->where('status', true)
+                    ->with(['parametro', 'tema'])
+                    ->get()
+                    ->sortBy(function($pt) {
+                        return $pt->parametro->name ?? '';
+                    })
+                    ->values();
+            } else {
+                // Fallback: usar LIKE si no se encuentra el tema exacto
+                $jornadasTrabajo = \App\Models\ParametroTema::whereHas('tema', function($q) {
+                    $q->where('name', 'LIKE', '%JORNADAS%');
+                })->whereHas('parametro', function($query) {
+                    $query->where('status', true);
+                })->where('status', true)
+                  ->with(['parametro', 'tema'])
+                  ->get()
+                  ->sortBy(function($pt) {
+                      return $pt->parametro->name ?? '';
+                  })
+                  ->values();
+            }
+            
+            // Log para depuración
+            Log::info('Jornadas de trabajo cargadas en edit', [
+                'cantidad' => $jornadasTrabajo->count(),
+                'tema_id' => $temaJornadas->id ?? null,
+                'jornadas' => $jornadasTrabajo->map(function($j) {
+                    return [
+                        'id' => $j->id,
+                        'parametro_id' => $j->parametro_id,
+                        'nombre' => $j->parametro->name ?? 'Sin nombre',
+                        'tema' => $j->tema->name ?? 'Sin tema',
+                        'status' => $j->status
+                    ];
+                })->toArray()
+            ]);
+            
+            // Obtener jornadas asignadas al instructor - mapear desde jornadas_formacion a parametros_temas
+            $jornadasAsignadas = [];
+            try {
+                $jornadasFormacionAsignadas = $instructor->jornadas()->pluck('id')->toArray();
+                if (!empty($jornadasFormacionAsignadas)) {
+                    // Obtener los nombres de las jornadas desde jornadas_formacion
+                    $jornadasFormacion = \App\Models\JornadaFormacion::whereIn('id', $jornadasFormacionAsignadas)->pluck('jornada')->toArray();
+                    // Buscar los parametros_temas que corresponden a estos nombres
+                    if (!empty($jornadasFormacion)) {
+                        $parametrosTemas = \App\Models\ParametroTema::whereHas('tema', function($q) {
+                            $q->where('name', 'LIKE', '%JORNADAS%');
+                        })->whereHas('parametro', function($query) use ($jornadasFormacion) {
+                            $query->whereIn('name', $jornadasFormacion);
+                        })->pluck('id')->toArray();
+                        $jornadasAsignadas = $parametrosTemas;
+                    }
+                }
+            } catch (\Exception $e) {
+                // Si hay error, dejar array vacío
+                Log::warning('Error al obtener jornadas asignadas del instructor: ' . $e->getMessage());
+                $jornadasAsignadas = [];
+            }
 
             return view(
                 'Instructores.edit',
                 ['instructor' => $instructor],
-                compact('documentos', 'generos', 'regionales')
+                compact('documentos', 'generos', 'regionales', 'especialidades', 'centrosFormacion', 'tiposVinculacion', 'nivelesAcademicos', 'jornadasTrabajo', 'jornadasAsignadas')
             );
         } catch (Exception $e) {
             Log::error('Error al cargar formulario de edición de instructor', [
@@ -360,30 +473,170 @@ class InstructorController extends Controller
         try {
             DB::beginTransaction();
 
-            $persona = Persona::findOrFail($instructor->persona_id);
-            $persona->update([
-                'tipo_documento' => $request->input('tipo_documento'),
-                'numero_documento' => $request->input('numero_documento'),
-                'primer_nombre' => $request->input('primer_nombre'),
-                'segundo_nombre' => $request->input('segundo_nombre'),
-                'primer_apellido' => $request->input('primer_apellido'),
-                'segundo_apellido' => $request->input('segundo_apellido'),
-                'fecha_de_nacimiento' => $request->input('fecha_de_nacimiento'),
-                'genero' => $request->input('genero'),
-                'email' => $request->input('email'),
-            ]);
-
-            $instructor->update([
-                'persona_id' => $persona->id,
-                'regional_id' => $request->regional_id,
-            ]);
-
-            // Actualizar Usuario asociado a la Persona
-            $user = User::where('persona_id', $persona->id)->first();
-            if ($user) {
-                $user->update([
-                    'email' => $request->input('email'),
-                    'password' => Hash::make($request->input('numero_documento')),
+            $datos = $request->validated();
+            
+            // Preparar especialidades
+            if ($request->has('especialidades') && !empty($request->input('especialidades'))) {
+                $especialidadesIds = $request->input('especialidades');
+                $especialidades = \App\Models\RedConocimiento::whereIn('id', $especialidadesIds)->get();
+                $nombresEspecialidades = $especialidades->pluck('nombre', 'id')->toArray();
+                
+                $especialidadesFormateadas = [
+                    'principal' => null,
+                    'secundarias' => []
+                ];
+                
+                if (count($especialidadesIds) > 0) {
+                    $especialidadesFormateadas['principal'] = $nombresEspecialidades[$especialidadesIds[0]] ?? null;
+                    for ($i = 1; $i < count($especialidadesIds); $i++) {
+                        if (isset($nombresEspecialidades[$especialidadesIds[$i]])) {
+                            $especialidadesFormateadas['secundarias'][] = $nombresEspecialidades[$especialidadesIds[$i]];
+                        }
+                    }
+                }
+                $datos['especialidades'] = $especialidadesFormateadas;
+            }
+            
+            // Preparar jornadas (array de IDs) - mapear desde parametros_temas a jornadas_formacion
+            $jornadasIds = [];
+            if ($request->has('jornadas') && is_array($request->input('jornadas'))) {
+                $parametrosTemas = \App\Models\ParametroTema::whereIn('id', $request->input('jornadas'))
+                    ->with('parametro')
+                    ->get();
+                
+                foreach ($parametrosTemas as $parametroTema) {
+                    $nombreJornada = $parametroTema->parametro->name ?? null;
+                    if ($nombreJornada) {
+                        $jornadaFormacion = \App\Models\JornadaFormacion::where('jornada', $nombreJornada)->first();
+                        if ($jornadaFormacion) {
+                            $jornadasIds[] = $jornadaFormacion->id;
+                        }
+                    }
+                }
+            }
+            
+            // Preparar arrays JSON - campos dinámicos que vienen como arrays
+            $camposJsonArray = [
+                'titulos_obtenidos',
+                'instituciones_educativas',
+                'certificaciones_tecnicas',
+                'cursos_complementarios',
+                'idiomas',
+                'habilidades_pedagogicas',
+            ];
+            
+            foreach ($camposJsonArray as $campo) {
+                if (isset($datos[$campo]) && is_array($datos[$campo])) {
+                    if ($campo === 'idiomas') {
+                        // Manejo especial para idiomas (array anidado)
+                        $idiomasFiltrados = [];
+                        foreach ($datos[$campo] as $idioma) {
+                            if (is_array($idioma) && isset($idioma['idioma']) && !empty(trim($idioma['idioma']))) {
+                                $idiomasFiltrados[] = [
+                                    'idioma' => trim($idioma['idioma']),
+                                    'nivel' => $idioma['nivel'] ?? null
+                                ];
+                            }
+                        }
+                        $datos[$campo] = !empty($idiomasFiltrados) ? $idiomasFiltrados : null;
+                    } elseif ($campo === 'habilidades_pedagogicas') {
+                        // Manejo especial para habilidades pedagógicas (array simple de strings)
+                        $valores = array_filter(
+                            array_map('trim', $datos[$campo]),
+                            function($item) {
+                                return $item !== null && $item !== '' && in_array($item, ['virtual', 'presencial', 'dual']);
+                            }
+                        );
+                        $datos[$campo] = !empty($valores) ? array_values($valores) : null;
+                    } else {
+                        // Manejo estándar para otros arrays
+                        $valores = array_filter(
+                            array_map(function($item) {
+                                return is_string($item) ? trim($item) : (is_scalar($item) ? (string)$item : null);
+                            }, $datos[$campo]),
+                            function($item) {
+                                return $item !== null && $item !== '';
+                            }
+                        );
+                        $datos[$campo] = !empty($valores) ? array_values($valores) : null;
+                    }
+                } else {
+                    $datos[$campo] = null;
+                }
+            }
+            
+            // Convertir áreas de experticia y competencias TIC de string a array si vienen como texto
+            if (isset($datos['areas_experticia']) && is_string($datos['areas_experticia'])) {
+                $datos['areas_experticia'] = array_filter(array_map('trim', explode("\n", $datos['areas_experticia'])));
+                $datos['areas_experticia'] = !empty($datos['areas_experticia']) ? array_values($datos['areas_experticia']) : null;
+            }
+            
+            if (isset($datos['competencias_tic']) && is_string($datos['competencias_tic'])) {
+                $datos['competencias_tic'] = array_filter(array_map('trim', explode("\n", $datos['competencias_tic'])));
+                $datos['competencias_tic'] = !empty($datos['competencias_tic']) ? array_values($datos['competencias_tic']) : null;
+            }
+            
+            // Validar y limpiar tipo_vinculacion_id
+            if (isset($datos['tipo_vinculacion_id']) && !empty($datos['tipo_vinculacion_id'])) {
+                $parametroTema = \App\Models\ParametroTema::find($datos['tipo_vinculacion_id']);
+                if (!$parametroTema) {
+                    $datos['tipo_vinculacion_id'] = null;
+                }
+            } else {
+                $datos['tipo_vinculacion_id'] = null;
+            }
+            
+            // Validar y limpiar nivel_academico_id
+            if (isset($datos['nivel_academico_id']) && !empty($datos['nivel_academico_id'])) {
+                $parametroTema = \App\Models\ParametroTema::find($datos['nivel_academico_id']);
+                if (!$parametroTema) {
+                    $datos['nivel_academico_id'] = null;
+                }
+            } else {
+                $datos['nivel_academico_id'] = null;
+            }
+            
+            // Validar centro_formacion_id
+            if (isset($datos['centro_formacion_id']) && !empty($datos['centro_formacion_id'])) {
+                $centro = \App\Models\CentroFormacion::find($datos['centro_formacion_id']);
+                if (!$centro) {
+                    $datos['centro_formacion_id'] = null;
+                }
+            } else {
+                $datos['centro_formacion_id'] = null;
+            }
+            
+            // Filtrar solo los campos que están en fillable
+            $fillable = $instructor->getFillable();
+            $datosActualizar = array_intersect_key($datos, array_flip($fillable));
+            
+            // Agregar usuario editor
+            $datosActualizar['user_edit_id'] = Auth::id();
+            
+            // Actualizar instructor
+            $instructor->update($datosActualizar);
+            
+            // Sincronizar jornadas (many-to-many)
+            try {
+                if (!empty($jornadasIds)) {
+                    $pivotData = [];
+                    foreach ($jornadasIds as $jornadaId) {
+                        $pivotData[$jornadaId] = [
+                            'user_edit_id' => Auth::id(),
+                            'updated_at' => now()
+                        ];
+                    }
+                    $instructor->jornadas()->sync($pivotData);
+                } else {
+                    // Si no hay jornadas seleccionadas, eliminar todas
+                    $instructor->jornadas()->detach();
+                }
+            } catch (\Exception $e) {
+                // Si la tabla no existe, solo registrar el error pero no fallar la actualización
+                Log::warning('Error al sincronizar jornadas del instructor (tabla puede no existir)', [
+                    'instructor_id' => $instructor->id,
+                    'error' => $e->getMessage(),
+                    'jornadas_ids' => $jornadasIds
                 ]);
             }
 
@@ -391,36 +644,57 @@ class InstructorController extends Controller
 
             Log::info('Instructor actualizado exitosamente', [
                 'instructor_id' => $instructor->id,
-                'persona_id' => $persona->id,
-                'user_id' => $user ? $user->id : null,
-                'email' => $request->input('email'),
+                'persona_id' => $instructor->persona_id,
             ]);
 
             return redirect()
                 ->route('instructor.index')
-                ->with('success', '¡Actualización Exitosa!');
+                ->with('success', '¡Instructor actualizado exitosamente!');
         } catch (QueryException $e) {
             DB::rollBack();
+            $errorMessage = $e->getMessage();
+            $errorCode = $e->getCode();
+            
             Log::error('Error al actualizar instructor - QueryException', [
                 'instructor_id' => $instructor->id,
-                'error' => $e->getMessage(),
+                'error' => $errorMessage,
+                'error_code' => $errorCode,
+                'sql_state' => $e->errorInfo[0] ?? null,
+                'sql_code' => $e->errorInfo[1] ?? null,
+                'sql_message' => $e->errorInfo[2] ?? null,
                 'request_data' => $request->except(['password']),
+                'datos_actualizar' => $datosActualizar ?? [],
+                'trace' => $e->getTraceAsString()
             ]);
+            
+            // Mensaje más descriptivo basado en el tipo de error
+            $mensajeError = 'Error de base de datos. Por favor, inténtelo de nuevo.';
+            if (str_contains($errorMessage, 'foreign key constraint')) {
+                $mensajeError = 'Error: Uno de los valores seleccionados no es válido. Verifique las relaciones (regional, centro, tipo vinculación, nivel académico).';
+            } elseif (str_contains($errorMessage, 'Integrity constraint violation')) {
+                $mensajeError = 'Error: Violación de integridad de datos. Verifique que todos los valores sean válidos.';
+            }
+            
             return redirect()
                 ->back()
                 ->withInput()
-                ->with('error', 'Error de base de datos. Por favor, inténtelo de nuevo.');
+                ->with('error', $mensajeError);
         } catch (Exception $e) {
             DB::rollBack();
             Log::error('Error al actualizar instructor - Exception', [
                 'instructor_id' => $instructor->id,
                 'error' => $e->getMessage(),
+                'error_code' => $e->getCode(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
                 'request_data' => $request->except(['password']),
+                'datos_actualizar' => $datosActualizar ?? [],
+                'trace' => $e->getTraceAsString()
             ]);
             return redirect()
                 ->back()
                 ->withInput()
-                ->with('error', 'Error inesperado. Por favor, inténtelo de nuevo.');
+                ->with('error', 'Error inesperado: ' . $e->getMessage());
         }
     }
     public function ApiUpdate(Request $request)

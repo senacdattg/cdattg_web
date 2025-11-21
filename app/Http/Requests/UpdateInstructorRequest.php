@@ -26,85 +26,54 @@ class UpdateInstructorRequest extends FormRequest
     public function rules(): array
     {
         $instructor = $this->route('instructor');
-        $persona = Persona::find($instructor->persona_id);
-        $user = User::where('persona_id', $persona->id)->first();
 
         return [
-            'tipo_documento' => [
-                'required',
-                'integer',
-                'exists:parametros,id'
-            ],
-            'numero_documento' => [
-                'required',
-                'string',
-                'max:20',
-                Rule::unique('personas', 'numero_documento')->ignore($persona->id)
-            ],
-            'primer_nombre' => [
-                'required',
-                'string',
-                'max:255',
-                'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/'
-            ],
-            'segundo_nombre' => [
-                'nullable',
-                'string',
-                'max:255',
-                'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/'
-            ],
-            'primer_apellido' => [
-                'required',
-                'string',
-                'max:255',
-                'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/'
-            ],
-            'segundo_apellido' => [
-                'nullable',
-                'string',
-                'max:255',
-                'regex:/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/'
-            ],
-            'fecha_de_nacimiento' => [
-                'required',
-                'date',
-                'before:today',
-                'after:1900-01-01'
-            ],
-            'genero' => [
-                'required',
-                'integer',
-                'exists:parametros,id'
-            ],
-            'email' => [
-                'required',
-                'email',
-                'max:255',
-                Rule::unique('personas', 'email')->ignore($persona->id),
-                Rule::unique('users', 'email')->ignore($user->id)
-            ],
-            'regional_id' => [
-                'required',
-                'integer',
-                'exists:regionales,id'
-            ],
-            'telefono' => [
-                'nullable',
-                'string',
-                'max:20',
-                Rule::unique('personas', 'telefono')->ignore($persona->id)
-            ],
-            'celular' => [
-                'nullable',
-                'string',
-                'max:20',
-                Rule::unique('personas', 'celular')->ignore($persona->id)
-            ],
-            'direccion' => [
-                'nullable',
-                'string',
-                'max:500'
-            ]
+            // Información institucional
+            'regional_id' => 'required|integer|exists:regionals,id',
+            'centro_formacion_id' => 'nullable|integer|exists:centro_formacions,id',
+            'tipo_vinculacion_id' => 'nullable|integer|exists:parametros_temas,id',
+            'jornadas' => 'nullable|array',
+            'jornadas.*' => 'exists:parametros_temas,id',
+            'fecha_ingreso_sena' => 'nullable|date|before_or_equal:today',
+            'status' => 'required|boolean',
+            
+            // Experiencia
+            'anos_experiencia' => 'nullable|integer|min:0|max:50',
+            'experiencia_instructor_meses' => 'nullable|integer|min:0',
+            'experiencia_laboral' => 'nullable|string|max:1000',
+            
+            // Formación académica
+            'nivel_academico_id' => 'nullable|integer|exists:parametros_temas,id',
+            'formacion_pedagogia' => 'nullable|string|max:500',
+            'titulos_obtenidos' => 'nullable|array',
+            'titulos_obtenidos.*' => 'nullable|string|max:255',
+            'instituciones_educativas' => 'nullable|array',
+            'instituciones_educativas.*' => 'nullable|string|max:255',
+            'certificaciones_tecnicas' => 'nullable|array',
+            'certificaciones_tecnicas.*' => 'nullable|string|max:255',
+            'cursos_complementarios' => 'nullable|array',
+            'cursos_complementarios.*' => 'nullable|string|max:255',
+            
+            // Competencias y habilidades
+            'areas_experticia' => 'nullable',
+            'competencias_tic' => 'nullable',
+            'idiomas' => 'nullable|array',
+            'idiomas.*.idioma' => 'nullable|string|max:100',
+            'idiomas.*.nivel' => 'nullable|string|in:básico,intermedio,avanzado,nativo',
+            'habilidades_pedagogicas' => 'nullable|array',
+            'habilidades_pedagogicas.*' => 'in:virtual,presencial,dual',
+            
+            // Especialidades
+            'especialidades' => 'nullable|array',
+            'especialidades.*' => 'exists:red_conocimientos,id',
+            
+            // Información administrativa
+            'numero_contrato' => 'nullable|string|max:100',
+            'fecha_inicio_contrato' => 'nullable|date',
+            'fecha_fin_contrato' => 'nullable|date|after_or_equal:fecha_inicio_contrato',
+            'supervisor_contrato' => 'nullable|string|max:255',
+            'eps' => 'nullable|string|max:100',
+            'arl' => 'nullable|string|max:100',
         ];
     }
 
@@ -116,61 +85,20 @@ class UpdateInstructorRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'tipo_documento.required' => 'El tipo de documento es obligatorio.',
-            'tipo_documento.integer' => 'El tipo de documento debe ser un número entero.',
-            'tipo_documento.exists' => 'El tipo de documento seleccionado no es válido.',
-            
-            'numero_documento.required' => 'El número de documento es obligatorio.',
-            'numero_documento.string' => 'El número de documento debe ser una cadena de texto.',
-            'numero_documento.max' => 'El número de documento no puede tener más de 20 caracteres.',
-            'numero_documento.unique' => 'El número de documento ya está registrado.',
-            
-            'primer_nombre.required' => 'El primer nombre es obligatorio.',
-            'primer_nombre.string' => 'El primer nombre debe ser una cadena de texto.',
-            'primer_nombre.max' => 'El primer nombre no puede tener más de 255 caracteres.',
-            'primer_nombre.regex' => 'El primer nombre solo puede contener letras y espacios.',
-            
-            'segundo_nombre.string' => 'El segundo nombre debe ser una cadena de texto.',
-            'segundo_nombre.max' => 'El segundo nombre no puede tener más de 255 caracteres.',
-            'segundo_nombre.regex' => 'El segundo nombre solo puede contener letras y espacios.',
-            
-            'primer_apellido.required' => 'El primer apellido es obligatorio.',
-            'primer_apellido.string' => 'El primer apellido debe ser una cadena de texto.',
-            'primer_apellido.max' => 'El primer apellido no puede tener más de 255 caracteres.',
-            'primer_apellido.regex' => 'El primer apellido solo puede contener letras y espacios.',
-            
-            'segundo_apellido.string' => 'El segundo apellido debe ser una cadena de texto.',
-            'segundo_apellido.max' => 'El segundo apellido no puede tener más de 255 caracteres.',
-            'segundo_apellido.regex' => 'El segundo apellido solo puede contener letras y espacios.',
-            
-            'fecha_de_nacimiento.required' => 'La fecha de nacimiento es obligatoria.',
-            'fecha_de_nacimiento.date' => 'La fecha de nacimiento debe ser una fecha válida.',
-            'fecha_de_nacimiento.before' => 'La fecha de nacimiento debe ser anterior a hoy.',
-            'fecha_de_nacimiento.after' => 'La fecha de nacimiento debe ser posterior a 1900.',
-            
-            'genero.required' => 'El género es obligatorio.',
-            'genero.integer' => 'El género debe ser un número entero.',
-            'genero.exists' => 'El género seleccionado no es válido.',
-            
-            'email.required' => 'El correo electrónico es obligatorio.',
-            'email.email' => 'El correo electrónico debe tener un formato válido.',
-            'email.max' => 'El correo electrónico no puede tener más de 255 caracteres.',
-            'email.unique' => 'El correo electrónico ya está registrado.',
-            
             'regional_id.required' => 'La regional es obligatoria.',
-            'regional_id.integer' => 'La regional debe ser un número entero.',
             'regional_id.exists' => 'La regional seleccionada no es válida.',
-            
-            'telefono.string' => 'El teléfono debe ser una cadena de texto.',
-            'telefono.max' => 'El teléfono no puede tener más de 20 caracteres.',
-            'telefono.unique' => 'El número de teléfono ya está registrado.',
-            
-            'celular.string' => 'El celular debe ser una cadena de texto.',
-            'celular.max' => 'El celular no puede tener más de 20 caracteres.',
-            'celular.unique' => 'El número de celular ya está registrado.',
-            
-            'direccion.string' => 'La dirección debe ser una cadena de texto.',
-            'direccion.max' => 'La dirección no puede tener más de 500 caracteres.'
+            'centro_formacion_id.exists' => 'El centro de formación seleccionado no es válido.',
+            'tipo_vinculacion_id.exists' => 'El tipo de vinculación seleccionado no es válido.',
+            'jornadas.*.exists' => 'Una o más jornadas seleccionadas no son válidas.',
+            'fecha_ingreso_sena.before_or_equal' => 'La fecha de ingreso no puede ser posterior a hoy.',
+            'status.required' => 'El estado es obligatorio.',
+            'anos_experiencia.max' => 'Los años de experiencia no pueden ser mayores a 50.',
+            'experiencia_instructor_meses.min' => 'La experiencia como instructor no puede ser negativa.',
+            'nivel_academico_id.exists' => 'El nivel académico seleccionado no es válido.',
+            'idiomas.*.nivel.in' => 'El nivel de idioma debe ser: básico, intermedio, avanzado o nativo.',
+            'habilidades_pedagogicas.*.in' => 'Las habilidades pedagógicas deben ser: virtual, presencial o dual.',
+            'especialidades.*.exists' => 'Una o más especialidades seleccionadas no son válidas.',
+            'fecha_fin_contrato.after_or_equal' => 'La fecha de fin de contrato debe ser posterior o igual a la fecha de inicio.'
         ];
     }
 
@@ -182,19 +110,31 @@ class UpdateInstructorRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'tipo_documento' => 'tipo de documento',
-            'numero_documento' => 'número de documento',
-            'primer_nombre' => 'primer nombre',
-            'segundo_nombre' => 'segundo nombre',
-            'primer_apellido' => 'primer apellido',
-            'segundo_apellido' => 'segundo apellido',
-            'fecha_de_nacimiento' => 'fecha de nacimiento',
-            'genero' => 'género',
-            'email' => 'correo electrónico',
             'regional_id' => 'regional',
-            'telefono' => 'teléfono',
-            'celular' => 'celular',
-            'direccion' => 'dirección'
+            'centro_formacion_id' => 'centro de formación',
+            'tipo_vinculacion_id' => 'tipo de vinculación',
+            'jornadas' => 'jornadas de trabajo',
+            'fecha_ingreso_sena' => 'fecha de ingreso al SENA',
+            'anos_experiencia' => 'años de experiencia',
+            'experiencia_instructor_meses' => 'experiencia como instructor',
+            'experiencia_laboral' => 'experiencia laboral',
+            'nivel_academico_id' => 'nivel académico',
+            'formacion_pedagogia' => 'formación en pedagogía',
+            'titulos_obtenidos' => 'títulos obtenidos',
+            'instituciones_educativas' => 'instituciones educativas',
+            'certificaciones_tecnicas' => 'certificaciones técnicas',
+            'cursos_complementarios' => 'cursos complementarios',
+            'areas_experticia' => 'áreas de experticia',
+            'competencias_tic' => 'competencias TIC',
+            'idiomas' => 'idiomas',
+            'habilidades_pedagogicas' => 'habilidades pedagógicas',
+            'especialidades' => 'especialidades',
+            'numero_contrato' => 'número de contrato',
+            'fecha_inicio_contrato' => 'fecha de inicio de contrato',
+            'fecha_fin_contrato' => 'fecha de fin de contrato',
+            'supervisor_contrato' => 'supervisor de contrato',
+            'eps' => 'EPS',
+            'arl' => 'ARL'
         ];
     }
 }
