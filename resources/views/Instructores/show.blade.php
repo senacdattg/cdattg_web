@@ -97,7 +97,7 @@
         icon="fa-chalkboard-teacher" 
         title="Detalles del Instructor"
         subtitle="Información completa del instructor"
-        :breadcrumb="[['label' => 'Instructores', 'url' => route('instructor.index') , 'icon' => 'fa-chalkboard-teacher'], ['label' => '{{ $instructor->persona->primer_nombre }} {{ $instructor->persona->primer_apellido }}', 'icon' => 'fa-user', 'active' => true]]"
+        :breadcrumb="[['label' => 'Instructores', 'url' => route('instructor.index') , 'icon' => 'fa-chalkboard-teacher'], ['label' => $instructor->persona->primer_nombre . ' ' . $instructor->persona->primer_apellido, 'icon' => 'fa-user', 'active' => true]]"
     />
 @endsection
 
@@ -346,12 +346,70 @@
                                             </td>
                                         </tr>
                                         <tr>
+                                            <th class="py-3">Centro de Formación</th>
+                                            <td class="py-3">
+                                                @if($instructor->centroFormacion)
+                                                    <i class="fas fa-building mr-1"></i>
+                                                    {{ $instructor->centroFormacion->nombre }}
+                                                @else
+                                                    <span class="text-muted">No registrado</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Tipo de Vinculación</th>
+                                            <td class="py-3">
+                                                @if($instructor->tipoVinculacion)
+                                                    <i class="fas fa-briefcase mr-1"></i>
+                                                    {{ $instructor->tipoVinculacion->parametro->name ?? 'No registrado' }}
+                                                @else
+                                                    <span class="text-muted">No registrado</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Jornada(s) de Trabajo</th>
+                                            <td class="py-3">
+                                                @if($instructor->jornadas->count() > 0)
+                                                    @foreach($instructor->jornadas as $jornada)
+                                                        <span class="badge badge-info mr-1">
+                                                            <i class="fas fa-clock mr-1"></i>
+                                                            {{ $jornada->jornada }}
+                                                        </span>
+                                                    @endforeach
+                                                @else
+                                                    <span class="text-muted">No registradas</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Fecha de Ingreso al SENA</th>
+                                            <td class="py-3">
+                                                @if($instructor->fecha_ingreso_sena)
+                                                    <i class="far fa-calendar-alt mr-1"></i>
+                                                    {{ \Carbon\Carbon::parse($instructor->fecha_ingreso_sena)->format('d/m/Y') }}
+                                                @else
+                                                    <span class="text-muted">No registrada</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <th class="py-3">Años de Experiencia</th>
                                             <td class="py-3">
                                                 @if($instructor->anos_experiencia)
                                                     {{ $instructor->anos_experiencia }} años
                                                 @else
                                                     <span class="text-muted">No registrado</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Experiencia como Instructor (Meses)</th>
+                                            <td class="py-3">
+                                                @if($instructor->experiencia_instructor_meses)
+                                                    {{ $instructor->experiencia_instructor_meses }} meses
+                                                @else
+                                                    <span class="text-muted">No registrada</span>
                                                 @endif
                                             </td>
                                         </tr>
@@ -366,12 +424,21 @@
                                             </td>
                                         </tr>
                                         <tr>
+                                            <th class="py-3">Estado</th>
+                                            <td class="py-3">
+                                                <span class="status-badge {{ $instructor->status ? 'status-active' : 'status-inactive' }}">
+                                                    <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
+                                                    {{ $instructor->status ? 'Activo' : 'Inactivo' }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                        <tr>
                                             <th class="py-3">Estado de Disponibilidad</th>
                                             <td class="py-3">
                                                 <span class="status-badge {{ $instructor->estaDisponible() ? 'status-active' : 'status-inactive' }}">
                                                     <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
                                                     {{ $instructor->estaDisponible() ? 'Disponible' : 'Ocupado' }}
-                                </span>
+                                                </span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -380,7 +447,7 @@
                                                 <span class="status-badge {{ $instructor->tieneFichasActivas() ? 'status-active' : 'status-inactive' }}">
                                                     <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>
                                                     {{ $instructor->tieneFichasActivas() ? 'Sí tiene' : 'No tiene' }}
-                            </span>
+                                                </span>
                                             </td>
                                         </tr>
                                         <tr>
@@ -404,6 +471,215 @@
                         </div>
                     </div>
                 </div>
+
+            <!-- Formación Académica -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card detail-card no-hover">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                                <i class="fas fa-graduation-cap mr-2"></i>Formación Académica
+                            </h5>
+                        </div>
+
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table detail-table mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <th class="py-3">Nivel Académico</th>
+                                            <td class="py-3">
+                                                @if($instructor->nivelAcademico)
+                                                    <i class="fas fa-certificate mr-1"></i>
+                                                    {{ $instructor->nivelAcademico->parametro->name ?? 'No registrado' }}
+                                                @else
+                                                    <span class="text-muted">No registrado</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Formación en Pedagogía</th>
+                                            <td class="py-3">
+                                                @if($instructor->formacion_pedagogia)
+                                                    {{ $instructor->formacion_pedagogia }}
+                                                @else
+                                                    <span class="text-muted">No registrada</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Título(s) Obtenido(s)</th>
+                                            <td class="py-3">
+                                                @php
+                                                    $titulos = $instructor->titulos_obtenidos ?? [];
+                                                @endphp
+                                                @if(is_array($titulos) && count($titulos) > 0)
+                                                    <ul class="mb-0 pl-3">
+                                                        @foreach($titulos as $titulo)
+                                                            <li>{{ $titulo }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                @else
+                                                    <span class="text-muted">No registrados</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Institución(es) Educativa(s)</th>
+                                            <td class="py-3">
+                                                @php
+                                                    $instituciones = $instructor->instituciones_educativas ?? [];
+                                                @endphp
+                                                @if(is_array($instituciones) && count($instituciones) > 0)
+                                                    <ul class="mb-0 pl-3">
+                                                        @foreach($instituciones as $institucion)
+                                                            <li>{{ $institucion }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                @else
+                                                    <span class="text-muted">No registradas</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Certificaciones Técnicas</th>
+                                            <td class="py-3">
+                                                @php
+                                                    $certificaciones = $instructor->certificaciones_tecnicas ?? [];
+                                                @endphp
+                                                @if(is_array($certificaciones) && count($certificaciones) > 0)
+                                                    <ul class="mb-0 pl-3">
+                                                        @foreach($certificaciones as $certificacion)
+                                                            <li>{{ $certificacion }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                @else
+                                                    <span class="text-muted">No registradas</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Cursos Complementarios</th>
+                                            <td class="py-3">
+                                                @php
+                                                    $cursos = $instructor->cursos_complementarios ?? [];
+                                                @endphp
+                                                @if(is_array($cursos) && count($cursos) > 0)
+                                                    <ul class="mb-0 pl-3">
+                                                        @foreach($cursos as $curso)
+                                                            <li>{{ $curso }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                @else
+                                                    <span class="text-muted">No registrados</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Competencias y Habilidades -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card detail-card no-hover">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                                <i class="fas fa-tasks mr-2"></i>Competencias y Habilidades
+                            </h5>
+                        </div>
+
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table detail-table mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <th class="py-3">Áreas de Experticia</th>
+                                            <td class="py-3">
+                                                @php
+                                                    $areas = $instructor->areas_experticia ?? [];
+                                                @endphp
+                                                @if(is_array($areas) && count($areas) > 0)
+                                                    <ul class="mb-0 pl-3">
+                                                        @foreach($areas as $area)
+                                                            <li>{{ $area }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                @else
+                                                    <span class="text-muted">No registradas</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Competencias TIC</th>
+                                            <td class="py-3">
+                                                @php
+                                                    $competencias = $instructor->competencias_tic ?? [];
+                                                @endphp
+                                                @if(is_array($competencias) && count($competencias) > 0)
+                                                    <ul class="mb-0 pl-3">
+                                                        @foreach($competencias as $competencia)
+                                                            <li>{{ $competencia }}</li>
+                                                        @endforeach
+                                                    </ul>
+                                                @else
+                                                    <span class="text-muted">No registradas</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Idiomas</th>
+                                            <td class="py-3">
+                                                @php
+                                                    $idiomas = $instructor->idiomas ?? [];
+                                                @endphp
+                                                @if(is_array($idiomas) && count($idiomas) > 0)
+                                                    <ul class="mb-0 pl-3">
+                                                        @foreach($idiomas as $idioma)
+                                                            @if(is_array($idioma) && isset($idioma['idioma']) && !empty($idioma['idioma']))
+                                                                <li>
+                                                                    <strong>{{ $idioma['idioma'] }}</strong>
+                                                                    @if(isset($idioma['nivel']) && !empty($idioma['nivel']))
+                                                                        - <span class="text-muted">{{ ucfirst($idioma['nivel']) }}</span>
+                                                                    @endif
+                                                                </li>
+                                                            @endif
+                                                        @endforeach
+                                                    </ul>
+                                                @else
+                                                    <span class="text-muted">No registrados</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Habilidades Pedagógicas</th>
+                                            <td class="py-3">
+                                                @php
+                                                    $habilidades = $instructor->habilidades_pedagogicas ?? [];
+                                                @endphp
+                                                @if(is_array($habilidades) && count($habilidades) > 0)
+                                                    @foreach($habilidades as $habilidad)
+                                                        <span class="badge badge-primary mr-1">
+                                                            <i class="fas fa-chalkboard-teacher mr-1"></i>
+                                                            {{ ucfirst($habilidad) }}
+                                                        </span>
+                                                    @endforeach
+                                                @else
+                                                    <span class="text-muted">No registradas</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Especialidades -->
             <div class="row mb-4">
@@ -431,7 +707,7 @@
                                                     <span class="specialty-badge bg-primary text-white">
                                                         <i class="fas fa-star mr-1"></i>
                                                         {{ $especialidadPrincipal }}
-                                </span>
+                                                    </span>
                                                 @else
                                                     <span class="text-muted">No registrada</span>
                                                 @endif
@@ -444,7 +720,7 @@
                                                     @foreach($especialidadesSecundarias as $especialidad)
                                                         <span class="specialty-badge">
                                                             {{ $especialidad }}
-                            </span>
+                                                        </span>
                                                     @endforeach
                                                 @else
                                                     <span class="text-muted">No registradas</span>
@@ -453,11 +729,95 @@
                                         </tr>
                                     </tbody>
                                 </table>
-                        </div>
-                        </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
+
+            <!-- Información Administrativa -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card detail-card no-hover">
+                        <div class="card-header bg-white py-3">
+                            <h5 class="card-title m-0 font-weight-bold text-primary">
+                                <i class="fas fa-file-contract mr-2"></i>Información Administrativa
+                            </h5>
+                        </div>
+
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table detail-table mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <th class="py-3">Número de Contrato</th>
+                                            <td class="py-3">
+                                                @if($instructor->numero_contrato)
+                                                    {{ $instructor->numero_contrato }}
+                                                @else
+                                                    <span class="text-muted">No registrado</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Fecha de Inicio de Contrato</th>
+                                            <td class="py-3">
+                                                @if($instructor->fecha_inicio_contrato)
+                                                    <i class="far fa-calendar-alt mr-1"></i>
+                                                    {{ \Carbon\Carbon::parse($instructor->fecha_inicio_contrato)->format('d/m/Y') }}
+                                                @else
+                                                    <span class="text-muted">No registrada</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Fecha de Fin de Contrato</th>
+                                            <td class="py-3">
+                                                @if($instructor->fecha_fin_contrato)
+                                                    <i class="far fa-calendar-alt mr-1"></i>
+                                                    {{ \Carbon\Carbon::parse($instructor->fecha_fin_contrato)->format('d/m/Y') }}
+                                                @else
+                                                    <span class="text-muted">No registrada</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">Supervisor de Contrato</th>
+                                            <td class="py-3">
+                                                @if($instructor->supervisor_contrato)
+                                                    {{ $instructor->supervisor_contrato }}
+                                                @else
+                                                    <span class="text-muted">No registrado</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">EPS</th>
+                                            <td class="py-3">
+                                                @if($instructor->eps)
+                                                    {{ $instructor->eps }}
+                                                @else
+                                                    <span class="text-muted">No registrada</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th class="py-3">ARL</th>
+                                            <td class="py-3">
+                                                @if($instructor->arl)
+                                                    {{ $instructor->arl }}
+                                                @else
+                                                    <span class="text-muted">No registrada</span>
+                                                @endif
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
                 <!-- Fichas de Caracterización -->
                 @if($instructor->fichas->count() > 0)
