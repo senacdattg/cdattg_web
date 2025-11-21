@@ -140,6 +140,16 @@ class TemaSeeder extends Seeder
                 'name'     => 'JORNADAS',
                 'paramIds' => range(277, 280),
             ],
+            [
+                'id'       => 20,
+                'name'     => 'TIPOS DE VINCULACION',
+                'paramIds' => range(281, 283),
+            ],
+            [
+                'id'       => 21,
+                'name'     => 'NIVELES ACADEMICOS',
+                'paramIds' => range(284, 292),
+            ],
         ];
     }
 

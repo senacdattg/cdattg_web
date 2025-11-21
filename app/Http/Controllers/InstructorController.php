@@ -73,6 +73,41 @@ class InstructorController extends Controller
             // Obtener datos para filtros
             $regionales = Regional::where('status', true)->orderBy('nombre')->get();
             $especialidades = RedConocimiento::where('status', true)->orderBy('nombre')->get();
+            
+            // Obtener datos para el formulario de creación en acordeón
+            $personasDisponibles = Persona::query()
+                ->whereDoesntHave('instructor')
+                ->orderBy('primer_nombre')
+                ->orderBy('primer_apellido')
+                ->get();
+            
+            $jornadasTrabajo = \App\Models\JornadaFormacion::orderBy('jornada')->get();
+            
+            // Tipos de vinculación desde parametros_temas (tema: TIPOS DE VINCULACION)
+            $tiposVinculacion = \App\Models\ParametroTema::whereHas('tema', function($q) {
+                $q->where('name', 'LIKE', '%TIPOS DE VINCULACION%');
+            })->whereHas('parametro', function($query) {
+                $query->where('status', true);
+            })->where('status', true)
+              ->with('parametro')
+              ->get()
+              ->sortBy(function($pt) {
+                  return $pt->parametro->name;
+              })
+              ->values();
+            
+            // Niveles académicos desde parametros_temas (tema: NIVELES ACADEMICOS)
+            $nivelesAcademicos = \App\Models\ParametroTema::whereHas('tema', function($q) {
+                $q->where('name', 'LIKE', '%NIVELES ACADEMICOS%');
+            })->whereHas('parametro', function($query) {
+                $query->where('status', true);
+            })->where('status', true)
+              ->with('parametro')
+              ->get()
+              ->sortBy(function($pt) {
+                  return $pt->parametro->name;
+              })
+              ->values();
 
             // Estadísticas
             $estadisticas = $this->instructorService->obtenerEstadisticas();
@@ -84,7 +119,11 @@ class InstructorController extends Controller
                     'regionales',
                     'especialidades',
                     'estadisticas',
-                    'filtros'
+                    'filtros',
+                    'personasDisponibles',
+                    'jornadasTrabajo',
+                    'tiposVinculacion',
+                    'nivelesAcademicos'
                 )
             );
         } catch (Exception $e) {
@@ -185,29 +224,7 @@ class InstructorController extends Controller
      */
     public function create()
     {
-        try {
-            $personasDisponibles = Persona::query()
-                ->whereDoesntHave('instructor')
-                ->orderBy('primer_nombre')
-                ->orderBy('primer_apellido')
-                ->get();
-
-            $regionales = Regional::where('status', 1)->get();
-            $especialidades = RedConocimiento::where('status', true)->orderBy('nombre')->get();
-
-            return view(
-                'Instructores.create',
-                compact('personasDisponibles', 'regionales', 'especialidades')
-            );
-        } catch (Exception $e) {
-            Log::error('Error al cargar formulario de creación de instructor', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
-            return redirect()
-                ->route('instructor.index')
-                ->with('error', 'Error al cargar el formulario. Por favor, inténtelo de nuevo.');
-        }
+        return view('Instructores.create');
     }
 
     /**
@@ -227,7 +244,39 @@ class InstructorController extends Controller
                 $datos['especialidades'] = $especialidades;
             }
 
-            $this->instructorService->crear($datos);
+            // Preparar jornadas (array de IDs)
+            $jornadasIds = [];
+            if ($request->has('jornadas') && is_array($request->input('jornadas'))) {
+                $jornadasIds = array_filter($request->input('jornadas', []));
+            }
+            
+            // Preparar arrays JSON - campos dinámicos que vienen como arrays
+            $camposJsonArray = [
+                'titulos_obtenidos',
+                'instituciones_educativas',
+                'certificaciones_tecnicas',
+                'cursos_complementarios',
+                'areas_experticia',
+                'competencias_tic',
+                'idiomas',
+                'habilidades_pedagogicas',
+                'documentos_adjuntos'
+            ];
+            
+            foreach ($camposJsonArray as $campo) {
+                if ($request->has($campo) && is_array($request->input($campo, []))) {
+                    // Filtrar valores vacíos y trim
+                    $valores = array_filter(array_map('trim', $request->input($campo, [])));
+                    $datos[$campo] = !empty($valores) ? array_values($valores) : null;
+                } else {
+                    $datos[$campo] = null;
+                }
+            }
+
+            // Agregar usuario creador
+            $datos['user_create_id'] = Auth::id();
+
+            $instructor = $this->instructorService->crear($datos, $jornadasIds);
 
             return redirect()
                 ->route('instructor.index')
@@ -1546,6 +1595,70 @@ class InstructorController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al desasignar la ficha del instructor'
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtiene centros de formación por regional (AJAX)
+     */
+    public function centrosPorRegional(Request $request)
+    {
+        try {
+            $regionalId = $request->input('regional_id');
+            
+            Log::info('Solicitud de centros por regional recibida', [
+                'regional_id' => $regionalId,
+                'tipo' => gettype($regionalId),
+                'request_all' => $request->all()
+            ]);
+            
+            if (!$regionalId) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'ID de regional requerido'
+                ], 400);
+            }
+
+            // Convertir a entero para asegurar el tipo correcto
+            $regionalId = (int) $regionalId;
+            
+            Log::info('Buscando centros para regional', [
+                'regional_id' => $regionalId
+            ]);
+
+            $centros = \App\Models\CentroFormacion::where('regional_id', $regionalId)
+                ->where('status', true)
+                ->orderBy('nombre')
+                ->get(['id', 'nombre'])
+                ->map(function ($centro) {
+                    return [
+                        'id' => (int) $centro->id,
+                        'nombre' => $centro->nombre
+                    ];
+                })
+                ->values();
+
+            Log::info('Centros obtenidos por regional', [
+                'regional_id' => $regionalId,
+                'cantidad' => $centros->count(),
+                'centros' => $centros->toArray()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'centros' => $centros
+            ]);
+        } catch (Exception $e) {
+            Log::error('Error al obtener centros por regional', [
+                'regional_id' => $request->input('regional_id'),
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener centros de formación: ' . $e->getMessage()
             ], 500);
         }
     }

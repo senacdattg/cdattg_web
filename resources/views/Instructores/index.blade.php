@@ -21,6 +21,8 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
+                    <x-session-alerts />
+                    
                     <x-create-card 
                         url="{{ route('instructor.create') }}"
                         title="Crear Instructor"

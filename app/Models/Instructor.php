@@ -5,11 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 use App\Models\AsignacionInstructor;
+use App\Models\ProgramaFormacion;
+use App\Models\ParametroTema;
 
 class Instructor extends Model
 {
@@ -28,7 +31,33 @@ class Instructor extends Model
         'anos_experiencia',
         'experiencia_laboral',
         'numero_documento_cache',
-        'nombre_completo_cache'
+        'nombre_completo_cache',
+        // Información laboral
+        'tipo_vinculacion_id',
+        'centro_formacion_id',
+        'experiencia_instructor_meses',
+        'fecha_ingreso_sena',
+        // Formación académica
+        'nivel_academico_id',
+        'titulos_obtenidos',
+        'instituciones_educativas',
+        'certificaciones_tecnicas',
+        'cursos_complementarios',
+        'formacion_pedagogia',
+        // Competencias y habilidades
+        'areas_experticia',
+        'competencias_tic',
+        'idiomas',
+        'habilidades_pedagogicas',
+        // Documentos adjuntos
+        'documentos_adjuntos',
+        // Información administrativa
+        'numero_contrato',
+        'fecha_inicio_contrato',
+        'fecha_fin_contrato',
+        'supervisor_contrato',
+        'eps',
+        'arl'
     ];
 
     protected $casts = [
@@ -36,6 +65,19 @@ class Instructor extends Model
         'especialidades' => 'array',
         'competencias' => 'array',
         'anos_experiencia' => 'integer',
+        'experiencia_instructor_meses' => 'integer',
+        'fecha_ingreso_sena' => 'date',
+        'fecha_inicio_contrato' => 'date',
+        'fecha_fin_contrato' => 'date',
+        'titulos_obtenidos' => 'array',
+        'instituciones_educativas' => 'array',
+        'certificaciones_tecnicas' => 'array',
+        'cursos_complementarios' => 'array',
+        'areas_experticia' => 'array',
+        'competencias_tic' => 'array',
+        'idiomas' => 'array',
+        'habilidades_pedagogicas' => 'array',
+        'documentos_adjuntos' => 'array',
         'created_at' => 'datetime',
         'updated_at' => 'datetime'
     ];
@@ -68,6 +110,40 @@ class Instructor extends Model
     public function regional(): BelongsTo
     {
         return $this->belongsTo(Regional::class, 'regional_id');
+    }
+
+    /**
+     * Relación con CentroFormacion (belongsTo)
+     */
+    public function centroFormacion(): BelongsTo
+    {
+        return $this->belongsTo(CentroFormacion::class, 'centro_formacion_id');
+    }
+
+    /**
+     * Relación con ParametroTema para tipo de vinculación (belongsTo)
+     */
+    public function tipoVinculacion(): BelongsTo
+    {
+        return $this->belongsTo(ParametroTema::class, 'tipo_vinculacion_id');
+    }
+
+    /**
+     * Relación muchos a muchos con JornadaFormacion (belongsToMany)
+     */
+    public function jornadas(): BelongsToMany
+    {
+        return $this->belongsToMany(JornadaFormacion::class, 'instructor_jornada_formacion', 'instructor_id', 'jornada_formacion_id')
+                    ->withPivot('user_create_id', 'user_edit_id')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Relación con ParametroTema para nivel académico (belongsTo)
+     */
+    public function nivelAcademico(): BelongsTo
+    {
+        return $this->belongsTo(ParametroTema::class, 'nivel_academico_id');
     }
 
     /**

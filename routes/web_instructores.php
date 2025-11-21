@@ -31,6 +31,11 @@ Route::get('/instructor/search', [InstructorController::class, 'search'])
     ->name('instructor.search')
     ->middleware(['auth', 'can:VER INSTRUCTOR']);
 
+// Ruta para obtener centros de formación por regional (AJAX)
+Route::get('/instructor/centros-por-regional', [InstructorController::class, 'centrosPorRegional'])
+    ->name('instructor.centrosPorRegional')
+    ->middleware('auth');
+
 // Ruta temporal para debuggear create
 Route::get('/instructor/create-debug', [InstructorController::class, 'create'])
     ->name('instructor.create.debug')

@@ -94,9 +94,9 @@ class InstructorService
      * @return Instructor
      * @throws \Exception
      */
-    public function crear(array $datos): Instructor
+    public function crear(array $datos, array $jornadasIds = []): Instructor
     {
-        return DB::transaction(function () use ($datos) {
+        return DB::transaction(function () use ($datos, $jornadasIds) {
             // Validar que la persona existe y no sea ya instructor
             $persona = Persona::with(['instructor', 'user'])->findOrFail($datos['persona_id']);
 
@@ -108,18 +108,66 @@ class InstructorService
                 throw new \Exception('Esta persona no tiene un usuario asociado.');
             }
 
-            // Crear instructor
-            $instructor = Instructor::create([
+            // Preparar datos para crear instructor
+            $datosInstructor = [
                 'persona_id' => $persona->id,
                 'regional_id' => $datos['regional_id'],
-                'anos_experiencia' => $datos['anos_experiencia'] ?? 0,
+                'anos_experiencia' => $datos['anos_experiencia'] ?? null,
                 'experiencia_laboral' => $datos['experiencia_laboral'] ?? null,
                 'status' => true,
-            ]);
+                'user_create_id' => $datos['user_create_id'] ?? null,
+            ];
+
+            // Agregar campos nuevos si existen
+            $camposNuevos = [
+                'tipo_vinculacion_id',
+                'centro_formacion_id',
+                'experiencia_instructor_meses',
+                'fecha_ingreso_sena',
+                'nivel_academico_id',
+                'titulos_obtenidos',
+                'instituciones_educativas',
+                'certificaciones_tecnicas',
+                'cursos_complementarios',
+                'formacion_pedagogia',
+                'areas_experticia',
+                'competencias_tic',
+                'idiomas',
+                'habilidades_pedagogicas',
+                'documentos_adjuntos',
+                'numero_contrato',
+                'fecha_inicio_contrato',
+                'fecha_fin_contrato',
+                'supervisor_contrato',
+                'eps',
+                'arl'
+            ];
+
+            foreach ($camposNuevos as $campo) {
+                if (isset($datos[$campo])) {
+                    $datosInstructor[$campo] = $datos[$campo];
+                }
+            }
+
+            // Crear instructor
+            $instructor = Instructor::create($datosInstructor);
 
             // Asignar especialidades si se proporcionan
             if (!empty($datos['especialidades'])) {
                 $this->asignarEspecialidades($instructor, $datos['especialidades']);
+            }
+
+            // Sincronizar jornadas (many-to-many)
+            if (!empty($jornadasIds)) {
+                $pivotData = [];
+                foreach ($jornadasIds as $jornadaId) {
+                    $pivotData[$jornadaId] = [
+                        'user_create_id' => auth()->id(),
+                        'created_at' => now(),
+                        'updated_at' => now()
+                    ];
+                }
+                $instructor->jornadas()->sync($pivotData);
             }
 
             // Sincronizar solo el rol de instructor (evita duplicados)

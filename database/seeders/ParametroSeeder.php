@@ -335,6 +335,24 @@ class ParametroSeeder extends Seeder
             279 => 'NOCHE',
             280 => 'FINES DE SEMANA',
         ],
+
+        'tipos_vinculacion' => [
+            281 => 'PLANTA',
+            282 => 'CONTRATISTA',
+            283 => 'APOYO A LA FORMACION',
+        ],
+
+        'niveles_academicos' => [
+            284 => 'PRIMARIA',
+            285 => 'SECUNDARIA',
+            286 => 'TECNICO MEDIO',
+            287 => 'TECNOLOGO PROFESIONAL',
+            288 => 'PREGRADO',
+            289 => 'POSTGRADO',
+            290 => 'DOCTORADO',
+            291 => 'ESPECIALIDAD',
+            292 => 'MAESTRIA',
+        ],
     ];
 
     /**
