@@ -429,7 +429,7 @@ class InstructorController extends Controller
             // Obtener jornadas asignadas al instructor - mapear desde jornadas_formacion a parametros_temas
             $jornadasAsignadas = [];
             try {
-                $jornadasFormacionAsignadas = $instructor->jornadas()->pluck('id')->toArray();
+                $jornadasFormacionAsignadas = $instructor->jornadas()->pluck('jornadas_formacion.id')->toArray();
                 if (!empty($jornadasFormacionAsignadas)) {
                     // Obtener los nombres de las jornadas desde jornadas_formacion
                     $jornadasFormacion = \App\Models\JornadaFormacion::whereIn('id', $jornadasFormacionAsignadas)->pluck('jornada')->toArray();
@@ -500,20 +500,74 @@ class InstructorController extends Controller
             // Preparar jornadas (array de IDs) - mapear desde parametros_temas a jornadas_formacion
             $jornadasIds = [];
             if ($request->has('jornadas') && is_array($request->input('jornadas'))) {
-                $parametrosTemas = \App\Models\ParametroTema::whereIn('id', $request->input('jornadas'))
-                    ->with('parametro')
-                    ->get();
+                $jornadasRequest = $request->input('jornadas');
+                Log::info('Jornadas recibidas en request', [
+                    'jornadas_request' => $jornadasRequest,
+                    'tipo' => gettype($jornadasRequest),
+                    'es_array' => is_array($jornadasRequest)
+                ]);
                 
-                foreach ($parametrosTemas as $parametroTema) {
-                    $nombreJornada = $parametroTema->parametro->name ?? null;
-                    if ($nombreJornada) {
-                        $jornadaFormacion = \App\Models\JornadaFormacion::where('jornada', $nombreJornada)->first();
-                        if ($jornadaFormacion) {
-                            $jornadasIds[] = $jornadaFormacion->id;
+                // Convertir a enteros si vienen como strings
+                $jornadasRequest = array_map('intval', array_filter($jornadasRequest));
+                
+                if (!empty($jornadasRequest)) {
+                    $parametrosTemas = \App\Models\ParametroTema::whereIn('id', $jornadasRequest)
+                        ->with('parametro')
+                        ->get();
+                    
+                    Log::info('Parametros temas encontrados', [
+                        'cantidad' => $parametrosTemas->count(),
+                        'parametros' => $parametrosTemas->map(function($pt) {
+                            return [
+                                'id' => $pt->id,
+                                'parametro_name' => $pt->parametro->name ?? null
+                            ];
+                        })->toArray()
+                    ]);
+                    
+                    foreach ($parametrosTemas as $parametroTema) {
+                        $nombreJornada = $parametroTema->parametro->name ?? null;
+                        if ($nombreJornada) {
+                            // Buscar por nombre exacto primero
+                            $jornadaFormacion = \App\Models\JornadaFormacion::where('jornada', $nombreJornada)->first();
+                            
+                            // Si no se encuentra, buscar sin acentos y case-insensitive
+                            if (!$jornadaFormacion) {
+                                $jornadaFormacion = \App\Models\JornadaFormacion::whereRaw('LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(jornada, "Á", "A"), "É", "E"), "Í", "I"), "Ó", "O"), "Ú", "U")) = LOWER(REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(?, "Á", "A"), "É", "E"), "Í", "I"), "Ó", "O"), "Ú", "U"))', [$nombreJornada])->first();
+                            }
+                            
+                            // Si aún no se encuentra, buscar por LIKE
+                            if (!$jornadaFormacion) {
+                                $jornadaFormacion = \App\Models\JornadaFormacion::where('jornada', 'LIKE', "%{$nombreJornada}%")->first();
+                            }
+                            
+                            // Si aún no se encuentra, crear la jornada si no existe
+                            if (!$jornadaFormacion) {
+                                Log::info('JornadaFormacion no encontrada, creando nueva', [
+                                    'nombre_jornada' => $nombreJornada
+                                ]);
+                                $jornadaFormacion = \App\Models\JornadaFormacion::create([
+                                    'jornada' => $nombreJornada
+                                ]);
+                            }
+                            
+                            if ($jornadaFormacion) {
+                                $jornadasIds[] = $jornadaFormacion->id;
+                                Log::info('Jornada mapeada', [
+                                    'parametro_tema_id' => $parametroTema->id,
+                                    'nombre_jornada' => $nombreJornada,
+                                    'jornada_formacion_id' => $jornadaFormacion->id
+                                ]);
+                            }
                         }
                     }
                 }
             }
+            
+            Log::info('Jornadas IDs finales para sincronizar', [
+                'jornadas_ids' => $jornadasIds,
+                'cantidad' => count($jornadasIds)
+            ]);
             
             // Preparar arrays JSON - campos dinámicos que vienen como arrays
             $camposJsonArray = [
@@ -526,12 +580,19 @@ class InstructorController extends Controller
             ];
             
             foreach ($camposJsonArray as $campo) {
+                // Log para debuggear
+                Log::info("Procesando campo array: {$campo}", [
+                    'existe' => isset($datos[$campo]),
+                    'es_array' => isset($datos[$campo]) && is_array($datos[$campo]),
+                    'valor' => $datos[$campo] ?? 'no existe'
+                ]);
+                
                 if (isset($datos[$campo]) && is_array($datos[$campo])) {
                     if ($campo === 'idiomas') {
                         // Manejo especial para idiomas (array anidado)
                         $idiomasFiltrados = [];
                         foreach ($datos[$campo] as $idioma) {
-                            if (is_array($idioma) && isset($idioma['idioma']) && !empty(trim($idioma['idioma']))) {
+                            if (is_array($idioma) && isset($idioma['idioma']) && !empty(trim($idioma['idioma'] ?? ''))) {
                                 $idiomasFiltrados[] = [
                                     'idioma' => trim($idioma['idioma']),
                                     'nivel' => $idioma['nivel'] ?? null
@@ -542,17 +603,24 @@ class InstructorController extends Controller
                     } elseif ($campo === 'habilidades_pedagogicas') {
                         // Manejo especial para habilidades pedagógicas (array simple de strings)
                         $valores = array_filter(
-                            array_map('trim', $datos[$campo]),
+                            array_map(function($item) {
+                                return is_string($item) ? trim($item) : (is_scalar($item) ? (string)$item : '');
+                            }, $datos[$campo]),
                             function($item) {
                                 return $item !== null && $item !== '' && in_array($item, ['virtual', 'presencial', 'dual']);
                             }
                         );
                         $datos[$campo] = !empty($valores) ? array_values($valores) : null;
                     } else {
-                        // Manejo estándar para otros arrays
+                        // Manejo estándar para otros arrays (titulos, instituciones, certificaciones, cursos)
                         $valores = array_filter(
                             array_map(function($item) {
-                                return is_string($item) ? trim($item) : (is_scalar($item) ? (string)$item : null);
+                                if (is_string($item)) {
+                                    return trim($item);
+                                } elseif (is_scalar($item)) {
+                                    return (string)$item;
+                                }
+                                return null;
                             }, $datos[$campo]),
                             function($item) {
                                 return $item !== null && $item !== '';
@@ -560,7 +628,12 @@ class InstructorController extends Controller
                         );
                         $datos[$campo] = !empty($valores) ? array_values($valores) : null;
                     }
+                    
+                    Log::info("Campo procesado: {$campo}", [
+                        'resultado' => $datos[$campo]
+                    ]);
                 } else {
+                    // Si no viene en el request o no es array, establecer como null
                     $datos[$campo] = null;
                 }
             }
@@ -613,8 +686,33 @@ class InstructorController extends Controller
             // Agregar usuario editor
             $datosActualizar['user_edit_id'] = Auth::id();
             
+            // Log para debuggear los datos que se van a actualizar
+            Log::info('Datos a actualizar en instructor', [
+                'instructor_id' => $instructor->id,
+                'campos_json' => [
+                    'titulos_obtenidos' => $datosActualizar['titulos_obtenidos'] ?? null,
+                    'instituciones_educativas' => $datosActualizar['instituciones_educativas'] ?? null,
+                    'certificaciones_tecnicas' => $datosActualizar['certificaciones_tecnicas'] ?? null,
+                    'cursos_complementarios' => $datosActualizar['cursos_complementarios'] ?? null,
+                    'idiomas' => $datosActualizar['idiomas'] ?? null,
+                    'habilidades_pedagogicas' => $datosActualizar['habilidades_pedagogicas'] ?? null,
+                ]
+            ]);
+            
             // Actualizar instructor
             $instructor->update($datosActualizar);
+            
+            // Verificar que se guardaron correctamente
+            $instructor->refresh();
+            Log::info('Instructor actualizado - valores guardados', [
+                'instructor_id' => $instructor->id,
+                'titulos_obtenidos' => $instructor->titulos_obtenidos,
+                'instituciones_educativas' => $instructor->instituciones_educativas,
+                'certificaciones_tecnicas' => $instructor->certificaciones_tecnicas,
+                'cursos_complementarios' => $instructor->cursos_complementarios,
+                'idiomas' => $instructor->idiomas,
+                'habilidades_pedagogicas' => $instructor->habilidades_pedagogicas,
+            ]);
             
             // Sincronizar jornadas (many-to-many)
             try {
@@ -626,18 +724,34 @@ class InstructorController extends Controller
                             'updated_at' => now()
                         ];
                     }
-                    $instructor->jornadas()->sync($pivotData);
+                    Log::info('Sincronizando jornadas con pivot data', [
+                        'instructor_id' => $instructor->id,
+                        'pivot_data' => $pivotData
+                    ]);
+                    
+                    $resultado = $instructor->jornadas()->sync($pivotData);
+                    
+                    Log::info('Jornadas sincronizadas exitosamente', [
+                        'instructor_id' => $instructor->id,
+                        'resultado_sync' => $resultado,
+                        'jornadas_actuales' => $instructor->jornadas()->pluck('jornadas_formacion.id')->toArray()
+                    ]);
                 } else {
                     // Si no hay jornadas seleccionadas, eliminar todas
+                    Log::info('No hay jornadas seleccionadas, eliminando todas', [
+                        'instructor_id' => $instructor->id
+                    ]);
                     $instructor->jornadas()->detach();
                 }
             } catch (\Exception $e) {
-                // Si la tabla no existe, solo registrar el error pero no fallar la actualización
-                Log::warning('Error al sincronizar jornadas del instructor (tabla puede no existir)', [
+                Log::error('Error al sincronizar jornadas del instructor', [
                     'instructor_id' => $instructor->id,
                     'error' => $e->getMessage(),
+                    'error_code' => $e->getCode(),
+                    'trace' => $e->getTraceAsString(),
                     'jornadas_ids' => $jornadasIds
                 ]);
+                // No lanzar la excepción para que la actualización continúe
             }
 
             DB::commit();

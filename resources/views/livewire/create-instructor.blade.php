@@ -340,26 +340,48 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="areas_experticia" class="form-label">Áreas de Experticia</label>
-                                    <textarea wire:model="areas_experticia" id="areas_experticia" rows="3" 
-                                              class="form-control @error('areas_experticia') is-invalid @enderror" 
-                                              placeholder="Ej: Electricidad, Programación, Contabilidad... (una por línea)"></textarea>
+                                    <label class="form-label">Áreas de Experticia</label>
+                                    @foreach($areas_experticia as $index => $area)
+                                        <div class="input-group mb-2">
+                                            <input type="text" wire:model="areas_experticia.{{ $index }}" class="form-control" placeholder="Ej: Electricidad, Programación, Contabilidad">
+                                            <div class="input-group-append">
+                                                @if(count($areas_experticia) > 1)
+                                                    <button type="button" class="btn btn-danger" wire:click="eliminarAreaExperticia({{ $index }})">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                    <button type="button" class="btn btn-sm btn-info mt-2" wire:click="agregarAreaExperticia">
+                                        <i class="fas fa-plus mr-1"></i> Agregar Área
+                                    </button>
                                     @error('areas_experticia')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
-                                    <small class="form-text text-muted">Un área por línea</small>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group">
-                                    <label for="competencias_tic" class="form-label">Competencias TIC</label>
-                                    <textarea wire:model="competencias_tic" id="competencias_tic" rows="3" 
-                                              class="form-control @error('competencias_tic') is-invalid @enderror" 
-                                              placeholder="Ej: Manejo de Office, LMS, SofíaPlus... (una por línea)"></textarea>
+                                    <label class="form-label">Competencias TIC</label>
+                                    @foreach($competencias_tic as $index => $competencia)
+                                        <div class="input-group mb-2">
+                                            <input type="text" wire:model="competencias_tic.{{ $index }}" class="form-control" placeholder="Ej: Manejo de Office, LMS, SofíaPlus">
+                                            <div class="input-group-append">
+                                                @if(count($competencias_tic) > 1)
+                                                    <button type="button" class="btn btn-danger" wire:click="eliminarCompetenciaTic({{ $index }})">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                    <button type="button" class="btn btn-sm btn-info mt-2" wire:click="agregarCompetenciaTic">
+                                        <i class="fas fa-plus mr-1"></i> Agregar Competencia
+                                    </button>
                                     @error('competencias_tic')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
-                                    <small class="form-text text-muted">Manejo de Office, LMS, herramientas SENA como SofíaPlus</small>
                                 </div>
                             </div>
                         </div>

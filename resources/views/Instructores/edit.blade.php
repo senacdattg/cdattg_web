@@ -498,26 +498,62 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="areas_experticia" class="form-label">Áreas de Experticia</label>
-                                                    <textarea name="areas_experticia" id="areas_experticia" rows="3" 
-                                                              class="form-control @error('areas_experticia') is-invalid @enderror" 
-                                                              placeholder="Ej: Electricidad, Programación, Contabilidad... (una por línea)">@if(is_array(old('areas_experticia', $instructor->areas_experticia))){{ implode("\n", old('areas_experticia', $instructor->areas_experticia ?? [])) }}@else{{ old('areas_experticia', $instructor->areas_experticia) }}@endif</textarea>
+                                                    <label class="form-label">Áreas de Experticia</label>
+                                                    @php
+                                                        $areas = old('areas_experticia', $instructor->areas_experticia ?? []);
+                                                        if (is_string($areas)) {
+                                                            $areas = array_filter(explode("\n", $areas));
+                                                        }
+                                                        if (empty($areas)) $areas = [''];
+                                                    @endphp
+                                                    @foreach($areas as $index => $area)
+                                                        <div class="input-group mb-2">
+                                                            <input type="text" name="areas_experticia[]" value="{{ $area }}" class="form-control" placeholder="Ej: Electricidad, Programación, Contabilidad">
+                                                            <div class="input-group-append">
+                                                                @if(count($areas) > 1)
+                                                                    <button type="button" class="btn btn-danger btn-remove-area">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </button>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                    <button type="button" class="btn btn-sm btn-info mt-2 btn-add-area">
+                                                        <i class="fas fa-plus mr-1"></i> Agregar Área
+                                                    </button>
                                                     @error('areas_experticia')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
                                                     @enderror
-                                                    <small class="form-text text-muted">Un área por línea</small>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
-                                                    <label for="competencias_tic" class="form-label">Competencias TIC</label>
-                                                    <textarea name="competencias_tic" id="competencias_tic" rows="3" 
-                                                              class="form-control @error('competencias_tic') is-invalid @enderror" 
-                                                              placeholder="Ej: Manejo de Office, LMS, SofíaPlus... (una por línea)">@if(is_array(old('competencias_tic', $instructor->competencias_tic))){{ implode("\n", old('competencias_tic', $instructor->competencias_tic ?? [])) }}@else{{ old('competencias_tic', $instructor->competencias_tic) }}@endif</textarea>
+                                                    <label class="form-label">Competencias TIC</label>
+                                                    @php
+                                                        $competencias = old('competencias_tic', $instructor->competencias_tic ?? []);
+                                                        if (is_string($competencias)) {
+                                                            $competencias = array_filter(explode("\n", $competencias));
+                                                        }
+                                                        if (empty($competencias)) $competencias = [''];
+                                                    @endphp
+                                                    @foreach($competencias as $index => $competencia)
+                                                        <div class="input-group mb-2">
+                                                            <input type="text" name="competencias_tic[]" value="{{ $competencia }}" class="form-control" placeholder="Ej: Manejo de Office, LMS, SofíaPlus">
+                                                            <div class="input-group-append">
+                                                                @if(count($competencias) > 1)
+                                                                    <button type="button" class="btn btn-danger btn-remove-competencia">
+                                                                        <i class="fas fa-times"></i>
+                                                                    </button>
+                                                                @endif
+                                                            </div>
+                                                        </div>
+                                                    @endforeach
+                                                    <button type="button" class="btn btn-sm btn-info mt-2 btn-add-competencia">
+                                                        <i class="fas fa-plus mr-1"></i> Agregar Competencia
+                                                    </button>
                                                     @error('competencias_tic')
-                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                        <div class="invalid-feedback d-block">{{ $message }}</div>
                                                     @enderror
-                                                    <small class="form-text text-muted">Manejo de Office, LMS, herramientas SENA como SofíaPlus</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -786,6 +822,52 @@
             // Eliminar curso
             document.addEventListener('click', function(e) {
                 if (e.target.closest('.btn-remove-curso')) {
+                    e.target.closest('.input-group').remove();
+                }
+            });
+
+            // Agregar área de experticia
+            document.querySelector('.btn-add-area')?.addEventListener('click', function() {
+                const container = this.previousElementSibling;
+                const newInput = document.createElement('div');
+                newInput.className = 'input-group mb-2';
+                newInput.innerHTML = `
+                    <input type="text" name="areas_experticia[]" class="form-control" placeholder="Ej: Electricidad, Programación, Contabilidad">
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-danger btn-remove-area">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(newInput);
+            });
+
+            // Eliminar área de experticia
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.btn-remove-area')) {
+                    e.target.closest('.input-group').remove();
+                }
+            });
+
+            // Agregar competencia TIC
+            document.querySelector('.btn-add-competencia')?.addEventListener('click', function() {
+                const container = this.previousElementSibling;
+                const newInput = document.createElement('div');
+                newInput.className = 'input-group mb-2';
+                newInput.innerHTML = `
+                    <input type="text" name="competencias_tic[]" class="form-control" placeholder="Ej: Manejo de Office, LMS, SofíaPlus">
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-danger btn-remove-competencia">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(newInput);
+            });
+
+            // Eliminar competencia TIC
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('.btn-remove-competencia')) {
                     e.target.closest('.input-group').remove();
                 }
             });

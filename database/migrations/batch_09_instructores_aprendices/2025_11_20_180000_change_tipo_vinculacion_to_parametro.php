@@ -12,13 +12,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('instructors', function (Blueprint $table) {
-            // Drop old tipo_vinculacion column
-            $table->dropIndex('idx_instructors_tipo_vinculacion');
-            $table->dropColumn('tipo_vinculacion');
+            // Verificar si la columna tipo_vinculacion existe antes de intentar eliminarla
+            if (Schema::hasColumn('instructors', 'tipo_vinculacion')) {
+                // Intentar eliminar el índice solo si existe
+                try {
+                    $table->dropIndex('idx_instructors_tipo_vinculacion');
+                } catch (\Exception $e) {
+                    // El índice puede no existir o estar asociado a una FK, continuar
+                }
+                $table->dropColumn('tipo_vinculacion');
+            }
             
-            // Add new tipo_vinculacion_id as foreign key to parametros_temas
-            $table->foreignId('tipo_vinculacion_id')->nullable()->after('regional_id')->constrained('parametros_temas')->onDelete('set null')->comment('Tipo de vinculación (parámetro_tema)');
-            $table->index('tipo_vinculacion_id', 'idx_instructors_tipo_vinculacion_id');
+            // Add new tipo_vinculacion_id as foreign key to parametros_temas (solo si no existe)
+            if (!Schema::hasColumn('instructors', 'tipo_vinculacion_id')) {
+                $table->foreignId('tipo_vinculacion_id')->nullable()->after('regional_id')->constrained('parametros_temas')->onDelete('set null')->comment('Tipo de vinculación (parámetro_tema)');
+                $table->index('tipo_vinculacion_id', 'idx_instructors_tipo_vinculacion_id');
+            }
         });
     }
 

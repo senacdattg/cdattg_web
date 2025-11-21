@@ -37,8 +37,8 @@ class CreateInstructor extends Component
     public $cursos_complementarios = [''];
     
     // Competencias y habilidades
-    public $areas_experticia = null;
-    public $competencias_tic = null;
+    public $areas_experticia = [''];
+    public $competencias_tic = [''];
     public $idiomas = [['idioma' => '', 'nivel' => '']];
     public $habilidades_pedagogicas = [];
     public $especialidades = [];
@@ -75,6 +75,12 @@ class CreateInstructor extends Component
         }
         if (old('cursos_complementarios')) {
             $this->cursos_complementarios = old('cursos_complementarios');
+        }
+        if (old('areas_experticia')) {
+            $this->areas_experticia = is_array(old('areas_experticia')) ? old('areas_experticia') : [old('areas_experticia')];
+        }
+        if (old('competencias_tic')) {
+            $this->competencias_tic = is_array(old('competencias_tic')) ? old('competencias_tic') : [old('competencias_tic')];
         }
         if (old('idiomas')) {
             $this->idiomas = old('idiomas');
@@ -150,6 +156,28 @@ class CreateInstructor extends Component
         $this->cursos_complementarios = array_values($this->cursos_complementarios);
     }
     
+    public function agregarAreaExperticia(): void
+    {
+        $this->areas_experticia[] = '';
+    }
+    
+    public function eliminarAreaExperticia(int $index): void
+    {
+        unset($this->areas_experticia[$index]);
+        $this->areas_experticia = array_values($this->areas_experticia);
+    }
+    
+    public function agregarCompetenciaTic(): void
+    {
+        $this->competencias_tic[] = '';
+    }
+    
+    public function eliminarCompetenciaTic(int $index): void
+    {
+        unset($this->competencias_tic[$index]);
+        $this->competencias_tic = array_values($this->competencias_tic);
+    }
+    
     public function agregarIdioma(): void
     {
         $this->idiomas[] = ['idioma' => '', 'nivel' => ''];
@@ -207,24 +235,92 @@ class CreateInstructor extends Component
             ];
             
             foreach ($camposJsonArray as $campo) {
-                if (isset($datos[$campo]) && is_array($datos[$campo])) {
-                    // Filtrar valores vacíos y trim
-                    $valores = array_filter(array_map('trim', $datos[$campo]));
-                    $datos[$campo] = !empty($valores) ? array_values($valores) : null;
+                if ($campo === 'idiomas') {
+                    // Manejo especial para idiomas (array anidado)
+                    if (isset($datos[$campo]) && is_array($datos[$campo])) {
+                        $idiomasFiltrados = [];
+                        foreach ($datos[$campo] as $idioma) {
+                            if (is_array($idioma) && isset($idioma['idioma']) && !empty(trim($idioma['idioma'] ?? ''))) {
+                                $idiomasFiltrados[] = [
+                                    'idioma' => trim($idioma['idioma']),
+                                    'nivel' => $idioma['nivel'] ?? null
+                                ];
+                            }
+                        }
+                        $datos[$campo] = !empty($idiomasFiltrados) ? $idiomasFiltrados : null;
+                    } else {
+                        $datos[$campo] = null;
+                    }
+                } elseif ($campo === 'habilidades_pedagogicas') {
+                    // Manejo especial para habilidades pedagógicas
+                    if (isset($datos[$campo]) && is_array($datos[$campo])) {
+                        $valores = array_filter(
+                            array_map(function($item) {
+                                return is_string($item) ? trim($item) : (is_scalar($item) ? (string)$item : '');
+                            }, $datos[$campo]),
+                            function($item) {
+                                return $item !== null && $item !== '' && in_array($item, ['virtual', 'presencial', 'dual']);
+                            }
+                        );
+                        $datos[$campo] = !empty($valores) ? array_values($valores) : null;
+                    } else {
+                        $datos[$campo] = null;
+                    }
                 } else {
-                    $datos[$campo] = null;
+                    // Manejo estándar para otros arrays
+                    if (isset($datos[$campo]) && is_array($datos[$campo])) {
+                        // Filtrar valores vacíos y trim
+                        $valores = array_filter(
+                            array_map(function($item) {
+                                if (is_string($item)) {
+                                    return trim($item);
+                                } elseif (is_scalar($item)) {
+                                    return (string)$item;
+                                }
+                                return null;
+                            }, $datos[$campo]),
+                            function($item) {
+                                return $item !== null && $item !== '';
+                            }
+                        );
+                        $datos[$campo] = !empty($valores) ? array_values($valores) : null;
+                    } else {
+                        $datos[$campo] = null;
+                    }
                 }
             }
             
-            // Convertir áreas de experticia y competencias TIC de string a array si vienen como texto
-            if (isset($datos['areas_experticia']) && is_string($datos['areas_experticia'])) {
+            // Procesar áreas de experticia y competencias TIC como arrays
+            if (isset($datos['areas_experticia']) && is_array($datos['areas_experticia'])) {
+                $valores = array_filter(
+                    array_map('trim', $datos['areas_experticia']),
+                    function($item) {
+                        return $item !== null && $item !== '';
+                    }
+                );
+                $datos['areas_experticia'] = !empty($valores) ? array_values($valores) : null;
+            } elseif (isset($datos['areas_experticia']) && is_string($datos['areas_experticia'])) {
+                // Compatibilidad: si viene como string, convertir a array
                 $datos['areas_experticia'] = array_filter(array_map('trim', explode("\n", $datos['areas_experticia'])));
                 $datos['areas_experticia'] = !empty($datos['areas_experticia']) ? array_values($datos['areas_experticia']) : null;
+            } else {
+                $datos['areas_experticia'] = null;
             }
             
-            if (isset($datos['competencias_tic']) && is_string($datos['competencias_tic'])) {
+            if (isset($datos['competencias_tic']) && is_array($datos['competencias_tic'])) {
+                $valores = array_filter(
+                    array_map('trim', $datos['competencias_tic']),
+                    function($item) {
+                        return $item !== null && $item !== '';
+                    }
+                );
+                $datos['competencias_tic'] = !empty($valores) ? array_values($valores) : null;
+            } elseif (isset($datos['competencias_tic']) && is_string($datos['competencias_tic'])) {
+                // Compatibilidad: si viene como string, convertir a array
                 $datos['competencias_tic'] = array_filter(array_map('trim', explode("\n", $datos['competencias_tic'])));
                 $datos['competencias_tic'] = !empty($datos['competencias_tic']) ? array_values($datos['competencias_tic']) : null;
+            } else {
+                $datos['competencias_tic'] = null;
             }
             
             // Agregar usuario creador
@@ -271,8 +367,10 @@ class CreateInstructor extends Component
             'certificaciones_tecnicas.*' => 'nullable|string|max:255',
             'cursos_complementarios' => 'nullable|array',
             'cursos_complementarios.*' => 'nullable|string|max:255',
-            'areas_experticia' => 'nullable',
-            'competencias_tic' => 'nullable',
+            'areas_experticia' => 'nullable|array',
+            'areas_experticia.*' => 'nullable|string|max:255',
+            'competencias_tic' => 'nullable|array',
+            'competencias_tic.*' => 'nullable|string|max:255',
             'idiomas' => 'nullable|array',
             'idiomas.*.idioma' => 'nullable|string|max:100',
             'idiomas.*.nivel' => 'nullable|string|in:básico,intermedio,avanzado,nativo',
