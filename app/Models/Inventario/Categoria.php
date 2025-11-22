@@ -5,12 +5,13 @@ namespace App\Models\Inventario;
 use App\Models\Parametro;
 use App\Models\ParametroTema;
 use App\Models\Tema;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Categoria extends Parametro
 {
     protected $table = 'parametros';
 
-    protected static function booted()
+    protected static function booted() : void
     {
         static::creating(function ($categoria) {
             $categoria->name = strtoupper($categoria->name);
@@ -18,13 +19,13 @@ class Categoria extends Parametro
     }
 
     // Relación con el tema "CATEGORIAS".
-    public static function tema()
+    public static function tema() : ?Tema
     {
         return Tema::where('name', 'CATEGORIAS')->first();
     }
 
     // Guardar la categoria como parámetro asociado al tema "CATEGORIAS".
-    public function asociarATemaCategorias()
+    public function asociarATemaCategorias() : void
     {
         $tema = self::tema();
 
@@ -39,7 +40,7 @@ class Categoria extends Parametro
         }
     }
 
-    public function productos()
+    public function productos() : HasMany
     {
         return $this->hasMany(Producto::class, 'categoria_id');
     }
