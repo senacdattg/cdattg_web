@@ -8,6 +8,8 @@ use App\Models\Ambiente;
 use App\Models\ParametroTema;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Producto extends Model
 {
@@ -39,7 +41,7 @@ class Producto extends Model
         'fecha_vencimiento' => 'datetime'
     ];
 
-    protected static function booted()
+    protected static function booted() : void
     {
         static::creating(function ($producto) {
             if (isset($producto->producto)) {
@@ -55,22 +57,22 @@ class Producto extends Model
     }
 
     // Relaciones existentes
-    public function tipoProducto()
+    public function tipoProducto() : BelongsTo
     {
         return $this->belongsTo(ParametroTema::class, 'tipo_producto_id');
     }
 
-    public function unidadMedida()
+    public function unidadMedida() : BelongsTo
     {
         return $this->belongsTo(ParametroTema::class, 'unidad_medida_id');
     }
 
-    public function estado()
+    public function estado() : BelongsTo
     {
         return $this->belongsTo(ParametroTema::class, 'estado_producto_id');
     }
 
-    public function marca()
+    public function marca() : BelongsTo
     {
         return $this->belongsTo(Parametro::class, 'marca_id')
             ->whereHas('temas', function($query) {
@@ -78,7 +80,7 @@ class Producto extends Model
             });
     }
 
-    public function categoria()
+    public function categoria() : BelongsTo
     {
         return $this->belongsTo(Parametro::class, 'categoria_id')
         ->whereHas('temas', function($query) {
@@ -86,37 +88,37 @@ class Producto extends Model
         });
     }
 
-    public function contratoConvenio()
+    public function contratoConvenio() : BelongsTo
     {
         return $this->belongsTo(ContratoConvenio::class);
     }
 
-    public function ambiente()
+    public function ambiente() : BelongsTo
     {
         return $this->belongsTo(Ambiente::class);
     }
 
-    public function proveedor()
+    public function proveedor() : BelongsTo
     {
         return $this->belongsTo(Proveedor::class);
     }
     
     // Relación con detalles de órdenes
-    public function detalleOrdenes()
+    public function detalleOrdenes() : HasMany
     {
         return $this->hasMany(DetalleOrden::class, 'producto_id');
     }
 
-  
+
     // Verificar si hay stock disponible
-    public function tieneStockDisponible($cantidadRequerida)
+    public function tieneStockDisponible(int $cantidadRequerida) : bool
     {
         return $this->cantidad >= $cantidadRequerida;
     }
 
 
     // Descontar stock del producto
-    public function descontarStock($cantidad)
+    public function descontarStock(int $cantidad) : self
     {
         if (!$this->tieneStockDisponible($cantidad)) {
             throw new \Exception("Stock insuficiente. Disponible: {$this->cantidad}, Requerido: {$cantidad}");
@@ -130,7 +132,7 @@ class Producto extends Model
 
    
     // Devolver stock al producto
-    public function devolverStock($cantidad)
+    public function devolverStock(int $cantidad) : self
     {
         $this->cantidad += $cantidad;
         $this->save();
@@ -151,7 +153,7 @@ class Producto extends Model
     }
 
     // Obtener el porcentaje de stock actual
-    public function getPorcentajeStock($stockMaximo = 100)
+    public function getPorcentajeStock(int $stockMaximo = 100) : float
     {
         if ($this->cantidad <= 0) {
             return 0;
@@ -161,7 +163,7 @@ class Producto extends Model
 
  
     // Obtener estado del stock (crítico, bajo, medio, normal)
-    public function getEstadoStock()
+    public function getEstadoStock() : string
     {
         $cantidad = $this->cantidad;
 
@@ -177,7 +179,7 @@ class Producto extends Model
     }
 
     // Obtener badge HTML para mostrar estado de stock
-    public function getBadgeStock()
+    public function getBadgeStock() : string
     {
         $estado = $this->getEstadoStock();
         $clases = [

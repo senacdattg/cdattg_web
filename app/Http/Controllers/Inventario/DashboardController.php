@@ -7,6 +7,7 @@ use App\Models\Inventario\Producto;
 use App\Models\Inventario\Categoria;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
@@ -16,7 +17,7 @@ class DashboardController extends Controller
         $this->middleware('can:VER DASHBOARD INVENTARIO')->only(['index']);
     }
 
-    public function index()
+    public function index() : View
     {
         // Total de productos
         $totalProductos = Producto::count();

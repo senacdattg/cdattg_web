@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Inventario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Inventario\Notificacion;
+use Illuminate\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 
 class NotificacionController extends InventarioController
 {
@@ -18,7 +21,7 @@ class NotificacionController extends InventarioController
     /**
      * Mostrar todas las notificaciones del usuario
      */
-    public function index()
+    public function index() : View
     {
         $notificaciones = Auth::user()->notifications()
             ->paginate(10);
@@ -29,7 +32,7 @@ class NotificacionController extends InventarioController
     /**
      * Obtener notificaciones no leídas para el dropdown
      */
-    public function getUnread()
+    public function getUnread() : JsonResponse
     {
         $notificaciones = Auth::user()->unreadNotifications()
             ->take(5)
@@ -46,7 +49,7 @@ class NotificacionController extends InventarioController
     /**
      * Marcar una notificación como leída
      */
-    public function markAsRead($id)
+    public function markAsRead($id) : JsonResponse
     {
         $notificacion = Auth::user()->notifications()
             ->where('id', $id)
@@ -70,7 +73,7 @@ class NotificacionController extends InventarioController
     /**
      * Marcar todas las notificaciones como leídas
      */
-    public function markAllAsRead()
+    public function markAllAsRead() : JsonResponse
     {
         Auth::user()->unreadNotifications->each(function ($notification) {
             $notification->markAsRead();
@@ -85,7 +88,7 @@ class NotificacionController extends InventarioController
     /**
      * Eliminar una notificación
      */
-    public function destroy($id)
+    public function destroy($id) : RedirectResponse
     {
         $notificacion = Auth::user()->notifications()
             ->where('id', $id)
@@ -103,7 +106,7 @@ class NotificacionController extends InventarioController
     /**
      * Eliminar todas las notificaciones del usuario
      */
-    public function destroyAll()
+    public function destroyAll()  : JsonResponse
     {
         $count = Auth::user()->notifications()->count();
         

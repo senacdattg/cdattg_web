@@ -13,6 +13,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Notifications\OrdenAprobadaNotification;
 use App\Notifications\OrdenRechazadaNotification;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\Inventario\AprobacionesRequest;
 
 class AprobacionController extends InventarioController
 {
@@ -28,7 +31,7 @@ class AprobacionController extends InventarioController
     /**
      * Mostrar órdenes pendientes de aprobación
      */
-    public function pendientes()
+    public function pendientes() : View
     {
         // Obtener estado EN ESPERA
         $estadoEnEspera = ParametroTema::whereHas('parametro', function ($q) {
@@ -61,7 +64,7 @@ class AprobacionController extends InventarioController
     /**
      * Aprobar una solicitud
      */
-    public function aprobar(Request $request, $detalleOrdenId)
+    public function aprobar(Request $request, $detalleOrdenId) : RedirectResponse
     {
         try {
             DB::beginTransaction();
@@ -153,12 +156,10 @@ class AprobacionController extends InventarioController
     /**
      * Rechazar una solicitud
      */
-    public function rechazar(Request $request, $detalleOrdenId)
+    public function rechazar(AprobacionesRequest $request, $detalleOrdenId) : RedirectResponse
     {
-        $validated = $request->validate([
-            'motivo_rechazo' => 'required|string|max:1000'
-        ]);
-
+        $validated = $request->validated();
+        
         try {
             DB::beginTransaction();
 
@@ -245,7 +246,7 @@ class AprobacionController extends InventarioController
     /**
      * Aprobar toda una orden completa
      */
-    public function aprobarOrden(Request $request, $ordenId)
+    public function aprobarOrden(Request $request, $ordenId) : RedirectResponse
     {
         try {
             DB::beginTransaction();
@@ -346,15 +347,14 @@ class AprobacionController extends InventarioController
     /**
      * Rechazar toda una orden completa
      */
-    public function rechazarOrden(Request $request, $ordenId)
+    public function rechazarOrden(AprobacionesRequest $request, $ordenId) : RedirectResponse
     {
-        $validated = $request->validate([
-            'motivo_rechazo' => 'required|string|max:1000'
-        ]);
-
+        $validated = $request->validated();
+        
         try {
             DB::beginTransaction();
 
+            $orden = Orden::with('detalles.producto')->findOrFail($ordenId);
             $orden = Orden::with('detalles.producto')->findOrFail($ordenId);
 
             // Verificar que todos los detalles estén en estado EN ESPERA
@@ -439,23 +439,5 @@ class AprobacionController extends InventarioController
             return back()
                 ->with('error', 'Error al rechazar la orden: ' . $e->getMessage());
         }
-    }
-
-    /**
-     * Ver historial de aprobaciones
-     */
-    public function historial()
-    {
-        $aprobaciones = Aprobacion::with([
-            'detalleOrden.orden.tipoOrden.parametro',
-            'detalleOrden.orden.userCreate',
-            'detalleOrden.producto',
-            'estado.parametro',
-            'aprobador'
-        ])
-        ->latest()
-        ->paginate(20);
-
-        return view('inventario.aprobaciones.historial', compact('aprobaciones'));
     }
 }

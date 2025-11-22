@@ -6,6 +6,8 @@ use App\Models\ParametroTema;
 use App\Traits\Seguimiento;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Orden extends Model
 {
@@ -14,37 +16,37 @@ class Orden extends Model
     protected $table = 'ordenes';
 
     protected $fillable = [
-        'descripcion_orden',
         'tipo_orden_id',
         'fecha_devolucion',
+        'estado_id',
         'user_create_id',
-        'user_update_id'
+        'user_edit_id'
     ];
 
     protected $casts = [
         'fecha_devolucion' => 'datetime'
     ];
 
-    public function tipoOrden()
+    public function tipoOrden() : BelongsTo
     {
         return $this->belongsTo(ParametroTema::class, 'tipo_orden_id');
     }
 
     // Relación con detalles de la orden
-    public function detalles()
+    public function detalles() : HasMany
     {
         return $this->hasMany(DetalleOrden::class, 'orden_id');
     }
 
     // Verificar si es un préstamo   
-    public function Prestamo()
+    public function Prestamo() : bool
     {
         return $this->tipoOrden && strtoupper($this->tipoOrden->parametro->name ?? '') === 'PRÉSTAMO';
     }
 
     
     // Verificar si es una salida 
-    public function Salida()
+    public function Salida() : bool
     {
         return $this->tipoOrden && strtoupper($this->tipoOrden->parametro->name ?? '') === 'SALIDA';
     }

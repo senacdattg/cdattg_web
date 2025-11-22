@@ -5,6 +5,7 @@ namespace App\Models\Inventario;
 use App\Traits\Seguimiento;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Aprobacion extends Model
 {
@@ -19,17 +20,17 @@ class Aprobacion extends Model
         'user_update_id'
     ];
 
-    public function detalleOrden()
+    public function detalleOrden() : BelongsTo
     {
         return $this->belongsTo(DetalleOrden::class, 'detalle_orden_id');
     }
 
-    public function estado()
+    public function estado() : BelongsTo
     {
         return $this->belongsTo(\App\Models\ParametroTema::class, 'estado_aprobacion_id');
     }
 
-    public function aprobador()
+    public function aprobador() : BelongsTo
     {
         return $this->belongsTo(\App\Models\User::class, 'user_update_id');
     }

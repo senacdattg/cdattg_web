@@ -15,6 +15,9 @@ use Illuminate\Support\Facades\Notification;
 use App\Models\ParametroTema;
 use App\Notifications\NuevaOrdenNotification;
 use App\Notifications\StockBajoNotification;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\Inventario\OrdenRequest;
 
 class OrdenController extends InventarioController
 {
@@ -36,7 +39,7 @@ class OrdenController extends InventarioController
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request) : View
     {
         $search = $request->input('search');
 
@@ -79,17 +82,9 @@ class OrdenController extends InventarioController
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(OrdenRequest $request) : RedirectResponse
     {
-        $validated = $request->validate([
-            'descripcion_orden' => self::RULE_REQUIRED_STRING,
-            'tipo_orden_id' => self::RULE_REQUIRED_ORDER_STATUS,
-            'fecha_devolucion' => 'nullable|date|after:today',
-            'productos' => 'required|array|min:1',
-            'productos.*.producto_id' => 'required|exists:productos,id',
-            'productos.*.cantidad' => 'required|integer|min:1',
-            'productos.*.estado_orden_id' => self::RULE_REQUIRED_ORDER_STATUS
-        ]);
+        $validated = $request->validated();
 
         try {
             DB::beginTransaction();
@@ -145,7 +140,7 @@ class OrdenController extends InventarioController
     /**
      * Mostrar formulario de solicitud de préstamo/salida
      */
-    public function prestamosSalidas()
+    public function prestamosSalidas() : View
     {
         $programas = ProgramaFormacion::where('status', true)
             ->orderBy('nombre', 'asc')
@@ -157,7 +152,7 @@ class OrdenController extends InventarioController
     /**
      * Mostrar órdenes pendientes (EN ESPERA)
      */
-    public function pendientes()
+    public function pendientes() : View
     {
         $estadoEnEspera = ParametroTema::whereHas('parametro', function($q) {
             $q->where('name', 'EN ESPERA');
@@ -189,7 +184,7 @@ class OrdenController extends InventarioController
     /**
      * Mostrar órdenes completadas (APROBADA)
      */
-    public function completadas()
+    public function completadas() : View
     {
         $estadoAprobada = ParametroTema::whereHas('parametro', function($q) {
             $q->where('name', 'APROBADA');
@@ -221,7 +216,7 @@ class OrdenController extends InventarioController
     /**
      * Mostrar órdenes rechazadas (RECHAZADA)
      */
-    public function rechazadas()
+    public function rechazadas() : View
     {
         $estadoRechazada = ParametroTema::whereHas('parametro', function($q) {
             $q->where('name', 'RECHAZADA');
@@ -253,20 +248,9 @@ class OrdenController extends InventarioController
     /**
      * Store a newly created resource in storage (Préstamos y Salidas).
      */
-    public function storePrestamos(Request $request)
+    public function storePrestamos(OrdenRequest $request) : RedirectResponse
     {
-        $validated = $request->validate([
-            'rol' => 'required|string|max:100',
-            'programa_formacion' => 'required|string|max:255',
-            'tipo' => 'required|in:prestamo,salida',
-            'fecha_devolucion' => 'required_if:tipo,prestamo|nullable|date|after:today',
-            'descripcion' => self::RULE_REQUIRED_STRING,
-            'carrito' => 'required|json' // El carrito viene como JSON desde el frontend
-        ], [
-            'fecha_devolucion.after' => 'La fecha de devolución debe ser posterior a hoy.',
-            'fecha_devolucion.required_if' => 'La fecha de devolución es obligatoria para préstamos.',
-            'fecha_devolucion.date' => 'La fecha de devolución debe ser una fecha válida.',
-        ]);
+        $validated = $request->validated();
 
         try {
             DB::beginTransaction();
@@ -430,7 +414,7 @@ class OrdenController extends InventarioController
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(OrdenRequest $request, string $id) : RedirectResponse
     {
         $orden = Orden::with(['detalles.producto'])->findOrFail($id);
 
@@ -442,15 +426,7 @@ class OrdenController extends InventarioController
                 ->with('error', 'No se puede editar una orden que ya tiene devoluciones registradas.');
         }
 
-        $validated = $request->validate([
-            'descripcion_orden' => self::RULE_REQUIRED_STRING,
-            'tipo_orden_id' => self::RULE_REQUIRED_ORDER_STATUS,
-            'fecha_devolucion' => 'nullable|date|after:today',
-            'productos' => 'required|array|min:1',
-            'productos.*.producto_id' => 'required|exists:productos,id',
-            'productos.*.cantidad' => 'required|integer|min:1',
-            'productos.*.estado_orden_id' => self::RULE_REQUIRED_ORDER_STATUS
-        ]);
+        $validated = $request->validated();
 
         try {
             DB::beginTransaction();
@@ -514,7 +490,7 @@ class OrdenController extends InventarioController
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id) : RedirectResponse
     {
         $orden = Orden::with(['detalles.producto', 'detalles.devoluciones'])->findOrFail($id);
 
@@ -555,7 +531,7 @@ class OrdenController extends InventarioController
     /**
      * Display the specified resource.
      */
-    public function show(Orden $orden)
+    public function show(Orden $orden) : View
     {
         $orden->load([
             'tipoOrden.parametro',

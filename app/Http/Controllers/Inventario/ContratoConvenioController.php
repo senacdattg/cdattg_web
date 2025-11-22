@@ -6,6 +6,9 @@ use App\Models\Inventario\ContratoConvenio;
 use App\Models\Inventario\Proveedor;
 use App\Models\ParametroTema;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\Inventario\ContratoConvenioRequest;
 use Illuminate\Support\Facades\Storage;
 
 class ContratoConvenioController extends InventarioController
@@ -19,7 +22,7 @@ class ContratoConvenioController extends InventarioController
         $this->middleware('can:ELIMINAR CONTRATO')->only('destroy');
     }
 
-    public function index(Request $request)
+    public function index(Request $request) : View
     {
         $search = $request->input('search');
 
@@ -54,13 +57,13 @@ class ContratoConvenioController extends InventarioController
         return view('inventario.contratos_convenios.index', compact('contratosConvenios', 'estados'));
     }
 
-    public function create()
+    public function create() : View
     {
         $proveedores = Proveedor::orderBy('proveedor')->get();
         return view('inventario.contratos_convenios.create', compact('proveedores'));
     }
 
-    public function show(ContratoConvenio $contratoConvenio)
+    public function show(ContratoConvenio $contratoConvenio) : View
     {
         $contratoConvenio->load([
             'proveedor',
@@ -72,22 +75,15 @@ class ContratoConvenioController extends InventarioController
         return view('inventario.contratos_convenios.show', compact('contratoConvenio'));
     }
 
-    public function edit(ContratoConvenio $contratoConvenio)
+    public function edit(ContratoConvenio $contratoConvenio) : View
     {
         $proveedores = Proveedor::orderBy('proveedor')->get();
         return view('inventario.contratos_convenios.edit', compact('contratoConvenio', 'proveedores'));
     }
 
-    public function store(Request $request)
+    public function store(ContratoConvenioRequest $request) : RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:contratos_convenios,name',
-            'codigo' => 'nullable|string|max:50',
-            'proveedor_id' => 'nullable|exists:proveedores,id',
-            'fecha_inicio' => 'nullable|date',
-            'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
-            'estado_id' => 'required|exists:parametros_temas,id',
-        ]);
+        $validated = $request->validated();
 
         $contrato = new ContratoConvenio($validated);
         $this->setUserIds($contrato);
@@ -97,16 +93,9 @@ class ContratoConvenioController extends InventarioController
             ->with('success', 'Contrato/Convenio creado exitosamente.');
     }
 
-    public function update(Request $request, ContratoConvenio $contratoConvenio)
+    public function update(ContratoConvenioRequest $request, ContratoConvenio $contratoConvenio) : RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255|unique:contratos_convenios,name,' . $contratoConvenio->id,
-            'codigo' => 'nullable|string|max:50',
-            'proveedor_id' => 'nullable|exists:proveedores,id',
-            'fecha_inicio' => 'nullable|date',
-            'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
-            'estado_id' => 'required|exists:parametros_temas,id',
-        ]);
+        $validated = $request->validated();
 
         $contratoConvenio->fill($validated);
         $this->setUserIds($contratoConvenio, true);
@@ -116,7 +105,7 @@ class ContratoConvenioController extends InventarioController
             ->with('success', 'Contrato/Convenio actualizado exitosamente.');
     }
 
-    public function destroy(ContratoConvenio $contratoConvenio)
+    public function destroy(ContratoConvenio $contratoConvenio) : RedirectResponse
     {
         try {
             $contratoConvenio->delete();

@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Devolucion extends Model
 {
@@ -33,7 +34,7 @@ class Devolucion extends Model
 
 
     // Relación con el detalle de orden
-    public function detalleOrden()
+    public function detalleOrden() : BelongsTo
     {
         return $this->belongsTo(DetalleOrden::class, 'detalle_orden_id');
     }
@@ -99,7 +100,7 @@ class Devolucion extends Model
 
     
     // Verificar si la devolución fue a tiempo
-    public function fueATiempo()
+    public function fueATiempo() : ?bool
     {
         $fechaEsperada = $this->detalleOrden->orden->fecha_devolucion;
 
@@ -112,7 +113,7 @@ class Devolucion extends Model
 
 
     //Obtener días de retraso en la devolución
-    public function getDiasRetraso()
+    public function getDiasRetraso() : int
     {
         $fechaEsperada = $this->detalleOrden->orden->fecha_devolucion;
 
@@ -124,7 +125,7 @@ class Devolucion extends Model
     }
 
     // Alias para compatibilidad con el controlador
-    public function getDiasRetrasoDevolucion()
+    public function getDiasRetrasoDevolucion() : int
     {
         return $this->getDiasRetraso();
     }

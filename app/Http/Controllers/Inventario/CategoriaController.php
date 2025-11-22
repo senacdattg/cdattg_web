@@ -9,6 +9,10 @@ use App\Models\Tema;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\Inventario\CategoriaRequest;
+use App\Http\Requests\Inventario\MarcaCategoriaRequest;
 
 class CategoriaController extends InventarioController
 {
@@ -26,7 +30,7 @@ class CategoriaController extends InventarioController
         $this->temacategorias = Tema::where('name', 'CATEGORIAS')->first();
     }
 
-    public function index(Request $request)
+    public function index(Request $request) : View|RedirectResponse
     {
         if (!$this->temacategorias) {
             return back()->with('error', 'No existe el tema "CATEGORIAS" en la base de datos.');
@@ -61,17 +65,15 @@ class CategoriaController extends InventarioController
         return view('inventario.categorias.index', compact('categorias'));
     }
 
-    public function create()
+    public function create() : View
     {
         return view('inventario.categorias.create');
     }
 
 
-    public function store(Request $request)
+    public function store(MarcaCategoriaRequest $request) : RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|unique:parametros,name',
-        ]);
+        $validated = $request->validated();
 
         try {
             $categoria = new categoria([
@@ -92,7 +94,7 @@ class CategoriaController extends InventarioController
         }
     }
 
-    public function edit(Parametro $categoria)
+    public function edit(Parametro $categoria) : View
     {
         return view('inventario.categorias.edit', [
             'title' => 'Editar categoria',
@@ -106,11 +108,9 @@ class CategoriaController extends InventarioController
     }
 
 
-    public function update(Request $request, Parametro $categoria)
+    public function update(MarcaCategoriaRequest $request, Parametro $categoria) : RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|unique:parametros,name,' . $categoria->id,
-        ]);
+        $validated = $request->validated();
 
         $categoria->update([
             'name'         => strtoupper($validated['name']),
@@ -121,7 +121,7 @@ class CategoriaController extends InventarioController
             ->with('success', 'categoria actualizada exitosamente.');
     }
 
-    public function destroy(Parametro $categoria)
+    public function destroy(Parametro $categoria) : RedirectResponse
     {
         try {
             // Desvincular del tema "CATEGORIAS"
@@ -138,7 +138,7 @@ class CategoriaController extends InventarioController
         }
     }
 
-    public function show(Parametro $categoria)
+    public function show(Parametro $categoria) : View
     {
         $categoria->load(['userCreate.persona', 'userUpdate.persona']);
         return view('inventario.categorias.show', [
