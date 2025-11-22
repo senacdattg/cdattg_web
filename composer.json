@@ -21,7 +21,7 @@
         "laravel/tinker": "^2.8",
         "livewire/livewire": "^3.6",
         "masbug/flysystem-google-drive-ext": "^2.4",
-        "phpoffice/phpspreadsheet": "^2.1",
+        "phpoffice/phpspreadsheet": "^2.2",
         "predis/predis": "^3.2",
         "pusher/pusher-php-server": "^7.2",
         "setasign/fpdi": "^2.6",
@@ -31,6 +31,7 @@
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.16",
         "fakerphp/faker": "^1.9.1",
+        "laravel/boost": "^1.8",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",
         "mockery/mockery": "^1.4.4",
@@ -77,6 +78,11 @@
         "optimize-autoloader": true,
         "preferred-install": "dist",
         "sort-packages": true,
+        "platform-check": false,
+        "platform": {
+            "ext-pcntl": "1.0",
+            "ext-posix": "1.0"
+        },
         "allow-plugins": {
             "pestphp/pest-plugin": true,
             "php-http/discovery": true

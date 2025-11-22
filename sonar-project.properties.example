@@ -1,0 +1,7 @@
+sonar.projectKey=academica-web
+sonar.sources=.
+sonar.host.url=https://sonarqube.dataguaviare.com.co
+sonar.token=TU_TOKEN_AQUI
+sonar.sourceEncoding=UTF-8
+sonar.exclusions=**/vendor/**,**/node_modules/**,**/storage/**,**/bootstrap/cache/**,**/public/build/**,**/public/vendor/**,**/public/dist/**
+

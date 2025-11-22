@@ -7,9 +7,9 @@
     },
     "devDependencies": {
         "axios": "^1.6.4",
-        "laravel-vite-plugin": "^1.0.0",
+        "laravel-vite-plugin": "^2.0.1",
         "playwright": "^1.56.1",
-        "vite": "^6.2.2"
+        "vite": "^7.2.4"
     },
     "dependencies": {
         "laravel-echo": "^2.2.4",
