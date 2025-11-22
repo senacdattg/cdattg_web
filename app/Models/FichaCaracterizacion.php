@@ -181,6 +181,7 @@ class FichaCaracterizacion extends Model
     /**
      * Relación Many-to-Many con Aprendiz.
      * Obtiene directamente los aprendices asignados a esta ficha.
+     * Laravel automáticamente excluye aprendices eliminados (soft deleted).
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */

@@ -29,6 +29,7 @@ class AprendizRepository
             ->whereIn('id', function($subquery) {
                 $subquery->select(DB::raw('MAX(id)'))
                     ->from('aprendices')
+                    ->whereNull('deleted_at')
                     ->groupBy('persona_id');
             });
 
@@ -163,7 +164,7 @@ class AprendizRepository
     }
 
     /**
-     * Verifica si una persona ya es aprendiz
+     * Verifica si una persona ya es aprendiz (solo aprendices no eliminados)
      *
      * @param int $personaId
      * @return bool

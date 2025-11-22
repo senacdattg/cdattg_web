@@ -2791,7 +2791,7 @@ class FichaCaracterizacionController extends Controller
 
             // Obtener todas las personas que NO están asignadas a esta ficha
             // Estrategia: obtener personas que no están en la tabla pivot para esta ficha
-            $aprendicesAsignadosIds = $ficha->aprendices()->pluck('aprendices.id');
+            $aprendicesAsignadosIds = $ficha->aprendices()->pluck('id')->toArray();
             
             $personasDisponibles = \App\Models\Persona::with('user', 'aprendiz')
                 ->where('status', 1) // Solo personas activas
@@ -2890,20 +2890,40 @@ class FichaCaracterizacionController extends Controller
                 $persona = \App\Models\Persona::with('user')->findOrFail($personaId);
                 
                 // Crear o actualizar registro de aprendiz
-                $aprendiz = \App\Models\Aprendiz::updateOrCreate([
-                    'persona_id' => $personaId,
-                ], [
-                    'ficha_caracterizacion_id' => $id, // Asignar la ficha actual
-                    'estado' => 1,
-                    'user_create_id' => Auth::id(),
-                    'user_edit_id' => Auth::id(),
-                ]);
+                // Si el aprendiz existe pero está eliminado (soft delete), restaurarlo primero
+                $aprendiz = \App\Models\Aprendiz::withTrashed()
+                    ->where('persona_id', $personaId)
+                    ->first();
+                
+                if ($aprendiz && $aprendiz->trashed()) {
+                    // Restaurar el aprendiz eliminado
+                    $aprendiz->restore();
+                    // Actualizar los datos
+                    $aprendiz->update([
+                        'ficha_caracterizacion_id' => $id,
+                        'estado' => 1,
+                        'user_edit_id' => Auth::id(),
+                    ]);
+                } else {
+                    // Crear o actualizar el aprendiz
+                    $aprendiz = \App\Models\Aprendiz::updateOrCreate([
+                        'persona_id' => $personaId,
+                    ], [
+                        'ficha_caracterizacion_id' => $id, // Asignar la ficha actual
+                        'estado' => 1,
+                        'user_create_id' => Auth::id(),
+                        'user_edit_id' => Auth::id(),
+                    ]);
+                }
                 
                 // Verificar que el aprendiz no esté ya asignado a esta ficha en la tabla pivot
-                if ($ficha->aprendices()->where('aprendiz_id', $aprendiz->id)->exists()) {
-                    DB::rollBack();
-                    return redirect()->back()
-                        ->with('error', 'La persona ya está asignada como aprendiz a esta ficha.');
+                $existeEnPivot = DB::table('aprendiz_fichas_caracterizacion')
+                    ->where('ficha_id', $id)
+                    ->where('aprendiz_id', $aprendiz->id)
+                    ->exists();
+                    
+                if ($existeEnPivot) {
+                    continue; // Ya está asignado, continuar con el siguiente
                 }
                 
                 // Asignar aprendiz a la ficha en la tabla pivot
@@ -2916,10 +2936,14 @@ class FichaCaracterizacionController extends Controller
             }
 
             DB::commit();
+            
+            // Refrescar la relación para asegurar que se carguen los nuevos aprendices
+            $ficha->load('aprendices.persona');
 
             Log::info('Personas asignadas como aprendices exitosamente', [
                 'ficha_id' => $id,
                 'personas_asignadas' => count($personasIds),
+                'aprendices_count' => $ficha->aprendices->count(),
                 'user_id' => Auth::id()
             ]);
 

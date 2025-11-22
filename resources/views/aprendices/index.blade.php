@@ -4,6 +4,44 @@
 
 @section('css')
     @vite(['resources/css/parametros.css'])
+    <style>
+        .select2-container--bootstrap4 .select2-selection--single {
+            height: calc(2.25rem + 2px) !important;
+            padding: 0.375rem 0.75rem !important;
+            border: 1px solid #ced4da !important;
+            border-radius: 0.25rem !important;
+            background-color: #fff !important;
+        }
+        
+        .select2-container--bootstrap4 .select2-selection--single:focus {
+            border-color: #80bdff !important;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+        }
+        
+        .select2-container--bootstrap4 .select2-selection--single .select2-selection__rendered {
+            padding: 0 !important;
+            line-height: 1.5 !important;
+            color: #495057 !important;
+        }
+        
+        .select2-container--bootstrap4 .select2-selection--single .select2-selection__placeholder {
+            color: #6c757d !important;
+        }
+        
+        .select2-container--bootstrap4 .select2-selection--single .select2-selection__arrow {
+            height: calc(2.25rem + 2px) !important;
+        }
+        
+        .form-control.select2 {
+            height: calc(2.25rem + 2px) !important;
+            padding: 0.375rem 0.75rem !important;
+        }
+        
+        .select2-container--bootstrap4.select2-container--focus .select2-selection--single {
+            border-color: #80bdff !important;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+        }
+    </style>
 @endsection
 
 @section('content_header')
@@ -40,6 +78,30 @@
                         </button>
                     </div>
                 @endif
+                
+                @can('CREAR APRENDIZ')
+                    <div class="accordion mb-4" id="accordionCrearAprendiz">
+                        <div class="card shadow-sm no-hover">
+                            <div class="card-header bg-white py-3 d-flex align-items-center" id="headingCrearAprendiz">
+                                <h2 class="mb-0 w-100">
+                                    <button
+                                        class="btn btn-link w-100 text-left d-flex align-items-center text-decoration-none font-weight-bold text-primary px-0"
+                                        type="button" data-toggle="collapse" data-target="#collapseCrearAprendiz"
+                                        aria-expanded="false" aria-controls="collapseCrearAprendiz">
+                                        <i class="fas fa-plus-circle mr-2"></i> Crear Aprendiz
+                                        <i class="fas fa-chevron-down ml-auto"></i>
+                                    </button>
+                                </h2>
+                            </div>
+                            <div id="collapseCrearAprendiz" class="collapse" aria-labelledby="headingCrearAprendiz"
+                                data-parent="#accordionCrearAprendiz">
+                                <div class="card-body">
+                                    @include('aprendices.create')
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endcan
                 
                 <!-- Filtros -->
                 <x-table-filters 
@@ -186,7 +248,6 @@
                                     @empty
                                         <tr>
                                             <td colspan="7" class="text-center py-5">
-                                                <img src="{{ asset('img/no-data.svg') }}" alt="No data" class="img-fluid" style="max-width: 200px;">
                                                 <p class="text-muted mt-3">No se encontraron aprendices</p>
                                             </td>
                                         </tr>
@@ -203,7 +264,23 @@
     {{-- Notificaciones manejadas globalmente por sweetalert2-notifications --}}
 @endsection
 
+@section('plugins.Select2', true)
+
 @section('js')
     @vite(['resources/js/aprendices.js'])
+    <script>
+        $(document).ready(function() {
+            // Inicializar Select2 cuando se expanda el acordeón
+            $('#collapseCrearAprendiz').on('shown.bs.collapse', function () {
+                $('#persona_id, #ficha_caracterizacion_id').select2({
+                    theme: 'bootstrap4',
+                    width: '100%',
+                    placeholder: function() {
+                        return $(this).data('placeholder') || 'Seleccione una opción';
+                    }
+                });
+            });
+        });
+    </script>
 @endsection
 

@@ -40,8 +40,13 @@ class AprendizController extends Controller
 
             $aprendices = $this->aprendizService->listarConFiltros($filtros);
             $fichas = FichaCaracterizacion::where('status', 1)->get();
+            
+            // Obtener solo personas que NO son aprendices aún (para el formulario de creación)
+            $personas = Persona::whereDoesntHave('aprendiz')
+                ->where('status', 1)
+                ->get();
 
-            return view('aprendices.index', compact('aprendices', 'fichas'));
+            return view('aprendices.index', compact('aprendices', 'fichas', 'personas'));
         } catch (\Exception $e) {
             Log::error('Error al listar aprendices: ' . $e->getMessage());
             return redirect()->back()->with('error', 'Error al cargar el listado de aprendices.');

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreAprendizRequest extends FormRequest
 {
@@ -22,7 +23,11 @@ class StoreAprendizRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'persona_id' => 'required|exists:personas,id|unique:aprendices,persona_id',
+            'persona_id' => [
+                'required',
+                'exists:personas,id',
+                Rule::unique('aprendices', 'persona_id')->whereNull('deleted_at')
+            ],
             'ficha_caracterizacion_id' => 'required|exists:fichas_caracterizacion,id',
             'estado' => 'required|boolean',
         ];
