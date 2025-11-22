@@ -196,7 +196,8 @@ function setupUppercaseConversion() {
                     return true;
                 }
                 // Permitir letras, espacios, guiones, tildes y teclas de control
-                if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]$/.test(char) && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-]$/.test(char) &&
+                    !e.ctrlKey && !e.altKey && !e.metaKey) {
                     e.preventDefault();
                     return false;
                 }

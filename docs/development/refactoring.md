@@ -106,7 +106,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.1'
+          php-version: '8.3'
       - name: Install dependencies
         run: composer install --no-interaction
       - name: Run refactor check
@@ -125,4 +125,9 @@ jobs:
 ## 🤝 Contribuir
 
 Si encuentras bugs o quieres agregar más reglas de refactorización, edita el script según tus necesidades.
+
+---
+
+**Última actualización:** 2025-11-17  
+**Versión:** Laravel 12.0, PHP 8.3+
 

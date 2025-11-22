@@ -214,3 +214,8 @@ batch_01_sistema_base (BASE)
 
 **¿Necesitas ayuda?** Revisa la documentación completa en `database/migrations/README.md` o consulta `migrations_batches.php` para entender las dependencias.
 
+---
+
+**Última actualización:** 2025-11-17  
+**Versión:** Laravel 12.0, 15 módulos de migraciones
+

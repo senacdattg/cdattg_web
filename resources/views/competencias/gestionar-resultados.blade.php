@@ -1,10 +1,11 @@
 @extends('adminlte::page')
 
+@section('plugins.Select2', true)
+
 @section('title', 'Gestionar Resultados - Competencia')
 
 @section('css')
-    <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2-bootstrap4.min.css') }}">
+    {{-- Select2 cargado por AdminLTE nativo --}}
     @vite(['resources/css/competencias.css'])
     <style>
         .dashboard-header {
@@ -389,7 +390,7 @@
 @endsection
 
 @section('footer')
-    @include('layout.footer')
+    @include('layouts.footer')
 @endsection
 
 @section('js')

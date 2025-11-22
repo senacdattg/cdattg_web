@@ -1,5 +1,7 @@
 @extends('adminlte::page')
 
+@section('plugins.Select2', true)
+
 @section('title', 'Gestionar Competencias - RAP')
 
 @section('content_header')
@@ -237,8 +239,7 @@
 @stop
 
 @section('css')
-    <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2-bootstrap4.min.css') }}">
+    {{-- Select2 cargado por AdminLTE nativo --}}
     <style>
         .card {
             border-radius: 10px;

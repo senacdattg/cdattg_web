@@ -201,3 +201,8 @@ Para acelerar el proceso, se puede crear un script que:
 5. ✅ El estado vacío se muestra correctamente
 6. ✅ Los botones de acción funcionan
 7. ✅ El diseño es consistente con otras vistas
+
+---
+
+**Última actualización:** 2025-11-17  
+**Versión:** Laravel 12.0, Blade Components

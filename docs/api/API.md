@@ -395,5 +395,10 @@ php artisan test --coverage
 
 ## 📞 Soporte
 
-Para más información, contactar al equipo de desarrollo.
+Para más información, contactar a ADSO - 2923560.
+
+---
+
+**Última actualización:** 2025-11-17  
+**Versión:** Laravel 12.0, API REST
 

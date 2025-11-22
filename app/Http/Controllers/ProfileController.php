@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\ProfileService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class ProfileController extends Controller
@@ -17,18 +18,21 @@ class ProfileController extends Controller
 
     public function index()
     {
-        $user = auth()->user();
-        return view('profile.index', compact('user'));
+        $user = Auth::user();
+        $persona = $user->persona;
+        $rolesAsignados = $user->roles->pluck('name');
+
+        return view('profile.index', compact('user', 'persona', 'rolesAsignados'));
     }
 
     public function update(Request $request)
     {
         try {
-            $user = auth()->user();
-            
+            $user = Auth::user();
+
             $datos = $request->validate([
                 'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email,'.$user->id,
+                'email' => 'required|email|unique:users,email,' . $user->id,
                 'current_password' => 'nullable|required_with:password',
                 'password' => 'nullable|min:8|confirmed',
             ]);
@@ -41,6 +45,12 @@ class ProfileController extends Controller
         }
     }
 
+    public function showChangePassword()
+    {
+        $user = Auth::user();
+        return view('profile.change-password', compact('user'));
+    }
+
     public function changePassword(Request $request)
     {
         try {
@@ -49,7 +59,7 @@ class ProfileController extends Controller
                 'password' => 'required|min:8|confirmed|different:current_password',
             ]);
 
-            $user = auth()->user();
+            $user = Auth::user();
 
             $this->profileService->cambiarContrasena(
                 $user,

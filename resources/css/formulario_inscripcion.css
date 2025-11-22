@@ -1,241 +1,97 @@
-/* Paleta minimalista complementarios */
-:root {
-    --bg-light: #ebf1f4;
-    --accent: #007bff;
-    --card: #ffffff;
-    --text-dark: #343a40;
-    --border: #dee2e6;
+/* Estilos para el formulario de inscripción complementarios */
+
+/* Headers con borde azul */
+.card-header-primary {
+    background-color: #ffffff;
+    color: #343a40;
+    border-left: 4px solid #007bff;
 }
 
-/* Botones tipo success (evitar verde) */
-.btn-success {
-    background-color: var(--accent);
-    border-color: var(--accent);
-    color: #ffffff;
+/* Headers secundarios */
+.card-header-secondary {
+    background-color: #f8f9fa;
+    color: #343a40;
 }
-.btn-success:hover {
+
+/* Texto primario */
+.text-primary {
+    color: #007bff !important;
+}
+
+/* Formulario de inscripción */
+.formulario-inscripcion {
+    background-color: #ebf1f4;
+    min-height: 100vh;
+}
+
+/* Cards del formulario */
+.card-inscripcion {
+    background-color: #ffffff;
+    border-color: #dee2e6;
+}
+
+/* Botones */
+.btn-primary-custom {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-primary-custom:hover {
     background-color: #0056b3;
     border-color: #0056b3;
 }
 
-/* Headers de cards “success” sin bloques de color (override AdminLTE) */
-.card-success .card-header {
-    background-color: var(--card) !important;
-    color: var(--text-dark) !important;
-    border-left: 4px solid var(--accent) !important;
-}
-/* Mayor especificidad para AdminLTE */
-.card.card-success:not(.card-outline) > .card-header,
-.card.card-success:not(.card-outline) .card-header {
-    background-color: var(--card) !important;
-    color: var(--text-dark) !important;
-    border-left: 4px solid var(--accent) !important;
+/* Validación de archivos */
+.file-input-container {
+    position: relative;
 }
 
-/* Fondos success muy claros para evitar el verde */
-.bg-success {
-    background-color: var(--bg-light) !important;
-    color: var(--text-dark) !important;
+.file-input-container input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
 }
 
-/* Focus de formularios con azul de acento */
-.form-control:focus {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+/* Alertas */
+.alert-custom {
+    border-left: 4px solid #007bff;
 }
 
-/* Borde de cards success neutro */
-.card-success {
-    border-color: var(--border) !important;
+/* Preloader */
+.preloader-active {
+    pointer-events: none;
+    opacity: 0.6;
 }
 
-/* Textos “success” en gris oscuro, no verde */
-.text-success {
-    color: var(--text-dark) !important;
+.preloader-active::after {
+    content: "";
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #007bff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    z-index: 9999;
 }
 
-/* Alertas info en azul suave */
-.alert-info {
-    background-color: #e7f1ff;
-    color: #084298;
-    border-color: #cee1ff;
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
 
-
-/* Responsividad para móviles */
+/* Responsive */
 @media (max-width: 768px) {
-    .container-fluid {
-        padding-left: 10px !important;
-        padding-right: 10px !important;
-    }
-
-    .card {
-        margin-bottom: 1rem;
-    }
-
-    .card-body {
-        padding: 1rem 0.75rem;
-    }
-
-    .row {
-        margin-left: -5px;
-        margin-right: -5px;
-    }
-
-    .row > [class*="col-"] {
-        padding-left: 5px;
-        padding-right: 5px;
-    }
-
-    .form-group, .form-check {
-        margin-bottom: 1rem;
-    }
-
-    .btn {
-        width: 100%;
-        margin-bottom: 0.5rem;
-    }
-
-    .d-grid {
-        display: block !important;
-    }
-
-    .d-md-flex {
-        flex-direction: column;
-    }
-
-    .me-md-2 {
-        margin-right: 0 !important;
-        margin-bottom: 0.5rem;
-    }
-
-    /* Header del formulario */
-    .card-header h3.card-title {
-        font-size: 1.1rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .card-header .card-tools {
-        margin-top: 0.25rem;
-    }
-
-    .card-header .card-tools .btn {
-        font-size: 0.85rem;
-        padding: 0.25rem 0.5rem;
-    }
-
-    /* Campos del formulario */
-    .form-control {
-        font-size: 16px; /* Previene zoom en iOS */
-        padding: 0.5rem 0.75rem;
-    }
-
-    .form-label {
-        font-size: 0.9rem;
-        margin-bottom: 0.25rem;
-        font-weight: 600;
-    }
-
-    /* Cards anidadas */
-    .card .card {
-        margin-bottom: 1rem;
-    }
-
-    .card .card .card-header h5 {
-        font-size: 1rem;
-        margin-bottom: 0.5rem;
-    }
-
-    /* Secciones del formulario */
-    .card-success .card-body .row .col-md-6 {
-        margin-bottom: 1rem;
-    }
-
-    /* Categorías de caracterización */
-    .card-outline .card-body .row .col-12 {
-        margin-bottom: 0.75rem;
-    }
-
-    .card-outline .card-body .form-check-label {
-        font-size: 0.85rem;
-        line-height: 1.3;
-    }
-
-    /* Footer del formulario */
-    .card-footer {
-        padding: 1rem 0.75rem;
-        text-align: center;
-    }
-
-    .card-footer .btn {
-        margin-bottom: 0.5rem;
-    }
-
-    /* Información del programa (columna derecha) */
-    .widget-user .widget-user-header {
+    .formulario-inscripcion {
         padding: 1rem;
     }
 
-    .widget-user .widget-user-header h3.widget-user-username {
-        font-size: 1.1rem;
-        margin-bottom: 0.25rem;
-    }
-
-    .widget-user .widget-user-header h5.widget-user-desc {
-        font-size: 0.9rem;
-    }
-
-    .widget-user .card-footer {
-        padding: 1rem 0.75rem;
-    }
-
-    .description-block {
-        text-align: center;
+    .card-inscripcion {
         margin-bottom: 1rem;
     }
-
-    .description-block .description-header {
-        font-size: 1rem;
-        margin-bottom: 0.25rem;
-    }
-
-    .description-block .description-text {
-        font-size: 0.8rem;
-        margin-bottom: 0.25rem;
-    }
 }
-
-/* Estilos para centrar y reducir el tamaño del formulario */
-.container-fluid {
-    padding-top: 20px;
-    padding-bottom: 20px;
-}
-.card {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Ajustes para textos largos en las categorías de caracterización */
-.card-outline .card-body .form-check-label {
-    word-wrap: break-word;
-    white-space: normal;
-    line-height: 1.4;
-    font-size: 0.9rem;
-}
-.card-outline .card-body .row .col-12 {
-    padding-left: 15px;
-    padding-right: 15px;
-}
-
-/* Forzar que el badge esté siempre abajo del título en las cards de programas */
-.card .card-body .card-title {
-    display: block;
-    margin-bottom: 0.5rem;
-}
-.card .card-body .badge {
-    display: block;
-    margin: 0.5rem 0;
-    width: fit-content;
-    margin-left: auto;
-    margin-right: auto;
-}
-

@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Services\PersonaService;
 use App\Exceptions\PersonaException;
 use App\Services\UbicacionService;
@@ -14,14 +13,25 @@ use App\Models\Departamento;
 use App\Models\Municipio;
 use App\Http\Requests\StorePersonaRequest;
 use App\Http\Requests\UpdatePersonaRequest;
+use App\Http\Requests\UpdatePersonaRoleRequest;
+use Illuminate\Http\Request;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Spatie\Permission\Models\Role;
 
 class PersonaController extends Controller
 {
+    private const PERMISSION_VIEW_PROFILE = 'VER PERFIL';
+    private const PERMISSION_VIEW_PERSON = 'VER PERSONA';
+    private const PERMISSION_ASSIGN_PERMISSIONS = 'ASIGNAR PERMISOS';
+    private const ERROR_USER_NOT_RESOLVED = 'No se pudo determinar el usuario autenticado.';
+
     protected PersonaService $personaService;
     protected UbicacionService $ubicacionService;
     protected TemaRepository $temaRepo;
@@ -36,19 +46,45 @@ class PersonaController extends Controller
         $this->ubicacionService = $ubicacionService;
         $this->temaRepo = $temaRepo;
 
-        // Restringir acceso a aspirantes - no pueden ver el módulo de personas
+        // Restringir acceso a aspirantes sin permisos específicos
         $this->middleware(function ($request, $next) {
-            if ($request->user()?->hasRole('ASPIRANTE')) {
+            $user = $request->user();
+            if (!$user instanceof User) {
+                abort(403, self::ERROR_USER_NOT_RESOLVED);
+            }
+            $routeName = $request->route()->getName();
+
+            // Permitir acceso a mi-perfil si tiene VER PERFIL
+            if ($routeName === 'personas.mi-perfil' && $user->can(self::PERMISSION_VIEW_PROFILE)) {
+                return $next($request);
+            }
+
+            // Permitir acceso a show si tiene VER PERFIL o VER PERSONA
+            if (
+                $routeName === 'personas.show'
+                && ($user->can(self::PERMISSION_VIEW_PROFILE) || $user->can(self::PERMISSION_VIEW_PERSON))
+            ) {
+                return $next($request);
+            }
+
+            // Bloquear aspirantes solo si carecen de permisos para el módulo
+            if (
+                $user->hasRole('ASPIRANTE')
+                && !$user->can(self::PERMISSION_VIEW_PERSON)
+                && !$user->can(self::PERMISSION_VIEW_PROFILE)
+            ) {
                 abort(403, 'No tienes permiso para acceder a este módulo.');
             }
+
             return $next($request);
         });
 
-        $this->middleware('can:VER PERSONA')->only(['index', 'show']);
+        $this->middleware('can:VER PERSONA')->only(['index']);
         $this->middleware('can:CREAR PERSONA')->only(['create', 'store']);
-        $this->middleware('can:EDITAR PERSONA')->only(['edit', 'update']);
+        $this->middleware('can:EDITAR PERSONA')->only(['edit', 'update', 'createUser']);
         $this->middleware('can:ELIMINAR PERSONA')->only('destroy');
         $this->middleware('can:CAMBIAR ESTADO USUARIO')->only('cambiarEstadoUser');
+        $this->middleware('can:ASIGNAR PERMISOS')->only('updateRole');
     }
 
     /**
@@ -60,16 +96,45 @@ class PersonaController extends Controller
     }
 
     /**
+     * Redirige al usuario a su propio perfil.
+     * Solo accesible para usuarios con permiso 'VER PERFIL'.
+     */
+    public function miPerfil()
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+
+        if (!$user instanceof User) {
+            abort(403, self::ERROR_USER_NOT_RESOLVED);
+        }
+
+        // Verificar permiso
+        if (!$user->can(self::PERMISSION_VIEW_PROFILE)) {
+            abort(403, 'No tienes permiso para ver tu perfil.');
+        }
+
+        // Obtener la persona del usuario autenticado
+        if (!$user->persona_id) {
+            return redirect()->route('verificarLogin')
+                ->with('error', 'No se encontró información de persona para este usuario.');
+        }
+
+        // Redirigir al show de su propia persona
+        return redirect()->route('personas.show', $user->persona_id);
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()
     {
         $documentos = $this->temaRepo->obtenerTiposDocumento();
-        $generos = $this->temaRepo->obtenerGeneros();
-        $paises = Pais::where('status', 1)->get();
+        $generos    = $this->temaRepo->obtenerGeneros();
+        $paises     = Pais::where('status', 1)->get();
         $departamentos = Departamento::where('status', 1)->get();
         $municipios = Municipio::where('status', 1)->get();
-        $vias = $this->temaRepo->obtenerVias();
+        $vias       = $this->temaRepo->obtenerVias();
+        $letras     = $this->temaRepo->obtenerLetras();
         $cardinales = $this->temaRepo->obtenerCardinales();
 
         // Cargar los tipos de caracterización
@@ -85,7 +150,7 @@ class PersonaController extends Controller
             'municipios' => $municipios,
             'caracterizaciones' => $caracterizaciones,
             'vias' => $vias,
-            'letras' => $this->temaRepo->obtenerLetras(),
+            'letras' => $letras,
             'cardinales' => $cardinales,
         ]);
     }
@@ -100,7 +165,7 @@ class PersonaController extends Controller
 
             return redirect()->route('personas.index')->with(
                 'success',
-                'La persona y su usuario fueron creados exitosamente en el sistema.'
+                'La persona fue creada exitosamente en el sistema.'
             );
         } catch (\Throwable $e) {
             Log::error('Error al registrar persona: ' . $e->getMessage());
@@ -117,20 +182,78 @@ class PersonaController extends Controller
      */
     public function show(Persona $persona)
     {
-        $persona->loadMissing([
-            'tipoDocumento',
-            'tipoGenero',
-            'pais',
-            'departamento',
-            'municipio',
-            'caracterizacionesComplementarias',
-            'caracterizacion',
-            'user.roles',
-            'userCreatedBy.persona',
-            'userUpdatedBy.persona'
-        ]);
+        /** @var User|null $user */
+        $user = Auth::user();
 
-        return view('personas.show', ['persona' => $persona]);
+        if (!$user instanceof User) {
+            abort(403, self::ERROR_USER_NOT_RESOLVED);
+        }
+
+        // Verificar si el usuario tiene permiso 'VER PERSONA' (puede ver cualquier persona)
+        if ($user->can(self::PERMISSION_VIEW_PERSON)) {
+            // Usuario con permiso completo, puede ver cualquier persona
+            $persona->loadMissing([
+                'tipoDocumento',
+                'tipoGenero',
+                'pais',
+                'departamento',
+                'municipio',
+                'caracterizacionesComplementarias',
+                'caracterizacion',
+                'user.roles',
+                'userCreatedBy.persona',
+                'userUpdatedBy.persona'
+            ]);
+
+            $rolesAsignados = $persona->user?->roles
+                ? $persona->user->roles->pluck('name')->unique()->values()
+                : collect();
+
+            $rolesDisponibles = $user->can(self::PERMISSION_ASSIGN_PERMISSIONS)
+                ? Role::orderBy('name')->get()
+                : collect();
+
+            return view('personas.show', [
+                'persona' => $persona,
+                'soloPerfil' => false,
+                'rolesDisponibles' => $rolesDisponibles,
+                'rolesAsignados' => $rolesAsignados,
+            ]);
+        }
+
+        // Verificar si el usuario tiene permiso 'VER PERFIL' (solo puede ver su propio perfil)
+        if ($user->can(self::PERMISSION_VIEW_PROFILE)) {
+            // Verificar que el usuario solo pueda ver su propio perfil
+            if ($user->persona_id !== $persona->id) {
+                abort(403, 'No tienes permiso para ver este perfil. Solo puedes ver tu propio perfil.');
+            }
+
+            // Usuario solo puede ver su propio perfil
+            $persona->loadMissing([
+                'tipoDocumento',
+                'tipoGenero',
+                'pais',
+                'departamento',
+                'municipio',
+                'caracterizacionesComplementarias',
+                'caracterizacion',
+                'user.roles',
+            ]);
+
+            $rolesAsignados = $persona->user?->roles
+                ? $persona->user->roles->pluck('name')->unique()->values()
+                : collect();
+
+            return view('personas.show', [
+                'persona' => $persona,
+                'soloPerfil' => true,
+                'rolesDisponibles' => collect(),
+                'rolesAsignados' => $rolesAsignados,
+            ]);
+        }
+
+        // Si no tiene ninguno de los permisos, denegar acceso
+        abort(403, 'No tienes permiso para ver este perfil.');
     }
 
     /**
@@ -184,54 +307,59 @@ class PersonaController extends Controller
      */
     public function update(UpdatePersonaRequest $request, Persona $persona)
     {
+        $expectsJson = $request->expectsJson() || $request->wantsJson();
+        $successPayload = null;
+        $errorMessage = null;
+
         try {
             $this->personaService->actualizar($persona, $request->validated());
 
-            if ($request->expectsJson() || $request->wantsJson()) {
-                $persona->loadMissing(['caracterizacionesComplementarias']);
-
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Información actualizada exitosamente',
-                    'data' => [
-                        'id' => $persona->id,
-                        'tipo_documento' => $persona->tipo_documento,
-                        'numero_documento' => $persona->numero_documento,
-                        'primer_nombre' => $persona->primer_nombre,
-                        'segundo_nombre' => $persona->segundo_nombre,
-                        'primer_apellido' => $persona->primer_apellido,
-                        'segundo_apellido' => $persona->segundo_apellido,
-                        'fecha_nacimiento' => $persona->fecha_nacimiento,
-                        'genero' => $persona->genero,
-                        'telefono' => $persona->telefono,
-                        'celular' => $persona->celular,
-                        'email' => $persona->email,
-                        'pais_id' => $persona->pais_id,
-                        'departamento_id' => $persona->departamento_id,
-                        'municipio_id' => $persona->municipio_id,
-                        'direccion' => $persona->direccion,
-                        'caracterizaciones' => $persona->caracterizacionesComplementarias->pluck('id')->toArray(),
-                    ]
-                ]);
-            }
-
-            return redirect()->route('personas.show', $persona->id)
-                ->with('success', 'Información actualizada exitosamente');
+            $persona->loadMissing(['caracterizacionesComplementarias']);
+            $successPayload = [
+                'success' => true,
+                'message' => 'Información actualizada exitosamente',
+                'data' => [
+                    'id' => $persona->id,
+                    'tipo_documento' => $persona->tipo_documento,
+                    'numero_documento' => $persona->numero_documento,
+                    'primer_nombre' => $persona->primer_nombre,
+                    'segundo_nombre' => $persona->segundo_nombre,
+                    'primer_apellido' => $persona->primer_apellido,
+                    'segundo_apellido' => $persona->segundo_apellido,
+                    'fecha_nacimiento' => $persona->fecha_nacimiento,
+                    'genero' => $persona->genero,
+                    'telefono' => $persona->telefono,
+                    'celular' => $persona->celular,
+                    'email' => $persona->email,
+                    'pais_id' => $persona->pais_id,
+                    'departamento_id' => $persona->departamento_id,
+                    'municipio_id' => $persona->municipio_id,
+                    'direccion' => $persona->direccion,
+                    'caracterizaciones' => $persona->caracterizacionesComplementarias->pluck('id')->toArray(),
+                ],
+            ];
         } catch (\Throwable $e) {
             Log::error("Error al actualizar la persona (ID: {$persona->id}): " . $e->getMessage());
-
-            if ($request->expectsJson() || $request->wantsJson()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Error al actualizar la información. Por favor, inténtelo de nuevo.'
-                ], 500);
-            }
-
-            return redirect()->back()->withErrors([
-                'error' => 'Error al actualizar la información. Por favor, inténtelo de nuevo '
-                    . 'o comuníquese con el administrador del sistema.'
-            ]);
+            $errorMessage = 'Error al actualizar la información. Por favor, inténtelo de nuevo.';
         }
+
+        if ($expectsJson) {
+            $payload = $successPayload ?? [
+                'success' => false,
+                'message' => $errorMessage,
+            ];
+
+            return response()->json($payload, $successPayload ? 200 : 500);
+        }
+
+        if ($successPayload) {
+            return redirect()->route('personas.show', $persona->id)
+                ->with('success', $successPayload['message']);
+        }
+
+        return redirect()->back()->withErrors([
+            'error' => $errorMessage . ' Comuníquese con el administrador si el problema persiste.',
+        ]);
     }
 
     /**
@@ -379,8 +507,100 @@ class PersonaController extends Controller
         }
     }
 
+    public function updateRole(UpdatePersonaRoleRequest $request, Persona $persona)
+    {
+        if (!$persona->user) {
+            return redirect()
+                ->back()
+                ->with('error', 'La persona no tiene un usuario asociado.');
+        }
+
+        $rolesSeleccionados = collect($request->validated()['roles'] ?? [])
+            ->map(static fn(string $role) => trim($role))
+            ->filter(static fn(string $role) => $role !== '')
+            ->unique()
+            ->values();
+
+        try {
+            DB::transaction(static function () use ($persona, $rolesSeleccionados) {
+                $user = $persona->user;
+                $user->syncRoles($rolesSeleccionados->all());
+            });
+
+            return redirect()
+                ->route('personas.show', $persona->id)
+                ->with('success', 'Roles actualizados correctamente.');
+        } catch (\Throwable $exception) {
+            Log::error('Error al actualizar el rol de la persona', [
+                'persona_id' => $persona->id,
+                'roles' => $rolesSeleccionados->all(),
+                'error' => $exception->getMessage(),
+            ]);
+
+            return redirect()
+                ->back()
+                ->with('error', 'No se pudo actualizar el rol de la persona.');
+        }
+    }
+
+    public function resetPassword(Persona $persona): RedirectResponse
+    {
+        $response = null;
+
+        if (!$persona->user) {
+            $response = redirect()->back()->with('error', 'La persona no tiene un usuario asociado.');
+        } elseif (empty($persona->numero_documento)) {
+            $response = redirect()->back()->with('error', 'La persona no tiene número de documento registrado.');
+        } else {
+            try {
+                DB::transaction(static function () use ($persona): void {
+                    $documento = (string) $persona->numero_documento;
+                    $persona->user->forceFill([
+                        'password' => Hash::make($documento),
+                    ])->save();
+                });
+
+                $response = redirect()->back()->with('success', 'Contraseña restablecida correctamente.');
+            } catch (\Throwable $exception) {
+                Log::error('Error al restablecer contraseña de persona', [
+                    'persona_id' => $persona->id,
+                    'error' => $exception->getMessage(),
+                ]);
+
+                $response = redirect()->back()->with('error', 'No se pudo restablecer la contraseña.');
+            }
+        }
+
+        return $response ?? redirect()->back()->with('error', 'No se pudo procesar la solicitud.');
+    }
+
+    public function createUser(Persona $persona): RedirectResponse
+    {
+        $response = null;
+
+        // Validaciones previas
+        if ($persona->user) {
+            $response = redirect()->back()->with('error', 'La persona ya tiene un usuario asociado.');
+        } elseif (empty($persona->email)) {
+            $response = redirect()->back()->with('error', 'La persona no tiene correo registrado.');
+        } elseif (empty($persona->numero_documento)) {
+            $response = redirect()->back()->with('error', 'La persona no tiene número de documento registrado.');
+        } else {
+            try {
+                $this->personaService->crearUsuarioParaPersona($persona);
+                $response = redirect()->back()->with('success', 'Usuario creado correctamente con rol VISITANTE.');
+            } catch (\Throwable $e) {
+                $response = redirect()
+                    ->back()
+                    ->with('error', 'No se pudo crear el usuario. ' . ($e->getMessage() ?? ''));
+            }
+        }
+
+        return $response ?? redirect()->back()->with('error', 'No se pudo procesar la solicitud.');
+    }
+
     /**
-     * Consulta una persona por número de documento (usado por Talento Humano)
+     * Consulta una persona por número de documento (usado por Ingreso y Salida)
      *
      * @param Request $request
      * @return JsonResponse
@@ -431,7 +651,7 @@ class PersonaController extends Controller
     }
 
     /**
-     * Crea una persona desde una petición JSON (usado por Talento Humano)
+     * Crea una persona desde una petición JSON (usado por Ingreso y Salida)
      *
      * @param StorePersonaRequest $request
      * @return JsonResponse
@@ -441,7 +661,7 @@ class PersonaController extends Controller
         try {
             $persona = $this->personaService->crear($request->validated());
 
-            Log::info('Persona creada desde Talento Humano', [
+            Log::info('Persona creada desde Ingreso y Salida', [
                 'persona_id' => $persona->id,
                 'numero_documento' => $persona->numero_documento,
                 'user_id' => Auth::id()

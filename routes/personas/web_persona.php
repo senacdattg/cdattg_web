@@ -13,7 +13,16 @@ Route::middleware('can:CREAR PERSONA')->group(function () {
 
 Route::middleware('can:VER PERSONA')->get('/personas/datatable', [PersonaController::class, 'datatable'])->name('personas.datatable');
 
+// Ruta para redirigir al perfil propio (solo con permiso VER PERFIL)
+Route::middleware('can:VER PERFIL')->get('/personas/mi-perfil', [PersonaController::class, 'miPerfil'])->name('personas.mi-perfil');
+
 Route::resource('personas', PersonaController::class);
+
+Route::middleware('can:ASIGNAR PERMISOS')->patch('/personas/{persona}/rol', [PersonaController::class, 'updateRole'])->name('personas.update-role');
+
+Route::middleware('can:RESTABLECER PASSWORD')->post('/personas/{persona}/reset-password', [PersonaController::class, 'resetPassword'])->name('personas.reset-password');
+
+Route::middleware('can:EDITAR PERSONA')->post('/personas/{persona}/crear-usuario', [PersonaController::class, 'createUser'])->name('personas.create-user');
 
 Route::middleware('can:CAMBIAR ESTADO PERSONA')->group(function () {
     Route::put('/personas/{id}/cambiarEstadoPersona', [PersonaController::class, 'cambiarEstadoPersona'])->name('persona.cambiarEstadoPersona');

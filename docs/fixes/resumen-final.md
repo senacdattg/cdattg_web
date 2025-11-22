@@ -203,6 +203,6 @@ En la lista de instructores asignados, cada instructor tiene un **botón azul de
 
 El sistema de gestión de días de formación está completamente integrado en el flujo de asignación de instructores. Todo funciona desde el mismo formulario de "Agregar Instructor".
 
-**Fecha:** 19 de Octubre 2025  
+**Fecha:** 2025-11-17  
 **Estado:** ✅ PRODUCCIÓN LISTA
 

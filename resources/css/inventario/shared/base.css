@@ -1,31 +1,34 @@
 /* Estilos base compartidos para todas las vistas del inventario (shared) */
+/* IMPORTANTE: Todos los estilos están scopeados a .inventario-module para no afectar el resto de la app */
 
-/* Fondo general */
-body {
+/* Fondo general solo para inventario */
+body.inventario-module {
     background: linear-gradient(to bottom, #CACCCE, #CACCCE);
     margin: 0;
     min-height: 100vh;
 }
 
-h1 {
+body.inventario-module h1 {
     color: #fdfdfd !important;
 }
 
-P {
-    color: #fdfdfd !important;
-}
-li {
+body.inventario-module p {
     color: #fdfdfd !important;
 }
 
-.bg-light {
+body.inventario-module li {
+    color: #fdfdfd !important;
+}
+
+body.inventario-module .bg-light {
     background-color: #72cd79 !important;
 }
-.text-muted {
+
+body.inventario-module .text-muted {
     color: #fdfdfd !important;
 }
 
-.text-dark {
+body.inventario-module .text-dark {
     color: #fdfdfd !important;
 }
 
@@ -74,16 +77,16 @@ li {
     color: #ffffff !important;
 }
 
-#inventario .text-gray-800 {
+body.inventario-module .text-gray-800 {
     color: #f2f3f4 !important;
 }
 
-#municipio_id {
+body.inventario-module #municipio_id {
     padding: .375rem .75rem !important;
 }
 
 /* Fondo específico solo para el módulo de inventario */
-body .content-wrapper {
+body.inventario-module .content-wrapper {
   background: linear-gradient(to bottom, 
     #000627 0%, 
     #5E6771 50%, 
@@ -93,115 +96,116 @@ body .content-wrapper {
   min-height: 100vh;
 }
 
-body .main-footer {
+body.inventario-module .main-footer {
     margin-left: 0 !important;
     width: 100%;
     padding-left: 0;
     padding-right: 0;
 }
 
-body .main-footer > .container-fluid {
+body.inventario-module .main-footer > .container-fluid {
     padding-left: 260px;
     padding-right: 30px;
 }
 
 @media (max-width: 991.98px) {
-    body .main-footer > .container-fluid {
+    body.inventario-module .main-footer > .container-fluid {
         padding-left: 1.5rem;
         padding-right: 1.5rem;
     }
 }
 
-/* Estilos del navbar */
-.main-header.navbar { 
+/* Estilos del navbar solo para inventario */
+body.inventario-module .main-header.navbar { 
     background-color: #00041D !important;
 }
 
-.main-header.navbar .nav-link {
+body.inventario-module .main-header.navbar .nav-link {
     color: #ffffff !important;
 }
 
-.main-header.navbar .nav-link:hover {
+body.inventario-module .main-header.navbar .nav-link:hover {
     color: #30d668 !important; 
 }
 
-.main-header.navbar .navbar-brand {
+body.inventario-module .main-header.navbar .navbar-brand {
     color: #ffffff !important;
 }
 
-.main-header.navbar .user-menu .nav-link {
+body.inventario-module .main-header.navbar .user-menu .nav-link {
     color: #ffffff !important;
 }
 
-.main-header.navbar .nav-item i {
+body.inventario-module .main-header.navbar .nav-item i {
     color: #ffffff !important;
 }
-.row {
+
+body.inventario-module .row {
     margin-left: 0 !important;
     margin-right: 0 !important;
 }
 
-#razon {
+body.inventario-module #razon {
     color: #343a40 !important;
 }
 
-#producto {
+body.inventario-module #producto {
     width: 95% !important;
 }
 
-#categoria_id {
+body.inventario-module #categoria_id {
     width: 95% !important;
 }
 
-#unidad_medida_id {
+body.inventario-module #unidad_medida_id {
     width: 95% !important;
 }
 
-#marca_id {
+body.inventario-module #marca_id {
     width: 95% !important;
 }
 
-#grupo-programa-formacion {
+body.inventario-module #grupo-programa-formacion {
    width:  220px !important;
 }
 
-#tipo_producto_id {
+body.inventario-module #tipo_producto_id {
     width: 95% !important;
 }
 
-#estado_producto_id {
+body.inventario-module #estado_producto_id {
     width: 95% !important;
 }
 
-#codigo_barras {
+body.inventario-module #codigo_barras {
     width: 80% !important;
 }
 
-#descripcion {
+body.inventario-module #descripcion {
     width: 95% !important;
 }
 
-#ambiente_id {
+body.inventario-module #ambiente_id {
     width: 95% !important;
 }
 
-#proveedor_id {
+body.inventario-module #proveedor_id {
     width: 95% !important;
 }
 
-#contrato_convenio_id {
+body.inventario-module #contrato_convenio_id {
     width: 95% !important;
 }
 
-#fecha_vencimiento {
+body.inventario-module #fecha_vencimiento {
     width: 95% !important;
 }
 
-#detalle {
+body.inventario-module #detalle {
     text-align: center !important;
 }
 
-#estadisticas-generales {
+body.inventario-module #estadisticas-generales {
     margin-top: 18px !important;
     padding: 15px 12px !important;
     background-color: #535c6800 !important;
@@ -210,19 +214,20 @@ body .main-footer > .container-fluid {
     color: #fdfdfd;
 
 }
-#icono-volver {
+
+body.inventario-module #icono-volver {
     margin-right: 6px !important;
     color: #e0e8e3 !important;
 }
 
-/* Estilos responsivos del navbar */
+/* Estilos responsivos del navbar solo para inventario */
 @media (max-width: 768px) {
-    .main-header.navbar {
+    body.inventario-module .main-header.navbar {
         padding-left: 1rem;
         padding-right: 1rem;
     }
 }
 
-.modal-body p {
+body.inventario-module .modal-body p {
     color: #343a40 !important;
 }

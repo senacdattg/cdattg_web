@@ -5,12 +5,23 @@
 @endsection
 
 @section('content_header')
-    <x-page-header 
-        icon="fa-cogs" 
-        title="Bloques"
-        subtitle="Gestión de bloques del sistema"
-        :breadcrumb="[['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'], ['label' => 'Bloques', 'url' => route('bloque.index'), 'icon' => 'fa-cog'], ['label' => 'Crear Bloque', 'icon' => 'fa-plus', 'active' => true]]"
-    />
+    <x-page-header icon="fa-cogs" title="Bloques" subtitle="Gestión de bloques del sistema" :breadcrumb="[
+        [
+            'label' => 'Inicio',
+            'url' => route('verificarLogin'),
+            'icon' => 'fa-home',
+        ],
+        [
+            'label' => 'Bloques',
+            'url' => route('bloque.index'),
+            'icon' => 'fa-cog',
+        ],
+        [
+            'label' => 'Crear Bloque',
+            'icon' => 'fa-plus',
+            'active' => true,
+        ],
+    ]" />
 @endsection
 
 @section('content')
@@ -41,7 +52,8 @@
                                             class="form-control @error('sede_id') is-invalid @enderror" required>
                                             <option value="">Seleccione una sede</option>
                                             @forelse ($sedes as $sede)
-                                                <option value="{{ $sede->id }}" {{ old('sede_id') == $sede->id ? 'selected' : '' }}>
+                                                <option value="{{ $sede->id }}"
+                                                    {{ old('sede_id') == $sede->id ? 'selected' : '' }}>
                                                     {{ $sede->sede }}
                                                 </option>
                                             @empty
@@ -57,14 +69,10 @@
                                 <div class="col-md-6">
                                     <div class="form-group">
                                         <label for="bloque" class="form-label font-weight-bold">Nombre del Bloque</label>
-                                        <input type="text" 
-                                               id="bloque" 
-                                               name="bloque" 
-                                               class="form-control @error('bloque') is-invalid @enderror"
-                                               value="{{ old('bloque') }}" 
-                                               required 
-                                               autofocus
-                                               placeholder="Ingrese el nombre del bloque">
+                                        <input type="text" id="bloque" name="bloque"
+                                            class="form-control @error('bloque') is-invalid @enderror"
+                                            value="{{ old('bloque') }}" required autofocus
+                                            placeholder="Ingrese el nombre del bloque">
                                         @error('bloque')
                                             <div class="invalid-feedback">{{ $message }}</div>
                                         @enderror
@@ -92,11 +100,12 @@
 @endsection
 
 @section('footer')
-    @include('layout.footer')
+    @include('layouts.footer')
 @endsection
 
+@section('plugins.Chartjs', true)
+
 @section('js')
-    <script src="{{ asset('vendor/chart.js/Chart.bundle.min.js') }}"></script>
     @vite(['resources/js/parametros.js'])
     @vite(['resources/js/pages/formularios-select-dinamico.js'])
 @endsection

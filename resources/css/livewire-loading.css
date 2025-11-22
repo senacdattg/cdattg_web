@@ -1,0 +1,25 @@
+/**
+ * Deshabilitamos el loading indicator de Livewire para wire:navigate
+ * El preloader de AdminLTE ya está deshabilitado
+ */
+
+/* Ocultar el loading bar de Livewire */
+[x-cloak] {
+    display: none !important;
+}
+
+/* Ocultar cualquier indicador de carga de Livewire */
+.livewire-loading,
+[wire\:loading] {
+    display: none !important;
+}
+
+/* Desactivar el loading indicator de navigate */
+html.livewire-navigate-loading {
+    cursor: default !important;
+}
+
+html.livewire-navigate-loading * {
+    cursor: default !important;
+}
+

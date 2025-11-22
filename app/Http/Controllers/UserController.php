@@ -41,11 +41,20 @@ class UserController extends Controller
                 'available_roles.*' => 'required|string|exists:roles,name',
             ]);
 
-            $existingRoles = $request->input('roles', []);
-            $newRoles = $request->input('available_roles', []);
-            $allRoles = array_unique(array_merge($existingRoles, $newRoles));
+            // Prevenir que el usuario modifique sus propios roles
+            if ($data['user_id'] == auth()->id()) {
+                return redirect()->back()->with('error', 'No puedes modificar tus propios roles.');
+            }
 
-            $this->userService->asignarRoles($data['user_id'], $allRoles);
+            $roles = collect($request->input('roles', []))
+                ->merge($request->input('available_roles', []))
+                ->filter()
+                ->map(static fn(string $role) => strtoupper($role))
+                ->unique()
+                ->values()
+                ->all();
+
+            $this->userService->agregarRoles($data['user_id'], $roles);
 
             return redirect()->back()->with('success', 'Roles asignados correctamente');
         } catch (\Exception $e) {

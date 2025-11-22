@@ -34,6 +34,8 @@ class AprendizObserver
      */
     public function deleted(Aprendiz $aprendiz): void
     {
+        // Evitar warning de parámetro no usado
+        unset($aprendiz);
         // Opcional: Remover rol APRENDIZ si se elimina el aprendiz
         // $this->removeAprendizRole($aprendiz);
     }
@@ -65,38 +67,28 @@ class AprendizObserver
                 return;
             }
 
-            // Crear usuario si no existe
+            // No crear usuario automáticamente: si no existe, registrar y salir
             if (!$persona->user) {
-                $user = User::create([
-                    'email' => $persona->email ?? "aprendiz_{$aprendiz->id}@sena.edu.co",
-                    'password' => Hash::make('123456'), // Password temporal
-                    'status' => 1,
-                    'persona_id' => $persona->id,
-                ]);
-                
-                Log::info('Usuario creado automáticamente para aprendiz', [
+                Log::info('No se creó usuario automáticamente para aprendiz (creación deshabilitada)', [
                     'aprendiz_id' => $aprendiz->id,
-                    'user_id' => $user->id,
                     'persona_id' => $persona->id,
-                    'email' => $user->email
                 ]);
-            } else {
-                $user = $persona->user;
+                return;
             }
+            $user = $persona->user;
 
             // Verificar que el rol APRENDIZ existe
-            $aprendizRole = Role::firstOrCreate(['name' => 'APRENDIZ']);
+            Role::firstOrCreate(['name' => 'APRENDIZ']);
 
             // Sincronizar solo el rol APRENDIZ (evita duplicados)
             $user->syncRoles(['APRENDIZ']);
-            
+
             Log::info('Rol APRENDIZ sincronizado automáticamente', [
                 'aprendiz_id' => $aprendiz->id,
                 'user_id' => $user->id,
                 'persona_id' => $persona->id,
                 'ficha_id' => $aprendiz->ficha_caracterizacion_id
             ]);
-
         } catch (\Exception $e) {
             Log::error('Error al asignar rol APRENDIZ automáticamente', [
                 'aprendiz_id' => $aprendiz->id,
@@ -107,29 +99,5 @@ class AprendizObserver
         }
     }
 
-    /**
-     * Remueve el rol APRENDIZ del usuario asociado.
-     *
-     * @param Aprendiz $aprendiz
-     * @return void
-     */
-    private function removeAprendizRole(Aprendiz $aprendiz): void
-    {
-        try {
-            $persona = $aprendiz->persona;
-            if ($persona && $persona->user) {
-                $persona->user->removeRole('APRENDIZ');
-                
-                Log::info('Rol APRENDIZ removido automáticamente', [
-                    'aprendiz_id' => $aprendiz->id,
-                    'user_id' => $persona->user->id
-                ]);
-            }
-        } catch (\Exception $e) {
-            Log::error('Error al remover rol APRENDIZ', [
-                'aprendiz_id' => $aprendiz->id,
-                'error' => $e->getMessage()
-            ]);
-        }
-    }
+    // Método removeAprendizRole eliminado por no uso
 }

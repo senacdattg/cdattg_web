@@ -2,7 +2,9 @@
 
     {{-- Menu toggler --}}
     <a class="nav-link {{ $item['class'] }} @isset($item['shift']) {{ $item['shift'] }} @endisset"
-       href="" {!! $item['data-compiled'] ?? '' !!}>
+       href="{{ $item['href'] ?? '#' }}" 
+       @if(!isset($item['href']) || empty($item['href']) || $item['href'] === '#') onclick="return false;" @endif
+       {!! $item['data-compiled'] ?? '' !!}>
 
         <i class="{{ $item['icon'] ?? 'far fa-fw fa-circle' }} {{
             isset($item['icon_color']) ? 'text-'.$item['icon_color'] : ''

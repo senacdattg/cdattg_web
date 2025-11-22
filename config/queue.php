@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('QUEUE_CONNECTION', 'sync'),
+    'default' => env('QUEUE_CONNECTION', 'database'),
 
     /*
     |--------------------------------------------------------------------------
@@ -38,15 +38,25 @@ return [
             'driver' => 'database',
             'table' => 'jobs',
             'queue' => 'default',
-            'retry_after' => 90,
+            'retry_after' => env('QUEUE_DEFAULT_RETRY_AFTER', 90),
             'after_commit' => false,
         ],
 
-        'sofia-validation' => [
+        // Cola para trabajos pesados (10-30 minutos)
+        'heavy' => [
             'driver' => 'database',
             'table' => 'jobs',
-            'queue' => 'sofia-validation',
-            'retry_after' => 90,
+            'queue' => 'heavy',
+            'retry_after' => env('QUEUE_HEAVY_RETRY_AFTER', 1800),
+            'after_commit' => false,
+        ],
+
+        // Cola para trabajos muy largos (30+ minutos)
+        'long-running' => [
+            'driver' => 'database',
+            'table' => 'jobs',
+            'queue' => 'long-running',
+            'retry_after' => env('QUEUE_LONG_RUNNING_RETRY_AFTER', 2400),
             'after_commit' => false,
         ],
 
@@ -115,3 +125,4 @@ return [
     ],
 
 ];
+

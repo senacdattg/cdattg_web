@@ -54,16 +54,16 @@ class InscripcionComplementarioController extends Controller
     {
         // Validar los datos del formulario
         $request->validate([
-            'tipo_documento' => 'required|integer',
+            'tipo_documento' => self::REQUIRED_INTEGER,
             'numero_documento' => 'required|string|max:191|unique:personas',
-            'primer_nombre' => 'required|string|max:191',
-            'segundo_nombre' => 'nullable|string|max:191',
-            'primer_apellido' => 'required|string|max:191',
-            'segundo_apellido' => 'nullable|string|max:191',
+            'primer_nombre' => self::REQUIRED_STRING_MAX_191,
+            'segundo_nombre' => self::NULLABLE_STRING_MAX_191,
+            'primer_apellido' => self::REQUIRED_STRING_MAX_191,
+            'segundo_apellido' => self::NULLABLE_STRING_MAX_191,
             'fecha_nacimiento' => [
                 'required',
                 'date',
-                function ($attribute, $value, $fail) {
+                function ($value, $fail) {
                     $fechaNacimiento = Carbon::parse($value);
                     $edadMinima = Carbon::now()->subYears(14);
 
@@ -72,14 +72,14 @@ class InscripcionComplementarioController extends Controller
                     }
                 },
             ],
-            'genero' => 'required|integer',
-            'telefono' => 'nullable|string|max:191',
+            'genero' => self::REQUIRED_INTEGER,
+            'telefono' => self::NULLABLE_STRING_MAX_191,
             'celular' => 'required|string|max:191',
             'email' => 'required|email|max:191|unique:personas',
-            'pais_id' => 'required|exists:pais,id',
-            'departamento_id' => 'required|exists:departamentos,id',
-            'municipio_id' => 'required|exists:municipios,id',
-            'direccion' => 'required|string|max:191',
+            'pais_id' => self::REQUIRED_INTEGER,
+            'departamento_id' => self::REQUIRED_INTEGER,
+            'municipio_id' => self::REQUIRED_INTEGER,
+            'direccion' => self::REQUIRED_STRING_MAX_191,
             'observaciones' => 'nullable|string',
             'parametro_id' => 'nullable|exists:parametros,id',
         ]);
@@ -90,7 +90,9 @@ class InscripcionComplementarioController extends Controller
             ->first();
 
         if ($personaExistente) {
-            return back()->withInput()->with('error', 'Ya existe una persona registrada con este número de documento o correo electrónico.');
+            return back()
+                ->withInput()
+                ->with('error', 'Ya existe una persona registrada con este número de documento o correo electrónico.');
         }
 
         // Crear nueva persona
@@ -113,7 +115,9 @@ class InscripcionComplementarioController extends Controller
             'caracterizacion_id'
         ]));
 
-        return redirect()->route('inscripcion.general')->with('success', '¡Registro exitoso! Sus datos han sido guardados correctamente.');
+        return redirect()
+            ->route('inscripcion.general')
+            ->with('success', '¡Registro exitoso! Sus datos han sido guardados correctamente.');
     }
 
     /**
@@ -212,29 +216,56 @@ class InscripcionComplementarioController extends Controller
      */
     public function procesarInscripcion(Request $request, $id)
     {
-        // Si el usuario está autenticado, verificar si ya está inscrito en este programa
-        if (Auth::check()) {
-            $existingInscription = AspiranteComplementario::where('persona_id', Auth::user()->persona_id)
-                ->where('complementario_id', $id)
-                ->first();
-
-            if ($existingInscription) {
-                return redirect()->back()->with('error', 'Ya estás inscrito en este programa complementario.');
-            }
+        // Verificar si el usuario ya está inscrito
+        $existingInscription = $this->checkExistingInscription($id);
+        if ($existingInscription) {
+            return redirect()->back()->with('error', 'Ya estás inscrito en este programa complementario.');
         }
 
         // Validar los datos del formulario
-        $request->validate([
-            'tipo_documento' => 'required|integer',
+        $validatedData = $this->validateInscripcionData($request);
+
+        // Procesar persona y usuario
+        $persona = $this->processPersona($validatedData);
+        $this->processUser($validatedData, $persona);
+
+        // Crear aspirante
+        $aspirante = $this->createAspirante($persona, $id, $validatedData);
+
+        // Procesar documento
+        return $this->processDocumento($request, $aspirante, $persona);
+    }
+
+    /**
+     * Verificar si el usuario ya está inscrito
+     */
+    private function checkExistingInscription($programaId)
+    {
+        if (!Auth::check()) {
+            return false;
+        }
+
+        return AspiranteComplementario::where('persona_id', Auth::user()->persona_id)
+            ->where('complementario_id', $programaId)
+            ->first();
+    }
+
+    /**
+     * Validar los datos del formulario
+     */
+    private function validateInscripcionData(Request $request)
+    {
+        return $request->validate([
+            'tipo_documento' => self::REQUIRED_INTEGER,
             'numero_documento' => 'required|string|max:191',
-            'primer_nombre' => 'required|string|max:191',
-            'segundo_nombre' => 'nullable|string|max:191',
-            'primer_apellido' => 'required|string|max:191',
-            'segundo_apellido' => 'nullable|string|max:191',
+            'primer_nombre' => self::REQUIRED_STRING_MAX_191,
+            'segundo_nombre' => self::NULLABLE_STRING_MAX_191,
+            'primer_apellido' => self::REQUIRED_STRING_MAX_191,
+            'segundo_apellido' => self::NULLABLE_STRING_MAX_191,
             'fecha_nacimiento' => [
                 'required',
                 'date',
-                function ($attribute, $value, $fail) {
+                function ($value, $fail) {
                     $fechaNacimiento = Carbon::parse($value);
                     $edadMinima = Carbon::now()->subYears(14);
 
@@ -243,21 +274,29 @@ class InscripcionComplementarioController extends Controller
                     }
                 },
             ],
-            'genero' => 'required|integer',
-            'telefono' => 'nullable|string|max:191',
+            'genero' => self::REQUIRED_INTEGER,
+            'telefono' => self::NULLABLE_STRING_MAX_191,
             'celular' => 'required|string|max:191',
-            'email' => 'required|email|max:191',
-            'pais_id' => 'required|exists:pais,id',
-            'departamento_id' => 'required|exists:departamentos,id',
-            'municipio_id' => 'required|exists:municipios,id',
-            'direccion' => 'required|string|max:191',
+            'email' => self::REQUIRED_EMAIL_MAX_191,
+            'pais_id' => self::REQUIRED_INTEGER,
+            'departamento_id' => self::REQUIRED_INTEGER,
+            'municipio_id' => self::REQUIRED_INTEGER,
+            'direccion' => self::REQUIRED_STRING_MAX_191,
             'observaciones' => 'nullable|string',
             'parametro_id' => 'nullable|exists:parametros,id',
+            'documento_identidad' => 'required|file|mimes:pdf|max:5120',
+            'acepto_privacidad' => 'required',
+            'acepto_terminos' => 'required',
         ]);
+    }
 
-        // Verificar si ya existe una persona con el mismo documento o email
-        $personaExistente = Persona::where('numero_documento', $request->numero_documento)
-            ->orWhere('email', $request->email)
+    /**
+     * Procesar la persona (crear o actualizar)
+     */
+    private function processPersona(array $validatedData)
+    {
+        $personaExistente = Persona::where('numero_documento', $validatedData['numero_documento'])
+            ->orWhere('email', $validatedData['email'])
             ->first();
 
         if ($personaExistente) {
@@ -306,48 +345,112 @@ class InscripcionComplementarioController extends Controller
             ]) + ['user_create_id' => 1, 'user_edit_id' => 1]);
         }
 
-        // Verificar si ya existe una inscripción para esta persona en este programa
-        $existingInscription = AspiranteComplementario::where('persona_id', $persona->id)
-            ->where('complementario_id', $id)
-            ->first();
+        return Persona::create($validatedData + ['user_create_id' => 1, 'user_edit_id' => 1]);
+    }
 
-        if ($existingInscription) {
-            return redirect()->back()->with('error', 'Ya estás inscrito en este programa complementario.');
-        }
-
-        // Crear el registro del aspirante
-        $aspirante = AspiranteComplementario::create([
-            'persona_id' => $persona->id,
-            'complementario_id' => $id,
-            'observaciones' => $request->observaciones,
-            'estado' => 1, // Estado "En proceso"
-        ]);
-
-        // Verificar si ya existe un usuario con este email
-        $existingUser = User::where('email', $request->email)->first();
+    /**
+     * Procesar el usuario (crear o actualizar rol)
+     */
+    private function processUser(array $validatedData, Persona $persona)
+    {
+        $existingUser = User::where('email', $validatedData['email'])->first();
 
         if (!$existingUser) {
-            // Crear cuenta de usuario automáticamente
             $user = User::create([
-                'email' => $request->email,
-                'password' => Hash::make($request->numero_documento), // Usar documento como contraseña
+                'email' => $validatedData['email'],
+                'password' => Hash::make($validatedData['numero_documento']),
                 'status' => 1,
                 'persona_id' => $persona->id,
             ]);
-
-            // Asignar rol de aspirante
             $user->assignRole('ASPIRANTE');
-        } else {
-            // Si el usuario ya existe, verificar si tiene rol VISITANTE y cambiarlo a ASPIRANTE
-            if ($existingUser->hasRole('VISITANTE')) {
-                $existingUser->removeRole('VISITANTE');
-                $existingUser->assignRole('ASPIRANTE');
-            }
+            
+            // Enviar email de verificación automáticamente
+            $user->sendEmailVerificationNotification();
+        } elseif ($existingUser->hasRole('VISITANTE')) {
+            $existingUser->removeRole('VISITANTE');
+            $existingUser->assignRole('ASPIRANTE');
         }
+    }
 
-        // Redirigir a la segunda fase (subida de documentos)
-        return redirect()->route('programas-complementarios.documentos', ['id' => $id, 'aspirante_id' => $aspirante->id])
-            ->with('success', 'Datos personales registrados correctamente. Ahora debe subir su documento de identidad.');
+    /**
+     * Crear el registro del aspirante
+     */
+    private function createAspirante(Persona $persona, $programaId, array $validatedData)
+    {
+        return AspiranteComplementario::create([
+            'persona_id' => $persona->id,
+            'complementario_id' => $programaId,
+            'observaciones' => $validatedData['observaciones'] ?? null,
+            'estado' => 1, // Estado "En proceso"
+        ]);
+    }
+
+    /**
+     * Procesar el documento de identidad
+     */
+    private function processDocumento(Request $request, AspiranteComplementario $aspirante, Persona $persona)
+    {
+        try {
+            Log::info('Procesando documento de identidad', [
+                'aspirante_id' => $aspirante->id,
+                'persona_id' => $persona->id,
+                'file_name' => $request->file('documento_identidad')->getClientOriginalName()
+            ]);
+
+            if ($request->hasFile('documento_identidad')) {
+                $file = $request->file('documento_identidad');
+
+                $tipoDocumento = $persona->tipoDocumento->name ?? 'DOC';
+                $numeroDocumento = $persona->numero_documento;
+                $primerNombre = $persona->primer_nombre;
+                $primerApellido = $persona->primer_apellido;
+                $timestamp = now()->format('d-m-y-H-i-s');
+
+                $fileName = "{$tipoDocumento}_{$numeroDocumento}_{$primerNombre}_" .
+                           "{$primerApellido}_{$timestamp}.{$file->getClientOriginalExtension()}";
+
+                Log::info('Subiendo archivo a Google Drive', [
+                    'file_name' => $fileName,
+                    'file_size' => $file->getSize()
+                ]);
+
+                $path = Storage::disk('google')->putFileAs('documentos_aspirantes', $file, $fileName);
+
+                Log::info('Archivo subido exitosamente', ['path' => $path]);
+
+                $aspirante->update([
+                    'documento_identidad_path' => $path,
+                    'documento_identidad_nombre' => $fileName,
+                    'estado' => 2, // Estado "Completo"
+                ]);
+
+                Log::info('Aspirante actualizado con documento', [
+                    'aspirante_id' => $aspirante->id,
+                    'estado' => $aspirante->estado
+                ]);
+            }
+
+            return redirect()->route('login.index')->with(
+                'success',
+                '¡Inscripción completada exitosamente! Su cuenta de usuario ha sido creada. ' .
+                'Puede iniciar sesión con su correo electrónico y número de documento como contraseña.'
+            );
+
+        } catch (\Exception $e) {
+            Log::error('Error al procesar documento: ' . $e->getMessage(), [
+                'exception' => $e,
+                'aspirante_id' => $aspirante->id,
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            $aspirante->update(['estado' => 1]);
+
+            return back()->withInput()->with(
+                'error',
+                'Los datos personales fueron registrados correctamente, ' .
+                'pero hubo un error al procesar el documento. Por favor contacte al administrador.'
+            );
+        }
     }
 
     private function buildTemaPayload($tema = null, $fallback = null): object

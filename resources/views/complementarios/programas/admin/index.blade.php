@@ -1,7 +1,7 @@
 @extends('adminlte::page')
 
 @section('plugins.Datatables', true)
-@section('plugins.Sweetalert2', true)
+{{-- SweetAlert2 activado globalmente en config/adminlte.php --}}
 
 @section('title', 'Programas complementarios')
 

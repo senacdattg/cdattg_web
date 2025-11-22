@@ -4,72 +4,206 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Persona;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Database\QueryException;
 
 class LoginController extends Controller
 {
     public function index()
     {
-        return view('welcome');
+        return view('adminlte::auth.login');
     }
 
     public function iniciarSesion(Request $request)
     {
         try {
-            // Validamos la solicitud
             $credentials = $request->validate([
                 'email'    => 'required|email',
                 'password' => 'required|string|min:6',
             ]);
 
-            if (Auth::attempt($credentials)) {
-                $user = Auth::user();
+            $remember = $request->boolean('remember');
+            $user = User::where('email', $credentials['email'])->first();
+            $response = null;
 
-                // Verificar si la cuenta está inactiva
-                if ($user->status == 0) {
-                    Log::warning("Intento de inicio de sesión de usuario inactivo: ID {$user->id}");
-                    Auth::logout();
-                    return back()->withInput()->withErrors(['error' => 'La cuenta se encuentra inactiva']);
-                }
-
-                // Verificar si hay un parámetro de redirección (primero del input POST, luego del query string)
-                $redirect = $request->input('redirect') ?: $request->query('redirect');
-                Log::info('LoginController - Verificando redirect', [
-                    'redirect_input' => $request->input('redirect'),
-                    'redirect_query' => $request->query('redirect'),
-                    'redirect_final' => $redirect,
-                    'has_redirect' => !empty($redirect),
-                    'all_input' => $request->all(),
-                    'all_query_params' => $request->query()
-                ]);
-                if ($redirect) {
-                    Log::info('LoginController - Redirigiendo a formulario de inscripción', ['redirect_id' => $redirect]);
-                    // Redirigir al formulario de inscripción con los datos del usuario pre-llenados
-                    return redirect('/programas-complementarios/' . $redirect . '/inscripcion')
-                        ->with('user_data', $this->getUserDataForForm($user))
-                        ->with('success', '¡Sesión Iniciada! Complete su información para finalizar la inscripción.');
-                }
-
-                Log::info('LoginController - No hay redirect, redirigiendo a /home');
-                // Redirigir al dashboard principal (/home) para usuarios normales
-                return redirect('/home')->with('success', '¡Sesión Iniciada!');
+            // Validar usuario antes de intentar autenticar
+            if ($user && !$this->validarUsuarioAntesLogin($user)) {
+                $response = $this->getRespuestaValidacionUsuario($user);
+            } elseif (!Auth::attempt($credentials, $remember)) {
+                // Intentar autenticar
+                $response = back()
+                    ->withInput()
+                    ->withErrors(['error' => 'Correo o contraseña inválidos']);
             } else {
-                Log::warning("Fallo en el inicio de sesión para el correo: {$request->email}");
-
-                return back()->withInput()->withErrors(['error' => 'Correo o contraseña inválidos']);
+                // Procesar autenticación exitosa
+                $request->session()->regenerate();
+                $response = $this->procesarLoginExitoso($request, Auth::user());
             }
-        } catch (QueryException $e) {
-            // Captura de excepciones de conexión a la base de datos
-            Log::error('Error de conexión a la base de datos: ' . $e->getMessage());
-            return back()->withInput()->withErrors(['error' => 'Error al conectar con la base de datos. Por favor, inténtelo de nuevo más tarde.']);
-        } catch (\Exception $e) {
-            Log::error('Error al iniciar sesión: ' . $e->getMessage());
 
-            return back()->withInput()->withErrors(['error' => 'Error al iniciar sesión. Por favor, inténtelo de nuevo más tarde.']);
+            return $response;
+        } catch (QueryException $e) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'error' => 'Error al conectar con la base de datos. '
+                        . 'Por favor, inténtelo de nuevo más tarde.',
+                ]);
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->withErrors([
+                    'error' => 'Error al iniciar sesión. Por favor, inténtelo de nuevo más tarde.',
+                ]);
         }
+    }
+
+    /**
+     * Valida si el usuario puede iniciar sesión antes de intentar autenticar
+     */
+    private function validarUsuarioAntesLogin(?User $user): bool
+    {
+        if (!$user) {
+            return true; // Permitir intento de autenticación
+        }
+
+        return $user->hasVerifiedEmail() && $user->status == 1;
+    }
+
+    /**
+     * Obtiene la respuesta de validación cuando el usuario no puede iniciar sesión
+     */
+    private function getRespuestaValidacionUsuario(User $user)
+    {
+        $response = null;
+
+        if (!$user->hasVerifiedEmail()) {
+            // Enviar correo de verificación automáticamente
+            try {
+                \Illuminate\Support\Facades\Log::info('Enviando correo de verificación automático al intentar login', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                ]);
+                
+                $user->sendEmailVerificationNotification();
+                
+                \Illuminate\Support\Facades\Log::info('Correo de verificación enviado automáticamente', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                ]);
+                
+                $response = back()
+                    ->withInput()
+                    ->with(
+                        'error',
+                        'Debes verificar tu correo electrónico antes de iniciar sesión. '
+                        . 'Se ha enviado un nuevo enlace de verificación a tu correo. '
+                        . 'Revisa tu bandeja de entrada y spam.'
+                    );
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Error al enviar correo de verificación automático', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'error' => $e->getMessage(),
+                ]);
+                
+                $response = back()
+                    ->withInput()
+                    ->with(
+                        'error',
+                        'Debes verificar tu correo electrónico antes de iniciar sesión. '
+                        . 'No se pudo enviar el correo automáticamente. '
+                        . 'Solicita un nuevo enlace de verificación usando el formulario a continuación.'
+                    );
+            }
+        } elseif ($user->status == 0) {
+            $response = back()
+                ->withInput()
+                ->withErrors(['email' => 'Tu cuenta se encuentra inactiva. Contacta al administrador.']);
+        } else {
+            $response = back()
+                ->withInput()
+                ->withErrors(['error' => 'No se puede iniciar sesión']);
+        }
+
+        return $response;
+    }
+
+    /**
+     * Procesa el login exitoso verificando estado y redirigiendo
+     */
+    private function procesarLoginExitoso(Request $request, User $user)
+    {
+        if ($user->status == 0) {
+            Auth::logout();
+            return back()
+                ->withInput()
+                ->withErrors(['error' => 'La cuenta se encuentra inactiva']);
+        }
+
+        if (!$user->hasVerifiedEmail()) {
+            Auth::logout();
+            
+            // Enviar correo de verificación automáticamente
+            try {
+                \Illuminate\Support\Facades\Log::info(
+                    'Enviando correo de verificación automático después de login exitoso',
+                    [
+                        'user_id' => $user->id,
+                        'email' => $user->email,
+                    ]
+                );
+                
+                $user->sendEmailVerificationNotification();
+                
+                \Illuminate\Support\Facades\Log::info(
+                    'Correo de verificación enviado automáticamente después de login',
+                    [
+                        'user_id' => $user->id,
+                        'email' => $user->email,
+                    ]
+                );
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error(
+                    'Error al enviar correo de verificación automático después de login',
+                    [
+                        'user_id' => $user->id,
+                        'email' => $user->email,
+                        'error' => $e->getMessage(),
+                    ]
+                );
+            }
+            
+            return redirect()
+                ->route('verification.notice')
+                ->with(
+                    'warning',
+                    'Por favor, verifica tu correo electrónico antes de iniciar sesión. '
+                    . 'Se ha enviado un enlace de verificación a tu correo. Revisa tu bandeja de entrada y spam.'
+                );
+        }
+
+        return $this->redirigirDespuesLogin($request, $user);
+    }
+
+    /**
+     * Redirige al usuario después de un login exitoso
+     */
+    private function redirigirDespuesLogin(Request $request, User $user)
+    {
+        $redirect = $request->input('redirect') ?: $request->query('redirect');
+
+        if ($redirect) {
+            return redirect('/programas-complementarios/' . $redirect . '/inscripcion')
+                ->with('user_data', $this->getUserDataForForm($user))
+                ->with(
+                    'success',
+                    '¡Sesión Iniciada! Complete su información para finalizar la inscripción.'
+                );
+        }
+
+        return redirect('/home')->with('success', '¡Sesión Iniciada!');
     }
 
     public function verificarLogin()
@@ -123,6 +257,73 @@ class LoginController extends Controller
         }
 
         return response()->json(['error' => 'Credenciales incorrectas'], 401);
+    }
+
+    /**
+     * Reenvía el correo de verificación sin autenticación (desde el login)
+     */
+    public function reenviarCorreoVerificacion(Request $request)
+    {
+        $validated = $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ], [
+            'email.exists' => 'No existe una cuenta registrada con este correo electrónico.',
+        ]);
+
+        $user = User::where('email', $validated['email'])->first();
+        $response = null;
+
+        if (!$user) {
+            $response = back()
+                ->withInput()
+                ->withErrors(['email' => 'No existe una cuenta registrada con este correo electrónico.']);
+        } elseif ($user->hasVerifiedEmail()) {
+            $response = back()
+                ->withInput()
+                ->with('info', 'Tu correo electrónico ya está verificado. Puedes iniciar sesión.');
+        } else {
+            try {
+                \Illuminate\Support\Facades\Log::info('Intentando enviar correo de verificación', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                ]);
+                
+                $user->sendEmailVerificationNotification();
+                
+                \Illuminate\Support\Facades\Log::info('Correo de verificación enviado exitosamente', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                ]);
+                
+                $response = back()
+                    ->withInput()
+                    ->with(
+                        'success',
+                        'Se ha enviado un nuevo enlace de verificación a tu correo electrónico. '
+                        . 'Por favor, revisa tu bandeja de entrada y spam.'
+                    );
+            } catch (\Exception $e) {
+                \Illuminate\Support\Facades\Log::error('Error al enviar correo de verificación', [
+                    'user_id' => $user->id,
+                    'email' => $user->email,
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                    'class' => get_class($e),
+                ]);
+                
+                $errorMessage = 'No se pudo enviar el correo de verificación.';
+                if (str_contains($e->getMessage(), 'Connection') || str_contains($e->getMessage(), 'SMTP')) {
+                    $errorMessage .= ' Verifica la configuración SMTP.';
+                }
+                $errorMessage .= ' Error: ' . $e->getMessage();
+                
+                $response = back()
+                    ->withInput()
+                    ->withErrors(['error' => $errorMessage]);
+            }
+        }
+
+        return $response;
     }
 
     /**

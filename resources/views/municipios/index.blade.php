@@ -47,11 +47,12 @@ GET
 @endsection
 
 @section('footer')
-    @include('layout.footer')
+    @include('layouts.footer')
 @endsection
 
+@section('plugins.Chartjs', true)
+
 @section('js')
-    <script src="{{ asset('vendor/chart.js/Chart.bundle.min.js') }}"></script>
     @vite(['resources/js/municipios.js'])
 @endsection
 

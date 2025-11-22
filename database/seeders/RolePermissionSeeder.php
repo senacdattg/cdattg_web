@@ -8,123 +8,287 @@ use Spatie\Permission\Models\Permission;
 
 class RolePermissionSeeder extends Seeder
 {
-    public function run()
-    {
-        // Crear roles usando firstOrCreate para evitar duplicados
-        $superAdministrador = Role::firstOrCreate(['name' => 'SUPER ADMINISTRADOR']);
-        $administrador      = Role::firstOrCreate(['name' => 'ADMINISTRADOR']);
-        $instructor         = Role::firstOrCreate(['name' => 'INSTRUCTOR']);
-        $visitante          = Role::firstOrCreate(['name' => 'VISITANTE']);
-        $aprendiz           = Role::firstOrCreate(['name' => 'APRENDIZ']);
-        $aspirante          = Role::firstOrCreate(['name' => 'ASPIRANTE']);
+    // Constantes para permisos comunes
+    private const PERMISO_VER_PERFIL = 'VER PERFIL';
+    private const PERMISO_EDITAR_PERSONA = 'EDITAR PERSONA';
+    private const PERMISO_VER_NOTIFICACION = 'VER NOTIFICACION';
+    private const PERMISO_VER_PROGRAMA_COMPLEMENTARIO = 'VER PROGRAMA COMPLEMENTARIO';
 
-        // Definir  un arreglo de permisos para cada grupo
-        $permisos = [   
-            // Permisos para parámetros
+    /**
+     * Ejecuta el seeder
+     */
+    public function run(): void
+    {
+        $roles = $this->crearRoles();
+        $this->crearPermisos();
+        $this->asignarPermisosARoles($roles);
+    }
+
+    /**
+     * Crea todos los roles del sistema
+     */
+    private function crearRoles(): array
+    {
+        return [
+            'bot' => Role::firstOrCreate(['name' => 'BOT']),
+            'super_admin' => Role::firstOrCreate(['name' => 'SUPER ADMINISTRADOR']),
+            'admin' => Role::firstOrCreate(['name' => 'ADMINISTRADOR']),
+            'vigilante' => Role::firstOrCreate(['name' => 'VIGILANTE']),
+            'coordinador' => Role::firstOrCreate(['name' => 'COORDINADOR']),
+            'instructor' => Role::firstOrCreate(['name' => 'INSTRUCTOR']),
+            'visitante' => Role::firstOrCreate(['name' => 'VISITANTE']),
+            'aprendiz' => Role::firstOrCreate(['name' => 'APRENDIZ']),
+            'aspirante' => Role::firstOrCreate(['name' => 'ASPIRANTE']),
+        ];
+    }
+
+    /**
+     * Crea todos los permisos del sistema
+     */
+    private function crearPermisos(): void
+    {
+        $permisos = array_merge(
+            $this->getPermisosParametros(),
+            $this->getPermisosInfraestructura(),
+            $this->getPermisosInstructores(),
+            $this->getPermisosFichas(),
+            $this->getPermisosPersonas(),
+            $this->getPermisosInventario(),
+            $this->getPermisosRedesConocimiento(),
+            $this->getPermisosAprendices(),
+            $this->getPermisosProgramas(),
+            $this->getPermisosResultadosAprendizaje(),
+            $this->getPermisosCompetencias(),
+            $this->getPermisosComplementarios(),
+            $this->getPermisosControlSeguimiento(),
+            $this->getPermisosGenerales()
+        );
+
+        foreach ($permisos as $permiso) {
+            Permission::firstOrCreate(['name' => $permiso]);
+        }
+    }
+
+    /**
+     * Asigna permisos a cada rol según sus responsabilidades
+     */
+    private function asignarPermisosARoles(array $roles): void
+    {
+        // SUPER ADMINISTRADOR tiene todos los permisos
+        $roles['super_admin']->syncPermissions(Permission::all());
+
+        // ADMINISTRADOR
+        $roles['admin']->syncPermissions($this->getPermisosAdministrador());
+
+        // INSTRUCTOR
+        $roles['instructor']->syncPermissions($this->getPermisosInstructor());
+
+        // ASPIRANTE
+        $roles['aspirante']->syncPermissions($this->getPermisosAspirante());
+
+        // VISITANTE
+        $roles['visitante']->syncPermissions($this->getPermisosVisitante());
+
+        // APRENDIZ
+        $roles['aprendiz']->syncPermissions($this->getPermisosAprendiz());
+    }
+
+    // ==========================================
+    // DEFINICIÓN DE PERMISOS POR MÓDULO
+    // ==========================================
+
+    /**
+     * Permisos del módulo de Parámetros y Temas
+     */
+    private function getPermisosParametros(): array
+    {
+        return [
             'CREAR PARAMETRO',
             'EDITAR PARAMETRO',
             'VER PARAMETRO',
             'ELIMINAR PARAMETRO',
-            // Permisos para temas
             'CREAR TEMA',
             'EDITAR TEMA',
             'VER TEMA',
             'ELIMINAR TEMA',
             'ELIMINAR PARAMETRO DE TEMA',
-            // Permisos para regionales
+        ];
+    }
+
+    /**
+     * Permisos del módulo de Infraestructura
+     */
+    private function getPermisosInfraestructura(): array
+    {
+        return [
             'CREAR REGIONAL',
             'EDITAR REGIONAL',
             'VER REGIONAL',
+            'VER REGIONALES',
             'ELIMINAR REGIONAL',
-            // Permisos para municipios
+            'CAMBIAR ESTADO REGIONAL',
+
             'CREAR MUNICIPIO',
             'EDITAR MUNICIPIO',
             'VER MUNICIPIO',
+            'VER MUNICIPIOS',
             'ELIMINAR MUNICIPIO',
-            // Permisos para centros de formación
+            'CAMBIAR ESTADO MUNICIPIO',
+
             'CREAR CENTRO DE FORMACION',
             'EDITAR CENTRO DE FORMACION',
+            'VER CENTRO DE FORMACION',
             'VER CENTROS DE FORMACION',
             'ELIMINAR CENTRO DE FORMACION',
-            // Permisos para sedes
+            'CAMBIAR ESTADO CENTRO DE FORMACION',
+
             'CREAR SEDE',
             'VER SEDE',
+            'VER SEDES',
             'EDITAR SEDE',
             'ELIMINAR SEDE',
-            // Permisos para bloques
+            'CAMBIAR ESTADO SEDE',
+
             'CREAR BLOQUE',
             'VER BLOQUE',
+            'VER BLOQUES',
             'EDITAR BLOQUE',
             'ELIMINAR BLOQUE',
-            // Permisos para pisos
+            'CAMBIAR ESTADO BLOQUE',
+
             'CREAR PISO',
             'VER PISO',
+            'VER PISOS',
             'EDITAR PISO',
             'ELIMINAR PISO',
-            // Permisos para ambientes
+            'CAMBIAR ESTADO PISO',
+
             'CREAR AMBIENTE',
             'VER AMBIENTE',
+            'VER AMBIENTES',
             'EDITAR AMBIENTE',
             'ELIMINAR AMBIENTE',
-            // Permisos para instructores
+            'CAMBIAR ESTADO AMBIENTE',
+        ];
+    }
+
+    /**
+     * Permisos del módulo de Instructores
+     */
+    private function getPermisosInstructores(): array
+    {
+        return [
             'CREAR INSTRUCTOR',
             'VER INSTRUCTOR',
+            'VER INSTRUCTORES',
             'EDITAR INSTRUCTOR',
             'ELIMINAR INSTRUCTOR',
-            // Permisos para fichas de caracterización
+            'CAMBIAR ESTADO INSTRUCTOR',
+
+            'GESTIONAR ESPECIALIDADES INSTRUCTOR',
+        ];
+    }
+
+    /**
+     * Permisos del módulo de Fichas de Caracterización
+     */
+    private function getPermisosFichas(): array
+    {
+        return [
             'CREAR FICHA DE CARACTERIZACION',
             'EDITAR FICHA DE CARACTERIZACION',
             'VER FICHA DE CARACTERIZACION',
             'ELIMINAR FICHA DE CARACTERIZACION',
-            // Permisos para roles y permisos
-            'ASIGNAR PERMISOS',
-            // Permisos para asistencia
-            'TOMAR ASISTENCIA',
-            // Permisos para caracterización de programas
+            'CAMBIAR ESTADO FICHA DE CARACTERIZACION',
+
+            'CREAR FICHA CARACTERIZACION',
+            'EDITAR FICHA CARACTERIZACION',
+            'VER FICHA CARACTERIZACION',
+            'ELIMINAR FICHA CARACTERIZACION',
+
+            'GESTIONAR INSTRUCTORES FICHA',
+            'GESTIONAR INSTRUCTORES',
+
+            'VER FICHAS ASIGNADAS',
+            'GESTIONAR DIAS FICHA',
+            'GESTIONAR APRENDICES FICHA',
+            'GESTIONAR APRENDICES',
+            'CAMBIAR ESTADO FICHA',
+
+            'ASIGNACION DE INSTRUCTORES',
             'VER PROGRAMA DE CARACTERIZACION',
             'CREAR PROGRAMA DE CARACTERIZACION',
             'EDITAR PROGRAMA DE CARACTERIZACION',
             'ELIMINAR PROGRAMA DE CARACTERIZACION',
-            //Permisos para crear personas
+            'CAMBIAR ESTADO PROGRAMA DE CARACTERIZACION',
+        ];
+    }
+
+    /**
+     * Permisos del módulo de Personas
+     */
+    private function getPermisosPersonas(): array
+    {
+        return [
             'CREAR PERSONA',
             'VER PERSONA',
-            'EDITAR PERSONA',
+            'VER PERSONAS',
+            self::PERMISO_VER_PERFIL,
+            self::PERMISO_EDITAR_PERSONA,
             'ELIMINAR PERSONA',
+
             'CAMBIAR ESTADO PERSONA',
-            // Permisos para inventario
+            'RESTABLECER PASSWORD',
+        ];
+    }
+
+    /**
+     * Permisos del módulo de Inventario
+     */
+    private function getPermisosInventario(): array
+    {
+        return [
             // Productos
             'CREAR PRODUCTO',
             'VER PRODUCTO',
+            'VER PRODUCTOS',
             'EDITAR PRODUCTO',
             'ELIMINAR PRODUCTO',
-            'VER CATALOGO PRODUCTO',
+            'CAMBIAR ESTADO PRODUCTO',
             'BUSCAR PRODUCTO',
+            'VER CATALOGO PRODUCTO',
+
             // Carrito
             'VER CARRITO',
             'AGREGAR CARRITO',
             'ACTUALIZAR CARRITO',
             'ELIMINAR CARRITO',
             'VACIAR CARRITO',
+
             // Categorías
             'CREAR CATEGORIA',
             'VER CATEGORIA',
             'EDITAR CATEGORIA',
             'ELIMINAR CATEGORIA',
+            
             // Marcas
             'CREAR MARCA',
             'VER MARCA',
             'EDITAR MARCA',
             'ELIMINAR MARCA',
+            
             // Contratos y Convenios
             'CREAR CONTRATO',
             'VER CONTRATO',
             'EDITAR CONTRATO',
             'ELIMINAR CONTRATO',
+            
             // Proveedores
             'CREAR PROVEEDOR',
             'VER PROVEEDOR',
             'EDITAR PROVEEDOR',
             'ELIMINAR PROVEEDOR',
+            
             // Ordenes
             'VER ORDEN',
             'CREAR ORDEN',
@@ -132,365 +296,257 @@ class RolePermissionSeeder extends Seeder
             'ELIMINAR ORDEN',
             'APROBAR ORDEN',
             'COMPLETAR ORDEN',
+            
             // Préstamos
             'VER PRESTAMO',
             'CREAR PRESTAMO',
             'EDITAR PRESTAMO',
             'DEVOLVER PRESTAMO',
             'APROBAR PRESTAMO',
+            
             // Entradas
             'VER ENTRADA',
             'CREAR ENTRADA',
+            
             // Salidas
             'VER SALIDA',
             'CREAR SALIDA',
+            
             // Devoluciones
             'VER DEVOLUCION',
             'CREAR DEVOLUCION',
             'PROCESAR DEVOLUCION',
+            
             // Notificaciones
-            'VER NOTIFICACION',
+            self::PERMISO_VER_NOTIFICACION,
             // Dashboard
             'VER DASHBOARD INVENTARIO',
-            // Permisos para redes de conocimiento
-            'CREAR RED CONOCIMIENTO',
-            'EDITAR RED CONOCIMIENTO',
-            'VER RED CONOCIMIENTO',
-            'ELIMINAR RED CONOCIMIENTO',
-            // Permisos para aprendices
-            'VER APRENDIZ',
-            'CREAR APRENDIZ',
-            'EDITAR APRENDIZ',
-            'ELIMINAR APRENDIZ',
-            // Permisos para programas de formación
-            'programa.index',
-            'programa.show',
-            'programa.create',
-            'programa.edit',
-            'programa.delete',
-            'programa.search',
-            // Permisos para resultados de aprendizaje
-            'VER RESULTADO APRENDIZAJE',
-            'CREAR RESULTADO APRENDIZAJE',
-            'EDITAR RESULTADO APRENDIZAJE',
-            'ELIMINAR RESULTADO APRENDIZAJE',
-            'GESTIONAR COMPETENCIAS RAP',
-            'CAMBIAR ESTADO RAP',
-            // Permisos para competencias
-            'VER COMPETENCIA',
-            'CREAR COMPETENCIA',
-            'EDITAR COMPETENCIA',
-            'ELIMINAR COMPETENCIA',
-            'GESTIONAR RESULTADOS COMPETENCIA',
-            'CAMBIAR ESTADO COMPETENCIA',
-            // Permisos para aspirantes complementarios
-            'VER ESTADISTICAS',
-            // Permisos para programas complementarios
-            'VER PROGRAMA COMPLEMENTARIO',
-            'CREAR PROGRAMA COMPLEMENTARIO',
-            'ELIMINAR ASPIRANTE COMPLEMENTARIO',
-            // Permisos para talento humano
-            'VER TALENTO HUMANO',
-            'CREAR TALENTO HUMANO',
-
-            'VER FICHAS ASIGNADAS',
-            'GESTIONAR DIAS FICHA',
-            'GESTIONAR APRENDICES FICHA',
-            'CAMBIAR ESTADO FICHA',
         ];
+    }
 
-        // Crear cada permiso si no existe
-        foreach ($permisos as $permiso) {
-            Permission::firstOrCreate(['name' => $permiso]);
-        }
-
-        // Asignar permisos a SUPER ADMINISTRADOR (todos los permisos que quieras para este rol)
-        $superAdministrador->givePermissionTo([
-            'CREAR PARAMETRO',
-            'EDITAR PARAMETRO',
-            'VER PARAMETRO',
-            'ELIMINAR PARAMETRO',
-            'CREAR TEMA',
-            'EDITAR TEMA',
-            'VER TEMA',
-            'ELIMINAR TEMA',
-            'ELIMINAR PARAMETRO DE TEMA',
-            'CREAR REGIONAL',
-            'EDITAR REGIONAL',
-            'VER REGIONAL',
-            'ELIMINAR REGIONAL',
-            'CREAR MUNICIPIO',
-            'EDITAR MUNICIPIO',
-            'VER MUNICIPIO',
-            'ELIMINAR MUNICIPIO',
-            'CREAR CENTRO DE FORMACION',
-            'EDITAR CENTRO DE FORMACION',
-            'VER CENTROS DE FORMACION',
-            'ELIMINAR CENTRO DE FORMACION',
-            'CREAR SEDE',
-            'VER SEDE',
-            'EDITAR SEDE',
-            'ELIMINAR SEDE',
-            'CREAR BLOQUE',
-            'VER BLOQUE',
-            'EDITAR BLOQUE',
-            'ELIMINAR BLOQUE',
-            'CREAR PISO',
-            'VER PISO',
-            'EDITAR PISO',
-            'ELIMINAR PISO',
-            'CREAR AMBIENTE',
-            'VER AMBIENTE',
-            'EDITAR AMBIENTE',
-            'ELIMINAR AMBIENTE',
-            'ASIGNAR PERMISOS',
-            'VER PROGRAMA DE CARACTERIZACION',
-            'CREAR PROGRAMA DE CARACTERIZACION',
-            'EDITAR PROGRAMA DE CARACTERIZACION',
-            'ELIMINAR PROGRAMA DE CARACTERIZACION',
-            'CREAR PERSONA',
-            'VER PERSONA',
-            'EDITAR PERSONA',
-            'ELIMINAR PERSONA',
-            'CAMBIAR ESTADO PERSONA',
-
-            // Permisos de inventario para SUPER ADMINISTRADOR
-            'CREAR PRODUCTO',
-            'VER PRODUCTO',
-            'EDITAR PRODUCTO',
-            'ELIMINAR PRODUCTO',
-            'VER CATALOGO PRODUCTO',
-            'BUSCAR PRODUCTO',
-            'VER CARRITO',
-            'AGREGAR CARRITO',
-            'ACTUALIZAR CARRITO',
-            'ELIMINAR CARRITO',
-            'VACIAR CARRITO',
-            'CREAR CATEGORIA',
-            'VER CATEGORIA',
-            'EDITAR CATEGORIA',
-            'ELIMINAR CATEGORIA',
-            'CREAR MARCA',
-            'VER MARCA',
-            'EDITAR MARCA',
-            'ELIMINAR MARCA',
-            'CREAR CONTRATO',
-            'VER CONTRATO',
-            'EDITAR CONTRATO',
-            'ELIMINAR CONTRATO',
-            'CREAR PROVEEDOR',
-            'VER PROVEEDOR',
-            'EDITAR PROVEEDOR',
-            'ELIMINAR PROVEEDOR',
-            'VER ORDEN',
-            'CREAR ORDEN',
-            'EDITAR ORDEN',
-            'ELIMINAR ORDEN',
-            'APROBAR ORDEN',
-            'COMPLETAR ORDEN',
-            'VER PRESTAMO',
-            'CREAR PRESTAMO',
-            'EDITAR PRESTAMO',
-            'DEVOLVER PRESTAMO',
-            'APROBAR PRESTAMO',
-            'VER ENTRADA',
-            'CREAR ENTRADA',
-            'VER SALIDA',
-            'CREAR SALIDA',
-            'VER DEVOLUCION',
-            'CREAR DEVOLUCION',
-            'PROCESAR DEVOLUCION',
-            'VER NOTIFICACION',
-            'VER DASHBOARD INVENTARIO',
+    /**
+     * Permisos del módulo de Redes de Conocimiento
+     */
+    private function getPermisosRedesConocimiento(): array
+    {
+        return [
             'CREAR RED CONOCIMIENTO',
             'EDITAR RED CONOCIMIENTO',
             'VER RED CONOCIMIENTO',
+            'VER REDES CONOCIMIENTO',
             'ELIMINAR RED CONOCIMIENTO',
+            'CAMBIAR ESTADO RED CONOCIMIENTO',
+        ];
+    }
+
+    /**
+     * Permisos del módulo de Aprendices
+     */
+    private function getPermisosAprendices(): array
+    {
+        return [
             'VER APRENDIZ',
+            'VER APRENDICES',
             'CREAR APRENDIZ',
             'EDITAR APRENDIZ',
             'ELIMINAR APRENDIZ',
-            // Permisos para programas de formación
+            'CAMBIAR ESTADO APRENDIZ',
+        ];
+    }
+
+    /**
+     * Permisos del módulo de Programas de Formación
+     */
+    private function getPermisosProgramas(): array
+    {
+        return [
+            'VER PROGRAMA DE FORMACION',
+            'VER PROGRAMAS DE FORMACION',
+            'CREAR PROGRAMA DE FORMACION',
+            'EDITAR PROGRAMA DE FORMACION',
+            'ELIMINAR PROGRAMA DE FORMACION',
+            'CAMBIAR ESTADO PROGRAMA DE FORMACION',
             'programa.index',
             'programa.show',
-            'programa.create',
-            'programa.edit',
-            'programa.delete',
             'programa.search',
-            // Permisos para resultados de aprendizaje
+        ];
+    }
+
+    /**
+     * Permisos del módulo de Resultados de Aprendizaje
+     */
+    private function getPermisosResultadosAprendizaje(): array
+    {
+        return [
             'VER RESULTADO APRENDIZAJE',
+            'VER RESULTADOS APRENDIZAJE',
             'CREAR RESULTADO APRENDIZAJE',
             'EDITAR RESULTADO APRENDIZAJE',
             'ELIMINAR RESULTADO APRENDIZAJE',
-            'GESTIONAR COMPETENCIAS RAP',
-            'CAMBIAR ESTADO RAP',
-            // Permisos para competencias
+            'GESTIONAR COMPETENCIAS RESULTADO APRENDIZAJE',
+            'CAMBIAR ESTADO RESULTADO APRENDIZAJE',
+        ];
+    }
+
+    /**
+     * Permisos del módulo de Competencias
+     */
+    private function getPermisosCompetencias(): array
+    {
+        return [
             'VER COMPETENCIA',
+            'VER COMPETENCIAS',
             'CREAR COMPETENCIA',
             'EDITAR COMPETENCIA',
             'ELIMINAR COMPETENCIA',
-            'GESTIONAR RESULTADOS COMPETENCIA',
             'CAMBIAR ESTADO COMPETENCIA',
+            'GESTIONAR RESULTADOS COMPETENCIA',
+            'ASOCIAR GUIA RAP',
+            'DESASOCIAR GUIA RAP',
+            'EXPORTAR RAP',
+            'IMPORTAR RAP',
+            'VER REPORTES RAP',
+        ];
+    }
+
+    /**
+     * Permisos del módulo de Programas Complementarios
+     */
+    private function getPermisosComplementarios(): array
+    {
+        return [
             'VER ESTADISTICAS',
-            'VER PROGRAMA COMPLEMENTARIO',
+            self::PERMISO_VER_PROGRAMA_COMPLEMENTARIO,
             'CREAR PROGRAMA COMPLEMENTARIO',
             'ELIMINAR ASPIRANTE COMPLEMENTARIO',
-            'VER TALENTO HUMANO',
-            'CREAR TALENTO HUMANO',
-        ]);
+        ];
+    }
 
-        // Asignar permisos al rol ADMINISTRADOR
-        $administrador->givePermissionTo([
-            'CREAR FICHA DE CARACTERIZACION',
-            'EDITAR FICHA DE CARACTERIZACION',
-            'VER FICHA DE CARACTERIZACION',
-            'ELIMINAR FICHA DE CARACTERIZACION',
-            'CREAR INSTRUCTOR',
-            'VER INSTRUCTOR',
-            'EDITAR INSTRUCTOR',
-            'ELIMINAR INSTRUCTOR',
-            'CREAR PERSONA',
-            'VER PERSONA',
-            'EDITAR PERSONA',
-            'CAMBIAR ESTADO PERSONA',
-
-            // Permisos para redes de conocimiento
-            'CREAR RED CONOCIMIENTO',
-            'EDITAR RED CONOCIMIENTO',
-            'VER RED CONOCIMIENTO',
-            'ELIMINAR RED CONOCIMIENTO',
-            // Permisos para aprendices
-            'VER APRENDIZ',
-            'CREAR APRENDIZ',
-            'EDITAR APRENDIZ',
-            'ELIMINAR APRENDIZ',
-            // Permisos para programas de formación (solo lectura y búsqueda para administradores)
-            'programa.index',
-            'programa.show',
-            'programa.search',
-            'VER NOTIFICACION',
-            'VER ESTADISTICAS',
-            'VER PROGRAMA COMPLEMENTARIO',
-            'CREAR PROGRAMA COMPLEMENTARIO',
-            'ELIMINAR ASPIRANTE COMPLEMENTARIO',
-            'VER TALENTO HUMANO',
-            'CREAR TALENTO HUMANO',
-
-            // Permisos de inventario para ADMINISTRADOR (todos menos APROBAR ORDEN)
-            'CREAR PRODUCTO',
-            'VER PRODUCTO',
-            'EDITAR PRODUCTO',
-            'ELIMINAR PRODUCTO',
-            'VER CATALOGO PRODUCTO',
-            'BUSCAR PRODUCTO',
-            'VER CARRITO',
-            'AGREGAR CARRITO',
-            'ACTUALIZAR CARRITO',
-            'ELIMINAR CARRITO',
-            'VACIAR CARRITO',
-            'CREAR CATEGORIA',
-            'VER CATEGORIA',
-            'EDITAR CATEGORIA',
-            'ELIMINAR CATEGORIA',
-            'CREAR MARCA',
-            'VER MARCA',
-            'EDITAR MARCA',
-            'ELIMINAR MARCA',
-            'CREAR CONTRATO',
-            'VER CONTRATO',
-            'EDITAR CONTRATO',
-            'ELIMINAR CONTRATO',
-            'CREAR PROVEEDOR',
-            'VER PROVEEDOR',
-            'EDITAR PROVEEDOR',
-            'ELIMINAR PROVEEDOR',
-            'VER ORDEN',
-            'CREAR ORDEN',
-            'EDITAR ORDEN',
-            'ELIMINAR ORDEN',
-            // NO incluir APROBAR ORDEN para que solo el SUPER ADMIN pueda aprobar
-            'COMPLETAR ORDEN',
-            'VER PRESTAMO',
-            'CREAR PRESTAMO',
-            'EDITAR PRESTAMO',
-            'DEVOLVER PRESTAMO',
-            'APROBAR PRESTAMO',
-            'VER ENTRADA',
-            'CREAR ENTRADA',
-            'VER SALIDA',
-            'CREAR SALIDA',
-            'VER DEVOLUCION',
-            'CREAR DEVOLUCION',
-            'PROCESAR DEVOLUCION',
-            'VER DASHBOARD INVENTARIO',
-
-        ]);
-
-        // Asignar permisos al rol INSTRUCTOR
-        $instructor->givePermissionTo([
+    /**
+     * Permisos del módulo de Control y Seguimiento
+     */
+    private function getPermisosControlSeguimiento(): array
+    {
+        return [
+            'VER INGRESO SALIDA',
             'TOMAR ASISTENCIA',
+        ];
+    }
 
-            'VER APRENDIZ',
-            // Permisos para instructores (solo los que le corresponden)
-            'VER INSTRUCTOR',
-            'VER FICHAS ASIGNADAS',
-            // Permisos para fichas de caracterización (limitados a fichas asignadas)
-            'VER FICHA DE CARACTERIZACION',
-            'EDITAR FICHA DE CARACTERIZACION',
-            'GESTIONAR DIAS FICHA',
-            'GESTIONAR APRENDICES FICHA',
-            'CAMBIAR ESTADO FICHA',
-            // Permisos para programas de formación (solo consulta para instructores)
-            'programa.index',
-            'programa.show',
-            'programa.search',
-            // Permisos para resultados de aprendizaje
-            'VER RESULTADO APRENDIZAJE',
-            'CREAR RESULTADO APRENDIZAJE',
-            'EDITAR RESULTADO APRENDIZAJE',
-            'GESTIONAR COMPETENCIAS RAP',
-            'CAMBIAR ESTADO RAP',
-            // Permisos para competencias
-            'VER COMPETENCIA',
-            // Permisos de inventario para INSTRUCTOR (solo catálogo y carrito, NO lista de productos ni configuraciones)
-            'VER CATALOGO PRODUCTO',
-            'BUSCAR PRODUCTO',
-            'VER CARRITO',
-            'AGREGAR CARRITO',
-            'ACTUALIZAR CARRITO',
-            'ELIMINAR CARRITO',
-            'VACIAR CARRITO',
-            'CREAR ORDEN',
-            'DEVOLVER PRESTAMO',
-            'VER NOTIFICACION',
-        ]);
+    /**
+     * Permisos generales del sistema
+     */
+    private function getPermisosGenerales(): array
+    {
+        return [
+            'ASIGNAR PERMISOS',
+        ];
+    }
 
-        // Asignar permisos al rol ASPIRANTE
-        // Los aspirantes NO deben tener acceso al módulo de personas
-        // Solo pueden ver su propio perfil a través de /mi-perfil
-        $aspirante->syncPermissions([
-            // Sin permisos de personas - solo pueden ver su propio perfil
-        ]);
+    // ==========================================
+    // ASIGNACIÓN DE PERMISOS POR ROL
+    // ==========================================
 
-        // Asignar permisos al rol VISITANTE
-        $visitante->givePermissionTo([
-            'VER PERSONA',
+    /**
+     * Permisos para el rol ADMINISTRADOR
+     */
+    private function getPermisosAdministrador(): array
+    {
+        return array_merge(
+            $this->getPermisosFichas(),
+            $this->getPermisosInstructores(),
+            [
+                'VER CENTRO DE FORMACION',
+                'CREAR PERSONA',
+                'VER PERSONA',
+                'EDITAR PERSONA',
+                'CAMBIAR ESTADO PERSONA',
+                'RESTABLECER PASSWORD',
+            ],
+            $this->getPermisosRedesConocimiento(),
+            $this->getPermisosAprendices(),
+            [
+                'programa.index',
+                'programa.show',
+                'programa.search',
+                self::PERMISO_VER_NOTIFICACION,
+                'VER ESTADISTICAS',
+                self::PERMISO_VER_PROGRAMA_COMPLEMENTARIO,
+                'CREAR PROGRAMA COMPLEMENTARIO',
+                'ELIMINAR ASPIRANTE COMPLEMENTARIO',
+                'VER INGRESO SALIDA',
+                'ASIGNACION DE INSTRUCTORES',
+            ]
+        );
+    }
 
-        ]);
-        // Asignar permisos al rol APRENDIZ
-        // Los aprendices tienen acceso limitado solo a consultar su propia información
-        $aprendiz->syncPermissions([
-            // Permisos de inventario para APRENDIZ (solo catálogo y carrito, NO lista de productos ni configuraciones)
-            'VER CATALOGO PRODUCTO',
-            'BUSCAR PRODUCTO',
-            'VER CARRITO',
-            'AGREGAR CARRITO',
-            'ACTUALIZAR CARRITO',
-            'ELIMINAR CARRITO',
-            'VACIAR CARRITO',
-            'CREAR ORDEN',
-            'DEVOLVER PRESTAMO',
-            'VER NOTIFICACION',
-        ]);
+    /**
+     * Permisos para el rol INSTRUCTOR
+     */
+    private function getPermisosInstructor(): array
+    {
+        return array_merge(
+            [
+                'TOMAR ASISTENCIA',
+                'VER APRENDIZ',
+                'VER INSTRUCTOR',
+                'VER FICHAS ASIGNADAS',
+                'VER FICHA DE CARACTERIZACION',
+                'EDITAR FICHA DE CARACTERIZACION',
+                'GESTIONAR DIAS FICHA',
+                'GESTIONAR APRENDICES FICHA',
+                'CAMBIAR ESTADO FICHA',
+                'programa.index',
+                'programa.show',
+                'programa.search',
+            ],
+            $this->getPermisosResultadosAprendizaje(),
+            [
+                'VER COMPETENCIA',
+            ],
+            [
+                'VER CATALOGO PRODUCTO',
+                'BUSCAR PRODUCTO',
+                'VER CARRITO',
+                'AGREGAR CARRITO',
+                'ACTUALIZAR CARRITO',
+                'ELIMINAR CARRITO',
+                'VACIAR CARRITO',
+                'CREAR ORDEN',
+                'DEVOLVER PRESTAMO',
+                self::PERMISO_VER_NOTIFICACION,
+            ]
+        );
+    }
+
+    /**
+     * Permisos para el rol ASPIRANTE
+     */
+    private function getPermisosAspirante(): array
+    {
+        return [
+            self::PERMISO_VER_PROGRAMA_COMPLEMENTARIO,
+            self::PERMISO_VER_PERFIL,
+            self::PERMISO_EDITAR_PERSONA,
+        ];
+    }
+
+    /**
+     * Permisos para el rol VISITANTE
+     */
+    private function getPermisosVisitante(): array
+    {
+        return [
+            self::PERMISO_VER_PERFIL,
+            self::PERMISO_EDITAR_PERSONA,
+        ];
+    }
+
+    /**
+     * Permisos para el rol APRENDIZ
+     */
+    private function getPermisosAprendiz(): array
+    {
+        return $this->getPermisosVisitante();
     }
 }

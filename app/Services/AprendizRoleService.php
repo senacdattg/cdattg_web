@@ -201,6 +201,9 @@ class AprendizRoleService
                 'persona_id' => $persona->id,
             ]);
             
+            // Enviar email de verificación automáticamente
+            $user->sendEmailVerificationNotification();
+            
             Log::info('Usuario creado por AprendizRoleService', [
                 'aprendiz_id' => $aprendiz->id,
                 'user_id' => $user->id,

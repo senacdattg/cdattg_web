@@ -16,7 +16,7 @@ Este documento explica cómo configurar y utilizar el WebSocket para notificacio
 
 ## 🔧 Requisitos Previos
 
-- **PHP 8.2+** (compatible con PHP 8.4)
+- **PHP 8.3+** (compatible con PHP 8.4)
 - **Laravel 12+**
 - **Composer**
 - **Node.js 16+**
@@ -504,3 +504,8 @@ php artisan reverb:start --host=0.0.0.0 --port=8080
 **¡Listo!** Ahora tienes un sistema completo de WebSocket funcionando con **Laravel Reverb** y soporte para aplicaciones Flutter. 🚀
 
 **Migración completada exitosamente desde beyondcode/laravel-websockets a Laravel Reverb.**
+
+---
+
+**Última actualización:** 2025-11-17  
+**Versión:** Laravel Reverb 1.6, PHP 8.3+

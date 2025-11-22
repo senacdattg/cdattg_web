@@ -14,11 +14,14 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\MunicipioController;
 use App\Http\Controllers\ParametroController;
+use App\Http\Controllers\PermisoController;
 use App\Http\Controllers\PisoController;
 use App\Http\Controllers\SedeController;
 use App\Http\Controllers\AsistenceQrController;
 use App\Http\Controllers\RegistroAsistenciaController;
 use Illuminate\Http\Request;
+use App\Models\Persona;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -62,6 +65,28 @@ Route::get('/user', function (Request $request) {
 });
 
 // ==========================================
+// PERMISOS - GESTIÓN EN TIEMPO REAL
+// ==========================================
+
+Route::middleware(['web', 'auth', 'can:ASIGNAR PERMISOS'])->group(function () {
+    Route::post('/permisos/asignar/{userId}/{permissionName}', [PermisoController::class, 'asignarPermiso'])
+        ->name('api.permisos.asignar');
+    Route::delete('/permisos/remover/{userId}/{permissionName}', [PermisoController::class, 'removerPermiso'])
+        ->name('api.permisos.remover');
+});
+
+// ==========================================
+// ROLES - GESTIÓN EN TIEMPO REAL
+// ==========================================
+
+Route::middleware(['web', 'auth', 'role:SUPER ADMINISTRADOR'])->group(function () {
+    Route::post('/roles/asignar/{userId}/{roleName}', [PermisoController::class, 'asignarRol'])
+        ->name('api.roles.asignar');
+    Route::delete('/roles/remover/{userId}/{roleName}', [PermisoController::class, 'removerRol'])
+        ->name('api.roles.remover');
+});
+
+// ==========================================
 // FICHAS DE CARACTERIZACIÓN - GENERALES
 // ==========================================
 
@@ -90,6 +115,108 @@ Route::get('/fichas-caracterizacion/flutter/{id}', [FichaCaracterizacionFlutterC
 // ==========================================
 
 Route::get('/paises', [UbicacionPublicApiController::class, 'paises'])->name('api.paises');
+
+Route::post('/check-cedula', function (Request $request) {
+    $request->validate([
+        'cedula' => 'required|string|max:20'
+    ]);
+
+    $persona = app(\App\Services\PersonaService::class)->buscarPorDocumento(trim($request->cedula));
+
+    if (!$persona) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Cédula disponible',
+            'available' => true
+        ]);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Cédula ya registrada',
+        'available' => false
+    ]);
+})->name('api.check-cedula');
+
+Route::post('/check-celular', function (Request $request) {
+    $data = $request->validate([
+        'celular' => 'required|string|size:10',
+        'persona_id' => 'nullable|integer|exists:personas,id',
+    ]);
+
+    $persona = Persona::where('celular', trim($data['celular']))->first();
+
+    if (!$persona || (!empty($data['persona_id']) && $persona->id === (int) $data['persona_id'])) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Celular disponible',
+            'available' => true
+        ]);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Celular ya registrado',
+        'available' => false
+    ]);
+})->name('api.check-celular');
+
+Route::post('/check-telefono', function (Request $request) {
+    $data = $request->validate([
+        'telefono' => 'required|string|size:7',
+        'persona_id' => 'nullable|integer|exists:personas,id',
+    ]);
+
+    $persona = Persona::where('telefono', trim($data['telefono']))->first();
+
+    if (!$persona || (!empty($data['persona_id']) && $persona->id === (int) $data['persona_id'])) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Teléfono disponible',
+            'available' => true
+        ]);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Teléfono ya registrado',
+        'available' => false
+    ]);
+})->name('api.check-telefono');
+
+Route::post('/check-email', function (Request $request) {
+    $data = $request->validate([
+        'email' => 'required|email',
+        'persona_id' => 'nullable|integer|exists:personas,id',
+    ]);
+
+    $email = trim($data['email']);
+    $personaId = !empty($data['persona_id']) ? (int) $data['persona_id'] : null;
+
+    $persona = Persona::where('email', $email)->first();
+    if ($persona && ($personaId === null || $persona->id !== $personaId)) {
+        return response()->json([
+            'success' => true,
+            'message' => 'Correo ya registrado',
+            'available' => false
+        ]);
+    }
+
+    $user = User::where('email', $email)->first();
+    if ($user && ($personaId === null || $user->persona_id !== $personaId)) {
+        return response()->json([
+            'success' => true,
+            'message' => 'Correo ya registrado',
+            'available' => false
+        ]);
+    }
+
+    return response()->json([
+        'success' => false,
+        'message' => 'Correo disponible',
+        'available' => true
+    ]);
+})->name('api.check-email');
 
 Route::get('/modalidades', function () {
     return \App\Models\Parametro::where('tema_id', function($query) {
@@ -285,3 +412,24 @@ Route::post('/asistencia/entrada', [RegistroAsistenciaController::class, 'regist
 Route::post('/asistencia/salida', [RegistroAsistenciaController::class, 'registrarSalida']);
 Route::get('/asistencia/jornada', [RegistroAsistenciaController::class, 'obtenerAsistenciasPorJornada']);
 Route::get('/asistencia/fichas', [RegistroAsistenciaController::class, 'obtenerFichasConJornadas']);
+
+// ==========================================
+// WEBSOCKETS - RUTAS PÚBLICAS
+// ==========================================
+
+Route::get('/websocket/estadisticas', [\App\Http\Controllers\WebSocketVisitantesController::class, 'obtenerEstadisticas']);
+Route::post('/websocket/entrada', [\App\Http\Controllers\WebSocketVisitantesController::class, 'registrarEntrada']);
+Route::post('/websocket/salida', [\App\Http\Controllers\WebSocketVisitantesController::class, 'registrarSalida']);
+Route::get('/websocket/visitantes-actuales', [\App\Http\Controllers\WebSocketVisitantesController::class, 'obtenerVisitantesActuales']);
+
+// ==========================================
+// REGISTRO DE PRESENCIA - ESTADÍSTICAS DE PERSONAS DENTRO
+// ==========================================
+
+Route::post('/presencia/entrada', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'registrarEntrada']);
+Route::post('/presencia/salida', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'registrarSalida']);
+Route::get('/presencia/estadisticas', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'estadisticasPersonasDentro']);
+Route::get('/presencia/estadisticas/hoy', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'estadisticasPersonasDentroHoy']);
+Route::get('/presencia/personas-dentro', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'personasDentro']);
+Route::get('/presencia/estadisticas/fecha', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'estadisticasPorFecha']);
+Route::get('/presencia/estadisticas/sede/{sedeId}', [\App\Http\Controllers\PersonaIngresoSalidaController::class, 'estadisticasPorSede']);

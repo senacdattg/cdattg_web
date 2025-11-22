@@ -24,26 +24,24 @@ class SedeRepository
     {
         return $this->cache('activas', function () {
             return Sede::where('status', true)
-                ->with(['centroFormacion', 'municipio'])
-                ->orderBy('nombre')
+                ->with(['municipio', 'regional'])
+                ->orderBy('sede')
                 ->get();
         }, 720); // 12 horas
     }
 
     /**
      * Obtiene sedes por centro de formación
+     * NOTA: Este método está obsoleto ya que la tabla sedes no tiene centro_formacion_id
+     * Se mantiene por compatibilidad pero retorna todas las sedes activas
      *
      * @param int $centroId
      * @return Collection
      */
     public function obtenerPorCentro(int $centroId): Collection
     {
-        return $this->cache("centro.{$centroId}.sedes", function () use ($centroId) {
-            return Sede::where('centro_formacion_id', $centroId)
-                ->where('status', true)
-                ->orderBy('nombre')
-                ->get();
-        }, 720);
+        // La tabla sedes no tiene centro_formacion_id, retornar todas las sedes activas
+        return $this->obtenerActivas();
     }
 
     /**
@@ -55,7 +53,7 @@ class SedeRepository
     public function encontrarConRelaciones(int $id): ?Sede
     {
         return $this->cache("sede.{$id}", function () use ($id) {
-            return Sede::with(['centroFormacion', 'municipio.departamento', 'ambientes', 'pisos'])
+            return Sede::with(['municipio.departamento', 'regional'])
                 ->find($id);
         }, 720);
     }

@@ -18,18 +18,58 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 import Echo from 'laravel-echo';
 import Pusher from 'pusher-js';
 
-// Configurar Laravel Echo para WebSockets
+const obtenerValorConfig = (clavesEnv = [], metaName) => {
+    const envSource = typeof import.meta !== 'undefined' && import.meta.env ? import.meta.env : {};
+    for (const clave of clavesEnv) {
+        const valor = envSource?.[clave];
+        if (typeof valor === 'string' && valor.trim() !== '') {
+            return valor;
+        }
+    }
+
+    if (typeof process !== 'undefined' && process.env) {
+        for (const clave of clavesEnv) {
+            const valor = process.env[clave];
+            if (typeof valor === 'string' && valor.trim() !== '') {
+                return valor;
+            }
+        }
+    }
+
+    if (typeof document !== 'undefined' && metaName) {
+        const metaTag = document.head?.querySelector(`meta[name="${metaName}"]`);
+        if (metaTag?.content?.trim()) {
+            return metaTag.content.trim();
+        }
+    }
+
+    return null;
+};
+
+const pusherKey = obtenerValorConfig(['VITE_PUSHER_APP_KEY', 'MIX_PUSHER_APP_KEY'], 'pusher-key');
+const pusherCluster = obtenerValorConfig(['VITE_PUSHER_APP_CLUSTER', 'MIX_PUSHER_APP_CLUSTER'], 'pusher-cluster') || 'mt1';
+const pusherHost = obtenerValorConfig(['VITE_PUSHER_HOST', 'MIX_PUSHER_HOST'], 'pusher-host') || window.location.hostname;
+const pusherPort = Number(obtenerValorConfig(['VITE_PUSHER_PORT', 'MIX_PUSHER_PORT'], 'pusher-port')) || 6001;
+const pusherScheme = obtenerValorConfig(['VITE_PUSHER_SCHEME', 'MIX_PUSHER_SCHEME'], 'pusher-scheme') || 'http';
+
 window.Pusher = Pusher;
 
-window.Echo = new Echo({
-    broadcaster: 'pusher',
-    key: import.meta.env.VITE_PUSHER_APP_KEY,
-    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-    forceTLS: true,
-    // Configuración para desarrollo local
-    wsHost: window.location.hostname,
-    wsPort: 6001,
-    forceTLS: false,
-    disableStats: true,
-    enabledTransports: ['ws', 'wss'],
-});
+if (pusherKey) {
+    window.Echo = new Echo({
+        broadcaster: 'pusher',
+        key: pusherKey,
+        cluster: pusherCluster,
+        forceTLS: pusherScheme === 'https',
+        wsHost: pusherHost,
+        wsPort: pusherPort,
+        wssPort: pusherScheme === 'https' ? pusherPort : undefined,
+        disableStats: true,
+        enabledTransports: ['ws', 'wss'],
+    });
+} else {
+    // Solo mostrar warning en desarrollo
+    if (process.env.NODE_ENV === 'development' || import.meta.env?.MODE === 'development') {
+        console.warn('Pusher no está configurado: se omitió la inicialización de Laravel Echo.');
+    }
+    window.Echo = null;
+}

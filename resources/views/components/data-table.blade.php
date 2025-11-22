@@ -68,7 +68,8 @@
 
     <div class="card-body px-3 pb-3 pt-0">
         <div class="{{ $tableWrapperClass }}">
-            <table @if ($tableId) id="{{ $tableId }}" @endif class="{{ $tableClass }}">
+            <table @if ($tableId) id="{{ $tableId }}" @endif class="{{ $tableClass }}"
+                aria-label="{{ $title }}" {{ $attributes }}>
                 <thead class="thead-light">
                     <tr>
                         @foreach ($columns as $column)

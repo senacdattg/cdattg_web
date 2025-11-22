@@ -1,4 +1,4 @@
-@extends('adminlte::page')
+@extends('inventario.layouts.base')
 
 @section('title', 'Historial de Mis Préstamos')
 
@@ -119,12 +119,12 @@
     </div>
 </div>
 
-    @include('layout.alertas')
+    {{-- Notificaciones manejadas globalmente por sweetalert2-notifications --}}
 @endsection
 
 @section('footer')
     {{-- Footer SENA --}}
-    @include('layout.footer')
+    @include('layouts.footer')
 @endsection
 
 @push('css')
@@ -132,4 +132,5 @@
         'resources/css/inventario/shared/base.css',
     ])
 @endpush
+
 

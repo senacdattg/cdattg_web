@@ -5,30 +5,80 @@
 @endsection
 
 @section('content_header')
-    <x-page-header icon="fa-cogs" title="Personas" subtitle="Gestión de personas del sistema" :breadcrumb="[
-        ['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'],
-        ['label' => 'Personas', 'url' => route('personas.index'), 'icon' => 'fa-cog'],
-        ['label' => $persona->nombre_completo, 'icon' => 'fa-user', 'active' => true],
-    ]" />
+    @if (!isset($soloPerfil) || !$soloPerfil)
+        <x-page-header icon="fa-cogs" title="Personas" subtitle="Gestión de personas del sistema" :breadcrumb="[
+            ['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'],
+            ['label' => 'Personas', 'url' => route('personas.index'), 'icon' => 'fa-cog'],
+            ['label' => $persona->nombre_completo, 'icon' => 'fa-user', 'active' => true],
+        ]" />
+    @else
+        <x-page-header icon="fa-user" title="Mi Perfil" subtitle="Información personal" :breadcrumb="[
+            ['label' => 'Inicio', 'url' => route('verificarLogin'), 'icon' => 'fa-home'],
+            ['label' => 'Mi Perfil', 'icon' => 'fa-user', 'active' => true],
+        ]" />
+    @endif
 @endsection
 
 @section('content')
     <section class="content mt-4">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <a class="btn btn-outline-secondary" href="{{ route('personas.index') }}">
-                        <i class="fas fa-arrow-left mr-1"></i> Volver
-                    </a>
+                <div class="d-flex align-items-center">
+                    @if (!isset($soloPerfil) || !$soloPerfil)
+                        <a class="btn btn-outline-secondary" href="{{ route('personas.index') }}"
+                            @if(config('adminlte.livewire')) wire:navigate @endif>
+                            <i class="fas fa-arrow-left mr-1"></i> Volver
+                        </a>
+                    @else
+                        <a class="btn btn-outline-secondary" href="{{ route('verificarLogin') }}"
+                            @if(config('adminlte.livewire')) wire:navigate @endif>
+                            <i class="fas fa-arrow-left mr-1"></i> Volver al inicio
+                        </a>
+                    @endif
                 </div>
-                <div>
+                <div class="d-flex align-items-center">
                     @can('EDITAR PERSONA')
-                        <a class="btn btn-primary" href="{{ route('personas.edit', $persona->id) }}">
+                        <a class="btn btn-primary mr-2" href="{{ route('personas.edit', $persona->id) }}"
+                            @if(config('adminlte.livewire')) wire:navigate @endif>
                             <i class="fas fa-edit mr-1"></i> Editar
                         </a>
                     @endcan
+                    @can('EDITAR PERSONA')
+                        @if (!$persona->user)
+                            @php
+                                $faltanCorreo = empty($persona->email);
+                                $faltanDocumento = empty($persona->numero_documento);
+                                $motivos = collect([
+                                    $faltanCorreo ? 'La persona no tiene correo registrado.' : null,
+                                    $faltanDocumento ? 'La persona no tiene número de documento registrado.' : null,
+                                ])->filter()->implode(' ');
+                                $botonDeshabilitado = $faltanCorreo || $faltanDocumento;
+                            @endphp
+                            <button
+                                type="button"
+                                class="btn btn-outline-success"
+                                id="crear-usuario-btn"
+                                data-toggle="tooltip"
+                                data-placement="bottom"
+                                title="{{ $botonDeshabilitado ? ($motivos ?: 'Completa los datos antes de crear el usuario.') : 'Crear usuario con las credenciales predeterminadas.' }}"
+                                data-email="{{ $persona->email ?? '' }}"
+                                data-documento="{{ $persona->numero_documento ?? '' }}"
+                                data-nombre="{{ $persona->nombre_completo }}"
+                                data-disabled="{{ $botonDeshabilitado ? 'true' : 'false' }}"
+                                data-error="{{ $motivos }}">
+                                <i class="fas fa-user-plus mr-1"></i> Crear usuario
+                            </button>
+                        @endif
+                    @endcan
                 </div>
             </div>
+            @can('EDITAR PERSONA')
+                @if (!$persona->user)
+                    <form id="crear-usuario-form" action="{{ route('personas.create-user', $persona) }}" method="POST" class="d-none">
+                        @csrf
+                    </form>
+                @endif
+            @endcan
             <div class="row">
                 <div class="col-lg-4 mb-4">
                     <div class="card shadow-sm border-0 h-100">
@@ -38,11 +88,17 @@
                             <h3 class="profile-username font-weight-bold">{{ $persona->nombre_completo }}</h3>
 
                             @php
-                                $rolesPersona = $persona->user?->getRoleNames();
+                                $rolesPersona = ($rolesAsignados ?? collect())->sort()->values();
                             @endphp
                             <div class="mb-3">
-                                @if ($rolesPersona && $rolesPersona->isNotEmpty())
-                                    <p class="text-muted mb-0">{{ $rolesPersona->implode(', ') }}</p>
+                                @if ($rolesPersona->isNotEmpty())
+                                    <div class="d-flex flex-wrap gap-2 justify-content-center">
+                                        @foreach ($rolesPersona as $rol)
+                                            <span class="badge badge-info text-white px-3 py-2 mr-2 mb-2">
+                                                <i class="fas fa-user-tag mr-1"></i>{{ $rol }}
+                                            </span>
+                                        @endforeach
+                                    </div>
                                 @else
                                     <span class="badge badge-warning text-dark px-3 py-2">
                                         <i class="fas fa-exclamation-triangle mr-1"></i>Sin roles asignados
@@ -64,8 +120,10 @@
                                     </a>
                                 @endif
                                 @if ($persona->celular)
-                                    <a class="btn btn-sm btn-light mx-1 mb-2"
-                                        href="https://wa.me/{{ $persona->celular }}" target="_blank">
+                                    <a
+                                        class="btn btn-sm btn-light mx-1 mb-2"
+                                        href="https://wa.me/{{ $persona->celular }}"
+                                        target="_blank">
                                         <i class="fab fa-whatsapp mr-1 text-success"></i> WhatsApp
                                     </a>
                                 @endif
@@ -164,7 +222,7 @@
                                     <span class="text-muted text-uppercase small d-block">Edad</span>
                                     <p class="h6 mb-0">
                                         @if ($persona->edad)
-                                            {{ $persona->edad }} años
+                                            {{ $persona->edad }} AÑOS
                                         @else
                                             <span class="badge badge-warning text-dark">Sin información</span>
                                         @endif
@@ -306,71 +364,140 @@
                         </div>
                     </div>
 
-                    <div class="card shadow-sm border-0">
-                        <div class="card-header bg-white border-0">
-                            <h5 class="card-title m-0 text-primary">
-                                <i class="fas fa-clipboard-list mr-2"></i>Auditoría
-                            </h5>
-                        </div>
-                        <div class="card-body pt-0">
-                            <div class="row">
-                                <div class="col-md-6 mb-4">
-                                    <span class="text-muted text-uppercase small d-block">Usuario que crea</span>
-                                    <p class="h6 mb-0">
-                                        @if ($persona->userCreatedBy && $persona->userCreatedBy->persona)
-                                            {{ $persona->userCreatedBy->persona->nombre_completo }}
-                                        @else
-                                            <span class="badge badge-warning text-dark">Sin información</span>
-                                        @endif
-                                    </p>
-                                </div>
-                                <div class="col-md-6 mb-4">
-                                    <span class="text-muted text-uppercase small d-block">Fecha de creación</span>
-                                    <p class="h6 mb-0">
-                                        @if ($persona->created_at)
-                                            {{ $persona->created_at->diffForHumans() }}
-                                        @else
-                                            <span class="badge badge-warning text-dark">Sin información</span>
-                                        @endif
-                                    </p>
-                                </div>
-                                <div class="col-md-6 mb-4">
-                                    <span class="text-muted text-uppercase small d-block">Usuario que modifica</span>
-                                    <p class="h6 mb-0">
-                                        @if ($persona->userUpdatedBy && $persona->userUpdatedBy->persona)
-                                            {{ $persona->userUpdatedBy->persona->nombre_completo }}
-                                        @else
-                                            <span class="badge badge-warning text-dark">Sin información</span>
-                                        @endif
-                                    </p>
-                                </div>
-                                <div class="col-md-6 mb-0">
-                                    <span class="text-muted text-uppercase small d-block">Última modificación</span>
-                                    <p class="h6 mb-0">
-                                        @if ($persona->updated_at)
-                                            {{ $persona->updated_at->diffForHumans() }}
-                                        @else
-                                            <span class="badge badge-warning text-dark">Sin información</span>
-                                        @endif
-                                    </p>
-                                </div>
-                                <div class="col-md-6 mb-4">
-                                    <span class="text-muted text-uppercase small d-block">Estado del usuario</span>
-                                    <p class="h6 mb-0">
-                                        <span class="badge {{ $estadoBadgeClass }}">{{ $estadoLabel }}</span>
-                                    </p>
-                                </div>
-                                <div class="col-md-6 mb-0">
-                                    <span class="text-muted text-uppercase small d-block">Registro en SOFIA</span>
-                                    <p class="h6 mb-0">
-                                        <span class="badge {{ $estadoSofiaBadgeClass }} text-white">
-                                            {{ $estadoSofiaLabel }}
+                    @if (!isset($soloPerfil) || !$soloPerfil)
+                        <div class="card shadow-sm border-0">
+                            <div class="card-header bg-white border-0">
+                                <h5 class="card-title m-0 text-primary">
+                                    <i class="fas fa-clipboard-list mr-2"></i>Auditoría
+                                </h5>
+                            </div>
+                            <div class="card-body pt-0">
+                                <div class="row">
+                                    <div class="col-md-6 mb-4">
+                                        <span class="text-muted text-uppercase small d-block">Usuario que crea</span>
+                                        <p class="h6 mb-0">
+                                            @if ($persona->userCreatedBy && $persona->userCreatedBy->persona)
+                                                {{ $persona->userCreatedBy->persona->nombre_completo }}
+                                            @else
+                                                <span class="badge badge-warning text-dark">Sin información</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <span class="text-muted text-uppercase small d-block">Fecha de creación</span>
+                                        <p class="h6 mb-0">
+                                            @if ($persona->created_at)
+                                                {{ $persona->created_at->diffForHumans() }}
+                                            @else
+                                                <span class="badge badge-warning text-dark">Sin información</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <span class="text-muted text-uppercase small d-block">
+                                            Usuario que modifica
                                         </span>
-                                    </p>
+                                        <p class="h6 mb-0">
+                                            @if ($persona->userUpdatedBy && $persona->userUpdatedBy->persona)
+                                                {{ $persona->userUpdatedBy->persona->nombre_completo }}
+                                            @else
+                                                <span class="badge badge-warning text-dark">Sin información</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6 mb-0">
+                                        <span class="text-muted text-uppercase small d-block">Última modificación</span>
+                                        <p class="h6 mb-0">
+                                            @if ($persona->updated_at)
+                                                {{ $persona->updated_at->diffForHumans() }}
+                                            @else
+                                                <span class="badge badge-warning text-dark">Sin información</span>
+                                            @endif
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6 mb-4">
+                                        <span class="text-muted text-uppercase small d-block">Estado del usuario</span>
+                                        <p class="h6 mb-0">
+                                            <span class="badge {{ $estadoBadgeClass }}">{{ $estadoLabel }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6 mb-0">
+                                        <span class="text-muted text-uppercase small d-block">Registro en SOFIA</span>
+                                        <p class="h6 mb-0">
+                                            <span class="badge {{ $estadoSofiaBadgeClass }} text-white">
+                                                {{ $estadoSofiaLabel }}
+                                            </span>
+                                        </p>
+                                    </div>
+                                @can('ASIGNAR PERMISOS')
+                                    <div class="col-12">
+                                        <hr class="mt-4 mb-4">
+                                        @php
+                                            $rolesActuales = isset($rolesAsignados) ? $rolesAsignados : collect();
+                                        @endphp
+                                            @if ($persona->user)
+                                            <form method="POST" action="{{ route('personas.update-role', $persona) }}">
+                                                @csrf
+                                                @method('PATCH')
+                                                <div class="form-group mb-3">
+                                                    <label class="small text-muted text-uppercase d-block mb-2">Seleccionar roles</label>
+                                                    <div class="row">
+                                                        @forelse ($rolesDisponibles as $rol)
+                                                            @php
+                                                                $inputId = 'role-' . \Illuminate\Support\Str::slug($rol->name);
+                                                                $asignado = $rolesActuales->contains($rol->name);
+                                                            @endphp
+                                                            <div class="col-md-6 mb-2">
+                                                                <div class="custom-control custom-checkbox">
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        class="custom-control-input"
+                                                                        id="{{ $inputId }}"
+                                                                        name="roles[]"
+                                                                        value="{{ $rol->name }}"
+                                                                        @if ($asignado) checked @endif
+                                                                    >
+                                                                    <label class="custom-control-label" for="{{ $inputId }}">
+                                                                        {{ $rol->name }}
+                                                                    </label>
+                                                                </div>
+                                                            </div>
+                                                        @empty
+                                                            <div class="col-12">
+                                                                <div class="alert alert-warning mb-0">
+                                                                    No hay roles disponibles en el sistema.
+                                                                </div>
+                                                            </div>
+                                                        @endforelse
+                                                    </div>
+                                                    @error('roles')
+                                                        <div class="invalid-feedback d-block">
+                                                            {{ $message }}
+                                                        </div>
+                                                    @enderror
+                                                    @error('roles.*')
+                                                        <div class="invalid-feedback d-block">
+                                                            {{ $message }}
+                                                        </div>
+                                                    @enderror
+                                                </div>
+                                                <div class="d-flex justify-content-end">
+                                                    <button type="submit" class="btn btn-primary" @if ($rolesDisponibles->isEmpty()) disabled @endif>
+                                                        <i class="fas fa-user-edit mr-1"></i>Actualizar roles
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        @else
+                                            <div class="alert alert-warning mb-0">
+                                                La persona no tiene usuario asociado.
+                                            </div>
+                                        @endif
+                                    </div>
+                                @endcan
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -378,9 +505,64 @@
 @endsection
 
 @section('footer')
-    @include('layout.footer')
+    @include('layouts.footer')
 @endsection
 
 @section('js')
     @vite(['resources/js/parametros.js'])
+    @stack('js')
 @endsection
+
+@push('js')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            if (typeof $ === 'function') {
+                $('[data-toggle="tooltip"]').tooltip();
+            }
+
+            const trigger = document.getElementById('crear-usuario-btn');
+            const form = document.getElementById('crear-usuario-form');
+
+            if (!trigger || !form) {
+                return;
+            }
+
+            trigger.addEventListener('click', function () {
+                const isDisabled = trigger.dataset.disabled === 'true';
+                const email = trigger.dataset.email || '';
+                const documento = trigger.dataset.documento || '';
+                const mensajeError = trigger.dataset.error || 'Actualiza el correo y el documento antes de crear el usuario.';
+
+                if (isDisabled) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'No es posible crear el usuario',
+                        text: mensajeError,
+                        confirmButtonText: 'Entendido',
+                        confirmButtonColor: '#d33'
+                    });
+                    return;
+                }
+
+                const emailSeguro = $('<div>').text(email).html();
+                const documentoSeguro = $('<div>').text(documento).html();
+
+                Swal.fire({
+                    title: 'Crear usuario',
+                    html: `Se creará el usuario <strong>${emailSeguro}</strong><br>` +
+                        `La contraseña temporal será el número de documento: <strong>${documentoSeguro}</strong>`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#28a745',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: '<i class="fas fa-user-plus mr-1"></i> Crear usuario',
+                    cancelButtonText: '<i class="fas fa-times mr-1"></i> Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    </script>
+@endpush

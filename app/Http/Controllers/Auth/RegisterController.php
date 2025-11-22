@@ -58,20 +58,28 @@ class RegisterController extends Controller
 
         $this->actualizarRolesSegunInscripcion($persona, $user);
 
+        // Enviar email de verificación
+        $user->sendEmailVerificationNotification();
+
         Auth::login($user);
 
-        return $this->resolvePostRegistroRedirect($persona, $this->tieneInscripciones($persona));
+        return redirect()
+            ->route('verification.notice')
+            ->with('success', '¡Registro exitoso! Por favor, verifica tu correo electrónico antes de continuar.');
     }
 
     private function personaExists(string $numeroDocumento, string $email): bool
     {
         return Persona::where('numero_documento', $numeroDocumento)
             ->orWhere('email', $email)
-            ->exists();
+            ->exists()
+            || User::where('email', $email)->exists();
     }
 
     private function createPersonaYUsuario(array $data): array
     {
+        $caracterizacionIds = $this->extractCaracterizacionIds($data);
+
         $persona = Persona::create([
             'tipo_documento' => $data['tipo_documento'],
             'numero_documento' => $data['numero_documento'],
@@ -100,6 +108,8 @@ class RegisterController extends Controller
         ]);
 
         $user->assignRole('VISITANTE');
+
+        $this->syncCaracterizaciones($persona, $caracterizacionIds);
 
         return [$persona, $user];
     }
@@ -130,34 +140,33 @@ class RegisterController extends Controller
         return $trimmed === '' ? null : strtoupper($trimmed);
     }
 
-    private function resolvePostRegistroRedirect(Persona $persona, bool $tieneInscripciones): RedirectResponse
+
+    /**
+     * @param array<string,mixed> $data
+     * @return array<int,int>
+     */
+    private function extractCaracterizacionIds(array $data): array
     {
-        if ($tieneInscripciones) {
-            $inscripcionPendiente = AspiranteComplementario::where('persona_id', $persona->id)
-                ->where('estado', 1)
-                ->whereNull('documento_identidad_path')
-                ->orderBy('created_at', 'desc')
-                ->first();
+        return collect($data['caracterizacion_ids'] ?? [])
+            ->filter()
+            ->map(fn($id) => (int) $id)
+            ->unique()
+            ->values()
+            ->all();
+    }
 
-            if ($inscripcionPendiente) {
-                return redirect()
-                    ->route('programas-complementarios.documentos', [
-                        'id' => $inscripcionPendiente->complementario_id,
-                        'aspirante_id' => $inscripcionPendiente->id,
-                    ])
-                    ->with(
-                        'success',
-                        '¡Registro Exitoso! Complete el proceso subiendo su documento de identidad.'
-                    );
-            }
+    /**
+     * @param array<int,int> $caracterizacionIds
+     */
+    private function syncCaracterizaciones(Persona $persona, array $caracterizacionIds): void
+    {
+        $persona->caracterizacionesComplementarias()->sync($caracterizacionIds);
+
+        if (!empty($caracterizacionIds)) {
+            $persona->updateQuietly([
+                'parametro_id' => $caracterizacionIds[0],
+            ]);
         }
-
-        return redirect()
-            ->route('programas-complementarios.index')
-            ->with(
-                'success',
-                '¡Registro Exitoso! Ahora puede inscribirse en los programas complementarios disponibles.'
-            );
     }
 
     private function resolveAuditableUserId(): ?int
@@ -174,18 +183,18 @@ class RegisterController extends Controller
             ->unique()
             ->values();
 
-        foreach ($candidates as $candidateId) {
-            if (User::whereKey($candidateId)->exists()) {
-                return $candidateId;
-            }
+        $resolvedId = $candidates
+            ->first(fn($candidateId) => User::whereKey($candidateId)->exists());
+
+        if (!$resolvedId) {
+            $resolvedId = User::role('ADMIN')->value('id');
         }
 
-        $adminFallback = User::role('ADMIN')->value('id');
-        if ($adminFallback) {
-            return (int) $adminFallback;
+        if (!$resolvedId) {
+            $resolvedId = User::orderBy('id')->value('id');
         }
 
-        return User::orderBy('id')->value('id');
+        return $resolvedId ? (int) $resolvedId : null;
     }
 
     private function resolveDocumentos(): object

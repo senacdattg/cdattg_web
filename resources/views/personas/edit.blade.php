@@ -16,7 +16,8 @@
     <section class="content mt-4 mb-4">
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <a class="btn btn-outline-secondary" href="{{ route('personas.show', $persona->id) }}">
+                <a class="btn btn-outline-secondary" href="{{ route('personas.show', $persona->id) }}"
+                    @if (config('adminlte.livewire')) wire:navigate @endif>
                     <i class="fas fa-arrow-left mr-1"></i> Ver persona
                 </a>
                 <span class="text-muted small">Actualiza los datos y guarda los cambios.</span>
@@ -27,7 +28,10 @@
                 @csrf
                 @method('PUT')
 
-                @include('personas.partials.form', ['showCaracterizacion' => true, 'cardinales' => $cardinales])
+                @include('personas.partials.form', [
+                    'showCaracterizacion' => true,
+                    'cardinales' => $cardinales,
+                ])
 
                 <div class="card shadow-sm border-0 mt-4 mb-5">
                     <div class="card-body d-flex justify-content-between align-items-center">
@@ -35,7 +39,8 @@
                             Última modificación: {{ $persona->updated_at?->diffForHumans() ?? 'Sin información' }}
                         </div>
                         <div>
-                            <a href="{{ route('personas.show', $persona->id) }}" class="btn btn-outline-secondary mr-2">
+                            <a href="{{ route('personas.show', $persona->id) }}" class="btn btn-outline-secondary mr-2"
+                                @if (config('adminlte.livewire')) wire:navigate @endif>
                                 <i class="fas fa-times mr-1"></i> Cancelar
                             </a>
                             <button type="submit" class="btn btn-primary">
@@ -50,7 +55,7 @@
 @endsection
 
 @section('footer')
-    @include('layout.footer')
+    @include('layouts.footer')
 @endsection
 
 @section('js')

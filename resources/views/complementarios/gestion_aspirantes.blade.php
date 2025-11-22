@@ -12,34 +12,37 @@
 @stop
 
 @section('content')
-<link rel="stylesheet" href="{{ asset('resources/css/complementario/gestion_aspirantes.css') }}">
+    <link rel="stylesheet" href="{{ asset('resources/css/complementario/gestion_aspirantes.css') }}">
 
     <!-- Main Content -->
     <div class="container-fluid px-4 py-4">
         <div class="row">
             @forelse($programas as $programa)
-            <div class="col-md-4 mb-4">
-                <div class="course-card">
-                    <div class="card-icon">
-                        <i class="{{ $programa->icono }}"></i>
+                <div class="col-md-4 mb-4">
+                    <div class="course-card">
+                        <div class="card-icon">
+                            <i class="{{ $programa->icono }}"></i>
+                        </div>
+                        <div class="card-title">{{ $programa->nombre }}</div>
+                        <span class="badge {{ $programa->badge_class }} mb-2">{{ $programa->estado_label }}</span>
+                        <p>{{ $programa->descripcion }}</p>
+                        <p><strong>Aspirantes:</strong> {{ $programa->aspirantes_count }}</p>
+                        <a href="{{ route('aspirantes.ver', [
+                            'curso' => str_replace(' ', '-', strtolower($programa->nombre)),
+                        ]) }}"
+                            class="btn btn-primary w-100">
+                            <i class="fas fa-users"></i> Ver Aspirantes
+                        </a>
                     </div>
-                    <div class="card-title">{{ $programa->nombre }}</div>
-                    <span class="badge {{ $programa->badge_class }} mb-2">{{ $programa->estado_label }}</span>
-                    <p>{{ $programa->descripcion }}</p>
-                    <p><strong>Aspirantes:</strong> {{ $programa->aspirantes_count }}</p>
-                    <a href="{{ route('aspirantes.ver', ['curso' => str_replace(' ', '-', strtolower($programa->nombre))]) }}" class="btn btn-primary w-100">
-                        <i class="fas fa-users"></i> Ver Aspirantes
-                    </a>
                 </div>
-            </div>
             @empty
-            <div class="col-12">
-                <div class="alert alert-info text-center">
-                    <i class="fas fa-info-circle fa-2x mb-3"></i>
-                    <h5>No hay programas complementarios disponibles</h5>
-                    <p>No se encontraron programas complementarios en el sistema.</p>
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <i class="fas fa-info-circle fa-2x mb-3"></i>
+                        <h5>No hay programas complementarios disponibles</h5>
+                        <p>No se encontraron programas complementarios en el sistema.</p>
+                    </div>
                 </div>
-            </div>
             @endforelse
         </div>
     </div>
@@ -53,7 +56,7 @@
                 document.querySelectorAll('.status-tab').forEach(t => t.classList.remove('active'));
                 // Add active class to clicked tab
                 this.classList.add('active');
-                
+
                 // Here you would typically filter the table based on the selected status
                 const status = this.getAttribute('data-status');
                 console.log('Selected status:', status);
@@ -70,8 +73,8 @@
         // Action button functionality
         document.querySelectorAll('.action-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                const action = this.classList.contains('action-btn-view') ? 'view' : 
-                            this.classList.contains('action-btn-edit') ? 'edit' : 'delete';
+                const action = this.classList.contains('action-btn-view') ? 'view' :
+                    this.classList.contains('action-btn-edit') ? 'edit' : 'delete';
                 const row = this.closest('tr');
                 const id = row.cells[0].textContent;
                 console.log(`${action} action for ID: ${id}`);

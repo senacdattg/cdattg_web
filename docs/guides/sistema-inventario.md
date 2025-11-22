@@ -277,6 +277,6 @@ Content-Type: application/json
 
 ---
 
-**Desarrollado para**: CDATTG Assistance Web  
-**Fecha**: Enero 2025  
+**Desarrollado para**: CDATTG Asistence Web (Académica Web)  
+**Fecha:** 2025-11-17  
 **Framework**: Laravel + AdminLTE

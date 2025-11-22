@@ -1,14 +1,12 @@
 <li @isset($item['id']) id="{{ $item['id'] }}" @endisset class="nav-item">
 
     <a class="nav-link {{ $item['class'] }}" href="{{ $item['href'] }}"
-       @isset($item['target']) target="{{ $item['target'] }}" @endisset
-       {!! $item['data-compiled'] ?? '' !!}>
+        @isset($item['target']) target="{{ $item['target'] }}" @elseif(config('adminlte.livewire')) wire:navigate @endisset
+        {!! $item['data-compiled'] ?? '' !!}>
 
         {{-- Icon (optional) --}}
         @isset($item['icon'])
-            <i class="{{ $item['icon'] }} {{
-                isset($item['icon_color']) ? 'text-' . $item['icon_color'] : ''
-            }}"></i>
+            <i class="{{ $item['icon'] }} {{ isset($item['icon_color']) ? 'text-' . $item['icon_color'] : '' }}"></i>
         @endisset
 
         {{-- Text --}}

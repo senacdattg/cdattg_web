@@ -16,7 +16,8 @@
     <section class="content mt-4">
         <div class="container-fluid">
             <div class="mb-3">
-                <a class="btn btn-outline-secondary btn-sm" href="{{ route('personas.index') }}" title="Volver">
+                <a class="btn btn-outline-secondary btn-sm" href="{{ route('personas.index') }}" title="Volver"
+                    @if(config('adminlte.livewire')) wire:navigate @endif>
                     <i class="fas fa-arrow-left mr-1"></i> Volver
                 </a>
             </div>
@@ -36,7 +37,8 @@
                         <div class="col-12">
                             <hr class="mt-4">
                             <div class="d-flex justify-content-center gap-2">
-                                <a href="{{ route('personas.index') }}" class="btn btn-outline-secondary btn-sm mx-1">
+                                <a href="{{ route('personas.index') }}" class="btn btn-outline-secondary btn-sm mx-1"
+                                    @if(config('adminlte.livewire')) wire:navigate @endif>
                                     <i class="fas fa-times mr-1"></i> Cancelar
                                 </a>
                                 <button type="submit" class="btn btn-outline-success btn-sm mx-1">
@@ -52,7 +54,7 @@
 @endsection
 
 @section('footer')
-    @include('layout.footer')
+    @include('layouts.footer')
 @endsection
 
 @section('js')

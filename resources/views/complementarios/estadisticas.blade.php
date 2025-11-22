@@ -123,9 +123,9 @@
     </style>
 @stop
 
+@section('plugins.Chartjs', true)
+
 @section('js')
-    <!-- Chart.js CDN -->
-    <script src="{{ asset('vendor/chart.js/Chart.bundle.min.js') }}"></script>
     <script src="{{ asset('js/complementarios/estadisticas.js') }}"></script>
     <script>
         let inscripcionesChart, programasPieChart;

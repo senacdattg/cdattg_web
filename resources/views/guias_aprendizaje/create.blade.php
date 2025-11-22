@@ -1,9 +1,9 @@
 @extends('adminlte::page')
 
+@section('plugins.Select2', true)
+
 @section('css')
     @vite(['resources/css/guias_aprendizaje.css'])
-    <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2-bootstrap4.min.css') }}">
     <style>
         .dashboard-header {
             background: #fff;
@@ -187,7 +187,7 @@
 @endsection
 
 @section('footer')
-    @include('layout.footer')
+    @include('layouts.footer')
 @endsection
 
 @section('js')

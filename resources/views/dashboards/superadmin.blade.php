@@ -1,4 +1,7 @@
 @extends('adminlte::page')
+
+@section('plugins.Chartjs', true)
+
 @push('css')
     @vite(['resources/css/dashboards/dashboard-superadmin.css'])
 @endpush
@@ -17,11 +20,10 @@
 @endsection
 
 @section('footer')
-    @include('layout.footer')
+    @include('layouts.footer')
 @endsection
 
 @push('js')
-    <script src="{{ asset('vendor/chart.js/Chart.bundle.min.js') }}"></script>
     @vite(['resources/js/app.js'])
     @vite(['resources/js/dashboards/superadmin/charts-scripts.js'])
 @endpush

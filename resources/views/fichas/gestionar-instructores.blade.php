@@ -1,5 +1,7 @@
 @extends('adminlte::page')
 
+@section('plugins.Select2', true)
+
 @section('title', 'Gestionar Instructores - Ficha ' . $ficha->ficha)
 
 @section('meta')
@@ -8,8 +10,7 @@
 
 @section('css')
     @vite(['resources/css/parametros.css'])
-    <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('plugins/select2/css/select2-bootstrap4.min.css') }}">
+    {{-- Select2 cargado por AdminLTE nativo --}}
     <style>
         /* Estilos para badges de estado */
         .badge {
@@ -474,7 +475,7 @@
 @endsection
 
 @section('footer')
-    @include('layout.footer')
+    @include('layouts.footer')
 @endsection
 
 @section('js')

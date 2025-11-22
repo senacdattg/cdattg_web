@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Models\User;
 
 class UpdatePersonaRequest extends FormRequest
 {
@@ -22,33 +23,42 @@ class UpdatePersonaRequest extends FormRequest
      */
     public function rules(): array
     {
-        // Se usa route model binding para obtener la instancia de Persona
-        $persona = $this->route('persona');
-        $personaId = $persona ? $persona->id : null;
-        // Se verifica que exista un usuario asociado; de lo contrario, se ignora la validación de unicidad en users
-        $userId = ($persona && $persona->user) ? $persona->user->id : null;
+        $personaId = $this->input('persona_id');
+        $userId = $this->input('persona_user_id');
+
+        if ($personaId && !$userId) {
+            $userId = User::where('persona_id', $personaId)->value('id');
+        }
 
         return [
             'tipo_documento'      => 'required',
-            'numero_documento'    => 'required',
+            'numero_documento'    => [
+                'required',
+                Rule::unique('personas', 'numero_documento')->ignore($personaId),
+            ],
             'primer_nombre'       => 'required|string',
             'segundo_nombre'      => 'nullable|string',
             'primer_apellido'     => 'required|string',
             'segundo_apellido'    => 'nullable|string',
             'fecha_nacimiento'    => 'required|date',
             'genero'              => 'required',
-            'telefono'            => 'nullable|unique:personas,telefono,' . $personaId,
-            'celular'             => 'nullable|unique:personas,celular,' . $personaId,
+            'telefono'            => [
+                'nullable',
+                Rule::unique('personas', 'telefono')->ignore($personaId),
+            ],
+            'celular'             => [
+                'nullable',
+                Rule::unique('personas', 'celular')->ignore($personaId),
+            ],
             'email'               => [
-                'required',
+                'nullable',
                 'email',
                 Rule::unique('personas', 'email')->ignore($personaId),
-                Rule::unique('users', 'email')->ignore($userId),
             ],
             'pais_id'             => 'required|exists:pais,id',
             'departamento_id'     => 'required|exists:departamentos,id',
             'municipio_id'        => 'required|exists:municipios,id',
-            'direccion'           => 'required|string|max:255',
+            'direccion'           => 'nullable|string|max:255',
             'caracterizacion_ids'   => 'nullable|array',
             'caracterizacion_ids.*' => 'integer|exists:parametros,id',
         ];
@@ -90,7 +100,6 @@ class UpdatePersonaRequest extends FormRequest
             'fecha_nacimiento.required'    => 'La fecha de nacimiento es obligatoria.',
             'fecha_nacimiento.date'        => 'La fecha de nacimiento debe ser una fecha válida.',
             'genero.required'              => 'El género es obligatorio.',
-            'email.required'               => 'El correo electrónico es obligatorio.',
             'email.email'                  => 'El correo electrónico debe ser válido.',
             'email.unique'                 => 'El correo electrónico ya está en uso.',
             'telefono.unique'              => 'El número de teléfono ya está en uso.',

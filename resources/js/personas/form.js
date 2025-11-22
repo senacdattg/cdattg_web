@@ -7,9 +7,6 @@ const CONFIG = {
     TOGGLE_SELECTOR: '#toggleAddressForm',
     DIRECCION_SELECTOR: '#direccion',
     CARACTERIZACION_CHECKBOX_FIELD: 'input[name="caracterizacion_ids[]"]',
-    SELECT_ALL_ACTION: '[data-action="caracterizacion-select-all"]',
-    CLEAR_ACTION: '[data-action="caracterizacion-clear"]',
-    GROUP_SELECTOR: '.caracterizacion-group',
     EDAD_MINIMA: 14,
     MENSAJE_EDAD_INVALIDA: 'Debe tener al menos 14 años para registrarse.'
 };
@@ -63,6 +60,12 @@ class HttpClient {
             'X-Requested-With': 'XMLHttpRequest',
             Accept: 'application/json'
         };
+
+        // Add CSRF token if available
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (csrfToken) {
+            this.defaultHeaders['X-CSRF-TOKEN'] = csrfToken.getAttribute('content');
+        }
     }
 
     async get(url, config = {}) {
@@ -78,6 +81,33 @@ class HttpClient {
         }
 
         const response = await fetch(url, { headers });
+        if (!response.ok) {
+            const error = new Error(`HTTP ${response.status}`);
+            this.logger.error('Solicitud fallida:', error);
+            throw error;
+        }
+
+        return response.json();
+    }
+
+    async post(url, data = {}, config = {}) {
+        if (!url) {
+            throw new Error('URL requerida para la solicitud.');
+        }
+
+        const headers = { ...this.defaultHeaders, ...(config.headers || {}) };
+
+        if (this.client) {
+            const response = await this.client.post(url, data, { ...config, headers });
+            return response.data;
+        }
+
+        headers['Content-Type'] = 'application/json';
+        const response = await fetch(url, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(data)
+        });
         if (!response.ok) {
             const error = new Error(`HTTP ${response.status}`);
             this.logger.error('Solicitud fallida:', error);
@@ -114,6 +144,17 @@ class InputHandler {
                 }, `personaUpper_${fieldName}`);
             });
         });
+
+        // Convertir email a mayúsculas
+        forms.forEach((form) => {
+            const emailField = resolveField(form, 'email');
+            if (emailField) {
+                bindOnce(emailField, 'input', () => {
+                    emailField.value = emailField.value.toUpperCase();
+                }, 'personaUpper_email');
+            }
+        });
+
         this.attachNumeric(forms);
     }
 
@@ -160,19 +201,6 @@ class CaracterizacionHandler {
             return;
         }
 
-        const selectAllButton = document.querySelector(this.config.SELECT_ALL_ACTION);
-        const clearButton = document.querySelector(this.config.CLEAR_ACTION);
-
-        bindOnce(selectAllButton, 'click', (event) => {
-            event.preventDefault();
-            this.toggleCheckboxes(true);
-        }, 'personaCaracterizacionSelectAll');
-
-        bindOnce(clearButton, 'click', (event) => {
-            event.preventDefault();
-            this.toggleCheckboxes(false);
-        }, 'personaCaracterizacionClear');
-
         const ningunaCheckbox = this.findNingunaCheckbox(checkboxes);
 
         checkboxes.forEach((checkbox) => {
@@ -191,14 +219,6 @@ class CaracterizacionHandler {
                     ningunaCheckbox.checked = false;
                 }
             }, `personaCaracterizacion_${checkbox.id || checkbox.name}`);
-        });
-    }
-
-    toggleCheckboxes(checked) {
-        DomFacade.findAll(this.config.GROUP_SELECTOR).forEach((group) => {
-            group.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
-                checkbox.checked = checked;
-            });
         });
     }
 
@@ -1056,6 +1076,14 @@ class LocationService {
         const paisSelect = DomFacade.find(this.selectors.PAIS);
         const departamentoSelect = DomFacade.find(this.selectors.DEPARTAMENTO);
 
+        if (!paisSelect || !departamentoSelect) {
+            return;
+        }
+
+        // Limpiar flags anteriores para permitir reasignación después de navegación Livewire
+        delete paisSelect.dataset.personaPaisListener;
+        delete departamentoSelect.dataset.personaDepartamentoListener;
+
         bindOnce(paisSelect, 'change', (event) => {
             const paisId = event.target.value;
             void this.loadDepartamentos(paisId);
@@ -1131,7 +1159,11 @@ class LocationService {
             return;
         }
 
-        this.populateSelect(municipioSelect, [], this.PLACEHOLDERS.municipios, selectedId, 'municipio');
+        // Guardar el valor actual antes de limpiar
+        const currentValue = municipioSelect.value || selectedId;
+
+        // Limpiar el select pero mantener el valor si existe
+        this.populateSelect(municipioSelect, [], this.PLACEHOLDERS.municipios, currentValue || selectedId, 'municipio');
 
         const endpoint = this.resolveEndpoint(municipioSelect, '/municipios', departamentoId);
         if (!endpoint) {
@@ -1147,7 +1179,21 @@ class LocationService {
                 return;
             }
 
-            this.populateSelect(municipioSelect, collection, this.PLACEHOLDERS.municipios, selectedId, 'municipio');
+            // Usar el valor guardado o el selectedId proporcionado
+            const valueToSelect = selectedId || currentValue;
+            this.populateSelect(municipioSelect, collection, this.PLACEHOLDERS.municipios, valueToSelect, 'municipio');
+
+            // Asegurar que el valor se establezca correctamente después de poblar
+            if (valueToSelect) {
+                // Pequeño delay para asegurar que el DOM esté actualizado
+                setTimeout(() => {
+                    if (municipioSelect.value !== String(valueToSelect)) {
+                        municipioSelect.value = String(valueToSelect);
+                        // Disparar evento change para notificar a otros listeners
+                        municipioSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                }, 10);
+            }
         } catch (error) {
             console.error('Error cargando municipios:', error);
             this.setMessage(municipioSelect, 'Error cargando municipios');
@@ -1159,20 +1205,28 @@ class LocationService {
             return;
         }
 
+        // Guardar el valor actual si existe y no hay selectedId
+        const currentValue = selectedId ? null : select.value;
+
         select.innerHTML = '';
 
         const placeholderOption = document.createElement('option');
         placeholderOption.value = '';
         placeholderOption.textContent = placeholder;
-        if (!selectedId) {
+        if (!selectedId && !currentValue) {
             placeholderOption.selected = true;
         }
         select.appendChild(placeholderOption);
 
         if (!Array.isArray(items) || !items.length) {
+            // Si hay un valor actual y no hay items, intentar mantenerlo
+            if (currentValue) {
+                select.value = currentValue;
+            }
             return;
         }
 
+        let hasSelected = false;
         items.forEach((item) => {
             const option = document.createElement('option');
             option.value = item.id ?? '';
@@ -1181,9 +1235,26 @@ class LocationService {
             if (selectedId && String(item.id) === String(selectedId)) {
                 option.selected = true;
                 placeholderOption.selected = false;
+                hasSelected = true;
+            } else if (currentValue && String(item.id) === String(currentValue)) {
+                option.selected = true;
+                placeholderOption.selected = false;
+                hasSelected = true;
             }
 
             select.appendChild(option);
+        });
+
+        // Asegurar que el valor se establezca correctamente
+        // Usar requestAnimationFrame para asegurar que el DOM esté completamente actualizado
+        requestAnimationFrame(() => {
+            const valueToSet = selectedId || (currentValue && hasSelected ? currentValue : null);
+            if (valueToSet) {
+                const valueStr = String(valueToSet);
+                if (select.value !== valueStr) {
+                    select.value = valueStr;
+                }
+            }
         });
     }
 
@@ -1247,6 +1318,8 @@ class AgeValidator {
         }
 
         forms.forEach((form) => {
+            const personaIdField = form.querySelector('#persona_id');
+            const personaId = personaIdField ? personaIdField.value : null;
             bindOnce(form, 'submit', (event) => {
                 if (!this.validateAge(field)) {
                     event.preventDefault();
@@ -1321,8 +1394,8 @@ class ValidationHandler {
         return (
             this.validateTextFields(form) &&
             this.validateNumericField(form, '#numero_documento', 'El número de documento solo puede contener números.') &&
-            this.validateNumericField(form, '#telefono', 'El teléfono fijo solo puede contener números.') &&
-            this.validateNumericField(form, '#celular', 'El celular solo puede contener números.')
+            this.validatePhoneField(form, '#telefono', 7, 'El teléfono fijo debe tener exactamente 7 dígitos.') &&
+            this.validatePhoneField(form, '#celular', 10, 'El celular debe tener exactamente 10 dígitos.')
         );
     }
 
@@ -1358,6 +1431,22 @@ class ValidationHandler {
         field.focus();
         return false;
     }
+
+    validatePhoneField(form, selector, exactLength, message) {
+        const field = form.querySelector(selector);
+        if (!field || !field.value) {
+            return true;
+        }
+
+        if (/^\d+$/.test(field.value) && field.value.length === exactLength) {
+            return true;
+        }
+
+        // Instead of alert, set custom validity for inline feedback
+        field.setCustomValidity(message);
+        field.classList.add('is-invalid');
+        return false;
+    }
 }
 
 class PreloaderHandler {
@@ -1377,6 +1466,210 @@ class PreloaderHandler {
     }
 }
 
+class FieldValidator {
+    constructor() {
+        this.timeouts = {};
+        this.http = new HttpClient();
+    }
+
+    attach(forms) {
+        forms.forEach((form) => {
+            // Validación de cédula
+            const cedulaField = resolveField(form, 'numero_documento');
+            if (cedulaField) {
+                bindOnce(cedulaField, 'input', (e) => {
+                    clearTimeout(this.timeouts.cedula);
+                    const cedula = e.target.value.trim();
+                    if (cedula.length >= 5) {
+                        this.timeouts.cedula = setTimeout(() => {
+                            this.checkCedulaAvailability(cedula);
+                        }, 500);
+                    } else {
+                        // Limpiar feedback si es muy corto
+                        const feedback = document.getElementById('cedula-feedback');
+                        if (feedback) {
+                            feedback.textContent = '';
+                        }
+                    }
+                }, 'personaCedulaInput');
+            }
+
+            // Validación de celular
+            const celularField = resolveField(form, 'celular');
+            if (celularField) {
+                bindOnce(celularField, 'input', (e) => {
+                    clearTimeout(this.timeouts.celular);
+                    this.timeouts.celular = setTimeout(() => {
+                        this.validatePhoneField(
+                            e.target,
+                            10,
+                            'celular-feedback',
+                            'El celular debe tener exactamente 10 dígitos',
+                            '/api/check-celular',
+                            'celular',
+                            personaId
+                        );
+                    }, 500);
+                }, 'personaCelularInput');
+            }
+
+            // Validación de teléfono
+            const telefonoField = resolveField(form, 'telefono');
+            if (telefonoField) {
+                bindOnce(telefonoField, 'input', (e) => {
+                    clearTimeout(this.timeouts.telefono);
+                    this.timeouts.telefono = setTimeout(() => {
+                        this.validatePhoneField(
+                            e.target,
+                            7,
+                            'telefono-feedback',
+                            'El teléfono fijo debe tener exactamente 7 dígitos',
+                            '/api/check-telefono',
+                            'telefono',
+                            personaId
+                        );
+                    }, 500);
+                }, 'personaTelefonoInput');
+            }
+
+            // Validación de email
+            const emailField = resolveField(form, 'email');
+            if (emailField) {
+                bindOnce(emailField, 'input', (e) => {
+                    clearTimeout(this.timeouts.email);
+                    this.timeouts.email = setTimeout(() => {
+                        this.validateEmailField(e.target, personaId);
+                    }, 500);
+                }, 'personaEmailInput');
+            }
+        });
+    }
+
+    async checkCedulaAvailability(cedula) {
+        const feedback = document.getElementById('cedula-feedback');
+        if (!feedback) return;
+
+        try {
+            const response = await this.http.post('/api/check-cedula', { cedula });
+
+            if (response.success) {
+                feedback.textContent = 'Cédula ya registrada en el sistema';
+                feedback.className = 'form-text text-danger';
+            } else {
+                feedback.textContent = 'Cédula disponible';
+                feedback.className = 'form-text text-success';
+            }
+        } catch (error) {
+            feedback.textContent = 'Error al verificar cédula';
+            feedback.className = 'form-text text-warning';
+        }
+    }
+
+    async validatePhoneField(field, requiredLength, feedbackId, lengthMessage, apiUrl, fieldName, personaId = null) {
+        const feedback = document.getElementById(feedbackId);
+        if (!feedback) return;
+
+        const value = field.value.trim();
+        if (!value) {
+            feedback.textContent = '';
+            field.setCustomValidity('');
+            field.classList.remove('is-invalid');
+            return;
+        }
+
+        if (/^\d+$/.test(value)) {
+            if (value.length === requiredLength) {
+                // Verificar unicidad
+                feedback.textContent = 'Verificando...';
+                feedback.className = 'form-text text-info';
+                try {
+                    const payload = { [fieldName]: value };
+                    if (personaId) {
+                        payload.persona_id = personaId;
+                    }
+                    const response = await this.http.post(apiUrl, payload);
+                    if (response.success) {
+                        feedback.textContent = `${fieldName === 'celular' ? 'Celular' : 'Teléfono'} ya registrado en el sistema`;
+                        feedback.className = 'form-text text-danger';
+                        field.setCustomValidity(`${fieldName === 'celular' ? 'Celular' : 'Teléfono'} ya registrado`);
+                        field.classList.add('is-invalid');
+                    } else {
+                        feedback.textContent = `${fieldName === 'celular' ? 'Celular' : 'Teléfono'} disponible`;
+                        feedback.className = 'form-text text-success';
+                        field.setCustomValidity('');
+                        field.classList.remove('is-invalid');
+                    }
+                } catch (error) {
+                    feedback.textContent = `Error al verificar ${fieldName === 'celular' ? 'celular' : 'teléfono'}`;
+                    feedback.className = 'form-text text-warning';
+                    field.setCustomValidity(`Error al verificar ${fieldName === 'celular' ? 'celular' : 'teléfono'}`);
+                    field.classList.add('is-invalid');
+                }
+            } else {
+                feedback.textContent = lengthMessage;
+                feedback.className = 'form-text text-danger';
+                field.setCustomValidity(lengthMessage);
+                field.classList.add('is-invalid');
+            }
+        } else {
+            feedback.textContent = 'Solo se permiten números';
+            feedback.className = 'form-text text-danger';
+            field.setCustomValidity('Solo se permiten números');
+            field.classList.add('is-invalid');
+        }
+    }
+
+    async validateEmailField(field, personaId = null) {
+        const feedback = document.getElementById('email-feedback');
+        if (!feedback) return;
+
+        const value = field.value.trim();
+        if (!value) {
+            feedback.textContent = '';
+            field.setCustomValidity('');
+            field.classList.remove('is-invalid');
+            return;
+        }
+
+        // Validar formato de email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(value)) {
+            feedback.textContent = 'Formato de correo inválido';
+            feedback.className = 'form-text text-danger';
+            field.setCustomValidity('Formato de correo inválido');
+            field.classList.add('is-invalid');
+            return;
+        }
+
+        // Verificar unicidad
+        feedback.textContent = 'Verificando...';
+        feedback.className = 'form-text text-info';
+        try {
+            const payload = { email: value };
+            if (personaId) {
+                payload.persona_id = personaId;
+            }
+            const response = await this.http.post('/api/check-email', payload);
+            if (response.success) {
+                feedback.textContent = 'Correo ya registrado en el sistema';
+                feedback.className = 'form-text text-danger';
+                field.setCustomValidity('Correo ya registrado');
+                field.classList.add('is-invalid');
+            } else {
+                feedback.textContent = 'Correo disponible';
+                feedback.className = 'form-text text-success';
+                field.setCustomValidity('');
+                field.classList.remove('is-invalid');
+            }
+        } catch (error) {
+            feedback.textContent = 'Error al verificar correo';
+            feedback.className = 'form-text text-warning';
+            field.setCustomValidity('Error al verificar correo');
+            field.classList.add('is-invalid');
+        }
+    }
+}
+
 class PersonaFormManager {
     constructor(config, selectors) {
         this.config = config;
@@ -1390,6 +1683,7 @@ class PersonaFormManager {
         this.age = new AgeValidator(config, selectors);
         this.validation = new ValidationHandler(config);
         this.preloader = new PreloaderHandler(selectors);
+        this.fieldValidator = new FieldValidator();
     }
 
     getTargetForms() {
@@ -1415,6 +1709,7 @@ class PersonaFormManager {
         this.input.attach(forms);
         this.caracterizacion.attach();
         this.address.attach();
+        this.fieldValidator.attach(forms);
 
         try {
             await this.location.init();
@@ -1452,9 +1747,43 @@ class PersonaFormManager {
 
 const personaFormManager = new PersonaFormManager(CONFIG, SELECTORS);
 
-document.addEventListener('DOMContentLoaded', () => {
+function initPersonaForm() {
+    // Verificar que los elementos del formulario existan
+    const paisSelect = document.getElementById('pais_id');
+    const departamentoSelect = document.getElementById('departamento_id');
+    const municipioSelect = document.getElementById('municipio_id');
+
+    if (!paisSelect && !departamentoSelect && !municipioSelect) {
+        // Si no hay formulario de persona en esta página, no hacer nada
+        return;
+    }
+
     void personaFormManager.initialize(false);
-});
+}
+
+// Inicializar en carga inicial
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initPersonaForm);
+} else {
+    // Si el DOM ya está listo, inicializar inmediatamente
+    setTimeout(initPersonaForm, 50);
+}
+
+// Reinicializar cuando Livewire navega (SPA)
+if (window.Livewire) {
+    document.addEventListener('livewire:navigated', function () {
+        // Delay mayor para asegurar que el DOM esté completamente actualizado y los scripts cargados
+        setTimeout(function () {
+            // Verificar que el script se haya cargado
+            if (typeof personaFormManager !== 'undefined') {
+                initPersonaForm();
+            } else {
+                // Si el script aún no está cargado, esperar un poco más
+                setTimeout(initPersonaForm, 200);
+            }
+        }, 400);
+    });
+}
 
 window.PersonaForm = {
     init: (force = true) => personaFormManager.init(force),

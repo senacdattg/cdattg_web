@@ -6,7 +6,9 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\DB;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\PersonaContactAlert;
 use App\Models\FichaCaracterizacion;
@@ -55,6 +57,21 @@ class Persona extends Model
             $persona->primer_apellido = strtoupper($persona->primer_apellido);
             $persona->segundo_apellido = strtoupper($persona->segundo_apellido);
             $persona->direccion = strtoupper($persona->direccion);
+
+            // Sincronizar email con el usuario relacionado si existe
+            if ($persona->isDirty('email')) {
+                // Obtener el nuevo valor del email desde los atributos (no del accessor)
+                $newEmail = $persona->getAttributes()['email'] ?? $persona->getOriginal('email');
+                
+                // Buscar si existe un usuario relacionado
+                $user = DB::table('users')->where('persona_id', $persona->id)->first();
+                if ($user) {
+                    // Usar DB directo para evitar loops infinitos
+                    DB::table('users')
+                        ->where('persona_id', $persona->id)
+                        ->update(['email' => $newEmail]);
+                }
+            }
         });
 
         // Eliminar usuario asociado antes de eliminar la persona
@@ -103,6 +120,19 @@ class Persona extends Model
     public function municipio()
     {
         return $this->belongsTo(Municipio::class);
+    }
+
+    /**
+     * Relación con la caracterización principal asociada a la persona.
+     *
+     * Nota: Aunque las caracterizaciones adicionales se gestionan mediante la
+     * tabla pivote `persona_caracterizacion`, algunas vistas todavía consultan
+     * la relación singular `caracterizacion`. Para mantener compatibilidad,
+     * se usa la columna `parametro_id` como referencia.
+     */
+    public function caracterizacion(): BelongsTo
+    {
+        return $this->belongsTo(Parametro::class, 'parametro_id');
     }
 
     /**
@@ -204,14 +234,29 @@ class Persona extends Model
     }
 
     /**
-     * Accesor para convertir el email a mayúsculas.
+     * Accesor para obtener el email.
+     * Prioriza el email del usuario relacionado si existe, sino usa el de la persona.
      *
-     * @param string $value
-     * @return string
+     * @param string|null $value
+     * @return string|null
      */
     public function getEmailAttribute($value)
     {
-        return strtoupper($value);
+        // Si hay un usuario relacionado y está cargado, usar su email (fuente de verdad)
+        if ($this->relationLoaded('user') && $this->user) {
+            return $this->user->email;
+        }
+
+        // Si la relación no está cargada, verificar si existe un usuario
+        if (!$this->relationLoaded('user')) {
+            $user = $this->user;
+            if ($user) {
+                return $user->email;
+            }
+        }
+
+        // Fallback al email de la tabla personas (para compatibilidad con personas sin usuario)
+        return $value;
     }
 
     /**
@@ -257,7 +302,7 @@ class Persona extends Model
     /**
      * Relación con el parámetro de caracterización.
      */
-    public function parametroCaracterizacion()
+    public function parametroCaracterizacion(): BelongsTo
     {
         return $this->belongsTo(Parametro::class, 'caracterizacion_id');
     }

@@ -160,7 +160,7 @@ Nivel 1: Sistema Base [1]
 
 ### Timestamps
 - Formato: `2025_10_27_NNNNNN_descripcion.php`
-- Fecha unificada: 27 de octubre de 2025
+- Fecha unificada: 2025-11-17
 - Números secuenciales por batch (000001, 000002, etc.)
 - Separación de 10 entre batches para facilitar expansión
 
@@ -224,7 +224,7 @@ php artisan migrate:module --all --fresh --env=testing
 
 ## ⚠️ Consideraciones Importantes
 
-### Para el Equipo de Desarrollo
+### Para ADSO - 2923560
 
 1. **NO modifiques migraciones existentes** que ya estén en producción
 2. **SIEMPRE crea nuevas migraciones** para cambios
@@ -333,7 +333,7 @@ El proyecto está listo para continuar con el desarrollo de forma más organizad
 
 ---
 
-**Fecha de reorganización:** 27 de octubre de 2025  
+**Fecha de reorganización:** 2025-11-17  
 **Versión del sistema:** 1.0  
 **Estado:** ✅ Completado y funcional  
 **Próxima revisión:** Según necesidades del proyecto

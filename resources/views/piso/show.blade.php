@@ -8,8 +8,12 @@
                     </div>
                     <div class="col-sm-6">
                         <ol class="breadcrumb float-sm-right">
-                            <li class="breadcrumb-item"><a href="{{ route('home.index') }}">Inicio</a></li>
-                            <li class="breadcrumb-item"><a href="{{ route('piso.index') }}">pisos</a></li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('home.index') }}" wire:navigate>Inicio</a>
+                            </li>
+                            <li class="breadcrumb-item">
+                                <a href="{{ route('piso.index') }}" wire:navigate>pisos</a>
+                            </li>
                             <li class="breadcrumb-item active">
                                 {{ $piso->piso }}
                             </li>

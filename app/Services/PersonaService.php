@@ -89,8 +89,10 @@ class PersonaService
 
             $this->syncCaracterizaciones($persona, $caracterizacionesIds);
 
-            // Crear usuario asociado
-            $this->crearUsuarioPersona($persona);
+            // Si la persona tiene correo, crear usuario y asignar rol VISITANTE
+            if (!empty($persona->email)) {
+                $this->crearUsuarioPersona($persona);
+            }
 
             return $persona->fresh(['caracterizacionesComplementarias', 'user']);
         });
@@ -116,9 +118,10 @@ class PersonaService
 
             $this->syncCaracterizaciones($persona, $caracterizacionesIds);
 
-            if ($persona->user) {
+            // Sincronizar email con el usuario relacionado si existe
+            if ($persona->user && isset($datos['email'])) {
                 $this->userRepo->actualizar($persona->user->id, [
-                    'email' => $persona->email,
+                    'email' => $datos['email'],
                 ]);
             }
 
@@ -173,6 +176,30 @@ class PersonaService
     }
 
     /**
+     * Crea un usuario asociado a una persona existente.
+     *
+     * @throws PersonaException
+     */
+    public function crearUsuarioParaPersona(Persona $persona): User
+    {
+        if ($persona->user) {
+            throw new PersonaException('La persona ya tiene un usuario asociado.');
+        }
+
+        if (empty($persona->email)) {
+            throw new PersonaException('La persona no tiene correo registrado.');
+        }
+
+        if (empty($persona->numero_documento)) {
+            throw new PersonaException('La persona no tiene número de documento registrado.');
+        }
+
+        return DB::transaction(function () use ($persona) {
+            return $this->crearUsuarioPersona($persona);
+        });
+    }
+
+    /**
      * Crea usuario asociado a persona
      *
      * @param Persona $persona
@@ -184,10 +211,14 @@ class PersonaService
             'email' => $persona->email,
             'password' => Hash::make($persona->numero_documento),
             'persona_id' => $persona->id,
+            'status' => true
         ]);
 
         // Asignar rol VISITANTE por defecto
         $user->assignRole('VISITANTE');
+
+        // Enviar email de verificación automáticamente
+        $user->sendEmailVerificationNotification();
 
         return $user;
     }
@@ -216,6 +247,22 @@ class PersonaService
     private function syncCaracterizaciones(Persona $persona, array $caracterizacionesIds): void
     {
         $persona->caracterizacionesComplementarias()->sync($caracterizacionesIds);
+    }
+
+    /**
+     * Crea una persona sin usuario (para importaciones masivas)
+     *
+     * @param array $datos
+     * @param int $userId ID del usuario que realiza la importación
+     * @return Persona
+     */
+    public function crearSinUsuario(array $datos, int $userId): Persona
+    {
+        $datos['user_create_id'] = $userId;
+        $datos['user_edit_id'] = $userId;
+        $datos['status'] = $datos['status'] ?? 1;
+
+        return Persona::create($datos);
     }
 
     protected function obtenerIdUsuarioAutenticado(): int

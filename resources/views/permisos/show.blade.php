@@ -200,9 +200,7 @@
                             <h4 class="card-title"><i class="fas fa-key"></i> Permisos de Usuario</h4>
                         </div>
                         <div class="card-body">
-                            <form action="{{ route('permiso.store') }}" method="POST">
-                                @csrf
-                                <input type="hidden" name="user_id" value="{{ $user->id }}">
+                            <div id="permissions-container" data-user-id="{{ $user->id }}">
 
                                 <div class="dual-list-container">
                                     <!-- Lista de Permisos Disponibles -->
@@ -276,12 +274,19 @@
                                     </div>
                                 </div>
 
-                                <div class="text-center mt-3">
-                                    <button type="submit" class="btn btn-sm btn-light">
-                                        <i class="fas fa-save text-success"></i> Guardar Cambios
-                                    </button>
-                                </div>
-                            </form>
+                                @if($user->id != auth()->id())
+                                    <div class="text-center mt-3">
+                                        <small class="text-muted">
+                                            <i class="fas fa-info-circle"></i>
+                                            Los cambios se guardan automáticamente al mover permisos entre listas
+                                        </small>
+                                    </div>
+                                @else
+                                    <div class="text-center mt-3">
+                                        <span class="text-muted">No puedes modificar tus propios permisos.</span>
+                                    </div>
+                                @endif
+                            </div>
                         </div>
                     </div>
 
@@ -367,9 +372,13 @@
                                     </div>
 
                                     <div class="text-center mt-3">
-                                        <button type="submit" class="btn btn-sm btn-light">
-                                            <i class="fas fa-save text-success"></i> Guardar Cambios
-                                        </button>
+                                        @if($user->id != auth()->id())
+                                            <button type="submit" class="btn btn-sm btn-light">
+                                                <i class="fas fa-save text-success"></i> Guardar Cambios
+                                            </button>
+                                        @else
+                                            <span class="text-muted">No puedes modificar tus propios roles.</span>
+                                        @endif
                                     </div>
                                 </form>
                             </div>
@@ -382,11 +391,13 @@
 @endsection
 
 @section('footer')
-    @include('layout.footer')
+    @include('layouts.footer')
 @endsection
 
+@section('plugins.Chartjs', true)
+
 @section('js')
-    <script src="{{ asset('vendor/chart.js/Chart.bundle.min.js') }}"></script>
     @vite(['resources/js/parametros.js'])
     @vite(['resources/js/pages/gestion-especializada.js'])
+    @vite(['resources/js/pages/permisos.js'])
 @endsection

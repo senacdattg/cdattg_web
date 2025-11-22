@@ -2,7 +2,7 @@
 
 {{-- Activar plugins de AdminLTE --}}
 @section('plugins.Datatables', true)
-@section('plugins.Sweetalert2', true)
+{{-- SweetAlert2 activado globalmente en config/adminlte.php --}}
 @section('plugins.Select2', true)
 
 @section('title', 'Crear Programa Complementario')
@@ -395,7 +395,7 @@
 @endsection
 
 @section('footer')
-    @include('layout.footer')
+    @include('layouts.footer')
 @endsection
 
 @section('js')

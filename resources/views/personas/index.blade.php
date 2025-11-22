@@ -2,7 +2,7 @@
 
 {{-- Activar plugins de AdminLTE --}}
 @section('plugins.Datatables', true)
-@section('plugins.Sweetalert2', true)
+{{-- SweetAlert2 activado globalmente en config/adminlte.php --}}
 
 @section('css')
     @vite(['resources/css/parametros.css'])
@@ -47,10 +47,12 @@
                             </div>
                             <div class="d-flex flex-wrap mt-2 mt-md-0">
                                 @can('CREAR PERSONA')
-                                    <a href="{{ route('personas.create') }}" class="btn btn-primary mr-2 mb-2">
+                                    <a href="{{ route('personas.create') }}" class="btn btn-primary mr-2 mb-2"
+                                        @if (config('adminlte.livewire')) wire:navigate @endif>
                                         <i class="fas fa-plus-circle mr-1"></i> Crear Persona
                                     </a>
-                                    <a href="{{ route('personas.import.create') }}" class="btn btn-success mb-2">
+                                    <a href="{{ route('personas.import.create') }}" class="btn btn-success mb-2"
+                                        @if (config('adminlte.livewire')) wire:navigate @endif>
                                         <i class="fas fa-file-import mr-1"></i> Importar
                                     </a>
                                 @endcan
@@ -60,7 +62,7 @@
                             <x-data-table title="Lista de Personas" :paginated="false" :searchable="false"
                                 tableId="personas-table" tableClass="table table-center table-sm table-striped mb-0"
                                 tableWrapperClass="table-responsive personas-table-responsive rounded-bottom"
-                                :columns="[
+                                data-datatable-url="{{ route('personas.datatable') }}" :columns="[
                                     ['label' => '#', 'width' => '5%'],
                                     ['label' => 'Nombres completos', 'width' => '25%'],
                                     ['label' => 'Documento', 'width' => '13%'],
@@ -240,227 +242,14 @@
 @endsection
 
 @section('footer')
-    @include('layout.footer')
+    @include('layouts.footer')
 @endsection
 
-@section('js')
-    @vite(['resources/js/app.js', 'resources/js/parametros.js', 'resources/js/pages/formularios-generico.js'])
-    <script>
-        $(function() {
-            // Mostrar mensajes flash con SweetAlert2
-            @if (session('success'))
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Éxito!',
-                    text: '{{ session('success') }}',
-                    confirmButtonText: 'Entendido',
-                    confirmButtonColor: '#28a745'
-                });
-            @endif
-
-            @if (session('error'))
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: '{{ session('error') }}',
-                    confirmButtonText: 'Entendido',
-                    confirmButtonColor: '#d33'
-                });
-            @endif
-
-            $('[data-toggle="tooltip"]').tooltip();
-
-            const $estadoFilter = $('#filtro-estado');
-            const $totalGeneral = $('#total-personas');
-            const $totalFiltrado = $('#total-personas-filtradas');
-            const $totalSofia = $('#total-personas-sofia');
-
-            const formatNumber = function(value) {
-                const numericValue = Number(value);
-                return Number.isFinite(numericValue) ? numericValue.toLocaleString('es-CO') : '0';
-            };
-
-            const personasTable = $('#personas-table').DataTable({
-                processing: true,
-                serverSide: true,
-                deferRender: true,
-                stateSave: false,
-                ajax: function(data, callback) {
-                    axios.get('{{ route('personas.datatable') }}', {
-                            params: Object.assign({}, data, {
-                                estado: $estadoFilter.val()
-                            })
-                        })
-                        .then(function(response) {
-                            const json = response.data;
-
-                            const totalGeneral = json.total_general ?? json.recordsTotal ?? 0;
-                            const totalFiltrado = json.total_filtrado ?? json.recordsFiltered ??
-                                totalGeneral;
-
-                            $totalGeneral.text(formatNumber(totalGeneral));
-                            $totalFiltrado.text(formatNumber(totalFiltrado));
-                            const totalSofiaRegistrados = Number(
-                                json.sofia_registrados_filtrados ??
-                                json.sofia_registrados_total ?? 0
-                            );
-                            $totalSofia.text(
-                                `${formatNumber(totalSofiaRegistrados)} / ${formatNumber(totalFiltrado)}`
-                            );
-
-                            callback(json);
-                        })
-                        .catch(function(error) {
-                            Swal.fire({
-                                title: 'Error al cargar personas',
-                                text: 'No se pudieron cargar las personas. Por favor, intente nuevamente.',
-                                icon: 'error',
-                                confirmButtonText: 'Entendido'
-                            });
-                            $totalGeneral.text('0');
-                            $totalFiltrado.text('0');
-                            $totalSofia.text('0 / 0');
-                            callback({
-                                draw: data.draw,
-                                recordsTotal: 0,
-                                recordsFiltered: 0,
-                                data: []
-                            });
-                        });
-                },
-                language: {
-                    url: 'https://cdn.datatables.net/plug-ins/1.13.8/i18n/es-ES.json',
-                    processing: [
-                        '<span class="spinner-border spinner-border-sm mr-2" role="status" aria-hidden="true"></span>',
-                        ' Cargando personas...'
-                    ].join(''),
-                    emptyTable: 'No se encontraron personas registradas.',
-                    zeroRecords: 'No hay resultados para los filtros aplicados.'
-                },
-                pageLength: 10,
-                lengthMenu: [10, 25, 50, 100],
-                order: [
-                    [0, 'desc']
-                ],
-                columns: [{
-                        data: 'index',
-                        name: 'id',
-                        searchable: false,
-                        className: 'align-middle text-muted'
-                    },
-                    {
-                        data: 'nombre',
-                        name: 'primer_nombre',
-                        className: 'align-middle'
-                    },
-                    {
-                        data: 'numero_documento',
-                        name: 'numero_documento',
-                        className: 'align-middle'
-                    },
-                    {
-                        data: 'email',
-                        name: 'email',
-                        className: 'align-middle'
-                    },
-                    {
-                        data: 'celular',
-                        name: 'celular',
-                        className: 'align-middle'
-                    },
-                    {
-                        data: 'estado',
-                        name: 'estado',
-                        orderable: false,
-                        searchable: false,
-                        className: 'align-middle text-center',
-                        render: function(data) {
-                            return data;
-                        }
-                    },
-                    {
-                        data: 'estado_sofia',
-                        name: 'estado_sofia',
-                        orderable: false,
-                        searchable: false,
-                        className: 'align-middle text-center',
-                        render: function(data) {
-                            return data;
-                        }
-                    },
-                    {
-                        data: 'acciones',
-                        name: 'acciones',
-                        orderable: false,
-                        searchable: false,
-                        className: 'align-middle text-center',
-                        render: function(data) {
-                            return data;
-                        }
-                    },
-                ],
-                columnDefs: [{
-                    targets: 0,
-                    orderable: true
-                }],
-                drawCallback: function() {
-                    $('[data-toggle="tooltip"]').tooltip();
-                },
-                dom: [
-                    '<"row align-items-center mb-2 px-3 pt-3"',
-                    '<"col-sm-12 col-md-6 mb-2 mb-md-0"l>',
-                    '<"col-sm-12 col-md-6 text-md-right"f>>',
-                    'rt',
-                    '<"row align-items-center mt-2 px-3 pb-3"',
-                    '<"col-sm-12 col-md-5 mb-2 mb-md-0"i>',
-                    '<"col-sm-12 col-md-7"p>>'
-                ].join('')
-            });
-
-            $estadoFilter.on('change', function() {
-                personasTable.draw();
-            });
-
-            $('#btn-limpiar-filtros').on('click', function() {
-                $estadoFilter.val('todos');
-                personasTable.search('');
-                personasTable.draw();
-            });
-
-            // Manejar eliminación con SweetAlert2
-            $(document).on('submit', '.eliminar-persona-form', function(e) {
-                const $form = $(this);
-
-                // Si ya fue confirmado, permitir el envío
-                if ($form.data('confirmed')) {
-                    return true;
-                }
-
-                e.preventDefault();
-                const personaNombre = $form.data('persona-nombre');
-
-                // Sanitizar el nombre para prevenir XSS
-                const nombreSeguro = $('<div>').text(personaNombre).html();
-
-                Swal.fire({
-                    title: '¿Estás seguro?',
-                    html: `Se eliminará la persona:<br><strong>${nombreSeguro}</strong><br>` +
-                        `<small class="text-danger">Esta acción también eliminará el usuario asociado</small>`,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: '<i class="fas fa-trash-alt mr-1"></i> Sí, eliminar',
-                    cancelButtonText: '<i class="fas fa-times mr-1"></i> Cancelar',
-                    reverseButtons: true
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Marcar como confirmado y enviar
-                        $form.data('confirmed', true);
-                        $form.submit();
-                    }
-                });
-            });
-        });
-    </script>
-@endsection
+@push('js')
+    @vite([
+        'resources/js/app.js',
+        'resources/js/parametros.js',
+        'resources/js/pages/formularios-generico.js',
+        'resources/js/pages/personas.js',
+    ])
+@endpush
