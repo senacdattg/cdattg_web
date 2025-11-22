@@ -66,42 +66,6 @@
                                 ])
 
                                 <hr class="my-5" style="border-color: #dee2e6;">
-
-                                <div class="card mb-4" style="background-color: #ffffff; border-color: #dee2e6;">
-                                    <div class="card-header card-header-primary">
-                                        <h5 class="mb-0"><i class="fas fa-tags mr-2"></i>Caracterización</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        <p class="text-muted mb-3">
-                                            Seleccione una categoría que corresponda a su situación:
-                                        </p>
-
-                                        @foreach ($temasCaracterizacion as $tema)
-                                            <div class="card card-outline mb-3" style="border-color: #dee2e6;">
-                                                <div class="card-header card-header-secondary">
-                                                    
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="row">
-                                                        @foreach ($tema->parametros as $parametro)
-                                                            <div class="col-12 mb-2">
-                                                                <div class="form-check">
-                                                                    <input class="form-check-input" type="radio"
-                                                                        name="parametro_id" value="{{ $parametro->id }}"
-                                                                        id="parametro_{{ $parametro->id }}">
-                                                                    <label class="form-check-label"
-                                                                        for="categoria_{{ $hijo->id }}">
-                                                                        {{ $hijo->nombre }}
-                                                                    </label>
-                                                                </div>
-                                                            </div>
-                                                        @endforeach
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        @endforeach
-                                    </div>
-                                </div>
                                  <div class="card mb-4" style="background-color: #ffffff; border-color: #dee2e6;">
                                      <div class="card-header card-header-primary">
                                          <h5 class="mb-0"><i class="fas fa-id-card mr-2"></i>Documento de Identidad</h5>
@@ -234,61 +198,6 @@
                                     </div>
                                 </div>
                             </form>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="card card-widget widget-user">
-                        <div class="widget-user-header card-header-primary">
-                            <h3 class="widget-user-username">Información del Programa</h3>
-                            <h5 class="widget-user-desc">{{ $programa->nombre }}</h5>
-                        </div>
-                        <div class="card-footer" style="background-color: #ffffff;">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="description-block">
-                                        <span class="description-text">DESCRIPCIÓN</span>
-                                        <p class="text-muted mb-3">{{ $programa->descripcion }}</p>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <div class="description-block">
-                                                    <span class="description-text">DURACIÓN</span>
-                                                    <h5 class="description-header text-primary">
-                                                        {{ formatear_horas($programa->duracion) }} horas
-                                                    </h5>
-                                                </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="description-block">
-                                                    <span class="description-text">MODALIDAD</span>
-                                                    <h5 class="description-header text-primary">
-                                                        {{ $programa->modalidad->parametro->name ?? 'N/A' }}
-                                                    </h5>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <div class="description-block">
-                                                    <span class="description-text">JORNADA</span>
-                                                    <h5 class="description-header text-primary">
-                                                        {{ $programa->jornada->jornada ?? 'N/A' }}
-                                                    </h5>
-                                                </div>
-                                            </div>
-                                            <div class="col-6">
-                                                <div class="description-block">
-                                                    <span class="description-text">CUPO</span>
-                                                    <h5 class="description-header text-primary">
-                                                        {{ $programa->cupos }}
-                                                    </h5>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
