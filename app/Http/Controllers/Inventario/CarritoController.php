@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Inventario\Producto;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
+use App\Http\Requests\Inventario\CarritoRequest;
 
 class CarritoController extends Controller
 {
@@ -23,20 +25,15 @@ class CarritoController extends Controller
     }
 
     // Vista del carrito
-    public function index()
+    public function index() : View
     {
         return view('inventario.carrito.carrito');
     }
 
     // Agregar productos al carrito (crear orden)
-    public function agregar(Request $request): JsonResponse
+    public function agregar(CarritoRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'items' => 'required|array|min:1',
-            'items.*.producto_id' => 'required|exists:productos,id',
-            'items.*.cantidad' => 'required|integer|min:1',
-            'notas' => 'nullable|string|max:1000'
-        ]);
+        $validated = $request->validated();
 
         try {
             $availabilityResponse = $this->checkItemsAvailability($validated['items']);
@@ -61,12 +58,10 @@ class CarritoController extends Controller
     }
 
     // Actualizar cantidad de un producto en el carrito
-     
-    public function actualizar(Request $request, $id)
+    
+    public function actualizar(CarritoRequest $request, $id) : JsonResponse
     {
-        $validated = $request->validate([
-            'cantidad' => 'required|integer|min:1'
-        ]);
+        $validated = $request->validated();
 
         try {
             $producto = Producto::findOrFail($id);
@@ -98,8 +93,8 @@ class CarritoController extends Controller
     }
 
     //Eliminar producto del carrito
-     
-    public function eliminar($id)
+    
+    public function eliminar($id) : JsonResponse
     {
         try {
             // Esta es una operación del lado del cliente (localStorage)
@@ -130,7 +125,7 @@ class CarritoController extends Controller
     }
 
     // Obtener contenido del carrito
-    public function contenido(Request $request)
+    public function contenido(Request $request) : JsonResponse
     {
         try {
             $items = $request->input('items', []);
