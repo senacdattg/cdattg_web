@@ -180,20 +180,23 @@ final class UploadLimits
         $recommended = self::getRecommendedPhpConfig();
         $current = [
             'upload_max_filesize' => ini_get('upload_max_filesize'),
-            'post_max_size' => ini_get('post_max_size'),
-            'memory_limit' => ini_get('memory_limit'),
-            'max_execution_time' => ini_get('max_execution_time'),
-            'max_input_time' => ini_get('max_input_time'),
+            'post_max_size'       => ini_get('post_max_size'),
+            'memory_limit'        => ini_get('memory_limit'),
+            'max_execution_time'  => ini_get('max_execution_time'),
+            'max_input_time'      => ini_get('max_input_time'),
         ];
 
         $issues = [];
 
-        // Convertir valores a bytes para comparar
-        $uploadMaxBytes = self::convertToBytes($current['upload_max_filesize']);
-        $postMaxBytes = self::convertToBytes($current['post_max_size']);
-        $memoryLimitBytes = self::convertToBytes($current['memory_limit']);
+        // Convertir valores actuales a bytes
+        $uploadMaxBytes    = self::convertToBytes($current['upload_max_filesize']);
+        $postMaxBytes      = self::convertToBytes($current['post_max_size']);
+        $memoryLimitBytes  = self::convertToBytes($current['memory_limit']);
 
-        if ($uploadMaxBytes < self::IMPORT_FILE_SIZE_BYTES) {
+        // Requisito real para upload_max_filesize basado en la recomendación (8M)
+        $requiredUploadMax = self::convertToBytes($recommended['upload_max_filesize']);
+
+        if ($uploadMaxBytes < $requiredUploadMax) {
             $issues[] = sprintf(
                 'upload_max_filesize (%s) es menor que el límite requerido (%s)',
                 $current['upload_max_filesize'],
@@ -201,6 +204,7 @@ final class UploadLimits
             );
         }
 
+        // Requisito real para post_max_size basado en contenido esperado
         $requiredPostMax = max(self::IMPORT_CONTENT_LENGTH_BYTES, self::GENERAL_CONTENT_LENGTH_BYTES);
 
         if ($postMaxBytes < $requiredPostMax) {
@@ -220,12 +224,13 @@ final class UploadLimits
         }
 
         return [
-            'is_safe' => empty($issues),
-            'current' => $current,
-            'recommended' => $recommended,
-            'issues' => $issues,
+            'is_safe'      => empty($issues),
+            'current'      => $current,
+            'recommended'  => $recommended,
+            'issues'       => $issues,
         ];
     }
+
 
     /**
      * Convierte valores de configuración de PHP a bytes.

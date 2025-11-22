@@ -4,7 +4,7 @@
 
 return [
     'accepted' => 'El :attribute debe ser aceptado.',
-    'active_url' => 'El :attribute no es una URL válida.',
+    'active_url' => 'El campo :attribute debe ser una URL válida.',
     'after' => 'El :attribute debe ser una fecha posterior a :date.',
     'after_or_equal' => 'El :attribute debe ser una fecha posterior o igual a :date.',
     'alpha' => 'El :attribute solo puede contener letras.',
@@ -12,11 +12,11 @@ return [
     'alpha_num' => 'El :attribute solo puede contener letras y números.',
     'array' => 'El :attribute debe ser un arreglo.',
     'required' => 'El campo :attribute es obligatorio.',
-    'numeric' => 'El campo :attribute solo puede contener números.',
-    'string' => 'El campo :attribute solo puede contener letras.',
+    'numeric' => 'El campo :attribute debe ser un valor numérico.',
+    'string' => 'El campo :attribute debe ser una cadena de caracteres.',
     'unique' => 'El valor que intentas agregar ya existe.',
     'before' => 'El :attribute debe ser una fecha anterior a :date.',
-    'before_or_equal' => 'El :attribute debe ser una fecha igual o anterior anterior a hoy.',
+    'before_or_equal' => 'El :attribute debe ser una fecha anterior o igual a :date.',
     'email' => 'El campo :attribute debe ser una dirección de correo electrónico válida.',
     'min' => [
         'numeric' => 'El campo :attribute debe ser de al menos :min.',
