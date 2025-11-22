@@ -17,7 +17,25 @@ class Producto extends Model
 
     protected $table = 'productos';
 
-    protected $guarded = [];
+    protected $fillable = [
+        'producto',
+        'tipo_producto_id',
+        'descripcion',
+        'peso',
+        'unidad_medida_id',
+        'cantidad',
+        'codigo_barras',
+        'estado_producto_id',
+        'categoria_id',
+        'marca_id',
+        'contrato_convenio_id',
+        'ambiente_id',
+        'proveedor_id',
+        'fecha_vencimiento',
+        'imagen',
+        'user_create_id',
+        'user_update_id'
+    ];
 
     protected $casts = [
         'fecha_vencimiento' => 'datetime'

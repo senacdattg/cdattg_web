@@ -16,7 +16,14 @@ class DetalleOrden extends Model
 
     protected $table = 'detalle_ordenes';
 
-    protected $guarded = [];
+    protected $fillable = [
+        'orden_id',
+        'producto_id',
+        'cantidad',
+        'estado_orden_id',
+        'user_create_id',
+        'user_edit_id'
+    ];
 
     // Relación con la orden 
     public function orden() : BelongsTo

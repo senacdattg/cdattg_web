@@ -11,8 +11,6 @@ class Marca extends Parametro
 {
     protected $table = 'parametros';
 
-    protected $guarded = [];
-
     protected static function booted() : void
     {
         static::creating(function ($marca) : void {

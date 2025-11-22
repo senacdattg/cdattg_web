@@ -27,7 +27,16 @@ class ContratoConvenio extends Model
         });
     }
 
-    protected $guarded= [];
+    protected $fillable = [
+        'name',
+        'codigo',
+        'proveedor_id',
+        'estado_id',
+        'fecha_inicio',
+        'fecha_fin',
+        'user_create_id',
+        'user_edit_id'
+    ];
 
     protected $dates = [
         'fecha_inicio',

@@ -15,7 +15,15 @@ class Notificacion extends DatabaseNotification
 
     protected $keyType = 'string';
 
-    protected $guarded = [];
+    protected $fillable = [
+        'id',
+        'tipo',
+        'datos',
+        'leida_en',
+        'user_id',
+        'created_at',
+        'updated_at',
+    ];
 
     protected $casts = [
         'datos' => 'array',

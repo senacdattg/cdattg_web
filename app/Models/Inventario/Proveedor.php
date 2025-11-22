@@ -26,7 +26,19 @@ class Proveedor extends Model
         });
     }
 
-    protected $guarded = [];
+    protected $fillable = [
+        'proveedor',
+        'nit',
+        'email',
+        'telefono',
+        'direccion',
+        'departamento_id',
+        'municipio_id',
+        'contacto',
+        'estado_id',
+        'user_create_id',
+        'user_update_id'
+    ];
 
     // Relación con el estado
     public function estado() : BelongsTo

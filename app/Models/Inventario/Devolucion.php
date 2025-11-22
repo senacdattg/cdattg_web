@@ -16,7 +16,16 @@ class Devolucion extends Model
 
     protected $table = 'devoluciones';
 
-    protected $guarded = [];
+    protected $fillable = [
+        'detalle_orden_id',
+        'cantidad_devuelta',
+        'fecha_devolucion',
+        'estado_id',
+        'observaciones',
+        'cierra_sin_stock',
+        'user_create_id',
+        'user_update_id'
+    ];
 
     protected $casts = [
         'fecha_devolucion' => 'datetime',

@@ -15,7 +15,13 @@ class Orden extends Model
 
     protected $table = 'ordenes';
 
-    protected $guarded = [];
+    protected $fillable = [
+        'tipo_orden_id',
+        'fecha_devolucion',
+        'estado_id',
+        'user_create_id',
+        'user_edit_id'
+    ];
 
     protected $casts = [
         'fecha_devolucion' => 'datetime'
