@@ -673,15 +673,47 @@ class FichaCaracterizacionController extends Controller
             $asignacionService = app(\App\Services\AsignacionInstructorService::class);
             $instructoresConDisponibilidad = $asignacionService->obtenerInstructoresDisponibles((int)$id);
 
+            // Obtener la red de conocimiento de la ficha
+            $redConocimientoId = $ficha->programaFormacion->red_conocimiento_id ?? null;
+
             // Filtrar instructores ya asignados
             $instructorLiderId = $ficha->instructor_id;
             $instructoresAsignadosIds = $ficha->instructorFicha()->pluck('instructor_id')->toArray();
             
-            // Filtrar instructores disponibles (excluir ya asignados, pero NO el instructor líder)
-            $instructoresDisponibles = collect($instructoresConDisponibilidad)->filter(function($instructorData) use ($instructorLiderId, $instructoresAsignadosIds) {
-                $instructorId = $instructorData['instructor']->id;
-                // Incluir instructor líder siempre, excluir otros ya asignados
-                return $instructorId == $instructorLiderId || !in_array($instructorId, $instructoresAsignadosIds);
+            // Filtrar instructores disponibles:
+            // 1. Excluir ya asignados (excepto instructor líder)
+            // 2. Filtrar por especialidad/red de conocimiento (excepto instructor líder)
+            $instructoresDisponibles = collect($instructoresConDisponibilidad)->filter(function($instructorData) use ($instructorLiderId, $instructoresAsignadosIds, $redConocimientoId) {
+                $instructor = $instructorData['instructor'];
+                $instructorId = $instructor->id;
+                
+                // Incluir instructor líder siempre
+                if ($instructorId == $instructorLiderId) {
+                    return true;
+                }
+                
+                // Excluir si ya está asignado
+                if (in_array($instructorId, $instructoresAsignadosIds)) {
+                    return false;
+                }
+                
+                // Si hay red de conocimiento definida, filtrar por especialidad
+                if ($redConocimientoId !== null) {
+                    $especialidades = $instructor->especialidades ?? [];
+                    $especialidadPrincipal = $especialidades['principal'] ?? null;
+                    $especialidadesSecundarias = $especialidades['secundarias'] ?? [];
+                    
+                    // Verificar si el instructor tiene la especialidad/red de conocimiento requerida
+                    // (puede estar en principal o en secundarias)
+                    $tieneEspecialidad = ($especialidadPrincipal == $redConocimientoId) || 
+                                       in_array($redConocimientoId, $especialidadesSecundarias);
+                    
+                    if (!$tieneEspecialidad) {
+                        return false;
+                    }
+                }
+                
+                return true;
             })->values();
 
             // Transformar datos para el frontend (extraer solo lo necesario)
@@ -703,7 +735,10 @@ class FichaCaracterizacionController extends Controller
                 'ficha_id' => $id,
                 'total_disponibles' => $instructoresParaFrontend->count(),
                 'instructor_lider_id' => $instructorLiderId,
-                'instructores_asignados' => $instructoresAsignadosIds
+                'instructores_asignados' => $instructoresAsignadosIds,
+                'red_conocimiento_id' => $redConocimientoId,
+                'red_conocimiento_nombre' => $ficha->programaFormacion->redConocimiento->nombre ?? 'N/A',
+                'total_antes_filtro_especialidad' => count($instructoresConDisponibilidad)
             ]);
 
             return response()->json([

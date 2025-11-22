@@ -57,23 +57,36 @@
                                                 <td class="px-4">
                                                     @php
                                                         $especialidades = $instructor->especialidades ?? [];
-                                                        $especialidadPrincipal = $especialidades['principal'] ?? null;
-                                                        $especialidadesSecundarias = $especialidades['secundarias'] ?? [];
+                                                        $especialidadPrincipalId = $especialidades['principal'] ?? null;
+                                                        $especialidadesSecundariasIds = $especialidades['secundarias'] ?? [];
+                                                        
+                                                        // Convertir IDs a nombres
+                                                        $especialidadPrincipalNombre = null;
+                                                        if ($especialidadPrincipalId) {
+                                                            $redConocimiento = \App\Models\RedConocimiento::find($especialidadPrincipalId);
+                                                            $especialidadPrincipalNombre = $redConocimiento ? $redConocimiento->nombre : null;
+                                                        }
+                                                        
+                                                        $especialidadesSecundariasNombres = [];
+                                                        if (!empty($especialidadesSecundariasIds)) {
+                                                            $redesConocimiento = \App\Models\RedConocimiento::whereIn('id', $especialidadesSecundariasIds)->get();
+                                                            $especialidadesSecundariasNombres = $redesConocimiento->pluck('nombre')->toArray();
+                                                        }
                                                     @endphp
-                                                    @if($especialidadPrincipal)
+                                                    @if($especialidadPrincipalNombre)
                                                         <div class="d-inline-block px-2 py-1 rounded-pill bg-primary-light text-primary mr-1 mb-1 font-weight-medium">
-                                                            {{ $especialidadPrincipal }}
+                                                            {{ $especialidadPrincipalNombre }}
                                                         </div>
                                                     @endif
-                                                    @if(count($especialidadesSecundarias) > 0)
-                                                        @foreach(array_slice($especialidadesSecundarias, 0, 2) as $especialidad)
-                                                            <div class="d-inline-block px-2 py-1 rounded-pill bg-secondary-light text-secondary mr-1 mb-1 font-weight-medium">{{ $especialidad }}</div>
+                                                    @if(count($especialidadesSecundariasNombres) > 0)
+                                                        @foreach(array_slice($especialidadesSecundariasNombres, 0, 2) as $especialidadNombre)
+                                                            <div class="d-inline-block px-2 py-1 rounded-pill bg-secondary-light text-secondary mr-1 mb-1 font-weight-medium">{{ $especialidadNombre }}</div>
                                                         @endforeach
-                                                        @if(count($especialidadesSecundarias) > 2)
-                                                            <div class="d-inline-block px-2 py-1 rounded-pill bg-light text-muted mr-1 mb-1 font-weight-medium">+{{ count($especialidadesSecundarias) - 2 }}</div>
+                                                        @if(count($especialidadesSecundariasNombres) > 2)
+                                                            <div class="d-inline-block px-2 py-1 rounded-pill bg-light text-muted mr-1 mb-1 font-weight-medium">+{{ count($especialidadesSecundariasNombres) - 2 }}</div>
                                                         @endif
                                                     @endif
-                                                    @if(!$especialidadPrincipal && count($especialidadesSecundarias) === 0)
+                                                    @if(!$especialidadPrincipalNombre && count($especialidadesSecundariasNombres) === 0)
                                                         <span class="text-muted">Sin especialidades</span>
                                                     @endif
                                                 </td>

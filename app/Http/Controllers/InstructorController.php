@@ -235,13 +235,12 @@ class InstructorController extends Controller
         try {
             $datos = $request->validated();
 
-            // Preparar especialidades
-            if ($request->has('especialidades')) {
-                $especialidades = $request->input('especialidades');
-                if (is_string($especialidades)) {
-                    $especialidades = json_decode($especialidades, true);
-                }
-                $datos['especialidades'] = $especialidades;
+            // Preparar especialidades (array de IDs)
+            if ($request->has('especialidades') && is_array($request->input('especialidades'))) {
+                $especialidadesIds = array_filter($request->input('especialidades', []));
+                $datos['especialidades'] = $especialidadesIds;
+            } else {
+                $datos['especialidades'] = [];
             }
 
             // Preparar jornadas (array de IDs)
@@ -475,26 +474,35 @@ class InstructorController extends Controller
 
             $datos = $request->validated();
             
-            // Preparar especialidades
-            if ($request->has('especialidades') && !empty($request->input('especialidades'))) {
-                $especialidadesIds = $request->input('especialidades');
-                $especialidades = \App\Models\RedConocimiento::whereIn('id', $especialidadesIds)->get();
-                $nombresEspecialidades = $especialidades->pluck('nombre', 'id')->toArray();
+            // Preparar especialidades (array de IDs)
+            if ($request->has('especialidades') && is_array($request->input('especialidades'))) {
+                $especialidadesIds = array_filter($request->input('especialidades', []));
+                
+                // Validar que los IDs existan en la base de datos
+                $especialidadesValidas = \App\Models\RedConocimiento::whereIn('id', $especialidadesIds)
+                    ->pluck('id')
+                    ->toArray();
                 
                 $especialidadesFormateadas = [
                     'principal' => null,
                     'secundarias' => []
                 ];
                 
-                if (count($especialidadesIds) > 0) {
-                    $especialidadesFormateadas['principal'] = $nombresEspecialidades[$especialidadesIds[0]] ?? null;
-                    for ($i = 1; $i < count($especialidadesIds); $i++) {
-                        if (isset($nombresEspecialidades[$especialidadesIds[$i]])) {
-                            $especialidadesFormateadas['secundarias'][] = $nombresEspecialidades[$especialidadesIds[$i]];
-                        }
+                // La primera especialidad es la principal (guardar ID, no nombre)
+                if (count($especialidadesValidas) > 0) {
+                    $especialidadesFormateadas['principal'] = $especialidadesValidas[0];
+                    
+                    // Las demás son secundarias (guardar IDs, no nombres)
+                    for ($i = 1; $i < count($especialidadesValidas); $i++) {
+                        $especialidadesFormateadas['secundarias'][] = $especialidadesValidas[$i];
                     }
                 }
                 $datos['especialidades'] = $especialidadesFormateadas;
+            } else {
+                $datos['especialidades'] = [
+                    'principal' => null,
+                    'secundarias' => []
+                ];
             }
             
             // Preparar jornadas (array de IDs) - mapear desde parametros_temas a jornadas_formacion
@@ -1095,9 +1103,22 @@ class InstructorController extends Controller
         // Obtener especialidades actuales del instructor
         $especialidadesActuales = $instructor->especialidades ?? [];
 
-        // Separar especialidades principales y secundarias
-        $especialidadPrincipal = $especialidadesActuales['principal'] ?? null;
-        $especialidadesSecundarias = $especialidadesActuales['secundarias'] ?? [];
+        // Separar especialidades principales y secundarias (ahora son IDs)
+        $especialidadPrincipalId = $especialidadesActuales['principal'] ?? null;
+        $especialidadesSecundariasIds = $especialidadesActuales['secundarias'] ?? [];
+        
+        // Obtener los nombres de las especialidades basándose en los IDs
+        $especialidadPrincipal = null;
+        if ($especialidadPrincipalId) {
+            $redConocimiento = RedConocimiento::find($especialidadPrincipalId);
+            $especialidadPrincipal = $redConocimiento ? $redConocimiento->nombre : null;
+        }
+        
+        $especialidadesSecundarias = [];
+        if (!empty($especialidadesSecundariasIds)) {
+            $redesConocimiento = RedConocimiento::whereIn('id', $especialidadesSecundariasIds)->get();
+            $especialidadesSecundarias = $redesConocimiento->pluck('nombre')->toArray();
+        }
 
         return view(
             'instructores.gestionar-especialidades',
@@ -1138,43 +1159,44 @@ class InstructorController extends Controller
             }
 
             $especialidadesActuales = $instructor->especialidades ?? [];
+            $redConocimientoId = $redConocimiento->id;
 
             if ($request->tipo === 'principal') {
                 // Verificar que no esté ya asignada como secundaria
                 $especialidadesSecundarias = $especialidadesActuales['secundarias'] ?? [];
-                if (in_array($redConocimiento->nombre, $especialidadesSecundarias)) {
+                if (in_array($redConocimientoId, $especialidadesSecundarias)) {
                     // Remover de secundarias antes de asignar como principal
                     $especialidadesSecundarias = array_filter(
                         $especialidadesSecundarias,
-                        function ($esp) use ($redConocimiento) {
-                            return $esp !== $redConocimiento->nombre;
+                        function ($espId) use ($redConocimientoId) {
+                            return $espId !== $redConocimientoId;
                         }
                     );
                     $especialidadesActuales['secundarias'] = array_values($especialidadesSecundarias);
                 }
 
-                // Solo puede haber una especialidad principal
-                $especialidadesActuales['principal'] = $redConocimiento->nombre;
+                // Solo puede haber una especialidad principal (guardar ID, no nombre)
+                $especialidadesActuales['principal'] = $redConocimientoId;
                 $mensaje = "Especialidad principal '{$redConocimiento->nombre}' asignada exitosamente";
             } else {
                 // Agregar especialidad secundaria
                 $especialidadesSecundarias = $especialidadesActuales['secundarias'] ?? [];
 
                 // Verificar que no sea la misma especialidad principal
-                if ($especialidadesActuales['principal'] === $redConocimiento->nombre) {
+                if ($especialidadesActuales['principal'] == $redConocimientoId) {
                     return redirect()
                         ->back()
                         ->with('warning', 'Esta especialidad ya está asignada como principal');
                 }
 
                 // Verificar que no esté ya en secundarias
-                if (in_array($redConocimiento->nombre, $especialidadesSecundarias)) {
+                if (in_array($redConocimientoId, $especialidadesSecundarias)) {
                     return redirect()
                         ->back()
                         ->with('warning', 'Esta especialidad ya está asignada como secundaria');
                 }
 
-                $especialidadesSecundarias[] = $redConocimiento->nombre;
+                $especialidadesSecundarias[] = $redConocimientoId;
                 $especialidadesActuales['secundarias'] = $especialidadesSecundarias;
                 $mensaje = "Especialidad secundaria '{$redConocimiento->nombre}' asignada exitosamente";
             }
@@ -1216,7 +1238,7 @@ class InstructorController extends Controller
         $this->authorize('gestionarEspecialidades', $instructor);
 
         $request->validate([
-            'especialidad' => 'required|string',
+            'especialidad' => 'required|integer|exists:red_conocimientos,id',
             'tipo' => 'required|in:principal,secundaria'
         ]);
 
@@ -1224,11 +1246,15 @@ class InstructorController extends Controller
             DB::beginTransaction();
 
             $especialidadesActuales = $instructor->especialidades ?? [];
-            $especialidadNombre = $request->especialidad;
+            $especialidadId = (int) $request->especialidad;
+            
+            // Obtener el nombre de la especialidad para el mensaje
+            $redConocimiento = RedConocimiento::find($especialidadId);
+            $especialidadNombre = $redConocimiento ? $redConocimiento->nombre : 'N/A';
 
             if ($request->tipo === 'principal') {
                 // Verificar que la especialidad principal existe
-                if ($especialidadesActuales['principal'] !== $especialidadNombre) {
+                if ($especialidadesActuales['principal'] != $especialidadId) {
                     return redirect()
                         ->back()
                         ->with('error', 'La especialidad principal especificada no coincide');
@@ -1239,23 +1265,24 @@ class InstructorController extends Controller
 
                 Log::info('Especialidad principal removida', [
                     'instructor_id' => $instructor->id,
-                    'especialidad_removida' => $especialidadNombre
+                    'especialidad_removida_id' => $especialidadId,
+                    'especialidad_removida_nombre' => $especialidadNombre
                 ]);
             } else {
                 $especialidadesSecundarias = $especialidadesActuales['secundarias'] ?? [];
 
                 // Verificar que la especialidad secundaria existe
-                if (!in_array($especialidadNombre, $especialidadesSecundarias)) {
+                if (!in_array($especialidadId, $especialidadesSecundarias)) {
                     return redirect()
                         ->back()
                         ->with('error', 'La especialidad secundaria especificada no existe');
                 }
 
-                // Remover la especialidad de la lista
+                // Remover la especialidad de la lista (comparar IDs, no nombres)
                 $especialidadesSecundarias = array_filter(
                     $especialidadesSecundarias,
-                    function ($esp) use ($especialidadNombre) {
-                        return $esp !== $especialidadNombre;
+                    function ($espId) use ($especialidadId) {
+                        return $espId != $especialidadId;
                     }
                 );
                 $especialidadesActuales['secundarias'] = array_values($especialidadesSecundarias);
@@ -1263,7 +1290,8 @@ class InstructorController extends Controller
 
                 Log::info('Especialidad secundaria removida', [
                     'instructor_id' => $instructor->id,
-                    'especialidad_removida' => $especialidadNombre,
+                    'especialidad_removida_id' => $especialidadId,
+                    'especialidad_removida_nombre' => $especialidadNombre,
                     'especialidades_restantes' => $especialidadesSecundarias
                 ]);
             }

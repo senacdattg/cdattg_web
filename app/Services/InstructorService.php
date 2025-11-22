@@ -269,24 +269,23 @@ class InstructorService
             return;
         }
 
-        // Obtener nombres de especialidades
-        $especialidades = \App\Models\RedConocimiento::whereIn('id', $especialidadesIds)->get();
-        $nombresEspecialidades = $especialidades->pluck('nombre', 'id')->toArray();
+        // Validar que los IDs existan en la base de datos
+        $especialidadesValidas = \App\Models\RedConocimiento::whereIn('id', $especialidadesIds)
+            ->pluck('id')
+            ->toArray();
 
         $especialidadesFormateadas = [
             'principal' => null,
             'secundarias' => []
         ];
 
-        // La primera especialidad es la principal
-        if (count($especialidadesIds) > 0) {
-            $especialidadesFormateadas['principal'] = $nombresEspecialidades[$especialidadesIds[0]] ?? null;
+        // La primera especialidad es la principal (guardar ID, no nombre)
+        if (count($especialidadesValidas) > 0) {
+            $especialidadesFormateadas['principal'] = $especialidadesValidas[0];
 
-            // Las demás son secundarias
-            for ($i = 1; $i < count($especialidadesIds); $i++) {
-                if (isset($nombresEspecialidades[$especialidadesIds[$i]])) {
-                    $especialidadesFormateadas['secundarias'][] = $nombresEspecialidades[$especialidadesIds[$i]];
-                }
+            // Las demás son secundarias (guardar IDs, no nombres)
+            for ($i = 1; $i < count($especialidadesValidas); $i++) {
+                $especialidadesFormateadas['secundarias'][] = $especialidadesValidas[$i];
             }
         }
 

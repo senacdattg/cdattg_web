@@ -585,6 +585,8 @@ class AsignacionInstructorService
             $ficha = FichaCaracterizacion::with(['programaFormacion.redConocimiento', 'diasFormacion', 'sede.regional', 'jornadaFormacion'])->findOrFail($fichaId);
             
             $regionalId = $ficha->sede->regional_id ?? null;
+            $redConocimientoId = $ficha->programaFormacion->red_conocimiento_id ?? null;
+            $instructorLiderId = $ficha->instructor_id;
             
             $datosFicha = [
                 'fecha_inicio' => $ficha->fecha_inicio,
@@ -598,9 +600,28 @@ class AsignacionInstructorService
             $instructores = Instructor::with(['persona', 'regional'])
                 ->where('status', true);
             
-            // Solo filtrar por regional si existe
+            // Filtrar por regional si existe
             if ($regionalId) {
                 $instructores->where('regional_id', $regionalId);
+            }
+            
+            // Filtrar por red de conocimiento si existe
+            // Incluir siempre al instructor líder aunque no tenga la especialidad
+            if ($redConocimientoId !== null) {
+                $instructores->where(function($query) use ($redConocimientoId, $instructorLiderId) {
+                    // Incluir instructor líder siempre
+                    if ($instructorLiderId) {
+                        $query->where('id', $instructorLiderId);
+                    }
+                    
+                    // O incluir instructores que tengan la especialidad (principal o secundaria)
+                    $query->orWhere(function($q) use ($redConocimientoId) {
+                        // Verificar si está en principal (es un valor único, no array)
+                        $q->where('especialidades->principal', $redConocimientoId)
+                          // O si está en secundarias (es un array)
+                          ->orWhereJsonContains('especialidades->secundarias', $redConocimientoId);
+                    });
+                });
             }
             
             $instructores = $instructores->get();
@@ -608,6 +629,8 @@ class AsignacionInstructorService
             Log::info('Instructores encontrados para ficha', [
                 'ficha_id' => $fichaId,
                 'regional_id' => $regionalId,
+                'red_conocimiento_id' => $redConocimientoId,
+                'instructor_lider_id' => $instructorLiderId,
                 'total_instructores' => $instructores->count(),
                 'instructores' => $instructores->pluck('id')->toArray()
             ]);

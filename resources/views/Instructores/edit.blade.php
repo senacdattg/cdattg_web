@@ -290,18 +290,15 @@
                                                 @php
                                                     $especialidadesActuales = $instructor->especialidades ?? [];
                                                     $idsEspecialidades = [];
-                                                    if (isset($especialidadesActuales['principal'])) {
-                                                        // Buscar ID de la especialidad principal
-                                                        $especialidadPrincipal = \App\Models\RedConocimiento::where('nombre', $especialidadesActuales['principal'])->first();
-                                                        if ($especialidadPrincipal) {
-                                                            $idsEspecialidades[] = $especialidadPrincipal->id;
-                                                        }
+                                                    
+                                                    // Ahora las especialidades ya son IDs, no nombres
+                                                    if (isset($especialidadesActuales['principal']) && $especialidadesActuales['principal']) {
+                                                        $idsEspecialidades[] = $especialidadesActuales['principal'];
                                                     }
-                                                    if (isset($especialidadesActuales['secundarias'])) {
-                                                        foreach ($especialidadesActuales['secundarias'] as $especialidadSecundaria) {
-                                                            $especialidad = \App\Models\RedConocimiento::where('nombre', $especialidadSecundaria)->first();
-                                                            if ($especialidad) {
-                                                                $idsEspecialidades[] = $especialidad->id;
+                                                    if (isset($especialidadesActuales['secundarias']) && is_array($especialidadesActuales['secundarias'])) {
+                                                        foreach ($especialidadesActuales['secundarias'] as $especialidadId) {
+                                                            if ($especialidadId) {
+                                                                $idsEspecialidades[] = $especialidadId;
                                                             }
                                                         }
                                                     }

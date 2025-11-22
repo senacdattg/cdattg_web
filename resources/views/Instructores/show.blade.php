@@ -700,13 +700,26 @@
                                             <td class="py-3">
                                                 @php
                                                     $especialidades = $instructor->especialidades ?? [];
-                                                    $especialidadPrincipal = $especialidades['principal'] ?? null;
-                                                    $especialidadesSecundarias = $especialidades['secundarias'] ?? [];
+                                                    $especialidadPrincipalId = $especialidades['principal'] ?? null;
+                                                    $especialidadesSecundariasIds = $especialidades['secundarias'] ?? [];
+                                                    
+                                                    // Convertir IDs a nombres
+                                                    $especialidadPrincipalNombre = null;
+                                                    if ($especialidadPrincipalId) {
+                                                        $redConocimiento = \App\Models\RedConocimiento::find($especialidadPrincipalId);
+                                                        $especialidadPrincipalNombre = $redConocimiento ? $redConocimiento->nombre : null;
+                                                    }
+                                                    
+                                                    $especialidadesSecundariasNombres = [];
+                                                    if (!empty($especialidadesSecundariasIds)) {
+                                                        $redesConocimiento = \App\Models\RedConocimiento::whereIn('id', $especialidadesSecundariasIds)->get();
+                                                        $especialidadesSecundariasNombres = $redesConocimiento->pluck('nombre')->toArray();
+                                                    }
                                                 @endphp
-                                                @if($especialidadPrincipal)
+                                                @if($especialidadPrincipalNombre)
                                                     <span class="specialty-badge bg-primary text-white">
                                                         <i class="fas fa-star mr-1"></i>
-                                                        {{ $especialidadPrincipal }}
+                                                        {{ $especialidadPrincipalNombre }}
                                                     </span>
                                                 @else
                                                     <span class="text-muted">No registrada</span>
@@ -716,10 +729,10 @@
                                         <tr>
                                             <th class="py-3">Especialidades Secundarias</th>
                                             <td class="py-3">
-                                                @if(count($especialidadesSecundarias) > 0)
-                                                    @foreach($especialidadesSecundarias as $especialidad)
+                                                @if(count($especialidadesSecundariasNombres) > 0)
+                                                    @foreach($especialidadesSecundariasNombres as $especialidadNombre)
                                                         <span class="specialty-badge">
-                                                            {{ $especialidad }}
+                                                            {{ $especialidadNombre }}
                                                         </span>
                                                     @endforeach
                                                 @else
