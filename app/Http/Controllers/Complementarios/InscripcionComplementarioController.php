@@ -20,6 +20,11 @@ use Illuminate\Support\Str;
 
 class InscripcionComplementarioController extends Controller
 {
+    private const REQUIRED_INTEGER = 'required|integer';
+    private const REQUIRED_STRING_MAX_191 = 'required|string|max:191';
+    private const NULLABLE_STRING_MAX_191 = 'nullable|string|max:191';
+    private const REQUIRED_EMAIL_MAX_191 = 'required|email|max:191';
+
     protected $complementarioService;
     protected $temaRepository;
 
@@ -63,12 +68,20 @@ class InscripcionComplementarioController extends Controller
             'fecha_nacimiento' => [
                 'required',
                 'date',
-                function ($value, $fail) {
-                    $fechaNacimiento = Carbon::parse($value);
-                    $edadMinima = Carbon::now()->subYears(14);
+                function ($attribute, $value, $fail) {
+                    if (empty($value)) {
+                        return;
+                    }
 
-                    if ($fechaNacimiento->gt($edadMinima)) {
-                        $fail('Debe tener al menos 14 años para registrarse.');
+                    try {
+                        $fechaNacimiento = Carbon::parse($value);
+                        $edadMinima = Carbon::now()->subYears(14);
+
+                        if ($fechaNacimiento->gt($edadMinima)) {
+                            $fail('Debe tener al menos 14 años para registrarse.');
+                        }
+                    } catch (\Exception $e) {
+                        $fail('La fecha de nacimiento no es válida.');
                     }
                 },
             ],
@@ -265,12 +278,20 @@ class InscripcionComplementarioController extends Controller
             'fecha_nacimiento' => [
                 'required',
                 'date',
-                function ($value, $fail) {
-                    $fechaNacimiento = Carbon::parse($value);
-                    $edadMinima = Carbon::now()->subYears(14);
+                function ($attribute, $value, $fail) {
+                    if (empty($value)) {
+                        return;
+                    }
 
-                    if ($fechaNacimiento->gt($edadMinima)) {
-                        $fail('Debe tener al menos 14 años para registrarse.');
+                    try {
+                        $fechaNacimiento = Carbon::parse($value);
+                        $edadMinima = Carbon::now()->subYears(14);
+
+                        if ($fechaNacimiento->gt($edadMinima)) {
+                            $fail('Debe tener al menos 14 años para registrarse.');
+                        }
+                    } catch (\Exception $e) {
+                        $fail('La fecha de nacimiento no es válida.');
                     }
                 },
             ],

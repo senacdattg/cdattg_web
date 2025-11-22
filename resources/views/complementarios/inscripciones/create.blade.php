@@ -40,7 +40,7 @@
                         </div>
 
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-12 col-lg-12">
                     <div class="card" style="background-color: #ffffff; border-color: #dee2e6;">
                         <div class="card-header card-header-primary">
                             <h5 class="mb-0"><i class="fas fa-user mr-2"></i>Información Personal</h5>
