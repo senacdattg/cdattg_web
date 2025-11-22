@@ -10,6 +10,9 @@ use App\Models\ParametroTema;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\Inventario\DevolucionRequest;
 
 class DevolucionController extends InventarioController
 {
@@ -23,7 +26,7 @@ class DevolucionController extends InventarioController
     }
 
     // Mostrar lista de préstamos pendientes de devolución
-    public function index()
+    public function index() : View
     {
         $estadoAprobadaId = $this->getEstadoOrdenAprobadaId();
 
@@ -42,7 +45,7 @@ class DevolucionController extends InventarioController
 
 
     // Mostrar formulario de devolución
-    public function create($detalleOrdenId)
+    public function create($detalleOrdenId) : View|RedirectResponse
     {
         $detalleOrden = DetalleOrden::with(['orden', 'producto'])->findOrFail($detalleOrdenId);
         
@@ -56,13 +59,9 @@ class DevolucionController extends InventarioController
 
     
     // Registrar devolució
-    public function store(Request $request)
+    public function store(DevolucionRequest $request) : RedirectResponse
     {
-        $validated = $request->validate([
-            'detalle_orden_id' => 'required|integer|exists:detalle_ordenes,id',
-            'cantidad_devuelta' => 'required|integer|min:0',
-            'observaciones' => 'nullable|string|max:500'
-        ]);
+        $validated = $request->validated();
 
         if ((int) $validated['cantidad_devuelta'] === 0) {
             $observaciones = $validated['observaciones'] ?? '';
@@ -106,7 +105,7 @@ class DevolucionController extends InventarioController
 
     
     // Mostrar historial de devoluciones
-    public function historial()
+    public function historial() : View
     {
         $devoluciones = Devolucion::with(['detalleOrden.producto', 'detalleOrden.orden', 'userCreate'])
             ->orderBy('fecha_devolucion', 'desc')
@@ -117,7 +116,7 @@ class DevolucionController extends InventarioController
 
 
     // Ver detalle de una devolución
-    public function show($id)
+    public function show($id) : View
     {
         $devolucion = Devolucion::with([
             'detalleOrden.producto',
@@ -129,7 +128,7 @@ class DevolucionController extends InventarioController
         return view('inventario.devoluciones.show', compact('devolucion'));
     }
     // Mostrar préstamos activos del usuario actual
-    public function misPrestamos()
+    public function misPrestamos() : View
     {
         $userId = Auth::id();
         $estadoAprobadaId = $this->getEstadoOrdenAprobadaId();
@@ -150,7 +149,7 @@ class DevolucionController extends InventarioController
     }
 
     // Historial de préstamos del usuario
-    public function historialPrestamos()
+    public function historialPrestamos() : View
     {
         $userId = Auth::id();
 
