@@ -4,7 +4,7 @@ namespace App\Http\Requests\Inventario;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CategoriaRequest extends FormRequest
+class MarcaCategoriaRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.

@@ -9,6 +9,9 @@ use App\Models\Tema;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use App\Http\Requests\Inventario\MarcaCategoriaRequest;
 
 class MarcaController extends InventarioController
 {
@@ -26,7 +29,7 @@ class MarcaController extends InventarioController
         $this->temaMarcas = Tema::where('name', 'MARCAS')->first();
     }
 
-    public function index(Request $request)
+    public function index(Request $request) : View|RedirectResponse
     {
         if (!$this->temaMarcas) {
             return back()->with('error', 'No existe el tema "MARCAS" en la base de datos.');
@@ -58,17 +61,15 @@ class MarcaController extends InventarioController
         return view('inventario.marcas.index', compact('marcas'));
     }
 
-    public function create()
+    public function create() : View
     {
         return view('inventario.marcas.create');
     }
 
 
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'name' => 'required|string|unique:parametros,name',
-        ]);
+    public function store(MarcaCategoriaRequest $request) : RedirectResponse
+    { 
+        $validated = $request->validated();
 
         try {
             $marca = new Marca([
@@ -89,7 +90,7 @@ class MarcaController extends InventarioController
         }
     }
 
-    public function edit(Parametro $marca)
+    public function edit(Parametro $marca) : View
     {
         return view('inventario.marcas.edit', [
             'title' => 'Editar marca',
@@ -103,11 +104,9 @@ class MarcaController extends InventarioController
     }
 
 
-    public function update(Request $request, Parametro $marca)
+    public function update(MarcaCategoriaRequest $request, Parametro $marca) : RedirectResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|unique:parametros,name,' . $marca->id,
-        ]);
+        $validated = $request->validated();
 
         $marca->update([
             'name'         => strtoupper($validated['name']),
@@ -118,7 +117,7 @@ class MarcaController extends InventarioController
             ->with('success', 'Marca actualizada exitosamente.');
     }
 
-    public function destroy(Parametro $marca)
+    public function destroy(Parametro $marca) : RedirectResponse
     {
         try {
             // Desvincular del tema "MARCAS"

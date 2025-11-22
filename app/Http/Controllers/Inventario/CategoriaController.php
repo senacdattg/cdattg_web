@@ -12,6 +12,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
 use App\Http\Requests\Inventario\CategoriaRequest;
+use App\Http\Requests\Inventario\MarcaCategoriaRequest;
 
 class CategoriaController extends InventarioController
 {
@@ -70,7 +71,7 @@ class CategoriaController extends InventarioController
     }
 
 
-    public function store(CategoriaRequest $request) : RedirectResponse
+    public function store(MarcaCategoriaRequest $request) : RedirectResponse
     {
         $validated = $request->validated();
 
@@ -107,7 +108,7 @@ class CategoriaController extends InventarioController
     }
 
 
-    public function update(CategoriaRequest $request, Parametro $categoria) : RedirectResponse
+    public function update(MarcaCategoriaRequest $request, Parametro $categoria) : RedirectResponse
     {
         $validated = $request->validated();
 

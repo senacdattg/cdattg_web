@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Inventario;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\JsonResponse;
 
 abstract class InventarioController extends Controller
 {
@@ -16,7 +17,7 @@ abstract class InventarioController extends Controller
 
     
     // Asignar IDs de usuario a un modelo antes de guardar
-    protected function setUserIds($model, $isUpdate = false)
+    protected function setUserIds($model, $isUpdate = false) : void
     {
         $userId = Auth::id();
         
@@ -29,7 +30,7 @@ abstract class InventarioController extends Controller
 
     
     // Respuesta JSON estándar para éxito
-    protected function successResponse($message, $data = null, $status = 200)
+    protected function successResponse($message, $data = null, $status = 200) : JsonResponse
     {
         return response()->json([
             'success' => true,
@@ -40,7 +41,7 @@ abstract class InventarioController extends Controller
 
     
     // Respuesta JSON estándar para error
-    protected function errorResponse($message, $errors = null, $status = 400)
+    protected function errorResponse($message, $errors = null, $status = 400) : JsonResponse
     {
         return response()->json([
             'success' => false,
