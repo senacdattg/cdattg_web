@@ -64,12 +64,35 @@ async function validarCedula(cedula, maxRetries = 3) {
       await page.getByRole("textbox", { name: "Buscar ciudad..." }).fill("san jose del gua");
       await page.getByRole("button", { name: "SAN JOSÉ DEL GUAVIARE" }).click();
 
-      // Paso 4. Seleccionar fecha de nacimiento (hardcodeada)
+      // Paso 4. Seleccionar fecha de nacimiento (9 de abril de 2005 - tu cumpleaños)
       console.error("📅 Seleccionando fecha de nacimiento...");
       await page.getByRole("button", { name: "placeholder" }).click();
       await page.getByRole("button", { name: "2025" }).click();
       await page.getByRole("button", { name: "2005" }).click();
-      await page.getByRole("button", { name: "Noviembre" }).click();
+      
+      // Detectar dinámicamente el mes actual que muestra la página
+      console.error("🔍 Detectando mes actual en el selector...");
+      const mesActual = await page.locator('button[name*="mes"], button[class*="month"], [class*="month"] button').first().innerText().catch(() => null);
+      
+      if (mesActual) {
+        console.error(`📆 Mes actual detectado: ${mesActual}`);
+        // Hacer clic en el mes actual para abrir el selector
+        await page.getByRole("button", { name: mesActual }).click();
+      } else {
+        console.error("⚠️ No se pudo detectar el mes actual, usando fallback");
+        // Fallback: buscar cualquier botón que parezca ser un mes
+        const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+        for (const mes of meses) {
+          const existe = await page.getByRole("button", { name: mes }).count().catch(() => 0);
+          if (existe > 0) {
+            console.error(`📆 Usando mes fallback: ${mes}`);
+            await page.getByRole("button", { name: mes }).click();
+            break;
+          }
+        }
+      }
+      
+      // Seleccionar abril (tu cumpleaños)
       await page.getByRole("button", { name: "Abril" }).click();
       await page.getByRole("button", { name: "9", exact: true }).click();
 
