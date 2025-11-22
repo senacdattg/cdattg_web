@@ -311,7 +311,68 @@ class StoreFichaCaracterizacionRequest extends FormRequest
                 }
             }
 
-            // 4. Validar reglas de negocio específicas del SENA
+            // 4. Validar que los días de formación estén dentro del rango de fechas
+            if ($this->fecha_inicio && $this->fecha_fin && $this->dias_formacion && is_array($this->dias_formacion)) {
+                $fechaInicio = \Carbon\Carbon::parse($this->fecha_inicio);
+                $fechaFin = \Carbon\Carbon::parse($this->fecha_fin);
+                
+                // Mapeo de IDs de días a días de la semana (0 = Domingo, 1 = Lunes, ..., 6 = Sábado)
+                $mapeoDias = [
+                    12 => 1, // LUNES -> 1
+                    13 => 2, // MARTES -> 2
+                    14 => 3, // MIÉRCOLES -> 3
+                    15 => 4, // JUEVES -> 4
+                    16 => 5, // VIERNES -> 5
+                    17 => 6, // SÁBADO -> 6
+                    18 => 0  // DOMINGO -> 0
+                ];
+                
+                // Calcular qué días de la semana están en el rango
+                $diasEnRango = [];
+                $fechaActual = $fechaInicio->copy();
+                while ($fechaActual->lte($fechaFin)) {
+                    $diaSemana = $fechaActual->dayOfWeek; // 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
+                    if (!in_array($diaSemana, $diasEnRango)) {
+                        $diasEnRango[] = $diaSemana;
+                    }
+                    $fechaActual->addDay();
+                }
+                
+                // Validar cada día seleccionado
+                $diasInvalidos = [];
+                foreach ($this->dias_formacion as $diaId) {
+                    $diaId = (int)$diaId;
+                    if (isset($mapeoDias[$diaId])) {
+                        $diaSemana = $mapeoDias[$diaId];
+                        if (!in_array($diaSemana, $diasEnRango)) {
+                            $diasInvalidos[] = $diaId;
+                        }
+                    }
+                }
+                
+                if (!empty($diasInvalidos)) {
+                    // Obtener nombres de los días inválidos
+                    $nombresDias = [
+                        12 => 'LUNES',
+                        13 => 'MARTES',
+                        14 => 'MIÉRCOLES',
+                        15 => 'JUEVES',
+                        16 => 'VIERNES',
+                        17 => 'SÁBADO',
+                        18 => 'DOMINGO'
+                    ];
+                    $nombresInvalidos = array_map(function($id) use ($nombresDias) {
+                        return $nombresDias[$id] ?? "Día ID {$id}";
+                    }, $diasInvalidos);
+                    
+                    $validator->errors()->add(
+                        'dias_formacion',
+                        'Los días ' . implode(', ', $nombresInvalidos) . ' no están dentro del rango de fechas seleccionado (' . $fechaInicio->format('d/m/Y') . ' a ' . $fechaFin->format('d/m/Y') . ').'
+                    );
+                }
+            }
+
+            // 5. Validar reglas de negocio específicas del SENA
             $datos = $this->all();
             $validacionReglas = $this->validarReglasNegocioSena($datos);
             

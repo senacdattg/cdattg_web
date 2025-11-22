@@ -7,7 +7,21 @@
 @endsection
 
 @section('css')
-    @vite(['dias_formacion_css'])
+    @vite(['resources/css/parametros.css'])
+    <style>
+        /* Estilos para días fuera del rango de fechas */
+        .dia-cuadro.fuera-rango {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #f8f9fa !important;
+            border-color: #dee2e6 !important;
+        }
+        
+        .dia-cuadro.fuera-rango:hover {
+            transform: none;
+            box-shadow: none;
+        }
+    </style>
 @endsection
 
 @section('content_header')
@@ -108,123 +122,63 @@
 
                             <div class="collapse show" id="configurarHorarios">
                 <div class="card-body">
-                        <!-- Configuración de Horarios -->
-                                    <div class="mb-4">
-                                        <h6 class="text-dark mb-3">
-                                            <i class="fas fa-clock mr-2"></i>Configuración de Horarios
-                                        </h6>
-                                        <div class="row">
-                            <div class="col-md-4">
-                                                <div class="form-group">
-                                                    <label class="text-muted small">Hora de Inicio</label>
-                                <input type="time" id="hora_inicio_global" class="form-control" 
-                                       value="{{ $ficha->jornadaFormacion->hora_inicio }}"
-                                       @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
-                                           min="06:00" max="13:00" step="3600"
-                                       @elseif($ficha->jornadaFormacion->jornada == 'TARDE')
-                                           min="13:00" max="17:59" step="3600"
-                                       @elseif($ficha->jornadaFormacion->jornada == 'NOCHE')
-                                           min="18:00" max="22:59" step="3600"
-                                       @elseif($ficha->jornadaFormacion->jornada == 'FINES DE SEMANA')
-                                           min="08:00" max="16:59" step="3600"
-                                       @endif>
-                                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                                <div class="form-group">
-                                                    <label class="text-muted small">Hora de Fin</label>
-                                <input type="time" id="hora_fin_global" class="form-control" 
-                                       value="{{ $ficha->jornadaFormacion->hora_fin }}"
-                                       @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
-                                           min="06:00" max="13:00" step="3600"
-                                       @elseif($ficha->jornadaFormacion->jornada == 'TARDE')
-                                           min="13:00" max="17:59" step="3600"
-                                       @elseif($ficha->jornadaFormacion->jornada == 'NOCHE')
-                                           min="18:00" max="22:59" step="3600"
-                                       @elseif($ficha->jornadaFormacion->jornada == 'FINES DE SEMANA')
-                                           min="08:00" max="16:59" step="3600"
-                                       @endif>
-                                                </div>
-                                            </div>
-                                            <div class="col-md-4">
-                                                <div class="form-group">
-                                                    <label class="text-muted small">&nbsp;</label>
-                                                    <button type="button" class="btn btn-primary btn-block" onclick="aplicarHorarioGlobal()">
-                                                        <i class="fas fa-sync-alt mr-1"></i>Aplicar a Todos
-                                                    </button>
-                                                </div>
-                                            </div>
-                            </div>
-                        </div>
-                        
                         <div class="alert alert-info mb-4">
                                         <div class="d-flex align-items-center">
                                             <i class="fas fa-info-circle mr-2"></i>
                                             <div>
                             <strong>Jornada:</strong> {{ $ficha->jornadaFormacion->jornada }}<br>
-                            <strong>Restricciones de horarios:</strong><br>
-                            @if($ficha->jornadaFormacion->jornada == 'MAÑANA')
-                                • <strong>MAÑANA:</strong> 06:00 - 13:00 horas (solo horas completas)
-                            @elseif($ficha->jornadaFormacion->jornada == 'TARDE')
-                                • <strong>TARDE:</strong> 13:00 - 17:59 horas (solo horas completas)
-                            @elseif($ficha->jornadaFormacion->jornada == 'NOCHE')
-                                • <strong>NOCHE:</strong> 18:00 - 22:59 horas (solo horas completas)
-                            @elseif($ficha->jornadaFormacion->jornada == 'FINES DE SEMANA')
-                                • <strong>FINES DE SEMANA:</strong> 08:00 - 16:59 horas (solo horas completas)
-                            @endif
-                            <br><strong>Nota:</strong> Los horarios deben respetar las restricciones de la jornada seleccionada.
+                                    <strong>Nota:</strong> Los horarios se configurarán automáticamente según la jornada seleccionada cuando marque los días de formación.
                                             </div>
                                         </div>
                         </div>
 
-                        <!-- Días Seleccionados -->
-                        <div id="dias-seleccionados" class="mb-4" style="display: none;">
-                                        <h6 class="text-dark mb-3">
-                                            <i class="fas fa-list mr-2"></i>Días Seleccionados
-                            </h6>
-                            <div id="lista-dias-seleccionados"></div>
-                        </div>
-
-                        <!-- Selección de Días con Cuadros -->
+                        <!-- Selección de Días de Formación -->
                         <div class="mb-4">
                                         <h6 class="text-dark mb-3">
                                             <i class="fas fa-calendar-week mr-2"></i>Seleccionar Días de Formación
                                         </h6>
-                            <div class="row">
+                            <div class="row" id="dias-formacion-container">
                                 @foreach($diasSemana as $dia)
                                     @php
                                         $estaAsignado = $diasAsignados->contains('dia_id', $dia->id);
-                                        $esPermitido = $ficha->jornada_id && isset($configuracionJornadas[$ficha->jornada_id]) 
-                                            ? in_array($dia->id, $configuracionJornadas[$ficha->jornada_id]['dias_permitidos'])
-                                            : true;
+                                        $diaAsignado = $diasAsignados->firstWhere('dia_id', $dia->id);
                                     @endphp
-                                    <div class="col-md-2 mb-3">
-                                        <div class="dia-cuadro {{ $estaAsignado ? 'asignado' : ($esPermitido ? 'disponible' : 'no-permitido') }}" 
-                                             data-dia-id="{{ $dia->id }}" 
-                                             data-dia-nombre="{{ $dia->name }}"
-                                             onclick="{{ $esPermitido && !$estaAsignado ? 'seleccionarDia(this)' : '' }}">
-                                            <div class="text-center">
-                                                <i class="fas fa-calendar-day fa-lg mb-1"></i>
-                                                <div class="dia-nombre">{{ $dia->name }}</div>
+                                    <div class="col-md-3 col-sm-4 col-6 mb-2">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" 
+                                                   class="custom-control-input dia-formacion-checkbox" 
+                                                   id="dia_{{ $dia->id }}" 
+                                                   name="dias_formacion[]" 
+                                                   value="{{ $dia->id }}"
+                                                   {{ $estaAsignado ? 'checked' : '' }}
+                                                   {{ $estaAsignado ? 'data-asignado="true"' : '' }}>
+                                            <label class="custom-control-label" for="dia_{{ $dia->id }}">
+                                                {{ $dia->name }}
                                                 @if($estaAsignado)
-                                                    <small class="text-success">
-                                                        <i class="fas fa-check"></i> Asignado
-                                                    </small>
-                                                @elseif($esPermitido)
-                                                    <small class="text-muted">Click para seleccionar</small>
-                                                @else
-                                                    <small class="text-danger">
-                                                        <i class="fas fa-ban"></i> No permitido
+                                                    <small class="text-success d-block">
+                                                        <i class="fas fa-check"></i> Ya asignado
                                                     </small>
                                                 @endif
-                                            </div>
+                                            </label>
                                         </div>
                                     </div>
                                 @endforeach
                                         </div>
+                            
+                            <!-- Contenedor de Horarios -->
+                            <div class="row mt-3" id="horarios-container" style="display: none;">
+                                <div class="col-md-12">
+                                    <h6 class="fw-bold text-primary mb-3">
+                                        <i class="fas fa-clock mr-2"></i>Horarios por Día
+                                    </h6>
+                                    <div id="horarios-dias" class="row">
+                                        <!-- Los horarios se generarán dinámicamente aquí -->
+                                    </div>
+                                </div>
+                            </div>
                                     </div>
 
-                                    <!-- Formulario Oculto para Envío -->
+                        <!-- Formulario para Guardar -->
                                     <form action="{{ route('fichaCaracterizacion.guardarDiasFormacion', $ficha->id) }}" method="POST" id="formDiasFormacion">
                                         @csrf
                                         <div id="dias-container" style="display: none;">
@@ -235,7 +189,7 @@
                                             <a href="{{ route('fichaCaracterizacion.show', $ficha->id) }}" class="btn btn-outline-secondary">
                                                 <i class="fas fa-arrow-left mr-1"></i> Volver
                                             </a>
-                                            <button type="button" class="btn btn-success" onclick="guardarDiasSeleccionados()" id="btn-guardar-dias" style="display: none;">
+                                <button type="submit" class="btn btn-success" id="btn-guardar-dias" style="display: none;">
                                                 <i class="fas fa-check mr-1"></i> Guardar Días Seleccionados
                                             </button>
                                         </div>
@@ -306,11 +260,12 @@
                                                                 <i class="fas fa-pencil-alt text-info"></i>
                                             </button>
                                             <form action="{{ route('fichaCaracterizacion.eliminarDiaFormacion', [$ficha->id, $diaAsignado->id]) }}" 
-                                                                  method="POST" class="d-inline">
+                                                                  method="POST" class="d-inline form-eliminar-dia" 
+                                                                  data-dia-id="{{ $diaAsignado->id }}"
+                                                                  data-dia-nombre="{{ $diaAsignado->dia->name }}">
                                                 @csrf
                                                 @method('DELETE')
-                                                                <button type="submit" class="btn btn-light btn-sm" 
-                                                                        onclick="return confirm('¿Está seguro de eliminar este día de formación?')"
+                                                                <button type="button" class="btn btn-light btn-sm btn-eliminar-dia" 
                                                                         data-toggle="tooltip" title="Eliminar día">
                                                                     <i class="fas fa-trash text-danger"></i>
                                                 </button>
@@ -374,7 +329,382 @@
 @endsection
 
 @section('js')
-    @vite(['resources/js/pages/gestion-especializada.js'])
+    <script>
+        // Pasar datos de la ficha al JavaScript
+        window.fichaId = {{ $ficha->id }};
+        window.fichaFechaInicio = @json($ficha->fecha_inicio ? $ficha->fecha_inicio->format('Y-m-d') : null);
+        window.fichaFechaFin = @json($ficha->fecha_fin ? $ficha->fecha_fin->format('Y-m-d') : null);
+        
+        // Jornada de la ficha para generar horarios automáticamente
+        @if($ficha->jornadaFormacion)
+            window.fichaJornadaNombre = @json($ficha->jornadaFormacion->jornada);
+            window.fichaJornadaId = {{ $ficha->jornada_id }};
+        @else
+            window.fichaJornadaNombre = null;
+            window.fichaJornadaId = null;
+        @endif
+        
+        // Mapeo de IDs de días a días de la semana (0 = Domingo, 1 = Lunes, ..., 6 = Sábado)
+        window.mapeoDiasFormacion = {
+            12: 1, // LUNES -> 1
+            13: 2, // MARTES -> 2
+            14: 3, // MIÉRCOLES -> 3
+            15: 4, // JUEVES -> 4
+            16: 5, // VIERNES -> 5
+            17: 6, // SÁBADO -> 6
+            18: 0  // DOMINGO -> 0
+        };
+    </script>
+    @vite(['resources/js/pages/fichas-form.js'])
+    <script>
+        // Cargar horarios de días ya asignados al cargar la página
+        // Función de validación manual para días según fechas de la ficha
+        function validarDiasFormacionManual() {
+            const fechaInicio = window.fichaFechaInicio;
+            const fechaFin = window.fichaFechaFin;
+            
+            if (!fechaInicio || !fechaFin) {
+                return;
+            }
+            
+            const mapeoDias = {
+                12: 1, // LUNES -> 1
+                13: 2, // MARTES -> 2
+                14: 3, // MIÉRCOLES -> 3
+                15: 4, // JUEVES -> 4
+                16: 5, // VIERNES -> 5
+                17: 6, // SÁBADO -> 6
+                18: 0  // DOMINGO -> 0
+            };
+            
+            const parsearFecha = (fechaStr) => {
+                const partes = fechaStr.split('-');
+                return new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
+            };
+            
+            const fechaInicioObj = parsearFecha(fechaInicio);
+            const fechaFinObj = parsearFecha(fechaFin);
+            const diasEnRango = new Set();
+            
+            const fechaActual = new Date(fechaInicioObj);
+            while (fechaActual <= fechaFinObj) {
+                const diaSemana = fechaActual.getDay();
+                diasEnRango.add(diaSemana);
+                fechaActual.setDate(fechaActual.getDate() + 1);
+            }
+            
+            console.log('Validación manual de días:', {
+                fechaInicio,
+                fechaFin,
+                diasEnRango: Array.from(diasEnRango)
+            });
+            
+            let diasDeshabilitados = [];
+            $('.dia-formacion-checkbox').each(function() {
+                const checkbox = $(this);
+                const diaId = parseInt(checkbox.val());
+                const diaSemana = mapeoDias[diaId];
+                const estaAsignado = checkbox.attr('data-asignado') === 'true';
+                
+                if (diaSemana !== undefined) {
+                    if (estaAsignado) {
+                        // Si ya está asignado, mantenerlo habilitado pero marcado
+                        checkbox.prop('disabled', false);
+                    } else if (diasEnRango.has(diaSemana)) {
+                        // El día está en el rango, habilitarlo
+                        checkbox.prop('disabled', false);
+                        checkbox.closest('.custom-control').removeClass('text-muted');
+                    } else {
+                        // El día no está en el rango, deshabilitarlo y desmarcarlo
+                        checkbox.prop('disabled', true);
+                        checkbox.prop('checked', false);
+                        checkbox.closest('.custom-control').addClass('text-muted');
+                        const nombreDia = checkbox.next('label').text().trim().split('\n')[0].trim();
+                        diasDeshabilitados.push(nombreDia);
+                        console.log(`Día deshabilitado: ${nombreDia} (ID: ${diaId}, Día semana: ${diaSemana})`);
+                    }
+                }
+            });
+            
+            if (diasDeshabilitados.length > 0) {
+                let mensajeInfo = $('#mensaje-dias-formacion');
+                if (mensajeInfo.length === 0) {
+                    $('#dias-formacion-container').parent().after(`
+                        <div class="alert alert-info mt-2" id="mensaje-dias-formacion">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            <strong>Nota:</strong> Los días <strong>${diasDeshabilitados.join(', ')}</strong> han sido deshabilitados porque no están dentro del rango de fechas de la ficha (${fechaInicio} a ${fechaFin}).
+                        </div>
+                    `);
+                } else {
+                    mensajeInfo.html(`
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <strong>Nota:</strong> Los días <strong>${diasDeshabilitados.join(', ')}</strong> han sido deshabilitados porque no están dentro del rango de fechas de la ficha (${fechaInicio} a ${fechaFin}).
+                    `);
+                }
+            } else {
+                $('#mensaje-dias-formacion').remove();
+            }
+        }
+        
+        $(document).ready(function() {
+            // Ejecutar validación de días según fechas al cargar (siempre)
+            if (window.fichaFechaInicio && window.fichaFechaFin) {
+                // Ejecutar validación manual primero
+                validarDiasFormacionManual();
+                
+                // También intentar usar la función global si está disponible
+                setTimeout(function() {
+                    if (typeof validarDiasFormacionSegunFechas === 'function') {
+                        validarDiasFormacionSegunFechas();
+                    }
+                }, 100);
+            }
+            
+            // Cargar horarios de días ya asignados
+            @if($diasAsignados->count() > 0)
+                @php
+                    $diasAsignadosData = $diasAsignados->map(function($dia) {
+                        $horaInicio = $dia->hora_inicio ? substr($dia->hora_inicio, 0, 5) : '';
+                        $horaFin = $dia->hora_fin ? substr($dia->hora_fin, 0, 5) : '';
+                        return [
+                            'dia_id' => $dia->dia_id,
+                            'hora_inicio' => $horaInicio,
+                            'hora_fin' => $horaFin
+                        ];
+                    })->values();
+                @endphp
+                const diasAsignados = @json($diasAsignadosData);
+                
+                // Esperar a que el script de fichas-form.js esté cargado
+                setTimeout(function() {
+                    // Marcar checkboxes y preparar horarios
+                    diasAsignados.forEach(function(dia) {
+                        const checkbox = $(`#dia_${dia.dia_id}`);
+                        if (checkbox.length) {
+                            checkbox.prop('checked', true);
+                            // Guardar horarios en el objeto valoresHorarios si existe en el scope global
+                            if (typeof window.valoresHorarios === 'undefined') {
+                                window.valoresHorarios = {};
+                            }
+                            window.valoresHorarios[dia.dia_id] = {
+                                hora_inicio: dia.hora_inicio || null,
+                                hora_fin: dia.hora_fin || null
+                            };
+                        }
+                    });
+                    
+                    // Trigger change en los checkboxes marcados para generar horarios
+                    $('.dia-formacion-checkbox:checked').each(function() {
+                        $(this).trigger('change');
+                    });
+                    
+                    // Mostrar botón de guardar si hay días seleccionados
+                    if ($('.dia-formacion-checkbox:checked').length > 0) {
+                        $('#btn-guardar-dias').show();
+                    }
+                }, 200);
+            @endif
+            
+            // Función para editar día
+            window.editarDia = function(diaId, horaInicio, horaFin) {
+                $('#formEditarDia').attr('action', `/fichaCaracterizacion/${window.fichaId}/dias-formacion/${diaId}`);
+                $('#edit_hora_inicio').val(horaInicio);
+                $('#edit_hora_fin').val(horaFin);
+                $('#modalEditarDia').modal('show');
+            };
+            
+            // Manejar envío del formulario de edición
+            $('#formEditarDia').on('submit', function(e) {
+                e.preventDefault();
+                
+                const formData = new FormData(this);
+                const url = $(this).attr('action');
+                
+                Swal.fire({
+                    title: '¿Guardar cambios?',
+                    text: 'Se actualizarán los horarios del día de formación',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, guardar',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#6c757d'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Guardando...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        
+                        $.ajax({
+                            url: url,
+                            method: 'POST',
+                            data: formData,
+                            processData: false,
+                            contentType: false,
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: '¡Éxito!',
+                                    text: 'Los horarios se han actualizado correctamente',
+                                    confirmButtonText: 'Aceptar'
+                                }).then(() => {
+                                    $('#modalEditarDia').modal('hide');
+                                    window.location.reload();
+                                });
+                            },
+                            error: function(xhr) {
+                                let errorMsg = 'Error al actualizar los horarios';
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    errorMsg = xhr.responseJSON.message;
+                                } else if (xhr.responseJSON && xhr.responseJSON.errors) {
+                                    const errors = Object.values(xhr.responseJSON.errors).flat();
+                                    errorMsg = errors.join('<br>');
+                                }
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    html: errorMsg
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+            
+            // Manejar eliminación de días
+            $(document).on('click', '.btn-eliminar-dia', function(e) {
+                e.preventDefault();
+                const form = $(this).closest('form');
+                const diaId = form.data('dia-id');
+                const diaNombre = form.data('dia-nombre');
+                
+                Swal.fire({
+                    title: '¿Eliminar día de formación?',
+                    html: `¿Está seguro de eliminar el día <strong>${diaNombre}</strong>?<br><small class="text-muted">Esta acción no se puede deshacer.</small>`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#6c757d',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Eliminando...',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        
+                        $.ajax({
+                            url: form.attr('action'),
+                            method: 'POST',
+                            data: {
+                                _token: form.find('input[name="_token"]').val(),
+                                _method: 'DELETE'
+                            },
+                            success: function(response) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: '¡Eliminado!',
+                                    text: 'El día de formación ha sido eliminado correctamente',
+                                    confirmButtonText: 'Aceptar'
+                                }).then(() => {
+                                    window.location.reload();
+                                });
+                            },
+                            error: function(xhr) {
+                                let errorMsg = 'Error al eliminar el día de formación';
+                                if (xhr.responseJSON && xhr.responseJSON.message) {
+                                    errorMsg = xhr.responseJSON.message;
+                                }
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: errorMsg
+                                });
+                            }
+                        });
+                    }
+                });
+            });
+            
+            // Manejar envío del formulario
+            $('#formDiasFormacion').on('submit', function(e) {
+                e.preventDefault();
+                
+                const diasSeleccionados = [];
+                $('.dia-formacion-checkbox:checked').each(function() {
+                    const diaId = $(this).val();
+                    const horaInicio = $(`select[name="horarios[${diaId}][hora_inicio]"]`).val() || 
+                                     $(`input[name="horarios[${diaId}][hora_inicio]"]`).val() || '';
+                    const horaFin = $(`select[name="horarios[${diaId}][hora_fin]"]`).val() || 
+                                   $(`input[name="horarios[${diaId}][hora_fin]"]`).val() || '';
+                    
+                    diasSeleccionados.push({
+                        dia_id: parseInt(diaId),
+                        hora_inicio: horaInicio,
+                        hora_fin: horaFin
+                    });
+                });
+                
+                if (diasSeleccionados.length === 0) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Sin días seleccionados',
+                        text: 'Debe seleccionar al menos un día de formación'
+                    });
+                    return;
+                }
+                
+                // Construir el formulario con los datos
+                const formData = new FormData(this);
+                formData.delete('dias_formacion[]');
+                
+                diasSeleccionados.forEach(function(dia, index) {
+                    formData.append(`dias[${dia.dia_id}][dia_id]`, dia.dia_id);
+                    formData.append(`dias[${dia.dia_id}][hora_inicio]`, dia.hora_inicio);
+                    formData.append(`dias[${dia.dia_id}][hora_fin]`, dia.hora_fin);
+                });
+                
+                // Enviar formulario
+                $.ajax({
+                    url: $(this).attr('action'),
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Éxito!',
+                            text: 'Los días de formación se han guardado correctamente',
+                            confirmButtonText: 'Aceptar'
+                        }).then(() => {
+                            window.location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        let errorMsg = 'Error al guardar los días de formación';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMsg = xhr.responseJSON.message;
+                        }
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: errorMsg
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 @endsection
 
 @section('footer')

@@ -208,34 +208,40 @@ document.addEventListener('DOMContentLoaded', () => {
         const instructoresExistentes = container.querySelectorAll('.instructor-row').length;
         const nuevoIndice = instructoresExistentes;
 
-        // Obtener días de la semana del DOM (deben estar disponibles en la vista)
-        const diasSemanaDisponibles = window.diasSemana || [
-            {id: 12, nombre: 'LUNES'},
-            {id: 13, nombre: 'MARTES'},
-            {id: 14, nombre: 'MIÉRCOLES'},
-            {id: 15, nombre: 'JUEVES'},
-            {id: 16, nombre: 'VIERNES'},
-            {id: 17, nombre: 'SÁBADO'},
-            {id: 18, nombre: 'DOMINGO'}
-        ];
+        // Obtener días de la semana disponibles (solo los de la ficha)
+        const diasSemanaDisponibles = window.diasSemanaDisponibles || window.diasSemana || [];
 
         // Crear HTML para los días de la semana (solo checkboxes)
         let diasHTML = '';
-        diasSemanaDisponibles.forEach(dia => {
-            diasHTML += `
-                <div class="col-md-4 col-sm-6 mb-2">
-                    <div class="form-check">
-                        <input class="form-check-input dia-check" type="checkbox" 
-                               name="instructores[${nuevoIndice}][dias_semana][]" 
-                               value="${dia.id}" 
-                               id="dia_${nuevoIndice}_${dia.id}">
-                        <label class="form-check-label fw-bold" for="dia_${nuevoIndice}_${dia.id}">
-                            <i class="far fa-calendar-alt mr-1"></i> ${dia.nombre}
-                        </label>
+        if (diasSemanaDisponibles.length === 0) {
+            diasHTML = `
+                <div class="col-12">
+                    <div class="alert alert-warning mb-0">
+                        <i class="fas fa-exclamation-triangle mr-2"></i>
+                        No hay días de formación configurados para esta ficha. 
+                        <a href="/fichaCaracterizacion/${window.fichaId}/gestionar-dias-formacion" class="alert-link">
+                            Configurar días de formación
+                        </a>
                     </div>
                 </div>
             `;
-        });
+        } else {
+            diasSemanaDisponibles.forEach(dia => {
+                diasHTML += `
+                    <div class="col-md-4 col-sm-6 mb-2">
+                        <div class="form-check custom-checkbox-blue">
+                            <input class="form-check-input dia-check" type="checkbox" 
+                                   name="instructores[${nuevoIndice}][dias_semana][]" 
+                                   value="${dia.id}" 
+                                   id="dia_${nuevoIndice}_${dia.id}">
+                            <label class="form-check-label fw-bold" for="dia_${nuevoIndice}_${dia.id}">
+                                <i class="far fa-calendar-alt mr-1"></i> ${dia.nombre}
+                            </label>
+                        </div>
+                    </div>
+                `;
+            });
+        }
 
         // Crear HTML para el nuevo instructor
         const instructorHTML = `
@@ -245,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <label class="form-label font-weight-bold">
                             <i class="fas fa-user-tie mr-1"></i> Instructor <span class="text-danger">*</span>
                         </label>
-                        <select name="instructores[${nuevoIndice}][instructor_id]" class="form-control instructor-select" required>
+                        <select name="instructores[${nuevoIndice}][instructor_id]" class="form-control select2 instructor-select" data-placeholder="Seleccionar instructor..." required>
                             <option value="">Seleccionar instructor...</option>
                         </select>
                     </div>
@@ -254,14 +260,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             <i class="fas fa-calendar-alt mr-1"></i> Fecha Inicio <span class="text-danger">*</span>
                         </label>
                         <input type="date" name="instructores[${nuevoIndice}][fecha_inicio]" 
-                               class="form-control fecha-inicio" required>
+                               class="form-control fecha-inicio" 
+                               required>
                     </div>
                     <div class="col-md-3">
                         <label class="form-label font-weight-bold">
                             <i class="fas fa-calendar-check mr-1"></i> Fecha Fin <span class="text-danger">*</span>
                         </label>
                         <input type="date" name="instructores[${nuevoIndice}][fecha_fin]" 
-                               class="form-control fecha-fin" required>
+                               class="form-control fecha-fin" 
+                               required>
                     </div>
                 </div>
                 
@@ -292,6 +300,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Configurar eventos para el nuevo instructor
         const nuevoRow = container.querySelector(`.instructor-row[data-index="${nuevoIndice}"]`);
+        
+        // Aplicar restricciones de fechas de la ficha
+        if (nuevoRow) {
+            const fechaInicioInput = nuevoRow.querySelector('.fecha-inicio');
+            const fechaFinInput = nuevoRow.querySelector('.fecha-fin');
+            
+            if (fechaInicioInput && typeof window.fichaFechaInicio !== 'undefined' && window.fichaFechaInicio) {
+                fechaInicioInput.setAttribute('min', window.fichaFechaInicio);
+                fechaFinInput.setAttribute('min', window.fichaFechaInicio);
+            }
+            
+            if (fechaFinInput && typeof window.fichaFechaFin !== 'undefined' && window.fichaFechaFin) {
+                fechaInicioInput.setAttribute('max', window.fichaFechaFin);
+                fechaFinInput.setAttribute('max', window.fichaFechaFin);
+            }
+        }
+        
         configurarEventosInstructor(nuevoRow);
 
         console.log(`Instructor agregado con índice: ${nuevoIndice}`);
@@ -345,12 +370,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         // Inicializar Select2 si está disponible
                         if (typeof $ !== 'undefined' && $.fn.select2) {
-                            $(select).select2({
-                                theme: 'bootstrap-5',
-                                width: '100%',
-                                placeholder: 'Seleccionar instructor...',
-                                allowClear: true
-                            });
+                            // Esperar un momento para asegurar que el DOM esté listo
+                            setTimeout(() => {
+                                const $select = $(select);
+                                
+                                // Destruir instancia previa si existe
+                                if ($select.hasClass('select2-hidden-accessible')) {
+                                    $select.select2('destroy');
+                                }
+                                
+                                // Asegurar que tenga la clase select2
+                                $select.addClass('select2');
+                                
+                                // Inicializar Select2 con configuración específica
+                                $select.select2({
+                                    theme: 'bootstrap-5',
+                                    width: '100%',
+                                    placeholder: $select.data('placeholder') || 'Seleccionar instructor...',
+                                    allowClear: true,
+                                    dropdownParent: $select.closest('.instructor-row'),
+                                    language: {
+                                        noResults: function() {
+                                            return "No se encontraron resultados";
+                                        },
+                                        searching: function() {
+                                            return "Buscando...";
+                                        }
+                                    }
+                                });
+                                
+                                // Forzar actualización del ancho
+                                $select.next('.select2-container').css('width', '100%');
+                            }, 100);
                         }
                         
                         console.log(`Cargados ${data.instructores.length} instructores en el select`);
@@ -385,32 +436,177 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Función para validar días según fechas en una fila de instructor
+    function validarDiasSegunFechasInstructor(instructorRow) {
+        const fechaInicio = instructorRow.querySelector('.fecha-inicio');
+        const fechaFin = instructorRow.querySelector('.fecha-fin');
+        const diasCheckboxes = instructorRow.querySelectorAll('.dia-check');
+        
+        if (!fechaInicio || !fechaFin || !diasCheckboxes.length) {
+            return;
+        }
+        
+        const fechaInicioVal = fechaInicio.value;
+        const fechaFinVal = fechaFin.value;
+        
+        if (!fechaInicioVal || !fechaFinVal) {
+            // Si no hay ambas fechas, habilitar todos los días
+            diasCheckboxes.forEach(checkbox => {
+                checkbox.disabled = false;
+                checkbox.closest('.form-check')?.classList.remove('text-muted');
+            });
+            return;
+        }
+        
+        // Mapa de días de la semana: 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
+        // IDs en la base de datos: 12 = LUNES, 13 = MARTES, 14 = MIÉRCOLES, 15 = JUEVES, 16 = VIERNES, 17 = SÁBADO, 18 = DOMINGO
+        const mapeoDias = {
+            12: 1, // LUNES -> 1
+            13: 2, // MARTES -> 2
+            14: 3, // MIÉRCOLES -> 3
+            15: 4, // JUEVES -> 4
+            16: 5, // VIERNES -> 5
+            17: 6, // SÁBADO -> 6
+            18: 0  // DOMINGO -> 0
+        };
+        
+        // Parsear fechas correctamente para evitar problemas de zona horaria
+        const parsearFecha = (fechaStr) => {
+            const partes = fechaStr.split('-');
+            return new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
+        };
+        
+        const fechaInicioObj = parsearFecha(fechaInicioVal);
+        const fechaFinObj = parsearFecha(fechaFinVal);
+        const diasEnRango = new Set();
+        
+        // Iterar por todas las fechas en el rango
+        const fechaActual = new Date(fechaInicioObj);
+        while (fechaActual <= fechaFinObj) {
+            const diaSemana = fechaActual.getDay(); // 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
+            diasEnRango.add(diaSemana);
+            fechaActual.setDate(fechaActual.getDate() + 1);
+        }
+        
+        // Habilitar/deshabilitar checkboxes según si el día está en el rango
+        let diasDeshabilitados = [];
+        diasCheckboxes.forEach(checkbox => {
+            const diaId = Number.parseInt(checkbox.value, 10);
+            const diaSemana = mapeoDias[diaId];
+            const formCheck = checkbox.closest('.form-check');
+            
+            if (diaSemana !== undefined) {
+                if (diasEnRango.has(diaSemana)) {
+                    // El día está en el rango, habilitarlo
+                    checkbox.disabled = false;
+                    formCheck?.classList.remove('text-muted');
+                } else {
+                    // El día no está en el rango, deshabilitarlo y desmarcarlo
+                    checkbox.disabled = true;
+                    checkbox.checked = false;
+                    formCheck?.classList.add('text-muted');
+                    const label = checkbox.nextElementSibling;
+                    if (label) {
+                        const nombreDia = label.textContent.trim();
+                        diasDeshabilitados.push(nombreDia);
+                    }
+                }
+            }
+        });
+        
+        // Actualizar contador después de validar
+        const indice = instructorRow.dataset.index;
+        if (indice) {
+            actualizarContadorDias(indice);
+        }
+    }
+
     // Función para configurar eventos de un instructor
     function configurarEventosInstructor(instructorRow) {
         const fechaInicio = instructorRow.querySelector('.fecha-inicio');
         const fechaFin = instructorRow.querySelector('.fecha-fin');
         const indice = instructorRow.dataset.index;
 
-        // Configurar fechas por defecto (sin restricción de fecha mínima)
-        // Dejar vacías para que el usuario las seleccione libremente
-        // fechaInicio.value = '';
-        // fechaFin.value = '';
+        // Aplicar restricciones de fechas de la ficha si están disponibles
+        if (typeof window.fichaFechaInicio !== 'undefined' && window.fichaFechaInicio) {
+            fechaInicio.setAttribute('min', window.fichaFechaInicio);
+            fechaFin.setAttribute('min', window.fichaFechaInicio);
+        }
+        
+        if (typeof window.fichaFechaFin !== 'undefined' && window.fichaFechaFin) {
+            fechaInicio.setAttribute('max', window.fichaFechaFin);
+            fechaFin.setAttribute('max', window.fichaFechaFin);
+        }
 
-        // Validar que fecha fin sea posterior a fecha inicio (solo validación, sin auto-ajuste)
+        // Validar días cuando cambien las fechas
+        const validarDias = () => {
+            validarDiasSegunFechasInstructor(instructorRow);
+        };
+
+        // Validar que fecha fin sea posterior o igual a fecha inicio
         fechaInicio.addEventListener('change', function() {
-            if (fechaFin.value && fechaFin.value < fechaInicio.value) {
-                // Solo mostrar advertencia, no auto-ajustar
-                console.warn('La fecha de fin debe ser posterior o igual a la fecha de inicio');
+            // Actualizar min de fecha fin para que no sea menor que fecha inicio
+            if (fechaInicio.value) {
+                fechaFin.setAttribute('min', fechaInicio.value);
+                
+                // Si fecha fin es menor que fecha inicio, limpiarla
+                if (fechaFin.value && fechaFin.value < fechaInicio.value) {
+                    fechaFin.value = '';
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Fecha inválida',
+                        text: 'La fecha de fin debe ser posterior o igual a la fecha de inicio',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    // Validar días cuando cambie la fecha de inicio
+                    validarDias();
+                }
+            } else {
+                // Si se limpia la fecha de inicio, validar días
+                validarDias();
             }
         });
 
-        // Configurar eventos para los checkboxes de días (solo contador)
+        // Validar que fecha inicio sea anterior o igual a fecha fin
+        fechaFin.addEventListener('change', function() {
+            // Actualizar max de fecha inicio para que no sea mayor que fecha fin
+            if (fechaFin.value) {
+                fechaInicio.setAttribute('max', fechaFin.value);
+                
+                // Si fecha inicio es mayor que fecha fin, limpiarla
+                if (fechaInicio.value && fechaInicio.value > fechaFin.value) {
+                    fechaInicio.value = '';
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Fecha inválida',
+                        text: 'La fecha de inicio debe ser anterior o igual a la fecha de fin',
+                        timer: 3000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    // Validar días cuando cambie la fecha de fin
+                    validarDias();
+                }
+            } else {
+                // Si se limpia la fecha de fin, validar días
+                validarDias();
+            }
+        });
+
+        // Configurar eventos para los checkboxes de días (contador y validación)
         const diasCheckboxes = instructorRow.querySelectorAll('.dia-check');
         diasCheckboxes.forEach(checkbox => {
             checkbox.addEventListener('change', function() {
                 actualizarContadorDias(indice);
             });
         });
+        
+        // Validar días al cargar si ya hay fechas
+        if (fechaInicio.value && fechaFin.value) {
+            validarDias();
+        }
     }
 
     // Función para actualizar contador de días seleccionados

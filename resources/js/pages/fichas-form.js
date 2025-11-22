@@ -198,6 +198,139 @@ document.addEventListener('DOMContentLoaded', () => {
     // Validación de fechas
     $('#fecha_inicio, #fecha_fin').change(function() {
         validateDates();
+        validarDiasFormacionSegunFechas();
+    });
+    
+    // Función para validar días de formación según el rango de fechas
+    function validarDiasFormacionSegunFechas() {
+        // Intentar obtener fechas de los inputs primero (para create)
+        let fechaInicio = $('#fecha_inicio').val();
+        let fechaFin = $('#fecha_fin').val();
+        
+        // Si no hay fechas en los inputs, usar las fechas de la ficha (para edición)
+        if (!fechaInicio && typeof window.fichaFechaInicio !== 'undefined' && window.fichaFechaInicio) {
+            fechaInicio = window.fichaFechaInicio;
+        }
+        if (!fechaFin && typeof window.fichaFechaFin !== 'undefined' && window.fichaFechaFin) {
+            fechaFin = window.fichaFechaFin;
+        }
+        
+        if (!fechaInicio || !fechaFin) {
+            // Si no hay ambas fechas, habilitar todos los días
+            $('.dia-formacion-checkbox').prop('disabled', false);
+            return;
+        }
+        
+        // Mapa de días de la semana: 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
+        // IDs en la base de datos: 12 = LUNES, 13 = MARTES, 14 = MIÉRCOLES, 15 = JUEVES, 16 = VIERNES, 17 = SÁBADO, 18 = DOMINGO
+        const mapeoDias = {
+            12: 1, // LUNES -> 1
+            13: 2, // MARTES -> 2
+            14: 3, // MIÉRCOLES -> 3
+            15: 4, // JUEVES -> 4
+            16: 5, // VIERNES -> 5
+            17: 6, // SÁBADO -> 6
+            18: 0  // DOMINGO -> 0
+        };
+        
+        // Calcular qué días de la semana están en el rango
+        // Parsear fechas correctamente para evitar problemas de zona horaria
+        const parsearFecha = (fechaStr) => {
+            const partes = fechaStr.split('-');
+            // new Date(year, monthIndex, day) usa zona horaria local
+            return new Date(parseInt(partes[0]), parseInt(partes[1]) - 1, parseInt(partes[2]));
+        };
+        
+        const fechaInicioObj = parsearFecha(fechaInicio);
+        const fechaFinObj = parsearFecha(fechaFin);
+        const diasEnRango = new Set();
+        
+        // Iterar por todas las fechas en el rango
+        const fechaActual = new Date(fechaInicioObj);
+        while (fechaActual <= fechaFinObj) {
+            const diaSemana = fechaActual.getDay(); // 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
+            diasEnRango.add(diaSemana);
+            
+            // Avanzar al siguiente día
+            fechaActual.setDate(fechaActual.getDate() + 1);
+        }
+        
+        console.log('Validación de días:', {
+            fechaInicio,
+            fechaFin,
+            fechaInicioObj: fechaInicioObj.toISOString().split('T')[0],
+            fechaFinObj: fechaFinObj.toISOString().split('T')[0],
+            diasEnRango: Array.from(diasEnRango)
+        });
+        
+        // Habilitar/deshabilitar checkboxes según si el día está en el rango
+        let diasDeshabilitados = [];
+        let diasHabilitados = [];
+        
+        $('.dia-formacion-checkbox').each(function() {
+            const checkbox = $(this);
+            const diaId = Number.parseInt(checkbox.val(), 10);
+            const diaSemana = mapeoDias[diaId];
+            
+            if (diaSemana !== undefined) {
+                if (diasEnRango.has(diaSemana)) {
+                    // El día está en el rango, habilitarlo
+                    checkbox.prop('disabled', false);
+                    checkbox.closest('.custom-control').removeClass('text-muted');
+                    const nombreDia = checkbox.next('label').text().trim();
+                    diasHabilitados.push(nombreDia);
+                    console.log(`Día habilitado: ${nombreDia} (ID: ${diaId}, Día semana: ${diaSemana})`);
+                } else {
+                    // El día no está en el rango, deshabilitarlo y desmarcarlo
+                    checkbox.prop('disabled', true);
+                    checkbox.prop('checked', false);
+                    checkbox.closest('.custom-control').addClass('text-muted');
+                    const nombreDia = checkbox.next('label').text().trim();
+                    diasDeshabilitados.push(nombreDia);
+                    console.log(`Día deshabilitado: ${nombreDia} (ID: ${diaId}, Día semana: ${diaSemana})`);
+                }
+            }
+        });
+        
+        // Mostrar mensaje informativo si hay días deshabilitados
+        let mensajeInfo = $('#mensaje-dias-formacion');
+        if (diasDeshabilitados.length > 0) {
+            if (mensajeInfo.length === 0) {
+                // Crear el mensaje si no existe
+                $('#dias-formacion-container').parent().after(`
+                    <div class="alert alert-info mt-2" id="mensaje-dias-formacion">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        <strong>Nota:</strong> Los días <strong>${diasDeshabilitados.join(', ')}</strong> han sido deshabilitados porque no están dentro del rango de fechas seleccionado (${fechaInicio} a ${fechaFin}).
+                    </div>
+                `);
+            } else {
+                // Actualizar el mensaje existente
+                mensajeInfo.html(`
+                    <i class="fas fa-info-circle mr-2"></i>
+                    <strong>Nota:</strong> Los días <strong>${diasDeshabilitados.join(', ')}</strong> han sido deshabilitados porque no están dentro del rango de fechas seleccionado (${fechaInicio} a ${fechaFin}).
+                `);
+            }
+        } else {
+            // Eliminar el mensaje si todos los días están habilitados
+            mensajeInfo.remove();
+        }
+        
+        // Actualizar horarios si hay días seleccionados
+        const diasSeleccionados = $('.dia-formacion-checkbox:checked:not(:disabled)');
+        if (diasSeleccionados.length > 0) {
+            // Trigger change para actualizar horarios
+            $('.dia-formacion-checkbox:checked:not(:disabled)').first().trigger('change');
+        } else {
+            // Ocultar contenedor de horarios si no hay días seleccionados
+            $('#horarios-container').hide();
+        }
+    }
+    
+    // Ejecutar validación al cargar la página si ya hay fechas
+    $(document).ready(function() {
+        if ($('#fecha_inicio').val() && $('#fecha_fin').val()) {
+            validarDiasFormacionSegunFechas();
+        }
     });
 
     // Establecer fecha mínima (2 años antes de hoy)
@@ -240,15 +373,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Función para obtener la configuración de horarios según la jornada seleccionada
     function obtenerHorariosJornada() {
-        const jornadaSelect = $('#jornada_id');
-        const jornadaId = jornadaSelect.val();
+        // Primero intentar usar la jornada de la ficha si está disponible (para edición)
+        let jornadaNombre = null;
         
-        if (!jornadaId) {
-            return null;
+        if (typeof window.fichaJornadaNombre !== 'undefined' && window.fichaJornadaNombre) {
+            jornadaNombre = window.fichaJornadaNombre.toUpperCase();
+        } else {
+            // Si no hay jornada de ficha, usar el select (para creación)
+            const jornadaSelect = $('#jornada_id');
+            const jornadaId = jornadaSelect.val();
+            
+            if (!jornadaId) {
+                return null;
+            }
+            
+            // Obtener el texto de la opción seleccionada (nombre de la jornada)
+            jornadaNombre = jornadaSelect.find('option:selected').text().trim().toUpperCase();
         }
         
-        // Obtener el texto de la opción seleccionada (nombre de la jornada)
-        const jornadaNombre = jornadaSelect.find('option:selected').text().trim().toUpperCase();
+        if (!jornadaNombre) {
+            return null;
+        }
         
         // Buscar la configuración de horarios para esta jornada
         for (const [key, config] of Object.entries(horariosJornadas)) {
@@ -267,8 +412,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const horariosContainer = $('#horarios-container');
         const horariosDias = $('#horarios-dias');
         
-        // Objeto para almacenar los valores de horarios
-        const valoresHorarios = {};
+        // Objeto para almacenar los valores de horarios (global para acceso desde otras funciones)
+        if (typeof window.valoresHorarios === 'undefined') {
+            window.valoresHorarios = {};
+        }
+        const valoresHorarios = window.valoresHorarios;
         
         // Función para guardar valores actuales antes de regenerar
         function guardarValoresActuales() {
@@ -296,29 +444,36 @@ document.addEventListener('DOMContentLoaded', () => {
         // Función para generar horarios para un día específico
         function generarHorariosDia(diaId, diaNombre) {
             // Obtener configuración de horarios según la jornada
-            const configHorarios = obtenerHorariosJornada();
+            let configHorarios = obtenerHorariosJornada();
             
+            // Si no hay configuración, verificar si hay jornada de ficha disponible
             if (!configHorarios) {
-                // Si no hay jornada seleccionada, mostrar mensaje con SweetAlert2
-                if (typeof Swal !== 'undefined' && typeof Swal.fire === 'function') {
-                    Swal.fire({
-                        icon: 'info',
-                        title: 'Jornada Requerida',
-                        text: 'Por favor, seleccione primero una jornada de formación para configurar los horarios.',
-                        confirmButtonText: 'Entendido',
-                        confirmButtonColor: '#17a2b8',
-                        allowOutsideClick: true,
-                        allowEscapeKey: true
-                    });
-                }
-                return `
-                    <div class="col-md-12 mb-3">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle mr-2"></i>
-                            Por favor, seleccione primero una jornada de formación para configurar los horarios.
+                const tieneJornadaFicha = typeof window.fichaJornadaNombre !== 'undefined' && window.fichaJornadaNombre;
+                
+                if (!tieneJornadaFicha) {
+                    // Si no hay jornada seleccionada ni de ficha, mostrar mensaje con SweetAlert2
+                    if (typeof Swal !== 'undefined' && typeof Swal.fire === 'function') {
+                        Swal.fire({
+                            icon: 'info',
+                            title: 'Jornada Requerida',
+                            text: 'Por favor, seleccione primero una jornada de formación para configurar los horarios.',
+                            confirmButtonText: 'Entendido',
+                            confirmButtonColor: '#17a2b8',
+                            allowOutsideClick: true,
+                            allowEscapeKey: true
+                        });
+                    }
+                    return `
+                        <div class="col-md-12 mb-3">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Por favor, seleccione primero una jornada de formación para configurar los horarios.
+                            </div>
                         </div>
-                    </div>
-                `;
+                    `;
+                }
+                // Si hay jornada de ficha pero no se encontró configuración, usar valores por defecto
+                configHorarios = { min: '06:00', max: '23:10', defaultInicio: '08:00', defaultFin: '16:00' };
             }
             
             // Usar valores guardados o valores por defecto según la jornada
@@ -381,6 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
             guardarValoresActuales();
             
             const diasSeleccionados = diasCheckboxes.filter(':checked');
+            const btnGuardar = $('#btn-guardar-dias');
             
             if (diasSeleccionados.length > 0) {
                 horariosContainer.show();
@@ -392,16 +548,29 @@ document.addEventListener('DOMContentLoaded', () => {
                     const horarioHTML = generarHorariosDia(diaId, diaNombre);
                     horariosDias.append(horarioHTML);
                 });
+                
+                // Mostrar botón de guardar
+                if (btnGuardar.length) {
+                    btnGuardar.show();
+                }
             } else {
                 horariosContainer.hide();
                 horariosDias.empty();
+                
+                // Ocultar botón de guardar
+                if (btnGuardar.length) {
+                    btnGuardar.hide();
+                }
             }
         }
         
         // Event listener para cambios en checkboxes
         diasCheckboxes.on('change', function() {
+            // Verificar si hay jornada disponible (del select o de la ficha)
             const jornadaId = $('#jornada_id').val();
-            if (!jornadaId) {
+            const tieneJornadaFicha = typeof window.fichaJornadaNombre !== 'undefined' && window.fichaJornadaNombre;
+            
+            if (!jornadaId && !tieneJornadaFicha) {
                 // Usar SweetAlert2 si está disponible, sino usar alert nativo
                 if (typeof Swal !== 'undefined' && typeof Swal.fire === 'function') {
                     Swal.fire({
@@ -578,23 +747,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Cargar datos iniciales para edición
     if (window.location.pathname.includes('/edit')) {
-        loadModalidades();
-        loadJornadas();
-        loadInstructores();
-        loadSedes();
-        
-        // Establecer valores actuales con delay para asegurar que los selects estén cargados
+        // Establecer valores actuales después de inicializar Select2
         setTimeout(() => {
-            // Los valores se establecerán desde el HTML con data attributes
-            const sedeId = $('#sede_id').data('initial-value');
-            const instructorId = $('#instructor_id').data('initial-value');
-            const modalidadId = $('#modalidad_formacion_id').data('initial-value');
-            const jornadaId = $('#jornada_id').data('initial-value');
-            const ambienteId = $('#ambiente_id').data('initial-value');
+            // Obtener valores directamente del select (ya vienen del HTML)
+            const sedeId = $('#sede_id').val();
+            const instructorId = $('#instructor_id').val();
+            const modalidadId = $('#modalidad_formacion_id').val();
+            const jornadaId = $('#jornada_id').val();
+            const ambienteId = $('#ambiente_id').val();
             
+            // Si hay valores, asegurarse de que Select2 los muestre correctamente
             if (sedeId) {
                 $('#sede_id').val(sedeId).trigger('change');
-                loadAmbientesPorSede(sedeId);
+                if (sedeId && !$('#ambiente_id').prop('disabled')) {
+                    loadAmbientesPorSede(sedeId);
+                }
             }
             
             if (instructorId) {
@@ -609,12 +776,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 $('#jornada_id').val(jornadaId).trigger('change');
             }
             
-            if (ambienteId) {
+            if (ambienteId && sedeId) {
                 setTimeout(() => {
                     $('#ambiente_id').val(ambienteId).trigger('change');
                 }, 500);
             }
-        }, 1000);
+        }, 500);
     }
 
     // Función para cargar modalidades

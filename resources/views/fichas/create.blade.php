@@ -8,7 +8,7 @@
                 <div class="col-md-6">
                     <div class="form-group mb-3">
                         <label for="ficha" class="form-label fw-bold">Número de Ficha <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control @error('ficha') is-invalid @enderror" id="ficha" name="ficha"
+                        <input type="number" class="form-control @error('ficha') is-invalid @enderror" id="ficha" name="ficha"
                             value="{{ old('ficha') }}" placeholder="Ej: 123456" maxlength="50" required>
                         @error('ficha')
                             <div class="invalid-feedback">{{ $message }}</div>

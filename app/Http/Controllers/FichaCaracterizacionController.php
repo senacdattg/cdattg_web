@@ -294,6 +294,8 @@ class FichaCaracterizacionController extends Controller
             Log::info('Datos cargados para edición de ficha', [
                 'ficha_id' => $ficha->id,
                 'numero_ficha' => $ficha->ficha,
+                'instructor_id' => $ficha->instructor_id,
+                'instructor_id_type' => gettype($ficha->instructor_id),
                 'total_programas' => $programas->count(),
                 'total_instructores' => $instructores->count(),
                 'total_ambientes' => $ambientes->count(),

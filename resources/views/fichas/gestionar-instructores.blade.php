@@ -11,7 +11,37 @@
 @section('css')
     @vite(['resources/css/parametros.css'])
     {{-- Select2 cargado por AdminLTE nativo --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css">
     <style>
+        /* Estilos para Select2 en selects dinámicos */
+        .instructor-select {
+            width: 100% !important;
+            min-width: 200px;
+        }
+        
+        .instructor-row .select2-container {
+            width: 100% !important;
+            margin-bottom: 0;
+        }
+        
+        .instructor-row .select2-container--bootstrap-5 .select2-selection {
+            min-height: 38px;
+            border: 1px solid #ced4da;
+            border-radius: 0.25rem;
+        }
+        
+        .instructor-row .select2-container--bootstrap-5 .select2-selection__rendered {
+            padding-left: 12px;
+            padding-right: 20px;
+            line-height: 36px;
+        }
+        
+        .instructor-row .select2-container--bootstrap-5 .select2-selection__arrow {
+            height: 36px;
+            right: 8px;
+        }
+        
         /* Estilos para badges de estado */
         .badge {
             font-size: 0.75rem;
@@ -104,6 +134,55 @@
         .hover-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+        }
+        
+        /* Estilos para checkboxes azules personalizados */
+        .custom-checkbox-blue .form-check-input {
+            width: 1.25rem;
+            height: 1.25rem;
+            margin-top: 0.125rem;
+            cursor: pointer;
+            border: 2px solid #6c757d;
+            border-radius: 0.25rem;
+            transition: all 0.2s ease;
+        }
+        
+        .custom-checkbox-blue .form-check-input:checked {
+            background-color: #007bff;
+            border-color: #007bff;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .custom-checkbox-blue .form-check-input:focus {
+            border-color: #007bff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        .custom-checkbox-blue .form-check-input:hover:not(:checked) {
+            border-color: #007bff;
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+        
+        .custom-checkbox-blue .form-check-label {
+            cursor: pointer;
+            user-select: none;
+            margin-left: 0.5rem;
+            color: #212529;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        
+        .custom-checkbox-blue .form-check-input:checked ~ .form-check-label {
+            color: #212529;
+            font-weight: 600;
+        }
+        
+        .custom-checkbox-blue .form-check-input:hover ~ .form-check-label {
+            color: #212529;
         }
     </style>
 @endsection
@@ -479,13 +558,32 @@
 @endsection
 
 @section('js')
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         // Pasar datos al contexto de JavaScript
         window.fichaId = {{ $ficha->id }};
         
+        // Fechas de la ficha para restricciones
+        window.fichaFechaInicio = @json($ficha->fecha_inicio ? $ficha->fecha_inicio->format('Y-m-d') : null);
+        window.fichaFechaFin = @json($ficha->fecha_fin ? $ficha->fecha_fin->format('Y-m-d') : null);
+        
+        // Días de formación de la ficha (solo estos estarán disponibles)
+        @php
+            $diasFormacionFichaIds = isset($diasFormacionFicha) && $diasFormacionFicha->isNotEmpty() 
+                ? $diasFormacionFicha->pluck('id')->toArray() 
+                : [];
+        @endphp
+        window.diasFormacionFichaIds = @json($diasFormacionFichaIds);
+        
+        // Todos los días de la semana disponibles
         window.diasSemana = @json($diasSemana->map(function($dia) {
             return ['id' => $dia->id, 'nombre' => $dia->name];
         })->values());
+        
+        // Filtrar días de la semana para mostrar solo los de la ficha
+        window.diasSemanaDisponibles = window.diasSemana.filter(dia => 
+            window.diasFormacionFichaIds.includes(dia.id)
+        );
         
         // Crear objeto de días de la semana con horas por defecto
         window.diasSemanaData = {};

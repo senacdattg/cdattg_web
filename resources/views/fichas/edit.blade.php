@@ -156,7 +156,13 @@
                                     >
                                         <option value="">Seleccione un instructor...</option>
                                         @foreach($instructores as $instructor)
-                                            <option value="{{ $instructor->id }}" {{ old('instructor_id', $ficha->instructor_id) == $instructor->id ? 'selected' : '' }}>
+                                            @php
+                                                $instructorId = (int) $instructor->id;
+                                                $fichaInstructorId = (int) ($ficha->instructor_id ?? 0);
+                                                $oldInstructorId = old('instructor_id', $fichaInstructorId);
+                                                $isSelected = ($oldInstructorId == $instructorId) || ($fichaInstructorId == $instructorId && !old('instructor_id'));
+                                            @endphp
+                                            <option value="{{ $instructorId }}" {{ $isSelected ? 'selected' : '' }}>
                                                 {{ $instructor->persona->primer_nombre ?? '' }} {{ $instructor->persona->segundo_nombre ?? '' }} {{ $instructor->persona->primer_apellido ?? '' }} {{ $instructor->persona->segundo_apellido ?? '' }}
                                             </option>
                                         @endforeach

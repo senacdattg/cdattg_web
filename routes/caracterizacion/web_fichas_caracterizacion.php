@@ -82,6 +82,18 @@ Route::middleware(['auth'])->group(function () {
             ->name('fichaCaracterizacion.eliminarDiaFormacion');
     });
 
+    // Gestión de aprendices
+    Route::middleware('can:GESTIONAR APRENDICES FICHA')->group(function () {
+        Route::get('/fichaCaracterizacion/{id}/gestionar-aprendices', [FichaCaracterizacionController::class, 'gestionarAprendices'])
+            ->name('fichaCaracterizacion.gestionarAprendices');
+        
+        Route::post('/fichaCaracterizacion/{id}/asignar-aprendices', [FichaCaracterizacionController::class, 'asignarAprendices'])
+            ->name('fichaCaracterizacion.asignarAprendices');
+        
+        Route::post('/fichaCaracterizacion/{id}/desasignar-aprendices', [FichaCaracterizacionController::class, 'desasignarAprendices'])
+            ->name('fichaCaracterizacion.desasignarAprendices');
+    });
+
     // Rutas para consultas específicas
     Route::middleware('can:VER FICHA CARACTERIZACION')->group(function () {
         // Consultas por criterios específicos
