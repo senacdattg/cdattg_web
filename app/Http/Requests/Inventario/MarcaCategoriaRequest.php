@@ -21,6 +21,15 @@ class MarcaCategoriaRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Update - el route parameter puede ser 'categoria' o 'marca'
+        if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
+            $parametroId = $this->route('categoria') ? $this->route('categoria')->id : ($this->route('marca') ? $this->route('marca')->id : null);
+            return [
+                'name' => 'required|string|unique:parametros,name,' . $parametroId,
+            ];
+        }
+
+        // Store
         return [
             'name' => 'required|string|unique:parametros,name',
         ];

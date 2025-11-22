@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\QueryException;
 use Illuminate\View\View;
 use Illuminate\Http\RedirectResponse;
-use App\Http\Requests\Inventario\CategoriaRequest;
 use App\Http\Requests\Inventario\MarcaCategoriaRequest;
 
 class CategoriaController extends InventarioController

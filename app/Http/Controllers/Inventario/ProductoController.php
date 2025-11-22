@@ -15,13 +15,15 @@ use App\Models\Inventario\ContratoConvenio;
 use App\Models\Ambiente;
 use App\Models\Inventario\Proveedor;
 use App\Notifications\StockBajoNotification;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\JsonResponse;
+use App\Http\Requests\Inventario\ProductoRequest;
 
 
 class ProductoController extends InventarioController
 {
     private const THEME_PRODUCT_STATES = 'ESTADOS DE PRODUCTO';
-    private const RULE_REQUIRED_PARAMETRO_TEMA = 'required|exists:parametros_temas,id';
-    private const RULE_REQUIRED_PARAMETRO = 'required|exists:parametros,id';
     private const DEFAULT_PRODUCT_IMAGE = 'img/inventario/producto-default.png';
 
 
@@ -41,7 +43,7 @@ class ProductoController extends InventarioController
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(Request $request) : View
     {
         $search = $request->input('search');
 
@@ -85,7 +87,7 @@ class ProductoController extends InventarioController
      * Show the form for creating a new resource.
      */
 
-    public function create()
+    public function create() : View
     {
         $tiposProductos = ParametroTema::with(['parametro','tema'])
             ->whereHas('tema', fn($q) => $q->where('name', 'TIPOS DE PRODUCTO'))
@@ -136,25 +138,9 @@ class ProductoController extends InventarioController
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ProductoRequest $request) : RedirectResponse
     {
-        $validated = $request->validate([
-            'producto' => 'required|unique:productos',
-            'tipo_producto_id' => self::RULE_REQUIRED_PARAMETRO_TEMA,
-            'descripcion' => 'required|string',
-            'peso' => 'required|numeric|min:0',
-            'unidad_medida_id' => self::RULE_REQUIRED_PARAMETRO_TEMA,
-            'cantidad' => 'required|integer|min:1',
-            'codigo_barras' => ['nullable','string'],
-            'estado_producto_id' => self::RULE_REQUIRED_PARAMETRO_TEMA,
-            'categoria_id' => self::RULE_REQUIRED_PARAMETRO,
-            'marca_id' => self::RULE_REQUIRED_PARAMETRO,
-            'contrato_convenio_id' => 'required|exists:contratos_convenios,id',
-            'ambiente_id' => 'required|exists:ambientes,id',
-            'proveedor_id' => 'required|exists:proveedores,id',
-            'fecha_vencimiento' => 'nullable|date',
-            'imagen' => 'nullable|image|mimes:jpg,jpeg,png| max:2048'
-        ]);
+        $validated = $request->validated();
 
         if ($request->hasFile('imagen')) {
             $nombreArchivo = time() . '.' . $request->imagen->extension();
@@ -209,7 +195,7 @@ class ProductoController extends InventarioController
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id) : View
     {
         $producto = Producto::with([
             'tipoProducto.parametro',
@@ -227,7 +213,7 @@ class ProductoController extends InventarioController
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit(string $id) : View
     {
         // Obtener el producto con sus relaciones
         $producto = Producto::with(['tipoProducto', 'unidadMedida', 'estado'])->findOrFail($id);
@@ -282,7 +268,7 @@ class ProductoController extends InventarioController
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(ProductoRequest $request, string $id) : RedirectResponse
     {
         $producto = Producto::findOrFail($id);
         $validated = $this->validateUpdateRequest($request, $id);
@@ -303,7 +289,7 @@ class ProductoController extends InventarioController
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id) : RedirectResponse
     {
         $producto = Producto::findOrFail($id);
         
@@ -334,7 +320,7 @@ class ProductoController extends InventarioController
     /**
      * Mostrar catálogo de productos estilo ecommerce
      */
-    public function catalogo(Request $request)
+    public function catalogo(Request $request) : View
     {
         // Obtener filtros de la URL
         $search = $request->input('search');
@@ -426,7 +412,7 @@ class ProductoController extends InventarioController
     /**
      * Buscar productos por término de búsqueda (AJAX)
      */
-    public function buscar(Request $request)
+    public function buscar(Request $request) : JsonResponse
     {
         $search = $request->input('search');
         $tipoProductoId = $request->input('tipo_producto_id');
@@ -483,24 +469,9 @@ class ProductoController extends InventarioController
         ]);
     }
 
-    private function validateUpdateRequest(Request $request, string $id): array
+    private function validateUpdateRequest(ProductoRequest $request, string $id): array
     {
-        return $request->validate([
-            'producto' => 'required|unique:productos,producto,' . $id,
-            'tipo_producto_id' => self::RULE_REQUIRED_PARAMETRO_TEMA,
-            'descripcion' => 'required|string',
-            'peso' => 'required|numeric|min:0',
-            'unidad_medida_id' => self::RULE_REQUIRED_PARAMETRO_TEMA,
-            'cantidad' => 'required|integer|min:0',
-            'codigo_barras' => ['nullable', 'string'],
-            'estado_producto_id' => self::RULE_REQUIRED_PARAMETRO_TEMA,
-            'categoria_id' => self::RULE_REQUIRED_PARAMETRO,
-            'marca_id' => self::RULE_REQUIRED_PARAMETRO,
-            'contrato_convenio_id' => 'required|exists:contratos_convenios,id',
-            'ambiente_id' => 'required|exists:ambientes,id',
-            'fecha_vencimiento' => 'nullable|date',
-            'imagen' => 'nullable|image|mimes:jpg,jpeg,png'
-        ]);
+        return $request->validated();
     }
 
     private function processImageForUpdate(Request $request, Producto $producto, array &$validated): void
@@ -572,12 +543,9 @@ class ProductoController extends InventarioController
     /**
      * Agregar producto al carrito (AJAX)
      */
-    public function agregarAlCarrito(Request $request)
+    public function agregarAlCarrito(ProductoRequest $request) : JsonResponse
     {
-        $validated = $request->validate([
-            'producto_id' => 'required|exists:productos,id',
-            'cantidad' => 'required|integer|min:1'
-        ]);
+        $validated = $request->validated();
 
         $producto = Producto::findOrFail($validated['producto_id']);
 
@@ -604,7 +572,7 @@ class ProductoController extends InventarioController
     /**
      * Obtener detalles del producto para modal 
      */
-    public function detalles(string $id)
+    public function detalles(string $id) : View
     {
         $producto = Producto::with([
             'tipoProducto.parametro',
@@ -629,7 +597,7 @@ class ProductoController extends InventarioController
     /**
      * Vista imprimible de la etiqueta con código de barras SENA (JS en cliente)
      */
-    public function etiqueta(string $id)
+    public function etiqueta(string $id) : View
     {
         $producto = Producto::findOrFail($id);
         return view('inventario.productos.etiqueta', compact('producto'));

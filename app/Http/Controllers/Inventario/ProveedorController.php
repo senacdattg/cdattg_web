@@ -5,7 +5,11 @@ namespace App\Http\Controllers\Inventario;
 use App\Models\Inventario\Proveedor;
 use App\Models\Departamento;
 use App\Models\Municipio;
+use App\Http\Requests\Inventario\ProveedorRequest;
 use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class ProveedorController extends InventarioController
 {
@@ -18,7 +22,7 @@ class ProveedorController extends InventarioController
         $this->middleware('can:ELIMINAR PROVEEDOR')->only('destroy');
     }
 
-    public function index(Request $request)
+    public function index(Request $request) : View
     {
         $search = $request->input('search');
 
@@ -57,7 +61,7 @@ class ProveedorController extends InventarioController
         return view('inventario.proveedores.index', compact('proveedores'));
     }
 
-    public function create()
+    public function create() : View
     {
         $departamentos = Departamento::orderBy('departamento')->get();
         $municipios = Municipio::with('departamento')->orderBy('municipio')->get();
@@ -77,26 +81,16 @@ class ProveedorController extends InventarioController
         return view('inventario.proveedores.show', compact('proveedor'));
     }
 
-    public function edit(Proveedor $proveedor)
+    public function edit(Proveedor $proveedor) : View
     {
         $departamentos = Departamento::orderBy('departamento')->get();
         $municipios = Municipio::with('departamento')->orderBy('municipio')->get();
         return view('inventario.proveedores.edit', compact('proveedor', 'departamentos', 'municipios'));
     }
 
-    public function store(Request $request)
+    public function store(ProveedorRequest $request) : RedirectResponse
     {
-        $validated = $request->validate([
-            'proveedor' => 'required|unique:proveedores,proveedor',
-            'nit' => 'nullable|string|max:50',
-            'email' => 'nullable|email|max:255',
-            'telefono' => 'nullable|string|max:10',
-            'direccion' => 'nullable|string|max:255',
-            'departamento_id' => 'nullable|exists:departamentos,id',
-            'municipio_id' => 'nullable|exists:municipios,id',
-            'contacto' => 'nullable|string|max:100',
-            'estado_id' => 'nullable|exists:parametros_temas,id'
-        ]);
+        $validated = $request->validated();
 
         $proveedor = new Proveedor($validated);
         $this->setUserIds($proveedor);
@@ -106,21 +100,11 @@ class ProveedorController extends InventarioController
             ->with('success', 'Proveedor creado exitosamente.');
     }
 
-    public function update(Request $request, string $id)
+    public function update(ProveedorRequest $request, string $id) : RedirectResponse
     {
         $proveedor = Proveedor::findOrFail($id);
 
-        $validated = $request->validate([
-            'proveedor' => 'required|unique:proveedores,proveedor,' . $proveedor->id,
-            'nit' => 'nullable|string|max:50|unique:proveedores,nit,' . $proveedor->id,
-            'email' => 'nullable|email|max:255|unique:proveedores,email,' . $proveedor->id,
-            'telefono' => 'nullable|string|max:10',
-            'direccion' => 'nullable|string|max:255',
-            'departamento_id' => 'nullable|exists:departamentos,id',
-            'municipio_id' => 'nullable|exists:municipios,id',
-            'contacto' => 'nullable|string|max:100',
-            'estado_id' => 'nullable|exists:parametros_temas,id'
-        ]);
+        $validated = $request->validated();
 
         $proveedor->fill($validated);
         $this->setUserIds($proveedor, true);
@@ -130,7 +114,7 @@ class ProveedorController extends InventarioController
             ->with('success', 'Proveedor actualizado exitosamente.');
     }
 
-    public function destroy(Proveedor $proveedor)
+    public function destroy(Proveedor $proveedor) : RedirectResponse
     {
         try {
             $proveedor->delete();
@@ -144,7 +128,7 @@ class ProveedorController extends InventarioController
     /**
      * Obtener municipios por departamento (API)
      */
-    public function getMunicipiosPorDepartamento($departamentoId)
+    public function getMunicipiosPorDepartamento($departamentoId) : JsonResponse
     {
         $municipios = Municipio::where('departamento_id', $departamentoId)
             ->orderBy('municipio')

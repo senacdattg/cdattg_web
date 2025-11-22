@@ -21,6 +21,20 @@ class ContratoConvenioRequest extends FormRequest
      */
     public function rules(): array
     {
+        // Update
+        if ($this->isMethod('PUT') || $this->isMethod('PATCH')) {
+            $contratoId = $this->route('contratos_convenio') ? $this->route('contratos_convenio')->id : null;
+            return [
+                'name' => 'required|string|max:255|unique:contratos_convenios,name,' . $contratoId,
+                'codigo' => 'nullable|string|max:100|unique:contratos_convenios,codigo,' . $contratoId,
+                'proveedor_id' => 'nullable|exists:proveedores,id',
+                'fecha_inicio' => 'nullable|date',
+                'fecha_fin' => 'nullable|date|after_or_equal:fecha_inicio',
+                'estado_id' => 'required|exists:parametros_temas,id',
+            ];
+        }
+
+        // Store
         return [
             'name' => 'required|string|max:255|unique:contratos_convenios,name',
             'codigo' => 'nullable|string|max:100|unique:contratos_convenios,codigo',
