@@ -86,7 +86,7 @@
                             <span class="text-muted">Sin asignar</span>
                             @endif
                         </td>
-                        <td class="px-4">{{ $ficha->sede->nombre ?? 'N/A' }}</td>
+                        <td class="px-4">{{ $ficha->sede->sede ?? 'N/A' }}</td>
                         <td class="px-4">
                             <div class="d-inline-block px-3 py-1 rounded-pill {{ $ficha->status ? 'bg-success-light text-success' : 'bg-danger-light text-danger' }}">
                                 <i class="fas fa-circle mr-1" style="font-size: 8px;"></i>

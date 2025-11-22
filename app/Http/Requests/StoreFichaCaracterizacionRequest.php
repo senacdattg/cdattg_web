@@ -377,13 +377,25 @@ class StoreFichaCaracterizacionRequest extends FormRequest
             $validacionReglas = $this->validarReglasNegocioSena($datos);
             
             if (!$validacionReglas['valido']) {
-                // TEMPORAL: Solo mostrar advertencia en lugar de error
-                \Log::warning('Reglas de negocio SENA no cumplidas', [
-                    'user_id' => $this->user()->id,
-                    'mensaje' => $validacionReglas['mensaje']
-                ]);
-                // Comentado temporalmente para permitir creación
-                // $validator->errors()->add('reglas_negocio', $validacionReglas['mensaje']);
+                // Agregar cada error individualmente para mejor UX
+                $mensajes = explode('. ', $validacionReglas['mensaje']);
+                foreach ($mensajes as $mensaje) {
+                    $mensaje = trim($mensaje);
+                    if (!empty($mensaje)) {
+                        // Determinar el campo específico según el mensaje
+                        if (strpos($mensaje, 'fecha de inicio') !== false) {
+                            $validator->errors()->add('fecha_inicio', $mensaje);
+                        } elseif (strpos($mensaje, 'fecha de fin') !== false) {
+                            $validator->errors()->add('fecha_fin', $mensaje);
+                        } elseif (strpos($mensaje, 'duración') !== false) {
+                            $validator->errors()->add('fecha_fin', $mensaje);
+                        } elseif (strpos($mensaje, 'ambiente') !== false && strpos($mensaje, 'sede') !== false) {
+                            $validator->errors()->add('ambiente_id', $mensaje);
+                        } else {
+                            $validator->errors()->add('reglas_negocio', $mensaje);
+                        }
+                    }
+                }
             }
             
             \Log::info('StoreFichaCaracterizacionRequest withValidator completed', [

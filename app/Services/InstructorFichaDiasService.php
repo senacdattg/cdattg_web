@@ -38,10 +38,24 @@ class InstructorFichaDiasService
             $validacion = $this->validarDisponibilidadInstructor($instructorFicha, $diasData);
             
             if (!$validacion['disponible']) {
+                $conflictos = $validacion['conflictos'];
+                $mensaje = 'El instructor tiene conflictos de horario, jornada o fechas con otras fichas asignadas:';
+                
+                $detallesConflictos = [];
+                foreach ($conflictos as $conflicto) {
+                    $detalle = "• {$conflicto['dia_nombre']}: Ficha {$conflicto['ficha_conflicto']} ({$conflicto['programa_conflicto']}) - ";
+                    $detalle .= "Jornada: {$conflicto['jornada_conflicto']}, ";
+                    $detalle .= "Fechas: {$conflicto['fecha_inicio_conflicto']} a {$conflicto['fecha_fin_conflicto']}, ";
+                    $detalle .= "Horario: {$conflicto['horario_conflicto']} (solicitado: {$conflicto['horario_solicitado']})";
+                    $detallesConflictos[] = $detalle;
+                }
+                
+                $mensajeCompleto = $mensaje . "\n\n" . implode("\n", $detallesConflictos);
+                
                 return [
                     'success' => false,
-                    'message' => 'El instructor no está disponible',
-                    'conflictos' => $validacion['conflictos']
+                    'message' => $mensajeCompleto,
+                    'conflictos' => $conflictos
                 ];
             }
 
@@ -100,6 +114,7 @@ class InstructorFichaDiasService
 
     /**
      * Valida la disponibilidad del instructor en los días y horarios especificados.
+     * Valida: fechas, jornada, días y horarios
      *
      * @param InstructorFichaCaracterizacion $instructorFicha
      * @param array $diasData
@@ -109,30 +124,76 @@ class InstructorFichaDiasService
     {
         $conflictos = [];
         
+        $fechaInicio = Carbon::parse($instructorFicha->fecha_inicio);
+        $fechaFin = Carbon::parse($instructorFicha->fecha_fin);
+        $jornadaIdFicha = $instructorFicha->ficha->jornada_id ?? null;
+        $diasIdsNuevos = collect($diasData)->pluck('dia_id')->toArray();
+        
+        // Buscar otras asignaciones del mismo instructor que puedan tener conflictos
+        $otrasAsignacionesFicha = InstructorFichaCaracterizacion::where('instructor_id', $instructorFicha->instructor_id)
+            ->where('id', '!=', $instructorFicha->id)
+            ->whereHas('ficha', function($q) use ($jornadaIdFicha) {
+                $q->where('status', true);
+                // Solo validar conflictos en la misma jornada
+                if ($jornadaIdFicha) {
+                    $q->where('jornada_id', $jornadaIdFicha);
+                }
+            })
+            ->where(function($q) use ($fechaInicio, $fechaFin) {
+                $q->whereBetween('fecha_inicio', [$fechaInicio, $fechaFin])
+                  ->orWhereBetween('fecha_fin', [$fechaInicio, $fechaFin])
+                  ->orWhere(function($subQ) use ($fechaInicio, $fechaFin) {
+                      $subQ->where('fecha_inicio', '<=', $fechaInicio)
+                           ->where('fecha_fin', '>=', $fechaFin);
+                  });
+            })
+            ->with(['ficha.jornadaFormacion', 'instructorFichaDias.dia'])
+            ->get();
+        
+        // Validar conflictos por día y horario
         foreach ($diasData as $diaData) {
             $diaId = $diaData['dia_id'];
             $horaInicio = $diaData['hora_inicio'] ?? null;
             $horaFin = $diaData['hora_fin'] ?? null;
 
-            // Buscar otras asignaciones del mismo instructor en el mismo día
-            $otrasAsignaciones = InstructorFichaDias::whereHas('instructorFicha', function($query) use ($instructorFicha) {
-                    $query->where('instructor_id', $instructorFicha->instructor_id)
-                          ->where('id', '!=', $instructorFicha->id);
-                })
-                ->where('dia_id', $diaId)
-                ->with(['instructorFicha.ficha'])
-                ->get();
-
-            foreach ($otrasAsignaciones as $otraAsignacion) {
-                // Validar cruce de horarios
-                if ($horaInicio && $horaFin && $otraAsignacion->hora_inicio && $otraAsignacion->hora_fin) {
-                    if ($this->hayConflictoHorario($horaInicio, $horaFin, $otraAsignacion->hora_inicio, $otraAsignacion->hora_fin)) {
+            foreach ($otrasAsignacionesFicha as $otraAsignacionFicha) {
+                // Buscar si la otra asignación tiene el mismo día
+                $diaExistente = $otraAsignacionFicha->instructorFichaDias->firstWhere('dia_id', $diaId);
+                
+                if ($diaExistente) {
+                    // Hay conflicto de día, ahora validar horario si ambos tienen horarios
+                    $hayConflictoHorario = false;
+                    
+                    if ($horaInicio && $horaFin && $diaExistente->hora_inicio && $diaExistente->hora_fin) {
+                        $hayConflictoHorario = $this->hayConflictoHorario(
+                            $horaInicio, 
+                            $horaFin, 
+                            $diaExistente->hora_inicio, 
+                            $diaExistente->hora_fin
+                        );
+                    } elseif ($horaInicio && $horaFin && (!$diaExistente->hora_inicio || !$diaExistente->hora_fin)) {
+                        // Si la nueva asignación tiene horario pero la existente no, considerar conflicto
+                        $hayConflictoHorario = true;
+                    } elseif (!$horaInicio || !$horaFin) {
+                        // Si la nueva asignación no tiene horario, considerar conflicto si hay día en común
+                        $hayConflictoHorario = true;
+                    }
+                    
+                    if ($hayConflictoHorario) {
                         $conflictos[] = [
                             'dia_id' => $diaId,
                             'dia_nombre' => $this->obtenerNombreDia($diaId),
-                            'ficha_conflicto' => $otraAsignacion->instructorFicha->ficha->ficha ?? 'N/A',
-                            'horario_conflicto' => $otraAsignacion->hora_inicio . ' - ' . $otraAsignacion->hora_fin,
-                            'horario_solicitado' => $horaInicio . ' - ' . $horaFin
+                            'ficha_conflicto' => $otraAsignacionFicha->ficha->ficha ?? 'N/A',
+                            'programa_conflicto' => $otraAsignacionFicha->ficha->programaFormacion->nombre ?? 'N/A',
+                            'jornada_conflicto' => $otraAsignacionFicha->ficha->jornadaFormacion->jornada ?? 'N/A',
+                            'fecha_inicio_conflicto' => Carbon::parse($otraAsignacionFicha->fecha_inicio)->format('d/m/Y'),
+                            'fecha_fin_conflicto' => Carbon::parse($otraAsignacionFicha->fecha_fin)->format('d/m/Y'),
+                            'horario_conflicto' => $diaExistente->hora_inicio && $diaExistente->hora_fin 
+                                ? $diaExistente->hora_inicio . ' - ' . $diaExistente->hora_fin 
+                                : 'Sin horario',
+                            'horario_solicitado' => $horaInicio && $horaFin 
+                                ? $horaInicio . ' - ' . $horaFin 
+                                : 'Sin horario'
                         ];
                     }
                 }

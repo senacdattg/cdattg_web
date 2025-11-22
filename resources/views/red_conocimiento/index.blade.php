@@ -21,11 +21,25 @@
         <div class="row">
             <div class="col-12">
                 @can('CREAR RED CONOCIMIENTO')
-                    <div class="card shadow-sm mb-4 no-hover">
-                        <div class="card-header bg-white py-3 d-flex align-items-center">
-                            <a href="{{ route('red-conocimiento.create') }}" class="card-title m-0 font-weight-bold text-primary d-flex align-items-center flex-grow-1 text-decoration-none">
-                                <i class="fas fa-plus-circle mr-2"></i> Crear Red de Conocimiento
-                            </a>
+                    <div class="accordion mb-4" id="accordionCrearRedConocimiento">
+                        <div class="card shadow-sm no-hover">
+                            <div class="card-header bg-white py-3 d-flex align-items-center" id="headingCrearRedConocimiento">
+                                <h2 class="mb-0 w-100">
+                                    <button
+                                        class="btn btn-link w-100 text-left d-flex align-items-center text-decoration-none font-weight-bold text-primary px-0"
+                                        type="button" data-toggle="collapse" data-target="#collapseCrearRedConocimiento"
+                                        aria-expanded="false" aria-controls="collapseCrearRedConocimiento">
+                                        <i class="fas fa-plus-circle mr-2"></i> Crear Red de Conocimiento
+                                        <i class="fas fa-chevron-down ml-auto"></i>
+                                    </button>
+                                </h2>
+                            </div>
+                            <div id="collapseCrearRedConocimiento" class="collapse" aria-labelledby="headingCrearRedConocimiento"
+                                data-parent="#accordionCrearRedConocimiento">
+                                <div class="card-body">
+                                    @include('red_conocimiento.create')
+                                </div>
+                            </div>
                         </div>
                     </div>
                 @endcan

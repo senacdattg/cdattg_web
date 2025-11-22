@@ -1,7 +1,7 @@
 <form method="POST" action="{{ route('red-conocimiento.store') }}" class="needs-validation" novalidate>
     @csrf
     <div class="form-group">
-        <div class="mb-4">
+        <div class="mb-3">
             <label for="nombre" class="form-label">Nombre de la Red de Conocimiento</label>
             <input type="text" 
                     id="nombre" 
@@ -18,7 +18,7 @@
             @enderror
         </div>
 
-        <div class="mb-4">
+        <div class="mb-3">
             <label for="regionals_id" class="form-label">Regional</label>
             <select id="regionals_id" 
                     name="regionals_id" 
@@ -37,7 +37,7 @@
             @enderror
         </div>
 
-        <div class="flex justify-end">
+        <div class="d-flex justify-content-end">
             <button type="submit" class="btn btn-success">
                 <i class="fas fa-save mr-2"></i>
                 Crear Red de Conocimiento

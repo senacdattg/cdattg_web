@@ -83,10 +83,27 @@
             <div class="row">
                 <div class="col-12">
                     @can('CREAR PROGRAMA DE FORMACION')
-                        <x-table-filters action="{{ route('programa.store') }}" method="POST"
-                            title="Crear Programa de Formación" icon="fa-plus-circle">
-                            @include('programas.create')
-                        </x-table-filters>
+                        <div class="accordion mb-4" id="accordionCrearPrograma">
+                            <div class="card shadow-sm no-hover">
+                                <div class="card-header bg-white py-3 d-flex align-items-center" id="headingCrearPrograma">
+                                    <h2 class="mb-0 w-100">
+                                        <button
+                                            class="btn btn-link w-100 text-left d-flex align-items-center text-decoration-none font-weight-bold text-primary px-0"
+                                            type="button" data-toggle="collapse" data-target="#collapseCrearPrograma"
+                                            aria-expanded="false" aria-controls="collapseCrearPrograma">
+                                            <i class="fas fa-plus-circle mr-2"></i> Crear Programa de Formación
+                                            <i class="fas fa-chevron-down ml-auto"></i>
+                                        </button>
+                                    </h2>
+                                </div>
+                                <div id="collapseCrearPrograma" class="collapse" aria-labelledby="headingCrearPrograma"
+                                    data-parent="#accordionCrearPrograma">
+                                    <div class="card-body">
+                                        @include('programas.create')
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     @endcan
 
                     @can('VER PROGRAMAS DE FORMACION')

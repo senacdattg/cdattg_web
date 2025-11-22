@@ -2081,13 +2081,29 @@ class FichaCaracterizacionController extends Controller
                 ->with(['instructor.persona', 'instructorFichaDias.dia'])
                 ->get();
 
-            // Obtener días de formación asignados a la ficha
+            // Obtener días de formación asignados a la ficha (con horarios)
             $diasFormacionFicha = $ficha->diasFormacion()
                 ->with('dia')
                 ->get()
-                ->pluck('dia')
-                ->unique('id')
-                ->sortBy('id');
+                ->filter(function($diaFormacion) {
+                    return $diaFormacion->dia !== null;
+                })
+                ->unique('dia_id')
+                ->values()
+                ->sortBy('dia_id');
+            
+            Log::info('Días de formación cargados para ficha', [
+                'ficha_id' => $ficha->id,
+                'total_dias' => $diasFormacionFicha->count(),
+                'dias' => $diasFormacionFicha->map(function($df) {
+                    return [
+                        'dia_id' => $df->dia_id,
+                        'dia_nombre' => $df->dia->name ?? 'N/A',
+                        'hora_inicio' => $df->hora_inicio,
+                        'hora_fin' => $df->hora_fin
+                    ];
+                })->toArray()
+            ]);
 
             // Obtener todos los días de la semana disponibles para el modal
             $diasSemana = \App\Models\Parametro::whereHas('parametrosTemas', function($query) {

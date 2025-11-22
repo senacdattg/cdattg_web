@@ -263,9 +263,25 @@ class AsignarInstructoresRequest extends FormRequest
 
     /**
      * Validar conflictos con otras fichas del mismo instructor
+     * Valida: fechas, jornada, días y horarios
      */
     private function validarConflictosOtrosInstructor($validator, $instructorId, $fechaInicio, $fechaFin, $diasNuevos, $jornadaIdFicha, $index): void
     {
+        $instructorData = $this->input("instructores.{$index}", []);
+        
+        // Extraer horarios si están disponibles (formato: dias[dia_id][hora_inicio/hora_fin])
+        $horariosNuevos = [];
+        if (isset($instructorData['dias']) && is_array($instructorData['dias'])) {
+            foreach ($instructorData['dias'] as $diaId => $diaInfo) {
+                if (isset($diaInfo['hora_inicio']) && isset($diaInfo['hora_fin'])) {
+                    $horariosNuevos[$diaId] = [
+                        'hora_inicio' => $diaInfo['hora_inicio'],
+                        'hora_fin' => $diaInfo['hora_fin']
+                    ];
+                }
+            }
+        }
+        
         $conflictosQuery = InstructorFichaCaracterizacion::where('instructor_id', $instructorId)
             ->whereHas('ficha', function($q) use ($jornadaIdFicha) {
                     $q->where('status', true);
@@ -287,18 +303,49 @@ class AsignarInstructoresRequest extends FormRequest
 
         $conflictosExistentes = $conflictosQuery->get();
 
-        // Filtrar conflictos por días de la semana si se especifican
+        // Filtrar conflictos por días de la semana y horarios si se especifican
         if (!empty($diasNuevos)) {
-            $conflictosExistentes = $conflictosExistentes->filter(function($conflicto) use ($diasNuevos) {
+            $conflictosExistentes = $conflictosExistentes->filter(function($conflicto) use ($diasNuevos, $horariosNuevos) {
                 $diasExistentes = $conflicto->instructorFichaDias->pluck('dia_id')->toArray();
                 $diasEnComun = array_intersect($diasNuevos, $diasExistentes);
-                return !empty($diasEnComun); // Solo es conflicto si hay días en común
+                
+                // Si no hay días en común, no hay conflicto
+                if (empty($diasEnComun)) {
+                    return false;
+                }
+                
+                // Si hay horarios especificados, validar también conflictos de horario
+                if (!empty($horariosNuevos)) {
+                    foreach ($diasEnComun as $diaId) {
+                        // Buscar horario del día en los nuevos horarios
+                        if (!isset($horariosNuevos[$diaId])) {
+                            continue; // Si no hay horario especificado para este día, no validar horario
+                        }
+                        
+                        $horaInicioNueva = $horariosNuevos[$diaId]['hora_inicio'];
+                        $horaFinNueva = $horariosNuevos[$diaId]['hora_fin'];
+                        
+                        // Buscar horario del día en las asignaciones existentes
+                        $diaExistente = $conflicto->instructorFichaDias->firstWhere('dia_id', $diaId);
+                        if ($diaExistente && $diaExistente->hora_inicio && $diaExistente->hora_fin) {
+                            // Verificar si hay conflicto de horario
+                            if ($this->hayConflictoHorario($horaInicioNueva, $horaFinNueva, $diaExistente->hora_inicio, $diaExistente->hora_fin)) {
+                                return true; // Hay conflicto de horario
+                            }
+                        }
+                    }
+                    // Si hay días en común pero no hay conflictos de horario, no es conflicto
+                    return false;
+                }
+                
+                // Si hay días en común pero no se especificaron horarios, considerar conflicto
+                return true;
             });
         }
 
-            if ($conflictosExistentes->isNotEmpty()) {
-                $instructor = Instructor::find($instructorId);
-            $conflictosText = $conflictosExistentes->map(function($conflicto) use ($diasNuevos) {
+        if ($conflictosExistentes->isNotEmpty()) {
+            $instructor = Instructor::find($instructorId);
+            $conflictosText = $conflictosExistentes->map(function($conflicto) use ($diasNuevos, $horariosNuevos) {
                     $programaNombre = $conflicto->ficha->programaFormacion->nombre ?? 'Sin programa';
                 $jornada = $conflicto->ficha->jornadaFormacion->jornada ?? 'Sin jornada';
                 
@@ -307,7 +354,17 @@ class AsignarInstructoresRequest extends FormRequest
                 $diasEnComun = array_intersect($diasNuevos, $diasExistentes);
                 $diasNombres = $conflicto->instructorFichaDias
                     ->whereIn('dia_id', $diasEnComun)
-                    ->pluck('dia.name')
+                    ->map(function($dia) use ($horariosNuevos) {
+                        $nombre = $dia->dia->name ?? '';
+                        $horario = '';
+                        if (isset($horariosNuevos[$dia->dia_id])) {
+                            $horario = " ({$horariosNuevos[$dia->dia_id]['hora_inicio']}-{$horariosNuevos[$dia->dia_id]['hora_fin']})";
+                        }
+                        if ($dia->hora_inicio && $dia->hora_fin) {
+                            $horario .= " [Conflicto: {$dia->hora_inicio}-{$dia->hora_fin}]";
+                        }
+                        return $nombre . $horario;
+                    })
                     ->filter()
                     ->implode(', ');
                 
@@ -317,9 +374,23 @@ class AsignarInstructoresRequest extends FormRequest
 
                 $validator->errors()->add(
                     "instructores.{$index}.fecha_inicio",
-                "📅 El instructor {$instructor->nombre_completo} ya tiene fichas con fechas superpuestas en la misma jornada y días: {$conflictosText}. Ajuste las fechas, jornada o días para evitar conflictos."
+                "📅 El instructor {$instructor->nombre_completo} ya tiene fichas con fechas superpuestas en la misma jornada, días y horarios: {$conflictosText}. Ajuste las fechas, jornada, días u horarios para evitar conflictos."
             );
         }
+    }
+    
+    /**
+     * Verificar si hay conflicto entre dos rangos horarios
+     */
+    private function hayConflictoHorario(string $inicio1, string $fin1, string $inicio2, string $fin2): bool
+    {
+        $inicio1 = Carbon::parse($inicio1);
+        $fin1 = Carbon::parse($fin1);
+        $inicio2 = Carbon::parse($inicio2);
+        $fin2 = Carbon::parse($fin2);
+
+        // Hay conflicto si los rangos se superponen
+        return !($fin1->lte($inicio2) || $inicio1->gte($fin2));
     }
 
     /**

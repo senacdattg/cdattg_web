@@ -303,11 +303,11 @@
                                 </div>
 
                                 <!-- Información de días de formación -->
-                                @if($diasFormacionFicha->count() > 0)
+                                @if(isset($diasFormacionFicha) && $diasFormacionFicha->count() > 0)
                                     <div class="alert alert-success">
                                         <i class="fas fa-calendar-check"></i>
                                         <strong>Días de formación disponibles:</strong>
-                                        {{ $diasFormacionFicha->pluck('name')->implode(', ') }}
+                                        {{ $diasFormacionFicha->map(function($diaFormacion) { return $diaFormacion->dia->name ?? ''; })->filter()->implode(', ') }}
                                     </div>
                                 @else
                                     <div class="alert alert-warning">
@@ -416,22 +416,24 @@
                                                            class="btn btn-sm {{ $asignacion->instructorFichaDias && $asignacion->instructorFichaDias->count() > 0 ? 'btn-info' : 'btn-outline-info' }} mb-1 btn-gestionar-dias" 
                                                            data-instructor-ficha-id="{{ $asignacion->id }}"
                                                            data-instructor-nombre="{{ $asignacion->instructor->persona->primer_nombre }} {{ $asignacion->instructor->persona->primer_apellido }}"
+                                                           data-fecha-inicio="{{ $asignacion->fecha_inicio ? $asignacion->fecha_inicio->format('Y-m-d') : '' }}"
+                                                           data-fecha-fin="{{ $asignacion->fecha_fin ? $asignacion->fecha_fin->format('Y-m-d') : '' }}"
                                                            data-toggle="tooltip" 
                                                            data-placement="top"
-                                                           title="Gestionar días de formación"
-                                                           onclick="abrirModalDias({{ $asignacion->id }}, '{{ $asignacion->instructor->persona->primer_nombre }} {{ $asignacion->instructor->persona->primer_apellido }}')">
+                                                           title="Gestionar días de formación">
                                                             <i class="fas fa-calendar-week"></i>
                                                         </button>
                                                         
                                                         <!-- Botón para desasignar instructor -->
                                                         <form action="{{ route('fichaCaracterizacion.desasignarInstructor', [$ficha->id, $asignacion->instructor_id]) }}" 
-                                                              method="POST" style="display: inline;">
+                                                              method="POST" style="display: inline;" 
+                                                              class="form-desasignar-instructor">
                                                             @csrf
                                                             @method('DELETE')
-                                                            <button type="submit" class="btn btn-sm btn-outline-danger" 
+                                                            <button type="button" class="btn btn-sm btn-outline-danger btn-desasignar-instructor" 
                                                                     data-toggle="tooltip"
                                                                     data-placement="top"
-                                                                    onclick="return confirm('¿Está seguro de desasignar este instructor?')"
+                                                                    data-instructor-nombre="{{ $asignacion->instructor->persona->primer_nombre }} {{ $asignacion->instructor->persona->primer_apellido }}"
                                                                     title="Desasignar instructor">
                                                                 <i class="fas fa-times"></i>
                                                             </button>
@@ -495,29 +497,39 @@
                                     </tr>
                                 </thead>
                                 <tbody id="dias-tbody">
-                                    @if(isset($diasSemana) && $diasSemana->count() > 0)
-                                        @foreach($diasSemana as $dia)
-                                        <tr class="dia-row-modal" data-dia-id="{{ $dia->id }}">
-                                            <td class="text-center align-middle">
-                                                <input type="checkbox" class="dia-checkbox-modal" value="{{ $dia->id }}" name="dias_selected[]">
-                                            </td>
-                                            <td class="align-middle">
-                                                <strong><i class="far fa-calendar mr-1"></i>{{ $dia->name }}</strong>
-                                            </td>
-                                            <td>
-                                                <input type="time" class="form-control hora-inicio-modal" name="hora_inicio_{{ $dia->id }}" data-dia="{{ $dia->id }}" disabled>
-                                            </td>
-                                            <td>
-                                                <input type="time" class="form-control hora-fin-modal" name="hora_fin_{{ $dia->id }}" data-dia="{{ $dia->id }}" disabled>
-                                            </td>
-                                            <td class="text-center align-middle">
-                                                <i class="fas fa-check-circle text-success dia-status-modal" style="display:none;"></i>
-                                            </td>
-                                        </tr>
+                                    @if(isset($diasFormacionFicha) && $diasFormacionFicha->count() > 0)
+                                        @foreach($diasFormacionFicha as $diaFormacion)
+                                            @php
+                                                $dia = $diaFormacion->dia ?? null;
+                                            @endphp
+                                            @if($dia)
+                                            <tr class="dia-row-modal" data-dia-id="{{ $dia->id }}">
+                                                <td class="text-center align-middle">
+                                                    <input type="checkbox" class="dia-checkbox-modal" value="{{ $dia->id }}" name="dias_selected[]">
+                                                </td>
+                                                <td class="align-middle">
+                                                    <strong><i class="far fa-calendar mr-1"></i>{{ $dia->name }}</strong>
+                                                </td>
+                                                <td>
+                                                    <input type="time" class="form-control hora-inicio-modal" name="hora_inicio_{{ $dia->id }}" data-dia="{{ $dia->id }}" disabled>
+                                                </td>
+                                                <td>
+                                                    <input type="time" class="form-control hora-fin-modal" name="hora_fin_{{ $dia->id }}" data-dia="{{ $dia->id }}" disabled>
+                                                </td>
+                                                <td class="text-center align-middle">
+                                                    <i class="fas fa-check-circle text-success dia-status-modal" style="display:none;"></i>
+                                                </td>
+                                            </tr>
+                                            @endif
                                         @endforeach
                                     @else
                                         <tr>
-                                            <td colspan="5" class="text-center text-muted">No se encontraron días de la semana configurados</td>
+                                            <td colspan="5" class="text-center text-muted">
+                                                No hay días de formación configurados para esta ficha. 
+                                                <a href="{{ route('fichaCaracterizacion.gestionarDiasFormacion', $ficha->id) }}" class="alert-link">
+                                                    Configurar días de formación
+                                                </a>
+                                            </td>
                                         </tr>
                                     @endif
                                 </tbody>
@@ -570,33 +582,57 @@
         // Días de formación de la ficha (solo estos estarán disponibles)
         @php
             $diasFormacionFichaIds = isset($diasFormacionFicha) && $diasFormacionFicha->isNotEmpty() 
-                ? $diasFormacionFicha->pluck('id')->toArray() 
+                ? $diasFormacionFicha->pluck('dia_id')->toArray() 
                 : [];
         @endphp
         window.diasFormacionFichaIds = @json($diasFormacionFichaIds);
         
-        // Todos los días de la semana disponibles
-        window.diasSemana = @json($diasSemana->map(function($dia) {
-            return ['id' => $dia->id, 'nombre' => $dia->name];
-        })->values());
+        // Jornada de la ficha para validaciones
+        window.fichaJornadaNombre = @json($ficha->jornadaFormacion->jornada ?? null);
+        window.fichaJornadaId = @json($ficha->jornada_id ?? null);
         
-        // Filtrar días de la semana para mostrar solo los de la ficha
-        window.diasSemanaDisponibles = window.diasSemana.filter(dia => 
-            window.diasFormacionFichaIds.includes(dia.id)
-        );
+        // Crear array de días disponibles para el formulario de asignación
+        window.diasSemanaDisponibles = [];
+        @if(isset($diasFormacionFicha) && $diasFormacionFicha->count() > 0)
+            @foreach($diasFormacionFicha as $diaFormacion)
+                @php
+                    $dia = $diaFormacion->dia ?? null;
+                @endphp
+                @if($dia)
+                window.diasSemanaDisponibles.push({
+                    id: {{ $dia->id }},
+                    nombre: '{{ $dia->name }}'
+                });
+                @endif
+            @endforeach
+        @endif
         
-        // Crear objeto de días de la semana con horas por defecto
+        // Crear objeto de días de formación de la ficha con horas por defecto
         window.diasSemanaData = {};
-        @if(isset($diasSemana) && $diasSemana->count() > 0)
-            @foreach($diasSemana as $dia)
+        @if(isset($diasFormacionFicha) && $diasFormacionFicha->count() > 0)
+            @foreach($diasFormacionFicha as $diaFormacion)
+                @php
+                    $dia = $diaFormacion->dia ?? null;
+                    $horaInicio = $diaFormacion->hora_inicio 
+                        ? \Carbon\Carbon::parse($diaFormacion->hora_inicio)->format('H:i') 
+                        : ($ficha->jornadaFormacion->hora_inicio ?? '08:00');
+                    $horaFin = $diaFormacion->hora_fin 
+                        ? \Carbon\Carbon::parse($diaFormacion->hora_fin)->format('H:i') 
+                        : ($ficha->jornadaFormacion->hora_fin ?? '12:00');
+                @endphp
+                @if($dia)
                 window.diasSemanaData[{{ $dia->id }}] = {
                     id: {{ $dia->id }},
                     name: '{{ $dia->name }}',
-                    hora_inicio: '{{ $dia->hora_inicio ?? $ficha->hora_inicio ?? "06:30" }}',
-                    hora_fin: '{{ $dia->hora_fin ?? $ficha->hora_fin ?? "13:00" }}'
+                    hora_inicio: '{{ $horaInicio }}',
+                    hora_fin: '{{ $horaFin }}'
                 };
+                @endif
             @endforeach
         @endif
+        
+        // Datos antiguos del formulario (para restaurar después de errores de validación)
+        window.oldInstructores = @json(old('instructores', []));
     </script>
     @vite(['resources/js/pages/gestion-especializada.js'])
     <script>

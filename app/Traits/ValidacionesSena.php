@@ -288,12 +288,13 @@ trait ValidacionesSena
             }
 
             // 6. Validar días festivos
-            if (isset($datos['fecha_inicio']) && isset($datos['fecha_fin'])) {
-                $validacionFestivos = $this->validarFechasFestivos($datos['fecha_inicio'], $datos['fecha_fin']);
-                if (!$validacionFestivos['valido']) {
-                    $errores[] = $validacionFestivos['mensaje'];
-                }
-            }
+            // COMENTADO: La validación de días festivos se deshabilita según solicitud del usuario
+            // if (isset($datos['fecha_inicio']) && isset($datos['fecha_fin'])) {
+            //     $validacionFestivos = $this->validarFechasFestivos($datos['fecha_inicio'], $datos['fecha_fin']);
+            //     if (!$validacionFestivos['valido']) {
+            //         $errores[] = $validacionFestivos['mensaje'];
+            //     }
+            // }
 
             // 7. Validar capacidad del ambiente
             if (isset($datos['ambiente_id']) && isset($datos['programa_formacion_id'])) {
@@ -412,7 +413,7 @@ trait ValidacionesSena
     private function validarAmbientePerteneceASede($ambienteId, $sedeId)
     {
         try {
-            $ambiente = Ambiente::find($ambienteId);
+            $ambiente = Ambiente::with(['piso.bloque'])->find($ambienteId);
             if (!$ambiente) {
                 return [
                     'valido' => false,
@@ -420,7 +421,18 @@ trait ValidacionesSena
                 ];
             }
 
-            if ($ambiente->sede_id != $sedeId) {
+            // Obtener la sede del ambiente a través de la relación: Ambiente -> Piso -> Bloque -> Sede
+            $sedeAmbiente = $ambiente->piso?->bloque?->sede_id;
+            
+            if (!$sedeAmbiente) {
+                // Si no hay relación, permitir (puede ser ambiente externo o sin estructura definida)
+                return [
+                    'valido' => true,
+                    'mensaje' => 'El ambiente no tiene sede definida, se permite la asignación.'
+                ];
+            }
+
+            if ($sedeAmbiente != $sedeId) {
                 return [
                     'valido' => false,
                     'mensaje' => 'El ambiente seleccionado no pertenece a la sede de la ficha.'

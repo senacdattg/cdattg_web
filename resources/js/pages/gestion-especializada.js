@@ -190,10 +190,47 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#btn-desasignar').on('click', function() {
         const seleccionados = $('.checkbox-asignado:checked').length;
         if (seleccionados > 0) {
-            if (confirm(`¿Está seguro de desasignar ${seleccionados} aprendiz(es)?`)) {
-                $('#form-desasignar').submit();
-            }
+            Swal.fire({
+                title: '¿Está seguro?',
+                text: `¿Está seguro de desasignar ${seleccionados} aprendiz(es)?`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Sí, desasignar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $('#form-desasignar').submit();
+                }
+            });
         }
+    });
+
+    // Evento para desasignar instructor individual
+    $(document).on('click', '.btn-desasignar-instructor', function(e) {
+        e.preventDefault();
+        const button = $(this);
+        const form = button.closest('.form-desasignar-instructor');
+        const instructorNombre = button.data('instructor-nombre') || 'este instructor';
+        
+        Swal.fire({
+            title: '¿Está seguro?',
+            html: `<div class="text-left">
+                <p><strong>Instructor:</strong> ${instructorNombre}</p>
+                <p class="text-warning"><i class="fas fa-exclamation-triangle"></i> Esta acción desasignará al instructor de la ficha.</p>
+            </div>`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, desasignar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
     });
 
     // Función para agregar instructor dinámicamente
@@ -320,7 +357,116 @@ document.addEventListener('DOMContentLoaded', () => {
         configurarEventosInstructor(nuevoRow);
 
         console.log(`Instructor agregado con índice: ${nuevoIndice}`);
+        
+        return nuevoIndice;
     };
+    
+    // Función para restaurar instructores desde datos antiguos (después de errores de validación)
+    function restaurarInstructoresDesdeOld() {
+        if (!window.oldInstructores || !Array.isArray(window.oldInstructores) || window.oldInstructores.length === 0) {
+            return;
+        }
+        
+        console.log('Restaurando instructores desde datos antiguos:', window.oldInstructores);
+        
+        // Restaurar cada instructor secuencialmente
+        let indiceActual = 0;
+        
+        function restaurarSiguienteInstructor() {
+            if (indiceActual >= window.oldInstructores.length) {
+                console.log('Todos los instructores restaurados');
+                return;
+            }
+            
+            const instructorData = window.oldInstructores[indiceActual];
+            
+            // Agregar instructor
+            const indice = agregarInstructor();
+            
+            // Función para restaurar los valores después de que se carguen los instructores
+            function restaurarValores() {
+                const row = document.querySelector(`.instructor-row[data-index="${indice}"]`);
+                if (!row) {
+                    setTimeout(restaurarValores, 100);
+                    return;
+                }
+                
+                const select = row.querySelector(`select[name="instructores[${indice}][instructor_id]"]`);
+                
+                // Esperar a que el select tenga opciones cargadas
+                if (!select || select.options.length <= 1) {
+                    setTimeout(restaurarValores, 200);
+                    return;
+                }
+                
+                // Restaurar instructor seleccionado
+                if (instructorData.instructor_id) {
+                    if (typeof $ !== 'undefined' && $.fn.select2) {
+                        // Si Select2 está disponible, usarlo
+                        const $select = $(select);
+                        if ($select.hasClass('select2-hidden-accessible')) {
+                            $select.val(instructorData.instructor_id).trigger('change');
+                        } else {
+                            // Esperar a que Select2 se inicialice
+                            setTimeout(() => {
+                                $select.val(instructorData.instructor_id).trigger('change');
+                            }, 300);
+                        }
+                    } else {
+                        select.value = instructorData.instructor_id;
+                        select.dispatchEvent(new Event('change'));
+                    }
+                }
+                
+                // Restaurar fechas
+                if (instructorData.fecha_inicio) {
+                    const fechaInicio = row.querySelector(`input[name="instructores[${indice}][fecha_inicio]"]`);
+                    if (fechaInicio) {
+                        fechaInicio.value = instructorData.fecha_inicio;
+                        setTimeout(() => fechaInicio.dispatchEvent(new Event('change')), 100);
+                    }
+                }
+                
+                if (instructorData.fecha_fin) {
+                    const fechaFin = row.querySelector(`input[name="instructores[${indice}][fecha_fin]"]`);
+                    if (fechaFin) {
+                        fechaFin.value = instructorData.fecha_fin;
+                        setTimeout(() => fechaFin.dispatchEvent(new Event('change')), 100);
+                    }
+                }
+                
+                // Restaurar días seleccionados (esperar un poco más para que las fechas se procesen)
+                setTimeout(() => {
+                    if (instructorData.dias_semana && Array.isArray(instructorData.dias_semana)) {
+                        instructorData.dias_semana.forEach(diaId => {
+                            const checkbox = row.querySelector(`input[type="checkbox"][name="instructores[${indice}][dias_semana][]"][value="${diaId}"]`);
+                            if (checkbox) {
+                                checkbox.checked = true;
+                                checkbox.dispatchEvent(new Event('change'));
+                            }
+                        });
+                    }
+                    
+                    // Continuar con el siguiente instructor
+                    indiceActual++;
+                    setTimeout(restaurarSiguienteInstructor, 300);
+                }, 500);
+            }
+            
+            // Iniciar restauración después de un breve delay
+            setTimeout(restaurarValores, 300);
+        }
+        
+        // Iniciar restauración
+        restaurarSiguienteInstructor();
+    }
+    
+    // Restaurar instructores al cargar la página si hay datos antiguos
+    $(document).ready(function() {
+        if (typeof window.oldInstructores !== 'undefined' && window.oldInstructores && window.oldInstructores.length > 0) {
+            setTimeout(restaurarInstructoresDesdeOld, 1000);
+        }
+    });
 
     // Función para cargar instructores disponibles
     function cargarInstructoresDisponibles(indice) {
@@ -648,10 +794,16 @@ document.addEventListener('DOMContentLoaded', () => {
     let fichaIdActual = null;
     let guardandoDias = false; // Flag para prevenir múltiples guardados
 
+    // Variables globales para fechas del instructor
+    let instructorFechaInicio = null;
+    let instructorFechaFin = null;
+
     // Abrir modal de días de formación
     $(document).on('click', '.btn-gestionar-dias', function() {
         const instructorFichaId = $(this).data('instructor-ficha-id');
         const instructorNombre = $(this).data('instructor-nombre');
+        instructorFechaInicio = $(this).data('fecha-inicio');
+        instructorFechaFin = $(this).data('fecha-fin');
         
         instructorFichaIdActual = instructorFichaId;
         fichaIdActual = window.fichaId || obtenerFichaIdDeUrl();
@@ -660,12 +812,95 @@ document.addEventListener('DOMContentLoaded', () => {
         $('#modal-instructor-nombre').text(instructorNombre);
         $('#modal-instructor-ficha-id').val(instructorFichaId);
         
+        // Aplicar restricciones de horario a todos los días del modal
+        $('.dia-row-modal').each(function() {
+            const diaId = $(this).data('dia-id');
+            if (diaId) {
+                aplicarRestriccionesHorarioModal(diaId);
+            }
+        });
+        
+        // Validar días según fechas del instructor
+        validarDiasSegunFechasInstructorModal();
+        
         // Cargar días existentes
         cargarDiasExistentes();
         
         // Mostrar modal
         $('#modalDiasFormacion').modal('show');
     });
+
+    // Función para validar días según fechas del instructor
+    function validarDiasSegunFechasInstructorModal() {
+        if (!instructorFechaInicio || !instructorFechaFin) {
+            // Si no hay fechas, habilitar todos los días
+            $('.dia-checkbox-modal').prop('disabled', false);
+            return;
+        }
+
+        // Función helper para parsear fechas sin problemas de timezone
+        function parsearFecha(fechaStr) {
+            if (!fechaStr) return null;
+            const partes = fechaStr.split('-');
+            if (partes.length !== 3) return null;
+            return new Date(Number.parseInt(partes[0], 10), Number.parseInt(partes[1], 10) - 1, Number.parseInt(partes[2], 10));
+        }
+
+        const fechaInicio = parsearFecha(instructorFechaInicio);
+        const fechaFin = parsearFecha(instructorFechaFin);
+
+        if (!fechaInicio || !fechaFin) {
+            $('.dia-checkbox-modal').prop('disabled', false);
+            return;
+        }
+
+        // Mapa de días de la semana: 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
+        // IDs en la base de datos: 12 = LUNES, 13 = MARTES, 14 = MIÉRCOLES, 15 = JUEVES, 16 = VIERNES, 17 = SÁBADO, 18 = DOMINGO
+        const mapeoDias = {
+            12: 1, // LUNES -> 1
+            13: 2, // MARTES -> 2
+            14: 3, // MIÉRCOLES -> 3
+            15: 4, // JUEVES -> 4
+            16: 5, // VIERNES -> 5
+            17: 6, // SÁBADO -> 6
+            18: 0  // DOMINGO -> 0
+        };
+
+        // Calcular qué días de la semana están en el rango
+        const diasEnRango = new Set();
+        const fechaActual = new Date(fechaInicio);
+        
+        while (fechaActual <= fechaFin) {
+            const diaSemana = fechaActual.getDay(); // 0 = Domingo, 1 = Lunes, ..., 6 = Sábado
+            diasEnRango.add(diaSemana);
+            fechaActual.setDate(fechaActual.getDate() + 1);
+        }
+
+        // Recorrer todos los días del modal
+        $('.dia-row-modal').each(function() {
+            const checkbox = $(this).find('.dia-checkbox-modal');
+            const diaId = Number.parseInt(checkbox.val(), 10);
+            const diaSemana = mapeoDias[diaId];
+            const isChecked = checkbox.is(':checked');
+
+            if (diaSemana !== undefined) {
+                if (diasEnRango.has(diaSemana)) {
+                    // El día está en el rango, habilitarlo
+                    checkbox.prop('disabled', false);
+                } else {
+                    // El día no está en el rango, deshabilitarlo
+                    checkbox.prop('disabled', true);
+                    if (!isChecked) {
+                        checkbox.prop('checked', false);
+                        const horaInicio = $(`.hora-inicio-modal[data-dia="${diaId}"]`);
+                        const horaFin = $(`.hora-fin-modal[data-dia="${diaId}"]`);
+                        horaInicio.prop('disabled', true).val('');
+                        horaFin.prop('disabled', true).val('');
+                    }
+                }
+            }
+        });
+    }
 
     // Cargar días existentes del instructor
     function cargarDiasExistentes() {
@@ -692,13 +927,47 @@ document.addEventListener('DOMContentLoaded', () => {
                         horaInicio.val(dia.hora_inicio).prop('disabled', false);
                         horaFin.val(dia.hora_fin).prop('disabled', false);
                         status.show();
+                        
+                        // Aplicar restricciones de horario según jornada
+                        aplicarRestriccionesHorarioModal(dia.dia_id);
                     });
+                    
+                    // Validar días según fechas del instructor después de cargar
+                    validarDiasSegunFechasInstructorModal();
                 }
             },
             error: function(xhr) {
                 console.error('Error al cargar días existentes:', xhr);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Error al cargar los días existentes del instructor'
+                });
             }
         });
+    }
+
+    // Configuración de horarios por jornada (igual que en fichas-form.js)
+    const horariosJornadas = {
+        'MAÑANA': { min: '06:00', max: '13:10', defaultInicio: '08:00', defaultFin: '12:00', step: 30 },
+        'TARDE': { min: '13:00', max: '18:10', defaultInicio: '14:00', defaultFin: '18:00', step: 30 },
+        'NOCHE': { min: '17:50', max: '23:10', defaultInicio: '18:00', defaultFin: '22:00', step: 30 },
+        'FIN DE SEMANA': { min: '08:00', max: '17:00', defaultInicio: '08:00', defaultFin: '17:00', step: 30 },
+        'FINES DE SEMANA': { min: '08:00', max: '17:00', defaultInicio: '08:00', defaultFin: '17:00', step: 30 },
+        'MIXTA': { min: '06:00', max: '23:10', defaultInicio: '08:00', defaultFin: '18:00', step: 30 }
+    };
+
+    // Función para obtener la configuración de horarios según la jornada de la ficha
+    function obtenerHorariosJornadaModal() {
+        if (typeof window.fichaJornadaNombre !== 'undefined' && window.fichaJornadaNombre) {
+            const jornadaNombre = window.fichaJornadaNombre.toUpperCase();
+            for (const [key, config] of Object.entries(horariosJornadas)) {
+                if (jornadaNombre.includes(key) || key.includes(jornadaNombre)) {
+                    return config;
+                }
+            }
+        }
+        return null;
     }
 
     // Manejar cambio en checkboxes del modal
@@ -713,10 +982,76 @@ document.addEventListener('DOMContentLoaded', () => {
             horaFin.prop('disabled', false);
             // Cargar horas por defecto de la ficha si están disponibles
             cargarHorasPorDefecto(diaId);
+            // Aplicar restricciones de horario según jornada
+            aplicarRestriccionesHorarioModal(diaId);
         } else {
             horaInicio.prop('disabled', true).val('');
             horaFin.prop('disabled', true).val('');
             status.hide();
+        }
+    });
+
+    // Aplicar restricciones de horario según la jornada
+    function aplicarRestriccionesHorarioModal(diaId) {
+        const configHorarios = obtenerHorariosJornadaModal();
+        if (!configHorarios) return;
+        
+        const horaInicio = $(`.hora-inicio-modal[data-dia="${diaId}"]`);
+        const horaFin = $(`.hora-fin-modal[data-dia="${diaId}"]`);
+        
+        horaInicio.attr('min', configHorarios.min);
+        horaInicio.attr('max', configHorarios.max);
+        horaFin.attr('min', configHorarios.min);
+        horaFin.attr('max', configHorarios.max);
+    }
+
+    // Validar horarios cuando cambian
+    $(document).on('change', '.hora-inicio-modal, .hora-fin-modal', function() {
+        const diaId = $(this).data('dia');
+        const horaInicio = $(`.hora-inicio-modal[data-dia="${diaId}"]`).val();
+        const horaFin = $(`.hora-fin-modal[data-dia="${diaId}"]`).val();
+        const configHorarios = obtenerHorariosJornadaModal();
+        
+        if (!horaInicio || !horaFin) return;
+        
+        // Validar que la hora fin sea posterior a la hora inicio
+        if (horaFin <= horaInicio) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Horario inválido',
+                text: 'La hora de fin debe ser posterior a la hora de inicio',
+                timer: 3000,
+                showConfirmButton: false
+            });
+            $(`.hora-fin-modal[data-dia="${diaId}"]`).val('');
+            return;
+        }
+        
+        // Validar que estén dentro del rango de la jornada
+        if (configHorarios) {
+            if (horaInicio < configHorarios.min || horaInicio > configHorarios.max) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Horario fuera de rango',
+                    text: `La hora de inicio debe estar entre ${configHorarios.min} y ${configHorarios.max}`,
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                $(`.hora-inicio-modal[data-dia="${diaId}"]`).val('');
+                return;
+            }
+            
+            if (horaFin < configHorarios.min || horaFin > configHorarios.max) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Horario fuera de rango',
+                    text: `La hora de fin debe estar entre ${configHorarios.min} y ${configHorarios.max}`,
+                    timer: 3000,
+                    showConfirmButton: false
+                });
+                $(`.hora-fin-modal[data-dia="${diaId}"]`).val('');
+                return;
+            }
         }
     });
 
@@ -730,6 +1065,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const horaFin = diaData.hora_fin ? diaData.hora_fin.substring(0, 5) : '';
             $(`.hora-inicio-modal[data-dia="${diaId}"]`).val(horaInicio);
             $(`.hora-fin-modal[data-dia="${diaId}"]`).val(horaFin);
+        } else {
+            // Si no hay datos, usar valores por defecto de la jornada
+            const configHorarios = obtenerHorariosJornadaModal();
+            if (configHorarios) {
+                $(`.hora-inicio-modal[data-dia="${diaId}"]`).val(configHorarios.defaultInicio);
+                $(`.hora-fin-modal[data-dia="${diaId}"]`).val(configHorarios.defaultFin);
+            }
         }
     }
 
@@ -880,10 +1222,24 @@ document.addEventListener('DOMContentLoaded', () => {
                         location.reload();
                     });
                 } else {
+                    let mensajeHTML = response.message || 'Error al guardar los días de formación';
+                    
+                    // Si hay conflictos, formatearlos mejor
+                    if (response.conflictos && response.conflictos.length > 0) {
+                        mensajeHTML = '<div class="text-left"><strong>El instructor tiene conflictos con otras fichas asignadas:</strong><ul class="mt-2 mb-0">';
+                        response.conflictos.forEach(conflicto => {
+                            mensajeHTML += `<li><strong>${conflicto.dia_nombre}:</strong> Ficha ${conflicto.ficha_conflicto} (${conflicto.programa_conflicto})<br>`;
+                            mensajeHTML += `Jornada: ${conflicto.jornada_conflicto} | Fechas: ${conflicto.fecha_inicio_conflicto} a ${conflicto.fecha_fin_conflicto}<br>`;
+                            mensajeHTML += `Horario conflicto: ${conflicto.horario_conflicto} | Horario solicitado: ${conflicto.horario_solicitado}</li>`;
+                        });
+                        mensajeHTML += '</ul></div>';
+                    }
+                    
                     Swal.fire({
                         icon: 'error',
-                        title: 'Error',
-                        text: response.message || 'Error al guardar los días de formación'
+                        title: 'Conflicto de Horarios',
+                        html: mensajeHTML,
+                        width: '600px'
                     });
                 }
             },

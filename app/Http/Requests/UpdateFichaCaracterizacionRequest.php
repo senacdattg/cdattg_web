@@ -16,7 +16,9 @@ class UpdateFichaCaracterizacionRequest extends FormRequest
      */
     public function authorize()
     {
-        return $this->user()->can('EDITAR PROGRAMA DE CARACTERIZACION');
+        $user = $this->user();
+        // Verificar el permiso correcto
+        return $user->can('EDITAR FICHA CARACTERIZACION');
     }
 
     /**
@@ -250,7 +252,25 @@ class UpdateFichaCaracterizacionRequest extends FormRequest
             $validacionReglas = $this->validarReglasNegocioSena($datos, $fichaId);
             
             if (!$validacionReglas['valido']) {
-                $validator->errors()->add('reglas_negocio', $validacionReglas['mensaje']);
+                // Agregar cada error individualmente para mejor UX
+                $mensajes = explode('. ', $validacionReglas['mensaje']);
+                foreach ($mensajes as $mensaje) {
+                    $mensaje = trim($mensaje);
+                    if (!empty($mensaje)) {
+                        // Determinar el campo específico según el mensaje
+                        if (strpos($mensaje, 'fecha de inicio') !== false) {
+                            $validator->errors()->add('fecha_inicio', $mensaje);
+                        } elseif (strpos($mensaje, 'fecha de fin') !== false) {
+                            $validator->errors()->add('fecha_fin', $mensaje);
+                        } elseif (strpos($mensaje, 'duración') !== false) {
+                            $validator->errors()->add('fecha_fin', $mensaje);
+                        } elseif (strpos($mensaje, 'ambiente') !== false && strpos($mensaje, 'sede') !== false) {
+                            $validator->errors()->add('ambiente_id', $mensaje);
+                        } else {
+                            $validator->errors()->add('reglas_negocio', $mensaje);
+                        }
+                    }
+                }
             }
 
             // 5. Validación adicional: verificar que no se cambien fechas si ya hay aprendices asignados
