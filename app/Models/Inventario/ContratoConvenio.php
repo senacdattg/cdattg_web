@@ -6,6 +6,8 @@ use App\Models\ParametroTema;
 use App\Traits\Seguimiento;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ContratoConvenio extends Model
 {
@@ -14,7 +16,7 @@ class ContratoConvenio extends Model
 
     protected $table = 'contratos_convenios';
 
-    protected static function booted()
+    protected static function booted() : void
     {
         static::creating(function ($contrato) {
             $contrato->name = strtoupper($contrato->name);
@@ -25,16 +27,7 @@ class ContratoConvenio extends Model
         });
     }
 
-    protected $fillable = [
-        'name',
-        'codigo',
-        'proveedor_id',
-        'fecha_inicio',
-        'fecha_fin',
-        'estado_id',
-        'user_create_id',
-        'user_update_id'
-    ];
+    protected $guarded= [];
 
     protected $dates = [
         'fecha_inicio',
@@ -42,19 +35,19 @@ class ContratoConvenio extends Model
     ];
 
     // Relación con el proveedor
-    public function proveedor()
+    public function proveedor() : BelongsTo
     {
         return $this->belongsTo(Proveedor::class);
     }
 
     // Relación con el estado
-    public function estado()
+    public function estado() : BelongsTo
     {
         return $this->belongsTo(ParametroTema::class, 'estado_id');
     }
 
     // Relación con productos
-    public function productos()
+    public function productos() : HasMany
     {
         return $this->hasMany(Producto::class);
     }
