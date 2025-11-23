@@ -205,6 +205,7 @@ return [
             'batch_03_parametros',
             'batch_11_jornadas_horarios',
             'batch_06_infraestructura',
+            'batch_13_competencias',
         ],
         'tablas' => [
             'complementarios_ofertados',
@@ -212,6 +213,10 @@ return [
             'aspirantes_complementarios',
             'categorias_caracterizacion_complementarios',
             'persona_caracterizacion',
+            'competencia_complementario',
+            'resultado_aprendizaje_complementario',
+            'rap_competencia_complementario',
+            'guia_aprendizaje_complementario',
         ],
         'orden' => 17,
     ],
