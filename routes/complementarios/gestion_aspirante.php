@@ -3,13 +3,16 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Complementarios\AspiranteComplementarioController;
 
-Route::get('/gestion-aspirantes', [AspiranteComplementarioController::class, 'gestionAspirantes'])
-    ->name('gestion-aspirantes')
-    ->middleware('auth');
+// Rutas antiguas mantenidas por compatibilidad - redirigen a las nuevas rutas RESTful
+Route::get('/gestion-aspirantes', function () {
+    return redirect()->route('aspirantes.index');
+})->name('gestion-aspirantes')->middleware('auth');
 
-Route::get('/programas-complementarios/{curso}', [AspiranteComplementarioController::class, 'verAspirantes'])
-    ->name('programas-complementarios.ver-aspirantes')
-    ->middleware('auth');
+// Mantener ruta antigua por compatibilidad (búsqueda por nombre)
+Route::get('/programas-complementarios/{curso}', function ($curso) {
+    $programa = \App\Models\ComplementarioOfertado::where('nombre', str_replace('-', ' ', $curso))->firstOrFail();
+    return redirect()->route('aspirantes.programa', ['programa' => $programa->id]);
+})->name('programas-complementarios.ver-aspirantes')->middleware('auth');
 
 Route::post(
     '/programas-complementarios/{complementarioId}/agregar-aspirante',

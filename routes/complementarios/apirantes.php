@@ -3,8 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Complementarios\AspiranteComplementarioController;
 
-Route::get('/aspirantes/{curso}', [AspiranteComplementarioController::class, 'verAspirantes'])
-    ->name('aspirantes.ver')
-    ->middleware('auth');
-
-// Route moved to web.php for proper middleware handling
+// Ruta antigua mantenida por compatibilidad - redirige a la nueva ruta RESTful
+Route::get('/aspirantes/{curso}', function ($curso) {
+    $programa = \App\Models\ComplementarioOfertado::where('nombre', str_replace('-', ' ', $curso))->firstOrFail();
+    return redirect()->route('aspirantes.programa', ['programa' => $programa->id]);
+})->name('aspirantes.ver')->middleware('auth');
