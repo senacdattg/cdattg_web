@@ -52,6 +52,7 @@ export default defineConfig({
                 'inventario_solicitud': 'resources/js/inventario/solicitud.js',
                 // Complementarios files
                 'estadisticas_complementarios': 'resources/js/complementarios/estadisticas.js',
+                'aspirantes_programa': 'resources/js/complementarios/aspirantes/programa.js',
                 // Personas files
                 'formularios-generico': 'resources/js/pages/formularios-generico.js',
                 'formularios-select-dinamico': 'resources/js/pages/formularios-select-dinamico.js',

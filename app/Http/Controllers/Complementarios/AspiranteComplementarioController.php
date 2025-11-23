@@ -15,22 +15,33 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 use setasign\Fpdi\Fpdi;
 use App\Services\AspiranteDocumentoService;
 use App\Services\AspiranteComplementarioService;
+use App\Services\ComplementarioService;
+use App\Repositories\TemaRepository;
+use App\Models\Pais;
+use App\Models\Departamento;
 
 class AspiranteComplementarioController extends Controller
 {
     protected $documentoService;
     protected $complementarioService;
+    protected $temaRepository;
+    protected $complementarioServiceHelper;
 
-    public function __construct(AspiranteDocumentoService $documentoService)
-    {
+    public function __construct(
+        AspiranteDocumentoService $documentoService,
+        TemaRepository $temaRepository,
+        ComplementarioService $complementarioServiceHelper
+    ) {
         $this->documentoService = $documentoService;
         $this->complementarioService = new AspiranteComplementarioService($documentoService);
+        $this->temaRepository = $temaRepository;
+        $this->complementarioServiceHelper = $complementarioServiceHelper;
     }
 
     /**
-     * Mostrar gestión de aspirantes (Admin)
+     * Mostrar lista de programas complementarios (Index de aspirantes)
      */
-    public function gestionAspirantes()
+    public function index()
     {
         $programas = ComplementarioOfertado::with(['modalidad.parametro', 'jornada', 'diasFormacion'])->get();
 
@@ -39,17 +50,14 @@ class AspiranteComplementarioController extends Controller
             $programa->aspirantes_count = AspiranteComplementario::where('complementario_id', $programa->id)->count();
         });
 
-        return view('complementarios.gestion_aspirantes', compact('programas'));
+        return view('complementarios.aspirantes.index', compact('programas'));
     }
 
     /**
      * Mostrar aspirantes de un programa específico
      */
-    public function verAspirantes($curso)
+    public function programa(ComplementarioOfertado $programa)
     {
-        // Find program by name (assuming curso is the program name)
-        $programa = ComplementarioOfertado::where('nombre', str_replace('-', ' ', $curso))->firstOrFail();
-
         // Get aspirantes for this program
         $aspirantes = AspiranteComplementario::with(['persona', 'complementario'])
             ->where('complementario_id', $programa->id)
@@ -60,7 +68,194 @@ class AspiranteComplementarioController extends Controller
             ->whereIn('status', ['pending', 'processing'])
             ->first();
 
-        return view('complementarios.ver_aspirantes', compact('programa', 'aspirantes', 'existingProgress'));
+        return view('complementarios.aspirantes.programa', compact('programa', 'aspirantes', 'existingProgress'));
+    }
+
+    /**
+     * Buscar persona por número de documento
+     */
+    public function buscarPersona(Request $request)
+    {
+        $request->validate([
+            'numero_documento' => 'required|string|max:191',
+        ]);
+
+        $persona = Persona::where('numero_documento', $request->numero_documento)->first();
+
+        if (!$persona) {
+            return response()->json([
+                'success' => false,
+                'found' => false,
+                'message' => 'No se encontró ninguna persona con este número de documento.',
+            ]);
+        }
+
+        // Verificar si ya está inscrita en algún programa (opcional, para mostrar info)
+        $aspirantes = AspiranteComplementario::where('persona_id', $persona->id)->count();
+
+        return response()->json([
+            'success' => true,
+            'found' => true,
+            'persona' => [
+                'id' => $persona->id,
+                'numero_documento' => $persona->numero_documento,
+                'nombre_completo' => trim(($persona->primer_nombre ?? '') . ' ' . 
+                                         ($persona->segundo_nombre ?? '') . ' ' . 
+                                         ($persona->primer_apellido ?? '') . ' ' . 
+                                         ($persona->segundo_apellido ?? '')),
+                'email' => $persona->email ?? 'No registrado',
+                'telefono' => $persona->telefono ?? $persona->celular ?? 'No registrado',
+                'aspirantes_count' => $aspirantes,
+            ],
+        ]);
+    }
+
+    /**
+     * Mostrar formulario para crear nuevo aspirante
+     */
+    public function create(Request $request, ComplementarioOfertado $programa)
+    {
+        // Obtener datos para el formulario
+        $documentos = $this->buildTemaPayload(
+            $this->temaRepository->obtenerTiposDocumento(),
+            $this->complementarioServiceHelper->getTiposDocumento()
+        );
+        $generos = $this->buildTemaPayload(
+            $this->temaRepository->obtenerGeneros(),
+            $this->complementarioServiceHelper->getGeneros()
+        );
+        $caracterizaciones = $this->buildTemaPayload(
+            $this->temaRepository->obtenerCaracterizacionesComplementarias()
+        );
+        $vias = $this->buildTemaPayload($this->temaRepository->obtenerVias());
+        $letras = $this->buildTemaPayload($this->temaRepository->obtenerLetras());
+        $cardinales = $this->buildTemaPayload($this->temaRepository->obtenerCardinales());
+
+        $paises = Pais::where('status', 1)->get();
+        $departamentos = Departamento::where('status', 1)->get();
+        $municipios = collect();
+
+        // Prellenar datos si se viene desde búsqueda sin encontrar persona
+        if ($request->has('numero_documento')) {
+            // Agregar a old() para que el formulario lo prellene
+            $request->flash();
+        }
+
+        return view('complementarios.aspirantes.create', compact(
+            'programa',
+            'documentos',
+            'generos',
+            'caracterizaciones',
+            'vias',
+            'letras',
+            'cardinales',
+            'paises',
+            'departamentos',
+            'municipios'
+        ));
+    }
+
+    /**
+     * Almacenar nuevo aspirante
+     */
+    public function store(Request $request, ComplementarioOfertado $programa)
+    {
+        $validated = $request->validate([
+            'tipo_documento' => 'required|integer',
+            'numero_documento' => 'required|string|max:191',
+            'primer_nombre' => 'required|string|max:191',
+            'segundo_nombre' => 'nullable|string|max:191',
+            'primer_apellido' => 'required|string|max:191',
+            'segundo_apellido' => 'nullable|string|max:191',
+            'fecha_nacimiento' => 'required|date',
+            'genero' => 'required|integer',
+            'telefono' => 'nullable|string|max:191',
+            'celular' => 'nullable|string|max:191',
+            'email' => 'nullable|email|max:191',
+            'pais_id' => 'required|integer',
+            'departamento_id' => 'required|integer',
+            'municipio_id' => 'required|integer',
+            'direccion' => 'nullable|string|max:191',
+            'observaciones' => 'nullable|string',
+        ]);
+
+        try {
+            // Verificar si la persona ya existe
+            $personaExistente = Persona::where('numero_documento', $validated['numero_documento'])
+                ->orWhere(function ($query) use ($validated) {
+                    if (!empty($validated['email'])) {
+                        $query->where('email', $validated['email']);
+                    }
+                })
+                ->first();
+
+            if ($personaExistente) {
+                // Si existe, verificar si ya está inscrita en este programa
+                $aspiranteExistente = AspiranteComplementario::where('persona_id', $personaExistente->id)
+                    ->where('complementario_id', $programa->id)
+                    ->first();
+
+                if ($aspiranteExistente) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->with('error', 'La persona ya está inscrita en este programa complementario.');
+                }
+
+                // Si existe pero no está inscrita, actualizar datos y crear aspirante
+                $personaExistente->update($validated);
+                $persona = $personaExistente;
+            } else {
+                // Crear nueva persona
+                $persona = Persona::create($validated + [
+                    'user_create_id' => auth()->id() ?? 1,
+                    'user_edit_id' => auth()->id() ?? 1,
+                ]);
+            }
+
+            // Crear aspirante
+            AspiranteComplementario::create([
+                'persona_id' => $persona->id,
+                'complementario_id' => $programa->id,
+                'estado' => 1, // En proceso
+                'observaciones' => $validated['observaciones'] ?? 'Creado desde formulario de aspirantes',
+            ]);
+
+            return redirect()
+                ->route('aspirantes.programa', ['programa' => $programa->id])
+                ->with('success', 'Aspirante creado exitosamente.');
+        } catch (\Exception $e) {
+            Log::error('Error al crear aspirante', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'programa_id' => $programa->id,
+            ]);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Error al crear el aspirante. Por favor, inténtalo nuevamente.');
+        }
+    }
+
+    /**
+     * Construir payload de tema para el formulario
+     */
+    private function buildTemaPayload($tema = null, $parametros = null)
+    {
+        if ($tema && $tema->parametros && $tema->parametros->count() > 0) {
+            return $tema;
+        }
+
+        if ($parametros && $parametros->count() > 0) {
+            return (object) [
+                'id' => null,
+                'parametros' => $parametros,
+            ];
+        }
+
+        return (object) [
+            'id' => null,
+            'parametros' => collect(),
+        ];
     }
 
     /**

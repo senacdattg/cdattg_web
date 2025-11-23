@@ -43,8 +43,8 @@ function getFormContext() {
 document.addEventListener('DOMContentLoaded', function () {
     const context = getFormContext();
 
-    // Inicializar municipios si hay datos guardados
-    initializeMunicipios();
+    // NO inicializar municipios aquí - el script form.js del partial lo maneja
+    // initializeMunicipios();
 
     // Configurar validaciones de formularios
     setupFormValidations();
@@ -55,8 +55,8 @@ document.addEventListener('DOMContentLoaded', function () {
     // Configurar validación de números
     setupNumberValidation();
 
-    // Configurar carga dinámica de municipios
-    setupMunicipioLoading();
+    // NO configurar carga dinámica de municipios aquí - el script form.js del partial lo maneja
+    // setupMunicipioLoading();
 
     // Configurar manejo de caracterización solo para inscripción
     if (context === 'inscripcion') {
@@ -66,10 +66,10 @@ document.addEventListener('DOMContentLoaded', function () {
     // Configurar validación de edad mínima (aplica a ambos contextos si existe el campo)
     setupEdadMinimaValidation();
 
-    // Inicializar municipios dinámicos para formularios que lo necesiten
-    if (typeof initializeMunicipiosDynamic === 'function') {
-        initializeMunicipiosDynamic();
-    }
+    // NO inicializar municipios dinámicos aquí - el script form.js del partial lo maneja
+    // if (typeof initializeMunicipiosDynamic === 'function') {
+    //     initializeMunicipiosDynamic();
+    // }
 
     // Para registro, inicializar carga dinámica de países (solo si aplica)
     if (context === 'registro') {
