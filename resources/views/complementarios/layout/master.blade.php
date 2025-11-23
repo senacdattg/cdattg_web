@@ -128,6 +128,7 @@
         @yield('scripts')
     @endif
     @stack('scripts')
+    @stack('js')
 </body>
 
 </html>
