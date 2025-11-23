@@ -17,6 +17,43 @@
                  Por favor, complete los campos faltantes y revise que toda la información sea correcta.
              </div>
          @endif
+
+         <!-- Mensajes de sesión -->
+         @if(session('success'))
+             <div class="alert alert-success alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
+                 <i class="fas fa-check-circle mr-2"></i>
+                 <strong>¡Éxito!</strong> {{ session('success') }}
+                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                 </button>
+             </div>
+         @endif
+
+         @if(session('error'))
+             <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
+                 <i class="fas fa-exclamation-circle mr-2"></i>
+                 <strong>Error:</strong> {{ session('error') }}
+                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                 </button>
+             </div>
+         @endif
+
+         @if($errors->any())
+             <div class="alert alert-danger alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
+                 <i class="fas fa-exclamation-triangle mr-2"></i>
+                 <strong>Por favor, corrige los siguientes errores:</strong>
+                 <ul class="mb-0 mt-2">
+                     @foreach($errors->all() as $error)
+                         <li>{{ $error }}</li>
+                     @endforeach
+                 </ul>
+                 <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                     <span aria-hidden="true">&times;</span>
+                 </button>
+             </div>
+         @endif
+
         <div class="row justify-content-center">
             <div class="col-lg-10 col-xl-8">
                 <div class="text-center mb-4">
@@ -47,7 +84,8 @@
                         </div>
                         <div class="card-body">
                             <form id="formInscripcion" method="POST"
-                                action="{{ route('programas-complementarios.procesar-inscripcion', ['programa' => $programa->id]) }}">
+                                action="{{ route('programas-complementarios.procesar-inscripcion', ['programa' => $programa->id]) }}"
+                                enctype="multipart/form-data">
                                 @csrf
                                 <input type="hidden" name="programa_id" value="{{ $programa->id }}">
 

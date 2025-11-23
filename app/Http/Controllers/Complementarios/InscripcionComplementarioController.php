@@ -12,6 +12,8 @@ use App\Models\Pais;
 use App\Models\Departamento;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use App\Services\ComplementarioService;
 use App\Repositories\TemaRepository;
 use Carbon\Carbon;
@@ -92,7 +94,7 @@ class InscripcionComplementarioController extends Controller
             'pais_id' => self::REQUIRED_INTEGER,
             'departamento_id' => self::REQUIRED_INTEGER,
             'municipio_id' => self::REQUIRED_INTEGER,
-            'direccion' => self::REQUIRED_STRING_MAX_191,
+            'direccion' => self::NULLABLE_STRING_MAX_191,
             'observaciones' => 'nullable|string',
             'parametro_id' => 'nullable|exists:parametros,id',
         ]);
@@ -229,24 +231,41 @@ class InscripcionComplementarioController extends Controller
      */
     public function procesarInscripcion(Request $request, $id)
     {
-        // Verificar si el usuario ya está inscrito
-        $existingInscription = $this->checkExistingInscription($id);
-        if ($existingInscription) {
-            return redirect()->back()->with('error', 'Ya estás inscrito en este programa complementario.');
+        try {
+            // Verificar si el usuario ya está inscrito
+            $existingInscription = $this->checkExistingInscription($id);
+            if ($existingInscription) {
+                return redirect()->back()->with('error', 'Ya estás inscrito en este programa complementario.');
+            }
+
+            // Validar los datos del formulario
+            $validatedData = $this->validateInscripcionData($request);
+
+            // Procesar persona y usuario
+            $persona = $this->processPersona($validatedData);
+            $this->processUser($validatedData, $persona);
+
+            // Crear aspirante
+            $aspirante = $this->createAspirante($persona, $id, $validatedData);
+
+            // Procesar documento
+            return $this->processDocumento($request, $aspirante, $persona);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->validator)
+                ->withInput();
+        } catch (\Exception $e) {
+            \Log::error('Error al procesar inscripción', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'programa_id' => $id,
+                'request_data' => $request->except(['documento_identidad', '_token'])
+            ]);
+
+            return redirect()->back()
+                ->with('error', 'Ocurrió un error al procesar la inscripción. Por favor, inténtalo nuevamente.')
+                ->withInput();
         }
-
-        // Validar los datos del formulario
-        $validatedData = $this->validateInscripcionData($request);
-
-        // Procesar persona y usuario
-        $persona = $this->processPersona($validatedData);
-        $this->processUser($validatedData, $persona);
-
-        // Crear aspirante
-        $aspirante = $this->createAspirante($persona, $id, $validatedData);
-
-        // Procesar documento
-        return $this->processDocumento($request, $aspirante, $persona);
     }
 
     /**
@@ -302,10 +321,10 @@ class InscripcionComplementarioController extends Controller
             'pais_id' => self::REQUIRED_INTEGER,
             'departamento_id' => self::REQUIRED_INTEGER,
             'municipio_id' => self::REQUIRED_INTEGER,
-            'direccion' => self::REQUIRED_STRING_MAX_191,
+            'direccion' => self::NULLABLE_STRING_MAX_191,
             'observaciones' => 'nullable|string',
             'parametro_id' => 'nullable|exists:parametros,id',
-            'documento_identidad' => 'required|file|mimes:pdf|max:5120',
+            'documento_identidad' => 'required|file|mimes:pdf,application/pdf|max:5120',
             'acepto_privacidad' => 'required',
             'acepto_terminos' => 'required',
         ]);
@@ -325,24 +344,24 @@ class InscripcionComplementarioController extends Controller
             $persona = $personaExistente;
 
             // Actualizar datos si es necesario
-            $persona->update($request->only([
-                'tipo_documento',
-                'numero_documento',
-                'primer_nombre',
-                'segundo_nombre',
-                'primer_apellido',
-                'segundo_apellido',
-                'fecha_nacimiento',
-                'genero',
-                'telefono',
-                'celular',
-                'email',
-                'pais_id',
-                'departamento_id',
-                'municipio_id',
-                'direccion',
-                'caracterizacion_id'
-            ]));
+            $persona->update([
+                'tipo_documento' => $validatedData['tipo_documento'] ?? $persona->tipo_documento,
+                'numero_documento' => $validatedData['numero_documento'] ?? $persona->numero_documento,
+                'primer_nombre' => $validatedData['primer_nombre'] ?? $persona->primer_nombre,
+                'segundo_nombre' => $validatedData['segundo_nombre'] ?? $persona->segundo_nombre,
+                'primer_apellido' => $validatedData['primer_apellido'] ?? $persona->primer_apellido,
+                'segundo_apellido' => $validatedData['segundo_apellido'] ?? $persona->segundo_apellido,
+                'fecha_nacimiento' => $validatedData['fecha_nacimiento'] ?? $persona->fecha_nacimiento,
+                'genero' => $validatedData['genero'] ?? $persona->genero,
+                'telefono' => $validatedData['telefono'] ?? $persona->telefono,
+                'celular' => $validatedData['celular'] ?? $persona->celular,
+                'email' => $validatedData['email'] ?? $persona->email,
+                'pais_id' => $validatedData['pais_id'] ?? $persona->pais_id,
+                'departamento_id' => $validatedData['departamento_id'] ?? $persona->departamento_id,
+                'municipio_id' => $validatedData['municipio_id'] ?? $persona->municipio_id,
+                'direccion' => $validatedData['direccion'] ?? $persona->direccion,
+                'caracterizacion_id' => $validatedData['parametro_id'] ?? $persona->caracterizacion_id,
+            ]);
         } else {
             // Crear nueva persona
             $persona = Persona::create($request->only([
